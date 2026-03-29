@@ -48,27 +48,16 @@
 
 <main class="page-body" id="main"></main>
 
+<script src="/config.js"></script>
 <script src="/site.js"></script>
 <script src="/days.js"></script>
-<script src="/config.js"></script>
 <script>
 renderHeader('today');
 
 // ── Date calculation ──────────────────────────────────────────────────────
-// Returns { dayNum, campDates, todayStr }
-// dayNum is 1-20, or 'before', 'after', 'weekend'
-function getCampInfo(startDateStr) {
-  // Build all 20 camp days by skipping weekends from startDate
-  const start = new Date(startDateStr + 'T00:00:00');
-  const campDates = [];
-  let d = new Date(start);
-  while (campDates.length < 20) {
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) campDates.push(new Date(d));
-    d.setDate(d.getDate() + 1);
-  }
+function getCampInfo() {
+  const campDates = buildCampDates();
 
-  // Today in the configured timezone
   const now = new Date();
   const todayStr = now.toLocaleDateString('en-CA', { timeZone: CONFIG.timezone });
   const today = new Date(todayStr + 'T00:00:00');
@@ -78,15 +67,15 @@ function getCampInfo(startDateStr) {
     if (cdStr === todayStr) return { dayNum: i + 1, campDates, todayStr };
   }
 
+  // Check if today is a holiday during camp range
+  const holidaySet = new Set(CONFIG.holidays || []);
+  if (today >= campDates[0] && today <= campDates[campDates.length - 1] && holidaySet.has(todayStr)) {
+    return { dayNum: 'weekend', campDates, todayStr };
+  }
+
   if (today < campDates[0]) return { dayNum: 'before', campDates, todayStr };
   if (today > campDates[campDates.length - 1]) return { dayNum: 'after', campDates, todayStr };
   return { dayNum: 'weekend', campDates, todayStr };
-}
-
-// Get real weekday name from a camp date object
-function realWeekday(campDates, dayIndex) {
-  const names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  return names[campDates[dayIndex].getDay()];
 }
 
 // ── Block helpers ────────────────────────────────────────────────────────
@@ -111,7 +100,7 @@ function blockLabel(block) {
 
 // ── Render ───────────────────────────────────────────────────────────────
 const main = document.getElementById('main');
-const { dayNum, campDates } = getCampInfo(CONFIG.startDate);
+const { dayNum, campDates } = getCampInfo();
 
 if (dayNum === 'before') {
   const d = DAYS[0];
@@ -164,7 +153,7 @@ if (dayNum === 'before') {
     <a class="pip${d.day === dayNum ? ' today' : d.day < dayNum ? ' past' : ''}"
        href="/day.html?day=${d.day}">
       <div class="pip-num">${d.day}</div>
-      <div class="pip-day">${realWeekday(campDates, d.day - 1).slice(0,3)}</div>
+      <div class="pip-day">${campDayWeekday(campDates, d.day).slice(0,3)}</div>
     </a>`).join('');
 
   main.innerHTML = `
@@ -213,7 +202,7 @@ function buildWeekGrid(currentDay) {
         onmouseover="this.style.borderColor='var(--cyan)'"
         onmouseout="this.style.borderColor='${isToday ? 'var(--cyan)' : 'var(--card-border)'}'">
         <div style="font-size:1rem;font-weight:800;color:${isToday ? 'var(--cyan)' : 'var(--white)'};">${d.day}</div>
-        <div style="font-size:0.625rem;color:var(--slate);font-weight:500;margin-top:0.125rem;">${realWeekday(campDates, d.day - 1).slice(0,3)}</div>
+        <div style="font-size:0.625rem;color:var(--slate);font-weight:500;margin-top:0.125rem;">${campDayWeekday(campDates, d.day).slice(0,3)}</div>
       </a>`;
     }).join('');
     return `

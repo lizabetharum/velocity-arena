@@ -21,6 +21,10 @@ const CONFIG = {
   // Optional: your site's name for the footer
   siteName: "NYC FIRST",
 
+  // Holidays to skip (camp days won't fall on these).
+  // Format: ["YYYY-MM-DD", ...]
+  holidays: [],
+
   // Password for the Teacher Resources page.
   // Change this before sharing the site with students.
   teacherPassword: "velocityNYCFIRST2026"

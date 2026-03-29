@@ -1,3 +1,29 @@
+// ── Camp date helpers (shared across pages) ──────────────────────────────
+// Builds an array of 20 Date objects for camp days, skipping weekends and
+// any dates listed in CONFIG.holidays.  Requires config.js to be loaded first.
+function buildCampDates() {
+  const start = new Date(CONFIG.startDate + 'T00:00:00');
+  const holidaySet = new Set(CONFIG.holidays || []);
+  const dates = [];
+  let d = new Date(start);
+  while (dates.length < 20) {
+    const dow = d.getDay();
+    const iso = d.toISOString().slice(0, 10);
+    if (dow !== 0 && dow !== 6 && !holidaySet.has(iso)) {
+      dates.push(new Date(d));
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return dates;
+}
+
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// Returns the full weekday name for camp day number (1-based)
+function campDayWeekday(campDates, dayNum) {
+  return DAY_NAMES[campDates[dayNum - 1].getDay()];
+}
+
 function getNavLink(page) {
   const pages = [
     { id: 'today',    href: '/index.html',    label: 'Today' },
