@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Day</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.block-tag{display:inline-block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+.block-hook{background:#FFF3E0;color:#AA5500;border:1px solid #FFCC80;}
+.block-challenge{background:#E8F5E9;color:#2E6B3E;border:1px solid #A5D6A7;}
+.block-matchbuild{background:#EDE7F6;color:#4A2B8A;border:1px solid #CE93D8;}
+.block-openlab{background:#E3F2FD;color:#0D5A8A;border:1px solid #90CAF9;}
+.block-ends{background:#FCE4EC;color:#880E4F;border:1px solid #F48FB1;}
+.block-other{background:#F5F5F5;color:#555770;border:1px solid #E0E0E0;}
+
+.activity-row{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--card-border);}
+.activity-row:last-child{border-bottom:none;}
+.act-mins{font-size:13px;font-weight:700;color:var(--teal);min-width:48px;text-align:right;padding-top:2px;flex-shrink:0;}
+.act-name{font-size:15px;font-weight:700;color:var(--text);}
+
+.ends-box{background:var(--navy);border-radius:12px;padding:22px 24px;margin-top:28px;}
+.ends-label{font-size:12px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.ends-prompt{font-size:16px;color:var(--white);line-height:1.65;font-style:italic;}
+
+.risk-box{background:#FFF8E1;border:1.5px solid #FFCA28;border-radius:10px;padding:18px 20px;margin-top:20px;}
+.risk-label{font-size:12px;font-weight:700;color:#AA6600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.risk-text{font-size:14px;color:#444;line-height:1.6;margin-bottom:10px;}
+.risk-say-label{font-size:11px;font-weight:700;color:#AA6600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.risk-say{font-size:14px;color:#222;line-height:1.65;font-style:italic;padding-left:12px;border-left:3px solid #FFCA28;}
+
+.fun-box{background:#F0FCFF;border:1.5px solid #99E8F5;border-radius:10px;padding:16px 18px;margin-top:16px;}
+.fun-label{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.fun-text{font-size:14px;color:var(--text-muted);line-height:1.6;}
+
+.lo-box{background:#F5F0FF;border:1px solid #C9B8F0;border-radius:10px;padding:16px 18px;margin-top:16px;}
+.lo-label{font-size:12px;font-weight:700;color:#5B3EA6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.lo-text{font-size:14px;color:#333;line-height:1.6;}
+
+.day-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--card-border);}
+.day-nav a{font-size:14px;font-weight:700;color:var(--teal);text-decoration:none;padding:10px 16px;border:1.5px solid var(--teal);border-radius:8px;transition:background .15s,color .15s;}
+.day-nav a:hover{background:var(--teal);color:var(--white);}
+.day-nav a.disabled{opacity:.3;pointer-events:none;}
+
+.week-strip-sm{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:24px;}
+.day-pip{background:var(--white);border:1.5px solid var(--card-border);border-radius:7px;padding:8px 4px;text-align:center;cursor:pointer;text-decoration:none;display:block;transition:border-color .15s;}
+.day-pip:hover{border-color:var(--teal);}
+.day-pip.current{border-color:var(--teal);background:#E8F7FB;}
+.day-pip.done{opacity:.45;}
+.pip-num{font-size:15px;font-weight:800;color:var(--text);}
+.day-pip.current .pip-num{color:var(--teal);}
+.pip-day{font-size:10px;color:var(--text-muted);font-weight:500;margin-top:2px;}
+
+.day-hero{background:var(--navy);border-left:6px solid var(--cyan);border-radius:0 12px 12px 0;padding:22px 26px;margin-bottom:24px;}
+.hero-meta{font-size:13px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.hero-theme{font-size:24px;font-weight:800;color:var(--white);line-height:1.25;}
+.hero-week{font-size:15px;color:var(--slate);margin-top:6px;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="page-body" id="main-content">
+  <div id="loading" style="padding:40px;text-align:center;color:var(--text-muted);font-size:16px;">Loading...</div>
+</main>
+
+<script src="/site.js"></script>
+<script src="/days.js"></script>
+<script>
+renderHeader('schedule');
+
+const params = new URLSearchParams(window.location.search);
+const dayNum = parseInt(params.get('day')) || 1;
+const day = DAYS.find(d => d.day === dayNum);
+
+function blockClass(block) {
+  const b = (block || '').toLowerCase();
+  if (b.includes('hook')) return 'block-hook';
+  if (b.includes('challenge')) return 'block-challenge';
+  if (b.includes('match')) return 'block-matchbuild';
+  if (b.includes('open lab') || b.includes('open-lab')) return 'block-openlab';
+  if (b.includes('ends')) return 'block-ends';
+  return 'block-other';
+}
+
+function blockLabel(block) {
+  const b = (block || '').toLowerCase();
+  if (b.includes('hook')) return 'Hook';
+  if (b.includes('challenge')) return 'Challenge Block';
+  if (b.includes('match')) return 'Match-Build-Make';
+  if (b.includes('open lab') || b.includes('open-lab')) return 'Open Lab';
+  if (b.includes('ends')) return 'ENDS';
+  return block || 'Activity';
+}
+
+if (!day) {
+  document.getElementById('main-content').innerHTML =
+    '<p style="padding:40px;color:var(--text-muted);">Day not found.</p>';
+} else {
+  document.title = `Velocity Arena — Day ${day.day}: ${day.theme}`;
+
+  // Week strip — show the 5 days of that week
+  const weekStart = (day.week - 1) * 5 + 1;
+  const weekDays = DAYS.filter(d => d.week === day.week);
+  const weekPips = weekDays.map(d => {
+    const isCurrent = d.day === dayNum;
+    const isDone = d.day < dayNum;
+    return `<a href="/day.html?day=${d.day}" class="day-pip${isCurrent ? ' current' : ''}${isDone ? ' done' : ''}">
+      <div class="pip-num">${d.day}</div>
+      <div class="pip-day">${d.weekday.slice(0,3)}</div>
+    </a>`;
+  }).join('');
+
+  // Activities
+  const actRows = (day.activities || []).map(a =>
+    `<div class="activity-row">
+      <div class="act-mins">${a.mins}m</div>
+      <div>
+        <span class="act-name">${a.name}</span>
+        <span class="block-tag ${blockClass(a.block)}">${blockLabel(a.block)}</span>
+      </div>
+    </div>`
+  ).join('');
+
+  // ENDS
+  const endsHtml = day.ends ? `
+    <div class="ends-box">
+      <div class="ends-label">ENDS closing ritual</div>
+      <div class="ends-prompt">${day.ends}</div>
+    </div>` : '';
+
+  // Risk
+  const riskHtml = day.facilitatorRisk ? `
+    <div class="risk-box">
+      <div class="risk-label">Highest-risk facilitation moment</div>
+      <div class="risk-text">${day.facilitatorRisk.risk}</div>
+      <div class="risk-say-label">Say:</div>
+      <div class="risk-say">${day.facilitatorRisk.say}</div>
+    </div>` : '';
+
+  // Fun
+  const funHtml = day.funElement ? `
+    <div class="fun-box">
+      <div class="fun-label">Fun element</div>
+      <div class="fun-text">${day.funElement}</div>
+    </div>` : '';
+
+  // LOs
+  const loHtml = day.los ? `
+    <div class="lo-box">
+      <div class="lo-label">Learning objectives targeted</div>
+      <div class="lo-text">${day.los}</div>
+    </div>` : '';
+
+  // Prev / next
+  const prevDay = dayNum > 1 ? dayNum - 1 : null;
+  const nextDay = dayNum < 20 ? dayNum + 1 : null;
+
+  document.getElementById('main-content').innerHTML = `
+
+    <div style="margin-bottom:20px;">
+      <div class="section-label">Week ${day.week} · ${day.weekName}</div>
+      <div class="week-strip-sm">${weekPips}</div>
+    </div>
+
+    <div class="day-hero">
+      <div class="hero-meta">Day ${day.day} · ${day.weekday}</div>
+      <div class="hero-theme">${day.theme}</div>
+      <div class="hero-week">Week ${day.week}: ${day.weekName}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <div>
+        <div class="section-label">Today's activities</div>
+        <div class="card" style="padding:6px 22px;">
+          ${actRows || '<p style="padding:14px 0;color:var(--text-muted);font-size:15px;">No activities extracted for this day.</p>'}
+        </div>
+        ${endsHtml}
+      </div>
+
+      <div>
+        ${riskHtml}
+        ${funHtml}
+        ${loHtml}
+
+        <div class="card" style="margin-top:16px;">
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">Daily schedule</div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--text-muted);line-height:1.8;">
+            <div><strong style="color:var(--teal);">9:00</strong> &nbsp;Arrival + Team Check-in (15 min)</div>
+            <div><strong style="color:var(--teal);">9:15</strong> &nbsp;Hook Activity (25 min)</div>
+            <div><strong style="color:var(--teal);">9:40</strong> &nbsp;Challenge Block (52 min)</div>
+            <div><strong style="color:var(--teal);">10:32</strong> Morning Open Lab (58 min)</div>
+            <div><strong style="color:var(--teal);">11:30</strong> Lunch / Snack (30 min)</div>
+            <div><strong style="color:var(--teal);">12:00</strong> Match-Build-Make (90 min)</div>
+            <div><strong style="color:var(--teal);">1:30</strong> &nbsp;Afternoon Open Lab (55 min)</div>
+            <div><strong style="color:var(--teal);">2:25</strong> &nbsp;Transition to Close (10 min)</div>
+            <div><strong style="color:var(--teal);">2:35</strong> &nbsp;ENDS Closing Ritual (18 min)</div>
+            <div><strong style="color:var(--teal);">2:53</strong> &nbsp;Cleanup + Departure (7 min)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="day-nav">
+      <a href="${prevDay ? `/day.html?day=${prevDay}` : '#'}" class="${prevDay ? '' : 'disabled'}">
+        ← Day ${prevDay || 1}
+      </a>
+      <span style="font-size:14px;color:var(--text-muted);">Day ${day.day} of 20</span>
+      <a href="${nextDay ? `/day.html?day=${nextDay}` : '#'}" class="${nextDay ? '' : 'disabled'}">
+        Day ${nextDay || 20} →
+      </a>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
