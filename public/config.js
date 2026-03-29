@@ -23,6 +23,6 @@ const CONFIG = {
 
   // Password for the Teacher Resources page.
   // Change this before sharing the site with students.
-  teacherPassword: "velocity2025"
+  teacherPassword: "velocityNYCFIRST2026"
 
 };
