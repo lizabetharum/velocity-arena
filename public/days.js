@@ -33,7 +33,8 @@ const DAYS = [
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
         "mins": 15,
         "block": "Challenge Block",
-        "description": "You answer 10 questions about general math (speed, distance, graphs) in 15 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are."
+        "description": "You answer 10 questions about general math (speed, distance, graphs) in 15 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
+        "link": "/activities/diagnostic/index.html"
       },
       {
         "name": "Speed Stat Challenge: What Does Motor Power Actually Mean?",
