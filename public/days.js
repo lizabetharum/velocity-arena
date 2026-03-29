@@ -20,7 +20,7 @@ const DAYS = [
       {
         "name": "Driving Question Reveal + Team Formation",
         "mins": 10,
-        "block": "Ice Breaker",
+        "block": "LX Setup",
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet."
       },
       {
@@ -44,7 +44,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -101,7 +101,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -150,9 +150,15 @@ const DAYS = [
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
+        "name": "MAP FAL Session: Distance-Time Graphs + Turning Stat Introduction",
+        "mins": 50,
+        "block": "Challenge Block (MAP FAL)",
+        "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
+      },
+      {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -161,12 +167,7 @@ const DAYS = [
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
-      {
-        "name": "MAP FAL Session: Distance-Time Graphs + Turning Stat Introduction",
-        "mins": 50,
-        "block": "Challenge Block (MAP FAL)",
-        "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
-      },
+      
       {
         "name": "Coordinate Navigation Practice: Three Consecutive Successes",
         "mins": 90,
@@ -209,7 +210,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -254,7 +255,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -311,7 +312,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -362,7 +363,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -413,7 +414,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -464,7 +465,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -509,7 +510,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -560,7 +561,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -611,7 +612,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -662,7 +663,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -707,7 +708,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -752,7 +753,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -797,7 +798,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -842,7 +843,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -893,7 +894,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -938,7 +939,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -989,7 +990,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "",
+        "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
