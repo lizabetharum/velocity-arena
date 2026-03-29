@@ -1,102 +1,136 @@
-# Setting up Google Sheets data collection
+# Setting up your Velocity Arena data spreadsheet
+### For Michigan, New York, Rhode Island, and Tennessee pilot sites
 
-Follow these steps once per pilot site. Takes about 10 minutes.
+This guide is for someone who does not write code. You need a Google account and about 15 minutes. These steps only need to be done once.
 
----
-
-## Step 1 — Create your Google Sheet
-
-1. Go to [sheets.google.com](https://sheets.google.com) and create a new sheet
-2. Name it **Velocity Arena Diagnostic**
-3. In row 1, add these column headers:
-
-```
-Timestamp | First Name | Last Name | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10
-```
-
-4. Copy the Sheet ID from the URL — it's the long string between `/d/` and `/edit`:
-   `https://docs.google.com/spreadsheets/d/THIS_IS_YOUR_SHEET_ID/edit`
+At the end, every time a student at your site clicks "Hand in" on the diagnostic, their name and answers will appear in your spreadsheet automatically.
 
 ---
 
-## Step 2 — Create a Google Service Account
+## What you are setting up
 
-1. Go to [console.cloud.google.com](https://console.cloud.google.com)
-2. Create a new project (or use an existing one) — name it anything
-3. In the search bar, search for **Google Sheets API** and enable it
-4. Go to **IAM & Admin → Service Accounts**
-5. Click **Create Service Account**
+You are connecting a Google Sheet (where the data lands) to the Velocity Arena website (which sends the data). The connection uses a **service account** — a special Google account the website uses to write to your sheet. You create it, then give it permission to edit your sheet.
+
+---
+
+## Part 1 — Create your Google Sheet
+
+1. Go to [sheets.google.com](https://sheets.google.com) and sign in.
+
+2. Click the large **+** button to create a blank spreadsheet.
+
+3. Click **Untitled spreadsheet** at the top left. Rename it:
+   `Velocity Arena Diagnostic — [Your State]`
+
+4. Click cell **A1** and type these headers across row 1, one per cell:
+
+   | A | B | C | D | E | F | G | H | I | J | K | L | M | N |
+   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+   | Timestamp | State | First Name | Last Name | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 |
+
+5. Copy your **Sheet ID** from the browser URL — it is the long string between `/d/` and `/edit`:
+   `https://docs.google.com/spreadsheets/d/`**`THIS_IS_YOUR_SHEET_ID`**`/edit`
+   Save it somewhere — you will need it in Part 4.
+
+---
+
+## Part 2 — Create a Google service account
+
+1. Go to [console.cloud.google.com](https://console.cloud.google.com) and sign in with the same Google account.
+
+2. At the top of the page, click the project name next to "Google Cloud." A window opens — click **New Project** in the top right. Name it `velocity-arena` and click **Create**.
+
+3. When the project is ready, click the notification bell and select your new project.
+
+4. In the search bar at the top, type `Google Sheets API` and click the result. Click **Enable**.
+
+5. In the search bar, type `Service Accounts` and click the result under IAM & Admin.
+
+6. Click **+ Create Service Account**.
    - Name: `velocity-arena`
-   - Click **Create and Continue** then **Done**
-6. Click on the service account you just created
-7. Go to the **Keys** tab → **Add Key → Create new key → JSON**
-8. Download the JSON file — keep it safe, you only get it once
+   - Click **Create and Continue**, then **Continue**, then **Done**
 
-The JSON file looks like this:
-```json
-{
-  "type": "service_account",
-  "project_id": "...",
-  "client_email": "velocity-arena@your-project.iam.gserviceaccount.com",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
-  ...
-}
-```
+7. Click on the service account email in the list to open it.
 
-You need two values from this file:
-- `client_email` → this is your `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-- `private_key` → this is your `GOOGLE_PRIVATE_KEY`
+8. Click the **Keys** tab → **Add Key** → **Create new key** → **JSON** → **Create**.
+   A JSON file downloads to your computer. Keep it safe — you only get it once.
 
 ---
 
-## Step 3 — Share your Sheet with the service account
+## Part 3 — Share your sheet with the service account
 
-1. Open your Google Sheet
-2. Click **Share**
-3. Paste the `client_email` value from the JSON file
-4. Set permission to **Editor**
-5. Click **Send**
+1. Open the JSON file in a text editor (Notepad on Windows, TextEdit on Mac).
 
----
+2. Find the line that starts with `"client_email"`. Copy the email address between the quotes — it looks like:
+   `velocity-arena@velocity-arena.iam.gserviceaccount.com`
 
-## Step 4 — Add environment variables to Vercel
+3. Go back to your Google Sheet and click **Share** (top right).
 
-1. Go to your Vercel project dashboard
-2. Click **Settings → Environment Variables**
-3. Add these three variables:
+4. Paste the service account email into the "Add people" box.
 
-| Name | Value |
-|------|-------|
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | The `client_email` from your JSON file |
-| `GOOGLE_PRIVATE_KEY` | The full `private_key` from your JSON file (include the `-----BEGIN/END-----` lines) |
-| `GOOGLE_SHEET_ID` | Your Sheet ID from Step 1 |
+5. Set the permission to **Editor**.
 
-4. Check all three boxes: Production, Preview, Development
-5. Click **Save**
-6. Go to **Deployments** → click the three dots on the latest → **Redeploy**
+6. Uncheck **Notify people** — it is not a real person.
+
+7. Click **Share**.
 
 ---
 
-## What gets collected
+## Part 4 — Send your three values to Lizabeth
 
-Each time a student clicks "Hand in", a new row is added to your sheet:
+From the JSON file, find and copy these three things:
 
-| Column | Content |
-|--------|---------|
-| Timestamp | Date and time of submission (Eastern time) |
-| First Name | Student's first name |
-| Last Name | Student's last name |
-| Q1–Q10 | Student's answer, or "Not yet" if they clicked that button |
+**1. Service account email**
+The value next to `"client_email"`:
+`velocity-arena@velocity-arena.iam.gserviceaccount.com`
+
+
+Send the Service account email to Lizabeth. She adds it to the website so your state's data goes to your sheet.
+
+---
+
+## Part 5 — What Lizabeth does (coordinator only)
+
+Go to [vercel.com](https://vercel.com) → **velocity-arena** project → **Settings** → **Environment Variables**.
+
+Add one Sheet ID variable per state:
+
+| Variable name | Value |
+|--------------|-------|
+| `GOOGLE_SHEET_ID_MI` | Michigan's Sheet ID |
+| `GOOGLE_SHEET_ID_NY` | New York's Sheet ID |
+| `GOOGLE_SHEET_ID_RI` | Rhode Island's Sheet ID |
+| `GOOGLE_SHEET_ID_TN` | Tennessee's Sheet ID |
+
+Add the shared credentials once (use values from any one of the four sites — one service account works for all sheets as long as each sheet is shared with it):
+
+| Variable name | Value |
+|--------------|-------|
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | The `client_email` from the JSON file |
+| `GOOGLE_PRIVATE_KEY` | The full `private_key` including the BEGIN/END lines |
+
+Check all three boxes (Production, Preview, Development) for each variable.
+
+Then redeploy: **Deployments** → three dots on the latest → **Redeploy**.
+
+---
+
+## Verifying it works
+
+Test each state after redeploying:
+
+1. Open the diagnostic: `velocity-arena.vercel.app/activities/diagnostic/`
+2. Enter a test name, select the state, answer one question, click **Hand in**
+3. Check that state's Google Sheet — a row should appear within seconds
 
 ---
 
 ## Troubleshooting
 
-**Rows are not appearing in the sheet**
-- Check that the service account email has Editor access to the sheet
-- Check that all three environment variables are set and the project was redeployed
-- Open browser DevTools → Network tab → click "Hand in" → look for the `/api/submit-diagnostic` request and check the response
+Go to Vercel → your project → **Logs** and look for errors from `/api/submit-diagnostic`:
 
-**Private key errors**
-- The private key must include the full `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines
-- In Vercel, paste it exactly as it appears in the JSON file — Vercel handles the newline escaping automatically
+| Error message | Fix |
+|--------------|-----|
+| `No sheet configured for: MI` | `GOOGLE_SHEET_ID_MI` is missing — add it and redeploy |
+| `Sheets API error: 403` | The service account was not given Editor access — repeat Part 3 for that sheet |
+| `Failed to get access token` | `GOOGLE_PRIVATE_KEY` is missing or was pasted incorrectly |

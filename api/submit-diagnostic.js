@@ -1,51 +1,70 @@
 // api/submit-diagnostic.js
-// Appends a student's diagnostic submission to a Google Sheet.
+// Appends a student diagnostic submission to the correct Google Sheet
+// based on the state they selected.
 //
-// Required environment variables (set in Vercel dashboard):
-//   GOOGLE_SERVICE_ACCOUNT_EMAIL  — service account email from the JSON key file
-//   GOOGLE_PRIVATE_KEY            — private key from the JSON key file (include the full -----BEGIN/END----- lines)
-//   GOOGLE_SHEET_ID               — the long ID from your Google Sheet URL
+// Required environment variables in Vercel:
+//
+//   Per-state Sheet IDs:
+//     GOOGLE_SHEET_ID_MI   — Michigan
+//     GOOGLE_SHEET_ID_NY   — New York
+//     GOOGLE_SHEET_ID_RI   — Rhode Island
+//     GOOGLE_SHEET_ID_TN   — Tennessee
+//
+//   Shared credentials (one service account works for all four sheets):
+//     GOOGLE_SERVICE_ACCOUNT_EMAIL
+//     GOOGLE_PRIVATE_KEY
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return respond({ error: 'Method not allowed' }, 405);
   }
 
-  const { firstName, lastName, answers } = await req.json();
+  const { firstName, lastName, state, answers } = await req.json();
 
   if (!firstName || !lastName) {
-    return new Response(JSON.stringify({ error: 'Name required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return respond({ error: 'Name required' }, 400);
   }
 
-  const sheetId = process.env.GOOGLE_SHEET_ID;
+  const sheetIds = {
+    MI: process.env.GOOGLE_SHEET_ID_MI,
+    NY: process.env.GOOGLE_SHEET_ID_NY,
+    RI: process.env.GOOGLE_SHEET_ID_RI,
+    TN: process.env.GOOGLE_SHEET_ID_TN,
+  };
+
+  const sheetId = sheetIds[state];
+  if (!sheetId) {
+    return respond({ error: `No sheet configured for: ${state}` }, 400);
+  }
+
   const serviceEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
-  if (!sheetId || !serviceEmail || !privateKey) {
-    return new Response(JSON.stringify({ error: 'Server not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  if (!serviceEmail || !privateKey) {
+    return respond({ error: 'Server credentials not configured' }, 500);
   }
 
   try {
     const token = await getAccessToken(serviceEmail, privateKey);
-    const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 
-    // Build the row: Timestamp, First Name, Last Name, Q1..Q10
+    const timestamp = new Date().toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+      dateStyle: 'short',
+      timeStyle: 'short'
+    });
+
+    // Row: Timestamp | State | First Name | Last Name | Q1 ... Q10
     const row = [
       timestamp,
+      state,
       firstName.trim(),
       lastName.trim(),
       ...Array.from({ length: 10 }, (_, i) => answers?.[i] ?? '')
     ];
 
-    const response = await fetch(
+    const res = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
       {
         method: 'POST',
@@ -57,26 +76,26 @@ export default async function handler(req) {
       }
     );
 
-    if (!response.ok) {
-      const err = await response.text();
+    if (!res.ok) {
+      const err = await res.text();
       throw new Error(`Sheets API error: ${err}`);
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return respond({ ok: true });
 
   } catch (err) {
-    console.error('Submit diagnostic error:', err);
-    return new Response(JSON.stringify({ error: 'Failed to save' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error('submit-diagnostic error:', err.message);
+    return respond({ error: 'Failed to save. Check Vercel logs.' }, 500);
   }
 }
 
-// ── Google JWT auth (no external library needed) ──────────────────────────────
+function respond(body, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
 async function getAccessToken(email, privateKey) {
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
@@ -87,13 +106,10 @@ async function getAccessToken(email, privateKey) {
     iat: now,
     exp: now + 3600
   }));
-
   const unsigned = `${header}.${claim}`;
   const key = await importPrivateKey(privateKey);
-  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key,
-    new TextEncoder().encode(unsigned));
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
   const jwt = `${unsigned}.${b64url(sig)}`;
-
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -102,16 +118,13 @@ async function getAccessToken(email, privateKey) {
       assertion: jwt
     })
   });
-
   const data = await res.json();
   if (!data.access_token) throw new Error('Failed to get access token');
   return data.access_token;
 }
 
 function b64url(input) {
-  const bytes = typeof input === 'string'
-    ? new TextEncoder().encode(input)
-    : new Uint8Array(input);
+  const bytes = typeof input === 'string' ? new TextEncoder().encode(input) : new Uint8Array(input);
   let str = '';
   bytes.forEach(b => str += String.fromCharCode(b));
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
