@@ -1,0 +1,74 @@
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const { word, type } = await req.json();
+
+  if (!word || !type) {
+    return new Response(JSON.stringify({ error: 'Missing word or type' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const trimmed = word.trim();
+
+  // Basic sanity check first — letters only, 2-20 chars
+  if (!/^[a-zA-Z\-']{2,20}$/.test(trimmed)) {
+    return new Response(JSON.stringify({ valid: false, word: trimmed, type, reason: 'Letters only, 2-20 characters.' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    // No API key — fall back to accepting any reasonable word
+    return new Response(JSON.stringify({ valid: true, word: trimmed, type }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+
+  const prompt = type === 'adj'
+    ? `Is "${trimmed}" a descriptive adjective in English — a word that describes a quality or characteristic, like "fierce", "electric", or "rapid"? Words that are primarily adverbs, nouns, or verbs do not count. Reply with only "yes" or "no".`
+    : `Is "${trimmed}" a real animal in English, like "falcon", "cobra", or "jaguar"? Reply with only "yes" or "no".`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 5,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const answer = data?.content?.[0]?.text?.trim().toLowerCase();
+    const valid = answer === 'yes';
+
+    return new Response(JSON.stringify({ valid, word: trimmed, type }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+
+  } catch (e) {
+    // If API call fails for any reason, fall back to accepting the word
+    return new Response(JSON.stringify({ valid: true, word: trimmed, type }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+}
