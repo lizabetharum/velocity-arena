@@ -8,37 +8,37 @@ const DAYS = [
       {
         "name": "Sound and Movement: Circle Pass",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Stand in a circle with your whole group. One person makes any sound and movement -- anything goes -- then passes it to the next person. That person copies it and immediately adds their own twist. Keep it moving around the circle. When your facilitator calls 'reverse,' flip directions. You can not do this wrong."
       },
       {
         "name": "Mirror: Pairs",
         "mins": 15,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Face a partner. One person leads slow, deliberate movements while the other mirrors exactly. No talking. After two minutes, swap. No winner, no evaluator -- just two people paying attention to each other."
       },
       {
         "name": "Driving Question Reveal + Team Formation",
         "mins": 10,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet."
       },
       {
         "name": "Stat Card Distribution",
         "mins": 5,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "You get a blank stat card -- a 4x6 index card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks."
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
         "mins": 15,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "You answer 10 questions about general math (speed, distance, graphs) in 15 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are."
       },
       {
         "name": "Speed Stat Challenge: What Does Motor Power Actually Mean?",
         "mins": 40,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "One formula goes on the board: Speed % = (Speed points / 20) x 100. Your team calculates motor power for Speed values of 1, 3, 5, 6, and 8. Then compare answers with the team next to you. If you disagree, figure out where the split is -- without asking the facilitator first."
       },
       {
@@ -50,19 +50,19 @@ const DAYS = [
       {
         "name": "First Bot Drive: Speed in Real Life",
         "mins": 80,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?"
       },
       {
         "name": "Data Dashboard Setup",
         "mins": 15,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Label every column in your data dashboard: date, match number, Speed allocation, goals/minute, possession time, predicted outcome, actual outcome, and notes. This document travels with your team for four weeks."
       },
       {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Unstructured time with your bot. Drive it, experiment with MakeCode, or talk strategy with your team. No task to complete -- just time to explore."
       }
     ],
@@ -83,13 +83,13 @@ const DAYS = [
       {
         "name": "Failure Bow",
         "mins": 15,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "One at a time, each person makes a deliberate, over-the-top mistake -- drop something, say something wrong, trip on purpose -- then takes a deep, exaggerated bow while the whole group cheers as loud as possible. The bigger the mistake, the louder the cheer."
       },
       {
         "name": "Slow Down, Slow Down",
         "mins": 15,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance."
       },
       {
@@ -101,25 +101,25 @@ const DAYS = [
       {
         "name": "Program Endurance Into Your Bot",
         "mins": 65,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Open MakeCode and write code that reduces your bot's motor power over time based on your Endurance allocation. Test it by running the bot for 2 minutes. Record distance in the first 30 seconds vs. the last 30 seconds, and write one sentence about the gap between what the formula predicted and what actually happened."
       },
       {
         "name": "Role Rotation Briefing",
         "mins": 10,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Your facilitator explains the three team roles -- Coder, Fabricator, Analyst -- that rotate weekly. Your team decides who starts in each role next week."
       },
       {
         "name": "Bot Naming Ceremony",
         "mins": 20,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Your team names your bot. Then you write exactly one sentence explaining where the name came from, what it stands for, and what your bot is fighting for. The name and sentence go on the wall right now and stay there for all four weeks."
       },
       {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Unstructured time with your bot. Experiment with your Endurance code. Try different point values and observe. No task, no output required."
       }
     ],
@@ -140,7 +140,7 @@ const DAYS = [
       {
         "name": "Human Robot Programming Challenge",
         "mins": 25,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
@@ -158,19 +158,19 @@ const DAYS = [
       {
         "name": "MAP FAL Session: Distance-Time Graphs + Turning Stat Introduction",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)\\",
+        "block": "Challenge Block (MAP FAL)",
         "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
       },
       {
         "name": "Coordinate Navigation Practice: Three Consecutive Successes",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Keep programming your bot to navigate to called coordinates. The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance."
       },
       {
         "name": "Open Lab: Free Code Time",
         "mins": 45,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Unstructured navigation practice. Try different coordinate targets. Experiment with Turning values. Build your intuition for what different settings do to the turn radius."
       }
     ],
@@ -191,7 +191,7 @@ const DAYS = [
       {
         "name": "Finger Speed-Sums",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Face a partner. On a count of three, both of you show any number of fingers (0-5). Race to say the sum first. Correct answer earns a point. Rotate partners every 90 seconds. The math is easy -- the speed is the challenge."
       },
       {
@@ -203,13 +203,13 @@ const DAYS = [
       {
         "name": "Scoop Build + Ratio Testing",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings, run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'"
       },
       {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Refine your scoop design and your Power speed value in MakeCode. Try one scoop redesign and one speed change. Record which had a bigger effect on kick distance."
       }
     ],
@@ -230,13 +230,13 @@ const DAYS = [
       {
         "name": "Conditional Simon Says",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' You have to check the math on your stat card before you act. Only do the action if the condition is actually true for your numbers."
       },
       {
         "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
         "mins": 50,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation."
       },
       {
@@ -248,7 +248,7 @@ const DAYS = [
       {
         "name": "Cold Recall Check",
         "mins": 10,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Five questions, 10 minutes, by yourself, no notes. General math -- slopes, recipes, percentages, distances. No grade. This is just a check on what is sticking after four days."
       },
       {
@@ -260,13 +260,13 @@ const DAYS = [
       {
         "name": "Simulation Matches: Your Loadout vs. Reality",
         "mins": 80,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Pick your best loadout from this morning, program it into your bot, and run practice matches. These do not count. After each run, compare: did your bot behave the way your allocation predicted? Record observations labeled 'simulation' in your dashboard."
       },
       {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Experiment with the loadouts you designed this morning. Try each one. Which one produces the behavior your formulas predicted?"
       }
     ],
@@ -287,13 +287,13 @@ const DAYS = [
       {
         "name": "Equation Relay Race",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Your team lines up. The first person solves step 1 of a multi-step equation on the whiteboard, tags the next person for step 2, and so on. First team to the correct final answer wins."
       },
       {
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types. You can not just do all Speed problems first -- you have to figure out which formula applies before you calculate. Circle your four official values. All must be verified correct before you touch a tool."
       },
       {
@@ -305,13 +305,13 @@ const DAYS = [
       {
         "name": "Scoop Finalization + MakeCode Programming",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Finalize your front scoop with one last adjustment, then lock it in with hot glue. Open MakeCode and program your full stat loadout -- all four stats translated into code. Verify your Speed by driving the bot. Does the behavior match the number you coded?"
       },
       {
         "name": "Open Lab: Free Code or Final Verification",
         "mins": 45,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Track A (Data Dive): Check each stat value in your dashboard against the formula output. Fix any mismatches before tomorrow's first match. Track B (Bot Lab): Test a loadout you would never use competitively. What happens at Speed = 2 with Power = 15?"
       }
     ],
@@ -332,13 +332,13 @@ const DAYS = [
       {
         "name": "Trashketball: Warm-Up Round",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Your team solves one equation from your allocation sheet. Get it right and you earn a shot -- crumple paper into a bin. Make the shot, bonus point. Quick, physical, competitive. Warm-up for match day."
       },
       {
         "name": "Endurance Decay Equations in Slope-Intercept Form",
         "mins": 50,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept before the first match."
       },
       {
@@ -356,7 +356,7 @@ const DAYS = [
       {
         "name": "Season 1 Round-Robin Matches, Day 1",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Three matches, round-robin bracket. Before each match, state your prediction. After each match, record actual goals and win/loss immediately. If you lose, the loss-recovery protocol runs before your next match -- no skipping it."
       }
     ],
@@ -377,7 +377,7 @@ const DAYS = [
       {
         "name": "Math Scavenger Hunt: Leaderboard Edition",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Problem cards are posted around the room, each showing a real stat from yesterday's leaderboard. Walk to each card, answer the question on the back, and find the matching answer on the next card. It is a self-correcting chain -- if your answer is not in the pile, go back and check your math."
       },
       {
@@ -389,7 +389,7 @@ const DAYS = [
       {
         "name": "MAP FAL Session: Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)\\",
+        "block": "Challenge Block (MAP FAL)",
         "description": "Part 1: Add your data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Then match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together. Part 2: Use two data points from the scatter plot to write the linear equation. Teams share -- everyone's equation is different. That is the point."
       },
       {
@@ -401,19 +401,19 @@ const DAYS = [
       {
         "name": "Season 1 Match Day 2",
         "mins": 70,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Two more matches. Before each, log your scatter plot equation's prediction. After each, record the actual result. Loss-recovery for every losing team. Update the dashboard -- no blanks."
       },
       {
         "name": "Rivalry Cards",
         "mins": 20,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Write one trash-talk card to a specific rival. The rule: your trash talk must cite a specific stat or data point from the dashboard. 'Your Endurance = 3 means your bot slows at minute 4. We will be ready.' No data, no card."
       },
       {
         "name": "Open Lab",
         "mins": 25,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Track A: Review your scatter plot equation against today's results. Does the line fit the new data? Track B: Adjust one MakeCode setting and run the bot for 90 seconds. What changes?"
       }
     ],
@@ -434,7 +434,7 @@ const DAYS = [
       {
         "name": "Rivalry Card Response",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Read the rivalry card your team received. Open your dashboard. Do the numbers check out? If the trash talk is factually wrong, mark it 'check your data' with a sticky note and the correct number. If it is accurate, make a plan."
       },
       {
@@ -446,13 +446,13 @@ const DAYS = [
       {
         "name": "Season 1 Match Day 3",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Three matches. Before each: state your prediction. After each: record actual result. If prediction and actual differ by more than 20%, write one sentence about what variable your model missed. Dashboard complete before end of day."
       },
       {
         "name": "Open Lab: Post-Match Debrief and Free Code",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Track A: Look at your three match results. Write one hypothesis: 'If we change [stat] from [X] to [Y], we expect [outcome] because [data].' Track B: Run the bot and experiment. If you find something useful, put it in the dashboard before you leave."
       }
     ],
@@ -473,13 +473,13 @@ const DAYS = [
       {
         "name": "Best Match Gallery Walk",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Walk the room and read every card. Vote with a dot sticker: which team had the most mathematically interesting finding?"
       },
       {
         "name": "Distance Formula: How Far Did Your Bot Actually Travel?",
         "mins": 50,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Pick two coordinates from your match data log. Calculate straight-line distance: square root of ((x2-x1) squared + (y2-y1) squared). Do this for three coordinate pairs and check: does the computed distance match what you observed on the grid?"
       },
       {
@@ -491,19 +491,19 @@ const DAYS = [
       {
         "name": "Cold Recall Check",
         "mins": 10,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Five questions, 10 minutes, by yourself, no notes. Percent change, slope-intercept form, distance formula, decay functions, budget percentages. No grade -- just a check on what is holding after two weeks."
       },
       {
         "name": "Season 1 Final Round",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete your dashboard -- goals per minute, possession time, win/loss by stat matchup. No blanks. Final Season 1 leaderboard update."
       },
       {
         "name": "Open Lab: Season 2 Planning",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Track A: Look at your Season 1 data. If you could change one stat for Season 2, what would it be and why? Write it as a hypothesis with data. Track B: Test the change you are considering before committing. Run it live, then write the hypothesis."
       }
     ],
@@ -524,7 +524,7 @@ const DAYS = [
       {
         "name": "Human Number Line: Stat Rankings",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "A tape line runs across the room from 'least important' to 'most important' for winning Season 1 matches. Stand where you think the most important stat belongs -- pure instinct, no data. Then your facilitator says: 'Open your dashboard. Does the data support where you are standing?'"
       },
       {
@@ -536,19 +536,19 @@ const DAYS = [
       {
         "name": "Underdog Mechanic Announced + Season 2 Stat Reallocation",
         "mins": 30,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Big announcement: the team in last place gets one free stat reallocation before Season 2 -- no Commissioner approval required. If that is your team, rework your allocation now. Everyone else: start thinking about Season 2 loadouts under the new rules coming tomorrow."
       },
       {
         "name": "Practice Matches: Test New Loadout Hypotheses",
         "mins": 55,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "No formal scoring. Program and test adjusted loadout ideas. Record observations as 'hypothesis' entries -- clearly labeled so you can compare to Season 2 actuals."
       },
       {
         "name": "Open Lab: Commissioner Proposal Refinement",
         "mins": 30,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Verify every number in your draft proposal against the actual dashboard. Are your two cited numbers accurate? Does your rule change genuinely help the last-place team?"
       }
     ],
@@ -569,13 +569,13 @@ const DAYS = [
       {
         "name": "Lobby the Commissioners",
         "mins": 25,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Spend 10 minutes moving around the room in informal conversation. 'Here is our proposal. Here is the number behind it. What do you think?' After, 15 minutes back at your seat to finalize based on what you heard."
       },
       {
         "name": "Final Proposal Verification",
         "mins": 35,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed."
       },
       {
@@ -587,13 +587,13 @@ const DAYS = [
       {
         "name": "Commissioner's Meeting: Formal Presentations + Vote",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Each team has 3 minutes. Cite two data points, explain your reasoning, describe how the change affects the last-place team. The league votes. Proposals that pass become rules -- written on the wall in permanent marker. Then adjust your Season 2 allocation under the new constraints before you leave."
       },
       {
         "name": "Open Lab: Season 2 Allocation Verification",
         "mins": 35,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Verify your Season 2 allocation calculations. Program the new loadout into MakeCode. Run one test drive to confirm the code matches the math."
       }
     ],
@@ -614,7 +614,7 @@ const DAYS = [
       {
         "name": "The Prediction Market",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Write your Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Post it publicly. Everyone can see every team's prediction. You will revisit these on Friday."
       },
       {
@@ -626,7 +626,7 @@ const DAYS = [
       {
         "name": "MAP FAL Session: Building and Solving Linear Equations",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)\\",
+        "block": "Challenge Block (MAP FAL)",
         "description": "Part 1: Using your Season 1 and early Season 2 data, write the equation that predicts your win probability. Choose two past data points, calculate slope and y-intercept, write it in slope-intercept form. Part 2: Test your equation against three past matches. Calculate the residual for each. Report your residuals to the class."
       },
       {
@@ -638,7 +638,7 @@ const DAYS = [
       {
         "name": "Season 2 Match Day 1",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "First matches under the new Commissioner-approved rules. Before each match, log your equation-based prediction. After each, record the actual. Compare today's residuals to Season 1. Is your model improving?"
       }
     ],
@@ -659,13 +659,13 @@ const DAYS = [
       {
         "name": "Stat Auction + Prediction Check",
         "mins": 30,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Your team starts with 3 math tokens. Earn more by answering formula questions correctly. Then bid on stat improvements -- but you must calculate the new formula output out loud to win. Wrong math means you lose your tokens. After the auction, check your Season 2 prediction on the wall. Update it if needed, with a data justification."
       },
       {
         "name": "Percent Change: Season 1 to Season 2 Configurations",
         "mins": 50,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Using your Season 1 and Season 2 allocations, calculate the percent change for each stat: (new - old) / old x 100. Also calculate the percentage point difference. Enter both for all four stats. Then answer: are these the same number? Which one better describes the actual change in your bot's behavior?"
       },
       {
@@ -677,7 +677,7 @@ const DAYS = [
       {
         "name": "Season 2 Match Day 2",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Three matches. Before each, log your equation-based prediction. After each, record the actual. If prediction and actual differ by more than 20%, write one sentence about what variable is missing. Dashboard fully updated before end of session."
       }
     ],
@@ -698,7 +698,7 @@ const DAYS = [
       {
         "name": "Bot Lore Gallery Walk",
         "mins": 25,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Walk the room and re-read every bot origin story from Day 2. Has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? Write one new sentence to add -- something that only makes sense because you played the matches."
       },
       {
@@ -710,13 +710,13 @@ const DAYS = [
       {
         "name": "Bot Identity + Creative Expression",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Design your bot's visual identity: a logo, a color scheme, and a team slogan. The slogan must reference a stat, equation, or data point. You can also redesign your scoop within the rules. Everything goes on the wall before you leave."
       },
       {
         "name": "Open Lab: Scouting Continuation or Identity Refinement",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Track A: Continue scouting report sections 1 and 2, or start section 3 (opponent Speed vs. Goals trend line). Track B: Test the scoop redesign or logo placement. Does the new scoop change your kick distance? If yes, update the dashboard."
       }
     ],
@@ -737,7 +737,7 @@ const DAYS = [
       {
         "name": "Memory Probe: Scout Your Opponent Cold",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "No notes, no dashboards, nothing posted. From memory, write down your opponent's top two stat allocations, their Endurance decay rate, their Season 1 average goals per match, and their Endurance output at t = 3. Then reports go up -- verify every number and score yourself."
       },
       {
@@ -749,13 +749,13 @@ const DAYS = [
       {
         "name": "Final Commissioner's Meeting, Part 1",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Teams present final Championship rule proposals. Same format: 3 minutes, two data points, address the last-place team. League votes. New rules on the wall. Adjust your loadout for Championship -- fix any math errors before leaving."
       },
       {
         "name": "Open Lab: Championship Loadout Verification",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now."
       }
     ],
@@ -776,7 +776,7 @@ const DAYS = [
       {
         "name": "Cold Retrieval + Scouting Annotation",
         "mins": 25,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Part 1: From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2: All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes."
       },
       {
@@ -788,19 +788,19 @@ const DAYS = [
       {
         "name": "Final Commissioner's Meeting, Part 2 + Championship Bracket Reveal",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Final rule adjustments confirmed. Championship bracket revealed and posted. Final bot tune-up: program your Championship loadout, verify code against math, run one test drive."
       },
       {
         "name": "What-If? Analysis",
         "mins": 15,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "The facilitator posts a hypothetical constraint: 'Endurance is capped at 4 for Championship.' You have 10 minutes to figure out which teams this affects and calculate how their decay rate and Speed change if they reallocate. Does this help or hurt your team? Show the math."
       },
       {
         "name": "Open Lab: Pitch Refinement and Bot Prep",
         "mins": 25,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow."
       }
     ],
@@ -821,13 +821,13 @@ const DAYS = [
       {
         "name": "Pre-Championship Ritual",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "The whole camp does a physical warm-up together -- energetic and brief -- led by any camper who volunteers. Then each team gets 3 minutes for their own ritual: a chant, a handshake, anything you invented. This is earned."
       },
       {
         "name": "Championship Rounds 1 and 2",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Double-elimination bracket begins. Before each match, your team delivers a 2-minute pitch to the judges covering your strategy with specific numbers. Judges score on math, not presentation polish. After each match, loss-recovery runs -- same three steps, no shortcuts."
       },
       {
@@ -839,13 +839,13 @@ const DAYS = [
       {
         "name": "Championship Semifinals and Final",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Remaining bracket matches. Pre-match pitch continues. Loss-recovery for every elimination. After the final, the champion posts their Championship configuration on the wall."
       },
       {
         "name": "Open Lab: Reflection Time",
         "mins": 25,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "No task required. Look at your Day 1 allocation versus today's. What changed and why? Reflect on your team's four-week data arc."
       }
     ],
@@ -866,13 +866,13 @@ const DAYS = [
       {
         "name": "Expert Setup",
         "mins": 25,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the content to your teammates before visitors arrive. Write down the one thing you want every visitor to understand."
       },
       {
         "name": "Community Exhibition: Teaching Begins",
         "mins": 90,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Visitors arrive. Teach each visitor to do three things: plot a coordinate on the grid, program a bot to navigate there, and explain why your Speed allocation produces the motor power percentage it does. Your goal: each visitor completes all three tasks on their own."
       },
       {
@@ -884,19 +884,19 @@ const DAYS = [
       {
         "name": "Extended Exhibition + Best Teacher Voting",
         "mins": 60,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Keep teaching. Visitors get one ballot: 'Which camper explained the math most clearly?' Exhibition matches can run while visitors watch."
       },
       {
         "name": "Scouting Report Verbal Check + Vote Count (concurrent)",
         "mins": 45,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot."
       },
       {
         "name": "Open Lab: Final Debrief and Prep",
         "mins": 15,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Debrief with your team: what did visitors understand quickly? What confused them? Identify one explanation that did not land and write a revised version."
       }
     ],
@@ -917,13 +917,13 @@ const DAYS = [
       {
         "name": "Walk the Wall: Final Gallery",
         "mins": 20,
-        "block": "Ice-Breaker\\",
+        "block": "Ice Breaker",
         "description": "Final gallery walk of everything: bot origin stories, rivalry cards, leaderboard history, Commissioner rules, scouting reports, and the Day 1 goals from Week 1. Walk quietly. You are looking at what four weeks of work looks like."
       },
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
         "mins": 15,
-        "block": "Challenge Block\\",
+        "block": "Challenge Block",
         "description": "Ten questions, 15 minutes, by yourself. Same types as Day 1 -- proportional reasoning, rate of change, coordinate geometry. This measures your growth, not a grade. Your facilitator will compare your results to Day 1."
       },
       {
@@ -935,13 +935,13 @@ const DAYS = [
       {
         "name": "Awards Ceremony",
         "mins": 60,
-        "block": "Match-Build-Make\\",
+        "block": "Match-Build-Make",
         "description": "Championship winner celebrated. Best Teacher award announced. Your facilitator names one specific mathematical moment for each team -- a particular calculation, a dashboard decision, a Commissioner argument. Then each camper names one personal growth area and one specific camp moment that shows that growth."
       },
       {
         "name": "Open Lab: Final Free Time",
         "mins": 40,
-        "block": "Open Lab\\",
+        "block": "Open Lab",
         "description": "Unstructured time. Drive the bots. Revisit the coordinate grid. Teach each other anything you want. This is the last time the program exists in this form."
       }
     ],
