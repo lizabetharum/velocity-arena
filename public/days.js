@@ -26,7 +26,7 @@ const DAYS = [
       {
         "name": "Stat Card Distribution",
         "mins": 5,
-        "block": "Ice Breaker",
+        "block": "LX Setup",
         "description": "You get a blank stat card -- a 4x6 index card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks."
       },
       {
