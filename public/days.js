@@ -93,6 +93,12 @@ const DAYS = [
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance."
       },
       {
+        "name": "Endurance Stat Challenge: Drawing the Decay",
+        "mins": 50,
+        "block": "Challenge Block",
+        "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example, then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you."
+      },
+      {
         "name": "Lunch / Snack Break",
         "mins": 30,
         "block": "",
@@ -193,6 +199,12 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Face a partner. On a count of three, both of you show any number of fingers (0-5). Race to say the sum first. Correct answer earns a point. Rotate partners every 90 seconds. The math is easy -- the speed is the challenge."
+      },
+      {
+        "name": "Power Stat Challenge: Ratio and Motor Speed",
+        "mins": 50,
+        "block": "Challenge Block",
+        "description": "One rule goes on the board: charge motor speed = Power points squared. Calculate charge speed for Power = 1, 2, 4, and 8. Then test it physically: program Power 4 into MakeCode, drive your bot at a ball from 40 cm, and measure how far the ball goes. Repeat with Power 8. Did doubling the points double kick distance? The answer should surprise you."
       },
       {
         "name": "Lunch / Snack Break",
@@ -358,6 +370,12 @@ const DAYS = [
         "mins": 90,
         "block": "Match-Build-Make",
         "description": "Three matches, round-robin bracket. Before each match, state your prediction. After each match, record actual goals and win/loss immediately. If you lose, the loss-recovery protocol runs before your next match -- no skipping it."
+      },
+      {
+        "name": "Leaderboard Reveal + Open Lab",
+        "mins": 35,
+        "block": "Match-Build-Make / Open Lab",
+        "description": "The physical leaderboard goes up on the wall with three columns: Wins, Goals Scored, Best Prediction. Update it now. Then 20 minutes of open time to review your dashboard, strategize, or adjust code."
       }
     ],
     "ends": "Name one math concept you used today. Write the full calculation. Share it with your teammate and explain what it means for your bot's behavior. Not formula terms. Bot terms. You have 4 minutes. |",
@@ -436,6 +454,12 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Read the rivalry card your team received. Open your dashboard. Do the numbers check out? If the trash talk is factually wrong, mark it 'check your data' with a sticky note and the correct number. If it is accurate, make a plan."
+      },
+      {
+        "name": "Formula Relay: All Five Types in One Race",
+        "mins": 50,
+        "block": "Challenge Block",
+        "description": "Twenty problem cards, face down, shuffled across all five formula types. Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards by formula type and count errors. Your weakest type is today's focus."
       },
       {
         "name": "Lunch / Snack Break",
@@ -526,6 +550,12 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "A tape line runs across the room from 'least important' to 'most important' for winning Season 1 matches. Stand where you think the most important stat belongs -- pure instinct, no data. Then your facilitator says: 'Open your dashboard. Does the data support where you are standing?'"
+      },
+      {
+        "name": "Systems of Inequalities NOW Session + Commissioner Proposal Prep",
+        "mins": 45,
+        "block": "Challenge Block",
+        "description": "'Speed > 5 AND Endurance > 3. What loadouts satisfy both constraints at the same time?' List at least three valid combinations. Then spend 25 minutes drafting a rule change proposal backed by at least two numbers from your dashboard."
       },
       {
         "name": "Lunch / Snack Break",
@@ -640,6 +670,12 @@ const DAYS = [
         "mins": 90,
         "block": "Match-Build-Make",
         "description": "First matches under the new Commissioner-approved rules. Before each match, log your equation-based prediction. After each, record the actual. Compare today's residuals to Season 1. Is your model improving?"
+      },
+      {
+        "name": "Open Lab: Residual Analysis or Bot Calibration",
+        "mins": 35,
+        "block": "Open Lab",
+        "description": "Track A: Look at your residuals. Is your model's error getting smaller or larger? Write one sentence about what the model is missing. Track B: Run one calibration test under the new rules. Does the rule change affect your bot in ways your formula did not predict?"
       }
     ],
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
@@ -679,6 +715,12 @@ const DAYS = [
         "mins": 90,
         "block": "Match-Build-Make",
         "description": "Three matches. Before each, log your equation-based prediction. After each, record the actual. If prediction and actual differ by more than 20%, write one sentence about what variable is missing. Dashboard fully updated before end of session."
+      },
+      {
+        "name": "Open Lab: Equation Revision or Loadout Experiments",
+        "mins": 40,
+        "block": "Open Lab",
+        "description": "Track A: Look at your residuals from the last two match days. If your model's error has increased, identify one variable to add. Track B: Test the new stat points from the Stat Auction under match conditions. Do they perform as the formula predicted?"
       }
     ],
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action in tomorrow's schedule\\].\" You have 3 minutes. |",
@@ -700,6 +742,12 @@ const DAYS = [
         "mins": 25,
         "block": "Ice Breaker",
         "description": "Walk the room and re-read every bot origin story from Day 2. Has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? Write one new sentence to add -- something that only makes sense because you played the matches."
+      },
+      {
+        "name": "Scouting Report: Mathematical Foundation",
+        "mins": 50,
+        "block": "Challenge Block",
+        "description": "Begin your formal scouting report on your Championship opponent. Section 1: express their stats as percentages of the 20-point budget. Section 2: write their Endurance decay equation in slope-intercept form using their data. Show all work."
       },
       {
         "name": "Lunch / Snack Break",
@@ -741,6 +789,12 @@ const DAYS = [
         "description": "No notes, no dashboards, nothing posted. From memory, write down your opponent's top two stat allocations, their Endurance decay rate, their Season 1 average goals per match, and their Endurance output at t = 3. Then reports go up -- verify every number and score yourself."
       },
       {
+        "name": "Scouting Report Completion: Sections 3 and 4",
+        "mins": 50,
+        "block": "Challenge Block",
+        "description": "Section 3: Use two of your opponent's data points to write their Speed vs. Goals trend line equation and make a prediction for Championship. Section 4: Write one strategy recommendation backed by an inequality constraint analysis -- show three loadouts that counter your opponent."
+      },
+      {
         "name": "Lunch / Snack Break",
         "mins": 30,
         "block": "",
@@ -778,6 +832,12 @@ const DAYS = [
         "mins": 25,
         "block": "Ice Breaker",
         "description": "Part 1: From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2: All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes."
+      },
+      {
+        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
+        "mins": 45,
+        "block": "Challenge Block",
+        "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in."
       },
       {
         "name": "Lunch / Snack Break",
