@@ -1,6 +1,6 @@
 function getNavLink(page) {
   const pages = [
-    { id: 'today',    href: '/index.html',    label: 'Today' },
+  
     { id: 'schedule', href: '/schedule.html', label: 'Schedule' },
     { id: 'tools',    href: '/tools.html',    label: 'Tools' },
     { id: 'teachers', href: '/teachers.html', label: 'Teacher resources' },
