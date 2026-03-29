@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Teacher Schedule</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.gate{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;}
+.gate-box{background:var(--navy2);border:1.5px solid var(--border);border-radius:0.75rem;padding:2.5rem 2rem;width:100%;max-width:22rem;text-align:center;}
+.gate-icon{width:3rem;height:3rem;background:var(--navy3);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
+.gate-title{font-size:1.125rem;font-weight:800;color:var(--white);margin-bottom:0.375rem;}
+.gate-sub{font-size:0.875rem;color:var(--slate);margin-bottom:1.5rem;line-height:1.5;}
+.gate-input{width:100%;background:var(--navy3);border:1.5px solid var(--border);border-radius:0.5rem;padding:0.75rem 1rem;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--white);text-align:center;letter-spacing:.1em;outline:none;transition:border-color .15s;margin-bottom:0.75rem;}
+.gate-input:focus{border-color:var(--cyan);}
+.gate-input::placeholder{color:var(--slate);letter-spacing:0;}
+.gate-btn{width:100%;background:var(--cyan);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:0.9375rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:0.875rem;border-radius:0.5rem;border:none;cursor:pointer;transition:opacity .15s;}
+.gate-btn:hover{opacity:.88;}
+.gate-error{font-size:0.8125rem;color:#FF6B6B;margin-top:0.625rem;min-height:1.2em;}
+.page-content{display:none;}
+.page-content.unlocked{display:block;}
+
+.week-section{margin-bottom:2.5rem;}
+.week-heading{font-size:1.125rem;font-weight:800;color:var(--white);margin-bottom:0.25rem;}
+.week-subtitle{font-size:0.875rem;color:var(--slate);margin-bottom:0.875rem;}
+
+.tday-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:0.75rem;padding:1.25rem 1.5rem;margin-bottom:1rem;cursor:pointer;transition:border-color .15s;}
+.tday-card:hover{border-color:var(--cyan);}
+.tday-header{display:flex;justify-content:space-between;align-items:center;}
+.tday-num{font-size:1.25rem;font-weight:800;color:var(--white);}
+.tday-weekday{font-size:0.75rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;}
+.tday-theme{font-size:0.875rem;color:var(--slate);margin-top:0.375rem;line-height:1.4;}
+.tday-details{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--card-border);}
+.tday-card.open .tday-details{display:block;}
+.tday-card.open{border-color:var(--cyan);}
+
+.tact-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.625rem 0;border-bottom:1px solid var(--card-border);}
+.tact-row:last-child{border-bottom:none;}
+.tact-mins{font-size:0.75rem;font-weight:700;color:var(--cyan);min-width:2.5rem;flex-shrink:0;padding-top:0.125rem;}
+.tact-name{font-size:0.875rem;font-weight:700;color:var(--white);}
+.tact-block{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:0.125rem;color:var(--slate);}
+.tact-desc{font-size:0.8125rem;color:var(--slate);line-height:1.5;margin-top:0.375rem;}
+
+.tends-box{background:var(--navy2);border-radius:0.625rem;padding:1rem 1.25rem;margin-top:0.75rem;}
+.tends-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.375rem;}
+.tends-text{font-size:0.8125rem;color:var(--white);line-height:1.6;font-style:italic;}
+
+.trisk-box{background:var(--navy3);border:1.5px solid #FFCA28;border-radius:0.625rem;padding:1rem 1.25rem;margin-top:0.75rem;}
+.trisk-label{font-size:0.6875rem;font-weight:700;color:#FFCA28;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.375rem;}
+.trisk-text{font-size:0.8125rem;color:var(--slate);line-height:1.5;margin-bottom:0.5rem;}
+.trisk-say-label{font-size:0.625rem;font-weight:700;color:#AA6600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.25rem;}
+.trisk-say{font-size:0.8125rem;color:var(--white);line-height:1.6;font-style:italic;padding-left:0.75rem;border-left:3px solid #FFCA28;}
+
+.tfun-box{background:var(--navy3);border:1.5px solid #99E8F5;border-radius:0.625rem;padding:1rem 1.25rem;margin-top:0.75rem;}
+.tfun-label{font-size:0.6875rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.375rem;}
+.tfun-text{font-size:0.8125rem;color:var(--slate);line-height:1.5;}
+
+.tlo-box{background:var(--navy3);border:1px solid #5B3EA6;border-radius:0.625rem;padding:1rem 1.25rem;margin-top:0.75rem;}
+.tlo-label{font-size:0.6875rem;font-weight:700;color:#A08EE0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:0.375rem;}
+.tlo-text{font-size:0.8125rem;color:var(--slate);line-height:1.5;}
+
+.back-link{font-size:0.875rem;font-weight:700;color:var(--cyan);text-decoration:none;display:inline-block;margin-bottom:1.25rem;}
+.back-link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<!-- PASSWORD GATE -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div class="gate-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="4" y="9" width="12" height="9" rx="2" stroke="#00E5FF" stroke-width="1.5"/>
+        <path d="M7 9V6a3 3 0 016 0v3" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="gate-title">Teacher Schedule</div>
+    <div class="gate-sub">This page is for facilitators only. Enter the password to continue.</div>
+    <input class="gate-input" id="gate-input" type="password" placeholder="Enter password" autocomplete="off"/>
+    <button class="gate-btn" id="gate-btn">Unlock</button>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<!-- PAGE CONTENT (hidden until unlocked) -->
+<div class="page-content" id="page-content">
+<main class="page-body">
+
+  <a class="back-link" href="/teachers.html">&larr; Back to Teacher Resources</a>
+
+  <div style="background:var(--navy3);border:1.5px solid #FFCC44;border-radius:0.625rem;padding:0.875rem 1.125rem;margin-bottom:1.5rem;font-size:0.8125rem;color:#FFCC44;line-height:1.6;">
+    <strong>Facilitator view.</strong> This schedule includes risk moments, facilitation scripts, fun elements, and learning objectives. The student-facing schedule does not show this information.
+  </div>
+
+  <div id="teacher-schedule">
+    <p style="color:var(--slate);font-size:1rem;">Loading schedule...</p>
+  </div>
+
+</main>
+</div>
+
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script src="/days.js"></script>
+<script>
+renderHeader('teachers');
+
+// Password gate
+const PASSWORD = CONFIG.teacherPassword;
+const SESSION_KEY = 'va_teacher_auth';
+const gate = document.getElementById('gate');
+const content = document.getElementById('page-content');
+const input = document.getElementById('gate-input');
+const btn = document.getElementById('gate-btn');
+const error = document.getElementById('gate-error');
+
+function unlock() {
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    gate.style.display = 'none';
+    content.classList.add('unlocked');
+    return;
+  }
+  if (input.value === PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    gate.style.display = 'none';
+    content.classList.add('unlocked');
+  } else {
+    error.textContent = 'Incorrect password.';
+    input.value = '';
+    input.focus();
+    input.style.borderColor = '#FF6B6B';
+    setTimeout(() => { input.style.borderColor = ''; }, 1200);
+  }
+}
+
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  gate.style.display = 'none';
+  content.classList.add('unlocked');
+}
+
+btn.addEventListener('click', unlock);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+// Build teacher schedule
+const campDates = buildCampDates();
+const weeks = [
+  { num: 1, name: 'Week 1', subtitle: 'Play Lab + Boot Camp' },
+  { num: 2, name: 'Week 2', subtitle: 'Season 1' },
+  { num: 3, name: 'Week 3', subtitle: 'Season 2 + Commissioner' },
+  { num: 4, name: 'Week 4', subtitle: 'Championship' },
+];
+
+const container = document.getElementById('teacher-schedule');
+container.innerHTML = weeks.map(w => {
+  const days = DAYS.filter(d => d.week === w.num);
+  const dayCards = days.map(d => {
+    const weekday = campDayWeekday(campDates, d.day);
+
+    const actRows = (d.activities || []).map(a =>
+      `<div class="tact-row">
+        <div class="tact-mins">${a.mins}m</div>
+        <div>
+          <div class="tact-name">${a.name}</div>
+          <div class="tact-block">${(a.block || '').replace(/\\/g, '')}</div>
+          ${a.description ? `<div class="tact-desc">${a.description}</div>` : ''}
+        </div>
+      </div>`
+    ).join('');
+
+    const endsHtml = d.ends ? `
+      <div class="tends-box">
+        <div class="tends-label">ENDS closing ritual</div>
+        <div class="tends-text">${d.ends.replace(/\s*\|\s*$/, '')}</div>
+      </div>` : '';
+
+    const riskHtml = d.facilitatorRisk ? `
+      <div class="trisk-box">
+        <div class="trisk-label">Highest-risk facilitation moment</div>
+        <div class="trisk-text">${d.facilitatorRisk.risk}</div>
+        <div class="trisk-say-label">Say:</div>
+        <div class="trisk-say">${d.facilitatorRisk.say.replace(/\s*\|\s*$/, '')}</div>
+      </div>` : '';
+
+    const funHtml = d.funElement ? `
+      <div class="tfun-box">
+        <div class="tfun-label">Fun element</div>
+        <div class="tfun-text">${d.funElement}</div>
+      </div>` : '';
+
+    const loHtml = d.los ? `
+      <div class="tlo-box">
+        <div class="tlo-label">Learning objectives</div>
+        <div class="tlo-text">${d.los.split(/[#*+=-]{3,}/)[0].trim()}</div>
+      </div>` : '';
+
+    return `
+      <div class="tday-card" onclick="this.classList.toggle('open')">
+        <div class="tday-header">
+          <div>
+            <div class="tday-num">Day ${d.day} &middot; ${weekday}</div>
+            <div class="tday-theme">${d.theme}</div>
+          </div>
+          <div class="tday-weekday">${(d.activities || []).length} activities</div>
+        </div>
+        <div class="tday-details">
+          ${actRows}
+          ${endsHtml}
+          ${riskHtml}
+          ${funHtml}
+          ${loHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="week-section">
+      <div class="week-heading">${w.name} &middot; ${w.subtitle}</div>
+      ${dayCards}
+    </div>`;
+}).join('');
+</script>
+</body>
+</html>

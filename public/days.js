@@ -8,25 +8,25 @@ const DAYS = [
       {
         "name": "Sound and Movement: Circle Pass",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Stand in a circle with your whole group. One person makes any sound and movement -- anything goes -- then passes it to the next person. That person copies it and immediately adds their own twist. Keep it moving around the circle. When your facilitator calls 'reverse,' flip directions. You can not do this wrong."
       },
       {
         "name": "Mirror: Pairs",
         "mins": 15,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Face a partner. One person leads slow, deliberate movements while the other mirrors exactly. No talking. After two minutes, swap. No winner, no evaluator -- just two people paying attention to each other."
       },
       {
         "name": "Driving Question Reveal + Team Formation",
         "mins": 10,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet."
       },
       {
         "name": "Stat Card Distribution",
         "mins": 5,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "You get a blank stat card -- a 4x6 index card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks."
       },
       {
@@ -44,7 +44,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -83,19 +83,19 @@ const DAYS = [
       {
         "name": "Failure Bow",
         "mins": 15,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "One at a time, each person makes a deliberate, over-the-top mistake -- drop something, say something wrong, trip on purpose -- then takes a deep, exaggerated bow while the whole group cheers as loud as possible. The bigger the mistake, the louder the cheer."
       },
       {
         "name": "Slow Down, Slow Down",
         "mins": 15,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -140,19 +140,19 @@ const DAYS = [
       {
         "name": "Human Robot Programming Challenge",
         "mins": 25,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
         "name": "Energy Reset (3 min)",
         "mins": 3,
-        "block": "Transition\\",
+        "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       {
@@ -191,13 +191,13 @@ const DAYS = [
       {
         "name": "Finger Speed-Sums",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Face a partner. On a count of three, both of you show any number of fingers (0-5). Race to say the sum first. Correct answer earns a point. Rotate partners every 90 seconds. The math is easy -- the speed is the challenge."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -230,7 +230,7 @@ const DAYS = [
       {
         "name": "Conditional Simon Says",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' You have to check the math on your stat card before you act. Only do the action if the condition is actually true for your numbers."
       },
       {
@@ -242,7 +242,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -254,7 +254,7 @@ const DAYS = [
       {
         "name": "Match Format Briefing",
         "mins": 10,
-        "block": "Transition\\",
+        "block": "",
         "description": "Your facilitator explains how matches work: 3 minutes each, two teams, first to push the ball across the end line scores. Bots are pre-programmed -- no joystick control during the match."
       },
       {
@@ -287,7 +287,7 @@ const DAYS = [
       {
         "name": "Equation Relay Race",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Your team lines up. The first person solves step 1 of a multi-step equation on the whiteboard, tags the next person for step 2, and so on. First team to the correct final answer wins."
       },
       {
@@ -299,7 +299,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -332,7 +332,7 @@ const DAYS = [
       {
         "name": "Trashketball: Warm-Up Round",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Your team solves one equation from your allocation sheet. Get it right and you earn a shot -- crumple paper into a bin. Make the shot, bonus point. Quick, physical, competitive. Warm-up for match day."
       },
       {
@@ -344,13 +344,13 @@ const DAYS = [
       {
         "name": "Pre-Match Prediction Huddle",
         "mins": 10,
-        "block": "Transition\\",
+        "block": "",
         "description": "Your team reads your stat allocation out loud -- every formula, every result. Then write one prediction: how many goals will your team score in your first match? Sign it."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -377,13 +377,13 @@ const DAYS = [
       {
         "name": "Math Scavenger Hunt: Leaderboard Edition",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Problem cards are posted around the room, each showing a real stat from yesterday's leaderboard. Walk to each card, answer the question on the back, and find the matching answer on the next card. It is a self-correcting chain -- if your answer is not in the pile, go back and check your math."
       },
       {
         "name": "Energy Reset (3 min)",
         "mins": 3,
-        "block": "Transition\\",
+        "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       {
@@ -395,7 +395,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -434,13 +434,13 @@ const DAYS = [
       {
         "name": "Rivalry Card Response",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Read the rivalry card your team received. Open your dashboard. Do the numbers check out? If the trash talk is factually wrong, mark it 'check your data' with a sticky note and the correct number. If it is accurate, make a plan."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -473,7 +473,7 @@ const DAYS = [
       {
         "name": "Best Match Gallery Walk",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Walk the room and read every card. Vote with a dot sticker: which team had the most mathematically interesting finding?"
       },
       {
@@ -485,7 +485,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -524,13 +524,13 @@ const DAYS = [
       {
         "name": "Human Number Line: Stat Rankings",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "A tape line runs across the room from 'least important' to 'most important' for winning Season 1 matches. Stand where you think the most important stat belongs -- pure instinct, no data. Then your facilitator says: 'Open your dashboard. Does the data support where you are standing?'"
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -569,7 +569,7 @@ const DAYS = [
       {
         "name": "Lobby the Commissioners",
         "mins": 25,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Spend 10 minutes moving around the room in informal conversation. 'Here is our proposal. Here is the number behind it. What do you think?' After, 15 minutes back at your seat to finalize based on what you heard."
       },
       {
@@ -581,7 +581,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -614,13 +614,13 @@ const DAYS = [
       {
         "name": "The Prediction Market",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Write your Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Post it publicly. Everyone can see every team's prediction. You will revisit these on Friday."
       },
       {
         "name": "Energy Reset (3 min)",
         "mins": 3,
-        "block": "Transition\\",
+        "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       {
@@ -632,7 +632,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -659,7 +659,7 @@ const DAYS = [
       {
         "name": "Stat Auction + Prediction Check",
         "mins": 30,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Your team starts with 3 math tokens. Earn more by answering formula questions correctly. Then bid on stat improvements -- but you must calculate the new formula output out loud to win. Wrong math means you lose your tokens. After the auction, check your Season 2 prediction on the wall. Update it if needed, with a data justification."
       },
       {
@@ -671,7 +671,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -698,13 +698,13 @@ const DAYS = [
       {
         "name": "Bot Lore Gallery Walk",
         "mins": 25,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Walk the room and re-read every bot origin story from Day 2. Has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? Write one new sentence to add -- something that only makes sense because you played the matches."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -737,13 +737,13 @@ const DAYS = [
       {
         "name": "Memory Probe: Scout Your Opponent Cold",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "No notes, no dashboards, nothing posted. From memory, write down your opponent's top two stat allocations, their Endurance decay rate, their Season 1 average goals per match, and their Endurance output at t = 3. Then reports go up -- verify every number and score yourself."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -776,13 +776,13 @@ const DAYS = [
       {
         "name": "Cold Retrieval + Scouting Annotation",
         "mins": 25,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Part 1: From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2: All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes."
       },
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -821,7 +821,7 @@ const DAYS = [
       {
         "name": "Pre-Championship Ritual",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "The whole camp does a physical warm-up together -- energetic and brief -- led by any camper who volunteers. Then each team gets 3 minutes for their own ritual: a chant, a handshake, anything you invented. This is earned."
       },
       {
@@ -833,7 +833,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -866,7 +866,7 @@ const DAYS = [
       {
         "name": "Expert Setup",
         "mins": 25,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the content to your teammates before visitors arrive. Write down the one thing you want every visitor to understand."
       },
       {
@@ -878,7 +878,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
@@ -917,7 +917,7 @@ const DAYS = [
       {
         "name": "Walk the Wall: Final Gallery",
         "mins": 20,
-        "block": "Hook\\",
+        "block": "Ice-Breaker\\",
         "description": "Final gallery walk of everything: bot origin stories, rivalry cards, leaderboard history, Commissioner rules, scouting reports, and the Day 1 goals from Week 1. Walk quietly. You are looking at what four weeks of work looks like."
       },
       {
@@ -929,7 +929,7 @@ const DAYS = [
       {
         "name": "Lunch / Snack Break",
         "mins": 30,
-        "block": "Transition\\",
+        "block": "",
         "description": "Eat, rest, and talk about anything except math."
       },
       {
