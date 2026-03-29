@@ -1,6 +1,6 @@
 function getNavLink(page) {
   const pages = [
-  
+    { id: 'today',    href: '/index.html',    label: 'Today' },
     { id: 'schedule', href: '/schedule.html', label: 'Schedule' },
     { id: 'tools',    href: '/tools.html',    label: 'Tools' },
     { id: 'teachers', href: '/teachers.html', label: 'Teacher resources' },
@@ -38,7 +38,7 @@ function renderHeader(activePage) {
     </div>
     <footer class="site-footer">
       Velocity Arena · NYC FIRST · Summer Math Camp 2025 ·
-      Built by <a href="https://construct3d.org">Lizabeth Arum</a>
+      <a href="https://nycfirst.org">nycfirst.org</a>
     </footer>
   `;
   // Move footer out of header div after render

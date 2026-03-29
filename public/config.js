@@ -12,7 +12,7 @@ const CONFIG = {
   // This is the only date you need to set.
   // The site calculates all 20 days from this date,
   // skipping weekends automatically.
-  startDate: "2025-07-07",
+  startDate: "2026-03-30",
 
   // Your timezone — affects what "today" means.
   // Full list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
