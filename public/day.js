@@ -1,0 +1,867 @@
+const DAYS = [
+  {
+    "day": 1,
+    "week": 1,
+    "weekName": "Play Lab + Boot Camp",
+    "weekday": "Monday",
+    "theme": "First Contact: Speed, Bots, and the Question That Drives Everything",
+    "activities": [
+      {
+        "name": "Sound and Movement: Circle Pass",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Mirror: Pairs",
+        "mins": 15,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Driving Question Reveal + Team Formation",
+        "mins": 10,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Stat Card Distribution",
+        "mins": 5,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
+        "mins": 15,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Speed Stat Challenge: What Does Motor Power Actually Mean?",
+        "mins": 40,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "First Bot Drive: Speed in Real Life",
+        "mins": 80,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Data Dashboard Setup",
+        "mins": 15,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code Time",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write one personal goal and one team goal for this week. Post them on the wall. You have 3 minutes. |",
+    "funElement": "None today. Bot novelty and the two improv activities create psychological safety before any math is introduced. Let students touch the robots before anything else. The first time a bot moves, something shifts in the room.",
+    "los": "LO 1.1 (stat-to-formula matching on reference card); LO 3.1 (coordinate grid navigation, first attempt, informal)",
+    "facilitatorRisk": {
+      "risk": "The Pre-Task diagnostic triggers math shame and students shut down on the first morning, before trust is established.",
+      "say": "\"This is not a test. There is no grade. I am filling this out so I know what you already know, and so I can make sure this program works for you specifically. If you see a question you do not know, write \"not yet\" and move on. You will know every single thing on this paper by Week 4.\" |"
+    }
+  },
+  {
+    "day": 2,
+    "week": 1,
+    "weekName": "Play Lab + Boot Camp",
+    "weekday": "Tuesday",
+    "theme": "Endurance: When Your Bot Runs Out of Power",
+    "activities": [
+      {
+        "name": "Failure Bow",
+        "mins": 15,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Slow Down, Slow Down",
+        "mins": 15,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Program Endurance Into Your Bot",
+        "mins": 65,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Role Rotation Briefing",
+        "mins": 10,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Bot Naming Ceremony",
+        "mins": 20,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code Time",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Name one math concept you used today. Write the full calculation. Share it with a teammate and explain what it means about your bot, not in formula terms, but in behavior terms. You have 4 minutes. |",
+    "funElement": "Bot naming ceremony activates today at end of session. Bot names and origin stories are posted on the wall for the full four weeks. First permanent artifact of the program.",
+    "los": "LO 2.1 (slope meaning described from bot decay graph); LO 2.2 (Endurance decay equation written in slope-intercept form)",
+    "facilitatorRisk": {
+      "risk": "The Failure Bow feels humiliating to a student who already has math shame, and they disengage from the activity or refuse to participate.",
+      "say": "\"Before you start: this game is about the group cheering loudest for the biggest, most theatrical mistake, not the smallest one. You are trying to out-embarrass each other on purpose. Model it yourself first. Make a dramatic mistake and take a long bow. The room will follow.\" |"
+    }
+  },
+  {
+    "day": 3,
+    "week": 1,
+    "weekName": "Play Lab + Boot Camp",
+    "weekday": "Wednesday",
+    "theme": "Turning + The Story Your Data Tells",
+    "activities": [
+      {
+        "name": "Human Robot Programming Challenge",
+        "mins": 25,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Energy Reset (3 min)",
+        "mins": 3,
+        "block": "Transition\\"
+      },
+      {
+        "name": "MAP FAL Session: Distance-Time Graphs + Turning Stat Introduction",
+        "mins": 50,
+        "block": "Challenge Block (MAP FAL)\\"
+      },
+      {
+        "name": "Coordinate Navigation Practice: Three Consecutive Successes",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code Time",
+        "mins": 45,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Each person on your team silently rates today's collaboration: 1 = rough, 2 = okay, 3 = solid. Hold up your number at the same time so everyone sees at once. If anyone holds up a 1, talk for 2 minutes about what specifically happened. You have 5 minutes total. |",
+    "funElement": "None today. MAP FAL discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
+    "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance between coordinates calculated from grid data) ----------------------------------------------------------------------- **NOTE:** *Day 3 design note: The MAP FAL and the Turning stat introduction are intentionally unified in this session. The V2 context block explicitly states: \"The coordinate grid work IS the Turning stat introduction for the cognitive reveal sequence.\" This resolves what might appear to be a conflict between the MAP FAL session replacing the Challenge Block and the requirement to introduce the Turning stat on Day 3. No constraint is dropped.* ----------------------------------------------------------------------- -----------------------------------------------------------------------",
+    "facilitatorRisk": {
+      "risk": "The MAP FAL becomes a worksheet exercise where campers just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
+      "say": "\"Before Part 2: stop everyone. Say \"Look at your graph and the team next to yours. Your lines are different shapes. I want one sentence from each team, not what the formula says, but what your bot physically did differently to create that shape. Start there.\" Then, when you transition to the coordinate navigation: \"This grid is your new stat. Turning controls how your bot moves through this space. Let's see what it actually does.\"\" |"
+    }
+  },
+  {
+    "day": 4,
+    "week": 1,
+    "weekName": "Play Lab + Boot Camp",
+    "weekday": "Thursday",
+    "theme": "Power: Ratio, Motor Speed, and the Scoop",
+    "activities": [
+      {
+        "name": "Finger Speed-Sums",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Scoop Build + Ratio Testing",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code Time",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
+    "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
+    "los": "LO 1.2 (proportional calculation applied to Power stat); LO 3.2 (distance calculations verified against bot kick test data)",
+    "facilitatorRisk": {
+      "risk": "Campers assume more Power always wins and stop thinking about trade-offs in the 20-point budget. Cognitive overload from trying to optimize all four stats simultaneously.",
+      "say": "\"Before anyone changes that speed value: what happens to your Endurance if you give 3 more points to Power? Calculate it. Your total is still 20. Where does that Power come from? Your equation has four variables. Show me the trade-off on paper before you touch the code.\" |"
+    }
+  },
+  {
+    "day": 5,
+    "week": 1,
+    "weekName": "Play Lab + Boot Camp",
+    "weekday": "Friday",
+    "theme": "The Full System: 20 Points, Four Stats, One Equation",
+    "activities": [
+      {
+        "name": "Conditional Simon Says",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
+        "mins": 50,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Cold Recall Check",
+        "mins": 10,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Match Format Briefing",
+        "mins": 10,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Simulation Matches: Your Loadout vs. Reality",
+        "mins": 80,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code Time",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "What is one thing you are good at that most people do not know about? Be specific. Name the thing. Give a real example from your own life. You have 5 minutes. |",
+    "funElement": "Misconception correction: Equals sign as balance (activates today. Day 5 is the first day the full budget equation is introduced, making this the natural placement for the correction).",
+    "los": "LO 1.1 (all four stat-to-formula pairs applied); LO 1.2 (all four formula calculations correct across three loadout options); LO 5.1 (data dashboard with first simulation entries); LO 9.1 (Week 1 journal: one personal strength named with a specific example) # WEEK 2: THE BUILD + FIRST SEASON *Energy register: Competitive, invested, occasionally frustrated. The leaderboard is up. The data dashboard is live. Frustration is productive here. It means campers care.* +-----------------------------------------------------------------------+ | **OPEN LAB PROTOCOL: WEEKS 2 AND 3** Starting Week 2, Open Lab runs two parallel tracks. Campers choose which one to join at the start of each Open Lab. Both tracks are legitimate uses of the time. **Track A: Data Dive** Review the data dashboard. Revise predictions. Analyze residuals. Run formula calculations for next match prep. This track has a specific prompt in each day's Open Lab description. **Track B: Bot Lab** Experiment with MakeCode. Test a new scoop angle. Try a weird loadout you would never use in a real match. Drive backwards at full speed and observe Turning behavior. No required output. Just bot time. Track choice is self-selected and publicly visible. A team that chooses Bot Lab after a loss is avoiding their data. That tells you something. Do not redirect them immediately. Watch for one full Open Lab. If they choose Bot Lab after two consecutive losses without any dashboard revision, ask one question: \"What would your data tell you if you looked right now?\" Then step back and let them decide. The self-selection is diagnostic, not a problem to fix. Teams that consistently choose Track A are doing the analytical work the program is designed to produce. Teams that consistently choose Track B may be more engaged with the physical system than the mathematical one. Both are valid paths through the program. Only one of them produces a competitive advantage in Season 2. Let them figure that out. +=======================================================================+ +-----------------------------------------------------------------------+",
+    "facilitatorRisk": {
+      "risk": "Campers treat the budget constraint as a puzzle with one optimal answer, stopping creative exploration of trade-offs after the first \"good\" loadout. Facilitator talking too long about the constraint concept reinforces this.",
+      "say": "\"Launch in under 5 minutes and say nothing else until the grapple is over. The only words after you put the equation on the board are: \"Design three different loadouts. Show all four formula calculations for each. You have 20 minutes.\" Then stop talking and walk to the back of the room.\" |"
+    }
+  },
+  {
+    "day": 6,
+    "week": 2,
+    "weekName": "Season 1",
+    "weekday": "Monday",
+    "theme": "Lock In Your Build: Allocations, Fabrication, One Hard Correction",
+    "activities": [
+      {
+        "name": "Equation Relay Race",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Official Stat Allocation: Interleaved Problem Set",
+        "mins": 50,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Scoop Finalization + MakeCode Programming",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Free Code or Final Verification",
+        "mins": 45,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write one personal goal and one team goal for this week. Post them on the wall next to your bot's name. You have 3 minutes. |",
+    "funElement": "Season 1 begins tomorrow. Anticipation of real matches creates investment in getting the allocation right today.",
+    "los": "LO 1.2 (all four stat calculations on allocation sheet, 100% accuracy); LO 2.2 (Endurance decay equation derived from allocation); LO 6.1 (MakeCode motor command verified against proportional calculation)",
+    "facilitatorRisk": {
+      "risk": "The misconception correction becomes a 10-minute mini-lecture because the facilitator explains the concept twice in different ways, causing cognitive overload before fabrication begins.",
+      "say": "\"Do not explain it twice. Put one real team's numbers on the board, with their permission. Run the calculation once. Then say: \"Recalculate your own Speed change using this method. I will come check it.\" Walk away. If they ask for clarification, point to the board. One example, one pass.\" |"
+    }
+  },
+  {
+    "day": 7,
+    "week": 2,
+    "weekName": "Season 1",
+    "weekday": "Tuesday",
+    "theme": "Season 1 Begins: First Blood and the Leaderboard",
+    "activities": [
+      {
+        "name": "Trashketball: Warm-Up Round",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Endurance Decay Equations in Slope-Intercept Form",
+        "mins": 50,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Pre-Match Prediction Huddle",
+        "mins": 10,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Season 1 Round-Robin Matches, Day 1",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      }
+    ],
+    "ends": "Name one math concept you used today. Write the full calculation. Share it with your teammate and explain what it means for your bot's behavior. Not formula terms. Bot terms. You have 4 minutes. |",
+    "funElement": "Leaderboard activates today: physical, public, updated after every match day. The Best Prediction column rewards mathematical accuracy, not just winning.",
+    "los": "LO 2.2 (Endurance decay equation in slope-intercept form, x-intercept calculated); LO 5.1 (data dashboard complete after first real matches); LO 7.1 (prediction logged before match, actual recorded after)",
+    "facilitatorRisk": {
+      "risk": "A team's first real loss triggers shutdown and the facilitator improvises an emotional response: either dismissing the feeling (\"it's just a game\") or over-validating it (\"you tried your best\"), cutting the team off from the data.",
+      "say": "\"Three steps, in this exact order, no improvising. Step 1: say this and stop: \"That result was frustrating. That's a real feeling and it makes sense.\" Wait 30 seconds. Do not add anything. Step 2: say: \"Your model predicted \\[X\\] goals. You scored \\[Y\\]. That gap is the most interesting thing that happened today. Let's find the one decision that created it.\" Open the dashboard. One stat only. Step 3: say: \"You have \\[N\\] matches left. You now have data you didn't have before. What's one thing you'd change?\" Write their answer down. That is their next hypothesis.\" |"
+    }
+  },
+  {
+    "day": 8,
+    "week": 2,
+    "weekName": "Season 1",
+    "weekday": "Wednesday",
+    "theme": "MAP FAL: Matching Situations, Graphs, and Linear Equations",
+    "activities": [
+      {
+        "name": "Math Scavenger Hunt: Leaderboard Edition",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Energy Reset (3 min)",
+        "mins": 3,
+        "block": "Transition\\"
+      },
+      {
+        "name": "MAP FAL Session: Matching Situations, Graphs, and Linear Equations",
+        "mins": 50,
+        "block": "Challenge Block (MAP FAL)\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Season 1 Match Day 2",
+        "mins": 70,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Rivalry Cards",
+        "mins": 20,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab",
+        "mins": 25,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for exactly 2 minutes about what happened. You have 5 minutes total. |",
+    "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
+    "los": "LO 2.3 (scatter plot of Speed vs. Goals Scored with equation from two data points); LO 5.2 (scatter plot built from dashboard data, labeled); LO 7.1 (equation-based prediction logged before match)",
+    "facilitatorRisk": {
+      "risk": "The MAP FAL Part 1 \"matching\" activity feels like a worksheet and campers rush through the matching to get to the graph, losing the representational translation work that is the core of the session.",
+      "say": "\"Before you distribute the cards: \"You have three representations of the same thing: a situation in words, a data table, and a graph. They all describe the same relationship. Your job is to find which three belong together and be ready to explain why the graph looks the way it does given the numbers in the table. Do not match by elimination. Match by reasoning.\"\" |"
+    }
+  },
+  {
+    "day": 9,
+    "week": 2,
+    "weekName": "Season 1",
+    "weekday": "Thursday",
+    "theme": "Season 1: Adjustments, Linear Equations, and the Gap",
+    "activities": [
+      {
+        "name": "Rivalry Card Response",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Season 1 Match Day 3",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Post-Match Debrief and Free Code",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action\\].\" You have 3 minutes. |",
+    "funElement": "Rivalry cards drive ongoing engagement. Teams verify each other's data claims before match day.",
+    "los": "LO 2.3 (slope and y-intercept from two scatter plot points); LO 4.1 (slope-intercept form derived from match data); LO 7.2 (post-match revision with data-cited justification when \\>20% off)",
+    "facilitatorRisk": {
+      "risk": "When a team's linear equation produces a wrong prediction, they abandon the equation and go back to instinct, which loses the modeling iteration that is the purpose of Season 1.",
+      "say": "\"Do not throw out the equation. Your equation predicted \\[X\\] and the match gave \\[Y\\]. That is not a failure. That is your model telling you which variable it is missing. What is one specific thing that happened in the match that is not in your formula? Name it. That goes in the next version.\" |"
+    }
+  },
+  {
+    "day": 10,
+    "week": 2,
+    "weekName": "Season 1",
+    "weekday": "Friday",
+    "theme": "Season 1 Final Matches + Distance Formula",
+    "activities": [
+      {
+        "name": "Best Match Gallery Walk",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Distance Formula: How Far Did Your Bot Actually Travel?",
+        "mins": 50,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Cold Recall Check",
+        "mins": 10,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Season 1 Final Round",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Season 2 Planning",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
+    "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
+    "los": "LO 3.2 (distance formula applied to three coordinate pairs from match data); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded) # WEEK 3: COMMISSIONER'S WEEK + SECOND SEASON *Energy register: Empowered, analytical, creative. Campers run the rules committee. They change the game. This is the highest-agency week. Do not let facilitators take it back.*",
+    "facilitatorRisk": {
+      "risk": "The distance formula is treated as abstract algebra. Students plug in numbers without connecting it to the physical coordinate grid they have been driving on all week.",
+      "say": "\"Before you calculate: stand up and point to the two places on the grid where your bot was. Draw a straight line between them on your grid paper. That line is what you are calculating the length of. After you get your number, count the grid squares on the diagonal. Does your calculated number match what you see?\" |"
+    }
+  },
+  {
+    "day": 11,
+    "week": 3,
+    "weekName": "Season 2 + Commissioner",
+    "weekday": "Monday",
+    "theme": "You Run the League Now: Commissioner Prep + the Underdog Mechanic",
+    "activities": [
+      {
+        "name": "Human Number Line: Stat Rankings",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Underdog Mechanic Announced + Season 2 Stat Reallocation",
+        "mins": 30,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Practice Matches: Test New Loadout Hypotheses",
+        "mins": 55,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Commissioner Proposal Refinement",
+        "mins": 30,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write one personal goal and one team goal for this week. The personal goal must name a specific math skill, not \"get better at math.\" You have 3 minutes. |",
+    "funElement": "Underdog mechanic announced today. Public announcement is essential. Creates comeback narrative and keeps the last-place team mathematically engaged.",
+    "los": "LO 4.3 (systems of inequalities: three valid loadouts under dual constraints); LO 5.3 (Commissioner proposal with two cited data points addressing last-place team); LO 1.3 (percent change in Season 1 data used in proposal analysis)",
+    "facilitatorRisk": {
+      "risk": "Non-last-place teams feel the underdog mechanic is unfair and disengage from Commissioner prep to argue about it, leading to status hierarchy formation around winning record.",
+      "say": "\"Let them argue for exactly 60 seconds. Then say: \"Hold that thought. Look at the leaderboard. Is the current last-place team, with their Season 1 record, statistically a threat to your Season 2 wins if they get one free reallocation? Use the data. Show me the math.\" The argument usually resolves itself when they check the numbers.\" |"
+    }
+  },
+  {
+    "day": 12,
+    "week": 3,
+    "weekName": "Season 2 + Commissioner",
+    "weekday": "Tuesday",
+    "theme": "The Commissioner's Meeting: You Change the Rules",
+    "activities": [
+      {
+        "name": "Lobby the Commissioners",
+        "mins": 25,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Final Proposal Verification",
+        "mins": 35,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Commissioner's Meeting: Formal Presentations + Vote",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Season 2 Allocation Verification",
+        "mins": 35,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
+    "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Campers author the rules of their own game using data they collected.",
+    "los": "LO 4.3 (Season 2 loadout adjusted under new rule constraints); LO 5.3 (data-backed argument scored on rubric); LO 8.1 (3-minute presentation scored on evidence quality and math content)",
+    "facilitatorRisk": {
+      "risk": "One team's proposal dominates the meeting and other teams disengage from verifying the math in their own proposals. Anxiety contagion when a confident team presents first.",
+      "say": "\"After each presentation, before the vote, ask the whole room: \"Does this proposal use the data correctly? Can anyone verify the math?\" This is not about challenging teams. It makes the entire room responsible for the accuracy of what gets voted into the rules. Do this after every single proposal, including the strongest one.\" |"
+    }
+  },
+  {
+    "day": 13,
+    "week": 3,
+    "weekName": "Season 2 + Commissioner",
+    "weekday": "Wednesday",
+    "theme": "MAP FAL: Your Win Equation + Season 2 Begins",
+    "activities": [
+      {
+        "name": "The Prediction Market",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Energy Reset (3 min)",
+        "mins": 3,
+        "block": "Transition\\"
+      },
+      {
+        "name": "MAP FAL Session: Building and Solving Linear Equations",
+        "mins": 50,
+        "block": "Challenge Block (MAP FAL)\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Season 2 Match Day 1",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      }
+    ],
+    "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
+    "funElement": "Prediction market creates public stakes around the MAP FAL work. Season 2 under new rules gives the whole room a fresh start.",
+    "los": "LO 4.1 (slope-intercept equation from two match data points); LO 4.2 (pre-match prediction logged before match begins, actual recorded after); LO 6.2 (three-form representation: stat number, equation, MakeCode block)",
+    "facilitatorRisk": {
+      "risk": "Teams rush through the MAP FAL equation work to get to Season 2 matches, producing equations without slope or y-intercept labeled.",
+      "say": "\"Before you release teams to the afternoon: I need one equation from each team written on the whiteboard: slope labeled, y-intercept labeled, two source data points labeled. That is the only thing that gets your team to the matches. If it is not on the board, you are not playing yet. This is not punishment. Your prediction has to exist before the match starts or there is nothing to test.\" |"
+    }
+  },
+  {
+    "day": 14,
+    "week": 3,
+    "weekName": "Season 2 + Commissioner",
+    "weekday": "Thursday",
+    "theme": "Season 2: Percent Change and the Model vs. the Match",
+    "activities": [
+      {
+        "name": "Stat Auction + Prediction Check",
+        "mins": 30,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Percent Change: Season 1 to Season 2 Configurations",
+        "mins": 50,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Season 2 Match Day 2",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      }
+    ],
+    "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action in tomorrow's schedule\\].\" You have 3 minutes. |",
+    "funElement": "Prediction market still active. Teams track Season 2 record against public prediction.",
+    "los": "LO 1.3 (percent change vs. percentage point difference, three consecutive correct dashboard entries); LO 4.2 (pre-match prediction logged and compared each match); LO 7.2 (revision entry with data-cited justification when \\>20% off)",
+    "facilitatorRisk": {
+      "risk": "Campers confuse percent change and percentage point difference and treat the two numbers as interchangeable in their Commissioner proposals and scouting reports, a misconception that compounds from here forward.",
+      "say": "\"Stop and put both numbers side by side on the board using one team's actual data. Say: \"This team changed Speed from 4 to 7 points. That is 3 percentage points different. The percent change is (7 - 4) / 4 x 100 = 75%. Their bot is 75% faster, not 3% faster. Which number tells you more about the actual change in bot behavior? Why?\" Make teams answer in one sentence before moving on.\" |"
+    }
+  },
+  {
+    "day": 15,
+    "week": 3,
+    "weekName": "Season 2 + Commissioner",
+    "weekday": "Friday",
+    "theme": "Creative Expression: Bot Identity + Scouting Begins",
+    "activities": [
+      {
+        "name": "Bot Lore Gallery Walk",
+        "mins": 25,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Bot Identity + Creative Expression",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Scouting Continuation or Identity Refinement",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
+    "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
+    "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
+    "facilitatorRisk": {
+      "risk": "Creative expression becomes pure decoration with no mathematical connection. Campers spend 90 minutes on visual design with no reference to their stat system.",
+      "say": "\"Before the creative block starts, read your slogan to me out loud. It must reference a stat, equation, or data point. \"Team Velocity\" is a team name. \"Speed = 7: 35% Power and Still Climbing\" is a slogan with math. You have 2 minutes to revise if yours does not include a number. The creativity is real. It just has to connect to what your bot actually does.\" |"
+    }
+  },
+  {
+    "day": 16,
+    "week": 4,
+    "weekName": "Championship",
+    "weekday": "Monday",
+    "theme": "Scouting Reports + Final Commissioner's Meeting Begins",
+    "activities": [
+      {
+        "name": "Memory Probe: Scout Your Opponent Cold",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Final Commissioner's Meeting, Part 1",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Championship Loadout Verification",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write one personal goal and one team goal for this final week. The personal goal must name something mathematical you want to be able to explain clearly to a visitor on Thursday. You have 3 minutes. |",
+    "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
+    "los": "LO 7.3 (scouting report sections 3 and 4: trend line equation with prediction and inequality strategy); LO 4.3 (valid Championship loadouts under new constraints); LO 8.1 (Commissioner presentation with numerical evidence)",
+    "facilitatorRisk": {
+      "risk": "Scouting report verbal check-ins become interrogations that make campers feel tested rather than expert, which re-triggers math shame in the final week.",
+      "say": "\"Frame it as preparation, not evaluation. Say: \"I am going to ask you to walk me through one calculation from your scouting report. Pretend I am a visitor at the Exhibition who has never seen this before. Explain it so I understand what it means about your opponent.\" Expert framing, not quiz framing. If they stumble, say: \"Take 2 minutes to review it. I will come back.\"\" |"
+    }
+  },
+  {
+    "day": 17,
+    "week": 4,
+    "weekName": "Championship",
+    "weekday": "Tuesday",
+    "theme": "Championship Prep: Pre-Match Pitch Rehearsal + Final Adjustments",
+    "activities": [
+      {
+        "name": "Cold Retrieval + Scouting Annotation",
+        "mins": 25,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Final Commissioner's Meeting, Part 2 + Championship Bracket Reveal",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "What-If? Analysis",
+        "mins": 15,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Open Lab: Pitch Refinement and Bot Prep",
+        "mins": 25,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Name one mathematical claim from today's pre-match pitch rehearsals, from any team, not just yours. Write the calculation. Explain to a teammate why citing that specific number makes the argument stronger than a general claim. You have 4 minutes. |",
+    "funElement": "Championship bracket reveal creates maximum anticipation.",
+    "los": "LO 7.3 (scouting report complete, all four sections verified); LO 8.1 (pre-match pitch rehearsed with peer feedback on specificity); LO 8.2 (first rehearsal of expert-level explanation of proportional reasoning)",
+    "facilitatorRisk": {
+      "risk": "Pre-match pitch rehearsal focuses on delivery polish rather than mathematical specificity. Campers practice sounding confident rather than citing accurate numbers.",
+      "say": "\"The judges tomorrow are scoring on one thing: mathematical specificity. Every claim needs a number. \"Our bot is fast\" scores zero. \"Our Speed = 7 gives us 35% motor power, which is 10 percentage points above the league average Speed of 5\" scores full points. Before you leave today, every claim in your pitch has a number next to it on paper.\" |"
+    }
+  },
+  {
+    "day": 18,
+    "week": 4,
+    "weekName": "Championship",
+    "weekday": "Wednesday",
+    "theme": "Championship Tournament",
+    "activities": [
+      {
+        "name": "Pre-Championship Ritual",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Championship Rounds 1 and 2",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Championship Semifinals and Final",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Reflection Time",
+        "mins": 25,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
+    "funElement": "Pre-match pitch to judges activates today, scored on mathematical specificity. This is the moment all four weeks of math work is tested in a live, high-stakes public setting.",
+    "los": "LO 7.1 (pre-match prediction logged before every Championship match); LO 7.2 (post-match revision if \\>20% off); LO 8.1 (pre-match pitch scored by judges on rubric for evidence quality and math content)",
+    "facilitatorRisk": {
+      "risk": "Championship emotions make the loss-recovery protocol feel inadequate and the facilitator extends it into longer emotional support that skips the data step, causing loss-driven disengagement in the highest-stakes moment of the program.",
+      "say": "\"The three-step script does not change because the stakes are higher. Step 1: \"That result was frustrating. That's a real feeling and it makes sense.\" Stop. 30 seconds. Step 2: \"Your model predicted \\[X\\]. You got \\[Y\\]. That gap is the most interesting thing that happened. Find the one decision that created it.\" Open the dashboard. One stat only. Step 3: \"What is one thing you would change?\" Write it down. The Championship context is not a reason to skip the math. It is the reason the math matters most right now.\" |"
+    }
+  },
+  {
+    "day": 19,
+    "week": 4,
+    "weekName": "Championship",
+    "weekday": "Thursday",
+    "theme": "Community Exhibition: You Are the Experts Now",
+    "activities": [
+      {
+        "name": "Expert Setup",
+        "mins": 25,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Community Exhibition: Teaching Begins",
+        "mins": 90,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Extended Exhibition + Best Teacher Voting",
+        "mins": 60,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Scouting Report Verbal Check + Vote Count (concurrent)",
+        "mins": 45,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Final Debrief and Prep",
+        "mins": 15,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "Write: \"The skill I used today to teach a visitor was \\[name it\\] and I know it worked when \\[describe the specific moment you saw them understand it\\].\" You have 3 minutes. |",
+    "funElement": "Best Teacher vote collected by visitors today. Winner announced at tomorrow's ceremony. Creates anticipation and social recognition for mathematical communication, not just winning. Scouting Report Verbal Check runs concurrently with vote count in the afternoon.",
+    "los": "LO 8.2 (visitor completes coordinate plotting, navigation, and proportional reasoning explanation independently); LO 3.1 (coordinate plotting reviewed and taught to visitors); LO 1.2 (proportional reasoning explanation verified by visitor completion); LO 7.3 (scouting report verbal check: one calculation explained, method described, bot behavior implication named)",
+    "facilitatorRisk": {
+      "risk": "Campers feel embarrassed or exposed teaching visitors who are parents, adults, or people they know, which re-triggers math shame in a social context with high personal stakes.",
+      "say": "\"This conversation happens before visitors arrive. Say: \"In 20 minutes, someone is going to walk through that door and not know how any of this works. You know more about this than they do. That is not arrogance. That is four weeks of work. Your job is not to impress them. Your job is to help them understand one thing. Just one. That is it.\"\" |"
+    }
+  },
+  {
+    "day": 20,
+    "week": 4,
+    "weekName": "Championship",
+    "weekday": "Friday",
+    "theme": "Awards, Post-Task Diagnostic, and the Close",
+    "activities": [
+      {
+        "name": "Walk the Wall: Final Gallery",
+        "mins": 20,
+        "block": "Hook\\"
+      },
+      {
+        "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
+        "mins": 15,
+        "block": "Challenge Block\\"
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 30,
+        "block": "Transition\\"
+      },
+      {
+        "name": "Awards Ceremony",
+        "mins": 60,
+        "block": "Match-Build-Make\\"
+      },
+      {
+        "name": "Open Lab: Final Free Time",
+        "mins": 40,
+        "block": "Open Lab\\"
+      }
+    ],
+    "ends": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes. |",
+    "funElement": "Best Teacher award announced. Social recognition for mathematical communication, not winning. Awards ceremony closes the program with campers as the experts. The verbal check ran on Day 19. Day 20 is the celebration.",
+    "los": "LO 7.1 (post-task diagnostic reflects Season 1 and 2 prediction practice); LO 8.2 (Best Teacher award outcome reflects visitor-assessed teaching quality); Note: LO 9.2 verbal reflection runs at the awards ceremony (Hello Insight post-survey) and is assessed there, not in the daily LO field. Scouting Report Verbal Check (LO 7.3) completed on Day 19 afternoon. # SCOPE AND SEQUENCE SUMMARY",
+    "facilitatorRisk": {
+      "risk": "Post-task diagnostic triggers end-of-program anxiety and campers disengage from it, treating it as a formality. Cognitive overload after four weeks.",
+      "say": "\"Say this before distributing the diagnostic: \"On Day 1, you filled out something like this and most of you did not know most of the answers. Today you do. I am not grading you against anyone else. I am comparing you to yourself from four weeks ago. Every answer you know today that you did not know on Day 1 is evidence of what happened in this room. Fill it out completely.\"\" |"
+    }
+  }
+];
