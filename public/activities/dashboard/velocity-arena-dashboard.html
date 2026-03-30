@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena · Team Data Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --slate: #2B2D42;
+    --red: #EF233C;
+    --ice: #EDF2F4;
+    --steel: #8D99AE;
+    --white: #ffffff;
+    --border: rgba(43,45,66,0.12);
+    --font: 'Montserrat', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--ice);
+    color: var(--slate);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--slate);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--red);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-mark svg { width: 16px; height: 16px; }
+  .logo-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .logo-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--steel);
+    letter-spacing: 0.04em;
+  }
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-select {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+  }
+  .header-select option { background: var(--slate); color: var(--white); }
+  .save-btn {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+  }
+  .save-btn:hover { opacity: 0.88; }
+  .save-btn:active { opacity: 0.75; }
+
+  /* TEAM BAR */
+  .team-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .team-tab {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--steel);
+    padding: 14px 18px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+  }
+  .team-tab:hover { color: var(--slate); }
+  .team-tab.active {
+    color: var(--slate);
+    border-bottom-color: var(--red);
+  }
+  .add-team-btn {
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--steel);
+    padding: 8px 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .add-team-btn:hover { color: var(--red); }
+
+  /* MAIN LAYOUT */
+  .main { padding: 1.5rem 2rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+  /* SECTION HEADERS */
+  .section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 0.75rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* STAT LOADOUT */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-row {
+    background: var(--ice);
+    border-radius: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+  .stat-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .stat-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .stat-pts-input {
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--red);
+    width: 52px;
+    text-align: center;
+    border: none;
+    background: var(--white);
+    border-radius: 4px;
+    padding: 2px 4px;
+    outline: none;
+    border: 1.5px solid var(--border);
+  }
+  .stat-pts-input:focus { border-color: var(--red); }
+  .stat-pts-label {
+    font-size: 10px;
+    color: var(--steel);
+    font-weight: 600;
+    text-align: center;
+  }
+  .stat-formula {
+    font-size: 11px;
+    color: var(--steel);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .stat-result {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate);
+  }
+  .stat-result span {
+    color: var(--red);
+    font-weight: 800;
+  }
+  .budget-bar-wrap {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .budget-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .budget-total { font-size: 15px; font-weight: 800; }
+  .budget-bar-bg {
+    height: 6px;
+    background: var(--ice);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--slate);
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+  .budget-bar-fill.over { background: var(--red); }
+  .budget-warning {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--red);
+    margin-top: 4px;
+    display: none;
+  }
+  .budget-warning.show { display: block; }
+
+  /* MATCH LOG */
+  .match-table-wrap { overflow-x: auto; }
+  table.match-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 640px;
+  }
+  table.match-table th {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--steel);
+    padding: 6px 10px;
+    text-align: left;
+    background: var(--ice);
+    border-bottom: 1px solid var(--border);
+  }
+  table.match-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--slate);
+    font-weight: 400;
+    vertical-align: middle;
+  }
+  table.match-table tr:last-child td { border-bottom: none; }
+  table.match-table tr:hover td { background: #f9fafa; }
+  .outcome-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .outcome-w { background: #e6f4ec; color: #1a7a3e; }
+  .outcome-l { background: #fde8e8; color: #b91c1c; }
+  .outcome-d { background: #f0f0f0; color: #555; }
+
+  .add-match-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    align-items: end;
+  }
+  .form-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 4px;
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    width: 100%;
+    padding: 7px 9px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--slate);
+    background: var(--white);
+    outline: none;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { border-color: var(--red); }
+  .add-row-btn {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--slate);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    align-self: flex-end;
+    transition: background 0.15s;
+    height: 34px;
+  }
+  .add-row-btn:hover { background: var(--red); }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--steel);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .delete-btn:hover { color: var(--red); background: #fde8e8; }
+
+  /* STAT CHANGE JUSTIFICATION */
+  .justification-row {
+    display: grid;
+    grid-template-columns: 160px 80px 80px 1fr;
+    gap: 8px;
+    align-items: start;
+    margin-bottom: 10px;
+  }
+  .just-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--steel);
+    padding-top: 9px;
+  }
+  .justification-row input,
+  .justification-row select,
+  .justification-row textarea {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 9px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--slate);
+    background: var(--white);
+    outline: none;
+    width: 100%;
+  }
+  .justification-row textarea { resize: vertical; min-height: 34px; }
+  .justification-row input:focus,
+  .justification-row select:focus,
+  .justification-row textarea:focus { border-color: var(--red); }
+
+  /* FOUR VIEWS */
+  .four-views-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .view-panel {
+    background: var(--ice);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    padding: 1rem;
+  }
+  .view-panel-title {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.75rem;
+  }
+  .data-point-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .data-point-row input {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--slate);
+    background: var(--white);
+    outline: none;
+    width: 100%;
+  }
+  .data-point-row input:focus { border-color: var(--red); }
+  .view-small-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--steel);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .chart-wrap { position: relative; height: 200px; }
+  .equation-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .eq-box {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    width: 60px;
+    padding: 5px 7px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--red);
+    background: var(--white);
+    outline: none;
+    text-align: center;
+  }
+  .eq-box:focus { border-color: var(--red); }
+  .rw-sentence textarea {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 400;
+    width: 100%;
+    padding: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    color: var(--slate);
+    background: var(--white);
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+  .rw-sentence textarea:focus { border-color: var(--red); }
+
+  /* SEASON/WEEK INFO */
+  .meta-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .meta-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    flex: 1;
+  }
+  .meta-field label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--steel);
+    white-space: nowrap;
+  }
+  .meta-field input {
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    outline: none;
+    color: var(--slate);
+    background: transparent;
+    width: 100%;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--slate);
+    color: var(--white);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 6px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .main { padding: 1rem; }
+    .stat-grid { grid-template-columns: 1fr; }
+    .four-views-grid { grid-template-columns: 1fr; }
+    .justification-row { grid-template-columns: 1fr 1fr; }
+    .justification-row .just-reason { grid-column: 1 / -1; }
+    .header { padding: 0 1rem; }
+    .team-bar { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="6" stroke="white" stroke-width="1.5"/>
+        <path d="M5 8l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Velocity Arena</div>
+      <div class="logo-sub">Team Data Dashboard</div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <select class="header-select" id="site-select">
+      <option value="michigan">Michigan</option>
+      <option value="new_york">New York</option>
+      <option value="rhode_island">Rhode Island</option>
+      <option value="tennessee">Tennessee</option>
+    </select>
+    <button class="save-btn" onclick="saveDashboard()">Save</button>
+  </div>
+</header>
+
+<!-- TEAM TABS -->
+<div class="team-bar" id="team-bar">
+  <!-- populated by JS -->
+  <button class="add-team-btn" onclick="addTeam()" title="Add team">+</button>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- META -->
+  <div class="meta-row">
+    <div class="meta-field">
+      <label>Season</label>
+      <input type="text" id="meta-season" placeholder="Summer 2026">
+    </div>
+    <div class="meta-field">
+      <label>Week</label>
+      <input type="number" id="meta-week" min="1" max="4" placeholder="1">
+    </div>
+    <div class="meta-field">
+      <label>Team</label>
+      <input type="text" id="meta-teamname" placeholder="Team name" oninput="renameCurrentTeam(this.value)">
+    </div>
+  </div>
+
+  <!-- STAT LOADOUT -->
+  <div class="card">
+    <div class="card-title">
+      <span>Stat Loadout</span>
+      <span style="font-size:10px;font-weight:400;color:var(--steel);">Each stat 1–20 · Total must equal 20</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-row" id="stat-speed">
+        <div class="stat-row-header">
+          <span class="stat-name">Speed</span>
+          <div>
+            <input class="stat-pts-input" type="number" min="1" max="20" id="pts-speed" value="5" oninput="calcStats()">
+            <div class="stat-pts-label">/ 20</div>
+          </div>
+        </div>
+        <div class="stat-formula">motor speed = (pts / 20) × 100</div>
+        <div class="stat-result">Motor power: <span id="calc-speed">25%</span></div>
+      </div>
+      <div class="stat-row" id="stat-power">
+        <div class="stat-row-header">
+          <span class="stat-name">Power</span>
+          <div>
+            <input class="stat-pts-input" type="number" min="1" max="20" id="pts-power" value="5" oninput="calcStats()">
+            <div class="stat-pts-label">/ 20</div>
+          </div>
+        </div>
+        <div class="stat-formula">charge speed = pts² %</div>
+        <div class="stat-result">Charge speed: <span id="calc-power">25%</span></div>
+      </div>
+      <div class="stat-row" id="stat-turning">
+        <div class="stat-row-header">
+          <span class="stat-name">Turning</span>
+          <div>
+            <input class="stat-pts-input" type="number" min="1" max="20" id="pts-turning" value="5" oninput="calcStats()">
+            <div class="stat-pts-label">/ 20</div>
+          </div>
+        </div>
+        <div class="stat-formula">turn radius = 50 / Turning</div>
+        <div class="stat-result">Turn radius: <span id="calc-turning">10</span> grid units</div>
+      </div>
+      <div class="stat-row" id="stat-endurance">
+        <div class="stat-row-header">
+          <span class="stat-name">Endurance</span>
+          <div>
+            <input class="stat-pts-input" type="number" min="1" max="20" id="pts-endurance" value="5" oninput="calcStats()">
+            <div class="stat-pts-label">/ 20</div>
+          </div>
+        </div>
+        <div class="stat-formula">P(t) = 100 − (20 − E) × 1.5 × t</div>
+        <div class="stat-result">Decay rate: <span id="calc-endurance">22.5</span> / min</div>
+      </div>
+    </div>
+    <div class="budget-bar-wrap">
+      <div class="budget-label">
+        <span style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--steel);">Budget</span>
+        <span class="budget-total" id="budget-total">20 / 20</span>
+      </div>
+      <div class="budget-bar-bg">
+        <div class="budget-bar-fill" id="budget-bar" style="width:100%;"></div>
+      </div>
+      <div class="budget-warning" id="budget-warning">Over budget — reduce your total to exactly 20</div>
+    </div>
+  </div>
+
+  <!-- MATCH LOG -->
+  <div class="card">
+    <div class="card-title">
+      <span>Match Log</span>
+      <span style="font-size:10px;font-weight:400;color:var(--steel);">Fill every row by end of each match day</span>
+    </div>
+    <div class="match-table-wrap">
+      <table class="match-table" id="match-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Match #</th>
+            <th>Speed (pts)</th>
+            <th>Goals / min</th>
+            <th>Possession</th>
+            <th>Predicted</th>
+            <th>Actual</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="match-tbody">
+          <!-- populated by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="add-match-form">
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" id="new-date">
+      </div>
+      <div class="form-field">
+        <label>Match #</label>
+        <input type="number" id="new-match" min="1" placeholder="1">
+      </div>
+      <div class="form-field">
+        <label>Speed</label>
+        <input type="number" id="new-speed" min="1" max="20" placeholder="pts">
+      </div>
+      <div class="form-field">
+        <label>Goals / min</label>
+        <input type="number" id="new-goals" step="0.1" placeholder="0.0">
+      </div>
+      <div class="form-field">
+        <label>Possession %</label>
+        <input type="number" id="new-poss" min="0" max="100" placeholder="50">
+      </div>
+      <div class="form-field">
+        <label>Predicted</label>
+        <select id="new-pred">
+          <option value="">—</option>
+          <option value="W">Win</option>
+          <option value="L">Loss</option>
+          <option value="D">Draw</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Actual</label>
+        <select id="new-actual">
+          <option value="">—</option>
+          <option value="W">Win</option>
+          <option value="L">Loss</option>
+          <option value="D">Draw</option>
+        </select>
+      </div>
+      <div class="form-field" style="grid-column: span 2">
+        <label>Notes</label>
+        <input type="text" id="new-notes" placeholder="anything notable">
+      </div>
+      <button class="add-row-btn" onclick="addMatchRow()">+ Add row</button>
+    </div>
+  </div>
+
+  <!-- STAT CHANGE JUSTIFICATION -->
+  <div class="card">
+    <div class="card-title">
+      <span>Stat Change Justification</span>
+      <span style="font-size:10px;font-weight:400;color:var(--steel);">Explain every change using match log data</span>
+    </div>
+    <div id="justification-rows">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- FOUR VIEWS -->
+  <div class="card">
+    <div class="card-title">
+      <span>Four Views Protocol</span>
+    </div>
+    <div class="four-views-grid">
+
+      <!-- TABLE -->
+      <div class="view-panel">
+        <div class="view-panel-title">Table</div>
+        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Pick two columns from your match log — one for x, one for y. Enter 5 rows.</p>
+        <div style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:4px;margin-bottom:3px;">
+            <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">X</span>
+            <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">Y</span>
+            <span></span>
+          </div>
+          <div id="data-points">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <button class="add-row-btn" style="font-size:11px;padding:6px 12px;height:auto;" onclick="addDataPoint()">+ Add point</button>
+      </div>
+
+      <!-- GRAPH -->
+      <div class="view-panel">
+        <div class="view-panel-title">Graph</div>
+        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Label both axes, then check: does the line of best fit go up, down, or flat? What does that tell you?</p>
+        <div style="margin-bottom:6px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div>
+              <span class="view-small-label">X-axis label</span>
+              <input type="text" id="x-label" placeholder="e.g. Speed (pts)" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+            </div>
+            <div>
+              <span class="view-small-label">Y-axis label</span>
+              <input type="text" id="y-label" placeholder="e.g. Goals / min" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="four-views-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- EQUATION -->
+      <div class="view-panel">
+        <div class="view-panel-title">Equation</div>
+        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">The slope and intercept fill in automatically from your data. Then explain in words what the slope actually means for your bot.</p>
+        <div class="equation-inputs" style="margin-bottom:1rem;">
+          <span style="color:var(--slate);">y =</span>
+          <input class="eq-box" type="text" id="eq-slope" placeholder="___" oninput="updateEquationText()">
+          <span style="color:var(--slate);">x +</span>
+          <input class="eq-box" type="text" id="eq-intercept" placeholder="___" oninput="updateEquationText()">
+        </div>
+        <div>
+          <span class="view-small-label">Slope means:</span>
+          <textarea id="eq-meaning" placeholder="For every 1 unit increase in ___, ___ changes by ___." style="font-family:var(--font);font-size:12px;padding:7px 9px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;resize:vertical;min-height:60px;color:var(--slate);background:var(--white);"></textarea>
+        </div>
+      </div>
+
+      <!-- REAL-WORLD SENTENCE -->
+      <div class="view-panel rw-sentence">
+        <div class="view-panel-title">Real-World Sentence</div>
+        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Write one sentence a non-math person could understand. No variables, no symbols — just plain English about your bot.</p>
+        <span class="view-small-label">For every 1 point increase in ___,</span>
+        <textarea id="rw-text" placeholder="For every 1 point increase in Speed, my bot's distance covered per match changes by ___."></textarea>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+// ─── DATA MODEL ───────────────────────────────────────────
+const SITES = ['michigan','new_york','rhode_island','tennessee'];
+const SITE_LABELS = { michigan:'Michigan', new_york:'New York', rhode_island:'Rhode Island', tennessee:'Tennessee' };
+
+function defaultTeam(name) {
+  return {
+    name,
+    season: 'Summer 2026',
+    week: 1,
+    stats: { speed: 5, power: 5, turning: 5, endurance: 5 },
+    matchLog: [],
+    justifications: [
+      { stat: '', from: '', to: '', reason: '' },
+      { stat: '', from: '', to: '', reason: '' },
+      { stat: '', from: '', to: '', reason: '' }
+    ],
+    fourViews: {
+      dataPoints: [
+        { x: '', y: '' },
+        { x: '', y: '' },
+        { x: '', y: '' },
+        { x: '', y: '' },
+        { x: '', y: '' }
+      ],
+      xLabel: '',
+      yLabel: '',
+      slope: '',
+      intercept: '',
+      eqMeaning: '',
+      rwText: ''
+    }
+  };
+}
+
+function initSiteData() {
+  const d = {};
+  SITES.forEach(s => {
+    d[s] = { teams: [defaultTeam('Team A'), defaultTeam('Team B'), defaultTeam('Team C')] };
+  });
+  return d;
+}
+
+// ─── SHEETS ENDPOINTS ─────────────────────────────────────
+// After deploying each site's Apps Script, paste the Web app
+// URL here. Leave as empty string until ready.
+const SHEET_ENDPOINTS = {
+  michigan:      'https://script.google.com/macros/s/AKfycbzGhgPoHPgdzhylwKewlU6EdsnkEsPJSvg-bk26nIwuVslgN5CseO6MRK4wiHYLXzIm/exec',
+  new_york:      'https://script.google.com/macros/s/AKfycbz7Qv0_mSl_0gmW0q-LDVE_7lw1IwNE43YsEzQ1STNzWASSClXySDlrAFh__xusguRKeA/exec',
+  rhode_island:  'https://script.google.com/macros/s/AKfycbykNGNX7fNcgHFqaZfnuPEn2IGJVdbd3Mk9HMxvN08f8Y1aICa0lexzaCQ_OXmdheSt/exec',
+  tennessee:     'https://script.google.com/macros/s/AKfycbzHIwnFVBsirYDtUVTjH4IStEtHVKcIRKigziFEz5aFuHNf1rglkjzHIkRjmX7OOQ0/exec'
+};
+
+
+// Local cache — mirrors what's in Sheets. Falls back to
+// localStorage when endpoints are not configured yet.
+let allData = JSON.parse(localStorage.getItem('va_dashboard') || 'null') || initSiteData();
+let currentSite = document.getElementById('site-select').value;
+let currentTeamIdx = 0;
+let fourViewsChart = null;
+let isSaving = false;
+
+function currentSiteData() { return allData[currentSite]; }
+function currentTeam() { return currentSiteData().teams[currentTeamIdx]; }
+function sheetsEnabled() { return !!SHEET_ENDPOINTS[currentSite]; }
+
+// ─── SITE / TEAM SWITCHING ─────────────────────────────────
+document.getElementById('site-select').addEventListener('change', async function() {
+  currentSite = this.value;
+  currentTeamIdx = 0;
+  await loadFromSheets(currentSite);
+  renderTeamBar();
+  renderAll();
+});
+
+function renderTeamBar() {
+  const bar = document.getElementById('team-bar');
+  const addBtn = bar.querySelector('.add-team-btn');
+  bar.querySelectorAll('.team-tab').forEach(b => b.remove());
+  currentSiteData().teams.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'team-tab' + (i === currentTeamIdx ? ' active' : '');
+    btn.textContent = t.name;
+    btn.onclick = () => { currentTeamIdx = i; renderTeamBar(); renderAll(); };
+    bar.insertBefore(btn, addBtn);
+  });
+}
+
+function addTeam() {
+  const n = currentSiteData().teams.length;
+  const letters = 'ABCDEFGHIJKLMNOP';
+  currentSiteData().teams.push(defaultTeam('Team ' + (letters[n] || (n+1))));
+  currentTeamIdx = n;
+  renderTeamBar();
+  renderAll();
+}
+
+function renameCurrentTeam(val) {
+  currentTeam().name = val || 'Team';
+  renderTeamBar();
+}
+
+// ─── RENDER ALL ────────────────────────────────────────────
+function renderAll() {
+  const t = currentTeam();
+  document.getElementById('meta-season').value = t.season;
+  document.getElementById('meta-week').value = t.week;
+  document.getElementById('meta-teamname').value = t.name;
+  document.getElementById('pts-speed').value = t.stats.speed;
+  document.getElementById('pts-power').value = t.stats.power;
+  document.getElementById('pts-turning').value = t.stats.turning;
+  document.getElementById('pts-endurance').value = t.stats.endurance;
+  calcStats();
+  renderMatchTable();
+  renderJustifications();
+  renderDataPoints();
+  document.getElementById('x-label').value = t.fourViews.xLabel;
+  document.getElementById('y-label').value = t.fourViews.yLabel;
+  document.getElementById('eq-slope').value = t.fourViews.slope;
+  document.getElementById('eq-intercept').value = t.fourViews.intercept;
+  document.getElementById('eq-meaning').value = t.fourViews.eqMeaning;
+  document.getElementById('rw-text').value = t.fourViews.rwText;
+  updateChart();
+}
+
+// ─── META INPUTS ───────────────────────────────────────────
+document.getElementById('meta-season').addEventListener('input', function() { currentTeam().season = this.value; });
+document.getElementById('meta-week').addEventListener('input', function() { currentTeam().week = parseInt(this.value)||1; });
+
+// ─── STAT CALCULATIONS ─────────────────────────────────────
+function calcStats() {
+  const s = parseInt(document.getElementById('pts-speed').value) || 0;
+  const p = parseInt(document.getElementById('pts-power').value) || 0;
+  const tr = parseInt(document.getElementById('pts-turning').value) || 0;
+  const e = parseInt(document.getElementById('pts-endurance').value) || 0;
+  const t = currentTeam();
+  t.stats = { speed: s, power: p, turning: tr, endurance: e };
+
+  document.getElementById('calc-speed').textContent = Math.round((s / 20) * 100) + '%';
+  document.getElementById('calc-power').textContent = Math.round(p * p) + '%';
+  document.getElementById('calc-turning').textContent = tr > 0 ? (50 / tr).toFixed(1) : '—';
+  const decay = (20 - e) * 1.5;
+  document.getElementById('calc-endurance').textContent = decay.toFixed(1);
+
+  const total = s + p + tr + e;
+  const pct = Math.min((total / 20) * 100, 100);
+  document.getElementById('budget-total').textContent = total + ' / 20';
+  document.getElementById('budget-total').style.color = total > 20 ? 'var(--red)' : total === 20 ? '#1a7a3e' : 'var(--slate)';
+  document.getElementById('budget-bar').style.width = pct + '%';
+  document.getElementById('budget-bar').classList.toggle('over', total > 20);
+  document.getElementById('budget-warning').classList.toggle('show', total > 20);
+}
+
+// ─── MATCH LOG ─────────────────────────────────────────────
+function renderMatchTable() {
+  const tbody = document.getElementById('match-tbody');
+  tbody.innerHTML = '';
+  const rows = currentTeam().matchLog;
+  if (rows.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="9" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tbody.appendChild(tr);
+    return;
+  }
+  rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    const outcomeClass = r.actual === 'W' ? 'outcome-w' : r.actual === 'L' ? 'outcome-l' : r.actual ? 'outcome-d' : '';
+    const predClass = r.predicted === 'W' ? 'outcome-w' : r.predicted === 'L' ? 'outcome-l' : r.predicted ? 'outcome-d' : '';
+    tr.innerHTML = `
+      <td>${r.date||'—'}</td>
+      <td>${r.match||'—'}</td>
+      <td>${r.speed||'—'}</td>
+      <td>${r.goals||'—'}</td>
+      <td>${r.poss ? r.poss+'%' : '—'}</td>
+      <td>${r.predicted ? '<span class="outcome-badge '+predClass+'">'+r.predicted+'</span>' : '—'}</td>
+      <td>${r.actual ? '<span class="outcome-badge '+outcomeClass+'">'+r.actual+'</span>' : '—'}</td>
+      <td style="max-width:140px;white-space:normal;font-size:11px;">${r.notes||'—'}</td>
+      <td><button class="delete-btn" onclick="deleteMatchRow(${i})">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addMatchRow() {
+  const row = {
+    date: document.getElementById('new-date').value,
+    match: document.getElementById('new-match').value,
+    speed: document.getElementById('new-speed').value,
+    goals: document.getElementById('new-goals').value,
+    poss: document.getElementById('new-poss').value,
+    predicted: document.getElementById('new-pred').value,
+    actual: document.getElementById('new-actual').value,
+    notes: document.getElementById('new-notes').value
+  };
+  currentTeam().matchLog.push(row);
+  ['new-date','new-match','new-speed','new-goals','new-poss','new-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('new-pred').value = '';
+  document.getElementById('new-actual').value = '';
+  renderMatchTable();
+}
+
+function deleteMatchRow(i) {
+  currentTeam().matchLog.splice(i, 1);
+  renderMatchTable();
+}
+
+// ─── JUSTIFICATIONS ────────────────────────────────────────
+function renderJustifications() {
+  const container = document.getElementById('justification-rows');
+  container.innerHTML = '';
+  currentTeam().justifications.forEach((j, i) => {
+    const row = document.createElement('div');
+    row.className = 'justification-row';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="just-label" style="white-space:nowrap;padding-top:0;">I am changing</span>
+        <select onchange="updateJust(${i},'stat',this.value)" style="font-family:var(--font);font-size:12px;font-weight:600;padding:7px 8px;border:1.5px solid var(--border);border-radius:4px;color:var(--slate);background:var(--white);outline:none;min-width:100px;">
+          <option value="" ${!j.stat?'selected':''}>— stat —</option>
+          <option value="Speed" ${j.stat==='Speed'?'selected':''}>Speed</option>
+          <option value="Power" ${j.stat==='Power'?'selected':''}>Power</option>
+          <option value="Turning" ${j.stat==='Turning'?'selected':''}>Turning</option>
+          <option value="Endurance" ${j.stat==='Endurance'?'selected':''}>Endurance</option>
+        </select>
+      </div>
+      <div>
+        <label class="view-small-label">From</label>
+        <input type="number" min="1" max="20" value="${j.from}" placeholder="—" onchange="updateJust(${i},'from',this.value)">
+      </div>
+      <div>
+        <label class="view-small-label">To</label>
+        <input type="number" min="1" max="20" value="${j.to}" placeholder="—" onchange="updateJust(${i},'to',this.value)">
+      </div>
+      <div class="just-reason">
+        <label class="view-small-label">Because (use data from match log)</label>
+        <textarea rows="2" onchange="updateJust(${i},'reason',this.value)" style="font-family:var(--font);font-size:12px;padding:7px 9px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;resize:vertical;min-height:34px;color:var(--slate);background:var(--white);">${j.reason}</textarea>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function updateJust(i, field, val) {
+  currentTeam().justifications[i][field] = val;
+}
+
+// ─── FOUR VIEWS ────────────────────────────────────────────
+function renderDataPoints() {
+  const container = document.getElementById('data-points');
+  container.innerHTML = '';
+  currentTeam().fourViews.dataPoints.forEach((pt, i) => {
+    const row = document.createElement('div');
+    row.className = 'data-point-row';
+    row.innerHTML = `
+      <input type="number" step="any" value="${pt.x}" placeholder="x" oninput="updateDataPoint(${i},'x',this.value)">
+      <input type="number" step="any" value="${pt.y}" placeholder="y" oninput="updateDataPoint(${i},'y',this.value)">
+      <button class="delete-btn" onclick="removeDataPoint(${i})" style="font-size:12px;">✕</button>
+    `;
+    container.appendChild(row);
+  });
+  updateChart();
+}
+
+function updateDataPoint(i, field, val) {
+  currentTeam().fourViews.dataPoints[i][field] = val;
+  updateChart();
+}
+
+function addDataPoint() {
+  currentTeam().fourViews.dataPoints.push({ x: '', y: '' });
+  renderDataPoints();
+}
+
+function removeDataPoint(i) {
+  currentTeam().fourViews.dataPoints.splice(i, 1);
+  renderDataPoints();
+}
+
+function updateChart() {
+  const fv = currentTeam().fourViews;
+  fv.xLabel = document.getElementById('x-label').value;
+  fv.yLabel = document.getElementById('y-label').value;
+
+  const pts = fv.dataPoints
+    .map(p => ({ x: parseFloat(p.x), y: parseFloat(p.y) }))
+    .filter(p => !isNaN(p.x) && !isNaN(p.y));
+
+  const datasets = [
+    {
+      label: 'Data',
+      data: pts,
+      backgroundColor: '#EF233C',
+      pointRadius: 5,
+      pointHoverRadius: 7
+    }
+  ];
+
+  // Line of best fit
+  if (pts.length >= 2) {
+    const n = pts.length;
+    const sumX = pts.reduce((a, p) => a + p.x, 0);
+    const sumY = pts.reduce((a, p) => a + p.y, 0);
+    const sumXY = pts.reduce((a, p) => a + p.x * p.y, 0);
+    const sumX2 = pts.reduce((a, p) => a + p.x * p.x, 0);
+    const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const b = (sumY - m * sumX) / n;
+    const minX = Math.min(...pts.map(p => p.x));
+    const maxX = Math.max(...pts.map(p => p.x));
+    datasets.push({
+      label: 'Best fit',
+      data: [{ x: minX, y: m * minX + b }, { x: maxX, y: m * maxX + b }],
+      type: 'line',
+      borderColor: '#2B2D42',
+      borderWidth: 1.5,
+      borderDash: [4, 3],
+      pointRadius: 0,
+      fill: false
+    });
+    if (!document.getElementById('eq-slope').value && !document.getElementById('eq-intercept').value) {
+      document.getElementById('eq-slope').value = m.toFixed(2);
+      document.getElementById('eq-intercept').value = b.toFixed(2);
+    }
+  }
+
+  const ctx = document.getElementById('four-views-chart');
+  if (fourViewsChart) { fourViewsChart.destroy(); fourViewsChart = null; }
+  fourViewsChart = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          title: { display: !!fv.xLabel, text: fv.xLabel, color: '#8D99AE', font: { family: 'Montserrat', size: 11, weight: '600' } },
+          ticks: { color: '#8D99AE', font: { family: 'Montserrat', size: 10 } },
+          grid: { color: 'rgba(141,153,174,0.15)' }
+        },
+        y: {
+          title: { display: !!fv.yLabel, text: fv.yLabel, color: '#8D99AE', font: { family: 'Montserrat', size: 11, weight: '600' } },
+          ticks: { color: '#8D99AE', font: { family: 'Montserrat', size: 10 } },
+          grid: { color: 'rgba(141,153,174,0.15)' }
+        }
+      }
+    }
+  });
+}
+
+function updateEquationText() {
+  const fv = currentTeam().fourViews;
+  fv.slope = document.getElementById('eq-slope').value;
+  fv.intercept = document.getElementById('eq-intercept').value;
+  fv.eqMeaning = document.getElementById('eq-meaning').value;
+}
+
+document.getElementById('rw-text').addEventListener('input', function() {
+  currentTeam().fourViews.rwText = this.value;
+});
+document.getElementById('eq-meaning').addEventListener('input', function() {
+  currentTeam().fourViews.eqMeaning = this.value;
+});
+
+// ─── SAVE ──────────────────────────────────────────────────
+async function saveDashboard() {
+  if (isSaving) return;
+
+  // Flush pending justification textareas
+  document.querySelectorAll('#justification-rows textarea').forEach((el, i) => {
+    if (currentTeam().justifications[i]) currentTeam().justifications[i].reason = el.value;
+  });
+
+  // Always write to localStorage as cache
+  localStorage.setItem('va_dashboard', JSON.stringify(allData));
+
+  if (!sheetsEnabled()) {
+    showToast('Saved locally — add Sheets URL to enable cloud sync');
+    return;
+  }
+
+  isSaving = true;
+  document.querySelector('.save-btn').textContent = 'Saving...';
+
+  try {
+    const res = await fetch(SHEET_ENDPOINTS[currentSite], {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'save',
+        team: currentTeam().name,
+        data: currentTeam()
+      })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      showToast('Saved to Sheets');
+    } else {
+      showToast('Sheets error: ' + (json.error || 'unknown'));
+    }
+  } catch (err) {
+    showToast('Could not reach Sheets — saved locally');
+    console.error(err);
+  } finally {
+    isSaving = false;
+    document.querySelector('.save-btn').textContent = 'Save';
+  }
+}
+
+// ─── LOAD FROM SHEETS ──────────────────────────────────────
+async function loadFromSheets(site) {
+  const endpoint = SHEET_ENDPOINTS[site];
+  if (!endpoint) return;
+
+  showToast('Loading from Sheets...');
+  try {
+    const res = await fetch(endpoint + '?action=load');
+    const teams = await res.json();
+    if (Array.isArray(teams) && teams.length > 0) {
+      allData[site] = { teams };
+      localStorage.setItem('va_dashboard', JSON.stringify(allData));
+    }
+  } catch (err) {
+    console.warn('Could not load from Sheets, using local cache', err);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+(async () => {
+  await loadFromSheets(currentSite);
+  renderTeamBar();
+  renderAll();
+  // Set today's date as default for new matches
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('new-date').value = today;
+})();
+</script>
+</body>
+</html>
