@@ -122,7 +122,7 @@ const DAYS = [
         "mins": 20,
         "block": "Match-Build-Make",
         "description": "Your team names your bot. Then you write exactly one sentence explaining what it is fighting for. The name and sentence go on the wall right now and stay there for all four weeks.",
-        "link": "https://robot-name-19hw5mr3k-nycfirsts-projects.vercel.app/"
+        "link": "/activities/robot-names/index.html"
       },
       {
         "name": "Open Lab: Free Code Time",
