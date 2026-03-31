@@ -1193,19 +1193,47 @@ function renderMatchTable() {
   });
 }
 
+function getNextMatchNum(week) {
+  const log = currentTeam().matchLog || [];
+  let max = 0;
+  log.forEach(m => {
+    if (String(m.week) === String(week) && parseInt(m.match) > max) max = parseInt(m.match);
+  });
+  return max + 1;
+}
+
+function hasDuplicateMatch(week, matchNum) {
+  return currentTeam().matchLog.some(m => String(m.week) === String(week) && String(m.match) === String(matchNum));
+}
+
+// Auto-fill match # when week changes
+document.getElementById('new-week').addEventListener('change', function() {
+  document.getElementById('new-match').value = getNextMatchNum(this.value);
+});
+
 function addMatchRow() {
+  const week = document.getElementById('new-week').value;
+  const matchNum = document.getElementById('new-match').value;
+
+  // Warn on duplicate
+  if (matchNum && hasDuplicateMatch(week, matchNum)) {
+    if (!confirm('Match #' + matchNum + ' already exists for Week ' + week + '. Add it anyway?')) return;
+  }
+
   const row = {
-    week: document.getElementById('new-week').value,
+    week,
     date: document.getElementById('new-date').value,
-    match: document.getElementById('new-match').value,
+    match: matchNum,
     opponent: document.getElementById('new-opponent').value,
     score: document.getElementById('new-score').value,
     wl: document.getElementById('new-wl').value,
     notes: document.getElementById('new-notes').value
   };
   currentTeam().matchLog.push(row);
-  ['new-date','new-match','new-opponent','new-score','new-notes'].forEach(id => document.getElementById(id).value = '');
+  ['new-date','new-opponent','new-score','new-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('new-wl').value = '';
+  // Auto-increment match # for next entry
+  document.getElementById('new-match').value = getNextMatchNum(week);
   renderMatchTable();
 }
 
@@ -1609,6 +1637,7 @@ function showToast(msg) {
   renderAll();
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('new-date').value = today;
+  document.getElementById('new-match').value = getNextMatchNum(document.getElementById('new-week').value);
 })();
 </script>
 </body>
