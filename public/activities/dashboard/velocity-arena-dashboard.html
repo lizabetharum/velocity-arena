@@ -763,7 +763,7 @@
       <!-- TABLE -->
       <div class="view-panel">
         <div class="view-panel-title">Table</div>
-        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Pick two columns from your match log — one for x, one for y. Enter 5 rows.</p>
+        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Choose two things to compare from your match data. For example: x = Match # and y = Goals scored, or x = Speed points and y = Goals scored. Enter one row per match. Look for a pattern.</p>
         <div style="margin-bottom:6px;">
           <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:4px;margin-bottom:3px;">
             <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">X</span>
@@ -844,6 +844,7 @@ function defaultTeam(name) {
     justifications: [
       { stat: '', from: '', to: '', reason: '' },
       { stat: '', from: '', to: '', reason: '' },
+      { stat: '', from: '', to: '', reason: '' },
       { stat: '', from: '', to: '', reason: '' }
     ],
     fourViews: {
@@ -907,13 +908,26 @@ document.getElementById('site-select').addEventListener('change', async function
 function renderTeamBar() {
   const bar = document.getElementById('team-bar');
   const addBtn = bar.querySelector('.add-team-btn');
-  bar.querySelectorAll('.team-tab').forEach(b => b.remove());
+  bar.querySelectorAll('.team-tab').forEach(b => { if (b.parentElement !== bar) b.parentElement.remove(); else b.remove(); });
   currentSiteData().teams.forEach((t, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:inline-flex;align-items:center;position:relative;';
     const btn = document.createElement('button');
     btn.className = 'team-tab' + (i === currentTeamIdx ? ' active' : '');
     btn.textContent = t.name;
     btn.onclick = () => { currentTeamIdx = i; renderTeamBar(); renderAll(); };
-    bar.insertBefore(btn, addBtn);
+    wrap.appendChild(btn);
+    if (currentSiteData().teams.length > 1) {
+      const del = document.createElement('button');
+      del.textContent = '\u00d7';
+      del.title = 'Delete ' + t.name;
+      del.style.cssText = 'font-size:11px;color:var(--steel);background:none;border:none;cursor:pointer;padding:0 4px;margin-left:-4px;line-height:1;opacity:0.5;';
+      del.onmouseenter = () => { del.style.opacity = '1'; del.style.color = 'var(--red)'; };
+      del.onmouseleave = () => { del.style.opacity = '0.5'; del.style.color = 'var(--steel)'; };
+      del.onclick = (e) => { e.stopPropagation(); deleteTeam(i); };
+      wrap.appendChild(del);
+    }
+    bar.insertBefore(wrap, addBtn);
   });
 }
 
@@ -922,6 +936,15 @@ function addTeam() {
   const letters = 'ABCDEFGHIJKLMNOP';
   currentSiteData().teams.push(defaultTeam('Team ' + (letters[n] || (n+1))));
   currentTeamIdx = n;
+  renderTeamBar();
+  renderAll();
+}
+
+function deleteTeam(i) {
+  const name = currentSiteData().teams[i].name;
+  if (!confirm('Delete "' + name + '" and all its data?')) return;
+  currentSiteData().teams.splice(i, 1);
+  if (currentTeamIdx >= currentSiteData().teams.length) currentTeamIdx = currentSiteData().teams.length - 1;
   renderTeamBar();
   renderAll();
 }
@@ -995,14 +1018,18 @@ function renderMatchTable() {
   }
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
-    const wlClass = r.wl === 'W' ? 'outcome-w' : r.wl === 'L' ? 'outcome-l' : r.wl ? 'outcome-d' : '';
     tr.innerHTML = `
-      <td>${r.date||'—'}</td>
-      <td>${r.match||'—'}</td>
-      <td>${r.opponent||'—'}</td>
-      <td>${r.score||'—'}</td>
-      <td>${r.wl ? '<span class="outcome-badge '+wlClass+'">'+r.wl+'</span>' : '—'}</td>
-      <td style="max-width:180px;white-space:normal;font-size:11px;">${r.notes||'—'}</td>
+      <td><input type="date" value="${r.date||''}" onchange="updateMatch(${i},'date',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><input type="number" value="${r.match||''}" onchange="updateMatch(${i},'match',this.value)" min="1" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><input type="text" value="${r.opponent||''}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><input type="text" value="${r.score||''}" onchange="updateMatch(${i},'score',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:60px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><select onchange="updateMatch(${i},'wl',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
+        <option value="" ${!r.wl?'selected':''}>--</option>
+        <option value="W" ${r.wl==='W'?'selected':''}>W</option>
+        <option value="L" ${r.wl==='L'?'selected':''}>L</option>
+        <option value="D" ${r.wl==='D'?'selected':''}>D</option>
+      </select></td>
+      <td><input type="text" value="${r.notes||''}" onchange="updateMatch(${i},'notes',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><button class="delete-btn" onclick="deleteMatchRow(${i})">✕</button></td>
     `;
     tbody.appendChild(tr);
@@ -1022,6 +1049,10 @@ function addMatchRow() {
   ['new-date','new-match','new-opponent','new-score','new-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('new-wl').value = '';
   renderMatchTable();
+}
+
+function updateMatch(i, field, val) {
+  currentTeam().matchLog[i][field] = val;
 }
 
 function deleteMatchRow(i) {
