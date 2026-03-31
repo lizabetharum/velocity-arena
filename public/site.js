@@ -42,8 +42,8 @@ function renderHeader(activePage) {
   document.getElementById('site-header').innerHTML = `
     <div class="site-header">
       <div class="header-inner">
-        <a class="logo-block" href="/index.html" style="text-decoration:none;display:flex;align-items:center;gap:12px;">
-          <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:64px;width:auto;">
+        <a class="logo-block" href="/index.html" style="text-decoration:none;display:flex;align-items:flex-end;gap:12px;">
+          <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:64px;width:auto;margin-bottom:-2px;">
           <div>
             <div class="logo-program">NYC FIRST · Summer Math Camp 2026</div>
             <div class="logo-name">Velocity <span>Arena</span></div>
