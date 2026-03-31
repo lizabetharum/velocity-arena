@@ -463,6 +463,35 @@
   .justification-row textarea:focus { border-color: var(--red); }
 
   /* FOUR VIEWS */
+  .fv-steps { display: flex; flex-direction: column; gap: 0; }
+  .fv-step {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 0 14px;
+    padding-bottom: 1.5rem;
+    position: relative;
+  }
+  .fv-step:last-child { padding-bottom: 0; }
+  .fv-step::before {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 36px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .fv-step:last-child::before { display: none; }
+  .fv-step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--red); color: var(--white);
+    font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .fv-step-body { min-width: 0; }
+  .fv-step-title { font-size: 13px; font-weight: 800; color: var(--slate); margin-bottom: 2px; line-height: 36px; }
+  .fv-step-hint { font-size: 11px; color: var(--steel); line-height: 1.5; margin-bottom: 10px; }
   .four-views-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -610,7 +639,9 @@
   @media (max-width: 640px) {
     .main { padding: 1rem; }
     .stat-grid { grid-template-columns: 1fr; }
-    .four-views-grid { grid-template-columns: 1fr; }
+    .fv-step { grid-template-columns: 28px 1fr; gap: 0 10px; }
+    .fv-step-num { width: 28px; height: 28px; font-size: 12px; }
+    .fv-step::before { left: 13px; top: 28px; }
     .justification-row { grid-template-columns: 1fr; }
     .justification-row .just-reason { grid-column: 1 / -1; }
     .header { padding: 0 1rem; }
@@ -816,73 +847,92 @@
     </div>
   </div>
 
-  <!-- FOUR VIEWS -->
+  <!-- FOUR VIEWS OF A FUNCTION -->
   <div class="card">
     <div class="card-title">
-      <span>Four Views Protocol</span>
+      <span>Four Views of a Function</span>
+      <span style="font-size:10px;font-weight:400;color:var(--steel);">4 ways to see the same pattern</span>
     </div>
-    <div class="four-views-grid">
 
-      <!-- TABLE -->
-      <div class="view-panel">
-        <div class="view-panel-title">Table</div>
-        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Choose two things to compare from your match data. For example: x = Match # and y = Goals scored, or x = Speed points and y = Goals scored. Enter one row per match. Look for a pattern.</p>
-        <div style="margin-bottom:6px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:4px;margin-bottom:3px;">
-            <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">X</span>
-            <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">Y</span>
-            <span></span>
-          </div>
-          <div id="data-points">
-            <!-- populated by JS -->
+    <p style="font-size:12px;color:var(--steel);line-height:1.6;margin-bottom:1.25rem;">Pick one question about your bot to investigate. For example: <em>"Does more Speed mean more goals?"</em> Then show the answer four ways &mdash; in words, in a table, on a graph, and as an equation. All four should describe the same relationship.</p>
+
+    <div class="fv-steps">
+
+      <!-- STEP 1: WORDS -->
+      <div class="fv-step">
+        <div class="fv-step-num">1</div>
+        <div class="fv-step-body">
+          <div class="fv-step-title">Words</div>
+          <div class="fv-step-hint">Describe the relationship you are investigating in a full sentence. No numbers yet &mdash; just say what you think happens and why.</div>
+          <div class="view-panel">
+            <textarea id="rw-text" placeholder="Example: I think that when our team increases Speed, we score more goals because the bot reaches the ball faster." style="font-family:var(--font);font-size:12px;padding:9px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;resize:vertical;min-height:70px;color:var(--slate);background:var(--white);"></textarea>
           </div>
         </div>
-        <button class="add-row-btn" style="font-size:11px;padding:6px 12px;height:auto;" onclick="addDataPoint()">+ Add point</button>
       </div>
 
-      <!-- GRAPH -->
-      <div class="view-panel">
-        <div class="view-panel-title">Graph</div>
-        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Label both axes, then check: does the line of best fit go up, down, or flat? What does that tell you?</p>
-        <div style="margin-bottom:6px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-            <div>
-              <span class="view-small-label">X-axis label</span>
-              <input type="text" id="x-label" placeholder="e.g. Speed (pts)" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+      <!-- STEP 2: TABLE -->
+      <div class="fv-step">
+        <div class="fv-step-num">2</div>
+        <div class="fv-step-body">
+          <div class="fv-step-title">Table</div>
+          <div class="fv-step-hint">Use your match log to fill in the numbers. Pick one thing for X (the input you control, like Speed points) and one thing for Y (the result you measured, like Goals). One row per match.</div>
+          <div class="view-panel">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+              <div>
+                <span class="view-small-label">What is X? (input)</span>
+                <input type="text" id="x-label" placeholder="e.g. Speed (pts)" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+              </div>
+              <div>
+                <span class="view-small-label">What is Y? (result)</span>
+                <input type="text" id="y-label" placeholder="e.g. Goals scored" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:4px;margin-bottom:3px;">
+              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">X</span>
+              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">Y</span>
+              <span></span>
+            </div>
+            <div id="data-points">
+              <!-- populated by JS -->
+            </div>
+            <button class="add-row-btn" style="font-size:11px;padding:6px 12px;height:auto;" onclick="addDataPoint()">+ Add row</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: GRAPH -->
+      <div class="fv-step">
+        <div class="fv-step-num">3</div>
+        <div class="fv-step-body">
+          <div class="fv-step-title">Graph</div>
+          <div class="fv-step-hint">Your data points appear on the graph automatically. Look at the line: does it go up, down, or stay flat? A line going up means Y increases as X increases. A flat line means X does not affect Y.</div>
+          <div class="view-panel">
+            <div class="chart-wrap">
+              <canvas id="four-views-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: EQUATION -->
+      <div class="fv-step">
+        <div class="fv-step-num">4</div>
+        <div class="fv-step-body">
+          <div class="fv-step-title">Equation</div>
+          <div class="fv-step-hint">The slope and intercept are calculated from your table. The slope tells you: for every 1 unit X goes up, how much does Y change? Write what that means for your bot below.</div>
+          <div class="view-panel">
+            <div class="equation-inputs" style="margin-bottom:1rem;">
+              <span style="color:var(--slate);font-weight:700;">y =</span>
+              <input class="eq-box" type="text" id="eq-slope" placeholder="slope" oninput="updateEquationText()">
+              <span style="color:var(--slate);font-weight:700;">x +</span>
+              <input class="eq-box" type="text" id="eq-intercept" placeholder="intercept" oninput="updateEquationText()">
             </div>
             <div>
-              <span class="view-small-label">Y-axis label</span>
-              <input type="text" id="y-label" placeholder="e.g. Goals" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+              <span class="view-small-label">What does the slope mean for your bot?</span>
+              <textarea id="eq-meaning" placeholder="For every 1 extra point I put into ___, my ___ changes by ___. This means..." style="font-family:var(--font);font-size:12px;padding:8px 9px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;resize:vertical;min-height:60px;color:var(--slate);background:var(--white);"></textarea>
             </div>
           </div>
         </div>
-        <div class="chart-wrap">
-          <canvas id="four-views-chart"></canvas>
-        </div>
-      </div>
-
-      <!-- EQUATION -->
-      <div class="view-panel">
-        <div class="view-panel-title">Equation</div>
-        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">The slope and intercept fill in automatically from your data. Then explain in words what the slope actually means for your bot.</p>
-        <div class="equation-inputs" style="margin-bottom:1rem;">
-          <span style="color:var(--slate);">y =</span>
-          <input class="eq-box" type="text" id="eq-slope" placeholder="___" oninput="updateEquationText()">
-          <span style="color:var(--slate);">x +</span>
-          <input class="eq-box" type="text" id="eq-intercept" placeholder="___" oninput="updateEquationText()">
-        </div>
-        <div>
-          <span class="view-small-label">Slope means:</span>
-          <textarea id="eq-meaning" placeholder="For every 1 unit increase in ___, ___ changes by ___." style="font-family:var(--font);font-size:12px;padding:7px 9px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;resize:vertical;min-height:60px;color:var(--slate);background:var(--white);"></textarea>
-        </div>
-      </div>
-
-      <!-- REAL-WORLD SENTENCE -->
-      <div class="view-panel rw-sentence">
-        <div class="view-panel-title">Real-World Sentence</div>
-        <p style="font-size:11px;color:var(--steel);font-weight:400;margin-bottom:10px;line-height:1.5;">Write one sentence a non-math person could understand. No variables, no symbols — just plain English about your bot.</p>
-        <span class="view-small-label">For every 1 point increase in ___,</span>
-        <textarea id="rw-text" placeholder="For every 1 point increase in Speed, my bot's distance covered per match changes by ___."></textarea>
       </div>
 
     </div>
