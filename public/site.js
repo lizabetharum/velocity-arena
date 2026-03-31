@@ -43,7 +43,7 @@ function renderHeader(activePage) {
     <div class="site-header">
       <div class="header-inner">
         <a class="logo-block" href="/index.html" style="text-decoration:none;">
-          <div class="logo-program">NYC FIRST · Summer Math Camp 2025</div>
+          <div class="logo-program">NYC FIRST · Summer Math Camp 2026</div>
           <div class="logo-name">Velocity <span>Arena</span></div>
           <div class="logo-sub">4 weeks · BBC micro:bit v2 · Cutebot Pro robots · real algebra</div>
         </a>
@@ -64,7 +64,7 @@ function renderHeader(activePage) {
       </nav>
     </div>
     <footer class="site-footer">
-      Velocity Arena · NYC FIRST · Summer Math Camp 2025 ·
+      Velocity Arena · NYC FIRST · Summer Math Camp 2026 ·
       <a href="https://nycfirst.org">nycfirst.org</a>
     </footer>
   `;
