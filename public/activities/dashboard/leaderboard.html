@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Leaderboard</title>
+<style>
+  :root {
+    --font: 'Work Sans', -apple-system, sans-serif;
+    --navy: #0B1120;
+    --navy2: #111827;
+    --navy3: #1a2236;
+    --cyan: #00E5FF;
+    --white: #F8FAFC;
+    --slate: #94A3B8;
+    --border: #1e293b;
+    --green: #22c55e;
+    --red-l: #ef4444;
+    --gold: #f59e0b;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--navy); color: var(--white); min-height: 100vh; }
+
+  .header {
+    background: var(--navy2); border-bottom: 1px solid var(--border);
+    padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  .header h1 span { color: var(--cyan); }
+  .header-controls { display: flex; gap: 10px; align-items: center; }
+  .header select {
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    background: var(--navy3); color: var(--white); border: 1px solid var(--border);
+    padding: 7px 10px; border-radius: 4px; outline: none; cursor: pointer;
+  }
+  .header a {
+    font-size: 12px; font-weight: 600; color: var(--cyan); text-decoration: none;
+  }
+  .header a:hover { text-decoration: underline; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-size: 13px; font-weight: 700; color: var(--cyan); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 12px;
+  }
+  .section-note {
+    font-size: 11px; color: var(--slate); margin-bottom: 12px; line-height: 1.5;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    font-size: 10px; font-weight: 700; color: var(--slate); text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 8px 10px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 10px; border-bottom: 1px solid var(--border); color: var(--white);
+  }
+  tbody tr:hover { background: var(--navy3); }
+
+  .rank { font-weight: 800; color: var(--cyan); width: 30px; }
+  .team-name { font-weight: 700; }
+  .stat-w { color: var(--green); font-weight: 700; }
+  .stat-l { color: var(--red-l); font-weight: 700; }
+  .stat-d { color: var(--gold); font-weight: 700; }
+  .stat-pct { font-weight: 700; }
+
+  .trial-note {
+    background: var(--navy3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 14px; font-size: 11px; color: var(--slate); line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .no-data { text-align: center; padding: 40px; color: var(--slate); font-size: 13px; }
+
+  .week-tabs { display: flex; gap: 0; margin-bottom: 20px; }
+  .week-tab {
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    background: none; border: none; color: var(--slate); cursor: pointer;
+    padding: 8px 16px; border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .week-tab:hover { color: var(--white); }
+  .week-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+  .loading { text-align: center; padding: 60px; color: var(--slate); font-size: 14px; }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Velocity <span>Arena</span> Leaderboard</h1>
+  <div class="header-controls">
+    <select id="site-select">
+      <option value="michigan">Michigan</option>
+      <option value="new_york">New York</option>
+      <option value="rhode_island">Rhode Island</option>
+      <option value="tennessee">Tennessee</option>
+    </select>
+    <a href="velocity-arena-dashboard.html">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="trial-note">
+    Week 1 matches are trial runs and do not count toward standings. Weeks 2-4 are official.
+  </div>
+
+  <div class="week-tabs" id="week-tabs">
+    <button class="week-tab active" data-week="all" onclick="switchTab('all')">Overall</button>
+    <button class="week-tab" data-week="2" onclick="switchTab('2')">Week 2</button>
+    <button class="week-tab" data-week="3" onclick="switchTab('3')">Week 3</button>
+    <button class="week-tab" data-week="4" onclick="switchTab('4')">Week 4</button>
+  </div>
+
+  <div id="leaderboard-content">
+    <div class="loading">Loading teams...</div>
+  </div>
+
+</div>
+
+<script>
+const SHEET_ENDPOINTS = {
+  michigan:      'https://script.google.com/macros/s/AKfycbzGhgPoHPgdzhylwKewlU6EdsnkEsPJSvg-bk26nIwuVslgN5CseO6MRK4wiHYLXzIm/exec',
+  new_york:      'https://script.google.com/macros/s/AKfycbz7Qv0_mSl_0gmW0q-LDVE_7lw1IwNE43YsEzQ1STNzWASSClXySDlrAFh__xusguRKeA/exec',
+  rhode_island:  'https://script.google.com/macros/s/AKfycbykNGNX7fNcgHFqaZfnuPEn2IGJVdbd3Mk9HMxvN08f8Y1aICa0lexzaCQ_OXmdheSt/exec',
+  tennessee:     'https://script.google.com/macros/s/AKfycbzHIwnFVBsirYDtUVTjH4IStEtHVKcIRKigziFEz5aFuHNf1rglkjzHIkRjmX7OOQ0/exec'
+};
+
+let allTeams = [];
+let currentWeekFilter = 'all';
+
+function getCurrentSite() { return document.getElementById('site-select').value; }
+
+document.getElementById('site-select').addEventListener('change', loadLeaderboard);
+
+function switchTab(week) {
+  currentWeekFilter = week;
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.toggle('active', t.dataset.week === week));
+  renderLeaderboard();
+}
+
+async function loadLeaderboard() {
+  const container = document.getElementById('leaderboard-content');
+  const endpoint = SHEET_ENDPOINTS[getCurrentSite()];
+
+  if (!endpoint) {
+    container.innerHTML = '<div class="no-data">No cloud sync configured for this site.</div>';
+    return;
+  }
+
+  container.innerHTML = '<div class="loading">Loading teams...</div>';
+
+  try {
+    const res = await fetch(endpoint + '?action=load');
+    const teams = await res.json();
+    if (Array.isArray(teams) && teams.length > 0) {
+      allTeams = teams;
+    } else {
+      // Fall back to localStorage
+      const cached = JSON.parse(localStorage.getItem('va_dashboard') || 'null');
+      const site = getCurrentSite();
+      if (cached && cached[site] && cached[site].teams) {
+        allTeams = cached[site].teams;
+      } else {
+        allTeams = [];
+      }
+    }
+  } catch (err) {
+    // Fall back to localStorage
+    const cached = JSON.parse(localStorage.getItem('va_dashboard') || 'null');
+    const site = getCurrentSite();
+    if (cached && cached[site] && cached[site].teams) {
+      allTeams = cached[site].teams;
+    } else {
+      allTeams = [];
+    }
+  }
+
+  renderLeaderboard();
+}
+
+function tallyTeam(team, weekFilter) {
+  const log = team.matchLog || [];
+  let w = 0, l = 0, d = 0, goalsFor = 0, goalsAgainst = 0;
+
+  log.forEach(m => {
+    // Skip week 1 (trial) for standings
+    const mWeek = parseInt(m.week) || 2;
+    if (mWeek === 1) return;
+    if (weekFilter !== 'all' && mWeek !== parseInt(weekFilter)) return;
+
+    if (m.wl === 'W') w++;
+    else if (m.wl === 'L') l++;
+    else if (m.wl === 'D') d++;
+
+    // Parse score like "2-1"
+    if (m.score && m.score.includes('-')) {
+      const parts = m.score.split('-').map(Number);
+      if (!isNaN(parts[0])) goalsFor += parts[0];
+      if (!isNaN(parts[1])) goalsAgainst += parts[1];
+    }
+  });
+
+  const total = w + l + d;
+  const pct = total > 0 ? Math.round((w / total) * 100) : 0;
+  const pts = (w * 3) + d; // 3 points for win, 1 for draw
+
+  return { name: team.name, w, l, d, total, pct, pts, goalsFor, goalsAgainst, goalDiff: goalsFor - goalsAgainst };
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('leaderboard-content');
+
+  if (allTeams.length === 0) {
+    container.innerHTML = '<div class="no-data">No teams found. Teams need to save their dashboard first.</div>';
+    return;
+  }
+
+  const standings = allTeams
+    .map(t => tallyTeam(t, currentWeekFilter))
+    .sort((a, b) => b.pts - a.pts || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor);
+
+  const label = currentWeekFilter === 'all' ? 'Overall Standings (Weeks 2-4)' : 'Week ' + currentWeekFilter + ' Standings';
+
+  let html = `
+    <div class="section">
+      <div class="section-title">${label}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>W</th>
+            <th>L</th>
+            <th>D</th>
+            <th>Played</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>+/-</th>
+            <th>Pts</th>
+            <th>Win %</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+  if (standings.every(s => s.total === 0)) {
+    html += `<tr><td colspan="11" style="text-align:center;color:var(--slate);padding:24px;">No official matches recorded yet.</td></tr>`;
+  } else {
+    standings.forEach((s, i) => {
+      html += `
+        <tr>
+          <td class="rank">${i + 1}</td>
+          <td class="team-name">${s.name}</td>
+          <td class="stat-w">${s.w}</td>
+          <td class="stat-l">${s.l}</td>
+          <td class="stat-d">${s.d}</td>
+          <td>${s.total}</td>
+          <td>${s.goalsFor}</td>
+          <td>${s.goalsAgainst}</td>
+          <td style="font-weight:700;color:${s.goalDiff > 0 ? 'var(--green)' : s.goalDiff < 0 ? 'var(--red-l)' : 'var(--slate)'};">${s.goalDiff > 0 ? '+' : ''}${s.goalDiff}</td>
+          <td style="font-weight:800;color:var(--cyan);">${s.pts}</td>
+          <td class="stat-pct">${s.total > 0 ? s.pct + '%' : '--'}</td>
+        </tr>`;
+    });
+  }
+
+  html += `</tbody></table></div>`;
+  container.innerHTML = html;
+}
+
+// Init
+loadLeaderboard();
+</script>
+</body>
+</html>

@@ -641,6 +641,7 @@
       <option value="rhode_island">Rhode Island</option>
       <option value="tennessee">Tennessee</option>
     </select>
+    <a href="leaderboard.html" style="font-size:12px;font-weight:600;color:var(--white);text-decoration:none;border:1.5px solid rgba(255,255,255,0.3);padding:7px 12px;border-radius:4px;">Leaderboard</a>
     <button class="lookup-btn" onclick="showLookup()">Load Team</button>
     <span class="save-status" id="save-status"></span>
     <button class="save-btn" onclick="saveDashboard()">Save</button>
@@ -746,6 +747,7 @@
       <table class="match-table" id="match-table">
         <thead>
           <tr>
+            <th>Week</th>
             <th>Date</th>
             <th>Match #</th>
             <th>Opponent</th>
@@ -761,6 +763,15 @@
       </table>
     </div>
     <div class="add-match-form">
+      <div class="form-field">
+        <label>Week</label>
+        <select id="new-week">
+          <option value="1">1 (Trial)</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
       <div class="form-field">
         <label>Date</label>
         <input type="date" id="new-date">
@@ -1076,13 +1087,21 @@ function renderMatchTable() {
   const rows = currentTeam().matchLog;
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="7" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tr.innerHTML = '<td colspan="8" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
     tbody.appendChild(tr);
     return;
   }
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
+    const isTrial = r.week == 1;
+    if (isTrial) tr.style.opacity = '0.55';
     tr.innerHTML = `
+      <td><select onchange="updateMatch(${i},'week',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color:${isTrial?'var(--steel)':'var(--slate)'};" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
+        <option value="1" ${r.week==1?'selected':''}>1 (Trial)</option>
+        <option value="2" ${r.week==2?'selected':''}>2</option>
+        <option value="3" ${r.week==3?'selected':''}>3</option>
+        <option value="4" ${r.week==4?'selected':''}>4</option>
+      </select></td>
       <td><input type="date" value="${r.date||''}" onchange="updateMatch(${i},'date',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="number" value="${r.match||''}" onchange="updateMatch(${i},'match',this.value)" min="1" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="text" value="${r.opponent||''}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
@@ -1102,6 +1121,7 @@ function renderMatchTable() {
 
 function addMatchRow() {
   const row = {
+    week: document.getElementById('new-week').value,
     date: document.getElementById('new-date').value,
     match: document.getElementById('new-match').value,
     opponent: document.getElementById('new-opponent').value,
