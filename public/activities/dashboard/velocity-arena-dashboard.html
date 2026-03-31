@@ -696,11 +696,9 @@
           <tr>
             <th>Date</th>
             <th>Match #</th>
-            <th>Speed (pts)</th>
-            <th>Goals / min</th>
-            <th>Possession</th>
-            <th>Predicted</th>
-            <th>Actual</th>
+            <th>Opponent</th>
+            <th>Score</th>
+            <th>W/L</th>
             <th>Notes</th>
             <th></th>
           </tr>
@@ -720,38 +718,25 @@
         <input type="number" id="new-match" min="1" placeholder="1">
       </div>
       <div class="form-field">
-        <label>Speed</label>
-        <input type="number" id="new-speed" min="1" max="20" placeholder="pts">
+        <label>Opponent</label>
+        <input type="text" id="new-opponent" placeholder="Team name">
       </div>
       <div class="form-field">
-        <label>Goals / min</label>
-        <input type="number" id="new-goals" step="0.1" placeholder="0.0">
+        <label>Score</label>
+        <input type="text" id="new-score" placeholder="2-1">
       </div>
       <div class="form-field">
-        <label>Possession %</label>
-        <input type="number" id="new-poss" min="0" max="100" placeholder="50">
-      </div>
-      <div class="form-field">
-        <label>Predicted</label>
-        <select id="new-pred">
-          <option value="">—</option>
-          <option value="W">Win</option>
-          <option value="L">Loss</option>
-          <option value="D">Draw</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Actual</label>
-        <select id="new-actual">
-          <option value="">—</option>
-          <option value="W">Win</option>
-          <option value="L">Loss</option>
-          <option value="D">Draw</option>
+        <label>W/L</label>
+        <select id="new-wl">
+          <option value="">--</option>
+          <option value="W">W</option>
+          <option value="L">L</option>
+          <option value="D">D</option>
         </select>
       </div>
       <div class="form-field" style="grid-column: span 2">
         <label>Notes</label>
-        <input type="text" id="new-notes" placeholder="anything notable">
+        <input type="text" id="new-notes" placeholder="What happened? What to change?">
       </div>
       <button class="add-row-btn" onclick="addMatchRow()">+ Add row</button>
     </div>
@@ -804,7 +789,7 @@
             </div>
             <div>
               <span class="view-small-label">Y-axis label</span>
-              <input type="text" id="y-label" placeholder="e.g. Goals / min" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+              <input type="text" id="y-label" placeholder="e.g. Goals" style="font-family:var(--font);font-size:11px;font-weight:600;padding:4px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
             </div>
           </div>
         </div>
@@ -1004,23 +989,20 @@ function renderMatchTable() {
   const rows = currentTeam().matchLog;
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="9" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tr.innerHTML = '<td colspan="7" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
     tbody.appendChild(tr);
     return;
   }
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
-    const outcomeClass = r.actual === 'W' ? 'outcome-w' : r.actual === 'L' ? 'outcome-l' : r.actual ? 'outcome-d' : '';
-    const predClass = r.predicted === 'W' ? 'outcome-w' : r.predicted === 'L' ? 'outcome-l' : r.predicted ? 'outcome-d' : '';
+    const wlClass = r.wl === 'W' ? 'outcome-w' : r.wl === 'L' ? 'outcome-l' : r.wl ? 'outcome-d' : '';
     tr.innerHTML = `
       <td>${r.date||'—'}</td>
       <td>${r.match||'—'}</td>
-      <td>${r.speed||'—'}</td>
-      <td>${r.goals||'—'}</td>
-      <td>${r.poss ? r.poss+'%' : '—'}</td>
-      <td>${r.predicted ? '<span class="outcome-badge '+predClass+'">'+r.predicted+'</span>' : '—'}</td>
-      <td>${r.actual ? '<span class="outcome-badge '+outcomeClass+'">'+r.actual+'</span>' : '—'}</td>
-      <td style="max-width:140px;white-space:normal;font-size:11px;">${r.notes||'—'}</td>
+      <td>${r.opponent||'—'}</td>
+      <td>${r.score||'—'}</td>
+      <td>${r.wl ? '<span class="outcome-badge '+wlClass+'">'+r.wl+'</span>' : '—'}</td>
+      <td style="max-width:180px;white-space:normal;font-size:11px;">${r.notes||'—'}</td>
       <td><button class="delete-btn" onclick="deleteMatchRow(${i})">✕</button></td>
     `;
     tbody.appendChild(tr);
@@ -1031,17 +1013,14 @@ function addMatchRow() {
   const row = {
     date: document.getElementById('new-date').value,
     match: document.getElementById('new-match').value,
-    speed: document.getElementById('new-speed').value,
-    goals: document.getElementById('new-goals').value,
-    poss: document.getElementById('new-poss').value,
-    predicted: document.getElementById('new-pred').value,
-    actual: document.getElementById('new-actual').value,
+    opponent: document.getElementById('new-opponent').value,
+    score: document.getElementById('new-score').value,
+    wl: document.getElementById('new-wl').value,
     notes: document.getElementById('new-notes').value
   };
   currentTeam().matchLog.push(row);
-  ['new-date','new-match','new-speed','new-goals','new-poss','new-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('new-pred').value = '';
-  document.getElementById('new-actual').value = '';
+  ['new-date','new-match','new-opponent','new-score','new-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('new-wl').value = '';
   renderMatchTable();
 }
 
