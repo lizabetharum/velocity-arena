@@ -875,27 +875,43 @@
         <div class="fv-step-num">2</div>
         <div class="fv-step-body">
           <div class="fv-step-title">Table</div>
-          <div class="fv-step-hint">Use your match log to fill in the numbers. Pick one thing for X (the input you control, like Speed points) and one thing for Y (the result you measured, like Goals). One row per match.</div>
+          <div class="fv-step-hint">Pick what to compare from your match log. Choose an X (the input) and a Y (the result). The table fills in automatically from your matches. You can also add rows manually.</div>
           <div class="view-panel">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
               <div>
-                <span class="view-small-label">What is X? (input)</span>
-                <input type="text" id="x-label" placeholder="e.g. Speed (pts)" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+                <span class="view-small-label">X &mdash; input (what you control)</span>
+                <select id="x-field" onchange="autoPopulateTable()" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);background:var(--white);">
+                  <option value="">-- pick from match log --</option>
+                  <option value="match">Match #</option>
+                  <option value="week">Week</option>
+                  <option value="goals_for">Goals For (from score)</option>
+                  <option value="goals_against">Goals Against (from score)</option>
+                  <option value="custom">Custom (type my own)</option>
+                </select>
+                <input type="text" id="x-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);margin-top:4px;display:none;" oninput="updateChart()">
               </div>
               <div>
-                <span class="view-small-label">What is Y? (result)</span>
-                <input type="text" id="y-label" placeholder="e.g. Goals scored" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);" oninput="updateChart()">
+                <span class="view-small-label">Y &mdash; result (what you measure)</span>
+                <select id="y-field" onchange="autoPopulateTable()" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);background:var(--white);">
+                  <option value="">-- pick from match log --</option>
+                  <option value="match">Match #</option>
+                  <option value="week">Week</option>
+                  <option value="goals_for">Goals For (from score)</option>
+                  <option value="goals_against">Goals Against (from score)</option>
+                  <option value="custom">Custom (type my own)</option>
+                </select>
+                <input type="text" id="y-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);margin-top:4px;display:none;" oninput="updateChart()">
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:4px;margin-bottom:3px;">
-              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">X</span>
-              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;">Y</span>
+              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;" id="x-col-label">X</span>
+              <span style="font-size:10px;font-weight:700;color:var(--steel);letter-spacing:0.06em;" id="y-col-label">Y</span>
               <span></span>
             </div>
             <div id="data-points">
               <!-- populated by JS -->
             </div>
-            <button class="add-row-btn" style="font-size:11px;padding:6px 12px;height:auto;" onclick="addDataPoint()">+ Add row</button>
+            <button class="add-row-btn" style="font-size:11px;padding:6px 12px;height:auto;" onclick="addDataPoint()">+ Add row manually</button>
           </div>
         </div>
       </div>
@@ -1093,8 +1109,16 @@ function renderAll() {
   renderMatchTable();
   renderJustifications();
   renderDataPoints();
-  document.getElementById('x-label').value = t.fourViews.xLabel;
-  document.getElementById('y-label').value = t.fourViews.yLabel;
+  document.getElementById('x-field').value = t.fourViews.xField || '';
+  document.getElementById('y-field').value = t.fourViews.yField || '';
+  document.getElementById('x-label').value = t.fourViews.xLabel || '';
+  document.getElementById('y-label').value = t.fourViews.yLabel || '';
+  document.getElementById('x-label').style.display = t.fourViews.xField === 'custom' ? '' : 'none';
+  document.getElementById('y-label').style.display = t.fourViews.yField === 'custom' ? '' : 'none';
+  const xLbl = t.fourViews.xField && t.fourViews.xField !== 'custom' ? getFieldLabel(t.fourViews.xField) : (t.fourViews.xLabel || 'X');
+  const yLbl = t.fourViews.yField && t.fourViews.yField !== 'custom' ? getFieldLabel(t.fourViews.yField) : (t.fourViews.yLabel || 'Y');
+  document.getElementById('x-col-label').textContent = xLbl;
+  document.getElementById('y-col-label').textContent = yLbl;
   document.getElementById('eq-slope').value = t.fourViews.slope;
   document.getElementById('eq-intercept').value = t.fourViews.intercept;
   document.getElementById('eq-meaning').value = t.fourViews.eqMeaning;
@@ -1234,6 +1258,71 @@ function updateJust(i, field, val) {
 }
 
 // ─── FOUR VIEWS ────────────────────────────────────────────
+function getMatchFieldValue(match, field) {
+  if (field === 'match') return parseFloat(match.match) || '';
+  if (field === 'week') return parseFloat(match.week) || '';
+  if (field === 'goals_for') {
+    if (match.score && match.score.includes('-')) return parseFloat(match.score.split('-')[0]) || 0;
+    return '';
+  }
+  if (field === 'goals_against') {
+    if (match.score && match.score.includes('-')) return parseFloat(match.score.split('-')[1]) || 0;
+    return '';
+  }
+  return '';
+}
+
+function getFieldLabel(field) {
+  if (field === 'match') return 'Match #';
+  if (field === 'week') return 'Week';
+  if (field === 'goals_for') return 'Goals For';
+  if (field === 'goals_against') return 'Goals Against';
+  return '';
+}
+
+function autoPopulateTable() {
+  const xField = document.getElementById('x-field').value;
+  const yField = document.getElementById('y-field').value;
+  currentTeam().fourViews.xField = xField;
+  currentTeam().fourViews.yField = yField;
+  const xCustom = document.getElementById('x-label');
+  const yCustom = document.getElementById('y-label');
+
+  // Show/hide custom label inputs
+  xCustom.style.display = xField === 'custom' ? '' : 'none';
+  yCustom.style.display = yField === 'custom' ? '' : 'none';
+
+  // Update column headers
+  const xLabel = xField && xField !== 'custom' ? getFieldLabel(xField) : (xCustom.value || 'X');
+  const yLabel = yField && yField !== 'custom' ? getFieldLabel(yField) : (yCustom.value || 'Y');
+  document.getElementById('x-col-label').textContent = xLabel;
+  document.getElementById('y-col-label').textContent = yLabel;
+
+  // Auto-set the axis labels for the chart
+  if (xField && xField !== 'custom') document.getElementById('x-label').value = xLabel;
+  if (yField && yField !== 'custom') document.getElementById('y-label').value = yLabel;
+
+  // Only auto-populate if both fields are set to match log columns
+  if (!xField || !yField || xField === 'custom' || yField === 'custom') {
+    updateChart();
+    return;
+  }
+
+  const log = currentTeam().matchLog || [];
+  const points = [];
+  log.forEach(m => {
+    const x = getMatchFieldValue(m, xField);
+    const y = getMatchFieldValue(m, yField);
+    if (x !== '' && y !== '') points.push({ x: String(x), y: String(y) });
+  });
+
+  // Keep at least 5 rows
+  while (points.length < 5) points.push({ x: '', y: '' });
+
+  currentTeam().fourViews.dataPoints = points;
+  renderDataPoints();
+}
+
 function renderDataPoints() {
   const container = document.getElementById('data-points');
   container.innerHTML = '';
