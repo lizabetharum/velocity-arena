@@ -42,25 +42,25 @@ function renderHeader(activePage) {
   document.getElementById('site-header').innerHTML = `
     <div class="site-header">
       <div class="header-inner">
-        <a class="logo-block" href="/index.html" style="text-decoration:none;display:flex;align-items:flex-end;gap:12px;">
-          <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:64px;width:auto;margin-bottom:-2px;">
-          <div>
-            <div class="logo-program">NYC FIRST · Summer Math Camp 2026</div>
-            <div class="logo-name">Velocity <span>Arena</span></div>
-            <div class="logo-sub">4 weeks · BBC micro:bit v2 · Cutebot Pro robots · real algebra</div>
-          </div>
+        <a class="logo-block" href="/index.html" style="text-decoration:none;">
+          <div class="logo-program">NYC FIRST · Summer Math Camp 2026</div>
+          <div class="logo-name">Velocity <span>Arena</span></div>
+          <div class="logo-sub">4 weeks · BBC micro:bit v2 · Cutebot Pro robots · real algebra</div>
         </a>
-        <a href="/index.html" class="header-robot" style="text-decoration:none;">
-          <svg viewBox="0 0 40 40" fill="none">
-            <rect x="6" y="13" width="28" height="18" rx="4" fill="#00E5FF" fill-opacity=".1" stroke="#00E5FF" stroke-width="1.5"/>
-            <rect x="13" y="7" width="14" height="7" rx="3" fill="#00E5FF" fill-opacity=".1" stroke="#00E5FF" stroke-width="1.5"/>
-            <circle cx="14" cy="22" r="3" fill="#00E5FF"/>
-            <circle cx="26" cy="22" r="3" fill="#00E5FF"/>
-            <line x1="17" y1="22" x2="23" y2="22" stroke="#00E5FF" stroke-width="1.5"/>
-            <rect x="10" y="31" width="6" height="5" rx="1.5" fill="#00E5FF" fill-opacity=".4"/>
-            <rect x="24" y="31" width="6" height="5" rx="1.5" fill="#00E5FF" fill-opacity=".4"/>
-          </svg>
-        </a>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <a href="https://nycfirst.org" target="_blank"><img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:48px;width:auto;"></a>
+          <a href="/index.html" class="header-robot" style="text-decoration:none;">
+            <svg viewBox="0 0 40 40" fill="none">
+              <rect x="6" y="13" width="28" height="18" rx="4" fill="#00E5FF" fill-opacity=".1" stroke="#00E5FF" stroke-width="1.5"/>
+              <rect x="13" y="7" width="14" height="7" rx="3" fill="#00E5FF" fill-opacity=".1" stroke="#00E5FF" stroke-width="1.5"/>
+              <circle cx="14" cy="22" r="3" fill="#00E5FF"/>
+              <circle cx="26" cy="22" r="3" fill="#00E5FF"/>
+              <line x1="17" y1="22" x2="23" y2="22" stroke="#00E5FF" stroke-width="1.5"/>
+              <rect x="10" y="31" width="6" height="5" rx="1.5" fill="#00E5FF" fill-opacity=".4"/>
+              <rect x="24" y="31" width="6" height="5" rx="1.5" fill="#00E5FF" fill-opacity=".4"/>
+            </svg>
+          </a>
+        </div>
       </div>
       <nav class="site-nav">
         <div class="nav-inner">${getNavLink(activePage)}</div>
