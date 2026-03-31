@@ -99,6 +99,56 @@
   }
   .save-btn:hover { opacity: 0.88; }
   .save-btn:active { opacity: 0.75; }
+  .save-status {
+    font-size: 10px;
+    color: var(--steel);
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .lookup-btn {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--white);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    padding: 7px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: border-color 0.15s, opacity 0.15s;
+  }
+  .lookup-btn:hover { border-color: rgba(255,255,255,0.6); }
+  .lookup-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .lookup-box {
+    background: var(--white); border-radius: 8px; padding: 24px 28px;
+    width: 100%; max-width: 360px; text-align: center;
+  }
+  .lookup-box h3 { font-family: var(--font); font-size: 16px; color: var(--slate); margin: 0 0 4px; }
+  .lookup-box p { font-size: 12px; color: var(--steel); margin: 0 0 16px; line-height: 1.5; }
+  .lookup-box input {
+    font-family: var(--font); font-size: 14px; font-weight: 600;
+    padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 6px;
+    width: 100%; outline: none; color: var(--slate); text-align: center;
+    margin-bottom: 12px;
+  }
+  .lookup-box input:focus { border-color: var(--red); }
+  .lookup-box .lookup-go {
+    font-family: var(--font); font-size: 13px; font-weight: 700;
+    background: var(--red); color: var(--white); border: none;
+    padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%;
+    letter-spacing: 0.04em;
+  }
+  .lookup-box .lookup-go:hover { opacity: 0.88; }
+  .lookup-box .lookup-cancel {
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    background: none; color: var(--steel); border: none; cursor: pointer;
+    margin-top: 10px; padding: 6px;
+  }
+  .lookup-box .lookup-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 1.2em; }
 
   /* TEAM BAR */
   .team-bar {
@@ -591,6 +641,8 @@
       <option value="rhode_island">Rhode Island</option>
       <option value="tennessee">Tennessee</option>
     </select>
+    <button class="lookup-btn" onclick="showLookup()">Load Team</button>
+    <span class="save-status" id="save-status"></span>
     <button class="save-btn" onclick="saveDashboard()">Save</button>
   </div>
 </header>
@@ -826,6 +878,18 @@
   </div>
 
 </main>
+
+<!-- TEAM LOOKUP MODAL -->
+<div class="lookup-overlay" id="lookup-overlay" style="display:none;" onclick="if(event.target===this)hideLookup()">
+  <div class="lookup-box">
+    <h3>Load Your Team</h3>
+    <p>Enter your team name exactly as it was saved. This will pull your stats, match log, and all data from the cloud.</p>
+    <input type="text" id="lookup-name" placeholder="e.g. Team A" autocomplete="off">
+    <button class="lookup-go" onclick="doLookup()">Load</button>
+    <div class="lookup-error" id="lookup-error"></div>
+    <button class="lookup-cancel" onclick="hideLookup()">Cancel</button>
+  </div>
+</div>
 
 <div class="toast" id="toast">Saved</div>
 
@@ -1218,6 +1282,29 @@ document.getElementById('eq-meaning').addEventListener('input', function() {
   currentTeam().fourViews.eqMeaning = this.value;
 });
 
+// ─── AUTO-SAVE (debounced) ─────────────────────────────────
+let autoSaveTimer = null;
+function scheduleAutoSave() {
+  clearTimeout(autoSaveTimer);
+  updateSaveStatus('Unsaved changes');
+  autoSaveTimer = setTimeout(() => saveDashboard(), 3000);
+}
+
+function updateSaveStatus(msg) {
+  const el = document.getElementById('save-status');
+  if (el) el.textContent = msg;
+}
+
+// Listen for any input/change inside main content
+document.addEventListener('input', (e) => {
+  if (e.target.closest('#lookup-overlay')) return;
+  scheduleAutoSave();
+});
+document.addEventListener('change', (e) => {
+  if (e.target.closest('#lookup-overlay')) return;
+  scheduleAutoSave();
+});
+
 // ─── SAVE ──────────────────────────────────────────────────
 async function saveDashboard() {
   if (isSaving) return;
@@ -1231,11 +1318,12 @@ async function saveDashboard() {
   localStorage.setItem('va_dashboard', JSON.stringify(allData));
 
   if (!sheetsEnabled()) {
-    showToast('Saved locally — add Sheets URL to enable cloud sync');
+    updateSaveStatus('Saved locally');
     return;
   }
 
   isSaving = true;
+  updateSaveStatus('Saving...');
   document.querySelector('.save-btn').textContent = 'Saving...';
 
   try {
@@ -1249,12 +1337,13 @@ async function saveDashboard() {
     });
     const json = await res.json();
     if (json.ok) {
-      showToast('Saved to Sheets');
+      updateSaveStatus('Saved');
     } else {
+      updateSaveStatus('Error saving');
       showToast('Sheets error: ' + (json.error || 'unknown'));
     }
   } catch (err) {
-    showToast('Could not reach Sheets — saved locally');
+    updateSaveStatus('Saved locally');
     console.error(err);
   } finally {
     isSaving = false;
@@ -1267,18 +1356,85 @@ async function loadFromSheets(site) {
   const endpoint = SHEET_ENDPOINTS[site];
   if (!endpoint) return;
 
-  showToast('Loading from Sheets...');
+  updateSaveStatus('Loading...');
   try {
     const res = await fetch(endpoint + '?action=load');
     const teams = await res.json();
     if (Array.isArray(teams) && teams.length > 0) {
       allData[site] = { teams };
       localStorage.setItem('va_dashboard', JSON.stringify(allData));
+      updateSaveStatus('Loaded from cloud');
     }
   } catch (err) {
+    updateSaveStatus('Using local data');
     console.warn('Could not load from Sheets, using local cache', err);
   }
 }
+
+// ─── TEAM LOOKUP ───────────────────────────────────────────
+function showLookup() {
+  document.getElementById('lookup-overlay').style.display = 'flex';
+  document.getElementById('lookup-name').value = '';
+  document.getElementById('lookup-error').textContent = '';
+  document.getElementById('lookup-name').focus();
+}
+
+function hideLookup() {
+  document.getElementById('lookup-overlay').style.display = 'none';
+}
+
+async function doLookup() {
+  const name = document.getElementById('lookup-name').value.trim();
+  const errorEl = document.getElementById('lookup-error');
+  if (!name) { errorEl.textContent = 'Enter a team name.'; return; }
+
+  const endpoint = SHEET_ENDPOINTS[currentSite];
+  if (!endpoint) {
+    errorEl.textContent = 'Cloud sync is not configured for this site.';
+    return;
+  }
+
+  errorEl.textContent = '';
+  document.querySelector('.lookup-go').textContent = 'Loading...';
+
+  try {
+    const res = await fetch(endpoint + '?action=load');
+    const teams = await res.json();
+    if (!Array.isArray(teams)) { errorEl.textContent = 'Could not reach server.'; return; }
+
+    const match = teams.find(t => t.name && t.name.toLowerCase() === name.toLowerCase());
+    if (!match) {
+      errorEl.textContent = 'No team named "' + name + '" found. Check the spelling.';
+      return;
+    }
+
+    // Find or add the team in local data
+    const siteTeams = currentSiteData().teams;
+    const existingIdx = siteTeams.findIndex(t => t.name.toLowerCase() === name.toLowerCase());
+    if (existingIdx >= 0) {
+      siteTeams[existingIdx] = match;
+      currentTeamIdx = existingIdx;
+    } else {
+      siteTeams.push(match);
+      currentTeamIdx = siteTeams.length - 1;
+    }
+    localStorage.setItem('va_dashboard', JSON.stringify(allData));
+    hideLookup();
+    renderTeamBar();
+    renderAll();
+    showToast('Loaded ' + match.name);
+  } catch (err) {
+    errorEl.textContent = 'Could not connect. Check your internet.';
+    console.error(err);
+  } finally {
+    document.querySelector('.lookup-go').textContent = 'Load';
+  }
+}
+
+// Allow Enter key in lookup input
+document.getElementById('lookup-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLookup();
+});
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1292,7 +1448,6 @@ function showToast(msg) {
   await loadFromSheets(currentSite);
   renderTeamBar();
   renderAll();
-  // Set today's date as default for new matches
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('new-date').value = today;
 })();
