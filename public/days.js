@@ -44,7 +44,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -101,7 +101,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -159,7 +159,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -211,7 +211,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -256,7 +256,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -313,7 +313,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -364,7 +364,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -415,7 +415,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -466,7 +466,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -511,7 +511,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -562,7 +562,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -613,7 +613,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -664,7 +664,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -709,7 +709,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -754,7 +754,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -799,7 +799,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -844,7 +844,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -895,7 +895,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -940,7 +940,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
@@ -991,7 +991,7 @@ const DAYS = [
       },
       {
         "name": "Lunch / Snack Break",
-        "mins": 30,
+        "mins": 60,
         "block": "Break",
         "description": "Eat, rest, and talk about anything except math."
       },
