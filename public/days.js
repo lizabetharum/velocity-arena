@@ -119,14 +119,14 @@ const DAYS = [
       },
       {
         "name": "Bot Naming Ceremony",
-        "mins": 20,
+        "mins": 40,
         "block": "Match-Build-Make",
         "description": "Your team names your bot. Then you write exactly one sentence explaining what it is fighting for. The name and sentence go on the wall right now and stay there for all four weeks.",
         "link": "/activities/robot-names/index.html"
       },
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 40,
+        "mins": 20,
         "block": "Open Lab",
         "description": "Unstructured time with your bot. Experiment with your Endurance code. Try different point values and observe. No task, no output required."
       }
@@ -152,9 +152,9 @@ const DAYS = [
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
-        "name": "MAP FAL Session: Distance-Time Graphs + Turning Stat Introduction",
+        "name": "Distance-Time Graphs + Turning Stat Introduction",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)",
+        "block": "Challenge Block",
         "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
       },
       {
@@ -184,10 +184,10 @@ const DAYS = [
       }
     ],
     "ends": "Each person on your team silently rates today's collaboration: 1 = rough, 2 = okay, 3 = solid. Hold up your number at the same time so everyone sees at once. If anyone holds up a 1, talk for 2 minutes about what specifically happened. You have 5 minutes total. |",
-    "funElement": "None today. MAP FAL discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
-    "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance between coordinates calculated from grid data) ----------------------------------------------------------------------- **NOTE:** *Day 3 design note: The MAP FAL and the Turning stat introduction are intentionally unified in this session. The V2 context block explicitly states: \"The coordinate grid work IS the Turning stat introduction for the cognitive reveal sequence.\" This resolves what might appear to be a conflict between the MAP FAL session replacing the Challenge Block and the requirement to introduce the Turning stat on Day 3. No constraint is dropped.* ----------------------------------------------------------------------- -----------------------------------------------------------------------",
+    "funElement": "None today. Discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
+    "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance between coordinates calculated from grid data) ----------------------------------------------------------------------- **NOTE:** *Day 3 design note: Turning stat introduction are intentionally unified in this session. The V2 context block explicitly states: \"The coordinate grid work IS the Turning stat introduction for the cognitive reveal sequence.\" This resolves what might appear to be a conflict between the session replacing the Challenge Block and the requirement to introduce the Turning stat on Day 3. No constraint is dropped.* ----------------------------------------------------------------------- -----------------------------------------------------------------------",
     "facilitatorRisk": {
-      "risk": "The MAP FAL becomes a worksheet exercise where campers just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
+      "risk": "The worksheet becomes anexercise where campers just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
       "say": "\"Before Part 2: stop everyone. Say \"Look at your graph and the team next to yours. Your lines are different shapes. I want one sentence from each team, not what the formula says, but what your bot physically did differently to create that shape. Start there.\" Then, when you transition to the coordinate navigation: \"This grid is your new stat. Turning controls how your bot moves through this space. Let's see what it actually does.\"\" |"
     }
   },
@@ -342,7 +342,7 @@ const DAYS = [
     "day": 7,
     "week": 2,
     "weekName": "Season 1",
-    "theme": "Season 1 Begins: First Blood and the Leaderboard",
+    "theme": "Season 1 Begins: First Matches and the Leaderboard",
     "activities": [
       {
         "name": "Trashketball: Warm-Up Round",
@@ -393,7 +393,7 @@ const DAYS = [
     "day": 8,
     "week": 2,
     "weekName": "Season 1",
-    "theme": "MAP FAL: Matching Situations, Graphs, and Linear Equations",
+    "theme": "Matching Situations, Graphs, and Linear Equations",
     "activities": [
       {
         "name": "Math Scavenger Hunt: Leaderboard Edition",
@@ -408,9 +408,9 @@ const DAYS = [
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       {
-        "name": "MAP FAL Session: Matching Situations, Graphs, and Linear Equations",
+        "name": "Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)",
+        "block": "Challenge Block",
         "description": "Part 1: Add your data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Then match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together. Part 2: Use two data points from the scatter plot to write the linear equation. Teams share -- everyone's equation is different. That is the point."
       },
       {
@@ -442,7 +442,7 @@ const DAYS = [
     "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
     "los": "LO 2.3 (scatter plot of Speed vs. Goals Scored with equation from two data points); LO 5.2 (scatter plot built from dashboard data, labeled); LO 7.1 (equation-based prediction logged before match)",
     "facilitatorRisk": {
-      "risk": "The MAP FAL Part 1 \"matching\" activity feels like a worksheet and campers rush through the matching to get to the graph, losing the representational translation work that is the core of the session.",
+      "risk": "Part 1 \"matching\" activity feels like a worksheet and campers rush through the matching to get to the graph, losing the representational translation work that is the core of the session.",
       "say": "\"Before you distribute the cards: \"You have three representations of the same thing: a situation in words, a data table, and a graph. They all describe the same relationship. Your job is to find which three belong together and be ready to explain why the graph looks the way it does given the numbers in the table. Do not match by elimination. Match by reasoning.\"\" |"
     }
   },
@@ -642,7 +642,7 @@ const DAYS = [
     "day": 13,
     "week": 3,
     "weekName": "Season 2 + Commissioner",
-    "theme": "MAP FAL: Your Win Equation + Season 2 Begins",
+    "theme": "Your Win Equation + Season 2 Begins",
     "activities": [
       {
         "name": "The Prediction Market",
@@ -657,9 +657,9 @@ const DAYS = [
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       {
-        "name": "MAP FAL Session: Building and Solving Linear Equations",
+        "name": "Building and Solving Linear Equations",
         "mins": 50,
-        "block": "Challenge Block (MAP FAL)",
+        "block": "Challenge Block",
         "description": "Part 1: Using your Season 1 and early Season 2 data, write the equation that predicts your win probability. Choose two past data points, calculate slope and y-intercept, write it in slope-intercept form. Part 2: Test your equation against three past matches. Calculate the residual for each. Report your residuals to the class."
       },
       {
@@ -682,10 +682,10 @@ const DAYS = [
       }
     ],
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
-    "funElement": "Prediction market creates public stakes around the MAP FAL work. Season 2 under new rules gives the whole room a fresh start.",
+    "funElement": "Prediction market creates public stakes. Season 2 under new rules gives the whole room a fresh start.",
     "los": "LO 4.1 (slope-intercept equation from two match data points); LO 4.2 (pre-match prediction logged before match begins, actual recorded after); LO 6.2 (three-form representation: stat number, equation, MakeCode block)",
     "facilitatorRisk": {
-      "risk": "Teams rush through the MAP FAL equation work to get to Season 2 matches, producing equations without slope or y-intercept labeled.",
+      "risk": "Teams rush through the equation work to get to Season 2 matches, producing equations without slope or y-intercept labeled.",
       "say": "\"Before you release teams to the afternoon: I need one equation from each team written on the whiteboard: slope labeled, y-intercept labeled, two source data points labeled. That is the only thing that gets your team to the matches. If it is not on the board, you are not playing yet. This is not punishment. Your prediction has to exist before the match starts or there is nothing to test.\" |"
     }
   },
