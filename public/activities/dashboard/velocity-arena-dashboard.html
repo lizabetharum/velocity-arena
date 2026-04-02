@@ -834,11 +834,49 @@
     </div>
   </div>
 
-  <!-- STAT CHANGE JUSTIFICATION -->
+  <!-- STAT CHANGE LOG -->
   <div class="card">
     <div class="card-title">
-      <span>Stat Change Justification</span>
-      <span style="font-size:10px;font-weight:400;color:var(--steel);">Explain every change using match log data</span>
+      <span>Stat Change Log</span>
+      <span style="font-size:10px;font-weight:400;color:var(--steel);">Every change you make, with your reason why</span>
+    </div>
+    <div class="add-match-form" style="margin-bottom:12px;">
+      <div class="form-field">
+        <label>After match #</label>
+        <input type="number" id="just-match" min="1" placeholder="--">
+      </div>
+      <div class="form-field">
+        <label>Week</label>
+        <select id="just-week">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Stat</label>
+        <select id="just-stat">
+          <option value="">-- pick --</option>
+          <option value="Speed">Speed</option>
+          <option value="Power">Power</option>
+          <option value="Turning">Turning</option>
+          <option value="Endurance">Endurance</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>From</label>
+        <input type="number" id="just-from" min="1" max="20" placeholder="--">
+      </div>
+      <div class="form-field">
+        <label>To</label>
+        <input type="number" id="just-to" min="1" max="20" placeholder="--">
+      </div>
+      <div class="form-field" style="grid-column: span 2">
+        <label>Because (cite match log data)</label>
+        <input type="text" id="just-reason" placeholder="e.g. Lost 3 matches with Endurance = 2, bot died by minute 2">
+      </div>
+      <button class="add-row-btn" onclick="addJustification()">+ Log change</button>
     </div>
     <div id="justification-rows">
       <!-- populated by JS -->
@@ -980,12 +1018,7 @@ function defaultTeam(name) {
     week: 1,
     stats: { speed: 5, power: 5, turning: 5, endurance: 5 },
     matchLog: [],
-    justifications: [
-      { stat: '', from: '', to: '', reason: '' },
-      { stat: '', from: '', to: '', reason: '' },
-      { stat: '', from: '', to: '', reason: '' },
-      { stat: '', from: '', to: '', reason: '' }
-    ],
+    justifications: [],
     fourViews: {
       dataPoints: [
         { x: '', y: '' },
@@ -1244,43 +1277,53 @@ function deleteMatchRow(i) {
   renderMatchTable();
 }
 
-// ─── JUSTIFICATIONS ────────────────────────────────────────
+// ─── JUSTIFICATIONS (cumulative log) ───────────────────────
 function renderJustifications() {
   const container = document.getElementById('justification-rows');
+  const entries = currentTeam().justifications || [];
+  if (entries.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:16px;font-size:11px;color:var(--steel);">No stat changes logged yet.</div>';
+    return;
+  }
   container.innerHTML = '';
-  currentTeam().justifications.forEach((j, i) => {
+  // Show newest first
+  [...entries].reverse().forEach((j, ri) => {
+    const i = entries.length - 1 - ri;
     const row = document.createElement('div');
     row.className = 'justification-row';
+    row.style.gridTemplateColumns = 'auto auto 50px 20px 50px 1fr auto';
     row.innerHTML = `
-      <div>
-        <label class="view-small-label">Stat</label>
-        <select onchange="updateJust(${i},'stat',this.value)">
-          <option value="" ${!j.stat?'selected':''}>-- select --</option>
-          <option value="Speed" ${j.stat==='Speed'?'selected':''}>Speed</option>
-          <option value="Power" ${j.stat==='Power'?'selected':''}>Power</option>
-          <option value="Turning" ${j.stat==='Turning'?'selected':''}>Turning</option>
-          <option value="Endurance" ${j.stat==='Endurance'?'selected':''}>Endurance</option>
-        </select>
-      </div>
-      <div>
-        <label class="view-small-label">From</label>
-        <input type="number" min="1" max="20" value="${j.from}" placeholder="--" onchange="updateJust(${i},'from',this.value)">
-      </div>
-      <div>
-        <label class="view-small-label">To</label>
-        <input type="number" min="1" max="20" value="${j.to}" placeholder="--" onchange="updateJust(${i},'to',this.value)">
-      </div>
-      <div class="just-reason">
-        <label class="view-small-label">Because (cite match log data)</label>
-        <textarea rows="2" onchange="updateJust(${i},'reason',this.value)">${j.reason}</textarea>
-      </div>
+      <div style="font-size:11px;color:var(--steel);font-weight:600;white-space:nowrap;">Wk ${j.week || '?'}${j.match ? ', M' + j.match : ''}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--slate);">${j.stat || '?'}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--steel);text-align:center;">${j.from || '?'}</div>
+      <div style="font-size:12px;color:var(--steel);text-align:center;">&rarr;</div>
+      <div style="font-size:12px;font-weight:700;color:var(--red);text-align:center;">${j.to || '?'}</div>
+      <div style="font-size:11px;color:var(--slate);line-height:1.4;">${j.reason || ''}</div>
+      <button class="delete-btn" onclick="deleteJustification(${i})" style="font-size:12px;">&#x2715;</button>
     `;
     container.appendChild(row);
   });
 }
 
-function updateJust(i, field, val) {
-  currentTeam().justifications[i][field] = val;
+function addJustification() {
+  const entry = {
+    week: document.getElementById('just-week').value,
+    match: document.getElementById('just-match').value,
+    stat: document.getElementById('just-stat').value,
+    from: document.getElementById('just-from').value,
+    to: document.getElementById('just-to').value,
+    reason: document.getElementById('just-reason').value
+  };
+  if (!entry.stat) { alert('Pick a stat.'); return; }
+  currentTeam().justifications.push(entry);
+  ['just-match','just-from','just-to','just-reason'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('just-stat').value = '';
+  renderJustifications();
+}
+
+function deleteJustification(i) {
+  currentTeam().justifications.splice(i, 1);
+  renderJustifications();
 }
 
 // ─── FOUR VIEWS ────────────────────────────────────────────
@@ -1493,11 +1536,6 @@ document.addEventListener('change', (e) => {
 // ─── SAVE ──────────────────────────────────────────────────
 async function saveDashboard() {
   if (isSaving) return;
-
-  // Flush pending justification textareas
-  document.querySelectorAll('#justification-rows textarea').forEach((el, i) => {
-    if (currentTeam().justifications[i]) currentTeam().justifications[i].reason = el.value;
-  });
 
   // Always write to localStorage as cache
   localStorage.setItem('va_dashboard', JSON.stringify(allData));
