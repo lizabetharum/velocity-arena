@@ -248,6 +248,12 @@ const DAYS = [
         "block": "Ice Breaker",
         "description": "'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' You have to check the math on your stat card before you act. Only do the action if the condition is actually true for your numbers."
       },
+       {
+        "name": "Two Formula Warm-Up",
+        "mins": 8,
+        "block": "Warm-up Block",
+        "description": "This warm-up bridges the gap by pairing two formulas on one allocation — so the jump goes from one to two to four, not one to four."
+      },
       {
         "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
         "mins": 50,
