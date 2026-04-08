@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endurance Decay — Facilitator Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeede9;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-text: #0C447C;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --green-text: #27500A;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --red-text: #791F1F;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .section { margin-bottom: 2rem; }
+
+  .section-head {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .slider-row label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 130px;
+  }
+
+  .slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--blue);
+  }
+
+  .slider-row input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--blue);
+  }
+
+  .slider-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+
+  .mc {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .mc-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 6px;
+  }
+
+  .mc-val {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .mc-sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .bar-wrap {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    height: 34px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+    background: var(--blue);
+  }
+
+  .bar-fill.low { background: var(--red); }
+  .bar-fill.mid { background: #BA7517; }
+
+  .bar-lbl {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .eq-box {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .hi-blue { color: var(--blue-text); font-weight: 600; }
+  .hi-green { color: var(--green-text); font-weight: 600; }
+  .hi-red { color: var(--red-text); font-weight: 600; }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    border-left: 2px solid var(--border-strong);
+    padding: 6px 12px;
+    margin-bottom: 16px;
+    border-radius: 0;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .steps { margin-top: 12px; }
+
+  .step-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #E6F1FB;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.65;
+    padding-top: 2px;
+  }
+
+  .step-text strong { color: var(--blue-text); }
+  .step-text .green { color: var(--green-text); font-weight: 600; }
+
+  .checkpoint-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .cp-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+
+  .cp-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+  }
+
+  .cp-body {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .cp-body strong { color: var(--blue-text); }
+
+  .facilitator-callout {
+    background: #FFF8E6;
+    border: 1px solid #EF9F27;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #633806;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .facilitator-callout strong { font-weight: 600; }
+
+  @media (max-width: 540px) {
+    .page { padding: 1.5rem 1rem 3rem; }
+    .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .cards .mc:last-child { grid-column: span 2; }
+    .checkpoint-grid { grid-template-columns: 1fr; }
+    .slider-row label { min-width: 90px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-title">Endurance decay — facilitator tool</div>
+    <div class="page-sub">Velocity Arena · Programming endurance, day 1</div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">Team stats</div>
+    <div class="slider-row">
+      <label>Speed (1–10)</label>
+      <input type="range" min="1" max="10" value="4" step="1" id="spd">
+      <span class="slider-val" id="spd-out">4</span>
+    </div>
+    <div class="slider-row">
+      <label>Endurance (1–19)</label>
+      <input type="range" min="1" max="19" value="3" step="1" id="end">
+      <span class="slider-val" id="end-out">3</span>
+    </div>
+    <div class="slider-row">
+      <label>Time (0–30 sec)</label>
+      <input type="range" min="0" max="30" value="10" step="1" id="tim">
+      <span class="slider-val" id="tim-out">10</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="mc">
+      <div class="mc-label">Motor power</div>
+      <div class="mc-val" id="c-mp">20</div>
+      <div class="mc-sub">Speed × 100 ÷ 20</div>
+    </div>
+    <div class="mc">
+      <div class="mc-label">Decay rate</div>
+      <div class="mc-val" id="c-dr">17</div>
+      <div class="mc-sub">20 − Endurance</div>
+    </div>
+    <div class="mc">
+      <div class="mc-label">Current power</div>
+      <div class="mc-val" id="c-cp">16</div>
+      <div class="mc-sub">at t = <span id="c-t">10</span>s</div>
+    </div>
+  </div>
+
+  <div class="bar-wrap">
+    <div class="bar-fill" id="bar" style="width:80%"></div>
+    <div class="bar-lbl" id="bar-lbl">16% power</div>
+  </div>
+
+  <div class="eq-box">
+    currentPower = <span class="hi-blue" id="e-mp">20</span> − <span class="hi-green" id="e-dr">17</span> × <span class="hi-red" id="e-t">10</span> ÷ 40 = <span id="e-cp">16</span>
+  </div>
+  <div class="note">
+    The ÷ 40 comes from collapsing 1.5 (rewritten as 3÷2) and the minutes-to-seconds conversion (÷60) into a single division: 3 ÷ 2 ÷ 60 = 1 ÷ 40. The math predicts the same result. The computer can run it without dropping decimals.
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-head">Coding steps — say these aloud, do not write the code for them</div>
+    <div class="facilitator-callout">
+      <strong>Facilitator note:</strong> Read these steps verbally. Let teams figure out the MakeCode blocks themselves. If a team is stuck, re-read the step. Do not touch their keyboard.
+    </div>
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-text">Set your starting motor speed to <strong id="s1">20</strong>%.</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-text">Run the motors for 60 seconds — that's 60,000 milliseconds in MakeCode.</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-text">Set the motor speed to your 1-minute value: <strong id="s3">16</strong>%. That's <span id="s3-mp">20</span> minus your decay rate of <span class="green" id="s3-dr">17</span> × 60 ÷ 40. Your decay rate is from step two of this morning's worksheet.</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-text">Run for another 60 seconds.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">Checkpoint options for this team</div>
+    <div class="note">Both approaches are valid. Let teams choose.</div>
+    <div class="checkpoint-grid">
+      <div class="cp-card">
+        <div class="cp-title">2 checkpoints (60-second intervals)</div>
+        <div class="cp-body">
+          Start: <strong id="ck2-s">20</strong>%<br>
+          At 60s: <strong id="ck2-1">16</strong>%<br><br>
+          Less code. Good starting point.
+        </div>
+      </div>
+      <div class="cp-card">
+        <div class="cp-title">3 checkpoints (30-second intervals)</div>
+        <div class="cp-body">
+          Start: <strong id="ck3-s">20</strong>%<br>
+          At 30s: <strong id="ck3-1">18</strong>%<br>
+          At 60s: <strong id="ck3-2">16</strong>%<br><br>
+          More accurate. More code.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const spdEl = document.getElementById('spd');
+  const endEl = document.getElementById('end');
+  const timEl = document.getElementById('tim');
+
+  function calc(S, E, t) {
+    const mp = Math.floor(S * 100 / 20);
+    const dr = 20 - E;
+    const cp = Math.max(0, mp - Math.floor(dr * t / 40));
+    return { mp, dr, cp };
+  }
+
+  function update() {
+    const S = parseInt(spdEl.value);
+    const E = parseInt(endEl.value);
+    const t = parseInt(timEl.value);
+
+    document.getElementById('spd-out').textContent = S;
+    document.getElementById('end-out').textContent = E;
+    document.getElementById('tim-out').textContent = t;
+
+    const { mp, dr, cp } = calc(S, E, t);
+    const pct = Math.min(100, Math.round(cp / 50 * 100));
+
+    document.getElementById('c-mp').textContent = mp;
+    document.getElementById('c-dr').textContent = dr;
+    document.getElementById('c-cp').textContent = cp;
+    document.getElementById('c-t').textContent = t;
+
+    const bar = document.getElementById('bar');
+    bar.style.width = pct + '%';
+    bar.className = 'bar-fill' + (pct < 25 ? ' low' : pct < 55 ? ' mid' : '');
+    document.getElementById('bar-lbl').textContent = cp + '% power';
+
+    document.getElementById('e-mp').textContent = mp;
+    document.getElementById('e-dr').textContent = dr;
+    document.getElementById('e-t').textContent = t;
+    document.getElementById('e-cp').textContent = cp;
+
+    const at30 = calc(S, E, 30);
+    const at60 = calc(S, E, 60);
+
+    document.getElementById('s1').textContent = mp;
+    document.getElementById('s3').textContent = Math.max(0, at60.cp);
+    document.getElementById('s3-mp').textContent = mp;
+    document.getElementById('s3-dr').textContent = dr;
+
+    document.getElementById('ck2-s').textContent = mp;
+    document.getElementById('ck2-1').textContent = Math.max(0, at60.cp);
+
+    document.getElementById('ck3-s').textContent = mp;
+    document.getElementById('ck3-1').textContent = Math.max(0, at30.cp);
+    document.getElementById('ck3-2').textContent = Math.max(0, at60.cp);
+  }
+
+  spdEl.addEventListener('input', update);
+  endEl.addEventListener('input', update);
+  timEl.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>
