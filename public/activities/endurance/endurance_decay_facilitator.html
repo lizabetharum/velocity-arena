@@ -25,10 +25,10 @@
     --red: #A32D2D;
     --red-light: #FCEBEB;
     --red-text: #791F1F;
+    --amber: #BA7517;
     --radius: 8px;
     --radius-lg: 12px;
   }
-  
 
   body {
     font-family: 'Montserrat', sans-serif;
@@ -172,12 +172,14 @@
   .bar-fill {
     height: 100%;
     border-radius: 6px;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background 0.3s ease;
     background: var(--blue);
+    min-width: 0;
   }
 
-  .bar-fill.low { background: var(--red); }
-  .bar-fill.mid { background: #BA7517; }
+  .bar-fill.low  { background: var(--red); }
+  .bar-fill.mid  { background: var(--amber); }
+  .bar-fill.zero { width: 0 !important; }
 
   .bar-lbl {
     position: absolute;
@@ -187,6 +189,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    white-space: nowrap;
   }
 
   .eq-box {
@@ -200,9 +203,9 @@
     letter-spacing: 0.01em;
   }
 
-  .hi-blue { color: var(--blue-text); font-weight: 600; }
+  .hi-blue  { color: var(--blue-text); font-weight: 600; }
   .hi-green { color: var(--green-text); font-weight: 600; }
-  .hi-red { color: var(--red-text); font-weight: 600; }
+  .hi-red   { color: var(--red-text); font-weight: 600; }
 
   .note {
     font-size: 12px;
@@ -297,6 +300,18 @@
 
   .facilitator-callout strong { font-weight: 600; }
 
+  .zero-state {
+    background: var(--red-light);
+    border: 1px solid var(--red);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--red-text);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: none;
+  }
+
   @media (max-width: 540px) {
     .page { padding: 1.5rem 1rem 3rem; }
     .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -311,20 +326,24 @@
 
   <div class="page-header">
     <div class="page-title">Endurance decay — facilitator tool</div>
-    <div class="page-sub">Velocity Arena · Programming endurance, day 1</div>
+    <div class="page-sub">Velocity Arena · Programming endurance, day 1 · 20 total stat points (min 1 each for Turning &amp; Power)</div>
   </div>
 
   <div class="section">
     <div class="section-head">Team stats</div>
     <div class="slider-row">
-      <label>Speed (1–10)</label>
-      <input type="range" min="1" max="10" value="4" step="1" id="spd">
+      <label>Speed (1–20)</label>
+      <input type="range" min="1" max="17" value="4" step="1" id="spd">
       <span class="slider-val" id="spd-out">4</span>
     </div>
     <div class="slider-row">
-      <label>Endurance (1–19)</label>
-      <input type="range" min="1" max="19" value="3" step="1" id="end">
+      <label>Endurance (1–20)</label>
+      <input type="range" min="1" max="17" value="3" step="1" id="end">
       <span class="slider-val" id="end-out">3</span>
+    </div>
+    <div class="slider-row">
+      <label>Remaining for Turning &amp; Power</label>
+      <span class="slider-val" id="remaining-out" style="min-width:auto">13</span>
     </div>
     <div class="slider-row">
       <label>Time (0–30 sec)</label>
@@ -351,10 +370,13 @@
     </div>
   </div>
 
+  <!-- Bar width now maps directly: cp% = bar width%, max 100% -->
   <div class="bar-wrap">
-    <div class="bar-fill" id="bar" style="width:80%"></div>
+    <div class="bar-fill" id="bar" style="width:20%"></div>
     <div class="bar-lbl" id="bar-lbl">16% power</div>
   </div>
+
+  <div class="zero-state" id="zero-state">No power remaining — robot has stopped.</div>
 
   <div class="eq-box">
     currentPower = <span class="hi-blue" id="e-mp">20</span> − <span class="hi-green" id="e-dr">17</span> × <span class="hi-red" id="e-t">10</span> ÷ 40 = <span id="e-cp">16</span>
@@ -365,30 +387,7 @@
 
   <hr class="divider">
 
-  <div class="section">
-    <div class="section-head">Coding steps — say these aloud, do not write the code for them</div>
-    <div class="facilitator-callout">
-      <strong>Facilitator note:</strong> Read these steps verbally. Let teams figure out the MakeCode blocks themselves. If a team is stuck, re-read the step. Do not touch their keyboard.
-    </div>
-    <div class="steps">
-      <div class="step-row">
-        <div class="step-num">1</div>
-        <div class="step-text">Set your starting motor speed to <strong id="s1">20</strong>%.</div>
-      </div>
-      <div class="step-row">
-        <div class="step-num">2</div>
-        <div class="step-text">Run the motors for 60 seconds — that's 60,000 milliseconds in MakeCode.</div>
-      </div>
-      <div class="step-row">
-        <div class="step-num">3</div>
-        <div class="step-text">Set the motor speed to your 1-minute value: <strong id="s3">16</strong>%. That's <span id="s3-mp">20</span> minus your decay rate of <span class="green" id="s3-dr">17</span> × 60 ÷ 40. Your decay rate is from step two of this morning's worksheet.</div>
-      </div>
-      <div class="step-row">
-        <div class="step-num">4</div>
-        <div class="step-text">Run for another 60 seconds.</div>
-      </div>
-    </div>
-  </div>
+ 
 
   <div class="section">
     <div class="section-head">Checkpoint options for this team</div>
@@ -420,6 +419,24 @@
   const spdEl = document.getElementById('spd');
   const endEl = document.getElementById('end');
   const timEl = document.getElementById('tim');
+  const TOTAL_POINTS = 20;
+  const RESERVED = 2; // at least 1 for Turning + 1 for Power
+  const MAX_COMBINED = TOTAL_POINTS - RESERVED; // 18
+
+  function clampSliders(changed) {
+    const S = parseInt(spdEl.value);
+    const E = parseInt(endEl.value);
+    if (changed === 'spd') {
+      endEl.max = Math.max(1, MAX_COMBINED - S);
+      if (parseInt(endEl.value) > parseInt(endEl.max)) endEl.value = endEl.max;
+    } else {
+      spdEl.max = Math.max(1, MAX_COMBINED - E);
+      if (parseInt(spdEl.value) > parseInt(spdEl.max)) spdEl.value = spdEl.max;
+    }
+    // always update both maxes after clamping
+    spdEl.max = Math.max(1, MAX_COMBINED - parseInt(endEl.value));
+    endEl.max = Math.max(1, MAX_COMBINED - parseInt(spdEl.value));
+  }
 
   function calc(S, E, t) {
     const mp = Math.floor(S * 100 / 20);
@@ -428,17 +445,24 @@
     return { mp, dr, cp };
   }
 
-  function update() {
+  function update(changed) {
+    if (changed) clampSliders(changed);
     const S = parseInt(spdEl.value);
     const E = parseInt(endEl.value);
     const t = parseInt(timEl.value);
+    const remaining = TOTAL_POINTS - S - E;
 
     document.getElementById('spd-out').textContent = S;
     document.getElementById('end-out').textContent = E;
     document.getElementById('tim-out').textContent = t;
+    document.getElementById('remaining-out').textContent = remaining;
 
     const { mp, dr, cp } = calc(S, E, t);
-    const pct = Math.min(100, Math.round(cp / 50 * 100));
+
+    // FIX: bar width maps directly to cp (already a % value, max ~50).
+    // We scale relative to mp so the bar reads as "fraction of starting power remaining."
+    // If mp is 0 (shouldn't happen given slider min=1), guard against divide-by-zero.
+    const pct = mp > 0 ? Math.min(100, Math.round(cp / mp * 100)) : 0;
 
     document.getElementById('c-mp').textContent = mp;
     document.getElementById('c-dr').textContent = dr;
@@ -447,8 +471,14 @@
 
     const bar = document.getElementById('bar');
     bar.style.width = pct + '%';
-    bar.className = 'bar-fill' + (pct < 25 ? ' low' : pct < 55 ? ' mid' : '');
-    document.getElementById('bar-lbl').textContent = cp + '% power';
+    bar.className = 'bar-fill' + (cp === 0 ? ' zero' : pct < 25 ? ' low' : pct < 55 ? ' mid' : '');
+
+    // FIX: zero-state message shown when power hits 0
+    const zeroState = document.getElementById('zero-state');
+    zeroState.style.display = cp === 0 ? 'block' : 'none';
+
+    // Bar label: show cp value always; no label when zero (zero-state banner covers it)
+    document.getElementById('bar-lbl').textContent = cp === 0 ? '' : cp + '% power';
 
     document.getElementById('e-mp').textContent = mp;
     document.getElementById('e-dr').textContent = dr;
@@ -471,9 +501,10 @@
     document.getElementById('ck3-2').textContent = Math.max(0, at60.cp);
   }
 
-  spdEl.addEventListener('input', update);
-  endEl.addEventListener('input', update);
-  timEl.addEventListener('input', update);
+  spdEl.addEventListener('input', () => update('spd'));
+  endEl.addEventListener('input', () => update('end'));
+  timEl.addEventListener('input', () => update());
+  clampSliders('spd');
   update();
 </script>
 </body>
