@@ -62,7 +62,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 40,
+        "mins": 20,
         "block": "Open Lab",
         "description": "Unstructured time with your bot. Drive it, experiment with MakeCode, or talk strategy with your team. No task to complete -- just time to explore."
       }
@@ -153,7 +153,7 @@ const DAYS = [
       },
       {
         "name": "Distance-Time Graphs + Turning Stat Introduction",
-        "mins": 50,
+        "mins": 65,
         "block": "Challenge Block",
         "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
       },
@@ -178,7 +178,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 45,
+        "mins": 35,
         "block": "Open Lab",
         "description": "Unstructured navigation practice. Try different coordinate targets. Experiment with Turning values. Build your intuition for what different settings do to the turn radius."
       }
@@ -535,7 +535,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Season 2 Planning",
-        "mins": 40,
+        "mins": 30,
         "block": "Open Lab",
         "description": "Track A: Look at your Season 1 data. If you could change one stat for Season 2, what would it be and why? Write it as a hypothesis with data. Track B: Test the change you are considering before committing. Run it live, then write the hypothesis."
       }
@@ -580,13 +580,13 @@ const DAYS = [
       },
       {
         "name": "Practice Matches: Test New Loadout Hypotheses",
-        "mins": 55,
+        "mins": 60,
         "block": "Match-Build-Make",
         "description": "No formal scoring. Program and test adjusted loadout ideas. Record observations as 'hypothesis' entries -- clearly labeled so you can compare to Season 2 actuals."
       },
       {
         "name": "Open Lab: Commissioner Proposal Refinement",
-        "mins": 30,
+        "mins": 40,
         "block": "Open Lab",
         "description": "Verify every number in your draft proposal against the actual dashboard. Are your two cited numbers accurate? Does your rule change genuinely help the last-place team?"
       }
@@ -817,7 +817,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Championship Loadout Verification",
-        "mins": 40,
+        "mins": 45,
         "block": "Open Lab",
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now."
       }
@@ -862,13 +862,13 @@ const DAYS = [
       },
       {
         "name": "What-If? Analysis",
-        "mins": 15,
+        "mins": 45,
         "block": "Challenge Block",
         "description": "The facilitator posts a hypothetical constraint: 'Endurance is capped at 4 for Championship.' You have 10 minutes to figure out which teams this affects and calculate how their decay rate and Speed change if they reallocate. Does this help or hurt your team? Show the math."
       },
       {
         "name": "Open Lab: Pitch Refinement and Bot Prep",
-        "mins": 25,
+        "mins": 15,
         "block": "Open Lab",
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow."
       }
@@ -913,7 +913,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Reflection Time",
-        "mins": 25,
+        "mins": 15,
         "block": "Open Lab",
         "description": "No task required. Look at your Day 1 allocation versus today's. What changed and why? Reflect on your team's four-week data arc."
       }
@@ -958,7 +958,7 @@ const DAYS = [
       },
       {
         "name": "Scouting Report Verbal Check + Vote Count (concurrent)",
-        "mins": 45,
+        "mins": 40,
         "block": "Match-Build-Make",
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot."
       },
@@ -1009,7 +1009,7 @@ const DAYS = [
       },
       {
         "name": "Open Lab: Final Free Time",
-        "mins": 40,
+        "mins": 90,
         "block": "Open Lab",
         "description": "Unstructured time. Drive the bots. Revisit the coordinate grid. Teach each other anything you want. This is the last time the program exists in this form."
       }
