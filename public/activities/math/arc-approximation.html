@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arc Approximation — Velocity Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D1A;--card:#161A2E;--active:#1E2240;
+  --cyan:#00E5FF;--teal:#007A99;--slate:#8899AA;
+  --white:#FFFFFF;--orange:#CC7700;--green:#44CC88;
+  --font:'DM Sans',sans-serif;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--white);font-family:var(--font);overflow-x:hidden;min-height:100vh}
+
+.nav{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid rgba(0,229,255,.15);padding:.5rem .75rem;display:flex;align-items:center;gap:.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-brand{font-weight:700;color:var(--cyan);font-size:.85rem;white-space:nowrap;margin-right:.5rem;display:flex;align-items:center;gap:.35rem}
+.nav-brand svg{width:20px;height:20px;flex-shrink:0}
+.nav a{color:var(--slate);text-decoration:none;font-size:.72rem;font-weight:600;white-space:nowrap;padding:.35rem .55rem;border-radius:6px;transition:background .18s,color .18s}
+.nav a:hover,.nav a.active{background:var(--active);color:var(--cyan)}
+
+.page{max-width:900px;margin:0 auto;padding:1rem}
+h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:800;color:var(--cyan);margin-bottom:.25rem;line-height:1.1}
+.subtitle{color:var(--slate);font-size:.85rem;margin-bottom:1rem}
+
+.steps-container{position:relative;margin-bottom:1.5rem}
+.step{display:none;animation:fadeStep .4s ease-out}
+.step.active{display:block}
+@keyframes fadeStep{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step-content{background:var(--card);border-radius:12px;padding:1.25rem;border:1px solid rgba(0,229,255,.1)}
+.step-text{font-size:1.1rem;font-weight:600;line-height:1.4;text-align:center}
+.step-text .vocab{color:var(--cyan);font-size:1.3rem;font-weight:800}
+.step-text .hl-green{color:var(--green)}
+.step-text .hl-cyan{color:var(--cyan)}
+.step-text .hl-orange{color:var(--orange)}
+.step-nav{display:flex;justify-content:center;gap:.75rem;margin-top:.75rem}
+.step-btn{background:var(--active);color:var(--white);border:1px solid rgba(0,229,255,.2);padding:.45rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:.8rem;font-weight:600;cursor:pointer;transition:background .18s,border-color .18s}
+.step-btn:hover{background:var(--teal);border-color:var(--cyan)}
+.step-btn:disabled{opacity:.3;cursor:not-allowed}
+.step-dots{display:flex;justify-content:center;gap:.35rem;margin-top:.5rem}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--active);transition:background .2s}
+.step-dot.active{background:var(--cyan)}
+
+.canvas-wrap{background:var(--card);border-radius:12px;padding:.75rem;border:1px solid rgba(0,229,255,.1);margin-bottom:1rem;position:relative}
+canvas{display:block;width:100%;border-radius:8px}
+
+.slider-row{display:flex;align-items:center;gap:1rem;background:var(--card);border-radius:12px;padding:1rem;border:1px solid rgba(0,229,255,.1);margin-bottom:1rem;flex-wrap:wrap}
+.slider-label{font-weight:700;font-size:.85rem;color:var(--slate);white-space:nowrap}
+.slider-value{font-weight:800;font-size:1.4rem;color:var(--cyan);min-width:2ch;text-align:center}
+input[type=range]{flex:1;min-width:120px;-webkit-appearance:none;background:var(--active);height:6px;border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--cyan);cursor:pointer;border:2px solid var(--white)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--cyan);cursor:pointer;border:2px solid var(--white)}
+
+.stats-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.stat-card{flex:1;min-width:120px;background:var(--card);border-radius:10px;padding:.75rem;border:1px solid rgba(0,229,255,.1);text-align:center}
+.stat-card .label{font-size:.7rem;font-weight:600;color:var(--slate);text-transform:uppercase;margin-bottom:.25rem}
+.stat-card .value{font-size:1.2rem;font-weight:800}
+.stat-card .value.cyan{color:var(--cyan)}
+.stat-card .value.orange{color:var(--orange)}
+.stat-card .value.green{color:var(--green)}
+
+.vocab-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+.vocab-chip{background:var(--active);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:.3rem .6rem;font-size:.72rem;font-weight:600;color:var(--cyan)}
+
+.try-it{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,122,153,.08));border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:1rem;margin-top:1rem}
+.try-it h3{color:var(--cyan);font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.try-it p{color:var(--slate);font-size:.82rem;line-height:1.4}
+
+.compare-wrap{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap}
+.compare-card{flex:1;min-width:140px;background:var(--card);border-radius:10px;padding:.75rem;border:2px solid transparent;cursor:pointer;text-align:center;transition:border-color .18s,transform .18s}
+.compare-card:hover{transform:translateY(-2px)}
+.compare-card.selected{border-color:var(--cyan)}
+.compare-card .cc-label{font-weight:700;font-size:.85rem;color:var(--white);margin-bottom:.25rem}
+.compare-card .cc-val{font-size:.8rem;color:var(--slate)}
+.compare-result{margin-top:.5rem;font-weight:700;color:var(--green);font-size:.9rem;min-height:1.3em}
+
+@media(max-width:600px){
+  .page{padding:.75rem}
+  h1{font-size:1.3rem}
+  .stats-row{gap:.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+    VA Math
+  </div>
+  <a href="coordinate-geometry.html">5 Coordinates</a>
+  <a href="arc-approximation.html" class="active">6 Arcs</a>
+  <a href="slope.html">7 Slope</a>
+  <a href="budget.html">8 Budget</a>
+</nav>
+
+<div class="page">
+  <h1>Arc Approximation</h1>
+  <div class="subtitle">Straight Lines Make Curves</div>
+
+  <div class="vocab-bar">
+    <span class="vocab-chip">ARC</span>
+    <span class="vocab-chip">SEGMENT</span>
+    <span class="vocab-chip">APPROXIMATION</span>
+  </div>
+
+  <!-- STEP-BY-STEP -->
+  <div class="steps-container" id="stepsContainer">
+    <div class="step active" data-step="0">
+      <div class="step-content">
+        <div class="step-text">🤖 Your bot needs to <span class="vocab">TURN</span>.<br>But it can only move in straight lines!</div>
+      </div>
+    </div>
+    <div class="step" data-step="1">
+      <div class="step-content">
+        <div class="step-text">The bot can only move in <span class="hl-cyan">STRAIGHT LINES</span>.</div>
+      </div>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-content">
+        <div class="step-text">1 straight segment → <span class="hl-orange">Not very close</span></div>
+      </div>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-content">
+        <div class="step-text">3 segments → <span class="hl-cyan">Getting closer!</span></div>
+      </div>
+    </div>
+    <div class="step" data-step="4">
+      <div class="step-content">
+        <div class="step-text">8 segments → <span class="hl-green">Almost perfect!</span></div>
+      </div>
+    </div>
+    <div class="step" data-step="5">
+      <div class="step-content">
+        <div class="step-text"><span class="vocab">ARC APPROXIMATION</span><br>More segments = better match.</div>
+      </div>
+    </div>
+    <div class="step-dots" id="stepDots"></div>
+    <div class="step-nav">
+      <button class="step-btn" id="prevBtn" disabled>← Back</button>
+      <button class="step-btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="arcCanvas" width="600" height="600"></canvas>
+  </div>
+
+  <!-- SLIDER -->
+  <div class="slider-row">
+    <span class="slider-label">Segments:</span>
+    <input type="range" id="segSlider" min="1" max="10" value="1" step="1">
+    <span class="slider-value" id="segValue">1</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Path Length</div>
+      <div class="value cyan" id="pathLength">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">True Arc</div>
+      <div class="value green" id="trueArc">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Gap (Error)</div>
+      <div class="value orange" id="gapError">—</div>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it">
+    <h3>🎯 TRY IT</h3>
+    <p>Your bot needs to turn 90°. Which is closer to the real curve?</p>
+    <div class="compare-wrap">
+      <div class="compare-card" id="cmp3" onclick="selectCompare(3)">
+        <div class="cc-label">3 Segments</div>
+        <div class="cc-val" id="cmp3val">—</div>
+      </div>
+      <div class="compare-card" id="cmp6" onclick="selectCompare(6)">
+        <div class="cc-label">6 Segments</div>
+        <div class="cc-val" id="cmp6val">—</div>
+      </div>
+    </div>
+    <div class="compare-result" id="compareResult"></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('arcCanvas');
+const ctx = canvas.getContext('2d');
+const slider = document.getElementById('segSlider');
+const segValue = document.getElementById('segValue');
+const pathLenEl = document.getElementById('pathLength');
+const trueArcEl = document.getElementById('trueArc');
+const gapErrorEl = document.getElementById('gapError');
+
+let dpr = window.devicePixelRatio || 1;
+let cw, ch;
+const RADIUS_RATIO = 0.35;
+let radius, cx_center, cy_center;
+
+const TRUE_ARC_LENGTH_FACTOR = Math.PI / 2; // quarter circle
+
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const size = Math.min(rect.width - 24, 440);
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  cw = canvas.width; ch = canvas.height;
+  radius = cw * RADIUS_RATIO;
+  cx_center = cw * 0.15;
+  cy_center = ch * 0.85;
+  drawArc(parseInt(slider.value));
+}
+
+function getArcPoint(angle) {
+  return [
+    cx_center + radius * Math.cos(angle),
+    cy_center - radius * Math.sin(angle)
+  ];
+}
+
+function drawArc(numSegs) {
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Subtle grid
+  ctx.strokeStyle = 'rgba(0,229,255,0.06)';
+  ctx.lineWidth = dpr;
+  const gridSpacing = cw / 12;
+  for (let i = 0; i <= 12; i++) {
+    ctx.beginPath(); ctx.moveTo(i*gridSpacing, 0); ctx.lineTo(i*gridSpacing, ch); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, i*gridSpacing); ctx.lineTo(cw, i*gridSpacing); ctx.stroke();
+  }
+
+  // Draw true arc (quarter circle from 0 to PI/2)
+  ctx.beginPath();
+  ctx.arc(cx_center, cy_center, radius, -Math.PI/2, 0, false);
+  ctx.strokeStyle = 'rgba(0,229,255,0.25)';
+  ctx.lineWidth = 3 * dpr;
+  ctx.setLineDash([4*dpr, 4*dpr]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Fill area between arc and segments to show gap
+  if (numSegs <= 6) {
+    ctx.beginPath();
+    // Segments path
+    for (let i = 0; i <= numSegs; i++) {
+      const angle = (Math.PI/2) * (i / numSegs);
+      const [px, py] = getArcPoint(angle);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    // Arc path back
+    for (let i = numSegs; i >= 0; i--) {
+      const angle = (Math.PI/2) * (i / numSegs);
+      // Use many small arc steps for smooth path
+      if (i === numSegs) {
+        const [ax, ay] = getArcPoint((Math.PI/2) * (i / numSegs));
+        ctx.lineTo(ax, ay);
+      }
+    }
+    ctx.closePath();
+  }
+
+  // Draw segments
+  let totalLength = 0;
+  ctx.beginPath();
+  for (let i = 0; i <= numSegs; i++) {
+    const angle = (Math.PI/2) * (i / numSegs);
+    const [px, py] = getArcPoint(angle);
+    if (i === 0) ctx.moveTo(px, py); else {
+      ctx.lineTo(px, py);
+      const prevAngle = (Math.PI/2) * ((i-1) / numSegs);
+      const [ppx, ppy] = getArcPoint(prevAngle);
+      totalLength += Math.sqrt((px-ppx)**2 + (py-ppy)**2);
+    }
+  }
+  // Color gradient based on accuracy
+  const accuracy = numSegs / 10;
+  const r = Math.round(204 * (1-accuracy) + 0 * accuracy);
+  const g = Math.round(119 * (1-accuracy) + 229 * accuracy);
+  const b = Math.round(0 * (1-accuracy) + 255 * accuracy);
+  ctx.strokeStyle = `rgb(${r},${g},${b})`;
+  ctx.lineWidth = 3.5 * dpr;
+  ctx.stroke();
+
+  // Draw segment points
+  for (let i = 0; i <= numSegs; i++) {
+    const angle = (Math.PI/2) * (i / numSegs);
+    const [px, py] = getArcPoint(angle);
+    ctx.beginPath();
+    ctx.arc(px, py, 5*dpr, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(px, py, 3*dpr, 0, Math.PI*2);
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fill();
+  }
+
+  // Draw gap lines (perpendicular from arc to segment midpoints)
+  if (numSegs <= 5) {
+    for (let i = 0; i < numSegs; i++) {
+      const midAngle = (Math.PI/2) * ((i + 0.5) / numSegs);
+      const [arcX, arcY] = getArcPoint(midAngle);
+      // Point on segment
+      const a1 = (Math.PI/2) * (i / numSegs);
+      const a2 = (Math.PI/2) * ((i+1) / numSegs);
+      const [sx1, sy1] = getArcPoint(a1);
+      const [sx2, sy2] = getArcPoint(a2);
+      const smx = (sx1+sx2)/2, smy = (sy1+sy2)/2;
+
+      ctx.beginPath();
+      ctx.moveTo(arcX, arcY);
+      ctx.lineTo(smx, smy);
+      ctx.strokeStyle = 'rgba(204,119,0,0.5)';
+      ctx.lineWidth = 1.5*dpr;
+      ctx.setLineDash([3*dpr, 3*dpr]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // Bot at start
+  ctx.font = `${20*dpr}px serif`;
+  ctx.textAlign = 'center';
+  const [startX, startY] = getArcPoint(0);
+  ctx.fillText('🤖', startX + 18*dpr, startY + 6*dpr);
+
+  // Target at end
+  const [endX, endY] = getArcPoint(Math.PI/2);
+  ctx.fillText('🎯', endX - 6*dpr, endY - 14*dpr);
+
+  // Labels
+  ctx.fillStyle = 'rgba(136,153,170,0.7)';
+  ctx.font = `${11*dpr}px 'DM Sans',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('True curve (dashed)', cx_center + radius*0.7, cy_center - radius*0.7 - 10*dpr);
+
+  // Update stats
+  const trueLen = radius * TRUE_ARC_LENGTH_FACTOR;
+  const pixToUnit = 10 / radius; // normalize to ~10 unit radius
+  const pathU = totalLength * pixToUnit;
+  const trueU = trueLen * pixToUnit;
+  const gap = Math.abs(pathU - trueU);
+
+  pathLenEl.textContent = pathU.toFixed(1) + ' units';
+  trueArcEl.textContent = trueU.toFixed(1) + ' units';
+  gapErrorEl.textContent = gap.toFixed(2) + ' units';
+
+  // Accuracy indicator
+  const label = numSegs <= 2 ? '😟 Far off' : numSegs <= 5 ? '🙂 Getting close' : numSegs <= 8 ? '😊 Almost there' : '🎉 Excellent!';
+  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.font = `bold ${14*dpr}px 'DM Sans',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(label, cw/2, ch*0.15);
+
+  // Segment count display
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${16*dpr}px 'DM Sans',sans-serif`;
+  ctx.fillText(numSegs + (numSegs===1?' segment':' segments'), cw/2, ch*0.08);
+}
+
+slider.addEventListener('input', () => {
+  const v = parseInt(slider.value);
+  segValue.textContent = v;
+  drawArc(v);
+});
+
+// Compute compare values
+function getPathLengthForSegs(n) {
+  let total = 0;
+  for (let i = 1; i <= n; i++) {
+    const a1 = (Math.PI/2)*((i-1)/n);
+    const a2 = (Math.PI/2)*(i/n);
+    const [x1,y1] = getArcPoint(a1);
+    const [x2,y2] = getArcPoint(a2);
+    total += Math.sqrt((x2-x1)**2+(y2-y1)**2);
+  }
+  return total * (10/radius);
+}
+
+function selectCompare(n) {
+  document.querySelectorAll('.compare-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('cmp'+n).classList.add('selected');
+  const result = document.getElementById('compareResult');
+  if (n === 6) {
+    result.textContent = '✓ Correct! 6 segments is closer to the real curve.';
+  } else {
+    result.textContent = '↑ Try the other one — more segments = closer!';
+    result.style.color = 'var(--orange)';
+    setTimeout(()=>{result.style.color='var(--green)'},1500);
+  }
+}
+
+// Steps
+let currentStep = 0;
+const totalSteps = 6;
+const stepsEl = document.querySelectorAll('.step');
+const dotsContainer = document.getElementById('stepDots');
+for (let i = 0; i < totalSteps; i++) {
+  const d = document.createElement('div');
+  d.className = 'step-dot' + (i===0?' active':'');
+  dotsContainer.appendChild(d);
+}
+const dots = dotsContainer.querySelectorAll('.step-dot');
+
+function showStep(n) {
+  currentStep = n;
+  stepsEl.forEach((s,i) => s.classList.toggle('active', i===n));
+  dots.forEach((d,i) => d.classList.toggle('active', i===n));
+  document.getElementById('prevBtn').disabled = n===0;
+  document.getElementById('nextBtn').textContent = n===totalSteps-1?'Done ✓':'Next →';
+
+  // Sync slider with step
+  const stepSegs = [1, 1, 1, 3, 8, 10];
+  slider.value = stepSegs[n];
+  segValue.textContent = stepSegs[n];
+  drawArc(stepSegs[n]);
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentStep < totalSteps-1) showStep(currentStep+1);
+});
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (currentStep > 0) showStep(currentStep-1);
+});
+
+function updateCompareVals() {
+  const v3 = getPathLengthForSegs(3);
+  const v6 = getPathLengthForSegs(6);
+  document.getElementById('cmp3val').textContent = v3.toFixed(1) + ' units';
+  document.getElementById('cmp6val').textContent = v6.toFixed(1) + ' units';
+}
+
+window.addEventListener('resize', () => {
+  resize();
+  updateCompareVals();
+});
+resize();
+showStep(0);
+setTimeout(updateCompareVals, 100);
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

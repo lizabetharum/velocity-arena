@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proportional Scaling — Velocity Arena</title>
+  <link rel="stylesheet" href="./shared.css">
+  <style>
+    .split-screen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    @media (max-width: 600px) {
+      .split-screen { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--active);
+      border-radius: var(--r-md);
+      padding: var(--sp-5);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--sp-4);
+    }
+    .panel-left .panel-title { color: var(--cyan); }
+    .panel-right .panel-title { color: var(--orange); }
+
+    .panel-left { border: 1px solid rgba(0, 229, 255, 0.15); }
+    .panel-right { border: 1px solid rgba(204, 119, 0, 0.15); }
+
+    /* Bars for output */
+    .output-bar-track {
+      width: 100%;
+      height: 28px;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: var(--sp-3) 0;
+      position: relative;
+    }
+    .output-bar-fill {
+      height: 100%;
+      border-radius: var(--r-sm);
+      transition: width var(--t-med) var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: var(--sp-2);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bg);
+      min-width: 30px;
+    }
+    .fill-cyan { background: linear-gradient(90deg, var(--teal), var(--cyan)); }
+    .fill-orange { background: linear-gradient(90deg, #994400, var(--orange)); }
+
+    .output-value {
+      font-size: 24px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .output-value-cyan { color: var(--cyan); }
+    .output-value-orange { color: var(--orange); }
+
+    .prop-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 800;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-full);
+      margin-top: var(--sp-3);
+      transition: all var(--t-med) var(--ease);
+    }
+    .prop-yes {
+      color: var(--green);
+      background: rgba(68, 204, 136, 0.15);
+      border: 1px solid rgba(68, 204, 136, 0.3);
+    }
+    .prop-no {
+      color: var(--red);
+      background: rgba(255, 68, 102, 0.15);
+      border: 1px solid rgba(255, 68, 102, 0.3);
+    }
+
+    .input-label {
+      font-size: 12px;
+      color: var(--slate);
+      margin-bottom: var(--sp-1);
+    }
+    .output-label {
+      font-size: 12px;
+      color: var(--slate);
+      margin-top: var(--sp-1);
+    }
+
+    /* Multiplier badge */
+    .mult-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--r-full);
+      margin-top: var(--sp-2);
+      transition: all var(--t-med) var(--ease);
+    }
+    .mult-badge.green {
+      color: var(--green);
+      background: rgba(68, 204, 136, 0.15);
+    }
+    .mult-badge.red {
+      color: var(--red);
+      background: rgba(255, 68, 102, 0.15);
+    }
+
+    /* Step visuals */
+    .step-comparison {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-3);
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+    }
+    @media (max-width: 500px) {
+      .step-comparison { grid-template-columns: 1fr; }
+      .step-comparison .arrow-col { transform: rotate(90deg); }
+    }
+    .step-box {
+      background: var(--active);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+      text-align: center;
+    }
+    .step-box .val {
+      font-size: 28px;
+      font-weight: 800;
+    }
+    .step-box .lbl {
+      font-size: 11px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+    .arrow-col {
+      font-size: 24px;
+      color: var(--slate);
+    }
+
+    /* Try it */
+    .try-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    @media (max-width: 600px) {
+      .try-split { grid-template-columns: 1fr; }
+    }
+    .try-panel {
+      background: var(--bg);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      text-align: center;
+    }
+    .try-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--sp-3);
+    }
+
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1000; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 1.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="./unit-rate.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html">Ratio</a>
+    <a href="./proportional-scaling.html" class="active">Scaling</a>
+    <a href="./linear-decay.html">Decay</a>
+    <a href="#" class="disabled">Percent</a>
+    <a href="#" class="disabled">Graphs</a>
+    <a href="#" class="disabled">Equations</a>
+    <a href="#" class="disabled">Data</a>
+  </div>
+</nav>
+
+<main class="page-container">
+
+  <!-- TITLE -->
+  <div class="title-bar">
+    <span class="concept-label">Concept 3 of 8</span>
+    <h1>Proportional Scaling: Does It Double?</h1>
+    <p class="subtitle">Compare left and right. See the difference.</p>
+  </div>
+
+  <!-- INTERACTIVE -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">⚡</span>
+      INTERACTIVE — COMPARE TWO SIDES
+    </div>
+
+    <div class="split-screen">
+      <!-- LEFT: Proportional -->
+      <div class="panel panel-left">
+        <div class="panel-title">Speed → Motor Power</div>
+        <div class="input-label">Speed Stat</div>
+        <input type="range" id="speedSlider" min="1" max="10" value="3" step="1"
+               style="width: 100%; margin: var(--sp-2) 0;">
+        <div class="output-value output-value-cyan"><span id="speedInput">3</span></div>
+        <div class="output-label">Motor Power</div>
+        <div class="output-bar-track">
+          <div class="output-bar-fill fill-cyan" id="speedBar" style="width: 15%;"></div>
+        </div>
+        <div class="output-value output-value-cyan"><span id="speedOutput">15</span>%</div>
+        <div class="mult-badge green" id="speedMult">×1</div>
+        <div class="prop-badge prop-yes" id="propBadgeLeft">PROPORTIONAL ✓</div>
+      </div>
+
+      <!-- RIGHT: Non-proportional -->
+      <div class="panel panel-right">
+        <div class="panel-title">Power → Charge Speed</div>
+        <div class="input-label">Power Stat</div>
+        <input type="range" id="powerSlider" min="1" max="10" value="3" step="1"
+               style="width: 100%; margin: var(--sp-2) 0;">
+        <div class="output-value output-value-orange"><span id="powerInput">3</span></div>
+        <div class="output-label">Charge Speed</div>
+        <div class="output-bar-track">
+          <div class="output-bar-fill fill-orange" id="powerBar" style="width: 9%;"></div>
+        </div>
+        <div class="output-value output-value-orange"><span id="powerOutput">9</span></div>
+        <div class="mult-badge red" id="powerMult">×1</div>
+        <div class="prop-badge prop-no" id="propBadgeRight">NOT PROPORTIONAL ✗</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-5);">
+      <span class="keyword-badge">PROPORTIONAL</span>
+    </div>
+  </div>
+
+  <!-- STEP BY STEP -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">📖</span>
+      LEARN — CLICK THROUGH THE STEPS
+    </div>
+
+    <div class="steps-container" id="stepsContainer">
+      <!-- Step 1 -->
+      <div class="step active" data-step="1">
+        <div class="step-visual">
+          <div class="step-comparison">
+            <div class="step-box">
+              <div class="val" style="color: var(--cyan);">3</div>
+              <div class="lbl">Speed</div>
+            </div>
+            <div class="arrow-col">→</div>
+            <div class="step-box">
+              <div class="val" style="color: var(--cyan);">15%</div>
+              <div class="lbl">Motor Power</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Speed = <strong>3</strong> → Motor Power = <strong>15%</strong></p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div class="step-comparison" style="margin-bottom: var(--sp-3);">
+              <div class="step-box" style="border: 2px solid var(--cyan);">
+                <div class="val" style="color: var(--cyan);">6</div>
+                <div class="lbl">Speed ×2</div>
+              </div>
+              <div class="arrow-col">→</div>
+              <div class="step-box" style="border: 2px solid var(--green);">
+                <div class="val" style="color: var(--green);">30%</div>
+                <div class="lbl">Motor Power ×2</div>
+              </div>
+            </div>
+            <div class="prop-badge prop-yes" style="font-size: 16px;">DOUBLED! ✓</div>
+          </div>
+        </div>
+        <p class="step-text">Speed <strong>doubled</strong> → Motor Power <strong>doubled</strong> too!</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3">
+        <div class="step-visual">
+          <div class="step-comparison">
+            <div class="step-box">
+              <div class="val" style="color: var(--orange);">3</div>
+              <div class="lbl">Power</div>
+            </div>
+            <div class="arrow-col">→</div>
+            <div class="step-box">
+              <div class="val" style="color: var(--orange);">9</div>
+              <div class="lbl">Charge</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Power = <strong style="color: var(--orange);">3</strong> → Charge = <strong style="color: var(--orange);">9</strong></p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" data-step="4">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div class="step-comparison" style="margin-bottom: var(--sp-3);">
+              <div class="step-box" style="border: 2px solid var(--orange);">
+                <div class="val" style="color: var(--orange);">6</div>
+                <div class="lbl">Power ×2</div>
+              </div>
+              <div class="arrow-col">→</div>
+              <div class="step-box" style="border: 2px solid var(--red);">
+                <div class="val" style="color: var(--red);">36</div>
+                <div class="lbl">Charge ×4 !!</div>
+              </div>
+            </div>
+            <div class="prop-badge prop-no" style="font-size: 16px;">4× NOT 2× ! ✗</div>
+          </div>
+        </div>
+        <p class="step-text">Power doubled but Charge went <strong style="color: var(--red);">4×</strong> not 2×!</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; margin-bottom: var(--sp-4);">
+              <div class="prop-badge prop-yes" style="font-size: 15px;">PROPORTIONAL ✓</div>
+              <div class="prop-badge prop-no" style="font-size: 15px;">NOT PROPORTIONAL ✗</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text"><strong>Proportional</strong> = double input, double output. Power is <strong style="color: var(--red);">NOT proportional</strong>.</p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary" id="prevBtn" disabled>← Back</button>
+      <div class="step-dots" id="stepDots"></div>
+      <button class="btn btn-primary" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it-card">
+    <div class="section-label">
+      <span class="icon" style="background: rgba(204,119,0,0.15);">🎯</span>
+      <span style="color: var(--orange);">TRY IT — YOUR TURN</span>
+    </div>
+
+    <div class="try-split">
+      <div class="try-panel">
+        <div class="try-panel-title" style="color: var(--cyan);">Proportional</div>
+        <p style="font-size: 14px; color: var(--slate); margin-bottom: var(--sp-3);">Speed 4 → Motor 20%</p>
+        <p style="font-size: 14px; color: var(--white); margin-bottom: var(--sp-3);">Speed <strong style="color: var(--cyan);">8</strong> → Motor = ?</p>
+        <div class="try-it-input-row" style="justify-content: center;">
+          <input type="number" id="tryProp" placeholder="?" min="0" max="999" style="width: 80px;" aria-label="Proportional answer">
+          <span style="font-size: 14px; color: var(--slate);">%</span>
+        </div>
+      </div>
+      <div class="try-panel">
+        <div class="try-panel-title" style="color: var(--orange);">Not Proportional</div>
+        <p style="font-size: 14px; color: var(--slate); margin-bottom: var(--sp-3);">Power 2 → Charge 4</p>
+        <p style="font-size: 14px; color: var(--white); margin-bottom: var(--sp-3);">Power <strong style="color: var(--orange);">4</strong> → Charge = ?</p>
+        <div class="try-it-input-row" style="justify-content: center;">
+          <input type="number" id="tryNonProp" placeholder="?" min="0" max="999" style="width: 80px;" aria-label="Non-proportional answer">
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-4);">
+      <button class="btn-check" onclick="checkAnswer()">Check Both ✓</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+</main>
+
+<script>
+  // === INTERACTIVE ===
+  const speedSlider = document.getElementById('speedSlider');
+  const powerSlider = document.getElementById('powerSlider');
+  let baseSpeed = 1, basePower = 1;
+
+  function updatePanels() {
+    const s = parseInt(speedSlider.value);
+    const p = parseInt(powerSlider.value);
+
+    // Speed is proportional: output = input * 5
+    const speedOut = s * 5;
+    document.getElementById('speedInput').textContent = s;
+    document.getElementById('speedOutput').textContent = speedOut;
+    document.getElementById('speedBar').style.width = Math.min(speedOut, 100) + '%';
+
+    // Multiplier relative to baseline
+    const sRatio = s / baseSpeed;
+    const sOutRatio = speedOut / (baseSpeed * 5);
+    document.getElementById('speedMult').textContent = '×' + sRatio.toFixed(1).replace('.0', '');
+
+    // Power is non-proportional: output = input²
+    const powerOut = p * p;
+    document.getElementById('powerInput').textContent = p;
+    document.getElementById('powerOutput').textContent = powerOut;
+    document.getElementById('powerBar').style.width = Math.min(powerOut, 100) + '%';
+
+    const pRatio = p / basePower;
+    const pOutRatio = powerOut / (basePower * basePower);
+    const pMultText = '×' + pOutRatio.toFixed(1).replace('.0', '');
+    document.getElementById('powerMult').textContent = pMultText;
+
+    // Color mult badges
+    const sm = document.getElementById('speedMult');
+    const pm = document.getElementById('powerMult');
+    sm.className = 'mult-badge green';
+    pm.className = 'mult-badge ' + (pRatio.toFixed(2) === pOutRatio.toFixed(2) ? 'green' : 'red');
+  }
+
+  speedSlider.addEventListener('input', updatePanels);
+  powerSlider.addEventListener('input', updatePanels);
+  updatePanels();
+
+  // Track baseline for comparison
+  speedSlider.addEventListener('mousedown', () => { baseSpeed = parseInt(speedSlider.value); });
+  speedSlider.addEventListener('touchstart', () => { baseSpeed = parseInt(speedSlider.value); });
+  powerSlider.addEventListener('mousedown', () => { basePower = parseInt(powerSlider.value); });
+  powerSlider.addEventListener('touchstart', () => { basePower = parseInt(powerSlider.value); });
+
+  // === STEPS ===
+  const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  let currentStep = 0;
+
+  const dotsContainer = document.getElementById('stepDots');
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  function showStep(idx) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const dots = dotsContainer.querySelectorAll('.step-dot');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot';
+      if (i === idx) d.classList.add('active');
+      else if (i < idx) d.classList.add('done');
+    });
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').textContent = idx === totalSteps - 1 ? 'Done ✓' : 'Next →';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; showStep(currentStep); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+  });
+
+  // === TRY IT ===
+  function checkAnswer() {
+    const prop = parseInt(document.getElementById('tryProp').value);
+    const nonProp = parseInt(document.getElementById('tryNonProp').value);
+    const fb = document.getElementById('feedback');
+
+    const propCorrect = prop === 40;
+    const nonPropCorrect = nonProp === 16;
+
+    if (propCorrect && nonPropCorrect) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '🎉 <strong>Both correct!</strong> 40% (doubled) and 16 (4× not 2×)';
+      fb.style.display = 'block';
+      launchConfetti();
+    } else if (propCorrect) {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Left is correct! Right: Power 2→4, so 4² = 16';
+      fb.style.display = 'block';
+    } else if (nonPropCorrect) {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Right is correct! Left: Double input = double output → 40%';
+      fb.style.display = 'block';
+    } else {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Try again! Left: double 20%. Right: 4² = ?';
+      fb.style.display = 'block';
+    }
+  }
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#00E5FF', '#44CC88', '#CC7700', '#FF4466', '#FFFFFF'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1 + Math.random()) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 2500);
+  }
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

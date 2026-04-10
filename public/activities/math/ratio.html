@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ratio — Velocity Arena</title>
+  <link rel="stylesheet" href="./shared.css">
+  <style>
+    .bars-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: var(--sp-8);
+      height: 220px;
+      padding: var(--sp-4) var(--sp-6);
+      background: var(--active);
+      border-radius: var(--r-md);
+      margin-top: var(--sp-4);
+      position: relative;
+    }
+    .bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      flex: 1;
+      max-width: 120px;
+    }
+    .bar {
+      width: 100%;
+      border-radius: var(--r-sm) var(--r-sm) 0 0;
+      transition: height var(--t-med) var(--ease);
+      position: relative;
+    }
+    .bar-cyan { background: linear-gradient(to top, var(--teal), var(--cyan)); }
+    .bar-orange { background: linear-gradient(to top, #994400, var(--orange)); }
+    .bar-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate);
+    }
+    .bar-value {
+      font-size: 20px;
+      font-weight: 800;
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-variant-numeric: tabular-nums;
+    }
+    .bar-value-cyan { color: var(--cyan); }
+    .bar-value-orange { color: var(--orange); }
+
+    /* Ratio display formats */
+    .ratio-formats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-6);
+      margin-top: var(--sp-5);
+      flex-wrap: wrap;
+    }
+    .ratio-format {
+      background: var(--active);
+      padding: var(--sp-3) var(--sp-5);
+      border-radius: var(--r-md);
+      text-align: center;
+      min-width: 100px;
+    }
+    .ratio-format .format-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+      margin-bottom: var(--sp-1);
+    }
+    .ratio-format .format-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+    }
+    .ratio-format .format-value .c { color: var(--cyan); }
+    .ratio-format .format-value .o { color: var(--orange); }
+
+    /* Equal badge */
+    .equal-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: var(--cyan);
+      color: var(--bg);
+      font-size: 18px;
+      font-weight: 800;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-full);
+      transition: transform var(--t-med) var(--ease);
+      z-index: 2;
+      white-space: nowrap;
+    }
+    .equal-badge.show { transform: translate(-50%, -50%) scale(1); }
+
+    /* Step visuals */
+    .stat-cards {
+      display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap;
+    }
+    .stat-card {
+      background: var(--active);
+      padding: var(--sp-4) var(--sp-6);
+      border-radius: var(--r-md);
+      text-align: center;
+      min-width: 100px;
+    }
+    .stat-card .stat-val {
+      font-size: 32px;
+      font-weight: 800;
+    }
+    .stat-card .stat-name {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: var(--sp-1);
+    }
+    .simplify-anim {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-4);
+      flex-wrap: wrap;
+    }
+    .simplify-arrow {
+      font-size: 24px;
+      color: var(--green);
+      animation: arrowBounce 1s ease-in-out infinite;
+    }
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(6px); }
+    }
+
+    /* Try it side-by-side */
+    .try-it-pair {
+      display: flex; gap: var(--sp-4); flex-wrap: wrap;
+    }
+    .try-it-pair > div { flex: 1; min-width: 200px; }
+
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1000; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 1.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="./unit-rate.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html" class="active">Ratio</a>
+    <a href="./proportional-scaling.html">Scaling</a>
+    <a href="./linear-decay.html">Decay</a>
+    <a href="#" class="disabled">Percent</a>
+    <a href="#" class="disabled">Graphs</a>
+    <a href="#" class="disabled">Equations</a>
+    <a href="#" class="disabled">Data</a>
+  </div>
+</nav>
+
+<main class="page-container">
+
+  <!-- TITLE -->
+  <div class="title-bar">
+    <span class="concept-label">Concept 2 of 8</span>
+    <h1>Ratio: Comparing Two Numbers</h1>
+    <p class="subtitle">Change the bars. See the ratio.</p>
+  </div>
+
+  <!-- INTERACTIVE MANIPULATIVE -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">⚡</span>
+      INTERACTIVE — MOVE THE SLIDERS
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <label style="color: var(--cyan);">Value A</label>
+        <input type="range" id="sliderA" min="1" max="12" value="3" step="1">
+        <span class="slider-value" style="color: var(--cyan);"><span id="valA">3</span></span>
+      </div>
+      <div class="slider-row">
+        <label style="color: var(--orange);">Value B</label>
+        <input type="range" id="sliderB" min="1" max="12" value="5" step="1">
+        <span class="slider-value" style="color: var(--orange);"><span id="valB">5</span></span>
+      </div>
+    </div>
+
+    <div class="bars-container" id="barsContainer">
+      <div class="bar-wrapper">
+        <div class="bar bar-cyan" id="barA" style="height: 50%;">
+          <span class="bar-value bar-value-cyan" id="barValA">3</span>
+        </div>
+        <span class="bar-label" style="color: var(--cyan);">A</span>
+      </div>
+      <div class="bar-wrapper">
+        <div class="bar bar-orange" id="barB" style="height: 83%;">
+          <span class="bar-value bar-value-orange" id="barValB">5</span>
+        </div>
+        <span class="bar-label" style="color: var(--orange);">B</span>
+      </div>
+      <div class="equal-badge" id="equalBadge">1 : 1</div>
+    </div>
+
+    <div class="ratio-formats">
+      <div class="ratio-format">
+        <div class="format-label">Colon</div>
+        <div class="format-value"><span class="c" id="fmtColon1">3</span> : <span class="o" id="fmtColon2">5</span></div>
+      </div>
+      <div class="ratio-format">
+        <div class="format-label">Fraction</div>
+        <div class="format-value"><span class="c" id="fmtFrac1">3</span>/<span class="o" id="fmtFrac2">5</span></div>
+      </div>
+      <div class="ratio-format">
+        <div class="format-label">Words</div>
+        <div class="format-value" style="font-size: 16px;"><span class="c" id="fmtWord1">3</span> to <span class="o" id="fmtWord2">5</span></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-4);">
+      <span class="keyword-badge">RATIO</span>
+    </div>
+  </div>
+
+  <!-- STEP BY STEP -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">📖</span>
+      LEARN — CLICK THROUGH THE STEPS
+    </div>
+
+    <div class="steps-container" id="stepsContainer">
+      <!-- Step 1 -->
+      <div class="step active" data-step="1">
+        <div class="step-visual">
+          <div class="stat-cards">
+            <div class="stat-card">
+              <div class="stat-val" style="color: var(--cyan);">6</div>
+              <div class="stat-name" style="color: var(--cyan);">Speed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" style="color: var(--orange);">4</div>
+              <div class="stat-name" style="color: var(--orange);">Power</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Team A: <strong>Speed = 6</strong>, <strong style="color: var(--orange);">Power = 4</strong></p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--sp-3); flex-wrap: wrap;">
+              <span style="font-size: 28px; font-weight: 800; color: var(--cyan);">6</span>
+              <span style="font-size: 28px; font-weight: 700; color: var(--white);">:</span>
+              <span style="font-size: 28px; font-weight: 800; color: var(--orange);">4</span>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">The ratio of Speed to Power is <strong>6 : 4</strong></p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3">
+        <div class="step-visual">
+          <div class="simplify-anim">
+            <div style="text-align: center;">
+              <div style="display: flex; align-items: center; gap: var(--sp-2);">
+                <span style="font-size: 28px; font-weight: 800; color: var(--cyan);">6</span>
+                <span style="font-size: 24px; color: var(--white);">:</span>
+                <span style="font-size: 28px; font-weight: 800; color: var(--orange);">4</span>
+              </div>
+              <div style="font-size: 11px; color: var(--slate); margin-top: 4px;">÷ 2</div>
+            </div>
+            <span class="simplify-arrow">→</span>
+            <div style="text-align: center; background: var(--accent-dim); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); border: 2px solid var(--cyan);">
+              <div style="display: flex; align-items: center; gap: var(--sp-2);">
+                <span style="font-size: 32px; font-weight: 800; color: var(--cyan);">3</span>
+                <span style="font-size: 24px; color: var(--white);">:</span>
+                <span style="font-size: 32px; font-weight: 800; color: var(--orange);">2</span>
+              </div>
+              <div style="font-size: 11px; color: var(--green); margin-top: 4px; font-weight: 700;">SIMPLIFIED</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Simplify: divide both by <strong>2</strong></p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" data-step="4">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4);">
+              <div style="display: flex; gap: var(--sp-1);">
+                <div style="width: 20px; height: 20px; background: var(--cyan); border-radius: 4px;"></div>
+                <div style="width: 20px; height: 20px; background: var(--cyan); border-radius: 4px;"></div>
+                <div style="width: 20px; height: 20px; background: var(--cyan); border-radius: 4px;"></div>
+              </div>
+              <span style="font-size: 16px; color: var(--slate);">for every</span>
+              <div style="display: flex; gap: var(--sp-1);">
+                <div style="width: 20px; height: 20px; background: var(--orange); border-radius: 4px;"></div>
+                <div style="width: 20px; height: 20px; background: var(--orange); border-radius: 4px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">For every <strong>3 Speed</strong>, there are <strong style="color: var(--orange);">2 Power</strong></p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <span class="keyword-badge" style="font-size: 1.5rem;">RATIO</span>
+            <p style="margin-top: var(--sp-4); font-size: 15px; color: var(--slate);">compares two quantities</p>
+          </div>
+        </div>
+        <p class="step-text"><strong>RATIO</strong> compares two quantities</p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary" id="prevBtn" disabled>← Back</button>
+      <div class="step-dots" id="stepDots"></div>
+      <button class="btn btn-primary" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it-card">
+    <div class="section-label">
+      <span class="icon" style="background: rgba(204,119,0,0.15);">🎯</span>
+      <span style="color: var(--orange);">TRY IT — YOUR TURN</span>
+    </div>
+
+    <div style="display: flex; gap: var(--sp-4); margin-bottom: var(--sp-5); flex-wrap: wrap;">
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Speed</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--cyan);">8</div>
+      </div>
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Endurance</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--orange);">2</div>
+      </div>
+    </div>
+
+    <p class="try-it-prompt">What is the <strong style="color: var(--cyan);">simplified ratio</strong>?</p>
+
+    <div class="try-it-input-row">
+      <input type="number" id="tryA" placeholder="?" min="0" max="99" style="width: 70px;" aria-label="First number">
+      <span style="font-size: 20px; font-weight: 800; color: var(--white);">:</span>
+      <input type="number" id="tryB" placeholder="?" min="0" max="99" style="width: 70px;" aria-label="Second number">
+      <button class="btn-check" id="checkBtn" onclick="checkAnswer()">Check ✓</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+</main>
+
+<script>
+  // === INTERACTIVE ===
+  const sliderA = document.getElementById('sliderA');
+  const sliderB = document.getElementById('sliderB');
+  const valA = document.getElementById('valA');
+  const valB = document.getElementById('valB');
+  const barA = document.getElementById('barA');
+  const barB = document.getElementById('barB');
+  const barValA = document.getElementById('barValA');
+  const barValB = document.getElementById('barValB');
+  const equalBadge = document.getElementById('equalBadge');
+
+  function updateBars() {
+    const a = parseInt(sliderA.value);
+    const b = parseInt(sliderB.value);
+    valA.textContent = a;
+    valB.textContent = b;
+    barValA.textContent = a;
+    barValB.textContent = b;
+
+    const max = 12;
+    barA.style.height = (a / max * 100) + '%';
+    barB.style.height = (b / max * 100) + '%';
+
+    // GCD for simplification
+    function gcd(x, y) { return y === 0 ? x : gcd(y, x % y); }
+    const g = gcd(a, b);
+    const sa = a / g;
+    const sb = b / g;
+
+    document.getElementById('fmtColon1').textContent = sa;
+    document.getElementById('fmtColon2').textContent = sb;
+    document.getElementById('fmtFrac1').textContent = sa;
+    document.getElementById('fmtFrac2').textContent = sb;
+    document.getElementById('fmtWord1').textContent = sa;
+    document.getElementById('fmtWord2').textContent = sb;
+
+    // Equal badge
+    equalBadge.classList.toggle('show', a === b);
+  }
+
+  sliderA.addEventListener('input', updateBars);
+  sliderB.addEventListener('input', updateBars);
+  updateBars();
+
+  // === STEPS ===
+  const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  let currentStep = 0;
+
+  const dotsContainer = document.getElementById('stepDots');
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  function showStep(idx) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const dots = dotsContainer.querySelectorAll('.step-dot');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot';
+      if (i === idx) d.classList.add('active');
+      else if (i < idx) d.classList.add('done');
+    });
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').textContent = idx === totalSteps - 1 ? 'Done ✓' : 'Next →';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; showStep(currentStep); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+  });
+
+  // === TRY IT ===
+  function checkAnswer() {
+    const a = parseInt(document.getElementById('tryA').value);
+    const b = parseInt(document.getElementById('tryB').value);
+    const fb = document.getElementById('feedback');
+    if (a === 4 && b === 1) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '🎉 <strong>Correct!</strong> 8:2 simplifies to 4:1';
+      fb.style.display = 'block';
+      launchConfetti();
+    } else {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Try again! Divide both 8 and 2 by 2.';
+      fb.style.display = 'block';
+    }
+  }
+
+  document.getElementById('tryB').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#00E5FF', '#44CC88', '#CC7700', '#FF4466', '#FFFFFF'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1 + Math.random()) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 2500);
+  }
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>

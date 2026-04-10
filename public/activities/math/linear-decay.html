@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Decay — Velocity Arena</title>
+  <link rel="stylesheet" href="./shared.css">
+  <style>
+    /* Graph */
+    .graph-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 340px;
+      background: var(--active);
+      border-radius: var(--r-md);
+      margin-top: var(--sp-4);
+      overflow: hidden;
+    }
+    .graph-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Bot status */
+    .bot-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-6);
+      margin-top: var(--sp-5);
+      flex-wrap: wrap;
+    }
+    .bot-display {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bot-display svg {
+      transition: opacity var(--t-med) var(--ease), filter var(--t-med) var(--ease);
+    }
+    .power-ring {
+      position: absolute;
+      inset: 0;
+    }
+    .power-ring circle {
+      transition: stroke-dashoffset var(--t-med) var(--ease), stroke var(--t-med) var(--ease);
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      align-items: center;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate);
+    }
+    .stat-big {
+      font-size: 32px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      transition: color var(--t-med) var(--ease);
+    }
+
+    /* Time slider */
+    .time-slider-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+      padding: var(--sp-3) var(--sp-5);
+      background: var(--active);
+      border-radius: var(--r-md);
+    }
+    .time-slider-row label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+      white-space: nowrap;
+    }
+    .time-slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg);
+    }
+    .time-slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(204, 119, 0, 0.4);
+    }
+    .time-slider-row input[type="range"]::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 12px rgba(204, 119, 0, 0.4);
+    }
+
+    /* Rise/run label */
+    .slope-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-4);
+      flex-wrap: wrap;
+    }
+    .slope-box {
+      background: var(--active);
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-md);
+      text-align: center;
+    }
+    .slope-box .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate);
+    }
+    .slope-box .val {
+      font-size: 20px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Step visuals */
+    .step-graph-mini {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 4/3;
+      background: var(--active);
+      border-radius: var(--r-md);
+      overflow: hidden;
+    }
+    .step-bot-visual {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      justify-content: center;
+    }
+    .power-bar-vert {
+      width: 24px;
+      height: 80px;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .power-bar-vert-fill {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      border-radius: var(--r-sm);
+      transition: height var(--t-med) var(--ease), background var(--t-med) var(--ease);
+    }
+
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1000; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 1.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="./unit-rate.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html">Ratio</a>
+    <a href="./proportional-scaling.html">Scaling</a>
+    <a href="./linear-decay.html" class="active">Decay</a>
+    <a href="#" class="disabled">Percent</a>
+    <a href="#" class="disabled">Graphs</a>
+    <a href="#" class="disabled">Equations</a>
+    <a href="#" class="disabled">Data</a>
+  </div>
+</nav>
+
+<main class="page-container">
+
+  <!-- TITLE -->
+  <div class="title-bar">
+    <span class="concept-label">Concept 4 of 8</span>
+    <h1>Linear Decay: Your Bot Loses Power</h1>
+    <p class="subtitle">Change endurance. Watch the power drop.</p>
+  </div>
+
+  <!-- INTERACTIVE -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">⚡</span>
+      INTERACTIVE — ADJUST ENDURANCE
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <label>Endurance</label>
+        <input type="range" id="enduranceSlider" min="1" max="10" value="5" step="1">
+        <span class="slider-value"><span id="enduranceVal">5</span></span>
+      </div>
+    </div>
+
+    <!-- Graph -->
+    <div class="graph-container">
+      <canvas class="graph-canvas" id="decayGraph"></canvas>
+    </div>
+
+    <!-- Time control -->
+    <div class="time-slider-row">
+      <label>⏱ Time</label>
+      <input type="range" id="timeSlider" min="0" max="10" value="0" step="0.5">
+      <span class="slider-value" style="color: var(--orange);"><span id="timeVal">0</span> min</span>
+    </div>
+
+    <!-- Bot status -->
+    <div class="bot-status">
+      <div class="bot-display">
+        <svg class="power-ring" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="35" fill="none" stroke="#1E2240" stroke-width="4"/>
+          <circle id="powerRingFill" cx="40" cy="40" r="35" fill="none" stroke="#00E5FF" stroke-width="4"
+                  stroke-dasharray="220" stroke-dashoffset="0" stroke-linecap="round"
+                  transform="rotate(-90 40 40)"/>
+        </svg>
+        <svg id="botFace" width="40" height="40" viewBox="0 0 36 36" fill="none" style="position: relative; z-index: 1;">
+          <rect x="6" y="10" width="24" height="16" rx="4" fill="#161A2E" stroke="#00E5FF" stroke-width="1.5"/>
+          <circle cx="13" cy="18" r="2.5" fill="#00E5FF"/>
+          <circle cx="23" cy="18" r="2.5" fill="#00E5FF"/>
+          <rect x="14" y="5" width="8" height="6" rx="2" fill="#007A99"/>
+        </svg>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-label">Power</span>
+        <span class="stat-big" id="powerDisplay" style="color: var(--cyan);">100%</span>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-label">Status</span>
+        <span class="stat-big" id="statusDisplay" style="color: var(--green); font-size: 16px;">RUNNING</span>
+      </div>
+    </div>
+
+    <!-- Rate of change / slope -->
+    <div class="slope-display">
+      <div class="slope-box">
+        <div class="lbl">Rate of Change</div>
+        <div class="val" style="color: var(--red);" id="rateDisplay">-10%</div>
+      </div>
+      <div class="slope-box">
+        <div class="lbl">per minute</div>
+        <div class="val" style="color: var(--slate);">📉</div>
+      </div>
+      <div class="slope-box">
+        <div class="lbl">Bot stops at</div>
+        <div class="val" style="color: var(--orange);" id="stopTimeDisplay">t = 10</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-5);">
+      <span class="keyword-badge">RATE OF CHANGE</span>
+    </div>
+  </div>
+
+  <!-- STEP BY STEP -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">📖</span>
+      LEARN — CLICK THROUGH THE STEPS
+    </div>
+
+    <div class="steps-container" id="stepsContainer">
+      <!-- Step 1 -->
+      <div class="step active" data-step="1">
+        <div class="step-visual">
+          <div class="step-bot-visual">
+            <svg width="50" height="50" viewBox="0 0 36 36" fill="none">
+              <rect x="6" y="10" width="24" height="16" rx="4" fill="#161A2E" stroke="#00E5FF" stroke-width="1.5"/>
+              <circle cx="13" cy="18" r="2.5" fill="#00E5FF"/>
+              <circle cx="23" cy="18" r="2.5" fill="#00E5FF"/>
+              <rect x="14" y="5" width="8" height="6" rx="2" fill="#007A99"/>
+            </svg>
+            <div class="power-bar-vert">
+              <div class="power-bar-vert-fill" style="height: 100%; background: var(--cyan);"></div>
+            </div>
+            <span style="font-size: 28px; font-weight: 800; color: var(--cyan);">100%</span>
+          </div>
+        </div>
+        <p class="step-text">Bot starts at <strong>100% power</strong></p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2">
+        <div class="step-visual">
+          <div class="step-bot-visual">
+            <svg width="50" height="50" viewBox="0 0 36 36" fill="none" style="opacity: 0.8;">
+              <rect x="6" y="10" width="24" height="16" rx="4" fill="#161A2E" stroke="#00E5FF" stroke-width="1.5"/>
+              <circle cx="13" cy="18" r="2.5" fill="#00E5FF"/>
+              <circle cx="23" cy="18" r="2.5" fill="#00E5FF"/>
+              <rect x="14" y="5" width="8" height="6" rx="2" fill="#007A99"/>
+            </svg>
+            <div class="power-bar-vert">
+              <div class="power-bar-vert-fill" style="height: 80%; background: var(--green);"></div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 12px; color: var(--orange);">t = 1</div>
+              <span style="font-size: 28px; font-weight: 800; color: var(--green);">80%</span>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Time = 1 min → power <strong>drops</strong></p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3">
+        <div class="step-visual">
+          <div class="step-bot-visual">
+            <svg width="50" height="50" viewBox="0 0 36 36" fill="none" style="opacity: 0.5;">
+              <rect x="6" y="10" width="24" height="16" rx="4" fill="#161A2E" stroke="#00E5FF" stroke-width="1.5"/>
+              <circle cx="13" cy="18" r="2.5" fill="#00E5FF"/>
+              <circle cx="23" cy="18" r="2.5" fill="#00E5FF"/>
+              <rect x="14" y="5" width="8" height="6" rx="2" fill="#007A99"/>
+            </svg>
+            <div class="power-bar-vert">
+              <div class="power-bar-vert-fill" style="height: 40%; background: var(--orange);"></div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 12px; color: var(--orange);">t = 3</div>
+              <span style="font-size: 28px; font-weight: 800; color: var(--orange);">40%</span>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Low endurance = <strong>faster fade</strong></p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" data-step="4">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--sp-3); flex-wrap: wrap;">
+              <div class="slope-box" style="border: 2px solid var(--cyan);">
+                <div class="lbl">Rise (change)</div>
+                <div class="val" style="color: var(--red);">-20%</div>
+              </div>
+              <div style="font-size: 20px; color: var(--slate);">÷</div>
+              <div class="slope-box" style="border: 2px solid var(--orange);">
+                <div class="lbl">Run (time)</div>
+                <div class="val" style="color: var(--orange);">1 min</div>
+              </div>
+              <div style="font-size: 20px; color: var(--slate);">=</div>
+              <div class="slope-box" style="border: 2px solid var(--green);">
+                <div class="lbl">Slope</div>
+                <div class="val" style="color: var(--green);">-20</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">The <strong>SLOPE</strong> of this line = the rate of change</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <span class="keyword-badge" style="font-size: 1.2rem;">RATE OF CHANGE</span>
+            <p style="margin-top: var(--sp-3); font-size: 14px; color: var(--slate);">= how much power lost per minute</p>
+          </div>
+        </div>
+        <p class="step-text"><strong>Rate of change</strong> = power lost per minute</p>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step" data-step="6">
+        <div class="step-visual">
+          <div class="step-bot-visual">
+            <svg width="50" height="50" viewBox="0 0 36 36" fill="none" style="opacity: 0.2; filter: grayscale(1);">
+              <rect x="6" y="10" width="24" height="16" rx="4" fill="#161A2E" stroke="#8899AA" stroke-width="1.5"/>
+              <circle cx="13" cy="18" r="2.5" fill="#8899AA"/>
+              <circle cx="23" cy="18" r="2.5" fill="#8899AA"/>
+              <rect x="14" y="5" width="8" height="6" rx="2" fill="#8899AA"/>
+            </svg>
+            <div class="power-bar-vert">
+              <div class="power-bar-vert-fill" style="height: 0%; background: var(--red);"></div>
+            </div>
+            <div style="text-align: center;">
+              <span style="font-size: 28px; font-weight: 800; color: var(--red);">0%</span>
+              <div style="font-size: 12px; color: var(--red); font-weight: 700;">STOPPED</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text"><strong>Linear decay</strong> = drops at a <strong>constant rate</strong></p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary" id="prevBtn" disabled>← Back</button>
+      <div class="step-dots" id="stepDots"></div>
+      <button class="btn btn-primary" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it-card">
+    <div class="section-label">
+      <span class="icon" style="background: rgba(204,119,0,0.15);">🎯</span>
+      <span style="color: var(--orange);">TRY IT — YOUR TURN</span>
+    </div>
+
+    <div style="display: flex; gap: var(--sp-4); margin-bottom: var(--sp-4); flex-wrap: wrap; align-items: center;">
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Endurance</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--cyan);">4</div>
+      </div>
+      <div style="font-size: 14px; color: var(--slate);">→</div>
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Decay Rate</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--red);">-25%/min</div>
+      </div>
+    </div>
+
+    <div style="background: var(--active); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); margin-bottom: var(--sp-4);">
+      <div style="font-size: 13px; color: var(--slate); margin-bottom: var(--sp-2);">Formula:</div>
+      <div style="font-size: 16px; font-weight: 600; color: var(--white);">
+        Power = 100 + (<span style="color: var(--red);">-25</span> × <span style="color: var(--orange);">time</span>)
+      </div>
+    </div>
+
+    <p class="try-it-prompt">At <strong style="color: var(--orange);">t = 3 minutes</strong>, what is the power?</p>
+
+    <div class="try-it-input-row">
+      <input type="number" id="tryAnswer" placeholder="?" min="0" max="100" aria-label="Your answer">
+      <span style="font-size: 14px; color: var(--slate);">%</span>
+      <button class="btn-check" onclick="checkAnswer()">Check ✓</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+</main>
+
+<script>
+  // === GRAPH DRAWING ===
+  const canvas = document.getElementById('decayGraph');
+  const ctx = canvas.getContext('2d');
+
+  const enduranceSlider = document.getElementById('enduranceSlider');
+  const timeSlider = document.getElementById('timeSlider');
+
+  function getDecayRate(endurance) {
+    // Higher endurance = slower decay
+    // Rate: 100/(endurance + 1) percent per minute
+    // Endurance 1 → 50%/min (stops at t=2)
+    // Endurance 5 → ~17%/min (stops at t~6)
+    // Endurance 10 → ~9%/min (stops at t~11)
+    return 100 / (endurance + 1);
+  }
+
+  function getStopTime(endurance) {
+    return 100 / getDecayRate(endurance);
+  }
+
+  function getPower(endurance, time) {
+    const rate = getDecayRate(endurance);
+    return Math.max(0, 100 - rate * time);
+  }
+
+  function drawGraph() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(dpr, dpr);
+
+    const w = rect.width;
+    const h = rect.height;
+    const pad = { top: 30, right: 20, bottom: 40, left: 50 };
+    const gw = w - pad.left - pad.right;
+    const gh = h - pad.top - pad.bottom;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const endurance = parseInt(enduranceSlider.value);
+    const currentTime = parseFloat(timeSlider.value);
+    const decayRate = getDecayRate(endurance);
+    const stopTime = getStopTime(endurance);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(136, 153, 170, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+      const x = pad.left + (i / 10) * gw;
+      ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + gh); ctx.stroke();
+    }
+    for (let i = 0; i <= 5; i++) {
+      const y = pad.top + (i / 5) * gh;
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#8899AA';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, pad.top + gh);
+    ctx.lineTo(pad.left + gw, pad.top + gh);
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = '#8899AA';
+    ctx.font = '11px DM Sans';
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 10; i += 2) {
+      ctx.fillText(i, pad.left + (i / 10) * gw, pad.top + gh + 18);
+    }
+    ctx.fillText('Time (min)', pad.left + gw / 2, h - 4);
+
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 100; i += 20) {
+      const y = pad.top + gh - (i / 100) * gh;
+      ctx.fillText(i + '%', pad.left - 6, y + 4);
+    }
+
+    // Decay line
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    const startX = pad.left;
+    const startY = pad.top;
+    ctx.moveTo(startX, startY);
+
+    const endX = pad.left + Math.min(stopTime / 10, 1) * gw;
+    const endY = pad.top + gh;
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    // Flat at zero after stopTime
+    if (stopTime < 10) {
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(endX, endY);
+      ctx.lineTo(pad.left + gw, endY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Rise/run triangle at current time
+    if (currentTime > 0 && currentTime < stopTime) {
+      const power = getPower(endurance, currentTime);
+      const cx = pad.left + (currentTime / 10) * gw;
+      const cy = pad.top + gh - (power / 100) * gh;
+
+      // Run line (horizontal)
+      const runStart = pad.left;
+      const runY = pad.top;
+      ctx.strokeStyle = 'rgba(204, 119, 0, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx, pad.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(pad.left, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Current point
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#00E5FF';
+      ctx.fill();
+      ctx.strokeStyle = '#0D0D1A';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Rise/run triangle
+      const triX1 = pad.left + 0; // start at t=0
+      const triY1 = pad.top; // power=100
+      ctx.fillStyle = 'rgba(255, 68, 102, 0.08)';
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(cx, pad.top);
+      ctx.lineTo(cx, cy);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rise label
+      ctx.fillStyle = '#FF4466';
+      ctx.font = 'bold 11px DM Sans';
+      ctx.textAlign = 'left';
+      ctx.fillText('-' + Math.round(100 - power) + '%', cx + 4, (pad.top + cy) / 2 + 4);
+
+      // Run label
+      ctx.fillStyle = '#CC7700';
+      ctx.textAlign = 'center';
+      ctx.fillText(currentTime + ' min', (pad.left + cx) / 2, pad.top - 6);
+    }
+
+    // Update displays
+    const power = getPower(endurance, currentTime);
+    document.getElementById('enduranceVal').textContent = endurance;
+    document.getElementById('timeVal').textContent = currentTime;
+    document.getElementById('powerDisplay').textContent = Math.round(power) + '%';
+    document.getElementById('rateDisplay').textContent = '-' + decayRate.toFixed(1) + '%';
+    document.getElementById('stopTimeDisplay').textContent = 't = ' + stopTime.toFixed(1);
+
+    // Power ring
+    const ringOffset = 220 * (1 - power / 100);
+    const ring = document.getElementById('powerRingFill');
+    ring.setAttribute('stroke-dashoffset', ringOffset);
+
+    // Color power based on level
+    const powerEl = document.getElementById('powerDisplay');
+    const botFace = document.getElementById('botFace');
+    const statusEl = document.getElementById('statusDisplay');
+
+    if (power > 60) {
+      ring.setAttribute('stroke', '#00E5FF');
+      powerEl.style.color = '#00E5FF';
+      botFace.style.opacity = 1;
+      botFace.style.filter = 'none';
+      statusEl.textContent = 'RUNNING';
+      statusEl.style.color = '#44CC88';
+    } else if (power > 25) {
+      ring.setAttribute('stroke', '#CC7700');
+      powerEl.style.color = '#CC7700';
+      botFace.style.opacity = 0.6;
+      botFace.style.filter = 'none';
+      statusEl.textContent = 'LOW POWER';
+      statusEl.style.color = '#CC7700';
+    } else if (power > 0) {
+      ring.setAttribute('stroke', '#FF4466');
+      powerEl.style.color = '#FF4466';
+      botFace.style.opacity = 0.3;
+      botFace.style.filter = 'none';
+      statusEl.textContent = 'CRITICAL';
+      statusEl.style.color = '#FF4466';
+    } else {
+      ring.setAttribute('stroke', '#8899AA');
+      powerEl.style.color = '#8899AA';
+      botFace.style.opacity = 0.15;
+      botFace.style.filter = 'grayscale(1)';
+      statusEl.textContent = 'STOPPED';
+      statusEl.style.color = '#8899AA';
+    }
+  }
+
+  enduranceSlider.addEventListener('input', drawGraph);
+  timeSlider.addEventListener('input', drawGraph);
+  window.addEventListener('resize', drawGraph);
+  drawGraph();
+
+  // === STEPS ===
+  const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  let currentStep = 0;
+
+  const dotsContainer = document.getElementById('stepDots');
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  function showStep(idx) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const dots = dotsContainer.querySelectorAll('.step-dot');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot';
+      if (i === idx) d.classList.add('active');
+      else if (i < idx) d.classList.add('done');
+    });
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').textContent = idx === totalSteps - 1 ? 'Done ✓' : 'Next →';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; showStep(currentStep); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+  });
+
+  // === TRY IT ===
+  function checkAnswer() {
+    const ans = parseInt(document.getElementById('tryAnswer').value);
+    const fb = document.getElementById('feedback');
+    // Endurance 4, rate = -25%/min, t=3: 100 + (-25 * 3) = 100 - 75 = 25
+    if (ans === 25) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '🎉 <strong>Correct!</strong> 100 + (-25 × 3) = 25%';
+      fb.style.display = 'block';
+      launchConfetti();
+    } else {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Try again! 100 + (-25 × 3) = ?';
+      fb.style.display = 'block';
+    }
+  }
+
+  document.getElementById('tryAnswer').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#00E5FF', '#44CC88', '#CC7700', '#FF4466', '#FFFFFF'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1 + Math.random()) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 2500);
+  }
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>
