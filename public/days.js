@@ -240,6 +240,7 @@ const DAYS = [
         "description": "Refine your scoop design and your Power speed value in MakeCode. Try one scoop redesign and one speed change. Record which had a bigger effect on kick distance."
       }
     ],
+    "endBufferMins": 12,
     "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
     "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
     "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P^2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
@@ -348,6 +349,7 @@ const DAYS = [
         "description": "Track A (Data Dive): Check each stat value in your dashboard against the formula output. Fix any mismatches before tomorrow's first match. Track B (Bot Lab): Test a loadout you would never use competitively. What happens at Speed = 2 with Power = 15?"
       }
     ],
+    "endBufferMins": 10,
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall next to your bot's name. You have 3 minutes. |",
     "funElement": "Season 1 begins tomorrow. Anticipation of real matches creates investment in getting the allocation right today.",
     "los": "LO 1.2 (all four stat calculations on allocation sheet, 100% accuracy); LO 2.2 (Endurance decay equation derived from allocation); LO 6.1 (MakeCode motor command verified against proportional calculation)",
@@ -399,6 +401,7 @@ const DAYS = [
         "description": "The physical leaderboard goes up on the wall with three columns: Wins, Goals Scored, Best Prediction. Update it now. Then 20 minutes of open time to review your dashboard, strategize, or adjust code."
       }
     ],
+    "endBufferMins": 10,
     "ends": "Name one math concept you used today. Write the full calculation. Share it with your teammate and explain what it means for your bot's behavior. Not formula terms. Bot terms. You have 4 minutes. |",
     "funElement": "Leaderboard activates today: physical, public, updated after every match day. The Best Prediction column rewards mathematical accuracy, not just winning.",
     "los": "LO 2.2 (Endurance decay equation in slope-intercept form, x-intercept calculated); LO 5.1 (data dashboard complete after first real matches); LO 7.1 (prediction logged before match, actual recorded after)",
@@ -456,6 +459,7 @@ const DAYS = [
         "description": "Track A: Review your scatter plot equation against today's results. Does the line fit the new data? Track B: Adjust one MakeCode setting and run the bot for 90 seconds. What changes?"
       }
     ],
+    "endBufferMins": 22,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for exactly 2 minutes about what happened. You have 5 minutes total. |",
     "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
     "los": "LO 2.3 (scatter plot of Speed vs. Goals Scored with equation from two data points); LO 5.2 (scatter plot built from dashboard data, labeled); LO 7.1 (equation-based prediction logged before match)",
@@ -501,6 +505,7 @@ const DAYS = [
         "description": "Track A: Look at your three match results. Write one hypothesis: 'If we change [stat] from [X] to [Y], we expect [outcome] because [data].' Track B: Run the bot and experiment. If you find something useful, put it in the dashboard before you leave."
       }
     ],
+    "endBufferMins": 20,
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action\\].\" You have 3 minutes. |",
     "funElement": "Rivalry cards drive ongoing engagement. Teams verify each other's data claims before match day.",
     "los": "LO 2.3 (slope and y-intercept from two scatter plot points); LO 4.1 (slope-intercept form derived from match data); LO 7.2 (post-match revision with data-cited justification when \\>20% off)",
@@ -552,6 +557,7 @@ const DAYS = [
         "description": "Track A: Look at your Season 1 data. If you could change one stat for Season 2, what would it be and why? Write it as a hypothesis with data. Track B: Test the change you are considering before committing. Run it live, then write the hypothesis."
       }
     ],
+    "endBufferMins": 20,
     "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
     "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
     "los": "LO 3.2 (distance formula deepened: applied to three match-data coordinate pairs, discrepancy sourced); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded)",
@@ -603,6 +609,7 @@ const DAYS = [
         "description": "Verify every number in your draft proposal against the actual dashboard. Are your two cited numbers accurate? Does your rule change genuinely help the last-place team?"
       }
     ],
+    "endBufferMins": 20,
     "ends": "Write one personal goal and one team goal for this week. The personal goal must name a specific math skill, not \"get better at math.\" You have 3 minutes. |",
     "funElement": "Underdog mechanic announced today. Public announcement is essential. Creates comeback narrative and keeps the last-place team mathematically engaged.",
     "los": "LO 4.3 (systems of inequalities: three valid loadouts under dual constraints); LO 5.3 (Commissioner proposal with two cited data points addressing last-place team); LO 1.3 (percent change in Season 1 data used in proposal analysis)",
@@ -648,6 +655,7 @@ const DAYS = [
         "description": "Verify your Season 2 allocation calculations. Program the new loadout into MakeCode. Run one test drive to confirm the code matches the math."
       }
     ],
+    "endBufferMins": 30,
     "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
     "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Campers author the rules of their own game using data they collected.",
     "los": "LO 4.3 (Season 2 loadout adjusted under new rule constraints); LO 5.3 (data-backed argument scored on rubric); LO 8.1 (3-minute presentation scored on evidence quality and math content)",
@@ -699,6 +707,7 @@ const DAYS = [
         "description": "Track A: Look at your residuals. Is your model's error getting smaller or larger? Write one sentence about what the model is missing. Track B: Run one calibration test under the new rules. Does the rule change affect your bot in ways your formula did not predict?"
       }
     ],
+    "endBufferMins": 17,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
     "funElement": "Prediction market creates public stakes. Season 2 under new rules gives the whole room a fresh start.",
     "los": "LO 4.1 (slope-intercept equation from two match data points); LO 4.2 (pre-match prediction logged before match begins, actual recorded after); LO 6.2 (three-form representation: stat number, equation, MakeCode block)",
@@ -723,7 +732,7 @@ const DAYS = [
         "name": "Percent Change: Season 1 to Season 2 Configurations",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Using your Season 1 and Season 2 allocations, calculate the percent change for each stat: (new - old) / old x 100. Also calculate the percentage point difference. Enter both for all four stats. Then answer: are these the same number? Which one better describes the actual change in your bot's behavior?"
+        "description": "Using your Season 1 and Season 2 allocations, calculate the percent change for each stat: (new - old) / old x 100. Compare results as a room. Then answer the harder question: is percent change proportional? If your Speed went up 50%, will your wins go up 50%? The answer depends on which stat changed and how the bot formula works. Match Day 2 this afternoon is the test."
       },
       {
         "name": "Lunch / Snack Break",
@@ -786,9 +795,10 @@ const DAYS = [
         "name": "Open Lab: Scouting Continuation or Identity Refinement",
         "mins": 40,
         "block": "Open Lab",
-        "description": "Track A: Continue scouting report sections 1 and 2, or start section 3 (opponent Speed vs. Goals trend line). Track B: Test the scoop redesign or logo placement. Does the new scoop change your kick distance? If yes, update the dashboard."
+        "description": "Track A: Continue scouting report sections 1 and 2, or start section 3 (opponent Speed vs. Goals trend line). Track B: Test the scoop redesign or logo placement. Does the new scoop change your kick distance? If yes, update the dashboard. End with a concept retrieval line: write the name of the math concept you used in your scouting work today (unit rate, ratio, proportional scaling, slope as rate of change, linear decay, or other)."
       }
     ],
+    "endBufferMins": 10,
     "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
     "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
     "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
@@ -834,6 +844,7 @@ const DAYS = [
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now."
       }
     ],
+    "endBufferMins": 10,
     "ends": "Write one personal goal and one team goal for this final week. The personal goal must name something mathematical you want to be able to explain clearly to a visitor on Thursday. You have 3 minutes. |",
     "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
     "los": "LO 7.3 (scouting report sections 3 and 4: trend line equation with prediction and inequality strategy); LO 4.3 (valid Championship loadouts under new constraints); LO 8.1 (Commissioner presentation with numerical evidence)",
@@ -885,6 +896,7 @@ const DAYS = [
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow."
       }
     ],
+    "endsMins": 10,
     "ends": "Name one mathematical claim from today's pre-match pitch rehearsals, from any team, not just yours. Write the calculation. Explain to a teammate why citing that specific number makes the argument stronger than a general claim. You have 4 minutes. |",
     "funElement": "Championship bracket reveal creates maximum anticipation.",
     "los": "LO 7.3 (scouting report complete, all four sections verified); LO 8.1 (pre-match pitch rehearsed with peer feedback on specificity); LO 8.2 (first rehearsal of expert-level explanation of proportional reasoning)",
@@ -948,13 +960,13 @@ const DAYS = [
         "name": "Expert Setup",
         "mins": 25,
         "block": "Ice Breaker",
-        "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the content to your teammates before visitors arrive. Write down the one thing you want every visitor to understand."
+        "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the three visitor mini-challenges on a teammate: unit rate calculation, coordinate distance, and proportional scaling explanation. Write down the one thing you want every visitor to understand."
       },
       {
         "name": "Community Exhibition: Teaching Begins",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Visitors arrive. Teach each visitor to do three things: plot a coordinate on the grid, program a bot to navigate there, and explain why your Speed allocation produces the motor power percentage it does. Your goal: each visitor completes all three tasks on their own."
+        "description": "Visitors arrive. Teach each visitor to complete three mini-challenges: (1) calculate a unit rate from your scouting data -- Season 1 wins divided by your Speed stat, stated as wins per 1 Speed point; (2) plot two match coordinates on the arena grid and calculate the distance between them; (3) explain in their own words why your Speed stat and motor power scale proportionally. Your goal is for each visitor to complete all three independently, without prompting after your initial explanation. That is the assessment."
       },
       {
         "name": "Lunch / Snack Break",
@@ -973,12 +985,6 @@ const DAYS = [
         "mins": 40,
         "block": "Match-Build-Make",
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot."
-      },
-      {
-        "name": "Open Lab: Final Debrief and Prep",
-        "mins": 15,
-        "block": "Open Lab",
-        "description": "Debrief with your team: what did visitors understand quickly? What confused them? Identify one explanation that did not land and write a revised version."
       }
     ],
     "ends": "Write: \"The skill I used today to teach a visitor was \\[name it\\] and I know it worked when \\[describe the specific moment you saw them understand it\\].\" You have 3 minutes. |",
@@ -1005,7 +1011,7 @@ const DAYS = [
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
         "mins": 15,
         "block": "Challenge Block",
-        "description": "Ten questions, 15 minutes, by yourself. Same types as Day 1 -- proportional reasoning, rate of change, coordinate geometry. This measures your growth, not a grade. Your facilitator will compare your results to Day 1."
+        "description": "15 minutes, individual. Parallel questions to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon."
       },
       {
         "name": "Lunch / Snack Break",
@@ -1026,6 +1032,8 @@ const DAYS = [
         "description": "Unstructured time. Drive the bots. Revisit the coordinate grid. Teach each other anything you want. This is the last time the program exists in this form."
       }
     ],
+    "endBufferMins": 15,
+    "endsMins": 20,
     "ends": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes. |",
     "funElement": "Best Teacher award announced. Social recognition for mathematical communication, not winning. Awards ceremony closes the program with campers as the experts. The verbal check ran on Day 19. Day 20 is the celebration.",
     "los": "LO 7.1 (post-task diagnostic reflects Season 1 and 2 prediction practice); LO 8.2 (Best Teacher award outcome reflects visitor-assessed teaching quality); Note: LO 9.2 verbal reflection runs at the awards ceremony (Hello Insight post-survey) and is assessed there, not in the daily LO field. Scouting Report Verbal Check (LO 7.3) completed on Day 19 afternoon. # SCOPE AND SEQUENCE SUMMARY",
