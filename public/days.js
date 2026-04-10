@@ -539,13 +539,25 @@ const DAYS = [
         "name": "Rivalry Card Response",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "Read the rivalry card your team received. Open your dashboard. Do the numbers check out? If the trash talk is factually wrong, mark it 'check your data' with a sticky note and the correct number. If it is accurate, make a plan."
+        "description": "You read the rivalry card your team received. Open your dashboard. Do the cited numbers check out? If the trash talk is factually wrong, you mark it 'check your data' with a sticky note and the correct number. If it is accurate, you make a plan."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Formula Relay: All Six Types in One Race",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turning radius (2 cards), Power squared, budget constraint, and Proportional Scaling (2 scoop-scaling cards where you determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards by formula type and count errors. Your weakest type is today's focus -- use it for today's pre-match prediction."
+        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turning radius (2 cards), Power squared, budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions."
+      },
+      {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Lunch / Snack Break",
@@ -557,16 +569,21 @@ const DAYS = [
         "name": "Season 1 Match Day 3",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Three matches. Before each: state your prediction. After each: record actual result. If prediction and actual differ by more than 20%, write one sentence about what variable your model missed. Dashboard complete before end of day."
+        "description": "Three matches. Before each match: state your prediction from the morning equation. After each match: record actual result. For any match where prediction and actual differ by more than 20%, write one sentence identifying what variable your model missed. Loss-recovery protocol runs for every losing team between matches. Dashboard complete before end of day."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab: Post-Match Debrief and Free Code",
         "mins": 40,
         "block": "Open Lab",
-        "description": "Track A: Look at your three match results. Write one hypothesis: 'If we change [stat] from [X] to [Y], we expect [outcome] because [data].' Track B: Run the bot and experiment. If you find something useful, put it in the dashboard before you leave."
+        "description": "Track A (Data Dive): Look at your three match results. Does any pattern in the data suggest a loadout adjustment? Write one hypothesis entry in the dashboard: 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): Run the bot and experiment with whatever you want. If you find something useful, it goes in the dashboard before you leave."
       }
     ],
-    "endBufferMins": 20,
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action\\].\" You have 3 minutes. |",
     "funElement": "Rivalry cards drive ongoing engagement. Teams verify each other's data claims before match day.",
     "los": "LO 2.3 (slope and y-intercept from two scatter plot points); LO 4.1 (slope-intercept form derived from match data); LO 7.2 (post-match revision with data-cited justification when \\>20% off)",
