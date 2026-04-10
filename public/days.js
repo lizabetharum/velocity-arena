@@ -457,19 +457,31 @@ const DAYS = [
         "name": "Math Scavenger Hunt: Leaderboard Edition",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "Problem cards are posted around the room, each showing a real stat from yesterday's leaderboard. Walk to each card, answer the question on the back, and find the matching answer on the next card. It is a self-correcting chain -- if your answer is not in the pile, go back and check your math."
+        "description": "Problem cards are posted around the room, each showing a real stat value from yesterday's leaderboard ('Team A: Speed = 5, scored 3 goals'). Walk to each card, answer the question on the back (calculate a percentage, write a ratio), and find the matching answer on the next card. It is a self-correcting chain loop."
       },
       {
-        "name": "Energy Reset (3 min)",
-        "mins": 3,
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
+        "name": "Energy Reset",
+        "mins": 5,
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Part 1: Add your data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Then match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together. Part 2: Use two data points from the scatter plot to write the linear equation. Teams share -- everyone's equation is different. That is the point. SUMMER SPARKS EVALUATION FLAG: Day 8 is a candidate mid-program measurement point for the JHU evaluation team. It produces two artifacts -- individual student equations (quantitative) and the class scatter plot (qualitative) -- without any schedule changes."
+        "description": "Part 1 (20 min): Each team adds their data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together and explain why. Part 2 (20 min): Use two data points from the scatter plot to write the linear equation -- slope calculated, y-intercept solved. Teams share. Everyone's equation is different. That is the point. SUMMER SPARKS EVALUATION FLAG: Day 8 is a candidate mid-program measurement point for the JHU evaluation team."
       },
       {
         "name": "Lunch / Snack Break",
@@ -481,22 +493,34 @@ const DAYS = [
         "name": "Season 1 Match Day 2",
         "mins": 70,
         "block": "Match-Build-Make",
-        "description": "Two more matches. Before each, log your scatter plot equation's prediction. After each, record the actual result. Loss-recovery for every losing team. Update the dashboard -- no blanks."
+        "description": "Two more matches. Before each match, log your scatter plot equation's prediction in the data log. After each match, record the actual result. Loss-recovery protocol for every losing team. Update the data dashboard. No blanks."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Rivalry Cards",
         "mins": 20,
         "block": "Match-Build-Make",
-        "description": "Write one trash-talk card to a specific rival. The rule: your trash talk must cite a specific stat or data point from the dashboard. 'Your Endurance = 3 means your bot slows at minute 4. We will be ready.' No data, no card."
+        "description": "Each team writes one trash-talk card to a specific rival. One rule: the trash talk must cite a specific stat or data point from the dashboard. 'Your Endurance = 3 means your bot slows at minute 4. We will be ready.' No data, no card. Post on the wall."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab",
         "mins": 25,
         "block": "Open Lab",
-        "description": "Track A: Review your scatter plot equation against today's results. Does the line fit the new data? Track B: Adjust one MakeCode setting and run the bot for 90 seconds. What changes?"
+        "description": "Track A (Data Dive): Review your scatter plot equation against today's match results. Does the line fit the new data points? Note one variable your equation is not capturing. Track B (Bot Lab): Adjust one MakeCode setting and run the bot for 90 seconds. What changes? The 25 minutes is short today."
       }
     ],
-    "endBufferMins": 32,
+    "endBufferMins": 10,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for exactly 2 minutes about what happened. You have 5 minutes total. |",
     "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
     "los": "LO 2.3 (scatter plot of Speed vs. Goals Scored with equation from two data points); LO 5.2 (scatter plot built from dashboard data, labeled); LO 7.1 (equation-based prediction logged before match)",
