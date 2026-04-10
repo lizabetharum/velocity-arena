@@ -686,7 +686,7 @@ const DAYS = [
         "name": "Building and Solving Linear Equations",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Part 1: Using your Season 1 and early Season 2 data, write the equation that predicts your win probability. Choose two past data points, calculate slope and y-intercept, write it in slope-intercept form. Part 2: Test your equation against three past matches. Calculate the residual for each. Report your residuals to the class."
+        "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is camper-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point."
       },
       {
         "name": "Lunch / Snack Break",
@@ -704,7 +704,7 @@ const DAYS = [
         "name": "Open Lab: Residual Analysis or Bot Calibration",
         "mins": 35,
         "block": "Open Lab",
-        "description": "Track A: Look at your residuals. Is your model's error getting smaller or larger? Write one sentence about what the model is missing. Track B: Run one calibration test under the new rules. Does the rule change affect your bot in ways your formula did not predict?"
+        "description": "Track A: Look at your two residuals and your wins-per-Speed-point unit rate from the MAP FAL. Look at your Season 2 match prediction and actual. Write one sentence: is your model's error getting smaller or larger? What does that tell you about what the model is missing? Track B: Run one calibration test under the new Commissioner rules. Does the rule change affect how your bot performs in ways your formula did not predict?"
       }
     ],
     "endBufferMins": 17,
