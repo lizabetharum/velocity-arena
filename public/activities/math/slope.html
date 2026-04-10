@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slope — Velocity Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D1A;--card:#161A2E;--active:#1E2240;
+  --cyan:#00E5FF;--teal:#007A99;--slate:#8899AA;
+  --white:#FFFFFF;--orange:#CC7700;--green:#44CC88;
+  --font:'DM Sans',sans-serif;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--white);font-family:var(--font);overflow-x:hidden;min-height:100vh}
+
+.nav{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid rgba(0,229,255,.15);padding:.5rem .75rem;display:flex;align-items:center;gap:.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-brand{font-weight:700;color:var(--cyan);font-size:.85rem;white-space:nowrap;margin-right:.5rem;display:flex;align-items:center;gap:.35rem}
+.nav-brand svg{width:20px;height:20px;flex-shrink:0}
+.nav a{color:var(--slate);text-decoration:none;font-size:.72rem;font-weight:600;white-space:nowrap;padding:.35rem .55rem;border-radius:6px;transition:background .18s,color .18s}
+.nav a:hover,.nav a.active{background:var(--active);color:var(--cyan)}
+
+.page{max-width:900px;margin:0 auto;padding:1rem}
+h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:800;color:var(--cyan);margin-bottom:.25rem;line-height:1.1}
+.subtitle{color:var(--slate);font-size:.85rem;margin-bottom:1rem}
+
+.steps-container{position:relative;margin-bottom:1.5rem}
+.step{display:none;animation:fadeStep .4s ease-out}
+.step.active{display:block}
+@keyframes fadeStep{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step-content{background:var(--card);border-radius:12px;padding:1.25rem;border:1px solid rgba(0,229,255,.1)}
+.step-text{font-size:1.05rem;font-weight:600;line-height:1.4;text-align:center}
+.step-text .vocab{color:var(--cyan);font-size:1.3rem;font-weight:800}
+.step-text .hl-green{color:var(--green)}
+.step-text .hl-cyan{color:var(--cyan)}
+.step-text .hl-orange{color:var(--orange)}
+.step-nav{display:flex;justify-content:center;gap:.75rem;margin-top:.75rem}
+.step-btn{background:var(--active);color:var(--white);border:1px solid rgba(0,229,255,.2);padding:.45rem 1.2rem;border-radius:8px;font-family:var(--font);font-size:.8rem;font-weight:600;cursor:pointer;transition:background .18s,border-color .18s}
+.step-btn:hover{background:var(--teal);border-color:var(--cyan)}
+.step-btn:disabled{opacity:.3;cursor:not-allowed}
+.step-dots{display:flex;justify-content:center;gap:.35rem;margin-top:.5rem}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--active);transition:background .2s}
+.step-dot.active{background:var(--cyan)}
+
+.canvas-wrap{background:var(--card);border-radius:12px;padding:.75rem;border:1px solid rgba(0,229,255,.1);margin-bottom:1rem;position:relative}
+canvas{display:block;width:100%;border-radius:8px;cursor:grab;touch-action:none}
+canvas:active{cursor:grabbing}
+
+.slope-display{display:flex;align-items:center;justify-content:center;gap:1rem;background:var(--card);border-radius:12px;padding:1rem;border:1px solid rgba(0,229,255,.1);margin-bottom:1rem;flex-wrap:wrap;text-align:center}
+.slope-big{font-size:2rem;font-weight:800;color:var(--cyan)}
+.slope-calc{font-size:.95rem;color:var(--slate)}
+.slope-calc .s-rise{color:var(--orange)}
+.slope-calc .s-run{color:var(--cyan)}
+
+.rate-label{display:inline-block;color:var(--green);font-weight:800;font-size:.9rem;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.presets{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.preset-btn{background:var(--active);color:var(--white);border:1px solid rgba(0,229,255,.2);padding:.5rem 1rem;border-radius:8px;font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.preset-btn:hover{background:var(--teal);border-color:var(--cyan);transform:translateY(-1px)}
+
+.vocab-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+.vocab-chip{background:var(--active);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:.3rem .6rem;font-size:.72rem;font-weight:600;color:var(--cyan)}
+
+.try-it{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,122,153,.08));border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:1rem;margin-top:1rem}
+.try-it h3{color:var(--cyan);font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.try-it p{color:var(--slate);font-size:.82rem;line-height:1.4}
+.try-it .answer-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+.try-it .answer-btn{background:var(--card);border:2px solid rgba(0,229,255,.2);padding:.5rem 1rem;border-radius:8px;font-family:var(--font);font-size:.85rem;font-weight:700;color:var(--white);cursor:pointer;transition:border-color .18s,transform .18s}
+.try-it .answer-btn:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.try-it .answer-btn.correct{border-color:var(--green);background:rgba(68,204,136,.15);color:var(--green)}
+.try-it .answer-btn.wrong{border-color:var(--orange);background:rgba(204,119,0,.1);color:var(--orange)}
+.try-result{margin-top:.5rem;font-weight:700;font-size:.9rem;min-height:1.3em}
+
+.meaning-box{background:var(--active);border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;border-left:3px solid var(--green);font-size:.85rem;text-align:center}
+.meaning-box .slope-meaning{color:var(--white);font-weight:600}
+.meaning-box .slope-meaning span{color:var(--green)}
+
+@media(max-width:600px){
+  .page{padding:.75rem}
+  h1{font-size:1.3rem}
+  .slope-big{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="./index.html" class="nav-brand" style="text-decoration:none;color:var(--cyan);">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+    VA Math
+  </a>
+  <a href="coordinate-geometry.html">5 Coordinates</a>
+  <a href="arc-approximation.html">6 Arcs</a>
+  <a href="slope.html" class="active">7 Slope</a>
+  <a href="budget.html">8 Budget</a>
+</nav>
+
+<div class="page">
+  <h1>Slope</h1>
+  <div class="subtitle">How Fast Things Change</div>
+
+  <div class="vocab-bar">
+    <span class="vocab-chip">SLOPE</span>
+    <span class="vocab-chip">RISE</span>
+    <span class="vocab-chip">RUN</span>
+    <span class="vocab-chip">RATE OF CHANGE</span>
+  </div>
+
+  <!-- STEP-BY-STEP -->
+  <div class="steps-container" id="stepsContainer">
+    <div class="step active" data-step="0">
+      <div class="step-content">
+        <div class="step-text">A line on a graph.<br>"This line tells a story."</div>
+      </div>
+    </div>
+    <div class="step" data-step="1">
+      <div class="step-content">
+        <div class="step-text">Point A at <span class="hl-cyan">(1, 10)</span> and Point B at <span class="hl-green">(3, 30)</span>.<br>From A to B...</div>
+      </div>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-content">
+        <div class="step-text"><span class="hl-orange">Rise: UP 20</span> ↑</div>
+      </div>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-content">
+        <div class="step-text"><span class="hl-cyan">Run: RIGHT 2</span> →</div>
+      </div>
+    </div>
+    <div class="step" data-step="4">
+      <div class="step-content">
+        <div class="step-text">Slope = <span class="hl-orange">20</span> ÷ <span class="hl-cyan">2</span> = <span class="vocab">10</span></div>
+      </div>
+    </div>
+    <div class="step" data-step="5">
+      <div class="step-content">
+        <div class="step-text"><span class="vocab">SLOPE = RATE OF CHANGE</span><br>Slope of 10 → every 1 step right, 10 steps up.</div>
+      </div>
+    </div>
+    <div class="step" data-step="6">
+      <div class="step-content">
+        <div class="step-text"><span class="hl-orange">Steep line = fast change</span><br><span class="hl-cyan">Flat line = slow change</span></div>
+      </div>
+    </div>
+    <div class="step-dots" id="stepDots"></div>
+    <div class="step-nav">
+      <button class="step-btn" id="prevBtn" disabled>← Back</button>
+      <button class="step-btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE GRAPH -->
+  <div class="canvas-wrap">
+    <canvas id="slopeCanvas" width="600" height="500"></canvas>
+  </div>
+
+  <!-- SLOPE DISPLAY -->
+  <div class="slope-display">
+    <div>
+      <div style="font-size:.7rem;color:var(--slate);font-weight:600;text-transform:uppercase;margin-bottom:.15rem">Slope</div>
+      <div class="slope-big" id="slopeValue">—</div>
+    </div>
+    <div>
+      <div class="slope-calc" id="slopeCalc">Drag points on the graph</div>
+      <div class="rate-label">RATE OF CHANGE</div>
+    </div>
+  </div>
+
+  <!-- MEANING -->
+  <div class="meaning-box" id="meaningBox">
+    <div class="slope-meaning">Drag the two points to see how slope changes!</div>
+  </div>
+
+  <!-- PRESETS -->
+  <div class="presets">
+    <button class="preset-btn" onclick="setPreset('gentle')">🐢 Gentle Slope</button>
+    <button class="preset-btn" onclick="setPreset('steep')">🚀 Steep Slope</button>
+    <button class="preset-btn" onclick="setPreset('flat')">➡️ No Slope</button>
+    <button class="preset-btn" onclick="setPreset('negative')">📉 Downhill</button>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it">
+    <h3>🎯 TRY IT</h3>
+    <p>Bot power was <strong style="color:var(--orange)">80%</strong> at t=1 and <strong style="color:var(--cyan)">40%</strong> at t=3.<br>What is the slope (rate of change)?</p>
+    <div class="answer-row" id="answerRow">
+      <button class="answer-btn" onclick="checkAnswer(this,-20)">−20</button>
+      <button class="answer-btn" onclick="checkAnswer(this,20)">20</button>
+      <button class="answer-btn" onclick="checkAnswer(this,-10)">−10</button>
+      <button class="answer-btn" onclick="checkAnswer(this,10)">10</button>
+    </div>
+    <div class="try-result" id="tryResult"></div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('slopeCanvas');
+const ctx = canvas.getContext('2d');
+
+let dpr = window.devicePixelRatio || 1;
+let cw, ch;
+let padL, padB, padT, padR;
+
+// Graph range
+const XMIN = 0, XMAX = 10, YMIN = 0, YMAX = 50;
+let ptA = {x: 2, y: 10};
+let ptB = {x: 8, y: 40};
+let dragging = null;
+
+function resize() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = Math.min(rect.width - 24, 500);
+  const h = Math.round(w * 0.72);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  cw = canvas.width; ch = canvas.height;
+  padL = 50*dpr; padB = 40*dpr; padT = 25*dpr; padR = 25*dpr;
+  drawGraph();
+}
+
+function graphToCanvas(gx, gy) {
+  const x = padL + (gx - XMIN)/(XMAX - XMIN) * (cw - padL - padR);
+  const y = ch - padB - (gy - YMIN)/(YMAX - YMIN) * (ch - padT - padB);
+  return [x, y];
+}
+
+function canvasToGraph(cx, cy) {
+  const gx = XMIN + (cx - padL)/(cw - padL - padR) * (XMAX - XMIN);
+  const gy = YMIN + (ch - padB - cy)/(ch - padT - padB) * (YMAX - YMIN);
+  return [gx, gy];
+}
+
+function drawGraph() {
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,229,255,0.08)';
+  ctx.lineWidth = dpr;
+  for (let x = XMIN; x <= XMAX; x++) {
+    const [cx] = graphToCanvas(x, 0);
+    ctx.beginPath(); ctx.moveTo(cx, padT); ctx.lineTo(cx, ch-padB); ctx.stroke();
+  }
+  for (let y = YMIN; y <= YMAX; y += 10) {
+    const [,cy] = graphToCanvas(0, y);
+    ctx.beginPath(); ctx.moveTo(padL, cy); ctx.lineTo(cw-padR, cy); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(0,229,255,0.35)';
+  ctx.lineWidth = 2*dpr;
+  ctx.beginPath(); ctx.moveTo(padL, ch-padB); ctx.lineTo(cw-padR, ch-padB); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(padL, ch-padB); ctx.lineTo(padL, padT); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = 'rgba(136,153,170,0.7)';
+  ctx.font = `${10*dpr}px 'DM Sans',sans-serif`;
+  ctx.textAlign = 'center';
+  for (let x = XMIN; x <= XMAX; x += 2) {
+    const [cx, cy] = graphToCanvas(x, 0);
+    ctx.fillText(x, cx, cy + 16*dpr);
+  }
+  ctx.textAlign = 'right';
+  for (let y = YMIN; y <= YMAX; y += 10) {
+    const [cx, cy] = graphToCanvas(0, y);
+    ctx.fillText(y, cx - 8*dpr, cy + 4*dpr);
+  }
+
+  // Extended line through both points
+  const slope = (ptB.y - ptA.y) / (ptB.x - ptA.x || 0.001);
+  const yAtXmin = ptA.y + slope * (XMIN - ptA.x);
+  const yAtXmax = ptA.y + slope * (XMAX - ptA.x);
+  const [lx1, ly1] = graphToCanvas(XMIN, yAtXmin);
+  const [lx2, ly2] = graphToCanvas(XMAX, yAtXmax);
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 1.5*dpr;
+  ctx.setLineDash([4*dpr, 4*dpr]);
+  ctx.beginPath(); ctx.moveTo(lx1, ly1); ctx.lineTo(lx2, ly2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Rise/Run triangle
+  const [ax, ay] = graphToCanvas(ptA.x, ptA.y);
+  const [bx, by] = graphToCanvas(ptB.x, ptB.y);
+  const [corner_x, corner_y] = graphToCanvas(ptB.x, ptA.y);
+
+  // Run (horizontal) - cyan
+  ctx.strokeStyle = '#00E5FF';
+  ctx.lineWidth = 3*dpr;
+  ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(corner_x, corner_y); ctx.stroke();
+
+  // Rise (vertical) - orange
+  ctx.strokeStyle = '#CC7700';
+  ctx.lineWidth = 3*dpr;
+  ctx.beginPath(); ctx.moveTo(corner_x, corner_y); ctx.lineTo(bx, by); ctx.stroke();
+
+  // Arrow labels
+  const rise = ptB.y - ptA.y;
+  const run = ptB.x - ptA.x;
+
+  // Rise label
+  ctx.fillStyle = '#CC7700';
+  ctx.font = `bold ${13*dpr}px 'DM Sans',sans-serif`;
+  ctx.textAlign = 'left';
+  const riseMid = (corner_y + by) / 2;
+  ctx.fillText((rise >= 0 ? '↑ ' : '↓ ') + Math.abs(Math.round(rise)), corner_x + 8*dpr, riseMid + 4*dpr);
+
+  // Run label
+  ctx.fillStyle = '#00E5FF';
+  ctx.textAlign = 'center';
+  const runDir = run >= 0 ? '→ ' : '← ';
+  ctx.fillText(runDir + Math.abs(Math.round(run)), (ax + corner_x)/2, corner_y + 20*dpr);
+
+  // Line A to B (solid)
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+  ctx.lineWidth = 2.5*dpr;
+  ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+
+  // Point A
+  ctx.beginPath(); ctx.arc(ax, ay, 9*dpr, 0, Math.PI*2);
+  ctx.fillStyle = '#00E5FF'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2*dpr; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = `bold ${12*dpr}px 'DM Sans',sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(`A (${Math.round(ptA.x)}, ${Math.round(ptA.y)})`, ax, ay - 16*dpr);
+
+  // Point B
+  ctx.beginPath(); ctx.arc(bx, by, 9*dpr, 0, Math.PI*2);
+  ctx.fillStyle = '#44CC88'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2*dpr; ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`B (${Math.round(ptB.x)}, ${Math.round(ptB.y)})`, bx, by - 16*dpr);
+
+  // Update slope display
+  const slopeVal = run === 0 ? '∞' : (rise / run).toFixed(1);
+  document.getElementById('slopeValue').textContent = slopeVal;
+  document.getElementById('slopeCalc').innerHTML = `<span class="s-rise">${Math.round(rise)}</span> ÷ <span class="s-run">${Math.round(run)}</span> = ${slopeVal}`;
+
+  // Meaning
+  const meaningBox = document.getElementById('meaningBox');
+  const sv = parseFloat(slopeVal);
+  if (isNaN(sv) || !isFinite(sv)) {
+    meaningBox.innerHTML = '<div class="slope-meaning">Vertical line → <span>undefined slope</span></div>';
+  } else if (Math.abs(sv) < 0.5) {
+    meaningBox.innerHTML = '<div class="slope-meaning">Nearly flat → <span>almost no change</span></div>';
+  } else if (sv > 0) {
+    meaningBox.innerHTML = `<div class="slope-meaning">For every 1 step right → <span>${Math.abs(sv).toFixed(1)} steps up</span> 📈</div>`;
+  } else {
+    meaningBox.innerHTML = `<div class="slope-meaning">For every 1 step right → <span>${Math.abs(sv).toFixed(1)} steps down</span> 📉</div>`;
+  }
+}
+
+// Drag handling
+function getMousePos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return [(clientX - rect.left)*scaleX, (clientY - rect.top)*scaleY];
+}
+
+function nearPoint(mx, my, pt) {
+  const [px, py] = graphToCanvas(pt.x, pt.y);
+  return Math.sqrt((mx-px)**2 + (my-py)**2) < 20*dpr;
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  const [mx, my] = getMousePos(e);
+  if (nearPoint(mx, my, ptA)) dragging = 'A';
+  else if (nearPoint(mx, my, ptB)) dragging = 'B';
+  if (dragging) canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if (!dragging) {
+    const [mx, my] = getMousePos(e);
+    canvas.style.cursor = (nearPoint(mx, my, ptA) || nearPoint(mx, my, ptB)) ? 'grab' : 'crosshair';
+    return;
+  }
+  e.preventDefault();
+  const [mx, my] = getMousePos(e);
+  let [gx, gy] = canvasToGraph(mx, my);
+  gx = Math.max(XMIN, Math.min(XMAX, Math.round(gx)));
+  gy = Math.max(YMIN, Math.min(YMAX, Math.round(gy / 5) * 5));
+  if (dragging === 'A') { ptA.x = gx; ptA.y = gy; }
+  else { ptB.x = gx; ptB.y = gy; }
+  drawGraph();
+});
+
+canvas.addEventListener('pointerup', () => { dragging = null; });
+
+// Presets
+function setPreset(type) {
+  const presets = {
+    gentle: {a:{x:1,y:5}, b:{x:9,y:15}},
+    steep: {a:{x:2,y:5}, b:{x:4,y:45}},
+    flat: {a:{x:1,y:25}, b:{x:9,y:25}},
+    negative: {a:{x:1,y:40}, b:{x:9,y:5}}
+  };
+  const p = presets[type];
+  // Animate
+  const startA = {...ptA}, startB = {...ptB};
+  const duration = 400;
+  const start = performance.now();
+  function anim(t) {
+    const elapsed = t - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    ptA.x = startA.x + (p.a.x - startA.x) * ease;
+    ptA.y = startA.y + (p.a.y - startA.y) * ease;
+    ptB.x = startB.x + (p.b.x - startB.x) * ease;
+    ptB.y = startB.y + (p.b.y - startB.y) * ease;
+    drawGraph();
+    if (progress < 1) requestAnimationFrame(anim);
+    else {
+      ptA.x = p.a.x; ptA.y = p.a.y;
+      ptB.x = p.b.x; ptB.y = p.b.y;
+      drawGraph();
+    }
+  }
+  requestAnimationFrame(anim);
+}
+
+// Try It
+function checkAnswer(btn, val) {
+  const result = document.getElementById('tryResult');
+  document.querySelectorAll('.answer-btn').forEach(b => { b.classList.remove('correct','wrong'); });
+  if (val === -20) {
+    btn.classList.add('correct');
+    result.innerHTML = '<span style="color:var(--green)">✓ Correct! (40−80)÷(3−1) = −40÷2 = −20. Power is DROPPING!</span>';
+  } else {
+    btn.classList.add('wrong');
+    result.innerHTML = '<span style="color:var(--orange)">Try again! Rise = 40−80 = −40, Run = 3−1 = 2</span>';
+  }
+}
+
+// Steps
+let currentStep = 0;
+const totalSteps = 7;
+const stepsEl = document.querySelectorAll('.step');
+const dotsContainer = document.getElementById('stepDots');
+for (let i = 0; i < totalSteps; i++) {
+  const d = document.createElement('div');
+  d.className = 'step-dot' + (i===0?' active':'');
+  dotsContainer.appendChild(d);
+}
+const dots = dotsContainer.querySelectorAll('.step-dot');
+
+function showStep(n) {
+  currentStep = n;
+  stepsEl.forEach((s,i)=>s.classList.toggle('active',i===n));
+  dots.forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled = n===0;
+  document.getElementById('nextBtn').textContent = n===totalSteps-1?'Done ✓':'Next →';
+
+  // Sync graph with steps
+  const stepPresets = [
+    {a:{x:2,y:10},b:{x:8,y:40}},
+    {a:{x:1,y:10},b:{x:3,y:30}},
+    {a:{x:1,y:10},b:{x:3,y:30}},
+    {a:{x:1,y:10},b:{x:3,y:30}},
+    {a:{x:1,y:10},b:{x:3,y:30}},
+    {a:{x:1,y:10},b:{x:3,y:30}},
+    null
+  ];
+  if (stepPresets[n]) {
+    ptA = {...stepPresets[n].a};
+    ptB = {...stepPresets[n].b};
+    drawGraph();
+  }
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (currentStep < totalSteps-1) showStep(currentStep+1);
+});
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (currentStep > 0) showStep(currentStep-1);
+});
+
+window.addEventListener('resize', resize);
+resize();
+showStep(0);
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>
