@@ -671,13 +671,25 @@ const DAYS = [
         "name": "Human Number Line: Stat Rankings",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "A tape line runs across the room from 'least important' to 'most important' for winning Season 1 matches. Stand where you think the most important stat belongs -- pure instinct, no data. Then your facilitator says: 'Open your dashboard. Does the data support where you are standing?'"
+        "description": "A tape line runs across the room labeled 'least important' to 'most important' for winning Season 1 matches. You stand at the position that matches your belief about which stat matters most. No data allowed yet, pure instinct. After everyone has placed themselves: look at the spread. Then the facilitator asks: 'Now open your dashboard. Does the data support where you're standing?'"
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
         "mins": 45,
         "block": "Challenge Block",
         "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- 50% more Power gives 125% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Lunch / Snack Break",
@@ -689,13 +701,25 @@ const DAYS = [
         "name": "Underdog Mechanic Announced + Season 2 Stat Reallocation",
         "mins": 30,
         "block": "Match-Build-Make",
-        "description": "Big announcement: the team in last place gets one free stat reallocation before Season 2 -- no Commissioner approval required. If that is your team, rework your allocation now. Everyone else: start thinking about Season 2 loadouts under the new rules coming tomorrow."
+        "description": "The facilitator announces publicly: the team in last place gets one free stat reallocation before Season 2, no Commissioner approval required. If that is your team, you rework your allocation sheet now. Every team begins thinking about Season 2 loadouts under the rules that will pass tomorrow."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Practice Matches: Test New Loadout Hypotheses",
         "mins": 60,
         "block": "Match-Build-Make",
-        "description": "No formal scoring. Program and test adjusted loadout ideas. Record observations as 'hypothesis' entries -- clearly labeled so you can compare to Season 2 actuals."
+        "description": "No formal scoring. You program and test adjusted loadout ideas and record observations as 'hypothesis' entries, clearly labeled so you can compare to Season 2 actuals."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab: Commissioner Proposal Refinement",
@@ -704,7 +728,7 @@ const DAYS = [
         "description": "Verify every number in your draft proposal against the actual dashboard. Are your two cited numbers accurate? Does your rule change genuinely help the last-place team?"
       }
     ],
-    "endBufferMins": 25,
+    "endBufferMins": 5,
     "ends": "Write one personal goal and one team goal for this week. The personal goal must name a specific math skill, not \"get better at math.\" You have 3 minutes. |",
     "funElement": "Underdog mechanic announced today. Public announcement is essential. Creates comeback narrative and keeps the last-place team mathematically engaged.",
     "los": "LO 4.3 (systems of inequalities: three valid loadouts under dual constraints); LO 5.3 (Commissioner proposal with two cited data points addressing last-place team); LO 1.3 (percent change in Season 1 data used in proposal analysis)",
@@ -723,7 +747,13 @@ const DAYS = [
         "name": "Lobby the Commissioners",
         "mins": 25,
         "block": "Ice Breaker",
-        "description": "Spend 10 minutes moving around the room in informal conversation. 'Here is our proposal. Here is the number behind it. What do you think?' After, 15 minutes back at your seat to finalize based on what you heard."
+        "description": "You spend 10 minutes moving around the room in informal conversation, not a presentation, just talk. 'Here is our proposal. Here is the number behind it. What do you think?' After, 15 minutes back at your seat to finalize based on what you heard."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Final Proposal Verification",
@@ -756,7 +786,7 @@ const DAYS = [
         "description": "Verify your Season 2 allocation calculations. Program the new loadout into MakeCode. Run one test drive to confirm the code matches the math."
       }
     ],
-    "endBufferMins": 25,
+    "endBufferMins": 20,
     "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
     "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Campers author the rules of their own game using data they collected.",
     "los": "LO 4.3 (Season 2 loadout adjusted under new rule constraints); LO 5.3 (data-backed argument scored on rubric); LO 8.1 (3-minute presentation scored on evidence quality and math content)",
@@ -775,11 +805,17 @@ const DAYS = [
         "name": "The Prediction Market",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "Write your Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Post it publicly. Everyone can see every team's prediction. You will revisit these on Friday."
+        "description": "Each team writes their Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Post it publicly. Everyone can see every team's prediction. You will revisit these on Friday."
       },
       {
-        "name": "Energy Reset (3 min)",
-        "mins": 3,
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
+        "name": "Energy Reset",
+        "mins": 5,
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
@@ -788,6 +824,12 @@ const DAYS = [
         "mins": 50,
         "block": "Challenge Block",
         "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is camper-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Lunch / Snack Break",
@@ -799,16 +841,22 @@ const DAYS = [
         "name": "Season 2 Match Day 1",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "First matches under the new Commissioner-approved rules. Before each match, log your equation-based prediction. After each, record the actual. Compare today's residuals to Season 1. Is your model improving?"
+        "description": "First matches under the new Commissioner-approved rules. Before your first match, log your equation-based prediction. After each match, record the actual. Loss-recovery for every losing team. Compare today's prediction residuals to your Season 1 residuals. Is your model improving?"
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab: Residual Analysis or Bot Calibration",
         "mins": 35,
         "block": "Open Lab",
-        "description": "Track A: Look at your two residuals and your wins-per-Speed-point unit rate from the MAP FAL. Look at your Season 2 match prediction and actual. Write one sentence: is your model's error getting smaller or larger? What does that tell you about what the model is missing? Track B: Run one calibration test under the new Commissioner rules. Does the rule change affect how your bot performs in ways your formula did not predict?"
+        "description": "Track A (Data Dive): Look at your two residuals and your wins-per-Speed-point unit rate from the MAP FAL. Look at your Season 2 match prediction and actual. Write one sentence: is your model's error getting smaller or larger? What does that tell you about what the model is missing? Track B (Bot Lab): Run one calibration test under the new Commissioner rules. Does the rule change affect how your bot performs in ways your formula did not predict?"
       }
     ],
-    "endBufferMins": 22,
+    "endBufferMins": 5,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
     "funElement": "Prediction market creates public stakes. Season 2 under new rules gives the whole room a fresh start.",
     "los": "LO 4.1 (slope-intercept equation from two match data points); LO 4.2 (pre-match prediction logged before match begins, actual recorded after); LO 6.2 (three-form representation: stat number, equation, MakeCode block)",
@@ -827,7 +875,13 @@ const DAYS = [
         "name": "Stat Auction + Prediction Check",
         "mins": 30,
         "block": "Ice Breaker",
-        "description": "Your team starts with 3 math tokens. Earn more by answering formula questions correctly. Then bid on stat improvements -- but you must calculate the new formula output out loud to win. Wrong math means you lose your tokens. After the auction, check your Season 2 prediction on the wall. Update it if needed, with a data justification."
+        "description": "Twenty-five minutes of competitive stat bidding, then a 5-minute prediction check. Each team starts with 3 math tokens. Earn more by answering formula questions correctly. Then bid on stat improvements -- but you must calculate the new formula output out loud to win. Wrong math means you lose your tokens. After the auction, check your Season 2 prediction on the wall. Update it if needed, with a data justification."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Percent Change: Season 1 to Season 2 Configurations",
@@ -845,7 +899,13 @@ const DAYS = [
         "name": "Season 2 Match Day 2",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Three matches. Before each, log your equation-based prediction. After each, record the actual. If prediction and actual differ by more than 20%, write one sentence about what variable is missing. Dashboard fully updated before end of session."
+        "description": "Three matches. Before each match, log your equation-based prediction. After each match, record the actual. For any match where prediction and actual differ by more than 20%, write one sentence identifying the missing variable. Loss-recovery for every losing team. Dashboard fully updated before end of session."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab: Equation Revision or Loadout Experiments",
@@ -854,7 +914,6 @@ const DAYS = [
         "description": "Track A: Look at your residuals from the last two match days. If your model's error has increased, identify one variable to add. Track B: Test the new stat points from the Stat Auction under match conditions. Do they perform as the formula predicted?"
       }
     ],
-    "endBufferMins": 10,
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action in tomorrow's schedule\\].\" You have 3 minutes. |",
     "funElement": "Prediction market still active. Teams track Season 2 record against public prediction.",
     "los": "LO 1.3 (percent change vs. percentage point difference, three consecutive correct dashboard entries); LO 4.2 (pre-match prediction logged and compared each match); LO 7.2 (revision entry with data-cited justification when \\>20% off)",
@@ -873,7 +932,13 @@ const DAYS = [
         "name": "Bot Lore Gallery Walk",
         "mins": 25,
         "block": "Ice Breaker",
-        "description": "Walk the room and re-read every bot origin story from Day 2. Has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? Write one new sentence to add -- something that only makes sense because you played the matches."
+        "description": "You walk the room and re-read every bot origin story from Day 2. Then you ask: has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? You write one new sentence to add, something that only makes sense because you played the matches."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Scouting Report: Mathematical Foundation",
@@ -906,7 +971,6 @@ const DAYS = [
         "description": "Track A: Continue scouting report sections 1 and 2, or start section 3 (opponent Speed vs. Goals trend line). Track B: Test the scoop redesign or logo placement. Does the new scoop change your kick distance? If yes, update the dashboard. End with a concept retrieval line: write the name of the math concept you used in your scouting work today (unit rate, ratio, proportional scaling, slope as rate of change, linear decay, or other)."
       }
     ],
-    "endBufferMins": 5,
     "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
     "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
     "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
