@@ -94,10 +94,16 @@ const DAYS = [
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance."
       },
       {
+        "name": "Endurance Allocation: Stat Card Fill-In",
+        "mins": 3,
+        "block": "Ice Breaker",
+        "description": "Write your Endurance allocation in the Endurance row on your stat card. Any whole number works, as long as Speed + Endurance leaves at least 2 points for Turning and Power combined. You just felt Endurance in your body during Slow Down, Slow Down. Commit a number. The card is binding from the moment you write it."
+      },
+      {
         "name": "Endurance Stat Challenge: Drawing the Decay",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example, then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you."
+        "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example and names the rate of change out loud -- this number is the slope of the decay line, how fast your bot loses power per minute. Then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you."
       },
       {
         "name": "Lunch / Snack Break",
@@ -152,10 +158,10 @@ const DAYS = [
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
-        "name": "Distance-Time Graphs + Turning Stat Introduction",
+        "name": "Distance-Time Graphs + Arc Approximation + Turning Stat Introduction",
         "mins": 65,
         "block": "Challenge Block",
-        "description": "Part 1: You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator. Part 2: The Turning formula goes on the board -- turn radius = 50 / Turning points. Fill in your stat card, then program your bot to navigate to coordinates on the grid."
+        "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formula on the board -- turnAngle = 90 + (8 - TURNING) x 5. Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate."
       },
       {
         "name": "Lunch / Snack Break",
@@ -185,7 +191,7 @@ const DAYS = [
     ],
     "ends": "Each person on your team silently rates today's collaboration: 1 = rough, 2 = okay, 3 = solid. Hold up your number at the same time so everyone sees at once. If anyone holds up a 1, talk for 2 minutes about what specifically happened. You have 5 minutes total. |",
     "funElement": "None today. Discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
-    "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance between coordinates calculated from grid data) ----------------------------------------------------------------------- **NOTE:** *Day 3 design note: Turning stat introduction are intentionally unified in this session. The V2 context block explicitly states: \"The coordinate grid work IS the Turning stat introduction for the cognitive reveal sequence.\" This resolves what might appear to be a conflict between the session replacing the Challenge Block and the requirement to introduce the Turning stat on Day 3. No constraint is dropped.* ----------------------------------------------------------------------- -----------------------------------------------------------------------",
+    "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance formula introduced on life-sized grid, verified against two coordinate pairs; deepened on Day 10 with match data)",
     "facilitatorRisk": {
       "risk": "The worksheet becomes anexercise where campers just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
       "say": "\"Before Part 2: stop everyone. Say \"Look at your graph and the team next to yours. Your lines are different shapes. I want one sentence from each team, not what the formula says, but what your bot physically did differently to create that shape. Start there.\" Then, when you transition to the coordinate navigation: \"This grid is your new stat. Turning controls how your bot moves through this space. Let's see what it actually does.\"\" |"
@@ -204,10 +210,16 @@ const DAYS = [
         "description": "Face a partner. On a count of three, both of you show any number of fingers (0-5). Race to say the sum first. Correct answer earns a point. Rotate partners every 90 seconds. The math is easy -- the speed is the challenge."
       },
       {
+        "name": "Power Allocation: Stat Card Fill-In",
+        "mins": 3,
+        "block": "Ice Breaker",
+        "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins."
+      },
+      {
         "name": "Power Stat Challenge: Ratio and Motor Speed",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "One rule goes on the board: charge motor speed = Power points squared. Calculate charge speed for Power = 1, 2, 4, and 8. Then test it physically: program Power 4 into MakeCode, drive your bot at a ball from 40 cm, and measure how far the ball goes. Repeat with Power 8. Did doubling the points double kick distance? The answer should surprise you."
+        "description": "One rule goes on the board: charge motor speed = Power points squared (Power^2). Calculate charge speed for Power = 1, 2, 4, and 8. Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (16% speed) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (64% speed). Did doubling the points double kick distance? Both answers should surprise you."
       },
       {
         "name": "Lunch / Snack Break",
@@ -230,7 +242,7 @@ const DAYS = [
     ],
     "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
     "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
-    "los": "LO 1.2 (proportional calculation applied to Power stat); LO 3.2 (distance calculations verified against bot kick test data)",
+    "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P^2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
     "facilitatorRisk": {
       "risk": "Campers assume more Power always wins and stop thinking about trade-offs in the 20-point budget. Cognitive overload from trying to optimize all four stats simultaneously.",
       "say": "\"Before anyone changes that speed value: what happens to your Endurance if you give 3 more points to Power? Calculate it. Your total is still 20. Where does that Power come from? Your equation has four variables. Show me the trade-off on paper before you touch the code.\" |"
@@ -315,7 +327,7 @@ const DAYS = [
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types. You can not just do all Speed problems first -- you have to figure out which formula applies before you calculate. Circle your four official values. All must be verified correct before you touch a tool."
+        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool."
       },
       {
         "name": "Lunch / Snack Break",
@@ -360,7 +372,7 @@ const DAYS = [
         "name": "Endurance Decay Equations in Slope-Intercept Form",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept before the first match."
+        "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. When r is revealed, your facilitator names it explicitly: the slope of a line is its rate of change, and r is how fast your bot loses power per minute. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept before the first match."
       },
       {
         "name": "Pre-Match Prediction Huddle",
@@ -417,7 +429,7 @@ const DAYS = [
         "name": "Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Part 1: Add your data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Then match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together. Part 2: Use two data points from the scatter plot to write the linear equation. Teams share -- everyone's equation is different. That is the point."
+        "description": "Part 1: Add your data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Then match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together. Part 2: Use two data points from the scatter plot to write the linear equation. Teams share -- everyone's equation is different. That is the point. SUMMER SPARKS EVALUATION FLAG: Day 8 is a candidate mid-program measurement point for the JHU evaluation team. It produces two artifacts -- individual student equations (quantitative) and the class scatter plot (qualitative) -- without any schedule changes."
       },
       {
         "name": "Lunch / Snack Break",
@@ -465,10 +477,10 @@ const DAYS = [
         "description": "Read the rivalry card your team received. Open your dashboard. Do the numbers check out? If the trash talk is factually wrong, mark it 'check your data' with a sticky note and the correct number. If it is accurate, make a plan."
       },
       {
-        "name": "Formula Relay: All Five Types in One Race",
+        "name": "Formula Relay: All Six Types in One Race",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Twenty problem cards, face down, shuffled across all five formula types. Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards by formula type and count errors. Your weakest type is today's focus."
+        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turning radius (2 cards), Power squared, budget constraint, and Proportional Scaling (2 scoop-scaling cards where you determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards by formula type and count errors. Your weakest type is today's focus -- use it for today's pre-match prediction."
       },
       {
         "name": "Lunch / Snack Break",
@@ -501,7 +513,7 @@ const DAYS = [
     "day": 10,
     "week": 2,
     "weekName": "Season 1",
-    "theme": "Season 1 Final Matches + Distance Formula",
+    "theme": "Season 1 Final Matches + Distance Formula (Applied to Match Data)",
     "activities": [
       {
         "name": "Best Match Gallery Walk",
@@ -510,10 +522,10 @@ const DAYS = [
         "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Walk the room and read every card. Vote with a dot sticker: which team had the most mathematically interesting finding?"
       },
       {
-        "name": "Distance Formula: How Far Did Your Bot Actually Travel?",
+        "name": "Distance Formula: Applying It to Match Data",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Pick two coordinates from your match data log. Calculate straight-line distance: square root of ((x2-x1) squared + (y2-y1) squared). Do this for three coordinate pairs and check: does the computed distance match what you observed on the grid?"
+        "description": "Week 2 continuation of the coordinate geometry you started on Day 3. On Day 3 you walked the life-sized grid and calculated straight-line distance with your body. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what you observed during the match? If not, name the source: measurement error, bot drift, or formula misapplication. This closes the coordinate geometry arc started on Day 3."
       },
       {
         "name": "Lunch / Snack Break",
@@ -525,7 +537,7 @@ const DAYS = [
         "name": "Cold Recall Check",
         "mins": 10,
         "block": "Challenge Block",
-        "description": "Five questions, 10 minutes, by yourself, no notes. Percent change, slope-intercept form, distance formula, decay functions, budget percentages. No grade -- just a check on what is holding after two weeks."
+        "description": "Five questions, 10 minutes, by yourself, no notes. Percent change, slope-intercept form, distance formula, decay functions, and a unit rate question: a bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far does it travel at that rate in 8 seconds? No grade -- just a check on what is holding after two weeks."
       },
       {
         "name": "Season 1 Final Round",
@@ -542,10 +554,10 @@ const DAYS = [
     ],
     "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
     "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
-    "los": "LO 3.2 (distance formula applied to three coordinate pairs from match data); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded) # WEEK 3: COMMISSIONER'S WEEK + SECOND SEASON *Energy register: Empowered, analytical, creative. Campers run the rules committee. They change the game. This is the highest-agency week. Do not let facilitators take it back.*",
+    "los": "LO 3.2 (distance formula deepened: applied to three match-data coordinate pairs, discrepancy sourced); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded)",
     "facilitatorRisk": {
-      "risk": "The distance formula is treated as abstract algebra. Students plug in numbers without connecting it to the physical coordinate grid they have been driving on all week.",
-      "say": "\"Before you calculate: stand up and point to the two places on the grid where your bot was. Draw a straight line between them on your grid paper. That line is what you are calculating the length of. After you get your number, count the grid squares on the diagonal. Does your calculated number match what you see?\" |"
+      "risk": "Campers treat this as a new formula they have never seen, bypassing the Day 3 embodied experience. The formula is not new -- they used it on the life-sized grid on Day 3. Reconnect explicitly before calculating.",
+      "say": "\"You have used this formula before -- Day 3, on the floor grid. You walked to the coordinates. You estimated the diagonal. Then you calculated. Today is the same formula on real match data. Before you plug in numbers: which two coordinates are you starting with? Find them in your data log. Now you can calculate.\""
     }
   },
   {
@@ -561,10 +573,10 @@ const DAYS = [
         "description": "A tape line runs across the room from 'least important' to 'most important' for winning Season 1 matches. Stand where you think the most important stat belongs -- pure instinct, no data. Then your facilitator says: 'Open your dashboard. Does the data support where you are standing?'"
       },
       {
-        "name": "Systems of Inequalities NOW Session + Commissioner Proposal Prep",
+        "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
         "mins": 45,
         "block": "Challenge Block",
-        "description": "'Speed > 5 AND Endurance > 3. What loadouts satisfy both constraints at the same time?' List at least three valid combinations. Then spend 25 minutes drafting a rule change proposal backed by at least two numbers from your dashboard."
+        "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- 50% more Power gives 125% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected."
       },
       {
         "name": "Lunch / Snack Break",
@@ -615,7 +627,7 @@ const DAYS = [
         "name": "Final Proposal Verification",
         "mins": 35,
         "block": "Challenge Block",
-        "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed."
+        "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed. Your facilitator also checks Criterion 6: at least one of the following concept types must be named in the proposal -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay. Your facilitator asks one camper per team: 'How did you calculate this number? What kind of math is that?' before the meeting starts."
       },
       {
         "name": "Lunch / Snack Break",
