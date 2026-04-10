@@ -602,13 +602,25 @@ const DAYS = [
         "name": "Best Match Gallery Walk",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Walk the room and read every card. Vote with a dot sticker: which team had the most mathematically interesting finding?"
+        "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. You walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding, not who won the most, but who learned the most from one match result."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Distance Formula: Applying It to Match Data",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Week 2 continuation of the coordinate geometry you started on Day 3. On Day 3 you walked the life-sized grid and calculated straight-line distance with your body. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what you observed during the match? If not, name the source: measurement error, bot drift, or formula misapplication. This closes the coordinate geometry arc started on Day 3."
+        "description": "Week 2 continuation of the coordinate geometry introduced on Day 3. On Day 3 you walked the grid physically and computed straight-line distance with your bodies. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what was observed during the match? If not, name the source of the discrepancy -- measurement error, bot drift, or formula misapplication. This session closes the coordinate geometry arc started on Day 3."
+      },
+      {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Lunch / Snack Break",
@@ -620,22 +632,27 @@ const DAYS = [
         "name": "Cold Recall Check",
         "mins": 10,
         "block": "Challenge Block",
-        "description": "Five questions, 10 minutes, by yourself, no notes. Percent change, slope-intercept form, distance formula, decay functions, and a unit rate question: a bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far does it travel at that rate in 8 seconds? No grade -- just a check on what is holding after two weeks."
+        "description": "Five questions, 10 minutes, individual work, non-bot context, no grade. Write on paper without notes or devices. (1) Percent change in motor power between Speed = 6 and Speed = 9. (2) Slope-intercept form from slope 2 through (1,3). (3) Distance from (2,5) to (7,17). (4) When does P(t) = 100 - 12t reach zero? (5) A bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far at that rate for 8 seconds?"
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Season 1 Final Round",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete your dashboard -- goals per minute, possession time, win/loss by stat matchup. No blanks. Final Season 1 leaderboard update."
+        "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete data dashboard -- goals per minute, possession time, win/loss by stat matchup. No blanks. Leaderboard final Season 1 update."
       },
       {
         "name": "Open Lab: Season 2 Planning",
         "mins": 30,
         "block": "Open Lab",
-        "description": "Track A: Look at your Season 1 data. If you could change one stat for Season 2, what would it be and why? Write it as a hypothesis with data. Track B: Test the change you are considering before committing. Run it live, then write the hypothesis."
+        "description": "Track A (Data Dive): Look at your Season 1 data. If you could change one stat allocation for Season 2, what would it be and why? Write it as a hypothesis with a data justification. Track B (Bot Lab): Test the loadout change you are considering before committing. Run it live and observe. Then write the hypothesis entry. Physical testing before committing is legitimate analytical work, not avoidance."
       }
     ],
-    "endBufferMins": 20,
     "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
     "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
     "los": "LO 3.2 (distance formula deepened: applied to three match-data coordinate pairs, discrepancy sourced); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded)",
