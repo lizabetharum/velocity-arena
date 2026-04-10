@@ -29,6 +29,7 @@ function getNavLink(page) {
     { id: 'today',    href: '/index.html',    label: 'Today' },
     { id: 'schedule', href: '/schedule.html', label: 'Schedule' },
     { id: 'dashboard', href: '/activities/dashboard/velocity-arena-dashboard.html', label: 'Dashboard' },
+    { id: 'math',     href: '/activities/math/index.html', label: 'Math Concepts' },
     { id: 'tools',    href: '/tools.html',    label: 'Tools' },
     { id: 'teachers', href: '/teachers.html', label: 'Teacher resources' },
     { id: 'about',    href: '/about.html',    label: 'About' },
