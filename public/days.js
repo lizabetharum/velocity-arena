@@ -989,7 +989,13 @@ const DAYS = [
         "name": "Memory Probe: Scout Your Opponent Cold",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "No notes, no dashboards, nothing posted. From memory, write down your opponent's top two stat allocations, their Endurance decay rate, their Season 1 average goals per match, and their Endurance output at t = 3. Then reports go up -- verify every number and score yourself."
+        "description": "No posted reports. No dashboards. No notes. You have 5 minutes to write from memory: your Championship opponent's top two stat allocations, their Endurance decay rate (the r value), their Season 1 average goals per match, and their Endurance decay output at t = 3. Then reports go up -- verify every number and score yourself."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Scouting Report Completion: Sections 3 and 4",
@@ -1022,7 +1028,6 @@ const DAYS = [
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now."
       }
     ],
-    "endBufferMins": 5,
     "ends": "Write one personal goal and one team goal for this final week. The personal goal must name something mathematical you want to be able to explain clearly to a visitor on Thursday. You have 3 minutes. |",
     "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
     "los": "LO 7.3 (scouting report sections 3 and 4: trend line equation with prediction and inequality strategy); LO 4.3 (valid Championship loadouts under new constraints); LO 8.1 (Commissioner presentation with numerical evidence)",
@@ -1041,7 +1046,7 @@ const DAYS = [
         "name": "Cold Retrieval + Scouting Annotation",
         "mins": 25,
         "block": "Ice Breaker",
-        "description": "Part 1: From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2: All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes."
+        "description": "Part 1 (8 min): From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their Season 1 best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2 (17 min): All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes."
       },
       {
         "name": "Pre-Match Pitch Rehearsal + Teach the Math",
@@ -1062,10 +1067,16 @@ const DAYS = [
         "description": "Final rule adjustments confirmed. Championship bracket revealed and posted. Final bot tune-up: program your Championship loadout, verify code against math, run one test drive."
       },
       {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "What-If? Analysis",
         "mins": 45,
         "block": "Challenge Block",
-        "description": "The facilitator posts a hypothetical constraint: 'Endurance is capped at 4 for Championship.' You have 10 minutes to figure out which teams this affects and calculate how their decay rate and Speed change if they reallocate. Does this help or hurt your team? Show the math."
+        "description": "The facilitator posts one constraint: 'The Commissioner has capped Endurance at 4 for the Championship.' You have 10 minutes to answer for every team: which loadouts violate this constraint? For each, calculate how their decay rate changes if they reallocate excess points to Speed. State the new motor power output. Does this rule change help or hurt your team? Show the math."
       },
       {
         "name": "Open Lab: Pitch Refinement and Bot Prep",
@@ -1074,7 +1085,6 @@ const DAYS = [
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow."
       }
     ],
-    "endBufferMins": 5,
     "endsMins": 10,
     "ends": "Name one mathematical claim from today's pre-match pitch rehearsals, from any team, not just yours. Write the calculation. Explain to a teammate why citing that specific number makes the argument stronger than a general claim. You have 4 minutes. |",
     "funElement": "Championship bracket reveal creates maximum anticipation.",
@@ -1094,13 +1104,19 @@ const DAYS = [
         "name": "Pre-Championship Ritual",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "The whole camp does a physical warm-up together -- energetic and brief -- led by any camper who volunteers. Then each team gets 3 minutes for their own ritual: a chant, a handshake, anything you invented. This is earned."
+        "description": "The whole camp does one physical warm-up together, energetic and brief, led by any camper who wants to lead it. Then each team has 3 minutes for their own ritual: a chant, a handshake, anything they invented. This is earned. Four weeks of work made this moment exist."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Championship Rounds 1 and 2",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Double-elimination bracket begins. Before each match, your team delivers a 2-minute pitch to the judges covering your strategy with specific numbers. Judges score on math, not presentation polish. After each match, loss-recovery runs -- same three steps, no shortcuts."
+        "description": "Double-elimination bracket. Before each match: your team delivers the 2-minute pre-match pitch to the judges, covering stat optimization strategy, specific numbers, inequality analysis. Judges score on mathematical specificity, not presentation polish. After each match: loss-recovery protocol runs for every losing team, same three steps, same script, no shortcuts."
       },
       {
         "name": "Lunch / Snack Break",
@@ -1110,18 +1126,23 @@ const DAYS = [
       },
       {
         "name": "Championship Semifinals and Final",
-        "mins": 90,
+        "mins": 60,
         "block": "Match-Build-Make",
-        "description": "Remaining bracket matches. Pre-match pitch continues. Loss-recovery for every elimination. After the final, the champion posts their Championship configuration on the wall."
+        "description": "Remaining bracket matches. Pre-match pitch continues for every match. Loss-recovery runs for every elimination. Winner determined. After the final match, the champion posts their Championship configuration on the wall labeled 'Championship Configuration.'"
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Open Lab: Reflection Time",
-        "mins": 15,
+        "mins": 40,
         "block": "Open Lab",
-        "description": "No task required. Look at your Day 1 allocation versus today's. What changed and why? Reflect on your team's four-week data arc."
+        "description": "No task required. Teams reflect on their four-week data arc. Look at your Day 1 allocation versus today's. What changed and why?"
       }
     ],
-    "endBufferMins": 5,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
     "funElement": "Pre-match pitch to judges activates today, scored on mathematical specificity. This is the moment all four weeks of math work is tested in a live, high-stakes public setting.",
     "los": "LO 7.1 (pre-match prediction logged before every Championship match); LO 7.2 (post-match revision if \\>20% off); LO 8.1 (pre-match pitch scored by judges on rubric for evidence quality and math content)",
@@ -1140,7 +1161,13 @@ const DAYS = [
         "name": "Expert Setup",
         "mins": 25,
         "block": "Ice Breaker",
-        "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the three visitor mini-challenges on a teammate: unit rate calculation, coordinate distance, and proportional scaling explanation. Write down the one thing you want every visitor to understand."
+        "description": "You set up your station: scouting report, bot, coordinate grid, and data dashboard on display. You practice teaching the three visitor mini-challenges on a teammate: unit rate calculation, coordinate distance, and proportional scaling explanation. You write down the one thing you want every visitor to understand before they leave. That is your teaching goal."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Community Exhibition: Teaching Begins",
@@ -1167,7 +1194,6 @@ const DAYS = [
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot."
       }
     ],
-    "endBufferMins": 5,
     "ends": "Write: \"The skill I used today to teach a visitor was \\[name it\\] and I know it worked when \\[describe the specific moment you saw them understand it\\].\" You have 3 minutes. |",
     "funElement": "Best Teacher vote collected by visitors today. Winner announced at tomorrow's ceremony. Creates anticipation and social recognition for mathematical communication, not just winning. Scouting Report Verbal Check runs concurrently with vote count in the afternoon.",
     "los": "LO 8.2 (visitor completes coordinate plotting, navigation, and proportional reasoning explanation independently); LO 3.1 (coordinate plotting reviewed and taught to visitors); LO 1.2 (proportional reasoning explanation verified by visitor completion); LO 7.3 (scouting report verbal check: one calculation explained, method described, bot behavior implication named)",
@@ -1186,7 +1212,13 @@ const DAYS = [
         "name": "Walk the Wall: Final Gallery",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "Final gallery walk of everything: bot origin stories, rivalry cards, leaderboard history, Commissioner rules, scouting reports, and the Day 1 goals from Week 1. Walk quietly. You are looking at what four weeks of work looks like."
+        "description": "Final gallery walk of every artifact: bot origin stories, rivalry cards, leaderboard history, Commissioner rule changes, scouting reports, and the Day 1 goals posted in Week 1. You walk quietly. You are looking at what four weeks of work looks like."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
       },
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
@@ -1195,16 +1227,28 @@ const DAYS = [
         "description": "15 minutes, individual. Parallel questions to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon."
       },
       {
-        "name": "Lunch / Snack Break",
-        "mins": 60,
+        "name": "Break",
+        "mins": 5,
         "block": "Break",
-        "description": "Eat, rest, and talk about anything except math."
+        "description": ""
       },
       {
         "name": "Awards Ceremony",
         "mins": 60,
         "block": "Match-Build-Make",
-        "description": "Championship winner celebrated. Best Teacher award announced. Your facilitator names one specific mathematical moment for each team -- a particular calculation, a dashboard decision, a Commissioner argument. Then each camper names one personal growth area and one specific camp moment that shows that growth."
+        "description": "Championship winner celebrated. Best Teacher award announced. The facilitator names one specific mathematical moment for each team: a particular calculation, a dashboard decision, a Commissioner argument, not generic praise. Hello Insight post-survey verbal reflection: each camper names one personal growth area and one specific camp moment that demonstrates that growth."
+      },
+      {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
+        "name": "Lunch / Snack Break",
+        "mins": 60,
+        "block": "Break",
+        "description": "Eat, rest, and talk about anything except math. The afternoon belongs to free time."
       },
       {
         "name": "Open Lab: Final Free Time",
@@ -1213,7 +1257,7 @@ const DAYS = [
         "description": "Unstructured time. Drive the bots. Revisit the coordinate grid. Teach each other anything you want. This is the last time the program exists in this form."
       }
     ],
-    "endBufferMins": 30,
+    "endBufferMins": 15,
     "endsMins": 20,
     "ends": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes. |",
     "funElement": "Best Teacher award announced. Social recognition for mathematical communication, not winning. Awards ceremony closes the program with campers as the experts. The verbal check ran on Day 19. Day 20 is the celebration.",
