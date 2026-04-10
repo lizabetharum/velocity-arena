@@ -118,6 +118,12 @@ const DAYS = [
         "description": "Open MakeCode and write code that reduces your bot's motor power over time based on your Endurance allocation. Test it by running the bot for 2 minutes. Record distance in the first 30 seconds vs. the last 30 seconds, and write one sentence about the gap between what the formula predicted and what actually happened."
       },
       {
+        "name": "Break",
+        "mins": 2,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Role Rotation Briefing",
         "mins": 10,
         "block": "Match-Build-Make",
@@ -137,7 +143,6 @@ const DAYS = [
         "description": "Unstructured time with your bot. Experiment with your Endurance code. Try different point values and observe. No task, no output required."
       }
     ],
-    "endBufferMins": 2,
     "ends": "Name one math concept you used today. Write the full calculation. Share it with a teammate and explain what it means about your bot, not in formula terms, but in behavior terms. You have 4 minutes. |",
     "funElement": "Bot naming ceremony activates today at end of session. Bot names and origin stories are posted on the wall for the full four weeks. First permanent artifact of the program.",
     "los": "LO 2.1 (slope meaning described from bot decay graph); LO 2.2 (Endurance decay equation written in slope-intercept form)",
@@ -236,13 +241,19 @@ const DAYS = [
         "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings, run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'"
       },
       {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
         "block": "Open Lab",
         "description": "Refine your scoop design and your Power speed value in MakeCode. Try one scoop redesign and one speed change. Record which had a bigger effect on kick distance."
       }
     ],
-    "endBufferMins": 17,
+    "endBufferMins": 7,
     "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
     "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
     "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P^2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
@@ -328,6 +339,12 @@ const DAYS = [
         "description": "Your team lines up. The first person solves step 1 of a multi-step equation on the whiteboard, tags the next person for step 2, and so on. First team to the correct final answer wins."
       },
       {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
@@ -346,13 +363,18 @@ const DAYS = [
         "description": "Finalize your front scoop with one last adjustment, then lock it in with hot glue. Open MakeCode and program your full stat loadout -- all four stats translated into code. Verify your Speed by driving the bot. Does the behavior match the number you coded?"
       },
       {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Open Lab: Free Code or Final Verification",
         "mins": 45,
         "block": "Open Lab",
         "description": "Track A (Data Dive): Check each stat value in your dashboard against the formula output. Fix any mismatches before tomorrow's first match. Track B (Bot Lab): Test a loadout you would never use competitively. What happens at Speed = 2 with Power = 15?"
       }
     ],
-    "endBufferMins": 15,
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall next to your bot's name. You have 3 minutes. |",
     "funElement": "Season 1 begins tomorrow. Anticipation of real matches creates investment in getting the allocation right today.",
     "los": "LO 1.2 (all four stat calculations on allocation sheet, 100% accuracy); LO 2.2 (Endurance decay equation derived from allocation); LO 6.1 (MakeCode motor command verified against proportional calculation)",
@@ -374,16 +396,22 @@ const DAYS = [
         "description": "Your team solves one equation from your allocation sheet. Get it right and you earn a shot -- crumple paper into a bin. Make the shot, bonus point. Quick, physical, competitive. Warm-up for match day."
       },
       {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Endurance Decay Equations in Slope-Intercept Form",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. When r is revealed, your facilitator names it explicitly: the slope of a line is its rate of change, and r is how fast your bot loses power per minute. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept before the first match."
+        "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. When r is revealed, your facilitator names it explicitly: the slope of a line is its rate of change, and r is how fast your bot loses power per minute. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept in your match data log before the first match."
       },
       {
         "name": "Pre-Match Prediction Huddle",
         "mins": 10,
         "block": "",
-        "description": "Your team reads your stat allocation out loud -- every formula, every result. Then write one prediction: how many goals will your team score in your first match? Sign it."
+        "description": "Your team reads your stat allocation out loud -- every formula, every result. Then write one prediction in your match data log: how many goals will your team score in your first match?"
       },
       {
         "name": "Lunch / Snack Break",
@@ -392,19 +420,25 @@ const DAYS = [
         "description": "Eat, rest, and talk about anything except math."
       },
       {
+        "name": "Break",
+        "mins": 5,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Season 1 Round-Robin Matches, Day 1",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Three matches, round-robin bracket. Before each match, state your prediction. After each match, record actual goals and win/loss immediately. If you lose, the loss-recovery protocol runs before your next match -- no skipping it."
+        "description": "Three matches, round-robin bracket. Before each match, state your prediction from the data log. After each match, record actual goals and win/loss immediately. Loss-recovery protocol runs for every losing team before the next match -- no skipping it."
       },
       {
         "name": "Leaderboard Reveal + Open Lab",
         "mins": 35,
         "block": "Match-Build-Make / Open Lab",
-        "description": "The physical leaderboard goes up on the wall with three columns: Wins, Goals Scored, Best Prediction. Update it now. Then 20 minutes of open time to review your dashboard, strategize, or adjust code."
+        "description": "The physical leaderboard goes up on the wall or Velocity Arena Dashboard Leaderboard. Update the dashboard. Then 20 minutes of open bot time: review your dashboard, strategize, or adjust code."
       }
     ],
-    "endBufferMins": 15,
+    "endBufferMins": 5,
     "ends": "Name one math concept you used today. Write the full calculation. Share it with your teammate and explain what it means for your bot's behavior. Not formula terms. Bot terms. You have 4 minutes. |",
     "funElement": "Leaderboard activates today: physical, public, updated after every match day. The Best Prediction column rewards mathematical accuracy, not just winning.",
     "los": "LO 2.2 (Endurance decay equation in slope-intercept form, x-intercept calculated); LO 5.1 (data dashboard complete after first real matches); LO 7.1 (prediction logged before match, actual recorded after)",
@@ -652,13 +686,19 @@ const DAYS = [
         "description": "Each team has 3 minutes. Cite two data points, explain your reasoning, describe how the change affects the last-place team. The league votes. Proposals that pass become rules -- written on the wall in permanent marker. Then adjust your Season 2 allocation under the new constraints before you leave."
       },
       {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Open Lab: Season 2 Allocation Verification",
         "mins": 35,
         "block": "Open Lab",
         "description": "Verify your Season 2 allocation calculations. Program the new loadout into MakeCode. Run one test drive to confirm the code matches the math."
       }
     ],
-    "endBufferMins": 35,
+    "endBufferMins": 25,
     "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
     "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Campers author the rules of their own game using data they collected.",
     "los": "LO 4.3 (Season 2 loadout adjusted under new rule constraints); LO 5.3 (data-backed argument scored on rubric); LO 8.1 (3-minute presentation scored on evidence quality and math content)",
@@ -796,13 +836,19 @@ const DAYS = [
         "description": "Design your bot's visual identity: a logo, a color scheme, and a team slogan. The slogan must reference a stat, equation, or data point. You can also redesign your scoop within the rules. Everything goes on the wall before you leave."
       },
       {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Open Lab: Scouting Continuation or Identity Refinement",
         "mins": 40,
         "block": "Open Lab",
         "description": "Track A: Continue scouting report sections 1 and 2, or start section 3 (opponent Speed vs. Goals trend line). Track B: Test the scoop redesign or logo placement. Does the new scoop change your kick distance? If yes, update the dashboard. End with a concept retrieval line: write the name of the math concept you used in your scouting work today (unit rate, ratio, proportional scaling, slope as rate of change, linear decay, or other)."
       }
     ],
-    "endBufferMins": 15,
+    "endBufferMins": 5,
     "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
     "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
     "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
@@ -842,13 +888,19 @@ const DAYS = [
         "description": "Teams present final Championship rule proposals. Same format: 3 minutes, two data points, address the last-place team. League votes. New rules on the wall. Adjust your loadout for Championship -- fix any math errors before leaving."
       },
       {
+        "name": "Break",
+        "mins": 10,
+        "block": "Break",
+        "description": ""
+      },
+      {
         "name": "Open Lab: Championship Loadout Verification",
         "mins": 45,
         "block": "Open Lab",
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now."
       }
     ],
-    "endBufferMins": 15,
+    "endBufferMins": 5,
     "ends": "Write one personal goal and one team goal for this final week. The personal goal must name something mathematical you want to be able to explain clearly to a visitor on Thursday. You have 3 minutes. |",
     "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
     "los": "LO 7.3 (scouting report sections 3 and 4: trend line equation with prediction and inequality strategy); LO 4.3 (valid Championship loadouts under new constraints); LO 8.1 (Commissioner presentation with numerical evidence)",
