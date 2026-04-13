@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percent Change — Velocity Arena</title>
+  <link rel="stylesheet" href="./shared.css">
+  <style>
+    .split-screen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    @media (max-width: 600px) {
+      .split-screen { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--active);
+      border-radius: var(--r-md);
+      padding: var(--sp-5);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--sp-4);
+    }
+    .panel-left .panel-title { color: var(--cyan); }
+    .panel-right .panel-title { color: var(--orange); }
+
+    .panel-left { border: 1px solid rgba(0, 229, 255, 0.15); }
+    .panel-right { border: 1px solid rgba(204, 119, 0, 0.15); }
+
+    /* Bars for output */
+    .output-bar-track {
+      width: 100%;
+      height: 28px;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: var(--sp-3) 0;
+      position: relative;
+    }
+    .output-bar-fill {
+      height: 100%;
+      border-radius: var(--r-sm);
+      transition: width var(--t-med) var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: var(--sp-2);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bg);
+      min-width: 30px;
+    }
+    .fill-cyan { background: linear-gradient(90deg, var(--teal), var(--cyan)); }
+    .fill-orange { background: linear-gradient(90deg, #994400, var(--orange)); }
+
+    .output-value {
+      font-size: 24px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .output-value-cyan { color: var(--cyan); }
+    .output-value-orange { color: var(--orange); }
+
+    .prop-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 14px;
+      font-weight: 800;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-full);
+      margin-top: var(--sp-3);
+      transition: all var(--t-med) var(--ease);
+    }
+    .prop-yes {
+      color: var(--green);
+      background: rgba(68, 204, 136, 0.15);
+      border: 1px solid rgba(68, 204, 136, 0.3);
+    }
+    .prop-no {
+      color: var(--red);
+      background: rgba(255, 68, 102, 0.15);
+      border: 1px solid rgba(255, 68, 102, 0.3);
+    }
+
+    .input-label {
+      font-size: 12px;
+      color: var(--slate);
+      margin-bottom: var(--sp-1);
+    }
+    .output-label {
+      font-size: 12px;
+      color: var(--slate);
+      margin-top: var(--sp-1);
+    }
+
+    /* Large percent result */
+    .pct-result {
+      font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      margin: var(--sp-3) 0;
+      transition: color var(--t-med) var(--ease);
+    }
+    .pct-result.increase { color: var(--green); }
+    .pct-result.decrease { color: var(--red); }
+    .pct-result.neutral  { color: var(--slate); }
+
+    /* Formula display inline */
+    .formula-inline {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--slate);
+      margin-bottom: var(--sp-3);
+      font-family: monospace;
+    }
+
+    /* Step visuals */
+    .step-comparison {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--sp-3);
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+    }
+    @media (max-width: 500px) {
+      .step-comparison { grid-template-columns: 1fr; }
+      .step-comparison .arrow-col { transform: rotate(90deg); }
+    }
+    .step-box {
+      background: var(--active);
+      border-radius: var(--r-md);
+      padding: var(--sp-3) var(--sp-4);
+      text-align: center;
+    }
+    .step-box .val {
+      font-size: 28px;
+      font-weight: 800;
+    }
+    .step-box .lbl {
+      font-size: 11px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+    .arrow-col {
+      font-size: 24px;
+      color: var(--slate);
+    }
+
+    /* Fraction display for step 4 */
+    .fraction-display {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+    .fraction-display .frac-num {
+      padding-bottom: 2px;
+    }
+    .fraction-display .frac-line {
+      width: 100%;
+      height: 2px;
+      background: var(--cyan);
+    }
+    .fraction-display .frac-den {
+      padding-top: 2px;
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1000; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 1.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="site-banner">
+  <a href="/index.html">
+    <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:28px;width:auto;">
+    <div><div class="logo-text">Velocity Arena</div><div class="logo-sub">Percent Change</div></div>
+  </a>
+  <a class="back-btn" href="/index.html">&larr; Back to Velocity Arena</a>
+</div>
+
+<nav class="nav-bar">
+  <a href="./index.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html">Ratio</a>
+    <a href="./proportional-scaling.html">Scaling</a>
+    <a href="./linear-decay.html">Decay</a>
+    <a href="./percent.html" class="active">Percent</a>
+    <a href="./graphs.html">Graphs</a>
+    <a href="./equations.html">Equations</a>
+    <a href="./data.html">Data</a>
+    <a href="./playground.html">Playground</a>
+  </div>
+</nav>
+
+<main class="page-container">
+
+  <!-- TITLE -->
+  <div class="title-bar">
+    <span class="concept-label">Concept 5 of 8</span>
+    <h1>Percent Change: Season 2 Reallocation</h1>
+    <p class="subtitle">Boost or cut stats. Calculate the percent change.</p>
+  </div>
+
+  <!-- INTERACTIVE -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">&#9889;</span>
+      INTERACTIVE — ADJUST SEASON VALUES
+    </div>
+
+    <div class="split-screen">
+      <!-- LEFT: Season 1 -->
+      <div class="panel panel-left">
+        <div class="panel-title">Season 1 Value</div>
+        <div class="input-label">Old Stat</div>
+        <input type="range" id="oldSlider" min="1" max="10" value="6" step="1"
+               style="width: 100%; margin: var(--sp-2) 0;">
+        <div class="output-value output-value-cyan"><span id="oldDisplay">6</span></div>
+        <div class="output-label">Season 1</div>
+        <div class="output-bar-track">
+          <div class="output-bar-fill fill-cyan" id="oldBar" style="width: 60%;"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Season 2 -->
+      <div class="panel panel-right">
+        <div class="panel-title">Season 2 Value</div>
+        <div class="input-label">New Stat</div>
+        <input type="range" id="newSlider" min="1" max="10" value="8" step="1"
+               style="width: 100%; margin: var(--sp-2) 0;">
+        <div class="output-value output-value-orange"><span id="newDisplay">8</span></div>
+        <div class="output-label">Season 2</div>
+        <div class="output-bar-track">
+          <div class="output-bar-fill fill-orange" id="newBar" style="width: 80%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formula + Result -->
+    <div class="formula-display" style="margin-top: var(--sp-5);">
+      <span class="op">(</span>
+      <span class="num" id="formulaNew">8</span>
+      <span class="op">&minus;</span>
+      <span class="num" id="formulaOld">6</span>
+      <span class="op">)</span>
+      <span class="op">&divide;</span>
+      <span class="num" id="formulaBase">6</span>
+      <span class="op">&times; 100</span>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-4);">
+      <div class="pct-result increase" id="pctResult">+33.3%</div>
+      <div class="prop-badge prop-yes" id="changeBadge">INCREASE +33.3%</div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-5);">
+      <span class="keyword-badge">PERCENT CHANGE</span>
+    </div>
+  </div>
+
+  <!-- STEP BY STEP -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">&#128214;</span>
+      LEARN — CLICK THROUGH THE STEPS
+    </div>
+
+    <div class="steps-container" id="stepsContainer">
+      <!-- Step 1 -->
+      <div class="step active" data-step="1">
+        <div class="step-visual">
+          <div class="step-box" style="max-width: 160px;">
+            <div class="val" style="color: var(--cyan);">6</div>
+            <div class="lbl">Speed &mdash; Season 1</div>
+          </div>
+        </div>
+        <p class="step-text">Your bot had Speed = <strong>6</strong> in Season 1.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2">
+        <div class="step-visual">
+          <div class="step-comparison">
+            <div class="step-box" style="border: 2px solid var(--cyan);">
+              <div class="val" style="color: var(--cyan);">6</div>
+              <div class="lbl">Season 1</div>
+            </div>
+            <div class="arrow-col">&rarr;</div>
+            <div class="step-box" style="border: 2px solid var(--orange);">
+              <div class="val" style="color: var(--orange);">8</div>
+              <div class="lbl">Season 2</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Season 2: Speed = <strong style="color: var(--orange);">8</strong>.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3">
+        <div class="step-visual">
+          <div class="step-comparison">
+            <div class="step-box" style="border: 2px solid var(--orange);">
+              <div class="val" style="color: var(--orange);">8</div>
+              <div class="lbl">New</div>
+            </div>
+            <div class="arrow-col">&minus;</div>
+            <div class="step-box" style="border: 2px solid var(--cyan);">
+              <div class="val" style="color: var(--cyan);">6</div>
+              <div class="lbl">Old</div>
+            </div>
+            <div class="arrow-col">=</div>
+            <div class="step-box" style="border: 2px solid var(--green);">
+              <div class="val" style="color: var(--green);">2</div>
+              <div class="lbl">Difference</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Find the difference: <strong style="color: var(--orange);">8</strong> &minus; <strong>6</strong> = <strong style="color: var(--green);">2</strong>.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" data-step="4">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--sp-4); flex-wrap: wrap;">
+              <div class="fraction-display">
+                <span class="frac-num">2</span>
+                <span class="frac-line" style="width: 30px;"></span>
+                <span class="frac-den">6</span>
+              </div>
+              <span style="font-size: 22px; font-weight: 800; color: var(--slate);">=</span>
+              <span style="font-size: 22px; font-weight: 800; color: var(--cyan);">0.333</span>
+              <span style="font-size: 22px; font-weight: 800; color: var(--slate);">&times; 100 =</span>
+              <span style="font-size: 28px; font-weight: 800; color: var(--green);">33.3%</span>
+            </div>
+          </div>
+        </div>
+        <p class="step-text">Divide by original: <strong>2 &divide; 6 = 0.333</strong>. Multiply by 100 = <strong style="color: var(--green);">33.3%</strong>.</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5">
+        <div class="step-visual">
+          <div style="text-align: center;">
+            <div style="display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; margin-bottom: var(--sp-4);">
+              <div class="prop-badge prop-yes" style="font-size: 15px;">6 &rarr; 8 = +33.3%</div>
+              <div class="prop-badge prop-no" style="font-size: 15px;">8 &rarr; 6 = &minus;25%</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text"><strong>Key insight:</strong> 8&rarr;6 is <strong style="color: var(--red);">&minus;25%</strong>, NOT &minus;33.3%. The <strong>base changes</strong>!</p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary" id="prevBtn" disabled>&larr; Back</button>
+      <div class="step-dots" id="stepDots"></div>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it-card">
+    <div class="section-label">
+      <span class="icon" style="background: rgba(204,119,0,0.15);">&#127919;</span>
+      <span style="color: var(--orange);">TRY IT — YOUR TURN</span>
+    </div>
+
+    <p class="try-it-prompt">Your bot's Turning was <strong style="color: var(--cyan);">4</strong> in Season 1. In Season 2 it's <strong style="color: var(--orange);">7</strong>. What is the percent change?</p>
+
+    <div class="try-it-input-row" style="justify-content: center;">
+      <input type="number" id="tryAnswer" placeholder="?" min="0" max="999" style="width: 100px;" aria-label="Percent change answer">
+      <span style="font-size: 16px; color: var(--slate);">%</span>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-4);">
+      <button class="btn-check" onclick="checkAnswer()">Check Answer &#10003;</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+</main>
+
+<script>
+  // === INTERACTIVE ===
+  const oldSlider = document.getElementById('oldSlider');
+  const newSlider = document.getElementById('newSlider');
+
+  function updateInteractive() {
+    const oldVal = parseInt(oldSlider.value);
+    const newVal = parseInt(newSlider.value);
+
+    // Display values
+    document.getElementById('oldDisplay').textContent = oldVal;
+    document.getElementById('newDisplay').textContent = newVal;
+
+    // Bars (each unit = 10% width)
+    document.getElementById('oldBar').style.width = (oldVal * 10) + '%';
+    document.getElementById('newBar').style.width = (newVal * 10) + '%';
+
+    // Formula numbers
+    document.getElementById('formulaNew').textContent = newVal;
+    document.getElementById('formulaOld').textContent = oldVal;
+    document.getElementById('formulaBase').textContent = oldVal;
+
+    // Percent change
+    const pctChange = ((newVal - oldVal) / oldVal) * 100;
+    const pctRounded = Math.abs(pctChange) < 0.05 ? '0' : (pctChange > 0 ? '+' : '') + pctChange.toFixed(1).replace(/\.0$/, '');
+
+    const resultEl = document.getElementById('pctResult');
+    resultEl.textContent = pctRounded + '%';
+
+    const badge = document.getElementById('changeBadge');
+
+    if (pctChange > 0) {
+      resultEl.className = 'pct-result increase';
+      badge.className = 'prop-badge prop-yes';
+      badge.textContent = 'INCREASE ' + pctRounded + '%';
+    } else if (pctChange < 0) {
+      resultEl.className = 'pct-result decrease';
+      badge.className = 'prop-badge prop-no';
+      badge.textContent = 'DECREASE ' + pctRounded + '%';
+    } else {
+      resultEl.className = 'pct-result neutral';
+      badge.className = 'prop-badge prop-yes';
+      badge.textContent = 'NO CHANGE 0%';
+    }
+  }
+
+  oldSlider.addEventListener('input', updateInteractive);
+  newSlider.addEventListener('input', updateInteractive);
+  updateInteractive();
+
+  // === STEPS ===
+  const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  let currentStep = 0;
+
+  const dotsContainer = document.getElementById('stepDots');
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  function showStep(idx) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const dots = dotsContainer.querySelectorAll('.step-dot');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot';
+      if (i === idx) d.classList.add('active');
+      else if (i < idx) d.classList.add('done');
+    });
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').textContent = idx === totalSteps - 1 ? 'Done \u2713' : 'Next \u2192';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; showStep(currentStep); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+  });
+
+  // === TRY IT ===
+  function checkAnswer() {
+    const answer = parseInt(document.getElementById('tryAnswer').value);
+    const fb = document.getElementById('feedback');
+
+    if (answer === 75) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '\uD83C\uDF89 <strong>Correct!</strong> (7 \u2212 4) \u00F7 4 \u00D7 100 = 75% increase!';
+      fb.style.display = 'block';
+      launchConfetti();
+    } else {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Not quite! Find the difference (7 \u2212 4 = 3), divide by the original (3 \u00F7 4), then multiply by 100.';
+      fb.style.display = 'block';
+    }
+  }
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#00E5FF', '#44CC88', '#CC7700', '#FF4466', '#FFFFFF'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1 + Math.random()) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 2500);
+  }
+</script>
+</body>
+</html>

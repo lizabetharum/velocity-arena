@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playground — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D0D1A;
+    --card-bg: #13132a;
+    --border:  #1e1e3a;
+    --cyan:    #00E5FF;
+    --teal:    #007A99;
+    --orange:  #CC7700;
+    --green:   #44CC88;
+    --red:     #E05555;
+    --purple:  #9966FF;
+    --text:    #E8E8F0;
+    --muted:   #6b6b8a;
+    --header:  #0a0a18;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── SITE BANNER ── */
+  .site-banner {
+    background: #2B2D42;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .site-banner a { text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .site-banner .logo-text { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: .08em; text-transform: uppercase; }
+  .site-banner .logo-sub { font-size: 11px; font-weight: 400; color: rgba(255,255,255,.7); letter-spacing: .04em; }
+  .site-banner .back-btn {
+    font-size: 12px; font-weight: 600; color: #fff; text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,.3); padding: 7px 12px; border-radius: 4px;
+    transition: border-color .15s;
+    background: none; font-family: inherit; cursor: pointer;
+  }
+  .site-banner .back-btn:hover { border-color: #fff; }
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar { display: none; }
+  .nav-brand {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--cyan);
+    font-weight: 700; font-size: 14px;
+    letter-spacing: 0.05em; white-space: nowrap;
+    flex-shrink: 0; margin-right: 8px;
+  }
+  .nav-brand svg { flex-shrink: 0; }
+  .nav-links { display: flex; gap: 4px; list-style: none; }
+  .nav-links a {
+    display: block; padding: 4px 12px;
+    border-radius: 9999px; text-decoration: none;
+    font-size: 13px; font-weight: 500;
+    color: var(--muted); white-space: nowrap;
+    transition: all 180ms ease;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--border); }
+  .nav-links a.active {
+    color: var(--cyan);
+    background: rgba(0, 229, 255, 0.15);
+  }
+  @media (max-width: 600px) {
+    .nav-brand span { display: none; }
+  }
+
+  /* Internal "back to hub" button when a concept is open */
+  .concept-back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-right: auto;
+  }
+  .concept-back-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .concept-back-btn.hidden { display: none; }
+
+  /* ── HUB PAGE ── */
+  #hub { display: block; }
+  .hub-hero {
+    text-align: center;
+    padding: 56px 24px 40px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .hub-title {
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .hub-title span { color: var(--cyan); }
+  .hub-sub {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .hub-tag {
+    font-size: 13px;
+    color: var(--teal);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 0 24px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hub-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .hub-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent, var(--cyan));
+    border-radius: 12px 12px 0 0;
+  }
+  .hub-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border-color: var(--accent, var(--cyan));
+  }
+  .card-icon { font-size: 32px; margin-bottom: 12px; }
+  .card-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+  .card-week {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent, var(--cyan));
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border: 1px solid var(--accent, var(--cyan));
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    opacity: 0.8;
+  }
+
+  /* ── MODULE PAGE ── */
+  #module {
+    display: none;
+    height: calc(100vh - 56px - 50px);
+    overflow: hidden;
+  }
+
+  /* Full-height side-by-side, never collapses */
+  .module-body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    height: 100%;
+  }
+
+  /* ── LEFT: CONTROL PANEL ── */
+  .ctrl-panel {
+    background: var(--card-bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+  }
+
+  .ctrl-concept-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .ctrl-concept-name {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .ctrl-concept-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ctrl-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .ctrl-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ctrl-value {
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  /* ── RIGHT: CANVAS ── */
+  .canvas-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--navy);
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--thumb, var(--cyan));
+    cursor: pointer;
+    border: 2px solid var(--navy);
+    box-shadow: 0 0 0 2px var(--thumb, var(--cyan));
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* ── READ-OUT CARD ── */
+  .readout-card {
+    margin-top: auto;
+    padding-top: 16px;
+  }
+  .readout-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .readout-eq {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Mono', 'Courier New', monospace;
+    line-height: 1.9;
+    color: var(--text);
+  }
+  .readout-eq .hi {
+    font-size: 20px;
+    font-weight: 700;
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* ── CONCEPT ACCENT COLORS ── */
+  .acc-cyan   { --thumb: var(--cyan);   color: var(--cyan);   }
+  .acc-orange { --thumb: var(--orange); color: var(--orange); }
+  .acc-green  { --thumb: var(--green);  color: var(--green);  }
+  .acc-teal   { --thumb: var(--teal);   color: var(--teal);   }
+  .acc-red    { --thumb: var(--red);    color: var(--red);    }
+  .acc-purple { --thumb: var(--purple); color: var(--purple); }
+</style>
+</head>
+<body>
+
+<!-- ── SITE BANNER ── -->
+<div class="site-banner">
+  <a href="/index.html">
+    <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:28px;width:auto;">
+    <div><div class="logo-text">Velocity Arena</div><div class="logo-sub">Playground</div></div>
+  </a>
+  <a class="back-btn" href="/index.html">&larr; Back to Velocity Arena</a>
+</div>
+
+<!-- ── MATH CONCEPTS NAV ── -->
+<nav class="nav-bar">
+  <a href="./index.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html">Ratio</a>
+    <a href="./proportional-scaling.html">Scaling</a>
+    <a href="./linear-decay.html">Decay</a>
+    <a href="./percent.html">Percent</a>
+    <a href="./graphs.html">Graphs</a>
+    <a href="./equations.html">Equations</a>
+    <a href="./data.html">Data</a>
+    <a href="./playground.html" class="active">Playground</a>
+  </div>
+  <button class="concept-back-btn hidden" id="backBtn" onclick="showHub()">← All Concepts</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HUB
+══════════════════════════════════════ -->
+<div id="hub">
+  <div class="hub-hero">
+    <h1 class="hub-title">Interactive Math<br><span>Concepts</span></h1>
+    <p class="hub-sub">Summer Sparks · 8 Concepts</p>
+    <p class="hub-tag">Click a concept. Move the sliders. Watch the math happen.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="hub-card" style="--accent:var(--cyan)" onclick="openConcept(0)">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Proportional Reasoning</div>
+      <div class="card-desc">If Speed doubles, motor power doubles too. See why the relationship is always perfectly proportional.</div>
+      <span class="card-week">Week 1</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--orange)" onclick="openConcept(1)">
+      <div class="card-icon">🏁</div>
+      <div class="card-title">Unit Rates</div>
+      <div class="card-desc">How fast is your bot? Distance ÷ time = cm per second. One clean number that tells the whole story.</div>
+      <span class="card-week">Week 1</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--green)" onclick="openConcept(2)">
+      <div class="card-icon">⚖️</div>
+      <div class="card-title">Ratio</div>
+      <div class="card-desc">Speed vs Endurance. Two quantities compared. Watch how the pie changes as you shift your allocation.</div>
+      <span class="card-week">Week 1</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--teal)" onclick="openConcept(3)">
+      <div class="card-icon">🔢</div>
+      <div class="card-title">Proportional Scaling</div>
+      <div class="card-desc">Scale your loadout up or down. When you multiply one stat by k, all stats scale by k — ratios stay locked.</div>
+      <span class="card-week">Weeks 1–3</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--cyan)" onclick="openConcept(4)">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">Coordinate Geometry</div>
+      <div class="card-desc">Navigate the arena grid. Place your bot and the goal anywhere. Calculate the exact distance between them.</div>
+      <span class="card-week">Weeks 1–2</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--red)" onclick="openConcept(5)">
+      <div class="card-icon">↩️</div>
+      <div class="card-title">Arc Approximation</div>
+      <div class="card-desc">A curve is just many tiny straight lines. Add more segments and watch a jagged path become a smooth arc.</div>
+      <span class="card-week">Week 1</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--orange)" onclick="openConcept(6)">
+      <div class="card-icon">🔋</div>
+      <div class="card-title">Linear Decay</div>
+      <div class="card-desc">Power drops steadily over time. Your Endurance stat controls how steep the drop is. Drag time and watch.</div>
+      <span class="card-week">Weeks 1–3</span>
+    </div>
+    <div class="hub-card" style="--accent:var(--green)" onclick="openConcept(7)">
+      <div class="card-icon">📈</div>
+      <div class="card-title">Slope as Rate of Change</div>
+      <div class="card-desc">For every extra Speed point, goals go up by the slope. Change m and b — see how the line responds.</div>
+      <span class="card-week">Weeks 2–3</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODULE (single active concept)
+══════════════════════════════════════ -->
+<div id="module">
+  <div class="module-body">
+    <div class="ctrl-panel" id="ctrlPanel"></div>
+    <div class="canvas-wrap">
+      <canvas id="cv"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONCEPTS CONFIG
+// ══════════════════════════════════════════════════════
+const CONCEPTS = [
+  { num:'01', title:'Proportional Reasoning', accent:'var(--cyan)',
+    desc:'Drag Speed and watch motor power scale proportionally. Double the stat → double the output. Every time.',
+    controls:[{id:'c0a',label:'Speed Points',min:1,max:20,val:6,acc:'acc-cyan'}],
+    draw: draw0, readout: ro0 },
+  { num:'02', title:'Unit Rates', accent:'var(--orange)',
+    desc:'Set distance traveled and time taken. The unit rate — cm per second — is distance ÷ time.',
+    controls:[
+      {id:'c1a',label:'Distance (cm)',min:10,max:300,val:120,acc:'acc-orange'},
+      {id:'c1b',label:'Time (seconds)',min:1,max:20,val:8,acc:'acc-orange'}],
+    draw: draw1, readout: ro1 },
+  { num:'03', title:'Ratio', accent:'var(--green)',
+    desc:'Compare Speed and Endurance as a ratio. Watch the bar and pie respond as you shift points between them.',
+    controls:[
+      {id:'c2a',label:'Speed',min:1,max:19,val:10,acc:'acc-green'},
+      {id:'c2b',label:'Endurance',min:1,max:19,val:5,acc:'acc-green'}],
+    draw: draw2, readout: ro2 },
+  { num:'04', title:'Proportional Scaling', accent:'var(--teal)',
+    desc:'Start with a base loadout. Apply a scale factor. All four stats scale together — the ratios never change.',
+    controls:[
+      {id:'c3a',label:'Base Speed',min:2,max:14,val:8,acc:'acc-teal'},
+      {id:'c3b',label:'Scale Factor ×',min:5,max:25,val:10,acc:'acc-teal'}],
+    draw: draw3, readout: ro3 },
+  { num:'05', title:'Coordinate Geometry', accent:'var(--cyan)',
+    desc:'Drag your bot and the goal to any grid point. The distance formula calculates the straight-line path.',
+    controls:[
+      {id:'c4a',label:'Bot X',min:0,max:8,val:2,acc:'acc-cyan'},
+      {id:'c4b',label:'Bot Y',min:0,max:8,val:2,acc:'acc-cyan'},
+      {id:'c4c',label:'Goal X',min:0,max:8,val:6,acc:'acc-red'},
+      {id:'c4d',label:'Goal Y',min:0,max:8,val:6,acc:'acc-red'}],
+    draw: draw4, readout: ro4 },
+  { num:'06', title:'Arc Approximation', accent:'var(--red)',
+    desc:'A curved bot path is built from straight line segments. More segments = smoother arc. Fewer = jagged.',
+    controls:[
+      {id:'c5a',label:'Segments',min:2,max:32,val:4,acc:'acc-red'},
+      {id:'c5b',label:'Arc Angle (°)',min:60,max:270,val:180,acc:'acc-red'}],
+    draw: draw5, readout: ro5 },
+  { num:'07', title:'Linear Decay', accent:'var(--orange)',
+    desc:'Power starts at 100% and drops steadily. Endurance controls the rate of decay. Drag time to watch the bot fade.',
+    controls:[
+      {id:'c6a',label:'Endurance (E)',min:0,max:20,val:8,acc:'acc-orange'},
+      {id:'c6b',label:'Time (seconds)',min:0,max:30,val:0,acc:'acc-orange'}],
+    draw: draw6, readout: ro6 },
+  { num:'08', title:'Slope as Rate of Change', accent:'var(--green)',
+    desc:'Write your own linear equation. Change slope m and intercept b. Predict goals from any Speed value.',
+    controls:[
+      {id:'c7a',label:'Slope (m)',min:-10,max:10,val:4,acc:'acc-green'},
+      {id:'c7b',label:'Intercept (b)',min:-5,max:5,val:0,acc:'acc-green'},
+      {id:'c7c',label:'Predict Speed',min:0,max:20,val:10,acc:'acc-green'}],
+    draw: draw7, readout: ro7 }
+];
+
+let current = -1;
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function openConcept(idx) {
+  current = idx;
+  const c = CONCEPTS[idx];
+  document.getElementById('hub').style.display = 'none';
+  document.getElementById('module').style.display = 'block';
+  document.getElementById('backBtn').classList.remove('hidden');
+
+  // Build left panel
+  const panel = document.getElementById('ctrlPanel');
+  panel.innerHTML = `
+    <div class="ctrl-concept-title">Concept ${c.num} of 08</div>
+    <div class="ctrl-concept-name" style="color:${c.accent}">${c.title}</div>
+    <div class="ctrl-concept-desc">${c.desc}</div>
+  `;
+
+  c.controls.forEach(ctrl => {
+    const g = document.createElement('div');
+    g.className = 'ctrl-group';
+    g.innerHTML = `
+      <div class="ctrl-head">
+        <span class="ctrl-name">${ctrl.label}</span>
+        <span class="ctrl-value ${ctrl.acc}" id="${ctrl.id}_val">${ctrl.id==='c3b'?'1.0×':ctrl.val}</span>
+      </div>
+      <input type="range" min="${ctrl.min}" max="${ctrl.max}" value="${ctrl.val}"
+        id="${ctrl.id}" class="${ctrl.acc}" style="--thumb:${colorOf(ctrl.acc)}"
+        oninput="refresh()">
+    `;
+    panel.appendChild(g);
+  });
+
+  // Readout
+  const ro = document.createElement('div');
+  ro.className = 'readout-card';
+  ro.innerHTML = `<div class="readout-label">Live Calculation</div><div class="readout-eq" id="readout"></div>`;
+  panel.appendChild(ro);
+
+  refresh();
+}
+
+function showHub() {
+  document.getElementById('hub').style.display = 'block';
+  document.getElementById('module').style.display = 'none';
+  document.getElementById('backBtn').classList.add('hidden');
+  current = -1;
+}
+
+window.addEventListener('resize', () => { if(current >= 0) drawCanvas(); });
+
+function colorOf(acc) {
+  const map = {'acc-cyan':'var(--cyan)','acc-orange':'var(--orange)',
+    'acc-green':'var(--green)','acc-teal':'var(--teal)',
+    'acc-red':'var(--red)','acc-purple':'var(--purple)'};
+  return map[acc] || 'var(--cyan)';
+}
+
+function val(id) { return +document.getElementById(id)?.value ?? 0; }
+
+function refresh() {
+  if(current<0) return;
+  const c = CONCEPTS[current];
+
+  // Update value labels
+  c.controls.forEach(ctrl => {
+    const v = val(ctrl.id);
+    const el = document.getElementById(ctrl.id+'_val');
+    if(el) el.textContent = ctrl.id==='c3b' ? (v/10).toFixed(1)+'×' : v;
+  });
+
+  // Draw + readout
+  const ro = document.getElementById('readout');
+  if(ro) ro.innerHTML = c.readout();
+  drawCanvas();
+}
+
+function drawCanvas() {
+  if(current<0) return;
+  const cv = document.getElementById('cv');
+  const wrap = cv.parentElement;
+  const dpr = window.devicePixelRatio || 1;
+  const w = wrap.clientWidth  - 40;
+  const h = wrap.clientHeight - 40;
+  cv.style.width  = w + 'px';
+  cv.style.height = h + 'px';
+  cv.width  = w * dpr;
+  cv.height = h * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,w,h);
+  CONCEPTS[current].draw(ctx, w, h);
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+const C = { navy:'#0D0D1A', card:'#13132a', border:'#1e1e3a',
+  cyan:'#00E5FF', teal:'#007A99', orange:'#CC7700',
+  green:'#44CC88', red:'#E05555', muted:'#6b6b8a', text:'#E8E8F0' };
+
+function grid(ctx, w, h, pad, cols=8, rows=6) {
+  ctx.strokeStyle = C.border; ctx.lineWidth = 1;
+  for(let i=0;i<=cols;i++) {
+    const x = pad + i*(w-2*pad)/cols;
+    ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,h-pad); ctx.stroke();
+  }
+  for(let j=0;j<=rows;j++) {
+    const y = pad + j*(h-2*pad)/rows;
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad,y); ctx.stroke();
+  }
+}
+
+function axes(ctx, w, h, pad) {
+  ctx.strokeStyle = '#2a2a4a'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(pad,pad); ctx.lineTo(pad,h-pad); ctx.lineTo(w-pad,h-pad); ctx.stroke();
+}
+
+function label(ctx, txt, x, y, color='#6b6b8a', size=10, align='center') {
+  ctx.fillStyle = color; ctx.font = `600 ${size}px DM Sans`;
+  ctx.textAlign = align; ctx.fillText(txt, x, y);
+}
+
+// ══════════════════════════════════════════════════════
+// 0: PROPORTIONAL REASONING
+// ══════════════════════════════════════════════════════
+function draw0(ctx, w, h) {
+  const pad=40, s=val('c0a'), motor=Math.round(s*100/20);
+  grid(ctx,w,h,pad,20,5); axes(ctx,w,h,pad);
+  const bw = (w-2*pad)/20;
+  for(let i=1;i<=20;i++) {
+    const bh=(i/20)*(h-2*pad), x=pad+(i-1)*bw, y=h-pad-bh;
+    ctx.fillStyle = i<=s ? C.cyan+'44' : C.border;
+    ctx.fillRect(x+1,y,bw-2,bh);
+  }
+  // Highlighted bar
+  const bh=(s/20)*(h-2*pad), x=pad+(s-1)*bw;
+  ctx.fillStyle = C.cyan;
+  ctx.fillRect(x+1,h-pad-bh,bw-2,bh);
+
+  // Motor gauge — right side
+  const gx=w-70, gy=h/2, gr=40;
+  ctx.beginPath(); ctx.arc(gx,gy,gr,0,2*Math.PI);
+  ctx.strokeStyle='#1e1e3a'; ctx.lineWidth=8; ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(gx,gy,gr,-Math.PI/2,-Math.PI/2+(motor/100)*2*Math.PI);
+  ctx.strokeStyle=C.cyan; ctx.lineWidth=8; ctx.stroke();
+  label(ctx,motor+'%',gx,gy+5,C.cyan,13);
+  label(ctx,'Motor',gx,gy+20,C.muted,9);
+
+  label(ctx,'Speed (points)',w/2,h-6,C.muted,10);
+  label(ctx,'Speed='+s,pad,pad-8,C.cyan,10,'left');
+}
+function ro0() {
+  const s=val('c0a'), m=Math.round(s*100/20);
+  return `Motor = (${s} × 100) ÷ 20<br>= <span class="hi acc-cyan">${m}%</span>`;
+}
+
+// ══════════════════════════════════════════════════════
+// 1: UNIT RATES
+// ══════════════════════════════════════════════════════
+function draw1(ctx, w, h) {
+  const pad=40, d=val('c1a'), t=val('c1b'), rate=(d/t).toFixed(1);
+  grid(ctx,w,h,pad,10,5); axes(ctx,w,h,pad);
+  const maxD=300, maxT=20;
+  const xS=(w-2*pad)/maxT, yS=(h-2*pad)/maxD;
+
+  // Rate line
+  ctx.beginPath(); ctx.strokeStyle=C.orange; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+  for(let ti=0;ti<=maxT;ti++) {
+    const x=pad+ti*xS, y=h-pad-Math.min(ti*rate,maxD)*yS;
+    ti===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Actual point
+  const px=pad+t*xS, py=h-pad-Math.min(d,maxD)*yS;
+  ctx.beginPath(); ctx.arc(px,py,9,0,2*Math.PI);
+  ctx.fillStyle=C.orange; ctx.fill();
+  ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
+
+  // Triangle
+  const tx=pad+0*xS;
+  ctx.strokeStyle=C.orange+'55'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(tx,h-pad); ctx.lineTo(px,h-pad); ctx.lineTo(px,py); ctx.stroke();
+  label(ctx,d+'cm',px+12,(h-pad+py)/2,C.orange,10,'left');
+  label(ctx,t+'s',(tx+px)/2,h-pad+14,C.orange,10);
+
+  label(ctx,'Time (seconds)',w/2,h-6,C.muted,10);
+  label(ctx,'Distance (cm)',14,h/2,C.muted,10,'center');
+}
+function ro1() {
+  const d=val('c1a'), t=val('c1b'), r=(d/t).toFixed(2);
+  return `${d} cm ÷ ${t} s<br>= <span class="hi acc-orange">${r} cm/s</span>`;
+}
+
+// ══════════════════════════════════════════════════════
+// 2: RATIO
+// ══════════════════════════════════════════════════════
+function draw2(ctx, w, h) {
+  const pad=24, s=val('c2a'), e=val('c2b');
+  const tot=s+e;
+
+  // Stacked bar
+  const bw=w-2*pad, by=28, bh=44;
+  const sw=(s/tot)*bw;
+  ctx.fillStyle=C.cyan;
+  ctx.beginPath(); ctx.roundRect(pad,by,sw,bh,6); ctx.fill();
+  ctx.fillStyle=C.green;
+  ctx.beginPath(); ctx.roundRect(pad+sw,by,bw-sw,bh,[0,6,6,0]); ctx.fill();
+
+  if(sw>40) label(ctx,'Speed '+s,pad+sw/2,by+bh/2+5,'white',12);
+  if(bw-sw>60) label(ctx,'Endurance '+e,pad+sw+(bw-sw)/2,by+bh/2+5,'white',12);
+
+  // Pie
+  const cx=w/2, cy=h/2+30, r=Math.min(w,h)*0.28;
+  ctx.beginPath(); ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+(s/tot)*2*Math.PI);
+  ctx.closePath(); ctx.fillStyle=C.cyan; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,r,-Math.PI/2+(s/tot)*2*Math.PI,-Math.PI/2+2*Math.PI);
+  ctx.closePath(); ctx.fillStyle=C.green; ctx.fill();
+
+  // Legend
+  ctx.fillStyle=C.cyan; ctx.fillRect(cx-80,cy+r+16,12,12);
+  label(ctx,'Speed',cx-62,cy+r+26,C.muted,10,'left');
+  ctx.fillStyle=C.green; ctx.fillRect(cx+30,cy+r+16,12,12);
+  label(ctx,'Endurance',cx+48,cy+r+26,C.muted,10,'left');
+}
+function ro2() {
+  const s=val('c2a'), e=val('c2b'), g=gcd(s,e);
+  return `${s} : ${e}<br>simplified → <span class="hi acc-green">${s/g} : ${e/g}</span><br>Speed is ${(s/e).toFixed(2)}× Endurance`;
+}
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+
+// ══════════════════════════════════════════════════════
+// 3: PROPORTIONAL SCALING
+// ══════════════════════════════════════════════════════
+function draw3(ctx, w, h) {
+  const pad=36, base=val('c3a'), sc=val('c3b')/10;
+  const rem=20-base, e=Math.round(rem/3), t=Math.round(rem/3), p=rem-e-t;
+  const stats=[
+    {l:'Speed',v:base,c:C.cyan},
+    {l:'Endurance',v:e,c:C.green},
+    {l:'Turning',v:t,c:C.orange},
+    {l:'Power',v:p,c:C.teal}
+  ];
+  const gap=10, bw=(w-2*pad-gap*(stats.length-1))/(stats.length*2+1);
+  const maxH=h-2*pad;
+
+  stats.forEach((st,i) => {
+    const x = pad + i*(bw*2+gap);
+    // Original (faded)
+    const oh=(st.v/20)*maxH;
+    ctx.fillStyle=st.c+'33';
+    ctx.beginPath(); ctx.roundRect(x,h-pad-oh,bw,oh,4); ctx.fill();
+    // Scaled
+    const sv=Math.min(st.v*sc,20), sh=(sv/20)*maxH;
+    ctx.fillStyle=st.c;
+    ctx.beginPath(); ctx.roundRect(x+bw+2,h-pad-sh,bw,sh,4); ctx.fill();
+    label(ctx,st.l,x+bw,h-pad+14,C.muted,9);
+  });
+
+  label(ctx,'Faded = original · Solid = scaled',w/2,pad-8,C.muted,9);
+}
+function ro3() {
+  const base=val('c3a'), sc=val('c3b')/10;
+  const rem=20-base, e=Math.round(rem/3), t=Math.round(rem/3), p=rem-e-t;
+  return `Base: S=${base}, E=${e}, T=${t}, P=${p}<br>
+    ×${sc.toFixed(1)}: S=<span class="hi acc-teal">${Math.round(base*sc)}</span>, E=${Math.round(e*sc)}, T=${Math.round(t*sc)}, P=${Math.round(p*sc)}`;
+}
+
+// ══════════════════════════════════════════════════════
+// 4: COORDINATE GEOMETRY
+// ══════════════════════════════════════════════════════
+function draw4(ctx, w, h) {
+  const pad=36, cols=8, rows=8;
+  const bx=val('c4a'), by_=val('c4b'), gx=val('c4c'), gy=val('c4d');
+  const cw=(w-2*pad)/cols, ch=(h-2*pad)/rows;
+
+  // Grid
+  for(let i=0;i<=cols;i++){
+    ctx.strokeStyle='#1e1e3a'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad+i*cw,pad); ctx.lineTo(pad+i*cw,h-pad); ctx.stroke();
+  }
+  for(let j=0;j<=rows;j++){
+    ctx.beginPath(); ctx.moveTo(pad,pad+j*ch); ctx.lineTo(w-pad,pad+j*ch); ctx.stroke();
+  }
+  // Axis labels
+  for(let i=0;i<=cols;i++) label(ctx,i,pad+i*cw,h-pad+14,C.muted,8);
+  for(let j=0;j<=rows;j++) label(ctx,rows-j,pad-12,pad+j*ch+4,C.muted,8,'right');
+
+  const x1=pad+bx*cw, y1=h-pad-by_*ch, x2=pad+gx*cw, y2=h-pad-gy*ch;
+  const dist=Math.sqrt((gx-bx)**2+(gy-by_)**2).toFixed(2);
+
+  // Connection line
+  ctx.beginPath(); ctx.setLineDash([5,4]);
+  ctx.strokeStyle=C.cyan; ctx.lineWidth=2;
+  ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Distance label
+  label(ctx,dist+' units',(x1+x2)/2,(y1+y2)/2-10,C.cyan,11);
+
+  // Bot
+  ctx.beginPath(); ctx.arc(x1,y1,12,0,2*Math.PI);
+  ctx.fillStyle=C.cyan+'22'; ctx.fill();
+  ctx.strokeStyle=C.cyan; ctx.lineWidth=2; ctx.stroke();
+  label(ctx,'🤖',x1,y1+5,'white',14);
+
+  // Goal
+  ctx.beginPath(); ctx.arc(x2,y2,12,0,2*Math.PI);
+  ctx.fillStyle=C.orange+'22'; ctx.fill();
+  ctx.strokeStyle=C.orange; ctx.lineWidth=2; ctx.stroke();
+  label(ctx,'🥅',x2,y2+5,'white',14);
+}
+function ro4() {
+  const bx=val('c4a'),by_=val('c4b'),gx=val('c4c'),gy=val('c4d');
+  const dist=Math.sqrt((gx-bx)**2+(gy-by_)**2).toFixed(2);
+  return `Bot (${bx}, ${by_}) → Goal (${gx}, ${gy})<br>
+    d = √((${gx}−${bx})² + (${gy}−${by_})²)<br>
+    = <span class="hi acc-cyan">${dist} units</span>`;
+}
+
+// ══════════════════════════════════════════════════════
+// 5: ARC APPROXIMATION
+// ══════════════════════════════════════════════════════
+function draw5(ctx, w, h) {
+  const segs=val('c5a'), deg=val('c5b');
+  const rad=(deg*Math.PI)/180;
+  const cx=w/2, cy=h-30, r=Math.min(w*0.42,h*0.72);
+  const startA = Math.PI + (Math.PI-rad)/2;
+
+  // True arc
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,startA,startA+rad);
+  ctx.strokeStyle='#2a2a4a'; ctx.lineWidth=3; ctx.stroke();
+  label(ctx,'True arc',cx,cy-r-10,C.border,10);
+
+  // Approximated segments
+  const segR=rad/segs;
+  ctx.beginPath();
+  for(let i=0;i<=segs;i++){
+    const a=startA+i*segR;
+    const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle=C.red; ctx.lineWidth=2.5; ctx.stroke();
+
+  // Dots at segment joints
+  for(let i=0;i<=segs;i++){
+    const a=startA+i*segR, x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
+    ctx.beginPath(); ctx.arc(x,y,i===0||i===segs?5:3.5,0,2*Math.PI);
+    ctx.fillStyle=i===0||i===segs?'white':C.red; ctx.fill();
+  }
+
+  label(ctx,`${segs} segments (${(deg/segs).toFixed(1)}° each)`,cx,20,C.red,11);
+}
+function ro5() {
+  const s=val('c5a'), d=val('c5b');
+  const q = s<=3?'rough path':s<=8?'decent curve':s<=16?'smooth arc':'near-perfect circle';
+  return `${d}° arc ÷ ${s} segments<br>
+    = <span class="hi acc-red">${(d/s).toFixed(1)}°</span> per segment<br>
+    → ${q}`;
+}
+
+// ══════════════════════════════════════════════════════
+// 6: LINEAR DECAY
+// ══════════════════════════════════════════════════════
+function draw6(ctx, w, h) {
+  const pad=40, E=val('c6a'), t=val('c6b');
+  const maxT=30; grid(ctx,w,h,pad,6,5); axes(ctx,w,h,pad);
+  const xS=(w-2*pad)/maxT, yS=(h-2*pad)/100;
+
+  // Compare lines (faint)
+  [[2,'#334'],[20,'#224']].forEach(([e,col])=>{
+    ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.setLineDash([3,4]);
+    for(let ti=0;ti<=maxT;ti++){
+      const p=Math.max(0,100-(20-e)*1.5*ti);
+      ti===0?ctx.moveTo(pad+ti*xS,h-pad-p*yS):ctx.lineTo(pad+ti*xS,h-pad-p*yS);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  // Main line
+  ctx.beginPath(); ctx.strokeStyle=C.orange; ctx.lineWidth=3;
+  for(let ti=0;ti<=maxT;ti++){
+    const p=Math.max(0,100-(20-E)*1.5*ti);
+    ti===0?ctx.moveTo(pad+ti*xS,h-pad-p*yS):ctx.lineTo(pad+ti*xS,h-pad-p*yS);
+  }
+  ctx.stroke();
+
+  // Current point
+  const curP=Math.max(0,100-(20-E)*1.5*t);
+  const cx=pad+t*xS, cy=h-pad-curP*yS;
+  ctx.beginPath(); ctx.arc(cx,cy,9,0,2*Math.PI);
+  ctx.fillStyle=C.orange; ctx.fill();
+  ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
+
+  // Drop line
+  ctx.strokeStyle=C.orange+'44'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(cx,h-pad); ctx.lineTo(cx,cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Power readout on canvas
+  const pw=80, ph=32, px=cx+14, py=cy-16;
+  if(px+pw<w-pad){
+    ctx.fillStyle='#1a1a3a'; ctx.beginPath(); ctx.roundRect(px,py,pw,ph,6); ctx.fill();
+    label(ctx,Math.round(curP)+'%',px+pw/2,py+ph/2+5,C.orange,14);
+  }
+
+  label(ctx,'Time (seconds)',w/2,h-6,C.muted,10);
+  ctx.save(); ctx.translate(12,h/2); ctx.rotate(-Math.PI/2);
+  label(ctx,'Power %',0,0,C.muted,10); ctx.restore();
+}
+function ro6() {
+  const E=val('c6a'), t=val('c6b');
+  const p=Math.max(0,100-(20-E)*1.5*t);
+  return `P = 100 − (20−${E}) × 1.5 × ${t}<br>
+    = 100 − ${((20-E)*1.5*t).toFixed(0)}<br>
+    = <span class="hi acc-orange">${p.toFixed(0)}%</span>`;
+}
+
+// ══════════════════════════════════════════════════════
+// 7: SLOPE AS RATE OF CHANGE
+// ══════════════════════════════════════════════════════
+function draw7(ctx, w, h) {
+  const pad=40, mRaw=val('c7a'), b=val('c7b'), sp=val('c7c');
+  const m=mRaw/10, maxX=20, minY=-5, maxY=12;
+  const xS=(w-2*pad)/maxX, yS=(h-2*pad)/(maxY-minY);
+  grid(ctx,w,h,pad,10,8); axes(ctx,w,h,pad);
+
+  // Zero line
+  const y0=h-pad-(-minY)*yS;
+  ctx.strokeStyle='#2a2a4a'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad,y0); ctx.lineTo(w-pad,y0); ctx.stroke();
+
+  // Line
+  ctx.beginPath(); ctx.strokeStyle=C.green; ctx.lineWidth=3;
+  for(let x=0;x<=maxX;x++){
+    const y=m*x+b, py=h-pad-(y-minY)*yS;
+    x===0?ctx.moveTo(pad+x*xS,py):ctx.lineTo(pad+x*xS,py);
+  }
+  ctx.stroke();
+
+  // Prediction point
+  const px=pad+sp*xS, py=h-pad-((m*sp+b)-minY)*yS;
+  ctx.beginPath(); ctx.arc(px,py,9,0,2*Math.PI);
+  ctx.fillStyle=C.green; ctx.fill();
+  ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
+
+  // Crosshairs
+  ctx.strokeStyle=C.green+'44'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(px,h-pad); ctx.lineTo(px,py); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad,py); ctx.lineTo(px,py); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Slope triangle
+  if(Math.abs(m)>0.05 && sp>3){
+    const dx=3, x2=pad+(sp-dx)*xS, y2=h-pad-((m*(sp-dx)+b)-minY)*yS;
+    ctx.strokeStyle=C.green+'66'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(px,y2); ctx.lineTo(px,py); ctx.stroke();
+    label(ctx,'rise',px+18,(y2+py)/2+4,C.green,9,'left');
+    label(ctx,'run',(x2+px)/2,y2+13,C.green,9);
+  }
+
+  label(ctx,'Speed',w/2,h-6,C.muted,10);
+  ctx.save(); ctx.translate(12,h/2); ctx.rotate(-Math.PI/2);
+  label(ctx,'Goals',0,0,C.muted,10); ctx.restore();
+
+  // Axis tick numbers
+  for(let i=0;i<=maxX;i+=5) label(ctx,i,pad+i*xS,h-pad+14,C.muted,8);
+}
+function ro7() {
+  const m=val('c7a')/10, b=val('c7b'), sp=val('c7c');
+  const g=(m*sp+b).toFixed(1);
+  return `y = ${m.toFixed(1)}x + ${b}<br>
+    Speed ${sp} → Goals = <span class="hi acc-green">${g}</span><br>
+    Each +1 Speed = ${m>0?'+':''}${m.toFixed(1)} goals`;
+}
+
+// ══════════════════════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════════════════════
+window.addEventListener('resize', () => { if(current>=0) drawCanvas(); });
+</script>
+</body>
+</html>

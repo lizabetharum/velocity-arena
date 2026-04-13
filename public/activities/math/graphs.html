@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graphs — Velocity Arena</title>
+  <link rel="stylesheet" href="./shared.css">
+  <style>
+    /* Graph */
+    .graph-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 340px;
+      background: var(--active);
+      border-radius: var(--r-md);
+      margin-top: var(--sp-4);
+      overflow: hidden;
+    }
+    .graph-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Readout */
+    .readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-4);
+      padding: var(--sp-3) var(--sp-5);
+      background: var(--active);
+      border-radius: var(--r-md);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Time slider */
+    .time-slider-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-5);
+      padding: var(--sp-3) var(--sp-5);
+      background: var(--active);
+      border-radius: var(--r-md);
+    }
+    .time-slider-row label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+      white-space: nowrap;
+    }
+    .time-slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg);
+    }
+    .time-slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(204, 119, 0, 0.4);
+    }
+    .time-slider-row input[type="range"]::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 12px rgba(204, 119, 0, 0.4);
+    }
+
+    /* Step visuals */
+    .step-box {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      background: var(--active);
+      padding: var(--sp-3) var(--sp-5);
+      border-radius: var(--r-md);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+    .step-box .coord-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+
+    .step-axes-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      background: var(--active);
+      padding: var(--sp-4);
+      border-radius: var(--r-md);
+      min-width: 200px;
+    }
+    .step-axes-visual .axis-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .step-axes-visual .axis-desc {
+      font-size: 12px;
+      color: var(--slate);
+    }
+
+    .confetti-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1000; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; top: -20px;
+      width: 8px; height: 8px; border-radius: 2px;
+      animation: confettiFall 1.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="site-banner">
+  <a href="/index.html">
+    <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:28px;width:auto;">
+    <div><div class="logo-text">Velocity Arena</div><div class="logo-sub">Graphs</div></div>
+  </a>
+  <a class="back-btn" href="/index.html">&larr; Back to Velocity Arena</a>
+</div>
+
+<nav class="nav-bar">
+  <a href="./index.html" class="nav-brand">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="6" width="28" height="20" rx="4" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="11" cy="16" r="3" fill="#00E5FF"/>
+      <circle cx="21" cy="16" r="3" fill="#00E5FF"/>
+      <rect x="13" y="3" width="6" height="5" rx="2" fill="#007A99"/>
+      <path d="M8 26v3M24 26v3" stroke="#00E5FF" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>VELOCITY ARENA</span>
+  </a>
+  <div class="nav-links">
+    <a href="./unit-rate.html">Unit Rate</a>
+    <a href="./ratio.html">Ratio</a>
+    <a href="./proportional-scaling.html">Scaling</a>
+    <a href="./linear-decay.html">Decay</a>
+    <a href="./percent.html">Percent</a>
+    <a href="./graphs.html" class="active">Graphs</a>
+    <a href="./equations.html">Equations</a>
+    <a href="./data.html">Data</a>
+    <a href="./playground.html">Playground</a>
+  </div>
+</nav>
+
+<main class="page-container">
+
+  <!-- TITLE -->
+  <div class="title-bar">
+    <span class="concept-label">Concept 6 of 8</span>
+    <h1>Graphs: Plot Your Bot's Performance</h1>
+    <p class="subtitle">Points on a grid. Lines tell a story.</p>
+  </div>
+
+  <!-- INTERACTIVE -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">📈</span>
+      INTERACTIVE — ADJUST STATS
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <label>Speed Stat</label>
+        <input type="range" id="speedSlider" min="1" max="10" value="5" step="1">
+        <span class="slider-value"><span id="speedVal">5</span></span>
+      </div>
+      <div class="slider-row">
+        <label>Endurance Stat</label>
+        <input type="range" id="enduranceSlider" min="1" max="10" value="5" step="1">
+        <span class="slider-value"><span id="enduranceVal">5</span></span>
+      </div>
+    </div>
+
+    <!-- Graph -->
+    <div class="graph-container">
+      <canvas class="graph-canvas" id="perfGraph"></canvas>
+    </div>
+
+    <!-- Time control -->
+    <div class="time-slider-row">
+      <label>⏱ Read at time</label>
+      <input type="range" id="timeSlider" min="0" max="10" value="0" step="1">
+      <span class="slider-value" style="color: var(--orange);"><span id="timeVal">0</span> min</span>
+    </div>
+
+    <!-- Readout -->
+    <div class="readout" id="readout">
+      At t = 0, distance = 0 cm
+    </div>
+
+    <div style="text-align: center; margin-top: var(--sp-5);">
+      <span class="keyword-badge">GRAPH</span>
+    </div>
+  </div>
+
+  <!-- STEP BY STEP -->
+  <div class="section-card">
+    <div class="section-label">
+      <span class="icon">📖</span>
+      LEARN — CLICK THROUGH THE STEPS
+    </div>
+
+    <div class="steps-container" id="stepsContainer">
+      <!-- Step 1 -->
+      <div class="step active" data-step="1">
+        <div class="step-visual">
+          <div class="step-axes-visual">
+            <div class="axis-label">Y-axis ↑</div>
+            <div class="axis-desc">Distance (cm)</div>
+            <div style="width: 120px; height: 2px; background: var(--slate); margin: var(--sp-2) 0;"></div>
+            <div class="axis-label">X-axis →</div>
+            <div class="axis-desc">Time (min)</div>
+          </div>
+        </div>
+        <p class="step-text"><strong>A graph is a picture of data.</strong> The x-axis shows time, and the y-axis shows distance.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2">
+        <div class="step-visual">
+          <div class="step-box">
+            <span class="coord-label">x</span>2<span style="color: var(--slate);">,</span>
+            <span class="coord-label">y</span><span style="color: var(--green);">30</span>
+          </div>
+        </div>
+        <p class="step-text"><strong>Each point is a measurement.</strong> The point <strong>(2, 30)</strong> means at minute 2, the bot traveled 30 cm.</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3">
+        <div class="step-visual">
+          <div style="display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center;">
+            <div class="step-box" style="font-size: 16px;">(0, 0)</div>
+            <div class="step-box" style="font-size: 16px;">(1, 8)</div>
+            <div class="step-box" style="font-size: 16px;">(2, 15)</div>
+            <div class="step-box" style="font-size: 16px;">(3, 21)</div>
+          </div>
+        </div>
+        <p class="step-text"><strong>More points tell the full story.</strong> Plot one point per minute to see the bot's journey.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step" data-step="4">
+        <div class="step-visual">
+          <div style="display: flex; align-items: center; gap: var(--sp-3);">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--cyan);"></div>
+            <div style="width: 60px; height: 3px; background: var(--cyan);"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--cyan);"></div>
+            <div style="width: 60px; height: 3px; background: var(--cyan);"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--cyan);"></div>
+          </div>
+        </div>
+        <p class="step-text"><strong>Connect the dots — you get a line.</strong> The line shows how the bot performs over time.</p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5">
+        <div class="step-visual">
+          <div style="display: flex; gap: var(--sp-6); align-items: flex-end;">
+            <div style="text-align: center;">
+              <div style="width: 4px; height: 80px; background: linear-gradient(to top, var(--cyan), var(--green)); border-radius: 2px; margin: 0 auto;"></div>
+              <div style="font-size: 12px; color: var(--green); font-weight: 700; margin-top: var(--sp-2);">STEEP</div>
+              <div style="font-size: 11px; color: var(--slate);">Fast bot</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="width: 4px; height: 40px; background: linear-gradient(to top, var(--orange), var(--slate)); border-radius: 2px; margin: 0 auto;"></div>
+              <div style="font-size: 12px; color: var(--orange); font-weight: 700; margin-top: var(--sp-2);">GENTLE</div>
+              <div style="font-size: 11px; color: var(--slate);">Slow bot</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text"><strong>The shape tells you what happened.</strong> A steep line = fast bot. A gentle line = slow bot.</p>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step" data-step="6">
+        <div class="step-visual">
+          <div style="display: flex; align-items: center; gap: var(--sp-3);">
+            <div style="text-align: center;">
+              <div style="font-size: 14px; color: var(--orange); font-weight: 700;">Find x</div>
+              <div style="font-size: 24px;">👇</div>
+            </div>
+            <div style="font-size: 20px; color: var(--slate);">→</div>
+            <div style="text-align: center;">
+              <div style="font-size: 14px; color: var(--cyan); font-weight: 700;">Go up</div>
+              <div style="font-size: 24px;">👆</div>
+            </div>
+            <div style="font-size: 20px; color: var(--slate);">→</div>
+            <div style="text-align: center;">
+              <div style="font-size: 14px; color: var(--green); font-weight: 700;">Go across to y</div>
+              <div style="font-size: 24px;">👈</div>
+            </div>
+          </div>
+        </div>
+        <p class="step-text"><strong>Read the graph:</strong> find x, go up to the line, then go across to read y.</p>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-secondary" id="prevBtn" disabled>&larr; Back</button>
+      <div class="step-dots" id="stepDots"></div>
+      <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- TRY IT -->
+  <div class="try-it-card">
+    <div class="section-label">
+      <span class="icon" style="background: rgba(204,119,0,0.15);">🎯</span>
+      <span style="color: var(--orange);">TRY IT — YOUR TURN</span>
+    </div>
+
+    <div style="display: flex; gap: var(--sp-4); margin-bottom: var(--sp-4); flex-wrap: wrap; align-items: center;">
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Speed</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--cyan);">5</div>
+      </div>
+      <div style="font-size: 14px; color: var(--slate);">x</div>
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Time</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--orange);">4 min</div>
+      </div>
+      <div style="font-size: 14px; color: var(--slate);">x</div>
+      <div style="background: var(--active); padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md); text-align: center;">
+        <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em;">Endurance / 10</div>
+        <div style="font-size: 24px; font-weight: 800; color: var(--green);">1.0</div>
+      </div>
+    </div>
+
+    <div style="background: var(--active); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); margin-bottom: var(--sp-4);">
+      <div style="font-size: 13px; color: var(--slate); margin-bottom: var(--sp-2);">Formula:</div>
+      <div style="font-size: 16px; font-weight: 600; color: var(--white);">
+        Distance = Speed x Time x (Endurance / 10) = <span style="color: var(--cyan);">5</span> x <span style="color: var(--orange);">4</span> x <span style="color: var(--green);">1.0</span>
+      </div>
+    </div>
+
+    <p class="try-it-prompt">A bot has <strong style="color: var(--cyan);">Speed = 5</strong> and <strong style="color: var(--green);">Endurance = 10</strong>. At <strong style="color: var(--orange);">t = 4 minutes</strong>, what is the distance?</p>
+
+    <div class="try-it-input-row">
+      <input type="number" id="tryAnswer" placeholder="?" min="0" max="100" aria-label="Your answer">
+      <span style="font-size: 14px; color: var(--slate);">cm</span>
+      <button class="btn-check" onclick="checkAnswer()">Check ✓</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+</main>
+
+<script>
+  // === PERFORMANCE MODEL ===
+  function getDistance(speed, endurance, t) {
+    // endurance_factor decays over time; high endurance keeps it near 1
+    const endFactor = Math.max(0, 1 - (1 - endurance / 12) * t / 10);
+    return speed * t * endFactor;
+  }
+
+  // === GRAPH DRAWING ===
+  const canvas = document.getElementById('perfGraph');
+  const ctx = canvas.getContext('2d');
+
+  const speedSlider = document.getElementById('speedSlider');
+  const enduranceSlider = document.getElementById('enduranceSlider');
+  const timeSlider = document.getElementById('timeSlider');
+
+  function drawGraph() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(dpr, dpr);
+
+    const w = rect.width;
+    const h = rect.height;
+    const pad = { top: 30, right: 20, bottom: 40, left: 55 };
+    const gw = w - pad.left - pad.right;
+    const gh = h - pad.top - pad.bottom;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const speed = parseInt(speedSlider.value);
+    const endurance = parseInt(enduranceSlider.value);
+    const currentTime = parseInt(timeSlider.value);
+
+    // Compute max distance for y-axis (max possible: speed=10, endurance=12 factor~1, t=10 → 100)
+    const yMax = 100;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(136, 153, 170, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+      const x = pad.left + (i / 10) * gw;
+      ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + gh); ctx.stroke();
+    }
+    for (let i = 0; i <= 5; i++) {
+      const y = pad.top + (i / 5) * gh;
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#8899AA';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, pad.top + gh);
+    ctx.lineTo(pad.left + gw, pad.top + gh);
+    ctx.stroke();
+
+    // X-axis labels
+    ctx.fillStyle = '#8899AA';
+    ctx.font = '11px DM Sans';
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 10; i += 2) {
+      ctx.fillText(i, pad.left + (i / 10) * gw, pad.top + gh + 18);
+    }
+    ctx.fillText('Time (min)', pad.left + gw / 2, h - 4);
+
+    // Y-axis labels
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= yMax; i += 20) {
+      const y = pad.top + gh - (i / yMax) * gh;
+      ctx.fillText(i, pad.left - 6, y + 4);
+    }
+
+    // Y-axis title
+    ctx.save();
+    ctx.translate(12, pad.top + gh / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8899AA';
+    ctx.font = '11px DM Sans';
+    ctx.fillText('Distance (cm)', 0, 0);
+    ctx.restore();
+
+    // Compute data points at each integer minute
+    const points = [];
+    for (let t = 0; t <= 10; t++) {
+      points.push({ t: t, d: getDistance(speed, endurance, t) });
+    }
+
+    // Draw line segments
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i < points.length; i++) {
+      const px = pad.left + (points[i].t / 10) * gw;
+      const py = pad.top + gh - (Math.min(points[i].d, yMax) / yMax) * gh;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // Draw data points as cyan dots
+    for (let i = 0; i < points.length; i++) {
+      const px = pad.left + (points[i].t / 10) * gw;
+      const py = pad.top + gh - (Math.min(points[i].d, yMax) / yMax) * gh;
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#00E5FF';
+      ctx.fill();
+      ctx.strokeStyle = '#0D0D1A';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Crosshair at selected time
+    if (currentTime >= 0 && currentTime <= 10) {
+      const dist = getDistance(speed, endurance, currentTime);
+      const cx = pad.left + (currentTime / 10) * gw;
+      const cy = pad.top + gh - (Math.min(dist, yMax) / yMax) * gh;
+
+      // Vertical crosshair line
+      ctx.strokeStyle = 'rgba(204, 119, 0, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(cx, pad.top);
+      ctx.lineTo(cx, pad.top + gh);
+      ctx.stroke();
+
+      // Horizontal crosshair line
+      ctx.beginPath();
+      ctx.moveTo(pad.left, cy);
+      ctx.lineTo(pad.left + gw, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Highlight point
+      ctx.beginPath();
+      ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(204, 119, 0, 0.3)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#CC7700';
+      ctx.fill();
+      ctx.strokeStyle = '#0D0D1A';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Update readout
+      document.getElementById('readout').textContent =
+        'At t = ' + currentTime + ', distance = ' + dist.toFixed(1) + ' cm';
+    }
+
+    // Update slider value displays
+    document.getElementById('speedVal').textContent = speed;
+    document.getElementById('enduranceVal').textContent = endurance;
+    document.getElementById('timeVal').textContent = currentTime;
+  }
+
+  speedSlider.addEventListener('input', drawGraph);
+  enduranceSlider.addEventListener('input', drawGraph);
+  timeSlider.addEventListener('input', drawGraph);
+  window.addEventListener('resize', drawGraph);
+  drawGraph();
+
+  // === STEPS ===
+  const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  let currentStep = 0;
+
+  const dotsContainer = document.getElementById('stepDots');
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  function showStep(idx) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const dots = dotsContainer.querySelectorAll('.step-dot');
+    dots.forEach((d, i) => {
+      d.className = 'step-dot';
+      if (i === idx) d.classList.add('active');
+      else if (i < idx) d.classList.add('done');
+    });
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').textContent = idx === totalSteps - 1 ? 'Done \u2713' : 'Next \u2192';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentStep < totalSteps - 1) { currentStep++; showStep(currentStep); }
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if (currentStep > 0) { currentStep--; showStep(currentStep); }
+  });
+
+  // === TRY IT ===
+  function checkAnswer() {
+    const ans = parseInt(document.getElementById('tryAnswer').value);
+    const fb = document.getElementById('feedback');
+    // Speed=5, Endurance=10, Time=4: distance = 5 * 4 * (10/10) = 20
+    if (ans === 20) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '\uD83C\uDF89 <strong>Correct!</strong> 5 \u00d7 4 \u00d7 1.0 = 20 cm';
+      fb.style.display = 'block';
+      launchConfetti();
+    } else {
+      fb.className = 'feedback incorrect';
+      fb.innerHTML = 'Try again! Distance = Speed \u00d7 Time \u00d7 (Endurance / 10)';
+      fb.style.display = 'block';
+    }
+  }
+
+  document.getElementById('tryAnswer').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#00E5FF', '#44CC88', '#CC7700', '#FF4466', '#FFFFFF'];
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.animationDuration = (1 + Math.random()) + 's';
+      container.appendChild(piece);
+    }
+    setTimeout(() => container.remove(), 2500);
+  }
+</script>
+</body>
+</html>
