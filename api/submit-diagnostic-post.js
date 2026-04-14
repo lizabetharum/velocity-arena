@@ -28,9 +28,9 @@ export default async function handler(req) {
   }
 
   const sheetIds = {
-    NY: process.env.GOOGLE_SHEET_ID_NEW_YORK_1_POST,
-    RI: process.env.GOOGLE_SHEET_ID_NEW_YORK_2_POST,
-    TN: process.env.GOOGLE_SHEET_ID_TN_POST,
+    NY1: process.env.GOOGLE_SHEET_ID_NEW_YORK_1_POST,
+    NY2: process.env.GOOGLE_SHEET_ID_NEW_YORK_2_POST,
+    TN:  process.env.GOOGLE_SHEET_ID_TN_POST,
   };
 
   const sheetId = sheetIds[state];

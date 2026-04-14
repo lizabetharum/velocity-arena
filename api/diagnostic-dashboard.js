@@ -17,15 +17,15 @@
 export const config = { runtime: 'edge' };
 
 const PRE_SHEET_IDS = {
-  NY: 'GOOGLE_SHEET_ID_NEW_YORK_1',
-  RI: 'GOOGLE_SHEET_ID_NEW_YORK_2',
-  TN: 'GOOGLE_SHEET_ID_TN',
+  NY1: 'GOOGLE_SHEET_ID_NEW_YORK_1',
+  NY2: 'GOOGLE_SHEET_ID_NEW_YORK_2',
+  TN:  'GOOGLE_SHEET_ID_TN',
 };
 
 const POST_SHEET_IDS = {
-  NY: 'GOOGLE_SHEET_ID_NEW_YORK_1_POST',
-  RI: 'GOOGLE_SHEET_ID_NEW_YORK_2_POST',
-  TN: 'GOOGLE_SHEET_ID_TN_POST',
+  NY1: 'GOOGLE_SHEET_ID_NEW_YORK_1_POST',
+  NY2: 'GOOGLE_SHEET_ID_NEW_YORK_2_POST',
+  TN:  'GOOGLE_SHEET_ID_TN_POST',
 };
 
 export default async function handler(req) {

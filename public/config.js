@@ -15,18 +15,17 @@ const CONFIG = {
   startDate: "2026-03-31",
 
   // Per-site start dates. Each pilot site may begin camp on a different
-  // day of the week. Keys are the internal site codes used in the
-  // diagnostic:
-  //   NY = New York 1
-  //   RI = New York 2  (internal code kept for backend compatibility)
-  //   TN = Tennessee
+  // day of the week. Keys are the internal site codes:
+  //   NY1 = New York 1
+  //   NY2 = New York 2
+  //   TN  = Tennessee
   // Format: "YYYY-MM-DD". The site computes each site's Day 20
   // (last day of camp) by counting 20 weekdays forward from the start,
   // skipping weekends and any holidays listed below.
   siteStartDates: {
-    NY: "2026-03-31",   // New York 1
-    RI: "2026-03-31",   // New York 2
-    TN: "2026-03-31",   // Tennessee
+    NY1: "2026-03-31",   // New York 1
+    NY2: "2026-03-31",   // New York 2
+    TN:  "2026-03-31",   // Tennessee
   },
 
   // Your timezone — affects what "today" means.

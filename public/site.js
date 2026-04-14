@@ -5,9 +5,9 @@
 const SITE_KEY = 'va_selected_site';
 
 const SITE_OPTIONS = [
-  { code: 'NY', label: 'New York 1' },
-  { code: 'RI', label: 'New York 2' },
-  { code: 'TN', label: 'Tennessee'  },
+  { code: 'NY1', label: 'New York 1' },
+  { code: 'NY2', label: 'New York 2' },
+  { code: 'TN',  label: 'Tennessee'  },
 ];
 
 function getSelectedSite() {
@@ -26,7 +26,7 @@ function setSelectedSite(code) {
 // Builds an array of 20 Date objects for camp days, skipping weekends and
 // any dates listed in CONFIG.holidays.  Requires config.js to be loaded first.
 //
-// siteCode ("NY" | "RI" | "TN") picks that site's start date from
+// siteCode ("NY1" | "NY2" | "TN") picks that site's start date from
 // CONFIG.siteStartDates. If omitted, falls back to the site saved in
 // localStorage via the header picker, then to CONFIG.startDate.
 function buildCampDates(siteCode) {
