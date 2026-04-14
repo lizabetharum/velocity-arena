@@ -427,6 +427,11 @@ body{font-family:'Work Sans',Arial,sans-serif;background:var(--off-white);color:
   const siteButtons = document.querySelectorAll('.lock-site-btn');
 
   let selectedSite = null;
+  // Shadow copy of the password field value. Some password manager
+  // extensions clear the actual input at click-time; this shadow is
+  // updated on every keystroke so we always have what was typed.
+  let shadowEntered = '';
+  input.addEventListener('input', () => { shadowEntered = input.value; });
 
   // If a site was already unlocked earlier this session, skip the gate
   if (sessionStorage.getItem(SESSION_KEY) === '1') {
@@ -476,23 +481,34 @@ body{font-family:'Work Sans',Arial,sans-serif;background:var(--off-white);color:
   });
 
   function tryPreview() {
+    // Re-query the DOM each time so we never close over a stale reference.
+    const liveInput = document.getElementById('lock-input');
+    const liveErr = document.getElementById('lock-err');
+    const liveOverlay = document.getElementById('lock-overlay');
     const pwd = ((window.CONFIG && CONFIG.teacherPassword) || '').trim();
-    const entered = (input.value || '').trim();
+    // Prefer the live value, but fall back to the shadow copy if the
+    // field was cleared by an extension between keystroke and click.
+    const liveValue = liveInput ? (liveInput.value || '') : '';
+    const entered = (liveValue || shadowEntered || '').trim();
+    console.log('[lock] tryPreview liveValue=', JSON.stringify(liveValue), 'shadow=', JSON.stringify(shadowEntered), 'pwd=', JSON.stringify(pwd), 'match=', entered === pwd);
     if (entered === pwd && pwd.length > 0) {
       sessionStorage.setItem(SESSION_KEY, '1');
-      overlay.style.display = 'none';
-      err.textContent = '';
+      if (liveOverlay) liveOverlay.style.display = 'none';
+      if (liveErr) liveErr.textContent = '';
       if (selectedSite && typeof selectState === 'function') {
         sessionStorage.setItem(SESSION_SITE_KEY, selectedSite);
         selectState(selectedSite);
       }
     } else {
-      err.textContent = 'Incorrect password';
-      input.select();
+      if (liveErr) liveErr.textContent = 'Incorrect password';
+      if (liveInput) liveInput.select();
     }
   }
+  // Use mousedown (fires before click) so browser extensions / password
+  // managers don't get a chance to clear the input before we read it.
+  previewBtn.addEventListener('mousedown', (e) => { e.preventDefault(); tryPreview(); });
   previewBtn.addEventListener('click', tryPreview);
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryPreview(); });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); tryPreview(); } });
 })();
 
 const TOTAL_QUESTIONS = 8;
