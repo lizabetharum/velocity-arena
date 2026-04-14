@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic Growth Dashboard — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--blue-dark:#154593;--blue-mid:#0065B3;--blue-light:#009CD6;--red:#ED1C24;--green:#2BB673;--amber:#E8961A;--white:#FFFFFF;--off-white:#F4F7FB;--gray:#626262;--light-gray:#A5A5A5;--border:#D0DCF0;}
+body{font-family:'Work Sans',Arial,sans-serif;background:var(--off-white);color:#1A1A2E;min-height:100vh;}
+
+/* Back banner */
+.topbar{background:#2B2D42;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50;}
+.topbar a{text-decoration:none;display:flex;align-items:center;gap:10px;color:#fff;}
+.topbar .logo-text{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.topbar .logo-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.7);}
+.topbar .back-btn{font-size:12px;font-weight:600;color:#fff;text-decoration:none;border:1.5px solid rgba(255,255,255,.3);padding:7px 12px;border-radius:4px;transition:border-color .15s;}
+.topbar .back-btn:hover{border-color:#fff;}
+
+.header{background:var(--blue-dark);padding:1.5rem 2rem;}
+.header-inner{max-width:62rem;margin:0 auto;}
+.header-org{font-size:0.75rem;font-weight:600;color:var(--blue-light);text-transform:uppercase;letter-spacing:.12em;margin-bottom:0.25rem;}
+.header-title{font-size:1.5rem;font-weight:800;color:var(--white);margin-bottom:0.25rem;}
+.header-sub{font-size:0.9375rem;color:rgba(255,255,255,.7);}
+.accent-bar{height:0.25rem;background:linear-gradient(90deg,var(--blue-light) 0%,var(--blue-mid) 60%,var(--blue-dark) 100%);}
+
+.main{max-width:62rem;margin:0 auto;padding:2rem 2rem 4rem;}
+
+.notice{background:#FFF7E8;border:0.0625rem solid #F5D799;border-radius:0.5rem;padding:0.875rem 1.125rem;margin-bottom:1.5rem;font-size:0.8125rem;color:#8A5A00;line-height:1.6;}
+.notice strong{color:#5A3A00;}
+
+.toolbar{background:var(--white);border:0.0625rem solid var(--border);border-radius:0.625rem;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.toolbar label{font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;}
+.toolbar select,.toolbar input{background:var(--off-white);border:0.09375rem solid var(--border);border-radius:0.375rem;padding:0.5rem 0.75rem;font-family:'Work Sans',Arial,sans-serif;font-size:0.9375rem;color:#1A1A2E;outline:none;}
+.toolbar button{background:var(--blue-dark);color:var(--white);font-family:'Work Sans',Arial,sans-serif;font-size:0.8125rem;font-weight:700;padding:0.5rem 1rem;border-radius:0.375rem;border:none;cursor:pointer;}
+.toolbar button:hover{background:var(--blue-mid);}
+.toolbar .status{font-size:0.8125rem;color:var(--gray);margin-left:auto;}
+
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--white);border:0.0625rem solid var(--border);border-radius:0.625rem;padding:1.125rem 1.25rem;}
+.stat-label{font-size:0.6875rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.375rem;}
+.stat-value{font-size:1.75rem;font-weight:800;color:var(--blue-dark);line-height:1;font-variant-numeric:tabular-nums;}
+.stat-sub{font-size:0.75rem;color:var(--gray);margin-top:0.25rem;}
+
+.section-label{font-size:0.75rem;font-weight:700;color:var(--blue-mid);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.75rem;margin-top:1.75rem;}
+
+.topic-grid{display:grid;grid-template-columns:1fr;gap:0.75rem;}
+.topic-row{background:var(--white);border:0.0625rem solid var(--border);border-radius:0.625rem;padding:1rem 1.25rem;}
+.topic-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:0.625rem;flex-wrap:wrap;}
+.topic-name{font-size:1rem;font-weight:700;color:#1A1A2E;}
+.topic-counts{font-size:0.75rem;color:var(--gray);}
+.growth-bars{display:grid;grid-template-columns:3.25rem 1fr 3rem;gap:0.625rem;align-items:center;margin-top:0.375rem;}
+.gb-label{font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;}
+.gb-track{height:1.125rem;background:var(--off-white);border-radius:0.25rem;overflow:hidden;position:relative;}
+.gb-fill{height:100%;border-radius:0.25rem;transition:width .5s ease;}
+.gb-fill.pre{background:var(--light-gray);}
+.gb-fill.post{background:var(--green);}
+.gb-val{font-size:0.8125rem;font-weight:700;color:var(--blue-dark);text-align:right;font-variant-numeric:tabular-nums;}
+.delta{font-size:0.75rem;font-weight:700;padding:0.125rem 0.5rem;border-radius:0.25rem;display:inline-block;}
+.delta.pos{background:#E3F7ED;color:#1B7A44;}
+.delta.neg{background:#FDE5E5;color:#9C1A20;}
+.delta.zero{background:var(--off-white);color:var(--gray);}
+
+.table-wrap{background:var(--white);border:0.0625rem solid var(--border);border-radius:0.625rem;overflow:hidden;margin-top:0.75rem;}
+table.roster{width:100%;border-collapse:collapse;font-size:0.8125rem;}
+table.roster th{background:var(--off-white);font-weight:700;color:var(--blue-dark);padding:0.625rem 0.75rem;text-align:left;border-bottom:0.0625rem solid var(--border);white-space:nowrap;}
+table.roster td{padding:0.5rem 0.75rem;border-bottom:0.0625rem solid var(--border);color:#1A1A2E;font-variant-numeric:tabular-nums;}
+table.roster tr:last-child td{border-bottom:none;}
+table.roster .code{font-family:'SF Mono',Menlo,monospace;font-size:0.75rem;color:var(--gray);}
+table.roster .cell-score{text-align:center;}
+table.roster .delta-cell{font-weight:700;text-align:center;}
+table.roster .delta-pos{color:#1B7A44;}
+table.roster .delta-neg{color:#9C1A20;}
+
+.empty{background:var(--white);border:0.09375rem dashed var(--border);border-radius:0.625rem;padding:3rem 2rem;text-align:center;color:var(--gray);}
+.empty-title{font-size:1.125rem;font-weight:700;color:var(--blue-dark);margin-bottom:0.5rem;}
+.empty-sub{font-size:0.875rem;line-height:1.6;}
+
+.footer{background:var(--blue-dark);padding:1.25rem 2rem;text-align:center;font-size:0.8125rem;color:rgba(255,255,255,.6);margin-top:2rem;}
+
+/* Password gate */
+.gate{position:fixed;inset:0;background:var(--blue-dark);display:flex;align-items:center;justify-content:center;z-index:200;padding:2rem;}
+.gate-box{background:var(--white);border-radius:0.875rem;padding:2.5rem 2rem;max-width:26rem;width:100%;text-align:center;box-shadow:0 1rem 3rem rgba(0,0,0,.3);}
+.gate-icon{width:3rem;height:3rem;background:#EEF5FB;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;}
+.gate-title{font-size:1.125rem;font-weight:800;color:var(--blue-dark);margin-bottom:0.375rem;}
+.gate-sub{font-size:0.875rem;color:var(--gray);margin-bottom:1.25rem;line-height:1.5;}
+.gate-input{width:100%;background:var(--off-white);border:0.09375rem solid var(--border);border-radius:0.375rem;padding:0.75rem 1rem;font-family:'Work Sans',Arial,sans-serif;font-size:1rem;color:#1A1A2E;text-align:center;outline:none;margin-bottom:0.75rem;}
+.gate-btn{width:100%;background:var(--blue-dark);color:var(--white);font-family:'Work Sans',Arial,sans-serif;font-size:0.9375rem;font-weight:700;padding:0.75rem;border-radius:0.375rem;border:none;cursor:pointer;}
+.gate-btn:hover{background:var(--blue-mid);}
+.gate-err{font-size:0.8125rem;color:var(--red);margin-top:0.5rem;min-height:1.2em;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/index.html">
+    <img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:28px;width:auto;">
+    <div><div class="logo-text">Velocity Arena</div><div class="logo-sub">Diagnostic Dashboard</div></div>
+  </a>
+  <a class="back-btn" href="/teachers.html">&larr; Back to Teacher Resources</a>
+</div>
+
+<!-- Access gate -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div class="gate-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="4" y="10" width="14" height="9" rx="2" stroke="#0065B3" stroke-width="1.5"/><path d="M7 10V7a4 4 0 018 0v3" stroke="#0065B3" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="gate-title">Teacher Dashboard</div>
+    <div class="gate-sub">This dashboard aggregates diagnostic data across all pilot sites. For facilitators only.</div>
+    <input class="gate-input" id="gate-input" type="password" placeholder="Enter password" autocomplete="off"/>
+    <button class="gate-btn" id="gate-btn">Unlock</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-org">NYC FIRST · Velocity Arena</div>
+    <div class="header-title">Diagnostic Growth Dashboard</div>
+    <div class="header-sub">Topic-by-topic pre- vs post-task comparison. Student names are never loaded into this browser.</div>
+  </div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="main" id="main" style="display:none;">
+
+  <div class="notice">
+    <strong>How scoring works.</strong> Free-text answers are scored client-side with a simple heuristic (looking for the target number in the answer). This is a rough indicator, not a grade &mdash; it surfaces trends but a facilitator should review unusual rows. Rows marked "Not yet" are always scored 0.
+  </div>
+
+  <div class="toolbar">
+    <label for="state-filter">Site</label>
+    <select id="state-filter">
+      <option value="ALL">All sites</option>
+      <option value="NY">New York 1</option>
+      <option value="RI">New York 2</option>
+      <option value="TN">Tennessee</option>
+    </select>
+    <button id="refresh-btn">Refresh</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="stats-row" id="stats-row"></div>
+
+  <div class="section-label">Topic-by-topic growth</div>
+  <div class="topic-grid" id="topic-grid"></div>
+
+  <div class="section-label">Anonymized student roster</div>
+  <div id="roster-container"></div>
+
+</div>
+
+<div class="footer">Velocity Arena &middot; NYC FIRST &middot; Summer Math Camp 2026</div>
+
+<script src="/config.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// ACCESS GATE — reuses the teacher password from CONFIG
+// ══════════════════════════════════════════════════════════════════════
+const AUTH_KEY = 'va_diag_dash_auth';
+const DATA_KEY = 'va_diag_dash_token';
+
+const gate = document.getElementById('gate');
+const gateInput = document.getElementById('gate-input');
+const gateBtn = document.getElementById('gate-btn');
+const gateErr = document.getElementById('gate-err');
+const mainEl = document.getElementById('main');
+
+function unlock() {
+  gate.style.display = 'none';
+  mainEl.style.display = 'block';
+  loadData();
+}
+
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  unlock();
+} else {
+  setTimeout(() => gateInput.focus(), 80);
+}
+
+gateBtn.addEventListener('click', tryGate);
+gateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryGate(); });
+
+function tryGate() {
+  const pwd = (window.CONFIG && CONFIG.teacherPassword) || '';
+  if (gateInput.value === pwd && pwd.length > 0) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    unlock();
+  } else {
+    gateErr.textContent = 'Incorrect password';
+    gateInput.select();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ANSWER KEY AND SCORING HEURISTICS
+// ══════════════════════════════════════════════════════════════════════
+// Each topic has a pre-test and post-test target.  For numeric answers we
+// check whether the target numbers appear in the student's free-text.
+// For the qualitative questions we look for keyword families.
+//
+// Order matches the question sequence in both diagnostics (q1..q8):
+//   1 proportional reasoning
+//   2 unit rate
+//   3 ratio
+//   4 linear decay
+//   5 coordinate geometry (qualitative — quadrant mapping)
+//   6 proportional scaling
+//   7 arc approximation (qualitative — "segments / straight lines / string")
+//   8 slope as rate of change
+
+const TOPICS = [
+  { key: 'prop_reasoning', name: 'Proportional reasoning' },
+  { key: 'unit_rate',      name: 'Unit rate' },
+  { key: 'ratio',          name: 'Ratio' },
+  { key: 'linear_decay',   name: 'Linear decay' },
+  { key: 'coord_geom',     name: 'Coordinate geometry' },
+  { key: 'prop_scaling',   name: 'Proportional scaling' },
+  { key: 'arc_approx',     name: 'Arc approximation' },
+  { key: 'slope',          name: 'Slope as rate of change' },
+];
+
+// Numeric targets by (variant, topic index)
+const TARGETS = {
+  pre: [
+    { numbers: [200] },                              // 1 — 200 miles
+    { numbers: [4] },                                // 2 — 4 cm/s
+    { numbers: [15] },                               // 3 — 15 blue bots
+    { numbers: [80] },                               // 4 — 80% charge
+    { quadrants: { '(2,5)': 'I', '(-3,1)': 'II', '(0,-4)': null, '(-1,-2)': 'III' } },
+    { numbers: [6, 9] },                             // 6 — 6 cups flour, 9 cups milk
+    { keywords: ['segment','straight','string','piece','break','divide','small','short','many'] },
+    { numbers: [2] },                                // 8 — slope = 2
+  ],
+  post: [
+    { numbers: [20] },                               // 1 — 20 miles
+    { numbers: [60] },                               // 2 — 60 pages/min
+    { numbers: [16] },                               // 3 — 16 apples
+    { numbers: [14] },                               // 4 — 14 cm candle
+    { quadrants: { '(4,-2)': 'IV', '(-5,6)': 'II', '(-3,-1)': 'III', '(1,7)': 'I' } },
+    { numbers: [20, 30] },                           // 6 — 20 ft, 30 ft
+    { keywords: ['segment','straight','string','piece','break','divide','small','short','many'] },
+    { numbers: [3] },                                // 8 — slope = 3
+  ]
+};
+
+function normalize(text) {
+  return (text || '').toString().toLowerCase().replace(/[,$]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function scoreAnswer(rawText, target) {
+  const text = normalize(rawText);
+  if (!text || text === 'not yet') return 0;
+
+  if (target.numbers) {
+    // Every listed number must appear in the answer
+    const nums = text.match(/-?\d+(?:\.\d+)?/g) || [];
+    const asNum = nums.map(n => parseFloat(n));
+    const allPresent = target.numbers.every(t => asNum.some(n => Math.abs(n - t) < 0.01));
+    return allPresent ? 1 : 0;
+  }
+
+  if (target.quadrants) {
+    // Match each point to its expected quadrant. Score is fraction correct.
+    const points = Object.keys(target.quadrants);
+    let correct = 0; let scored = 0;
+    for (const pt of points) {
+      const expected = target.quadrants[pt];
+      if (!expected) continue; // skip "on axis" points
+      scored++;
+      // Look for the point followed by its quadrant in roman numerals
+      const idx = text.replace(/\s/g,'').indexOf(pt.replace(/\s/g,''));
+      if (idx >= 0) {
+        // Grab the next 12 chars and check for I/II/III/IV indicator
+        const ctx = text.replace(/\s/g,'').slice(idx, idx + 20);
+        const romans = ctx.match(/\b(iv|iii|ii|i)\b/);
+        if (romans && romans[1].toUpperCase() === expected) correct++;
+      }
+    }
+    return scored > 0 ? (correct / scored >= 0.75 ? 1 : 0) : 0;
+  }
+
+  if (target.keywords) {
+    return target.keywords.some(k => text.includes(k)) ? 1 : 0;
+  }
+
+  return 0;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DATA FETCH + RENDER
+// ══════════════════════════════════════════════════════════════════════
+async function loadData() {
+  const status = document.getElementById('status');
+  status.textContent = 'Loading…';
+
+  // The dashboard API requires a short token to discourage scraping.
+  // We keep that token in sessionStorage; if absent, prompt once.
+  let token = sessionStorage.getItem(DATA_KEY) || '';
+  if (!token) {
+    token = prompt('Dashboard data token (ask Lizabeth):') || '';
+    if (token) sessionStorage.setItem(DATA_KEY, token);
+  }
+
+  try {
+    const res = await fetch('/api/diagnostic-dashboard?token=' + encodeURIComponent(token));
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to load');
+    render(data.records);
+    status.textContent = data.records.length + ' submissions loaded · ' + new Date().toLocaleTimeString();
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+    document.getElementById('stats-row').innerHTML = '';
+    document.getElementById('topic-grid').innerHTML = '';
+    document.getElementById('roster-container').innerHTML = '<div class="empty"><div class="empty-title">Could not load data</div><div class="empty-sub">Check the Vercel function logs for /api/diagnostic-dashboard, verify the token, and confirm all eight sheet IDs are configured.</div></div>';
+  }
+}
+
+let allRecords = [];
+
+function render(records) {
+  allRecords = records;
+  renderForFilter();
+}
+
+document.getElementById('state-filter').addEventListener('change', renderForFilter);
+document.getElementById('refresh-btn').addEventListener('click', () => { sessionStorage.removeItem(DATA_KEY); loadData(); });
+
+function renderForFilter() {
+  const filter = document.getElementById('state-filter').value;
+  const records = filter === 'ALL' ? allRecords : allRecords.filter(r => r.state === filter);
+
+  // Score each record
+  const scored = records.map(r => {
+    const targets = TARGETS[r.variant] || TARGETS.pre;
+    const scores = TOPICS.map((_, i) => scoreAnswer(r.answers[i], targets[i]));
+    const total = scores.reduce((a,b) => a+b, 0);
+    return { ...r, scores, total };
+  });
+
+  const preRecords  = scored.filter(r => r.variant === 'pre');
+  const postRecords = scored.filter(r => r.variant === 'post');
+
+  // ── HEADLINE STATS ──
+  const statsEl = document.getElementById('stats-row');
+  const preN  = preRecords.length;
+  const postN = postRecords.length;
+  const preAvg  = preN  ? (preRecords.reduce((a,b)  => a + b.total, 0) / preN).toFixed(1)  : '—';
+  const postAvg = postN ? (postRecords.reduce((a,b) => a + b.total, 0) / postN).toFixed(1) : '—';
+
+  // matched pairs by pseudonym
+  const preBy  = new Map(preRecords.map(r => [r.pseudonym, r]));
+  const postBy = new Map(postRecords.map(r => [r.pseudonym, r]));
+  const matched = [];
+  preBy.forEach((preR, pseu) => {
+    const postR = postBy.get(pseu);
+    if (postR) matched.push({ pseudonym: pseu, pre: preR, post: postR });
+  });
+
+  const matchedGrowth = matched.length
+    ? (matched.reduce((a,m) => a + (m.post.total - m.pre.total), 0) / matched.length).toFixed(2)
+    : '—';
+
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Pre-task submissions</div><div class="stat-value">${preN}</div><div class="stat-sub">Avg ${preAvg} / 8 correct</div></div>
+    <div class="stat-card"><div class="stat-label">Post-task submissions</div><div class="stat-value">${postN}</div><div class="stat-sub">Avg ${postAvg} / 8 correct</div></div>
+    <div class="stat-card"><div class="stat-label">Matched students</div><div class="stat-value">${matched.length}</div><div class="stat-sub">Pre &amp; post from same student</div></div>
+    <div class="stat-card"><div class="stat-label">Avg growth (matched)</div><div class="stat-value">${matchedGrowth}</div><div class="stat-sub">Topics gained per student</div></div>
+  `;
+
+  // ── TOPIC GROWTH ──
+  const topicEl = document.getElementById('topic-grid');
+  topicEl.innerHTML = TOPICS.map((t, i) => {
+    const prePct  = preN  ? Math.round(100 * preRecords.reduce((a,r)  => a + r.scores[i], 0) / preN)  : 0;
+    const postPct = postN ? Math.round(100 * postRecords.reduce((a,r) => a + r.scores[i], 0) / postN) : 0;
+    const delta = postPct - prePct;
+    const deltaClass = delta > 0 ? 'pos' : (delta < 0 ? 'neg' : 'zero');
+    const deltaText = (delta > 0 ? '+' : '') + delta + ' pts';
+
+    return `
+      <div class="topic-row">
+        <div class="topic-head">
+          <div class="topic-name">${i+1}. ${t.name}</div>
+          <div class="topic-counts"><span class="delta ${deltaClass}">${deltaText}</span> &nbsp; pre n=${preN} · post n=${postN}</div>
+        </div>
+        <div class="growth-bars">
+          <div class="gb-label">Pre</div>
+          <div class="gb-track"><div class="gb-fill pre" style="width:${prePct}%;"></div></div>
+          <div class="gb-val">${prePct}%</div>
+        </div>
+        <div class="growth-bars">
+          <div class="gb-label">Post</div>
+          <div class="gb-track"><div class="gb-fill post" style="width:${postPct}%;"></div></div>
+          <div class="gb-val">${postPct}%</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // ── ANONYMIZED ROSTER (matched only) ──
+  const rosterEl = document.getElementById('roster-container');
+  if (matched.length === 0) {
+    rosterEl.innerHTML = '<div class="empty"><div class="empty-title">No matched students yet</div><div class="empty-sub">Once students complete both the Day 1 pre-task and the Day 20 post-task, their paired growth will appear here &mdash; keyed by an anonymous pseudonym (not their names).</div></div>';
+    return;
+  }
+
+  const rows = matched
+    .map(m => {
+      const delta = m.post.total - m.pre.total;
+      const deltaCls = delta > 0 ? 'delta-pos' : (delta < 0 ? 'delta-neg' : '');
+      const cells = TOPICS.map((_, i) => {
+        const p = m.pre.scores[i], q = m.post.scores[i];
+        const mark = (s) => s ? '✓' : '—';
+        const d = q - p;
+        const color = d > 0 ? '#1B7A44' : (d < 0 ? '#9C1A20' : '#A5A5A5');
+        return `<td class="cell-score" style="color:${color};">${mark(p)}→${mark(q)}</td>`;
+      }).join('');
+      return `<tr>
+        <td class="code">${m.pseudonym}</td>
+        <td>${m.pre.state}</td>
+        ${cells}
+        <td class="cell-score">${m.pre.total}</td>
+        <td class="cell-score">${m.post.total}</td>
+        <td class="delta-cell ${deltaCls}">${delta > 0 ? '+' : ''}${delta}</td>
+      </tr>`;
+    })
+    .sort()
+    .join('');
+
+  const topicHeaders = TOPICS.map((t, i) => `<th title="${t.name}">${i+1}</th>`).join('');
+
+  rosterEl.innerHTML = `
+    <div class="table-wrap">
+      <table class="roster">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Site</th>
+            ${topicHeaders}
+            <th>Pre</th>
+            <th>Post</th>
+            <th>Δ</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

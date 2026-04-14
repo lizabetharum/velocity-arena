@@ -1,15 +1,16 @@
-// api/submit-diagnostic.js
-// Appends a student diagnostic submission to the correct Google Sheet
-// based on the state they selected.
+// api/submit-diagnostic-post.js
+// Appends a student post-task diagnostic submission to the correct Google Sheet
+// based on the state they selected. Uses separate _POST sheets so pre and post
+// data stay cleanly separated for topic-by-topic growth analysis.
 //
 // Required environment variables in Vercel:
 //
-//   Per-site Sheet IDs (three pilot sites):
-//     GOOGLE_SHEET_ID_NEW_YORK_1  — New York 1 (internal code "NY")
-//     GOOGLE_SHEET_ID_NEW_YORK_2  — New York 2 (internal code "RI")
-//     GOOGLE_SHEET_ID_TN          — Tennessee
+//   Per-site Post Sheet IDs (three pilot sites):
+//     GOOGLE_SHEET_ID_NEW_YORK_1_POST  — New York 1
+//     GOOGLE_SHEET_ID_NEW_YORK_2_POST  — New York 2
+//     GOOGLE_SHEET_ID_TN_POST          — Tennessee
 //
-//   Shared credentials (one service account works for all three sheets):
+//   Shared credentials (reused from the pre-test — same service account):
 //     GOOGLE_SERVICE_ACCOUNT_EMAIL
 //     GOOGLE_PRIVATE_KEY
 
@@ -27,14 +28,14 @@ export default async function handler(req) {
   }
 
   const sheetIds = {
-    NY: process.env.GOOGLE_SHEET_ID_NEW_YORK_1,
-    RI: process.env.GOOGLE_SHEET_ID_NEW_YORK_2,
-    TN: process.env.GOOGLE_SHEET_ID_TN,
+    NY: process.env.GOOGLE_SHEET_ID_NEW_YORK_1_POST,
+    RI: process.env.GOOGLE_SHEET_ID_NEW_YORK_2_POST,
+    TN: process.env.GOOGLE_SHEET_ID_TN_POST,
   };
 
   const sheetId = sheetIds[state];
   if (!sheetId) {
-    return respond({ error: `No sheet configured for: ${state}` }, 400);
+    return respond({ error: `No post sheet configured for: ${state}` }, 400);
   }
 
   const serviceEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -54,6 +55,7 @@ export default async function handler(req) {
     });
 
     // Row: Timestamp | State | First Name | Last Name | Q1 ... Q10
+    // (10 answer columns for forward compatibility; post-test uses 8.)
     const row = [
       timestamp,
       state,
@@ -82,7 +84,7 @@ export default async function handler(req) {
     return respond({ ok: true });
 
   } catch (err) {
-    console.error('submit-diagnostic error:', err.message);
+    console.error('submit-diagnostic-post error:', err.message);
     return respond({ error: 'Failed to save. Check Vercel logs.' }, 500);
   }
 }
