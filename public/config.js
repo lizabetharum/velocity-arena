@@ -8,11 +8,26 @@ const CONFIG = {
   // Camp name shown in the header and homepage
   campName: "Velocity Arena",
 
-  // The Monday of Week 1. Format: YYYY-MM-DD
-  // This is the only date you need to set.
-  // The site calculates all 20 days from this date,
-  // skipping weekends automatically.
+  // First day of Week 1. Format: YYYY-MM-DD.
+  // Can be any weekday — weekends are skipped automatically.
+  // Used as the default for any code that doesn't specify a site
+  // (e.g. the current "Today" view on the homepage).
   startDate: "2026-03-31",
+
+  // Per-site start dates. Each pilot site may begin camp on a different
+  // day of the week. Keys are the internal site codes used in the
+  // diagnostic:
+  //   NY = New York 1
+  //   RI = New York 2  (internal code kept for backend compatibility)
+  //   TN = Tennessee
+  // Format: "YYYY-MM-DD". The site computes each site's Day 20
+  // (last day of camp) by counting 20 weekdays forward from the start,
+  // skipping weekends and any holidays listed below.
+  siteStartDates: {
+    NY: "2026-03-31",   // New York 1
+    RI: "2026-03-31",   // New York 2
+    TN: "2026-03-31",   // Tennessee
+  },
 
   // Your timezone — affects what "today" means.
   // Full list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones

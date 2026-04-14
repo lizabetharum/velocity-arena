@@ -1,8 +1,39 @@
+// ── Site picker helpers ──────────────────────────────────────────────────
+// Each pilot site may start camp on a different weekday. The site picker
+// in the header stores the selection in localStorage so every page that
+// calls buildCampDates() automatically uses that site's schedule.
+const SITE_KEY = 'va_selected_site';
+
+const SITE_OPTIONS = [
+  { code: 'NY', label: 'New York 1' },
+  { code: 'RI', label: 'New York 2' },
+  { code: 'TN', label: 'Tennessee'  },
+];
+
+function getSelectedSite() {
+  try {
+    const saved = localStorage.getItem(SITE_KEY);
+    if (saved && SITE_OPTIONS.some(o => o.code === saved)) return saved;
+  } catch (e) {}
+  return null;
+}
+
+function setSelectedSite(code) {
+  try { localStorage.setItem(SITE_KEY, code); } catch (e) {}
+}
+
 // ── Camp date helpers (shared across pages) ──────────────────────────────
 // Builds an array of 20 Date objects for camp days, skipping weekends and
 // any dates listed in CONFIG.holidays.  Requires config.js to be loaded first.
-function buildCampDates() {
-  const start = new Date(CONFIG.startDate + 'T00:00:00');
+//
+// siteCode ("NY" | "RI" | "TN") picks that site's start date from
+// CONFIG.siteStartDates. If omitted, falls back to the site saved in
+// localStorage via the header picker, then to CONFIG.startDate.
+function buildCampDates(siteCode) {
+  const code = siteCode || getSelectedSite();
+  const siteStart = code && CONFIG.siteStartDates && CONFIG.siteStartDates[code];
+  const startISO = siteStart || CONFIG.startDate;
+  const start = new Date(startISO + 'T00:00:00');
   const holidaySet = new Set(CONFIG.holidays || []);
   const dates = [];
   let d = new Date(start);
@@ -40,6 +71,11 @@ function getNavLink(page) {
 }
 
 function renderHeader(activePage) {
+  const currentSite = getSelectedSite();
+  const sitePickerOptions = SITE_OPTIONS.map(o =>
+    `<option value="${o.code}"${o.code === currentSite ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+
   document.getElementById('site-header').innerHTML = `
     <div class="site-header">
       <div class="header-inner">
@@ -48,7 +84,14 @@ function renderHeader(activePage) {
           <div class="logo-name">Velocity <span>Arena</span></div>
           <div class="logo-sub">4 weeks · BBC micro:bit v2 · Cutebot Pro robots · real algebra</div>
         </a>
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="site-picker">
+            <label for="site-picker-select">Your site</label>
+            <select id="site-picker-select" onchange="onSitePickerChange(this.value)">
+              ${currentSite ? '' : '<option value="">Pick a site…</option>'}
+              ${sitePickerOptions}
+            </select>
+          </div>
           <a href="https://nycfirst.org" target="_blank"><img src="/images/nycfirst-logo.png" alt="NYC FIRST" style="height:48px;width:auto;"></a>
           <a href="/index.html" class="header-robot" style="text-decoration:none;">
             <svg viewBox="0 0 40 40" fill="none">
@@ -76,4 +119,12 @@ function renderHeader(activePage) {
   // Move footer out of header div after render
   const footer = document.querySelector('.site-footer');
   document.body.appendChild(footer);
+}
+
+// Called from the header <select>. Saves the site and reloads so every
+// page's schedule view re-renders with the new site's camp dates.
+function onSitePickerChange(code) {
+  if (!code) return;
+  setSelectedSite(code);
+  window.location.reload();
 }
