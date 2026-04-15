@@ -771,6 +771,11 @@
       <span>Match Log</span>
       <span style="font-size:10px;font-weight:400;color:var(--steel);">Fill every row by end of each match day</span>
     </div>
+    <div id="pred-spark-wrap" style="display:none;background:var(--card-soft,#F5F7FA);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--steel);line-height:1.3;">Prediction<br>error trend</div>
+      <svg id="pred-spark" width="220" height="34" viewBox="0 0 220 34" style="flex-shrink:0;"></svg>
+      <div id="pred-spark-label" style="font-size:11px;color:var(--steel);line-height:1.4;flex:1;min-width:140px;"></div>
+    </div>
     <div class="match-table-wrap">
       <table class="match-table" id="match-table">
         <thead>
@@ -780,6 +785,8 @@
             <th>Match #</th>
             <th>Opponent</th>
             <th>Score</th>
+            <th>Predicted</th>
+            <th>Pred. Error</th>
             <th>W/L</th>
             <th>Notes</th>
             <th></th>
@@ -815,6 +822,10 @@
       <div class="form-field">
         <label>Score</label>
         <input type="text" id="new-score" placeholder="2-1">
+      </div>
+      <div class="form-field">
+        <label>Predicted Goals</label>
+        <input type="number" id="new-predicted" min="0" placeholder="0">
       </div>
       <div class="form-field">
         <label>W/L</label>
@@ -921,6 +932,8 @@
                   <option value="week">Week</option>
                   <option value="goals_for">Goals For (from score)</option>
                   <option value="goals_against">Goals Against (from score)</option>
+                  <option value="predictedGoals">Predicted Goals</option>
+                  <option value="predictionError">Prediction Error</option>
                   <option value="custom">Custom (type my own)</option>
                 </select>
                 <input type="text" id="x-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);margin-top:4px;display:none;" oninput="updateChart()">
@@ -933,6 +946,8 @@
                   <option value="week">Week</option>
                   <option value="goals_for">Goals For (from score)</option>
                   <option value="goals_against">Goals Against (from score)</option>
+                  <option value="predictedGoals">Predicted Goals</option>
+                  <option value="predictionError">Prediction Error</option>
                   <option value="custom">Custom (type my own)</option>
                 </select>
                 <input type="text" id="y-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color:var(--slate);margin-top:4px;display:none;" oninput="updateChart()">
@@ -1184,14 +1199,66 @@ function calcStats() {
 }
 
 // ─── MATCH LOG ─────────────────────────────────────────────
+// Draw a compact sparkline of the team's last-N prediction errors.
+// Hidden when there are fewer than 2 data points.
+function renderPredErrorSparkline() {
+  const wrap = document.getElementById('pred-spark-wrap');
+  const svg = document.getElementById('pred-spark');
+  const label = document.getElementById('pred-spark-label');
+  if (!wrap || !svg) return;
+
+  const MAX_POINTS = 6;
+  const log = (currentTeam().matchLog || []);
+  // Keep matches that have both a predicted value and parseable actual-goals-for
+  const points = [];
+  log.forEach(m => {
+    const p = parseFloat(m.predictedGoals);
+    const a = parseInt((m.score || '').split('-')[0], 10);
+    if (!isNaN(p) && !isNaN(a)) points.push(Math.abs(p - a));
+  });
+  const tail = points.slice(-MAX_POINTS);
+
+  if (tail.length < 2) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'flex';
+
+  // Scale points into the 220 x 34 SVG viewBox with 4px padding
+  const W = 220, H = 34, pad = 4;
+  const maxErr = Math.max(...tail, 1);
+  const stepX = (W - pad*2) / (tail.length - 1);
+  const coords = tail.map((v, i) => {
+    const x = pad + i * stepX;
+    const y = H - pad - (v / maxErr) * (H - pad*2);
+    return [x, y];
+  });
+  const path = 'M ' + coords.map(c => c[0].toFixed(1) + ',' + c[1].toFixed(1)).join(' L ');
+  const dots = coords.map(c => `<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="2" fill="var(--red,#E74C3C)"/>`).join('');
+  svg.innerHTML = `
+    <path d="${path}" fill="none" stroke="var(--red,#E74C3C)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}
+  `;
+
+  // Friendly label: is the error trending down?
+  const first = tail[0], last = tail[tail.length - 1];
+  const avg = (tail.reduce((a,b) => a+b, 0) / tail.length).toFixed(1);
+  let msg;
+  if (last < first) msg = 'Trending down — your predictions are getting closer to reality. 📉';
+  else if (last > first) msg = 'Error rising — time to revisit how you predict.';
+  else msg = 'Holding steady.';
+  label.textContent = 'Last ' + tail.length + ' matches · avg error ' + avg + ' goals. ' + msg;
+}
+
 function renderMatchTable() {
   const tbody = document.getElementById('match-tbody');
   tbody.innerHTML = '';
   const rows = currentTeam().matchLog;
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="8" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tr.innerHTML = '<td colspan="10" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
     tbody.appendChild(tr);
+    renderPredErrorSparkline();
     return;
   }
   rows.forEach((r, i) => {
@@ -1209,6 +1276,8 @@ function renderMatchTable() {
       <td><input type="number" value="${r.match||''}" onchange="updateMatch(${i},'match',this.value)" min="1" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="text" value="${r.opponent||''}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="text" value="${r.score||''}" onchange="updateMatch(${i},'score',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:60px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><input type="number" value="${r.predictedGoals||''}" onchange="updateMatch(${i},'predictedGoals',this.value)" min="0" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td style="text-align:center;font-size:11px;color:var(--steel);">${(() => { const predicted = parseFloat(r.predictedGoals); const actual = parseInt((r.score||'').split('-')[0]); if (isNaN(predicted) || isNaN(actual)) return '—'; return Math.abs(predicted - actual); })()}</td>
       <td><select onchange="updateMatch(${i},'wl',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
         <option value="" ${!r.wl?'selected':''}>--</option>
         <option value="W" ${r.wl==='W'?'selected':''}>W</option>
@@ -1220,6 +1289,7 @@ function renderMatchTable() {
     `;
     tbody.appendChild(tr);
   });
+  renderPredErrorSparkline();
 }
 
 function getNextMatchNum(week) {
@@ -1240,6 +1310,14 @@ document.getElementById('new-week').addEventListener('change', function() {
   document.getElementById('new-match').value = getNextMatchNum(this.value);
 });
 
+// Auto-fill W/L when a complete score is typed (left > right = W, etc.).
+// Only overwrites the W/L field if it's still blank so manual choices stick.
+document.getElementById('new-score').addEventListener('input', function() {
+  const wlEl = document.getElementById('new-wl');
+  const derived = deriveWLFromScore(this.value);
+  if (derived && !wlEl.value) wlEl.value = derived;
+});
+
 function addMatchRow() {
   const week = document.getElementById('new-week').value;
   const matchNum = document.getElementById('new-match').value;
@@ -1255,11 +1333,12 @@ function addMatchRow() {
     match: matchNum,
     opponent: document.getElementById('new-opponent').value,
     score: document.getElementById('new-score').value,
+    predictedGoals: document.getElementById('new-predicted').value,
     wl: document.getElementById('new-wl').value,
     notes: document.getElementById('new-notes').value
   };
   currentTeam().matchLog.push(row);
-  ['new-date','new-opponent','new-score','new-notes'].forEach(id => document.getElementById(id).value = '');
+  ['new-date','new-opponent','new-score','new-predicted','new-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('new-wl').value = '';
   // Auto-increment match # for next entry
   document.getElementById('new-match').value = getNextMatchNum(week);
@@ -1268,9 +1347,36 @@ function addMatchRow() {
 
 function updateMatch(i, field, val) {
   currentTeam().matchLog[i][field] = val;
+  // When score changes, derive W/L if empty (don't overwrite a manual choice)
+  if (field === 'score') {
+    const row = currentTeam().matchLog[i];
+    const derived = deriveWLFromScore(val);
+    if (derived && !row.wl) {
+      row.wl = derived;
+      renderMatchTable();
+      renderPredErrorSparkline();
+    } else if (field === 'score') {
+      renderPredErrorSparkline();
+    }
+  }
+  if (field === 'predictedGoals') renderPredErrorSparkline();
+}
+
+// Parse a score string like "2-1" and return 'W' | 'L' | 'D' | null.
+// Left side of the dash is the team's own goals, right side is the opponent's.
+function deriveWLFromScore(scoreStr) {
+  if (!scoreStr || !scoreStr.includes('-')) return null;
+  const parts = scoreStr.split('-').map(s => parseInt(s.trim(), 10));
+  if (isNaN(parts[0]) || isNaN(parts[1])) return null;
+  if (parts[0] > parts[1]) return 'W';
+  if (parts[0] < parts[1]) return 'L';
+  return 'D';
 }
 
 function deleteMatchRow(i) {
+  const m = currentTeam().matchLog[i] || {};
+  const label = m.opponent ? ('match vs ' + m.opponent) : ('match #' + (m.match || (i+1)));
+  if (!confirm('Delete ' + label + '? This cannot be undone.')) return;
   currentTeam().matchLog.splice(i, 1);
   renderMatchTable();
 }
@@ -1336,6 +1442,15 @@ function getMatchFieldValue(match, field) {
     if (match.score && match.score.includes('-')) return parseFloat(match.score.split('-')[1]) || 0;
     return '';
   }
+  if (field === 'predictedGoals') {
+    const p = parseFloat(match.predictedGoals);
+    return isNaN(p) ? '' : p;
+  }
+  if (field === 'predictionError') {
+    const p = parseFloat(match.predictedGoals);
+    const a = parseInt((match.score || '').split('-')[0]);
+    return (!isNaN(p) && !isNaN(a)) ? Math.abs(p - a) : '';
+  }
   return '';
 }
 
@@ -1344,6 +1459,8 @@ function getFieldLabel(field) {
   if (field === 'week') return 'Week';
   if (field === 'goals_for') return 'Goals For';
   if (field === 'goals_against') return 'Goals Against';
+  if (field === 'predictedGoals') return 'Predicted Goals';
+  if (field === 'predictionError') return 'Prediction Error';
   return '';
 }
 

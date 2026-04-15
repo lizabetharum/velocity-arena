@@ -66,6 +66,15 @@
 
   .rank { font-weight: 800; color: var(--cyan); width: 30px; }
   .team-name { font-weight: 700; }
+  .underdog-badge {
+    display: inline-block; margin-left: 6px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--gold);
+    background: rgba(245,158,11,0.12); border: 1px solid var(--gold);
+    padding: 2px 6px; border-radius: 3px; vertical-align: middle;
+  }
+  tbody tr.underdog-row { background: rgba(245,158,11,0.04); }
+  tbody tr.underdog-row:hover { background: rgba(245,158,11,0.1); }
   .stat-w { color: var(--green); font-weight: 700; }
   .stat-l { color: var(--red-l); font-weight: 700; }
   .stat-d { color: var(--gold); font-weight: 700; }
@@ -194,6 +203,7 @@ async function loadLeaderboard() {
 function tallyTeam(team, weekFilter) {
   const log = team.matchLog || [];
   let w = 0, l = 0, d = 0, goalsFor = 0, goalsAgainst = 0;
+  let predErrorSum = 0, predErrorCount = 0;
 
   log.forEach(m => {
     // Skip week 1 (trial) for standings — matches without a week default to trial
@@ -206,18 +216,33 @@ function tallyTeam(team, weekFilter) {
     else if (m.wl === 'D') d++;
 
     // Parse score like "2-1"
+    let actualFor = NaN;
     if (m.score && m.score.includes('-')) {
       const parts = m.score.split('-').map(Number);
-      if (!isNaN(parts[0])) goalsFor += parts[0];
+      if (!isNaN(parts[0])) { goalsFor += parts[0]; actualFor = parts[0]; }
       if (!isNaN(parts[1])) goalsAgainst += parts[1];
+    }
+
+    // Accumulate prediction error: |predicted - actual goals for|
+    const predicted = parseFloat(m.predictedGoals);
+    if (!isNaN(predicted) && !isNaN(actualFor)) {
+      predErrorSum += Math.abs(predicted - actualFor);
+      predErrorCount++;
     }
   });
 
   const total = w + l + d;
   const pct = total > 0 ? Math.round((w / total) * 100) : 0;
   const pts = (w * 3) + d; // 3 points for win, 1 for draw
+  const avgPredError = predErrorCount ? (predErrorSum / predErrorCount).toFixed(1) : '—';
 
-  return { name: team.name, w, l, d, total, pct, pts, goalsFor, goalsAgainst, goalDiff: goalsFor - goalsAgainst };
+  return { name: team.name, w, l, d, total, pct, pts, goalsFor, goalsAgainst, goalDiff: goalsFor - goalsAgainst, avgPredError };
+}
+
+// Numeric helper for sorting: treat '—' as the worst possible error
+// so teams with no predictions fall below teams with actual data.
+function parseAvgErr(t) {
+  return t.avgPredError === '—' ? Infinity : parseFloat(t.avgPredError);
 }
 
 function renderLeaderboard() {
@@ -230,7 +255,12 @@ function renderLeaderboard() {
 
   const standings = allTeams
     .map(t => tallyTeam(t, currentWeekFilter))
-    .sort((a, b) => b.pts - a.pts || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor);
+    .sort((a, b) =>
+      b.pts - a.pts ||                          // 1. Points (3 per W, 1 per D)
+      b.goalDiff - a.goalDiff ||                // 2. Goal differential
+      b.goalsFor - a.goalsFor ||                // 3. Tiebreaker: most goals scored
+      parseAvgErr(a) - parseAvgErr(b)           // 4. Tiebreaker: smallest avg prediction error
+    );
 
   const label = currentWeekFilter === 'all' ? 'Overall Standings (Weeks 2-4)' : 'Week ' + currentWeekFilter + ' Standings';
 
@@ -251,18 +281,30 @@ function renderLeaderboard() {
             <th>+/-</th>
             <th>Pts</th>
             <th>Win %</th>
+            <th>Avg Pred Error</th>
           </tr>
         </thead>
         <tbody>`;
 
   if (standings.every(s => s.total === 0)) {
-    html += `<tr><td colspan="11" style="text-align:center;color:var(--slate);padding:24px;">No official matches recorded yet.</td></tr>`;
+    html += `<tr><td colspan="12" style="text-align:center;color:var(--slate);padding:24px;">No official matches recorded yet.</td></tr>`;
   } else {
+    // Underdog = the last-place team, IF they have actually played matches.
+    // The mechanic unlocks a full stat reallocation for that team.
+    const playedStandings = standings.filter(s => s.total > 0);
+    const underdogName = playedStandings.length > 0
+      ? playedStandings[playedStandings.length - 1].name
+      : null;
+
     standings.forEach((s, i) => {
+      const isUnderdog = s.name === underdogName;
+      const teamCell = isUnderdog
+        ? `<td class="team-name">${s.name} <span class="underdog-badge" title="Last place — full stat reallocation unlocked">🔓 Underdog</span></td>`
+        : `<td class="team-name">${s.name}</td>`;
       html += `
-        <tr>
+        <tr${isUnderdog ? ' class="underdog-row"' : ''}>
           <td class="rank">${i + 1}</td>
-          <td class="team-name">${s.name}</td>
+          ${teamCell}
           <td class="stat-w">${s.w}</td>
           <td class="stat-l">${s.l}</td>
           <td class="stat-d">${s.d}</td>
@@ -272,11 +314,63 @@ function renderLeaderboard() {
           <td style="font-weight:700;color:${s.goalDiff > 0 ? 'var(--green)' : s.goalDiff < 0 ? 'var(--red-l)' : 'var(--slate)'};">${s.goalDiff > 0 ? '+' : ''}${s.goalDiff}</td>
           <td style="font-weight:800;color:var(--cyan);">${s.pts}</td>
           <td class="stat-pct">${s.total > 0 ? s.pct + '%' : '--'}</td>
+          <td style="color:var(--slate);">${s.avgPredError}</td>
         </tr>`;
     });
   }
 
   html += `</tbody></table></div>`;
+
+  // ── BEST PREDICTORS TABLE ────────────────────────────────
+  // Separates engagement from winning. Teams with the smallest average
+  // prediction error float to the top here regardless of match record.
+  const predictors = standings
+    .filter(s => s.avgPredError !== '—')
+    .sort((a, b) => parseFloat(a.avgPredError) - parseFloat(b.avgPredError));
+
+  if (predictors.length > 0) {
+    const predLabel = currentWeekFilter === 'all'
+      ? 'Best Predictors (Weeks 2-4)'
+      : 'Best Predictors — Week ' + currentWeekFilter;
+    html += `
+      <div class="section">
+        <div class="section-title">${predLabel}</div>
+        <div class="section-note">Average |predicted goals &minus; actual goals| per match. Lower is better. Building a mental model of your own bot is a separate competition.</div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>Avg Pred Error</th>
+              <th>Matches Predicted</th>
+            </tr>
+          </thead>
+          <tbody>`;
+    predictors.forEach((p, i) => {
+      // Count how many matches have predictions + scores (same rule as tallyTeam)
+      const team = allTeams.find(t => t.name === p.name);
+      let predicted = 0;
+      if (team && team.matchLog) {
+        team.matchLog.forEach(m => {
+          const mWeek = parseInt(m.week) || 1;
+          if (mWeek === 1) return;
+          if (currentWeekFilter !== 'all' && mWeek !== parseInt(currentWeekFilter)) return;
+          const pp = parseFloat(m.predictedGoals);
+          const aa = parseInt((m.score || '').split('-')[0], 10);
+          if (!isNaN(pp) && !isNaN(aa)) predicted++;
+        });
+      }
+      html += `
+        <tr>
+          <td class="rank">${i + 1}</td>
+          <td class="team-name">${p.name}</td>
+          <td style="font-weight:800;color:var(--green);">${p.avgPredError}</td>
+          <td>${predicted}</td>
+        </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
   container.innerHTML = html;
 }
 
