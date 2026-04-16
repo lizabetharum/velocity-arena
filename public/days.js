@@ -31,9 +31,9 @@ const DAYS = [
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
-        "mins": 15,
+        "mins": 12,
         "block": "Challenge Block",
-        "description": "You answer 10 questions about general math (speed, distance, graphs) in 15 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
+        "description": "You answer 8 questions about general math (speed, distance, graphs) in 12 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
         "link": "/activities/diagnostic/index.html"
       },
       {
@@ -167,7 +167,7 @@ const DAYS = [
         "name": "Distance-Time Graphs + Arc Approximation + Turning Stat Introduction",
         "mins": 65,
         "block": "Challenge Block",
-        "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formula on the board -- turnAngle = 90 + (8 - TURNING) x 5. Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate."
+        "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formulas on the board -- Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02). Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate."
       },
       {
         "name": "Lunch / Snack Break",
@@ -186,7 +186,7 @@ const DAYS = [
         "name": "Coordinate Navigation Practice: Three Consecutive Successes",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Keep programming your bot to navigate to called coordinates. The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance."
+        "description": "Keep programming your bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance."
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -226,7 +226,7 @@ const DAYS = [
         "name": "Power Stat Challenge: Ratio and Motor Speed",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "One rule goes on the board: charge motor speed = Power points squared (Power^2). Calculate charge speed for Power = 1, 2, 4, and 8. Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (16% speed) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (64% speed). Did doubling the points double kick distance? Both answers should surprise you."
+        "description": "Two rules go on the board: charge speed = Power² / 2, and follow through = POWER x 200. Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you."
       },
       {
         "name": "Lunch / Snack Break",
@@ -238,7 +238,7 @@ const DAYS = [
         "name": "Scoop Build + Ratio Testing",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings, run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'"
+        "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings (charge speed = Power² / 2), run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'"
       },
       {
         "name": "Break",
@@ -256,7 +256,7 @@ const DAYS = [
     "endBufferMins": 7,
     "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
     "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
-    "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P^2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
+    "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P²/2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
     "facilitatorRisk": {
       "risk": "Campers assume more Power always wins and stop thinking about trade-offs in the 20-point budget. Cognitive overload from trying to optimize all four stats simultaneously.",
       "say": "\"Before anyone changes that speed value: what happens to your Endurance if you give 3 more points to Power? Calculate it. Your total is still 20. Where does that Power come from? Your equation has four variables. Show me the trade-off on paper before you touch the code.\" |"
@@ -284,7 +284,7 @@ const DAYS = [
         "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation."
+        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power² / 2, follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation."
       },
       {
         "name": "Lunch / Snack Break",
@@ -348,7 +348,7 @@ const DAYS = [
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool."
+        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool."
       },
       {
         "name": "Lunch / Snack Break",
@@ -551,7 +551,7 @@ const DAYS = [
         "name": "Formula Relay: All Six Types in One Race",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turning radius (2 cards), Power squared, budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions."
+        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² / 2 charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions."
       },
       {
         "name": "Break",
@@ -683,7 +683,7 @@ const DAYS = [
         "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
         "mins": 45,
         "block": "Challenge Block",
-        "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- 50% more Power gives 125% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected."
+        "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected."
       },
       {
         "name": "Break",
@@ -1222,9 +1222,9 @@ const DAYS = [
       },
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
-        "mins": 15,
+        "mins": 12,
         "block": "Challenge Block",
-        "description": "15 minutes, individual. Parallel questions to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon."
+        "description": "12 minutes, individual. 8 questions parallel to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon."
       },
       {
         "name": "Break",
