@@ -926,7 +926,7 @@ const DAYS = [
     "day": 15,
     "week": 3,
     "weekName": "Season 2 + Commissioner",
-    "theme": "Creative Expression: Bot Identity + Scouting Begins",
+    "theme": "Creative Expression: Bot Identity + Scouting Begins + Season 3 Begins",
     "activities": [
       {
         "name": "Bot Lore Gallery Walk",
@@ -956,7 +956,7 @@ const DAYS = [
         "name": "Match Day 3",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Three matches under Season 2 rules. Before each match, log your equation-based prediction. After each match, record the actual. Loss-recovery for every losing team. Dashboard fully updated before end of session."
+        "description": "Season 2 match day. Three rounds of round-robin play with the equation prediction ritual before every match and loss-recovery protocol for every losing team. Prediction Market cards resolved at close: facilitator reads each team's final Season 2 record against their public prediction card. Season 2 data retrospective follows — teams compare Season 2 residuals against Season 1 and identify which stat changes produced proportional results."
       },
       {
         "name": "Break",
