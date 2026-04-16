@@ -31,7 +31,7 @@ const DAYS = [
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
-        "mins": 12,
+        "mins": 15,
         "block": "Challenge Block",
         "description": "You answer 8 questions about general math (speed, distance, graphs) in 12 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
         "link": "/activities/diagnostic/index.html"
@@ -1228,7 +1228,7 @@ const DAYS = [
       },
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
-        "mins": 12,
+        "mins": 15,
         "block": "Challenge Block",
         "description": "12 minutes, individual. 8 questions parallel to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon."
       },
