@@ -764,6 +764,7 @@
         <div class="budget-bar-fill" id="budget-bar" style="width:100%;"></div>
       </div>
       <div class="budget-warning" id="budget-warning">Over budget — reduce your total to exactly 20</div>
+      <div id="underdog-toggle" style="margin-top:8px;min-height:24px;"></div>
     </div>
   </div>
 
@@ -1033,6 +1034,7 @@ function defaultTeam(name) {
     season: 'Summer 2026',
     week: 1,
     stats: { speed: 5, power: 5, turning: 5, endurance: 5 },
+    isUnderdog: false,
     matchLog: [],
     justifications: [],
     fourViews: {
@@ -1176,6 +1178,72 @@ function renderAll() {
 document.getElementById('meta-season').addEventListener('input', function() { currentTeam().season = this.value; });
 document.getElementById('meta-week').addEventListener('input', function() { currentTeam().week = parseInt(this.value)||1; });
 
+// ─── UNDERDOG BUDGET MECHANIC ──────────────────────────────
+// Season 2 (Days 11–15): the underdog from Season 1 gets a 22-point
+// budget instead of 20. On Day 16 and beyond, the budget reverts to 20.
+// The facilitator toggles underdog status; the date check enforces when
+// the +2 is actually applied.
+
+function getCurrentCampDay() {
+  try {
+    const tz = (window.CONFIG && CONFIG.timezone) || 'America/New_York';
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: tz });
+    const today = new Date(todayStr + 'T00:00:00');
+    // Use the site picker if available, otherwise default startDate
+    const siteCode = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+    const siteStart = siteCode && CONFIG.siteStartDates && CONFIG.siteStartDates[siteCode];
+    const startISO = siteStart || CONFIG.startDate;
+    const start = new Date(startISO + 'T00:00:00');
+    const holidaySet = new Set(CONFIG.holidays || []);
+    let day = 0;
+    let d = new Date(start);
+    while (d <= today) {
+      const dow = d.getDay();
+      const iso = d.toISOString().slice(0, 10);
+      if (dow !== 0 && dow !== 6 && !holidaySet.has(iso)) day++;
+      d.setDate(d.getDate() + 1);
+    }
+    return day; // 1-based camp day; 0 = before camp
+  } catch (e) {
+    return 0;
+  }
+}
+
+function isUnderdogBudgetActive() {
+  const t = currentTeam();
+  if (!t.isUnderdog) return false;
+  const day = getCurrentCampDay();
+  return day >= 11 && day <= 15;
+}
+
+function getEffectiveBudget() {
+  return isUnderdogBudgetActive() ? 22 : 20;
+}
+
+function toggleUnderdog() {
+  const t = currentTeam();
+  t.isUnderdog = !t.isUnderdog;
+  renderUnderdogToggle();
+  calcStats();
+}
+
+function renderUnderdogToggle() {
+  const el = document.getElementById('underdog-toggle');
+  if (!el) return;
+  const t = currentTeam();
+  const isOn = t.isUnderdog;
+  const active = isUnderdogBudgetActive();
+  const day = getCurrentCampDay();
+
+  el.innerHTML = isOn
+    ? `<button onclick="toggleUnderdog()" style="font-family:var(--font);font-size:11px;font-weight:700;padding:5px 12px;border-radius:4px;border:1.5px solid #f59e0b;background:rgba(245,158,11,0.08);color:#f59e0b;cursor:pointer;transition:all .15s;">🔓 Underdog ON — ${active ? '22-point budget active' : 'budget +2 applies Days 11–15 only'}</button>`
+    : `<button onclick="toggleUnderdog()" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--steel);cursor:pointer;transition:all .15s;">Set as underdog (+2 budget for Season 2)</button>`;
+
+  if (isOn && day > 15) {
+    el.innerHTML += `<span style="font-size:10px;color:var(--red);margin-left:8px;">Season 2 ended — budget reverted to 20</span>`;
+  }
+}
+
 // ─── STAT CALCULATIONS ─────────────────────────────────────
 function calcStats() {
   const s = parseInt(document.getElementById('pts-speed').value) || 0;
@@ -1195,13 +1263,17 @@ function calcStats() {
   const decay = (20 - e) * 1.5;
   document.getElementById('calc-endurance').textContent = decay.toFixed(1);
 
+  const budget = getEffectiveBudget();
   const total = s + p + tr + e;
-  const pct = Math.min((total / 20) * 100, 100);
-  document.getElementById('budget-total').textContent = total + ' / 20';
-  document.getElementById('budget-total').style.color = total > 20 ? 'var(--red)' : total === 20 ? '#1a7a3e' : 'var(--slate)';
+  const pct = Math.min((total / budget) * 100, 100);
+  document.getElementById('budget-total').textContent = total + ' / ' + budget;
+  document.getElementById('budget-total').style.color = total > budget ? 'var(--red)' : total === budget ? '#1a7a3e' : 'var(--slate)';
   document.getElementById('budget-bar').style.width = pct + '%';
-  document.getElementById('budget-bar').classList.toggle('over', total > 20);
-  document.getElementById('budget-warning').classList.toggle('show', total > 20);
+  document.getElementById('budget-bar').classList.toggle('over', total > budget);
+  const warningEl = document.getElementById('budget-warning');
+  warningEl.classList.toggle('show', total > budget);
+  warningEl.textContent = 'Over budget — reduce your total to exactly ' + budget;
+  renderUnderdogToggle();
 }
 
 // ─── MATCH LOG ─────────────────────────────────────────────
