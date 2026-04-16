@@ -164,7 +164,7 @@ const DAYS = [
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed."
       },
       {
-        "name": "Distance-Time Graphs + Arc Approximation + Turning Stat Introduction",
+        "name": "Distance-Time Graphs",
         "mins": 65,
         "block": "Challenge Block",
         "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formulas on the board -- Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02). Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate."
@@ -176,14 +176,14 @@ const DAYS = [
         "description": "Eat, rest, and talk about anything except math."
       },
       {
-        "name": "Energy Reset (3 min)",
+        "name": "Energy Reset",
         "mins": 3,
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
       
       {
-        "name": "Coordinate Navigation Practice: Three Consecutive Successes",
+        "name": "Coordinate Navigation Practice: Arc Approximation",
         "mins": 90,
         "block": "Match-Build-Make",
         "description": "Keep programming your bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance."
@@ -275,13 +275,13 @@ const DAYS = [
         "description": "'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' You have to check the math on your stat card before you act. Only do the action if the condition is actually true for your numbers."
       },
        {
-        "name": "Two Formula Warm-Up",
+        "name": "Two-Formula Warm-Up",
         "mins": 8,
         "block": "Warm-up Block",
         "description": "This warm-up bridges the gap by pairing two formulas on one allocation — so the jump goes from one to two to four, not one to four."
       },
       {
-        "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
+        "name": "The Budget Constraint: S + P + T + E = 20",
         "mins": 50,
         "block": "Challenge Block",
         "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power² / 2, follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation."
@@ -467,7 +467,7 @@ const DAYS = [
       },
       {
         "name": "Energy Reset",
-        "mins": 5,
+        "mins": 3,
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
@@ -548,7 +548,7 @@ const DAYS = [
         "description": ""
       },
       {
-        "name": "Formula Relay: All Six Types in One Race",
+        "name": "Formula Relay: All Five Types in One Race",
         "mins": 50,
         "block": "Challenge Block",
         "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² / 2 charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions."
@@ -611,7 +611,7 @@ const DAYS = [
         "description": ""
       },
       {
-        "name": "Distance Formula: Applying It to Match Data",
+        "name": "Distance Formula: How Far Did the Ball Travel",
         "mins": 50,
         "block": "Challenge Block",
         "description": "Week 2 continuation of the coordinate geometry introduced on Day 3. On Day 3 you walked the grid physically and computed straight-line distance with your bodies. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what was observed during the match? If not, name the source of the discrepancy -- measurement error, bot drift, or formula misapplication. This session closes the coordinate geometry arc started on Day 3."
@@ -680,7 +680,7 @@ const DAYS = [
         "description": ""
       },
       {
-        "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
+        "name": "Proportional Scaling + Commissioner Proposal Prep",
         "mins": 45,
         "block": "Challenge Block",
         "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected."
@@ -815,7 +815,7 @@ const DAYS = [
       },
       {
         "name": "Energy Reset",
-        "mins": 5,
+        "mins": 3,
         "block": "",
         "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down."
       },
@@ -953,10 +953,10 @@ const DAYS = [
         "description": "Eat, rest, and talk about anything except math."
       },
       {
-        "name": "Bot Identity + Creative Expression",
+        "name": "Match Day 3",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Design your bot's visual identity: a logo, a color scheme, and a team slogan. The slogan must reference a stat, equation, or data point. You can also redesign your scoop within the rules. Everything goes on the wall before you leave."
+        "description": "Three matches under Season 2 rules. Before each match, log your equation-based prediction. After each match, record the actual. Loss-recovery for every losing team. Dashboard fully updated before end of session."
       },
       {
         "name": "Break",
@@ -1188,10 +1188,16 @@ const DAYS = [
         "description": "Keep teaching. Visitors get one ballot: 'Which camper explained the math most clearly?' Exhibition matches can run while visitors watch."
       },
       {
-        "name": "Scouting Report Verbal Check + Vote Count (concurrent)",
+        "name": "Scouting Report Verbal Check + Vote Count",
         "mins": 40,
         "block": "Match-Build-Make",
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot."
+      },
+      {
+        "name": "Open Lab: Final Debrief and Prep",
+        "mins": 15,
+        "block": "Open Lab",
+        "description": "Final debrief and preparation time. Review your data, reflect on the program, and get ready for the final day."
       }
     ],
     "ends": "Write: \"The skill I used today to teach a visitor was \\[name it\\] and I know it worked when \\[describe the specific moment you saw them understand it\\].\" You have 3 minutes. |",
