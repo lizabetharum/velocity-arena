@@ -5,7 +5,7 @@
 const SITE_KEY = 'va_selected_site';
 
 const SITE_OPTIONS = [
-  { code: 'NY1', label: 'New York 1' },
+  { code: 'NY1', label: 'Gotham Tech' },
   { code: 'NY2', label: 'New York 2' },
   { code: 'TN',  label: 'Tennessee'  },
 ];
