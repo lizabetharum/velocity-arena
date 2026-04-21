@@ -4,6 +4,8 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "First Contact: Speed, Bots, and the Question That Drives Everything",
+    "bigMathIdea": "Proportional reasoning. Motor Power = Speed × 100 / 20. Each stat point = 5 motor power.",
+    "vocabulary": "RATIO and UNIT RATE. Each Speed point gives you 5 motor power. That '5 per point' is a unit rate. The relationship between points and power is a ratio.",
     "activities": [
       {
         "name": "Sound and Movement: Circle Pass",
@@ -90,6 +92,8 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "Endurance: When Your Bot Runs Out of Power",
+    "bigMathIdea": "Rate of change. P(t) = 100 − (20 − E) × 1.5 × t. Motor power decays linearly over time.",
+    "vocabulary": "RATE OF CHANGE and LINEAR DECAY. Your clap count dropped by the same amount each round. That constant drop is a rate of change. When something decreases at a steady rate, that's linear decay.",
     "activities": [
       {
         "name": "Failure Bow",
@@ -176,6 +180,8 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "Turning + The Story Your Data Tells",
+    "bigMathIdea": "Coordinate geometry. Turning stat controls turn radius. Grid navigation IS the math.",
+    "vocabulary": "COORDINATE PAIR and ORDERED PAIR. When I say (4,3), that's a coordinate pair — also called an ordered pair. The order matters: (4,3) and (3,4) are different locations.",
     "activities": [
       {
         "name": "Human Robot Programming Challenge",
@@ -235,6 +241,8 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "Power: Ratio, Motor Speed, and the Scoop",
+    "bigMathIdea": "Ratios and non-proportional scaling. charge speed = Power² / 2 and follow through = Power × 200. Double the Power, quadruple the charge speed.",
+    "vocabulary": "PROPORTIONAL SCALING. If Power = 2 gives charge = 2 and Power = 4 gives charge = 8, the output scales with Power². The output grows faster than the input — that's non-proportional.",
     "activities": [
       {
         "name": "Finger Speed-Sums",
@@ -300,6 +308,8 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "The Full System: 20 Points, Four Stats, One Equation",
+    "bigMathIdea": "Budget constraint: S + E + T + P = 20. Equals sign as BALANCE, not 'the answer is.'",
+    "vocabulary": "CONSTRAINT and VARIABLE. S, E, T, and P are variables — they change based on your choices. The equation S + E + T + P = 20 is a constraint that limits the valid combinations.",
     "activities": [
       {
         "name": "Conditional Simon Says",
@@ -372,6 +382,7 @@ const DAYS = [
     "week": 2,
     "weekName": "Season 1",
     "theme": "Lock In Your Build: Allocations, Fabrication, One Hard Correction",
+    "bigMathIdea": "All four formulas working together. Interleaved practice across Speed, Endurance, Turning, Power, and Budget — identify the formula before you calculate.",
     "activities": [
       {
         "name": "Equation Relay Race",
@@ -436,6 +447,8 @@ const DAYS = [
     "week": 2,
     "weekName": "Season 1",
     "theme": "Season 1 Begins: First Matches and the Leaderboard",
+    "bigMathIdea": "Slope-intercept form: P(t) = 100 − rt. The slope r is the rate of change; the x-intercept is when the bot's power reaches zero.",
+    "vocabulary": "SLOPE and X-INTERCEPT. The slope r tells you how fast the bot loses power per minute. The x-intercept is where the line crosses zero — the minute your bot dies.",
     "activities": [
       {
         "name": "Trashketball: Warm-Up Round",
@@ -508,6 +521,8 @@ const DAYS = [
     "week": 2,
     "weekName": "Season 1",
     "theme": "Matching Situations, Graphs, and Linear Equations",
+    "bigMathIdea": "Linear equations from two data points. slope = Δy/Δx, y-intercept solves from a known point. Match-day data → scatter plot → equation.",
+    "vocabulary": "SCATTER PLOT and LINE OF BEST FIT. A scatter plot shows individual data points. A line of best fit approximates the trend across all of them.",
     "activities": [
       {
         "name": "Math Scavenger Hunt: Leaderboard Edition",
@@ -601,6 +616,8 @@ const DAYS = [
     "week": 2,
     "weekName": "Season 1",
     "theme": "Season 1: Adjustments, Linear Equations, and the Gap",
+    "bigMathIdea": "Residuals. Predicted − actual. A model's error tells you which variable is missing. The formula you got WRONG is more informative than the one you got right.",
+    "vocabulary": "RESIDUAL. The gap between what your equation predicted and what actually happened. Residuals point to variables your model is missing.",
     "activities": [
       {
         "name": "Rivalry Card Response",
@@ -672,6 +689,7 @@ const DAYS = [
     "week": 2,
     "weekName": "Season 1",
     "theme": "Season 1 Final Matches + Distance Formula (Applied to Match Data)",
+    "bigMathIdea": "Distance formula: d = √((x₂ − x₁)² + (y₂ − y₁)²). Applied to tip-off, ball position, and goal to evaluate charge efficiency.",
     "activities": [
       {
         "name": "Best Match Gallery Walk",
@@ -750,6 +768,7 @@ const DAYS = [
     "week": 3,
     "weekName": "Season 2 + Commissioner",
     "theme": "You Run the League Now: Commissioner Prep + the Underdog Mechanic",
+    "bigMathIdea": "Proportional vs non-proportional scaling at 50%. Speed scales linearly (+50% stat → +50% output); Power scales quadratically (+50% stat → +125% charge speed).",
     "activities": [
       {
         "name": "Human Number Line: Stat Rankings",
@@ -836,6 +855,8 @@ const DAYS = [
     "week": 3,
     "weekName": "Season 2 + Commissioner",
     "theme": "The Commissioner's Meeting: You Change the Rules",
+    "bigMathIdea": "Data-backed argument. Every claim in a proposal must cite a specific number from the dashboard. Evidence quality separates analysis from opinion.",
+    "vocabulary": "CAUSAL vs CORRELATIONAL. Causal: X produces Y, controlling for other variables. Correlational: X and Y happen together, but another factor might cause both.",
     "activities": [
       {
         "name": "Lobby the Commissioners",
@@ -901,6 +922,7 @@ const DAYS = [
     "week": 3,
     "weekName": "Season 2 + Commissioner",
     "theme": "Your Win Equation + Season 2 Begins",
+    "bigMathIdea": "Building your own linear equation from match data. Two data points → slope → y-intercept → testable prediction.",
     "activities": [
       {
         "name": "The Prediction Market",
@@ -980,6 +1002,8 @@ const DAYS = [
     "week": 3,
     "weekName": "Season 2 + Commissioner",
     "theme": "Season 2: Percent Change and the Model vs. the Match",
+    "bigMathIdea": "Percent change = (new − old) / old × 100. Percent change is not the same as percentage-point difference. Percent change of a stat does not always produce proportional percent change of wins.",
+    "vocabulary": "PERCENT CHANGE. A proportional comparison relative to the original value. Going from 4 to 6 is a +50% change; going from 6 to 4 is a −33% change.",
     "activities": [
       {
         "name": "Stat Auction + Prediction Check",
@@ -1044,6 +1068,7 @@ const DAYS = [
     "week": 3,
     "weekName": "Season 2 + Commissioner",
     "theme": "Creative Expression: Bot Identity + Scouting Begins + Season 3 Begins",
+    "bigMathIdea": "Scouting report math. Express stats as percentages of the 20-point budget. Write Endurance decay in slope-intercept form using allocation data.",
     "activities": [
       {
         "name": "Bot Lore Gallery Walk",
@@ -1108,6 +1133,8 @@ const DAYS = [
     "week": 4,
     "weekName": "Championship",
     "theme": "Scouting Reports + Final Commissioner's Meeting Begins",
+    "bigMathIdea": "Trend line equation from opponent data. Use two match data points to predict a specific Championship outcome. Inequality constraint analysis produces valid counter-loadouts.",
+    "vocabulary": "INEQUALITY. A statement that one quantity is less than, greater than, or not equal to another. Used to describe loadout constraints like 'Speed > 5' or 'Endurance ≤ 4.'",
     "activities": [
       {
         "name": "Memory Probe: Scout Your Opponent Cold",
@@ -1172,6 +1199,7 @@ const DAYS = [
     "week": 4,
     "weekName": "Championship",
     "theme": "Championship Prep: Pre-Match Pitch Rehearsal + Final Adjustments",
+    "bigMathIdea": "What-if analysis. A hypothetical constraint forces recalculation of every affected loadout. Practice surfacing which stats move and which don't.",
     "activities": [
       {
         "name": "Cold Retrieval + Scouting Annotation",
@@ -1237,6 +1265,7 @@ const DAYS = [
     "week": 4,
     "weekName": "Championship",
     "theme": "Championship Tournament",
+    "bigMathIdea": "Pre-match pitch math. Every claim needs a number. Judges score on mathematical specificity, not presentation polish.",
     "activities": [
       {
         "name": "Pre-Championship Ritual",
@@ -1301,6 +1330,7 @@ const DAYS = [
     "week": 4,
     "weekName": "Championship",
     "theme": "Community Exhibition: You Are the Experts Now",
+    "bigMathIdea": "Teaching math to an outsider. You only know a concept if you can explain it clearly to someone who has not seen the stat system before.",
     "activities": [
       {
         "name": "Expert Setup",
@@ -1365,6 +1395,7 @@ const DAYS = [
     "week": 4,
     "weekName": "Championship",
     "theme": "Awards, Post-Task Diagnostic, and the Close",
+    "bigMathIdea": "Post-task diagnostic. Parallel-form growth assessment across all eight topics: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry, arc approximation, slope, linear decay.",
     "activities": [
       {
         "name": "Walk the Wall: Final Gallery",
