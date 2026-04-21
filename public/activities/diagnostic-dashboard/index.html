@@ -301,16 +301,8 @@ async function loadData() {
   const status = document.getElementById('status');
   status.textContent = 'Loading…';
 
-  // The dashboard API requires a short token to discourage scraping.
-  // We keep that token in sessionStorage; if absent, prompt once.
-  let token = sessionStorage.getItem(DATA_KEY) || '';
-  if (!token) {
-    token = prompt('Dashboard data token (ask Lizabeth):') || '';
-    if (token) sessionStorage.setItem(DATA_KEY, token);
-  }
-
   try {
-    const res = await fetch('/api/diagnostic-dashboard?token=' + encodeURIComponent(token));
+    const res = await fetch('/api/diagnostic-dashboard');
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to load');
     render(data.records);
@@ -331,7 +323,7 @@ function render(records) {
 }
 
 document.getElementById('state-filter').addEventListener('change', renderForFilter);
-document.getElementById('refresh-btn').addEventListener('click', () => { sessionStorage.removeItem(DATA_KEY); loadData(); });
+document.getElementById('refresh-btn').addEventListener('click', () => { loadData(); });
 
 function renderForFilter() {
   const filter = document.getElementById('state-filter').value;

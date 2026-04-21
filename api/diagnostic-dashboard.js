@@ -11,8 +11,8 @@
 //   GOOGLE_SHEET_ID_NEW_YORK_1, GOOGLE_SHEET_ID_NEW_YORK_2, GOOGLE_SHEET_ID_TN
 //   GOOGLE_SHEET_ID_NEW_YORK_1_POST, GOOGLE_SHEET_ID_NEW_YORK_2_POST, GOOGLE_SHEET_ID_TN_POST
 //   GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY
-//   DIAGNOSTIC_DASHBOARD_TOKEN — a short shared secret required on the
-//     request (?token=...) so the endpoint is not publicly scrapable.
+//   (no DIAGNOSTIC_DASHBOARD_TOKEN check — endpoint is open. Names are
+//    still hashed server-side so only pseudonyms reach the browser.)
 
 export const config = { runtime: 'edge' };
 
@@ -29,14 +29,6 @@ const POST_SHEET_IDS = {
 };
 
 export default async function handler(req) {
-  const url = new URL(req.url);
-  const token = url.searchParams.get('token');
-  const expected = process.env.DIAGNOSTIC_DASHBOARD_TOKEN;
-
-  if (!expected || token !== expected) {
-    return respond({ error: 'Unauthorized' }, 401);
-  }
-
   const serviceEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
