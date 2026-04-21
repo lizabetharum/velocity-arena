@@ -102,8 +102,8 @@ table.roster .delta-neg{color:#9C1A20;}
   <a class="back-btn" href="/teachers.html">&larr; Back to Teacher Resources</a>
 </div>
 
-<!-- Access gate — disabled; set style="" on the gate div below to re-enable -->
-<div class="gate" id="gate" style="display:none;">
+<!-- Access gate -->
+<div class="gate" id="gate">
   <div class="gate-box">
     <div class="gate-icon">
       <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="4" y="10" width="14" height="9" rx="2" stroke="#0065B3" stroke-width="1.5"/><path d="M7 10V7a4 4 0 018 0v3" stroke="#0065B3" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -175,22 +175,29 @@ function unlock() {
   loadData();
 }
 
-// Gate disabled — auto-unlock and show the dashboard immediately.
-// To re-enable: remove style="display:none;" from #gate above and
-// restore the sessionStorage check below.
-unlock();
-// if (sessionStorage.getItem(AUTH_KEY) === '1') {
-//   unlock();
-// } else {
-//   setTimeout(() => gateInput.focus(), 80);
-// }
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  unlock();
+} else {
+  setTimeout(() => gateInput.focus(), 80);
+}
 
+// Use mousedown in addition to click so password-manager extensions
+// cannot clear the input before we read it. (This was the cause of
+// the earlier "Incorrect password" bug on the post-test gate.)
+gateBtn.addEventListener('mousedown', (e) => { e.preventDefault(); tryGate(); });
 gateBtn.addEventListener('click', tryGate);
-gateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryGate(); });
+gateInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); tryGate(); }
+});
 
 function tryGate() {
-  const pwd = (window.CONFIG && CONFIG.teacherPassword) || '';
-  if (gateInput.value === pwd && pwd.length > 0) {
+  // Fall back to the hardcoded teacher password if CONFIG didn't
+  // load (extensions can race with the <script src="/config.js"> tag).
+  const pwdFromConfig = (window.CONFIG && CONFIG.teacherPassword) || '';
+  const pwd = (pwdFromConfig || 'velocityNYCFIRST2026').trim();
+  const liveInput = document.getElementById('gate-input');
+  const entered = ((liveInput ? liveInput.value : '') || '').trim();
+  if (entered === pwd && pwd.length > 0) {
     sessionStorage.setItem(AUTH_KEY, '1');
     unlock();
   } else {
