@@ -30,8 +30,8 @@ const DAYS = [
         "name": "Stat Card Distribution",
         "mins": 5,
         "block": "LX Setup",
-        "description": "You get a blank stat card -- a 4x6 index card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
-        "facilitatorDescription": "Hand each camper a blank 4x6 stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the camper for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper."
+        "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
+        "facilitatorDescription": "Hand each camper a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the camper for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper."
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
