@@ -59,7 +59,17 @@ export default async function handler(req) {
       // Skip header row
       for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
-        // Row: Timestamp | State | First Name | Last Name | Q1..Q10
+        // Row: Timestamp | State | First | Last | Q1..Q10 | (then AI columns)
+        // AI columns start at index 14:
+        //   14  Q1_Score | 15  Q1_Reason
+        //   16  Q2_Score | 17  Q2_Reason
+        //   18  Q3_Score | 19  Q3_Reason
+        //   20  Q4_Score | 21  Q4_Reason
+        //   22  Q5_Score | 23  Q5_Reason
+        //   24  Q6_Score | 25  Q6_Reason
+        //   26  Q7_Score | 27  Q7_Reason
+        //   28  Q8_Score | 29  Q8_Reason
+        //   30  Total    | 31  ScoredAt
         const timestamp = r[0] || '';
         const firstName = (r[2] || '').trim();
         const lastName  = (r[3] || '').trim();
@@ -68,12 +78,32 @@ export default async function handler(req) {
         const pseudonym = await hashName(firstName, lastName, state);
         const answers = r.slice(4, 14).map(x => (x || '').toString());
 
+        // Collect AI scores/reasons if present
+        const aiScores = [];
+        for (let q = 0; q < 8; q++) {
+          const scoreCell = r[14 + q * 2];
+          const reasonCell = r[14 + q * 2 + 1];
+          if (scoreCell === undefined || scoreCell === '') {
+            aiScores.push(null);
+          } else {
+            aiScores.push({
+              score: parseFloat(scoreCell) || 0,
+              reason: (reasonCell || '').toString()
+            });
+          }
+        }
+        const aiTotal = r[30] !== undefined && r[30] !== '' ? parseFloat(r[30]) : null;
+        const scoredAt = r[31] || '';
+
         records.push({
           pseudonym,
           state,
           variant,
           timestamp,
-          answers
+          answers,
+          aiScores,
+          aiTotal,
+          scoredAt
         });
       }
     }
@@ -88,7 +118,7 @@ export default async function handler(req) {
 
 async function readSheet(sheetId, token) {
   const res = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:N1000`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:AF1000`,
     {
       headers: { 'Authorization': `Bearer ${token}` }
     }
@@ -101,11 +131,15 @@ async function readSheet(sheetId, token) {
   return data.values || [];
 }
 
-// Stable anonymization: SHA-256 of normalized name+state, truncated to 10 hex chars.
-// Same student in pre and post sheets will hash to the same pseudonym, so growth
-// can be matched client-side without ever sending names to the browser.
+// Stable anonymization: SHA-256 of (first-initial + last-name + state), truncated
+// to 10 hex chars. Same student in pre and post sheets will hash to the same
+// pseudonym, so growth can be matched client-side without ever sending names to
+// the browser. Using first-initial (not full first name) tolerates nickname
+// variations like "Liza" vs "Elizabeth".
 async function hashName(firstName, lastName, state) {
-  const input = `${firstName.toLowerCase().trim()}|${lastName.toLowerCase().trim()}|${state}`;
+  const firstInitial = (firstName || '').toLowerCase().trim().charAt(0);
+  const last = (lastName || '').toLowerCase().trim();
+  const input = `${firstInitial}|${last}|${state}`;
   const bytes = new TextEncoder().encode(input);
   const hash = await crypto.subtle.digest('SHA-256', bytes);
   return Array.from(new Uint8Array(hash))

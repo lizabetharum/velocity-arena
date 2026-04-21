@@ -128,7 +128,7 @@ table.roster .delta-neg{color:#9C1A20;}
 <div class="main" id="main" style="display:none;">
 
   <div class="notice">
-    <strong>How scoring works.</strong> Free-text answers are scored client-side with a simple heuristic (looking for the target number in the answer). This is a rough indicator, not a grade &mdash; it surfaces trends but a facilitator should review unusual rows. Rows marked "Not yet" are always scored 0.
+    <strong>How scoring works.</strong> Each answer is graded by Claude Haiku against a rubric and saved to the Google Sheet. Scoring is 0 / 0.5 / 1 per question with a short rationale. Click "Score new submissions" to grade any submissions that have not yet been scored. Scores persist in the sheet, so you only pay the API cost once per submission. Hover any cell in the roster to see Claude's reasoning.
   </div>
 
   <div class="toolbar">
@@ -140,6 +140,7 @@ table.roster .delta-neg{color:#9C1A20;}
       <option value="TN">Tennessee</option>
     </select>
     <button id="refresh-btn">Refresh</button>
+    <button id="score-btn" style="background:#E86C3F;">Score new submissions</button>
     <div class="status" id="status"></div>
   </div>
 
@@ -207,22 +208,8 @@ function tryGate() {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// ANSWER KEY AND SCORING HEURISTICS
+// TOPICS — order matches q1..q8 in both diagnostics
 // ══════════════════════════════════════════════════════════════════════
-// Each topic has a pre-test and post-test target.  For numeric answers we
-// check whether the target numbers appear in the student's free-text.
-// For the qualitative questions we look for keyword families.
-//
-// Order matches the question sequence in both diagnostics (q1..q8):
-//   1 proportional reasoning
-//   2 unit rate
-//   3 ratio
-//   4 linear decay
-//   5 coordinate geometry (qualitative — quadrant mapping)
-//   6 proportional scaling
-//   7 arc approximation (qualitative — "segments / straight lines / string")
-//   8 slope as rate of change
-
 const TOPICS = [
   { key: 'prop_reasoning', name: 'Proportional reasoning' },
   { key: 'unit_rate',      name: 'Unit rate' },
@@ -233,73 +220,6 @@ const TOPICS = [
   { key: 'arc_approx',     name: 'Arc approximation' },
   { key: 'slope',          name: 'Slope as rate of change' },
 ];
-
-// Numeric targets by (variant, topic index)
-const TARGETS = {
-  pre: [
-    { numbers: [200] },                              // 1 — 200 miles
-    { numbers: [4] },                                // 2 — 4 cm/s
-    { numbers: [15] },                               // 3 — 15 blue bots
-    { numbers: [80] },                               // 4 — 80% charge
-    { quadrants: { '(2,5)': 'I', '(-3,1)': 'II', '(0,-4)': null, '(-1,-2)': 'III' } },
-    { numbers: [6, 9] },                             // 6 — 6 cups flour, 9 cups milk
-    { keywords: ['segment','straight','string','piece','break','divide','small','short','many'] },
-    { numbers: [2] },                                // 8 — slope = 2
-  ],
-  post: [
-    { numbers: [20] },                               // 1 — 20 miles
-    { numbers: [60] },                               // 2 — 60 pages/min
-    { numbers: [16] },                               // 3 — 16 apples
-    { numbers: [14] },                               // 4 — 14 cm candle
-    { quadrants: { '(4,-2)': 'IV', '(-5,6)': 'II', '(-3,-1)': 'III', '(1,7)': 'I' } },
-    { numbers: [20, 30] },                           // 6 — 20 ft, 30 ft
-    { keywords: ['segment','straight','string','piece','break','divide','small','short','many'] },
-    { numbers: [3] },                                // 8 — slope = 3
-  ]
-};
-
-function normalize(text) {
-  return (text || '').toString().toLowerCase().replace(/[,$]/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function scoreAnswer(rawText, target) {
-  const text = normalize(rawText);
-  if (!text || text === 'not yet') return 0;
-
-  if (target.numbers) {
-    // Every listed number must appear in the answer
-    const nums = text.match(/-?\d+(?:\.\d+)?/g) || [];
-    const asNum = nums.map(n => parseFloat(n));
-    const allPresent = target.numbers.every(t => asNum.some(n => Math.abs(n - t) < 0.01));
-    return allPresent ? 1 : 0;
-  }
-
-  if (target.quadrants) {
-    // Match each point to its expected quadrant. Score is fraction correct.
-    const points = Object.keys(target.quadrants);
-    let correct = 0; let scored = 0;
-    for (const pt of points) {
-      const expected = target.quadrants[pt];
-      if (!expected) continue; // skip "on axis" points
-      scored++;
-      // Look for the point followed by its quadrant in roman numerals
-      const idx = text.replace(/\s/g,'').indexOf(pt.replace(/\s/g,''));
-      if (idx >= 0) {
-        // Grab the next 12 chars and check for I/II/III/IV indicator
-        const ctx = text.replace(/\s/g,'').slice(idx, idx + 20);
-        const romans = ctx.match(/\b(iv|iii|ii|i)\b/);
-        if (romans && romans[1].toUpperCase() === expected) correct++;
-      }
-    }
-    return scored > 0 ? (correct / scored >= 0.75 ? 1 : 0) : 0;
-  }
-
-  if (target.keywords) {
-    return target.keywords.some(k => text.includes(k)) ? 1 : 0;
-  }
-
-  return 0;
-}
 
 // ══════════════════════════════════════════════════════════════════════
 // DATA FETCH + RENDER
@@ -331,21 +251,57 @@ function render(records) {
 
 document.getElementById('state-filter').addEventListener('change', renderForFilter);
 document.getElementById('refresh-btn').addEventListener('click', () => { loadData(); });
+document.getElementById('score-btn').addEventListener('click', scoreNewSubmissions);
+
+async function scoreNewSubmissions() {
+  const btn = document.getElementById('score-btn');
+  const status = document.getElementById('status');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Scoring…';
+  status.textContent = 'Grading with Claude (may take ~1 min for many submissions)…';
+
+  try {
+    const res = await fetch('/api/score-diagnostic?max=100');
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'Scoring failed');
+    status.textContent = `Scored ${data.scored} submission${data.scored === 1 ? '' : 's'}. Refreshing…`;
+    if (data.errors && data.errors.length) {
+      console.warn('score errors:', data.errors);
+    }
+    await loadData();
+  } catch (err) {
+    status.textContent = 'Scoring error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
 
 function renderForFilter() {
   const filter = document.getElementById('state-filter').value;
   const records = filter === 'ALL' ? allRecords : allRecords.filter(r => r.state === filter);
 
-  // Score each record
+  // Use AI scores stored in the sheet. Records that haven't been scored
+  // yet get `null` in their aiScores array; we treat those as unscored
+  // (not zero) so they don't distort averages.
   const scored = records.map(r => {
-    const targets = TARGETS[r.variant] || TARGETS.pre;
-    const scores = TOPICS.map((_, i) => scoreAnswer(r.answers[i], targets[i]));
-    const total = scores.reduce((a,b) => a+b, 0);
-    return { ...r, scores, total };
+    const scores = (r.aiScores || []).map(s => s ? s.score : null);
+    const reasons = (r.aiScores || []).map(s => s ? s.reason : '');
+    const hasAll = scores.length === 8 && scores.every(s => s !== null);
+    const total = hasAll ? scores.reduce((a, b) => a + b, 0) : null;
+    return { ...r, scores, reasons, total, scoredByAI: hasAll };
   });
 
-  const preRecords  = scored.filter(r => r.variant === 'pre');
-  const postRecords = scored.filter(r => r.variant === 'post');
+  // Split into scored vs unscored so unscored don't distort averages
+  const unscoredCount = scored.filter(r => !r.scoredByAI).length;
+
+  // Only use AI-scored records in stats and topic growth. Matching students
+  // across pre/post also requires both records to be scored.
+  const preAll  = scored.filter(r => r.variant === 'pre');
+  const postAll = scored.filter(r => r.variant === 'post');
+  const preRecords  = preAll.filter(r => r.scoredByAI);
+  const postRecords = postAll.filter(r => r.scoredByAI);
 
   // ── HEADLINE STATS ──
   const statsEl = document.getElementById('stats-row');
@@ -354,7 +310,7 @@ function renderForFilter() {
   const preAvg  = preN  ? (preRecords.reduce((a,b)  => a + b.total, 0) / preN).toFixed(1)  : '—';
   const postAvg = postN ? (postRecords.reduce((a,b) => a + b.total, 0) / postN).toFixed(1) : '—';
 
-  // matched pairs by pseudonym
+  // matched pairs by pseudonym (AI-scored only)
   const preBy  = new Map(preRecords.map(r => [r.pseudonym, r]));
   const postBy = new Map(postRecords.map(r => [r.pseudonym, r]));
   const matched = [];
@@ -367,11 +323,16 @@ function renderForFilter() {
     ? (matched.reduce((a,m) => a + (m.post.total - m.pre.total), 0) / matched.length).toFixed(2)
     : '—';
 
+  const unscoredNote = unscoredCount > 0
+    ? `<div class="stat-card" style="border-color:#F5D799;background:#FFF7E8;"><div class="stat-label" style="color:#8A5A00;">Awaiting scoring</div><div class="stat-value" style="color:#8A5A00;">${unscoredCount}</div><div class="stat-sub">Click "Score new submissions" above</div></div>`
+    : '';
+
   statsEl.innerHTML = `
-    <div class="stat-card"><div class="stat-label">Pre-task submissions</div><div class="stat-value">${preN}</div><div class="stat-sub">Avg ${preAvg} / 8 correct</div></div>
-    <div class="stat-card"><div class="stat-label">Post-task submissions</div><div class="stat-value">${postN}</div><div class="stat-sub">Avg ${postAvg} / 8 correct</div></div>
+    <div class="stat-card"><div class="stat-label">Pre-task submissions</div><div class="stat-value">${preAll.length}</div><div class="stat-sub">Scored: ${preN} · Avg ${preAvg} / 8</div></div>
+    <div class="stat-card"><div class="stat-label">Post-task submissions</div><div class="stat-value">${postAll.length}</div><div class="stat-sub">Scored: ${postN} · Avg ${postAvg} / 8</div></div>
     <div class="stat-card"><div class="stat-label">Matched students</div><div class="stat-value">${matched.length}</div><div class="stat-sub">Pre &amp; post from same student</div></div>
-    <div class="stat-card"><div class="stat-label">Avg growth (matched)</div><div class="stat-value">${matchedGrowth}</div><div class="stat-sub">Topics gained per student</div></div>
+    <div class="stat-card"><div class="stat-label">Avg growth (matched)</div><div class="stat-value">${matchedGrowth}</div><div class="stat-sub">Points gained out of 8</div></div>
+    ${unscoredNote}
   `;
 
   // ── TOPIC GROWTH ──
@@ -410,24 +371,34 @@ function renderForFilter() {
     return;
   }
 
+  function fmt(n) {
+    return n === 0 ? '0' : n === 1 ? '1' : n === 0.5 ? '½' : n.toFixed(1);
+  }
+  function htmlEscape(s) {
+    return (s || '').toString()
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   const rows = matched
     .map(m => {
       const delta = m.post.total - m.pre.total;
       const deltaCls = delta > 0 ? 'delta-pos' : (delta < 0 ? 'delta-neg' : '');
       const cells = TOPICS.map((_, i) => {
         const p = m.pre.scores[i], q = m.post.scores[i];
-        const mark = (s) => s ? '✓' : '—';
         const d = q - p;
         const color = d > 0 ? '#1B7A44' : (d < 0 ? '#9C1A20' : '#A5A5A5');
-        return `<td class="cell-score" style="color:${color};">${mark(p)}→${mark(q)}</td>`;
+        const preReason = m.pre.reasons[i] || '';
+        const postReason = m.post.reasons[i] || '';
+        const title = htmlEscape(`Pre (${fmt(p)}): ${preReason}\nPost (${fmt(q)}): ${postReason}`);
+        return `<td class="cell-score" style="color:${color};" title="${title}">${fmt(p)}→${fmt(q)}</td>`;
       }).join('');
       return `<tr>
         <td class="code">${m.pseudonym}</td>
         <td>${m.pre.state}</td>
         ${cells}
-        <td class="cell-score">${m.pre.total}</td>
-        <td class="cell-score">${m.post.total}</td>
-        <td class="delta-cell ${deltaCls}">${delta > 0 ? '+' : ''}${delta}</td>
+        <td class="cell-score">${m.pre.total.toFixed(1)}</td>
+        <td class="cell-score">${m.post.total.toFixed(1)}</td>
+        <td class="delta-cell ${deltaCls}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</td>
       </tr>`;
     })
     .sort()
