@@ -345,34 +345,17 @@ function closeRefCard() { document.getElementById('ref-modal').classList.remove(
 
 // ── MAIN RENDER ────────────────────────────────────────────────────────
 const main = document.getElementById('main');
-const { dayNum, campDates } = getCampInfo();
+const { dayNum: todayDayNum, campDates } = getCampInfo();
 
-if (dayNum === 'before' || dayNum === 'after' || dayNum === 'weekend' || dayNum === 'holiday') {
-  const msgMap = {
-    before: { title: 'Camp starts soon', sub: 'Browse the full schedule below.' },
-    after:  { title: 'Camp has ended', sub: 'Thanks for a great four weeks.' },
-    weekend:{ title: 'No camp today', sub: 'See you next camp day. Browse the schedule below.' },
-    holiday:{ title: 'No camp today', sub: 'Enjoy the break. Browse the schedule below.' },
-  };
-  const msg = msgMap[dayNum];
-  main.innerHTML = `
-    <div class="offday">
-      <div class="offday-title">${msg.title}</div>
-      <div class="offday-sub">${msg.sub}</div>
-    </div>
-    <div class="section-label">Full schedule</div>
-    ${buildWeekGrid(null)}`;
-
-} else {
-  // ── Live camp day ──
+function renderDay(dayNum) {
   const day = DAYS.find(d => d.day === dayNum);
   const weekDays = DAYS.filter(d => d.week === day.week);
   const framing = WEEK_FRAMING[day.week] || {};
 
-  // show zoom strip
-  document.getElementById('zoom-strip').style.display = '';
-  // show Zoom 2 weekly framing button only on Monday (day 1 of week)
   const isFirstDayOfWeek = weekDays[0].day === dayNum;
+  // Keep the week-framing panel open when the user has navigated to a
+  // non-today day — otherwise clicking a tile inside it would collapse it.
+  const openPanel = isFirstDayOfWeek || dayNum !== todayDayNum;
 
   // Build "What You'll Do" — one line per block type, de-duped
   const blockSeen = new Set();
@@ -403,7 +386,6 @@ if (dayNum === 'before' || dayNum === 'after' || dayNum === 'weekend' || dayNum 
       <div class="exit-response" id="exit-resp"></div>
     </div>` : '';
 
-  // Week framing collapsible (Zoom 2) — shown every day, highlighted on Mondays
   const weekFramingHtml = `
     <div class="week-framing">
       <button class="week-framing-toggle" onclick="toggleWeekFraming()">
@@ -411,14 +393,16 @@ if (dayNum === 'before' || dayNum === 'after' || dayNum === 'weekend' || dayNum 
           <span class="wf-label">Week ${day.week}</span>
           <span class="wf-title">${framing.ask || 'This week\'s question'}</span>
         </div>
-        <span class="wf-chevron" id="wf-chevron">${isFirstDayOfWeek ? '▴' : '▾'}</span>
+        <span class="wf-chevron" id="wf-chevron">${openPanel ? '▴' : '▾'}</span>
       </button>
-      <div class="week-framing-body ${isFirstDayOfWeek ? 'open' : ''}" id="wf-body">
+      <div class="week-framing-body ${openPanel ? 'open' : ''}" id="wf-body">
         <div class="wf-question">${framing.detail || ''}</div>
         <div class="wf-days">
           ${weekDays.map(d => `
-            <a class="wf-day ${d.day === dayNum ? 'today-day' : d.day < dayNum ? 'past-day' : ''}"
-               href="/day.html?day=${d.day}" style="text-decoration:none">
+            <a class="wf-day ${d.day === dayNum ? 'today-day' : d.day < todayDayNum ? 'past-day' : ''}"
+               href="/day.html?day=${d.day}"
+               onclick="event.preventDefault();renderDay(${d.day});"
+               style="text-decoration:none">
               <div class="wf-day-num">${d.day}</div>
               <div class="wf-day-label">${d.theme.split(':')[0].split(',')[0].slice(0,18)}</div>
             </a>`).join('')}
@@ -426,7 +410,7 @@ if (dayNum === 'before' || dayNum === 'after' || dayNum === 'weekend' || dayNum 
       </div>
     </div>`;
 
-  // Build today's activity list (full, for right column)
+  // Build the selected day's activity list (full, for right column)
   const actRows = (day.activities||[]).map(a => `
     <div class="act-row">
       <div class="act-mins">${a.mins}m</div>
@@ -514,6 +498,26 @@ if (dayNum === 'before' || dayNum === 'after' || dayNum === 'weekend' || dayNum 
       </div>
 
     </div>`;
+}
+
+if (todayDayNum === 'before' || todayDayNum === 'after' || todayDayNum === 'weekend' || todayDayNum === 'holiday') {
+  const msgMap = {
+    before: { title: 'Camp starts soon', sub: 'Browse the full schedule below.' },
+    after:  { title: 'Camp has ended', sub: 'Thanks for a great four weeks.' },
+    weekend:{ title: 'No camp today', sub: 'See you next camp day. Browse the schedule below.' },
+    holiday:{ title: 'No camp today', sub: 'Enjoy the break. Browse the schedule below.' },
+  };
+  const msg = msgMap[todayDayNum];
+  main.innerHTML = `
+    <div class="offday">
+      <div class="offday-title">${msg.title}</div>
+      <div class="offday-sub">${msg.sub}</div>
+    </div>
+    <div class="section-label">Full schedule</div>
+    ${buildWeekGrid(null)}`;
+} else {
+  document.getElementById('zoom-strip').style.display = '';
+  renderDay(todayDayNum);
 }
 
 // ── Build week grid ─────────────────────────────────────────────────────
