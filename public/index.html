@@ -209,7 +209,7 @@
     <button class="zoom-btn" id="z4-btn" onclick="openRefCard()">
       <span class="zoom-name">Reference card</span>
     </button>
-    <button class="zoom-btn" id="z5-btn" onclick="window.location='/stuck.html'">
+    <button class="zoom-btn" id="z5-btn" onclick="openStuckCard()">
       <span class="zoom-name">Stuck?</span>
     </button>
   </div>
@@ -239,7 +239,7 @@
     <div class="ref-grid">
       <div class="ref-chip">
         <div><div class="ref-stat">Speed</div></div>
-        <div><div class="ref-formula">Motor% = (S × 100) ÷ 20</div><div class="ref-desc">Double stat → double speed. Proportional.</div></div>
+        <div><div class="ref-formula">motorPower% = (S × 100) ÷ 20</div><div class="ref-desc">Double stat → double speed. Proportional.</div></div>
       </div>
       <div class="ref-chip">
         <div><div class="ref-stat">Endurance</div></div>
@@ -247,11 +247,11 @@
       </div>
       <div class="ref-chip">
         <div><div class="ref-stat">Turning</div></div>
-        <div><div class="ref-formula">Arc = T · Ratio = 0.2 + (T × 0.02)</div><div class="ref-desc">How sharp can you turn?</div></div>
+        <div><div class="ref-formula">arcSegments = T <br /> turnRatio = 0.2 + (T × 0.02)</div><div class="ref-desc">How sharp can you turn?</div></div>
       </div>
       <div class="ref-chip">
         <div><div class="ref-stat">Power</div></div>
-        <div><div class="ref-formula">Charge = P² · Follow = P × 200</div><div class="ref-desc">Double stat → quadruple charge. Quadratic.</div></div>
+        <div><div class="ref-formula">charge = P² <br /> followThrough = P × 200</div><div class="ref-desc">Double stat → quadruple charge. Quadratic.</div></div>
       </div>
     </div>
     <div style="background:var(--navy3);border-radius:.5rem;padding:.625rem 1rem;font-size:.875rem">
@@ -268,6 +268,16 @@
         <span style="font-size:.75rem;background:var(--navy3);border-radius:.25rem;padding:3px 10px;color:var(--white)">Linear decay</span>
         <span style="font-size:.75rem;background:var(--navy3);border-radius:.25rem;padding:3px 10px;color:var(--white)">Quadratic growth</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUCK? MODAL (Zoom 5) — content lazy-loaded from /stuck.html -->
+<div class="modal-backdrop" id="stuck-modal" onclick="if(event.target===this)closeStuckCard()">
+  <div class="modal-box" style="max-width:760px">
+    <button class="modal-close" onclick="closeStuckCard()">✕</button>
+    <div id="stuck-modal-body">
+      <div style="padding:3rem 1rem;text-align:center;color:var(--slate);font-size:.875rem">Loading…</div>
     </div>
   </div>
 </div>
@@ -342,6 +352,37 @@ function toggleWhy() {
 }
 function openRefCard()  { document.getElementById('ref-modal').classList.add('open'); }
 function closeRefCard() { document.getElementById('ref-modal').classList.remove('open'); }
+
+async function openStuckCard() {
+  const modal = document.getElementById('stuck-modal');
+  const body  = document.getElementById('stuck-modal-body');
+  modal.classList.add('open');
+  if (body.dataset.loaded) return;
+  try {
+    const res  = await fetch('/stuck.html');
+    const text = await res.text();
+    const doc  = new DOMParser().parseFromString(text, 'text/html');
+    // Pull stuck.html's styles into the host page so all its classes work.
+    doc.querySelectorAll('style').forEach(s => {
+      const copy = document.createElement('style');
+      copy.textContent = s.textContent;
+      document.head.appendChild(copy);
+    });
+    const main = doc.querySelector('main.page-body');
+    body.innerHTML = main ? main.innerHTML : '<p style="padding:1.5rem;color:var(--slate)">Content unavailable. <a href="/stuck.html" style="color:var(--cyan)">Open in page →</a></p>';
+    // Re-run inline scripts (toggleStep / answerStep / toggleLost).
+    doc.querySelectorAll('script:not([data-pplx-inline-edit])').forEach(s => {
+      if (!s.textContent.trim()) return;
+      const copy = document.createElement('script');
+      copy.textContent = s.textContent;
+      document.head.appendChild(copy);
+    });
+    body.dataset.loaded = '1';
+  } catch (_err) {
+    body.innerHTML = '<p style="padding:1.5rem;color:var(--slate)">Could not load. <a href="/stuck.html" style="color:var(--cyan)">Open in page →</a></p>';
+  }
+}
+function closeStuckCard() { document.getElementById('stuck-modal').classList.remove('open'); }
 
 // ── MAIN RENDER ────────────────────────────────────────────────────────
 const main = document.getElementById('main');
