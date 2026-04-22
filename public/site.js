@@ -54,7 +54,10 @@ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 function campDayWeekday(campDates, dayNum) {
   return DAY_NAMES[campDates[dayNum - 1].getDay()];
 }
-
+function realWeekday(campDates, idx) {
+  if (!campDates[idx]) return '';
+  return campDates[idx].toLocaleDateString('en-US', { weekday: 'long', timeZone: CONFIG.timezone });
+}
 function getNavLink(page) {
   const pages = [
     { id: 'today',    href: '/index.html',    label: 'Today' },
