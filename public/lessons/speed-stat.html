@@ -178,7 +178,13 @@
     .timer-ring .fg  {
       stroke: var(--cyan);
       stroke-linecap: round;
-      transition: stroke-dashoffset .9s linear;
+      stroke-dasharray: 106.8;
+      stroke-dashoffset: 0;
+      animation: countdown 5s linear forwards;
+    }
+    @keyframes countdown {
+      from { stroke-dashoffset: 0; }
+      to   { stroke-dashoffset: 106.8; }
     }
     .timer-ring .num {
       position: absolute;
@@ -735,8 +741,7 @@
       <div class="timer-ring" id="timer-ring">
         <svg width="40" height="40" viewBox="0 0 40 40">
           <circle class="bg" cx="20" cy="20" r="17" />
-          <circle class="fg" id="timer-arc" cx="20" cy="20" r="17"
-                  stroke-dasharray="106.8" stroke-dashoffset="0" />
+          <circle class="fg" id="timer-arc" cx="20" cy="20" r="17" />
         </svg>
         <div class="num" id="timer-num">5</div>
       </div>
@@ -1024,32 +1029,20 @@ function getHint(speed, rawAnswer) {
 }
 
 // ══ Phase 1 — Timer ══════════════════════════════════════════════
-let timerInterval;
 function startTimer() {
-  let remaining = 5;
-  const arc = document.getElementById('timer-arc');
   const num = document.getElementById('timer-num');
   const label = document.getElementById('timer-label');
-  const circumference = 106.8;
+  const arc = document.getElementById('timer-arc');
 
-  // Show initial state
-  num.textContent = remaining;
-  arc.style.strokeDashoffset = 0;
-
-  timerInterval = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById('go-btn').disabled = false;
-      label.textContent = 'Ready — press Go when you are.';
-      num.textContent = '✓';
-      arc.style.stroke = 'var(--green)';
-      arc.style.strokeDashoffset = circumference;
-    } else {
-      num.textContent = remaining;
-      arc.style.strokeDashoffset = circumference * (1 - remaining / 5);
-    }
-  }, 1000);
+  // CSS animation handles the visual ring drain over 5s
+  // setTimeout enables the button after 5s — single reliable call
+  setTimeout(() => {
+    document.getElementById('go-btn').disabled = false;
+    label.textContent = 'Ready — press Go when you are.';
+    num.textContent = '✓';
+    num.style.color = 'var(--green)';
+    arc.style.stroke = 'var(--green)';
+  }, 5000);
 }
 window.addEventListener('DOMContentLoaded', () => {
   buildCalcTable();
