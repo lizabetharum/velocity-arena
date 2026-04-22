@@ -237,7 +237,8 @@
       background: var(--red);
       color: #fff;
     }
-    .btn-lock:hover { opacity: .88; }
+    .btn-lock:not(:disabled):hover { opacity: .88; }
+    .btn-lock:disabled { opacity: .35; cursor: not-allowed; }
 
     /* ── Calculation table ── */
     .calc-table {
@@ -609,6 +610,19 @@
     }
     .modal-actions .btn { flex: 1; justify-content: center; }
 
+    /* ── Already-locked notice (shown when server rejects overwrite) ── */
+    .lock-notice {
+      background: rgba(255,209,102,.08);
+      border: 1px solid rgba(255,209,102,.3);
+      border-radius: 8px;
+      padding: .875rem 1.125rem;
+      margin-bottom: 1.25rem;
+      color: var(--yellow);
+      font-size: .875rem;
+      line-height: 1.5;
+    }
+    .lock-notice strong { color: var(--yellow); font-weight: 800; }
+
     /* ── Locked state ── */
     .locked-display {
       text-align: center;
@@ -934,8 +948,14 @@
       <div class="budget-note ok" id="budget-note">12 points remain for Endurance, Turning, and Power (Days 2–4)</div>
     </div>
 
-    <div class="mt-2">
-      <button class="btn btn-lock" onclick="openLockModal()">
+    <!-- Name + Lock -->
+    <div style="margin-top:1.5rem;margin-bottom:1rem;">
+      <label for="student-name" style="display:block;font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Your name</label>
+      <input type="text" id="student-name" class="work-input" placeholder="First name, last initial — e.g. Alex M." oninput="onNameInput()" autocomplete="off" />
+    </div>
+
+    <div>
+      <button class="btn btn-lock" id="lock-btn" onclick="openLockModal()" disabled>
         🔒 Lock in Speed allocation
       </button>
     </div>
@@ -943,6 +963,7 @@
 
   <!-- Locked state (shown after commit) -->
   <div class="card" id="phase5-locked" style="display:none;">
+    <div class="lock-notice" id="lock-notice" style="display:none;"></div>
     <div class="locked-display">
       <div class="lock-icon">🔒</div>
       <h3>Speed locked for Week 1</h3>
@@ -1003,6 +1024,12 @@
 </div>
 
 <script>
+// ══ Storage endpoint ══════════════════════════════════════════════
+// Paste the Google Apps Script web-app URL below after deploying it
+// (see docs in repo / setup notes). Leave as empty string to disable
+// remote save — the lesson still works via localStorage only.
+const SAVE_ENDPOINT = '';
+
 // ══ Data ══════════════════════════════════════════════════════════
 const SPEED_VALUES = [1, 3, 5, 6, 8];
 const CORRECT = { 1: 5, 3: 15, 5: 25, 6: 30, 8: 40 };
@@ -1058,9 +1085,17 @@ function startTimer() {
 }
 window.addEventListener('DOMContentLoaded', () => {
   buildCalcTable();
+  const savedName = localStorage.getItem('va_student_name');
+  const nameInput = document.getElementById('student-name');
+  if (savedName && nameInput) { nameInput.value = savedName; onNameInput(); }
   onSliderChange();
   startTimer();
 });
+
+function onNameInput() {
+  const name = document.getElementById('student-name').value.trim();
+  document.getElementById('lock-btn').disabled = name.length < 1;
+}
 
 // ══ Phase 2 — Build table ════════════════════════════════════════
 function buildCalcTable() {
@@ -1347,11 +1382,60 @@ function closeLockModal() {
   document.getElementById('lock-modal').classList.remove('open');
 }
 
-function confirmLock() {
+async function confirmLock() {
   const pts = parseInt(document.getElementById('speed-slider').value);
+  const name = document.getElementById('student-name').value.trim();
   closeLockModal();
-  localStorage.setItem('va_speed_locked', pts);
-  showLockedState(pts);
+  localStorage.setItem('va_student_name', name);
+
+  // Default: use the student's latest pick. If the server tells us they
+  // already locked a different value for Week 1, we override with that value
+  // and surface a notice so the student sees their actual commitment.
+  let lockedPts = pts;
+
+  // No Content-Type header → "simple" CORS request → no preflight required
+  // (Apps Script web apps don't respond to OPTIONS preflight).
+  if (SAVE_ENDPOINT) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          site: localStorage.getItem('va_selected_site') || '',
+          stat: 'speed',
+          points: pts,
+          motorPower: pts * 5,
+          lesson: 'speed-stat',
+          ts: new Date().toISOString(),
+        }),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.ok === false && result.error === 'already_locked') {
+        const existing = Number(result.existing);
+        if (!isNaN(existing)) {
+          lockedPts = existing;
+          showAlreadyLockedNotice(name, existing);
+        }
+      }
+    } catch (_e) {
+      // Network failure — proceed with the student's pick. Facilitator will
+      // reconcile any discrepancy against the sheet.
+    }
+  }
+
+  localStorage.setItem('va_speed_locked', lockedPts);
+  showLockedState(lockedPts);
+}
+
+function showAlreadyLockedNotice(name, existing) {
+  const el = document.getElementById('lock-notice');
+  if (!el) return;
+  const pct = existing * 5;
+  el.innerHTML =
+    '<strong>Already locked.</strong> ' +
+    name + '’s Speed was set to <strong>' + existing + ' pts (' + pct + '%)</strong> ' +
+    'earlier this week. Week 1 individual allocations are one-way — you’re seeing your actual commitment now.';
+  el.style.display = 'block';
 }
 
 function showLockedState(pts) {
