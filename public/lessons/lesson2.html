@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speed Stat Challenge · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    /* ── Design tokens (mirrors style.css custom props) ── */
+    :root {
+      --navy:       #0D0D1A;
+      --navy2:      #161A2E;
+      --navy3:      #1E2240;
+      --cyan:       #00E5FF;
+      --teal:       #007A99;
+      --slate:      #8899AA;
+      --card-border:#222840;
+      --card-bg:    #161A2E;
+      --green:      #00C97A;
+      --red:        #FF4D6A;
+      --yellow:     #FFD166;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 4rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--cyan);
+      transition: width .5s ease;
+      z-index: 100;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate);
+      text-decoration: none;
+      font-size: .8125rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 {
+      font-size: .9375rem;
+      font-weight: 700;
+      color: #E8EAF2;
+      letter-spacing: .01em;
+    }
+    .page-header .day-tag {
+      margin-left: auto;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 4px;
+      padding: .2em .6em;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Phase wrapper ── */
+    .phase {
+      display: none;
+      max-width: 680px;
+      margin: 2.5rem auto 0;
+      padding: 0 1.25rem;
+      animation: fadeUp .35s ease both;
+    }
+    .phase.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Phase label ── */
+    .phase-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: .5rem;
+    }
+    .phase-label span {
+      color: var(--cyan);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: .75rem;
+    }
+
+    /* ── Formula board ── */
+    .formula-board {
+      background: var(--navy3);
+      border: 1.5px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+      margin: 1rem 0 1.5rem;
+    }
+    .formula-board .formula-text {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: .02em;
+      line-height: 1.3;
+    }
+    .formula-board .formula-sub {
+      font-size: .8125rem;
+      color: var(--slate);
+      margin-top: .5rem;
+      font-weight: 500;
+    }
+
+    .context-text {
+      font-size: .9375rem;
+      color: #C8CDD8;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Timer / countdown ── */
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .timer-ring {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+    .timer-ring svg { transform: rotate(-90deg); }
+    .timer-ring circle {
+      fill: none;
+      stroke-width: 3;
+    }
+    .timer-ring .bg  { stroke: var(--navy3); }
+    .timer-ring .fg  {
+      stroke: var(--cyan);
+      stroke-linecap: round;
+      transition: stroke-dashoffset .9s linear;
+    }
+    .timer-ring .num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+    .timer-label {
+      font-size: .875rem;
+      color: var(--slate);
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9375rem;
+      font-weight: 700;
+      padding: .75rem 1.5rem;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .01em;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+    .btn-primary:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+    .btn-primary:not(:disabled):hover { opacity: .88; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--slate);
+      border: 1px solid var(--card-border);
+    }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+    .btn-lock {
+      background: var(--red);
+      color: #fff;
+    }
+    .btn-lock:hover { opacity: .88; }
+
+    /* ── Calculation table ── */
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.25rem;
+    }
+    .calc-table th {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      text-align: left;
+      padding: .5rem .75rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .calc-table td {
+      padding: .625rem .75rem;
+      border-bottom: 1px solid rgba(34,40,64,.6);
+      vertical-align: top;
+    }
+    .calc-table tr:last-child td { border-bottom: none; }
+
+    .speed-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--cyan);
+      min-width: 2rem;
+    }
+
+    .work-input {
+      width: 100%;
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: .4rem .6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .8125rem;
+      color: #E8EAF2;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .work-input:focus { border-color: var(--teal); }
+    .work-input.error { border-color: var(--red); }
+    .work-input.correct { border-color: var(--green); }
+
+    .answer-input {
+      width: 90px;
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: .5rem .6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9375rem;
+      font-weight: 700;
+      color: #E8EAF2;
+      outline: none;
+      transition: border-color .15s;
+      text-align: center;
+    }
+    .answer-input:focus { border-color: var(--teal); }
+    .answer-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+    .answer-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+
+    .pct-suffix {
+      font-size: .8125rem;
+      color: var(--slate);
+      margin-left: .3rem;
+    }
+
+    /* ── Hint box ── */
+    .hint-box {
+      background: rgba(255,209,102,.07);
+      border: 1px solid rgba(255,209,102,.25);
+      border-radius: 6px;
+      padding: .75rem 1rem;
+      margin-top: .5rem;
+      font-size: .8125rem;
+      color: var(--yellow);
+      line-height: 1.5;
+      display: none;
+    }
+    .hint-box.visible { display: block; }
+    .hint-box strong { font-weight: 700; }
+
+    /* ── Row feedback icon ── */
+    .row-icon {
+      font-size: 1rem;
+      min-width: 1.25rem;
+      text-align: center;
+    }
+
+    /* ── Results table (phase 3) ── */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .results-table th {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      text-align: left;
+      padding: .5rem .75rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .results-table td {
+      padding: .625rem .75rem;
+      border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .9375rem;
+    }
+    .results-table tr:last-child td { border-bottom: none; }
+    .correct-val { color: var(--green); font-weight: 700; }
+    .wrong-val   { color: var(--red);   font-weight: 700; }
+    .shortcut-val { color: var(--slate); font-size: .8125rem; }
+
+    /* ── Pattern prompt ── */
+    .pattern-textarea {
+      width: 100%;
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: .875rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9375rem;
+      color: #E8EAF2;
+      resize: vertical;
+      min-height: 100px;
+      outline: none;
+      transition: border-color .15s;
+      line-height: 1.5;
+    }
+    .pattern-textarea:focus { border-color: var(--teal); }
+    .char-count {
+      font-size: .75rem;
+      color: var(--slate);
+      text-align: right;
+      margin-top: .25rem;
+    }
+    .char-count.ready { color: var(--green); }
+
+    /* ── Pattern reveal ── */
+    .pattern-reveal {
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .pattern-reveal .reveal-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: .5rem;
+    }
+    .pattern-reveal p {
+      font-size: .9375rem;
+      color: #C8CDD8;
+      line-height: 1.6;
+    }
+    .pattern-reveal .formula-highlight {
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    /* ── Stat card ── */
+    .stat-card-visual {
+      background: var(--navy3);
+      border: 2px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    .stat-card-visual .sc-title {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 1rem;
+    }
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .625rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-name {
+      font-size: .8125rem;
+      font-weight: 700;
+      color: var(--slate);
+      width: 80px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .stat-name.active { color: var(--cyan); }
+    .stat-points-display {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #E8EAF2;
+      min-width: 2rem;
+    }
+    .stat-pct-display {
+      font-size: .8125rem;
+      color: var(--slate);
+    }
+    .stat-locked {
+      margin-left: auto;
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: .2em .6em;
+    }
+    .stat-locked.speed-locked {
+      color: var(--cyan);
+      background: rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.3);
+    }
+
+    /* ── Slider ── */
+    .slider-wrap {
+      margin: 1.25rem 0;
+    }
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: .5rem;
+    }
+    .slider-label-row label {
+      font-size: .875rem;
+      font-weight: 700;
+      color: #E8EAF2;
+    }
+    .slider-value-display {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+    .slider-pct {
+      font-size: .875rem;
+      color: var(--slate);
+      margin-left: .25rem;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--navy3);
+      border-radius: 3px;
+      outline: none;
+      margin: .5rem 0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--cyan);
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(0,229,255,.2);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--cyan);
+      cursor: pointer;
+      border: none;
+    }
+    .slider-range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .6875rem;
+      color: var(--slate);
+      font-weight: 500;
+    }
+
+    .budget-bar-wrap {
+      margin: 1rem 0;
+    }
+    .budget-bar-label {
+      font-size: .75rem;
+      color: var(--slate);
+      margin-bottom: .375rem;
+      font-weight: 500;
+    }
+    .budget-bar-track {
+      height: 8px;
+      background: var(--navy3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .budget-bar-fill {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 4px;
+      transition: width .25s ease;
+    }
+    .budget-note {
+      font-size: .75rem;
+      color: var(--slate);
+      margin-top: .375rem;
+    }
+    .budget-note.warning { color: var(--yellow); }
+    .budget-note.ok { color: var(--green); }
+
+    /* ── Lock modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13,13,26,.8);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 440px;
+      width: 100%;
+      animation: fadeUp .25s ease both;
+    }
+    .modal-box h2 {
+      font-size: 1.1875rem;
+      font-weight: 800;
+      margin-bottom: .75rem;
+    }
+    .modal-box p {
+      font-size: .9375rem;
+      color: #C8CDD8;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .modal-box .modal-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--cyan);
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .modal-box .modal-pct {
+      font-size: 1rem;
+      color: var(--slate);
+      text-align: center;
+      margin-top: -.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: .75rem;
+    }
+    .modal-actions .btn { flex: 1; justify-content: center; }
+
+    /* ── Locked state ── */
+    .locked-display {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .locked-display .lock-icon {
+      font-size: 2.5rem;
+      margin-bottom: .75rem;
+    }
+    .locked-display h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: .375rem;
+    }
+    .locked-display p {
+      font-size: .875rem;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+    .locked-stat-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: .375rem;
+      background: rgba(0,229,255,.08);
+      border: 1.5px solid rgba(0,229,255,.3);
+      border-radius: 8px;
+      padding: .625rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .locked-stat-chip .pts { font-size: 2rem; font-weight: 800; color: var(--cyan); }
+    .locked-stat-chip .label { font-size: .875rem; color: var(--slate); font-weight: 500; }
+
+    /* ── Extension block ── */
+    .extension-card {
+      background: rgba(0,229,255,.04);
+      border: 1px dashed rgba(0,229,255,.25);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .extension-card .ext-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: .5rem;
+    }
+    .extension-card p {
+      font-size: .875rem;
+      color: #C8CDD8;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .ext-inputs {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+    }
+    .ext-item {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+      align-items: center;
+    }
+    .ext-item label {
+      font-size: .75rem;
+      color: var(--slate);
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+    .ext-item .answer-input { width: 80px; }
+
+    /* ── Misc ── */
+    .section-heading {
+      font-size: 1.0625rem;
+      font-weight: 800;
+      color: #E8EAF2;
+      margin-bottom: .5rem;
+      letter-spacing: .01em;
+    }
+    .muted { color: var(--slate); font-size: .875rem; line-height: 1.5; }
+    .mt-1 { margin-top: .5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .flex-end { display: flex; justify-content: flex-end; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+    /* ── Divider ── */
+    hr.va-divider {
+      border: none;
+      border-top: 1px solid var(--card-border);
+      margin: 1.25rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- ── Page header ── -->
+<header class="page-header">
+  <a href="/index.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Speed Stat Challenge</h1>
+  <span class="day-tag">Day 1</span>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHASE 1 · Formula Reveal
+══════════════════════════════════════════════════════════ -->
+<section class="phase active" id="phase-1">
+  <p class="phase-label">Phase <span>1 of 5</span> · Formula</p>
+
+  <div class="card">
+    <div class="section-heading">One formula.</div>
+    <p class="context-text">
+      Motor power equals Speed points times 100, divided by 20.
+      Your job: calculate motor power % for five Speed values.
+      Show your work.
+    </p>
+
+    <div class="formula-board">
+      <div class="formula-text">Speed % = (Speed × 100) ÷ 20</div>
+      <div class="formula-sub">Motor power as a percentage of your 20-point budget</div>
+    </div>
+
+    <p class="muted">You have five Speed values to calculate: <strong style="color:#E8EAF2">1, 3, 5, 6, and 8.</strong> Fill in your work and your answer for each row.</p>
+
+    <div class="timer-row mt-2">
+      <div class="timer-ring" id="timer-ring">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <circle class="bg" cx="20" cy="20" r="17" />
+          <circle class="fg" id="timer-arc" cx="20" cy="20" r="17"
+                  stroke-dasharray="106.8" stroke-dashoffset="0" />
+        </svg>
+        <div class="num" id="timer-num">5</div>
+      </div>
+      <span class="timer-label" id="timer-label">Read the formula — Go activates in 5 seconds</span>
+    </div>
+
+    <button class="btn btn-primary" id="go-btn" disabled onclick="startPhase2()">
+      Go — Start calculating →
+    </button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHASE 2 · Calculation Table
+══════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase-2">
+  <p class="phase-label">Phase <span>2 of 5</span> · Your Work</p>
+
+  <div class="card">
+    <div class="flex-between" style="margin-bottom:1rem;">
+      <div class="section-heading" style="margin-bottom:0">Calculate all five values.</div>
+      <div style="font-size:.75rem;color:var(--slate)">Formula: Speed % = (Speed × 100) ÷ 20</div>
+    </div>
+
+    <table class="calc-table">
+      <thead>
+        <tr>
+          <th style="width:60px">Speed</th>
+          <th>Show your work</th>
+          <th style="width:130px">Motor Power %</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody id="calc-tbody">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+
+    <p class="muted">Fill in all five rows, then submit. No feedback until you submit — find your own errors first.</p>
+
+    <div class="mt-2 flex-end">
+      <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">
+        Submit answers →
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHASE 3 · Error Check
+══════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase-3">
+  <p class="phase-label">Phase <span>3 of 5</span> · Check Your Work</p>
+
+  <div class="card" id="phase3-card">
+    <!-- injected by JS -->
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHASE 4 · Pattern Prompt
+══════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase-4">
+  <p class="phase-label">Phase <span>4 of 5</span> · The Pattern</p>
+
+  <div class="card">
+    <div class="section-heading">What do you notice about these numbers?</div>
+    <p class="muted mt-1" style="margin-bottom:1rem;">Look at your completed table. Write what you see. You need to write at least 10 characters before you can continue — no right or wrong answer here.</p>
+
+    <!-- Mini results reference -->
+    <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:6px;padding:.875rem 1rem;margin-bottom:1rem;">
+      <div class="card-title">Your table</div>
+      <div id="pattern-table-ref" style="display:flex;gap:.75rem;flex-wrap:wrap;"></div>
+    </div>
+
+    <textarea class="pattern-textarea" id="pattern-input"
+      placeholder="Write what you notice about the numbers in your table…"
+      oninput="onPatternInput()"></textarea>
+    <div class="char-count" id="char-count">0 / 10 characters needed</div>
+
+    <div class="mt-2 flex-end">
+      <button class="btn btn-primary" id="pattern-btn" disabled onclick="revealPattern()">
+        See the pattern →
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="pattern-reveal-card" style="display:none;">
+    <div class="pattern-reveal">
+      <div class="reveal-label">The pattern</div>
+      <p>Every Speed point adds exactly <span class="formula-highlight">5% motor power</span>.<br>
+      The shortcut: <span class="formula-highlight">Speed × 5 = motor power %</span>.</p>
+    </div>
+
+    <hr class="va-divider" />
+
+    <div class="section-heading" style="font-size:.9375rem;">Two quick checks</div>
+    <p class="muted mt-1" style="margin-bottom:1rem;">These values weren't in your table. Apply the formula.</p>
+
+    <div class="ext-inputs">
+      <div class="ext-item">
+        <label>Speed = 20</label>
+        <div style="display:flex;align-items:center;gap:.25rem;">
+          <input type="number" class="answer-input" id="check-20" placeholder="?" min="0" max="200"
+                 oninput="checkQuick(this, 100)" />
+          <span class="pct-suffix">%</span>
+        </div>
+        <div class="hint-box" id="hint-20"></div>
+      </div>
+      <div class="ext-item">
+        <label>Speed = 4</label>
+        <div style="display:flex;align-items:center;gap:.25rem;">
+          <input type="number" class="answer-input" id="check-4" placeholder="?" min="0" max="200"
+                 oninput="checkQuick(this, 20)" />
+          <span class="pct-suffix">%</span>
+        </div>
+        <div class="hint-box" id="hint-4"></div>
+      </div>
+    </div>
+
+    <div class="mt-3 flex-end">
+      <button class="btn btn-primary" id="to-phase5-btn" onclick="goPhase5()">
+        Choose your Speed allocation →
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHASE 5 · Stat Card Entry
+══════════════════════════════════════════════════════════ -->
+<section class="phase" id="phase-5">
+  <p class="phase-label">Phase <span>5 of 5</span> · Stat Card</p>
+
+  <div class="card" id="phase5-main">
+    <div class="section-heading">Lock in your Speed allocation.</div>
+    <p class="muted mt-1" style="margin-bottom:1.25rem;">
+      You've seen what Speed does. You don't know what Endurance, Turning, or Power cost yet — that's intentional.
+      Choose a number now. This is binding for Week 1.
+    </p>
+
+    <!-- Stat card visual -->
+    <div class="stat-card-visual">
+      <div class="sc-title">Stat Card · Week 1</div>
+      <div class="stat-row">
+        <div class="stat-name active">Speed</div>
+        <div class="stat-points-display" id="sc-speed-pts">—</div>
+        <div class="stat-pct-display" id="sc-speed-pct"></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Endurance</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Day 2</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Turning</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Day 3</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Power</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Day 4</div>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <div class="slider-wrap">
+      <div class="slider-label-row">
+        <label>Speed points</label>
+        <div>
+          <span class="slider-value-display" id="slider-val">8</span>
+          <span class="slider-pct" id="slider-pct">= 40%</span>
+        </div>
+      </div>
+      <input type="range" id="speed-slider" min="1" max="17" value="8" oninput="onSliderChange()" />
+      <div class="slider-range-labels">
+        <span>1 pt (5%)</span>
+        <span>17 pts (85%)</span>
+      </div>
+    </div>
+
+    <!-- Budget bar -->
+    <div class="budget-bar-wrap">
+      <div class="budget-bar-label" id="budget-label">Using 8 of your 20-point budget</div>
+      <div class="budget-bar-track">
+        <div class="budget-bar-fill" id="budget-fill" style="width:40%"></div>
+      </div>
+      <div class="budget-note ok" id="budget-note">12 points remain for Endurance, Turning, and Power (Days 2–4)</div>
+    </div>
+
+    <div class="mt-2">
+      <button class="btn btn-lock" onclick="openLockModal()">
+        🔒 Lock in Speed allocation
+      </button>
+    </div>
+  </div>
+
+  <!-- Locked state (shown after commit) -->
+  <div class="card" id="phase5-locked" style="display:none;">
+    <div class="locked-display">
+      <div class="lock-icon">🔒</div>
+      <h3>Speed locked for Week 1</h3>
+      <div class="locked-stat-chip">
+        <span class="pts" id="locked-pts">—</span>
+        <span class="label" id="locked-pct-label">pts · —% motor power</span>
+      </div>
+      <p id="locked-message"></p>
+    </div>
+
+    <!-- Extension -->
+    <div class="extension-card" id="extension-block" style="display:none;">
+      <div class="ext-label">Extension · Fast finisher?</div>
+      <p>You finished early. Try these without the formula — use the shortcut you found.</p>
+      <div class="ext-inputs">
+        <div class="ext-item">
+          <label>Speed = 2</label>
+          <div style="display:flex;align-items:center;gap:.25rem;">
+            <input type="number" class="answer-input" id="ext-2" placeholder="?" oninput="checkExt(this, 10)" />
+            <span class="pct-suffix">%</span>
+          </div>
+          <div class="hint-box" id="ext-hint-2"></div>
+        </div>
+        <div class="ext-item">
+          <label>Speed = 10</label>
+          <div style="display:flex;align-items:center;gap:.25rem;">
+            <input type="number" class="answer-input" id="ext-10" placeholder="?" oninput="checkExt(this, 50)" />
+            <span class="pct-suffix">%</span>
+          </div>
+          <div class="hint-box" id="ext-hint-10"></div>
+        </div>
+        <div class="ext-item">
+          <label>Speed = 20</label>
+          <div style="display:flex;align-items:center;gap:.25rem;">
+            <input type="number" class="answer-input" id="ext-20-b" placeholder="?" oninput="checkExt(this, 100)" />
+            <span class="pct-suffix">%</span>
+          </div>
+          <div class="hint-box" id="ext-hint-20-b"></div>
+        </div>
+      </div>
+      <p class="muted mt-2" style="font-size:.8125rem;">What does Speed = 20 tell you about the budget?</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Lock modal ── -->
+<div class="modal-overlay" id="lock-modal">
+  <div class="modal-box">
+    <h2>Lock in your Speed?</h2>
+    <p>From this moment, your Speed allocation is fixed for Week 1. You'll see what it costs you when Endurance, Turning, and Power are introduced on Days 2–4.</p>
+    <div class="modal-value" id="modal-val">—</div>
+    <div class="modal-pct" id="modal-pct">points · —% motor power</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeLockModal()">Not yet</button>
+      <button class="btn btn-lock" onclick="confirmLock()">🔒 Lock it in</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ Data ══════════════════════════════════════════════════════════
+const SPEED_VALUES = [1, 3, 5, 6, 8];
+const CORRECT = { 1: 5, 3: 15, 5: 25, 6: 30, 8: 40 };
+
+// Branching hints keyed by speed value and wrong-answer pattern
+function getHint(speed, rawAnswer) {
+  const ans = parseFloat(rawAnswer);
+  if (isNaN(ans)) return null;
+  // Inversion error: (20 / speed) * 100
+  const inverted = Math.round((20 / speed) * 100);
+  if (Math.abs(ans - inverted) < 1) {
+    return `Your answer would mean Speed = ${speed} uses <strong>${ans}%</strong> motor power — that's more than the entire budget. Check which number goes on top of the division: is it Speed × 100, or 20?`;
+  }
+  // Decimal error: forgot × 100
+  const decimal = speed / 20;
+  if (Math.abs(ans - decimal) < 0.01) {
+    return `You got <strong>${ans}</strong> — close! What does multiplying by 100 do to that number? The formula asks for a <em>percentage</em>.`;
+  }
+  // Off by factor of 10
+  if (Math.abs(ans - CORRECT[speed] / 10) < 0.5) {
+    return `Check the order of operations. Try (${speed} × 100) first, then ÷ 20.`;
+  }
+  // Generic hint
+  return `Step through it: first multiply ${speed} × 100, then divide that result by 20. What do you get?`;
+}
+
+// ══ Phase 1 — Timer ══════════════════════════════════════════════
+let timerInterval;
+function startTimer() {
+  let remaining = 5;
+  const arc = document.getElementById('timer-arc');
+  const num = document.getElementById('timer-num');
+  const label = document.getElementById('timer-label');
+  const circumference = 106.8;
+
+  // Show initial state
+  num.textContent = remaining;
+  arc.style.strokeDashoffset = 0;
+
+  timerInterval = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('go-btn').disabled = false;
+      label.textContent = 'Ready — press Go when you are.';
+      num.textContent = '✓';
+      arc.style.stroke = 'var(--green)';
+      arc.style.strokeDashoffset = circumference;
+    } else {
+      num.textContent = remaining;
+      arc.style.strokeDashoffset = circumference * (1 - remaining / 5);
+    }
+  }, 1000);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  buildCalcTable();
+  onSliderChange();
+  startTimer();
+});
+
+// ══ Phase 2 — Build table ════════════════════════════════════════
+function buildCalcTable() {
+  const tbody = document.getElementById('calc-tbody');
+  SPEED_VALUES.forEach(spd => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="speed-val">${spd}</span></td>
+      <td>
+        <input type="text" class="work-input" id="work-${spd}"
+               placeholder="e.g. (${spd} × 100) ÷ 20" autocomplete="off" />
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.25rem;">
+          <input type="number" class="answer-input" id="ans-${spd}"
+                 placeholder="?" min="0" max="200" autocomplete="off" />
+          <span class="pct-suffix">%</span>
+        </div>
+      </td>
+      <td><span class="row-icon" id="icon-${spd}"></span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function allFilled() {
+  return SPEED_VALUES.every(s => {
+    const v = document.getElementById(`ans-${s}`).value.trim();
+    return v !== '';
+  });
+}
+
+// ══ Phase transitions ════════════════════════════════════════════
+function setPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById(`phase-${n}`).classList.add('active');
+  const pcts = [0, 0, 20, 50, 75, 100];
+  document.getElementById('progress-bar').style.width = pcts[n] + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startPhase2() { setPhase(2); }
+
+// ══ Phase 2 → 3 — Submit ════════════════════════════════════════
+function submitAnswers() {
+  if (!allFilled()) {
+    alert('Fill in all five motor power values before submitting.');
+    return;
+  }
+
+  const results = SPEED_VALUES.map(spd => {
+    const ans = parseFloat(document.getElementById(`ans-${spd}`).value);
+    const correct = CORRECT[spd];
+    const work = document.getElementById(`work-${spd}`).value.trim();
+    return { spd, ans, correct, work, ok: Math.abs(ans - correct) < 0.5 };
+  });
+
+  buildPhase3(results);
+  setPhase(3);
+}
+
+// ══ Phase 3 — Error check ════════════════════════════════════════
+function buildPhase3(results) {
+  const card = document.getElementById('phase3-card');
+  const allCorrect = results.every(r => r.ok);
+  const wrongCount = results.filter(r => !r.ok).length;
+
+  let html = '';
+
+  if (allCorrect) {
+    html += `
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+        <span style="font-size:1.5rem;">✅</span>
+        <div>
+          <div class="section-heading" style="margin-bottom:.25rem;">All five correct.</div>
+          <div class="muted">Your table matches. Move on to the pattern.</div>
+        </div>
+      </div>`;
+  } else {
+    html += `
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+        <span style="font-size:1.5rem;">🔍</span>
+        <div>
+          <div class="section-heading" style="margin-bottom:.25rem;">${wrongCount} value${wrongCount > 1 ? 's' : ''} to fix.</div>
+          <div class="muted">Find where your work splits from the correct steps.</div>
+        </div>
+      </div>`;
+  }
+
+  html += `<table class="results-table"><thead><tr>
+    <th style="width:60px">Speed</th>
+    <th>Your answer</th>
+    <th>Status</th>
+  </tr></thead><tbody>`;
+
+  results.forEach(r => {
+    if (r.ok) {
+      html += `<tr>
+        <td><span class="speed-val">${r.spd}</span></td>
+        <td><span class="correct-val">${r.ans}%</span></td>
+        <td style="color:var(--green);font-size:.8125rem;font-weight:700;">✓ Correct</td>
+      </tr>`;
+    } else {
+      const hint = getHint(r.spd, r.ans);
+      html += `<tr>
+        <td><span class="speed-val">${r.spd}</span></td>
+        <td><span class="wrong-val">${r.ans}%</span></td>
+        <td>
+          <div style="font-size:.8125rem;color:var(--red);font-weight:700;margin-bottom:.375rem;">✗ Check this</div>
+          ${hint ? `<div class="hint-box visible">${hint}</div>` : ''}
+          <div style="margin-top:.5rem;display:flex;align-items:center;gap:.375rem;">
+            <input type="number" class="answer-input" id="fix-${r.spd}" placeholder="Fix it" style="width:80px" min="0" max="200"
+                   oninput="checkFix(this, ${r.spd})" />
+            <span class="pct-suffix">%</span>
+            <span class="row-icon" id="fix-icon-${r.spd}"></span>
+          </div>
+        </td>
+      </tr>`;
+    }
+  });
+
+  html += '</tbody></table>';
+
+  // Proceed button
+  if (allCorrect) {
+    html += `<div class="mt-2 flex-end">
+      <button class="btn btn-primary" onclick="goPhase4(${JSON.stringify(results.map(r => ({spd: r.spd, ans: r.correct})))})">
+        See the pattern →
+      </button>
+    </div>`;
+  } else {
+    html += `<div class="mt-2 flex-end">
+      <button class="btn btn-primary" id="phase3-next" disabled onclick="goPhase4WithFixed()">
+        See the pattern →
+      </button>
+    </div>`;
+  }
+
+  card.innerHTML = html;
+
+  // Store results for use in goPhase4WithFixed
+  window._phase3Results = results;
+}
+
+function checkFix(input, spd) {
+  const ans = parseFloat(input.value);
+  const icon = document.getElementById(`fix-icon-${spd}`);
+  if (isNaN(ans)) { input.className = 'answer-input'; icon.textContent = ''; return; }
+  if (Math.abs(ans - CORRECT[spd]) < 0.5) {
+    input.className = 'answer-input correct';
+    icon.textContent = '✅';
+    // Update stored result
+    const r = window._phase3Results.find(r => r.spd === spd);
+    if (r) r.fixed = ans;
+    checkAllFixed();
+  } else {
+    input.className = 'answer-input error';
+    icon.textContent = '';
+  }
+}
+
+function checkAllFixed() {
+  const btn = document.getElementById('phase3-next');
+  if (!btn) return;
+  const allFixed = window._phase3Results.every(r => r.ok || r.fixed !== undefined);
+  btn.disabled = !allFixed;
+}
+
+function goPhase4WithFixed() {
+  const resolved = window._phase3Results.map(r => ({
+    spd: r.spd,
+    ans: r.ok ? r.ans : (r.fixed || CORRECT[r.spd])
+  }));
+  goPhase4(resolved);
+}
+
+function goPhase4(resolved) {
+  window._resolvedAnswers = resolved;
+  // Build mini table reference
+  const ref = document.getElementById('pattern-table-ref');
+  ref.innerHTML = resolved.map(r => `
+    <div style="text-align:center;background:var(--navy3);border:1px solid var(--card-border);
+                border-radius:6px;padding:.5rem .75rem;min-width:56px;">
+      <div style="font-size:.6875rem;color:var(--slate);font-weight:700;letter-spacing:.06em;margin-bottom:.125rem;">SPD ${r.spd}</div>
+      <div style="font-size:1rem;font-weight:800;color:var(--cyan);">${r.ans}%</div>
+    </div>
+  `).join('');
+  setPhase(4);
+}
+
+// ══ Phase 4 — Pattern ════════════════════════════════════════════
+function onPatternInput() {
+  const val = document.getElementById('pattern-input').value.trim();
+  const len = val.length;
+  const countEl = document.getElementById('char-count');
+  const btn = document.getElementById('pattern-btn');
+  if (len >= 10) {
+    countEl.textContent = `${len} characters ✓`;
+    countEl.className = 'char-count ready';
+    btn.disabled = false;
+  } else {
+    countEl.textContent = `${len} / 10 characters needed`;
+    countEl.className = 'char-count';
+    btn.disabled = true;
+  }
+}
+
+function revealPattern() {
+  document.getElementById('pattern-reveal-card').style.display = 'block';
+  document.getElementById('pattern-btn').style.display = 'none';
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function checkQuick(input, correct) {
+  const ans = parseFloat(input.value);
+  const id = input.id;
+  const hintEl = document.getElementById('hint-' + id.split('-')[1]);
+  if (isNaN(ans)) { input.className = 'answer-input'; hintEl.className = 'hint-box'; return; }
+  if (Math.abs(ans - correct) < 0.5) {
+    input.className = 'answer-input correct';
+    hintEl.className = 'hint-box';
+    // Enable proceed if both done or just one
+    checkQuickBothDone();
+  } else {
+    input.className = 'answer-input error';
+    const spd = id === 'check-20' ? 20 : 4;
+    hintEl.innerHTML = `Try the shortcut: Speed × 5 = motor power %. What is ${spd} × 5?`;
+    hintEl.className = 'hint-box visible';
+  }
+}
+
+function checkQuickBothDone() {
+  // Allow proceed even if one is wrong — the questions are enrichment
+  document.getElementById('to-phase5-btn').style.opacity = '1';
+}
+
+function goPhase5() { setPhase(5); }
+
+// ══ Phase 5 — Stat card ══════════════════════════════════════════
+function onSliderChange() {
+  const pts = parseInt(document.getElementById('speed-slider').value);
+  const pct = pts * 5;
+  document.getElementById('slider-val').textContent = pts;
+  document.getElementById('slider-pct').textContent = `= ${pct}%`;
+  document.getElementById('sc-speed-pts').textContent = pts;
+  document.getElementById('sc-speed-pct').textContent = `${pct}% motor power`;
+
+  const budgetFill = document.getElementById('budget-fill');
+  const budgetLabel = document.getElementById('budget-label');
+  const budgetNote = document.getElementById('budget-note');
+  const remaining = 20 - pts;
+
+  budgetFill.style.width = (pts / 20 * 100) + '%';
+  budgetLabel.textContent = `Using ${pts} of your 20-point budget`;
+
+  if (remaining < 3) {
+    budgetNote.textContent = `Only ${remaining} point${remaining !== 1 ? 's' : ''} left — you need at least 1 each for Endurance, Turning, and Power.`;
+    budgetNote.className = 'budget-note warning';
+  } else {
+    budgetNote.textContent = `${remaining} points remain for Endurance, Turning, and Power (Days 2–4)`;
+    budgetNote.className = 'budget-note ok';
+  }
+}
+
+function openLockModal() {
+  const pts = parseInt(document.getElementById('speed-slider').value);
+  const pct = pts * 5;
+  document.getElementById('modal-val').textContent = pts;
+  document.getElementById('modal-pct').textContent = `points · ${pct}% motor power`;
+  document.getElementById('lock-modal').classList.add('open');
+}
+
+function closeLockModal() {
+  document.getElementById('lock-modal').classList.remove('open');
+}
+
+function confirmLock() {
+  const pts = parseInt(document.getElementById('speed-slider').value);
+  closeLockModal();
+  localStorage.setItem('va_speed_locked', pts);
+  showLockedState(pts);
+}
+
+function showLockedState(pts) {
+  const pct = pts * 5;
+  document.getElementById('phase5-main').style.display = 'none';
+  document.getElementById('phase5-locked').style.display = 'block';
+  document.getElementById('locked-pts').textContent = pts;
+  document.getElementById('locked-pct-label').textContent = `pts · ${pct}% motor power`;
+
+  let msg = '';
+  if (pts <= 4) msg = 'You allocated conservatively. More budget stays available for Days 2–4.';
+  else if (pts <= 8) msg = 'A balanced start. See how it plays on Day 5 when all four stats are on the table.';
+  else if (pts <= 12) msg = 'Speed-heavy allocation. You'll find out what that costs when the other stats come in.';
+  else msg = 'Maximum speed. Three days of constraint ahead. That's the point.';
+  document.getElementById('locked-message').textContent = msg;
+
+  // Show extension for anyone who has the time
+  document.getElementById('extension-block').style.display = 'block';
+  setPhase(5);
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+function checkExt(input, correct) {
+  const ans = parseFloat(input.value);
+  const id = input.id; // ext-2, ext-10, ext-20-b
+  const spd = id.replace('ext-', '').replace('-b', '');
+  const hintEl = document.getElementById(`ext-hint-${spd}`);
+  if (isNaN(ans)) { input.className = 'answer-input'; hintEl.className = 'hint-box'; return; }
+  if (Math.abs(ans - correct) < 0.5) {
+    input.className = 'answer-input correct';
+    hintEl.className = 'hint-box';
+    if (parseInt(spd) === 20 || id === 'ext-20-b') {
+      hintEl.innerHTML = `100% — that's the ceiling. A Speed of 20 uses the <strong>entire budget</strong> on one stat.`;
+      hintEl.className = 'hint-box visible';
+      hintEl.style.background = 'rgba(0,229,255,.06)';
+      hintEl.style.borderColor = 'rgba(0,229,255,.2)';
+      hintEl.style.color = 'var(--cyan)';
+    }
+  } else {
+    input.className = 'answer-input error';
+    hintEl.innerHTML = `Try the shortcut: ${spd} × 5 = ?`;
+    hintEl.className = 'hint-box visible';
+  }
+}
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>
