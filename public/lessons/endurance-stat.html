@@ -921,6 +921,54 @@
   <h2 class="section-heading">Connect It to the Match</h2>
   <p class="section-sub">Answer all three questions. Use the sentence frames as a starting point, then make it your own.</p>
 
+  <!-- Graph reference — stays in sync with the Section 3 slider so the
+       student can glance at the curve and numbers while writing answers. -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem;">
+      <div class="card-title" style="margin-bottom:0;">Graph reference</div>
+      <div style="font-size:.75rem;color:var(--slate);">Your E = <span id="ref-e-display" style="color:var(--cyan);font-weight:800;font-size:.9375rem;">10</span></div>
+    </div>
+    <input type="range" id="ref-e-slider" min="1" max="20" value="10" oninput="onRefSliderChange()" style="margin-bottom:.375rem;">
+    <div class="slider-range-labels" style="margin-bottom:.5rem;"><span>1</span><span>20</span></div>
+
+    <!-- Mini SVG decay curve -->
+    <svg id="ref-svg" viewBox="0 0 360 160" width="100%" height="160" style="display:block;margin:.25rem 0;">
+      <!-- Axes -->
+      <line x1="32" y1="12" x2="32" y2="136" stroke="#222840" stroke-width="1"/>
+      <line x1="32" y1="136" x2="348" y2="136" stroke="#222840" stroke-width="1"/>
+      <!-- Grid -->
+      <line x1="32" y1="12" x2="348" y2="12" stroke="#1E2240" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="32" y1="74" x2="348" y2="74" stroke="#1E2240" stroke-width="1" stroke-dasharray="3,3"/>
+      <!-- 20% floor -->
+      <line x1="32" y1="111" x2="348" y2="111" stroke="#FF4D6A" stroke-width="1" stroke-dasharray="4,2" opacity="0.55"/>
+      <!-- 3-min line -->
+      <line x1="221" y1="12" x2="221" y2="136" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.6"/>
+      <!-- Axis labels -->
+      <text x="28" y="16" text-anchor="end" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">100</text>
+      <text x="28" y="77" text-anchor="end" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">50</text>
+      <text x="28" y="114" text-anchor="end" font-size="9" fill="#FF4D6A" font-family="DM Sans,sans-serif" font-weight="700">20</text>
+      <text x="28" y="139" text-anchor="end" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">0</text>
+      <text x="32"  y="150" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">0</text>
+      <text x="221" y="150" text-anchor="middle" font-size="9" fill="#FFD166" font-family="DM Sans,sans-serif" font-weight="700">3</text>
+      <text x="348" y="150" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">5</text>
+      <!-- Dynamic curve + dots -->
+      <polyline id="ref-line" points="" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <g id="ref-dots"></g>
+    </svg>
+
+    <table class="live-table" style="margin:.5rem 0;">
+      <thead>
+        <tr><th style="width:3.25rem;">t</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+      </thead>
+      <tbody id="ref-p-row"></tbody>
+    </table>
+    <div style="font-size:.75rem;color:var(--slate);margin-top:.375rem;line-height:1.6;">
+      Decay: <span id="ref-decay" style="color:#E8EAF2;font-weight:700;">15/min</span>
+      · Hits 20% floor: <span id="ref-floor" style="color:#E8EAF2;font-weight:700;">t &gt; 5 min</span>
+      · vs teammate E=10 at t=3: <span id="ref-vs" style="color:#E8EAF2;font-weight:700;">—</span>
+    </div>
+  </div>
+
   <!-- Q1 -->
   <div class="card">
     <div class="card-title">Question 1 of 3</div>
@@ -1352,8 +1400,95 @@ function updateGraph() {
     dotsG.innerHTML += `<text x="${labelX}" y="${fy - 8}" text-anchor="${anchor}" font-size="10" fill="#FF4D6A" font-family="DM Sans,sans-serif" font-weight="700">⚡ ${tFloor.toFixed(1)} min</text>`;
   }
 
-  // Also update compare panel
+  // Also update compare panel and Section 4 reference panel
   updateCompare();
+  renderRefPanel(E);
+}
+
+// ── Section 4: Graph reference panel (synced with Section 3) ─────────────────
+// Mini-SVG coordinate mapping:
+//   x: t=0→32, t=5→348  → x = 32 + t * 63.2
+//   y: p=100→12, p=0→136 → y = 136 - p * 1.24
+function refTx(t) { return 32 + t * 63.2; }
+function refPy(p) { return 136 - p * 1.24; }
+
+function onRefSliderChange() {
+  const E = parseInt(document.getElementById('ref-e-slider').value);
+  const main = document.getElementById('e-slider');
+  if (main && parseInt(main.value) !== E) main.value = E;
+  // Delegate to the main updater, which will also call renderRefPanel.
+  updateGraph();
+}
+
+function renderRefPanel(E) {
+  const refSlider = document.getElementById('ref-e-slider');
+  if (refSlider && parseInt(refSlider.value) !== E) refSlider.value = E;
+
+  const displayEl = document.getElementById('ref-e-display');
+  if (displayEl) displayEl.textContent = E;
+
+  const decayEl = document.getElementById('ref-decay');
+  if (decayEl) decayEl.textContent = (20 - E) * 1.5 + '%/min';
+
+  const decayRate = (20 - E) * 1.5;
+  const floorEl = document.getElementById('ref-floor');
+  if (floorEl) {
+    if (decayRate === 0) floorEl.textContent = 'never (no decay)';
+    else {
+      const tFloor = 80 / decayRate;
+      floorEl.textContent = tFloor <= 5 ? 't = ' + tFloor.toFixed(1) + ' min' : 't > 5 min';
+    }
+  }
+
+  // vs teammate E=10 at t=3
+  const vsEl = document.getElementById('ref-vs');
+  if (vsEl) {
+    const you    = Math.round(calcP(E,  3));
+    const teammate = Math.round(calcP(10, 3));
+    const diff = you - teammate;
+    if (diff === 0)      vsEl.innerHTML = 'tied at ' + you + '%';
+    else if (diff > 0)   vsEl.innerHTML = '+' + diff + '% ahead (' + you + '% vs ' + teammate + '%)';
+    else                 vsEl.innerHTML = diff + '% behind (' + you + '% vs ' + teammate + '%)';
+  }
+
+  // P(t) row
+  const row = document.getElementById('ref-p-row');
+  if (row) {
+    let html = '<tr><td style="color:var(--slate);font-weight:700;">P(t)</td>';
+    for (let t = 0; t <= 5; t++) {
+      const p = calcP(E, t);
+      const col = powerColor(p);
+      const floorMark = (t > 0 && p === 20 && decayRate > 0 && (80 / decayRate) <= t) ? '<span style="color:var(--yellow);font-size:.7rem;margin-left:2px;">⚡</span>' : '';
+      html += '<td style="font-weight:800;color:' + col + ';">' + p + '%' + floorMark + '</td>';
+    }
+    html += '</tr>';
+    row.innerHTML = html;
+  }
+
+  // Mini SVG decay line — match the main graph's piecewise logic (decline, then flat at 20%)
+  const line = document.getElementById('ref-line');
+  if (line) {
+    const pts = [[0, 100]];
+    if (decayRate === 0) {
+      pts.push([5, 100]);
+    } else {
+      const tFloor = 80 / decayRate;
+      if (tFloor <= 5) { pts.push([tFloor, 20]); pts.push([5, 20]); }
+      else {
+        for (let t = 1; t <= 5; t++) pts.push([t, Math.max(20, 100 - decayRate * t)]);
+      }
+    }
+    line.setAttribute('points', pts.map(([t, p]) => refTx(t) + ',' + refPy(p)).join(' '));
+  }
+
+  const dots = document.getElementById('ref-dots');
+  if (dots) {
+    dots.innerHTML = '';
+    for (let t = 0; t <= 5; t++) {
+      const p = calcP(E, t);
+      dots.innerHTML += '<circle cx="' + refTx(t) + '" cy="' + refPy(p) + '" r="2.5" fill="' + powerColor(p) + '" stroke="#0D0D1A" stroke-width="1.5"/>';
+    }
+  }
 }
 
 function updateCompare() {
