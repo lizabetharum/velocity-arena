@@ -105,16 +105,24 @@ if (!day) {
     </a>`;
   }).join('');
 
-  // Activities. ACTIVITY_LESSONS comes from /lessons.js (shared with index.html).
+  // Activities. getLessonLinks() comes from /lessons.js (shared with index.html).
+  // The legacy `a.link` field (set directly on activities in days.js) takes
+  // precedence as a single link; otherwise we fall back to the shared map,
+  // which may return multiple links per activity.
   const actRows = (day.activities || []).map(a => {
-    const link = a.link || ACTIVITY_LESSONS[a.name];
+    const links = a.link
+      ? [{ url: a.link, label: 'Open Activity' }]
+      : getLessonLinks(a.name).map(l => ({ url: l.url, label: l.label || 'Open Activity' }));
+    const linksHtml = links.map(l =>
+      `<a class="act-link" href="${l.url}">${l.label} &rarr;</a>`
+    ).join(' ');
     return `<div class="activity-row">
       <div class="act-mins">${a.mins}m</div>
       <div>
         <span class="act-name">${a.name}</span>
         <span class="block-tag ${blockClass(a.block)}">${blockLabel(a.block)}</span>
         ${a.description ? `<div class="act-desc">${a.description}</div>` : ''}
-        ${link ? `<a class="act-link" href="${link}">Open Activity &rarr;</a>` : ''}
+        ${linksHtml}
       </div>
     </div>`;
   }).join('');

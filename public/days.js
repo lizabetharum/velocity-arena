@@ -22,6 +22,14 @@ const DAYS = [
         "facilitatorDescription": "Pairs face each other. One camper leads slow, deliberate movements; the partner mirrors exactly in silence. Swap leaders after two minutes. No winners, no evaluators -- the goal is sustained mutual attention. Watch for speed creep; gently remind the lead to slow down if the follower cannot keep up."
       },
       {
+        "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
+        "mins": 15,
+        "block": "Challenge Block",
+        "description": "You answer 8 questions about general math (speed, distance, graphs) in 12 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
+        "facilitatorDescription": "Campers receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each camper's starting point by math topic so the program meets campers where they are. Frame it before distributing: this is a measure of what campers already know about the eight math topics, not about Velocity Arena.",
+        "link": "/activities/diagnostic/index.html"
+      },
+      {
         "name": "Driving Question Reveal + Team Formation",
         "mins": 10,
         "block": "LX Setup",
@@ -35,14 +43,7 @@ const DAYS = [
         "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
         "facilitatorDescription": "Hand each camper a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the camper for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper."
       },
-      {
-        "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
-        "mins": 15,
-        "block": "Challenge Block",
-        "description": "You answer 8 questions about general math (speed, distance, graphs) in 12 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
-        "facilitatorDescription": "Campers receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each camper's starting point by math topic so the program meets campers where they are. Frame it before distributing: this is a measure of what campers already know about the eight math topics, not about Velocity Arena.",
-        "link": "/activities/diagnostic/index.html"
-      },
+      
       {
         "name": "Speed Stat Challenge: What Does Motor Power Actually Mean?",
         "mins": 40,
@@ -64,16 +65,10 @@ const DAYS = [
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?",
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware."
       },
-      {
-        "name": "Data Dashboard Setup",
-        "mins": 15,
-        "block": "Match-Build-Make",
-        "description": "Label every column in your data dashboard: date, match number, Speed allocation, goals/minute, possession time, predicted outcome, actual outcome, and notes. This document travels with your team for four weeks.",
-        "facilitatorDescription": "Teams label every column in their data dashboard: date, match number, Speed allocation, goals/minute, possession time, predicted outcome, actual outcome, notes. The dashboard travels with each team for the full four weeks -- flag it as a permanent team artifact, not a single-day worksheet."
-      },
+      
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 20,
+        "mins": 30,
         "block": "Open Lab",
         "description": "Unstructured time with your bot. Drive it, experiment with MakeCode, or talk strategy with your team. No task to complete -- just time to explore.",
         "facilitatorDescription": "Unstructured bot time for teams. Driving, experimenting in MakeCode, strategy talk -- all fine. No required output. First Open Lab of the program; resist the urge to assign a task. Novelty with the hardware is the point."
@@ -109,13 +104,7 @@ const DAYS = [
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance.",
         "facilitatorDescription": "Teams do jumping jacks at full speed for 30 seconds, then cycle down -- one fewer rep each cycle -- until they are doing one jumping jack every 10 seconds. Campers feel the drop physically. Then ask the hinge question: 'What would we call it if your bot did this?' The answer is Endurance. Physical embodiment before the formula gets introduced in the Challenge Block."
       },
-      {
-        "name": "Endurance Allocation: Stat Card Fill-In",
-        "mins": 3,
-        "block": "Ice Breaker",
-        "description": "Write your Endurance allocation in the Endurance row on your stat card. Any whole number works, as long as Speed + Endurance leaves at least 2 points for Turning and Power combined. You just felt Endurance in your body during Slow Down, Slow Down. Commit a number. The card is binding from the moment you write it.",
-        "facilitatorDescription": "Campers write their Endurance allocation in the Endurance row of the stat card. Any whole number works as long as Speed + Endurance leaves at least 2 points for Turning and Power combined. The card is binding from the moment it is written -- emphasize this before they commit."
-      },
+      
       {
         "name": "Endurance Stat Challenge: Drawing the Decay",
         "mins": 50,
@@ -350,7 +339,7 @@ const DAYS = [
         "name": "Match Format Briefing",
         "mins": 10,
         "block": "",
-        "description": "Your facilitator explains how matches work: 3 minutes each, two teams, first to push the ball across the end line scores. Bots are pre-programmed -- no joystick control during the match.",
+        "description": "Each match is 3 minutes, two teams on a flat field, first team to push the ball across the opposing end line scores a goal. Bots are pre-programmed. After each match, both teams record their score in the data dashboard immediately. Today's matches are practice only and do not count in Season 1 standings.",
         "facilitatorDescription": "Walk the whole camp through match format: 3 minutes each, two teams per match, first to push the ball across the end line scores. Bots are pre-programmed -- no joystick control during the match. Emphasize the programming commitment so teams understand their allocation choice is binding during play."
       },
       {

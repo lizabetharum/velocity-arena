@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 — Prove Your Build</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1b2a; --surface: #132033; --card: #1a2d45; --border: #2a4060;
+  --yellow: #ffd600; --cyan: #00b8d4; --orange: #ff9100;
+  --green: #00e676; --purple: #ce93d8; --blue: #4fc3f7;
+  --red: #ff5252; --text: #e8f0fe; --muted: #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; line-height: 1.6;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a, #1a1600);
+  border-bottom: 2px solid var(--yellow);
+  padding: 18px 24px; position: sticky; top: 0; z-index: 100;
+}
+.header-inner { max-width: 720px; margin: 0 auto; }
+.day-badge {
+  background: var(--yellow); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+  display: inline-block; margin-bottom: 4px;
+}
+.lesson-title { font-size: 19px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); }
+
+/* ── LAYOUT ─────────────────────────────── */
+.container { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+
+.section-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.section-heading {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--yellow); margin-bottom: 18px;
+}
+
+/* ── STEP 1: LOADOUT ────────────────────── */
+.loadout-row {
+  font-size: 16px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.loadout-input {
+  background: transparent; border: none;
+  border-bottom: 2px solid var(--yellow);
+  color: var(--yellow); font-family: 'DM Sans', sans-serif;
+  font-size: 16px; font-weight: 700;
+  width: 200px; padding: 2px 4px; outline: none;
+}
+.loadout-input::placeholder { color: rgba(255,214,0,.3); font-style: italic; }
+
+.stat-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.stat-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.stat-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted);
+}
+.stat-input {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,.04); border: 2px solid var(--border);
+  border-radius: 10px; color: var(--yellow);
+  font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 800;
+  text-align: center; padding: 4px; outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.stat-input::-webkit-inner-spin-button,
+.stat-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.stat-input:focus { border-color: var(--yellow); }
+.stat-dot { font-size: 22px; font-weight: 800; color: var(--border); padding-top: 34px; }
+
+.budget-bar {
+  margin-top: 20px; padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 15px; font-weight: 700;
+}
+.bv { color: var(--yellow); font-size: 17px; font-weight: 800; min-width: 22px; text-align: center; }
+.bop { color: var(--muted); }
+.budget-total {
+  font-size: 17px; font-weight: 800;
+  padding: 3px 14px; border-radius: 8px; transition: all 0.3s;
+}
+.budget-total.ok   { background: rgba(0,230,118,.15); color: var(--green); border: 2px solid var(--green); }
+.budget-total.over { background: rgba(255,82,82,.15);  color: var(--red);   border: 2px solid var(--red); }
+.budget-total.low  { background: rgba(255,145,0,.1);   color: var(--orange); border: 2px solid var(--orange); }
+.budget-msg { font-size: 13px; color: var(--muted); }
+.budget-msg.ok { color: var(--green); font-weight: 700; }
+
+/* ── STEP 2: PROVE ──────────────────────── */
+.formulas-wrap {
+  opacity: 0.35; pointer-events: none; transition: opacity 0.4s;
+}
+.formulas-wrap.active { opacity: 1; pointer-events: all; }
+.formulas-note {
+  font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px;
+}
+
+.formula-row {
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin-bottom: 10px;
+  transition: border-color 0.25s, background 0.25s;
+}
+.formula-row.confirmed {
+  border-color: rgba(0,230,118,.4);
+  background: rgba(0,230,118,.04);
+}
+.fr-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px; margin-bottom: 12px;
+}
+.fr-meta { flex: 1; }
+.fr-label { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.fr-expr  { font-size: 12px; color: var(--muted); font-family: monospace; }
+.fr-value { font-size: 24px; font-weight: 800; color: var(--yellow); white-space: nowrap; }
+.fr-value.ph { font-size: 18px; color: rgba(255,255,255,.15); }
+.fr-value.budget-eq { font-size: 13px; font-family: monospace; color: var(--yellow); }
+
+.fr-prompt { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.fr-chips  { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.tag-chip {
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 700;
+  border: 1.5px solid transparent; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.tag-chip:hover:not(.locked) { opacity: 0.8; }
+.tag-chip.locked { pointer-events: none; }
+
+@keyframes wrongShake {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(0.9) rotate(-3deg); }
+  50%  { transform: scale(1.06) rotate(2deg); }
+  80%  { transform: scale(0.97) rotate(-1deg); }
+  100% { transform: scale(1); }
+}
+.tag-chip.wrong-flash {
+  animation: wrongShake 0.38s ease;
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+}
+
+.fr-confirm-msg {
+  font-size: 12px; color: var(--green); line-height: 1.55;
+  margin-top: 10px; padding-top: 9px;
+  border-top: 1px solid rgba(0,230,118,.2);
+  display: none;
+}
+.fr-confirm-msg.visible { display: block; }
+
+/* ── LOCK IN BUTTON ─────────────────────── */
+.lockin-wrap { text-align: center; margin-top: 16px; }
+.lockin-btn {
+  background: var(--yellow); color: #000;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; font-weight: 800;
+  border: none; border-radius: 12px;
+  padding: 14px 48px; cursor: not-allowed;
+  opacity: 0.2; transition: all 0.3s;
+  letter-spacing: 0.3px;
+}
+.lockin-btn.ready { opacity: 1; cursor: pointer; }
+.lockin-btn.ready:hover {
+  background: #ffe033; transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255,214,0,.3);
+}
+
+/* ── LOADOUT CARD ───────────────────────── */
+.loadout-card {
+  display: none;
+  background: linear-gradient(140deg, #1c1500 0%, #091522 100%);
+  border: 2px solid var(--yellow); border-radius: 16px;
+  padding: 28px 28px 24px; margin-top: 4px;
+}
+.loadout-card.visible { display: block; animation: revealCard 0.5s ease; }
+@keyframes revealCard {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lc-eyebrow {
+  font-size: 10px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.lc-locked-badge {
+  display: inline-block;
+  background: var(--green); color: #000;
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; padding: 2px 10px; border-radius: 20px;
+  margin-bottom: 10px;
+}
+.lc-name { font-size: 28px; font-weight: 800; color: var(--yellow); margin-bottom: 22px; }
+
+.lc-stats-row {
+  display: flex; margin-bottom: 22px;
+  padding-bottom: 20px; border-bottom: 1px solid rgba(255,214,0,.2);
+}
+.lc-stat { flex: 1; text-align: center; }
+.lc-stat-k {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted); margin-bottom: 2px;
+}
+.lc-stat-v { font-size: 30px; font-weight: 800; color: var(--yellow); }
+.lc-stat-sep { width: 1px; background: var(--border); margin: 6px 0; align-self: stretch; }
+
+.lc-outputs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 22px;
+}
+.lc-out {
+  background: rgba(255,255,255,.04); border-radius: 8px; padding: 10px 14px;
+}
+.lc-out-lbl {
+  font-size: 10px; color: var(--muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+}
+.lc-out-val { font-size: 20px; font-weight: 800; color: var(--text); }
+
+.lc-math { border-top: 1px solid rgba(255,214,0,.2); padding-top: 18px; }
+.lc-math-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--green); margin-bottom: 10px;
+}
+.lc-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+.lc-pill {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 800;
+}
+</style>
+</head>
+<body>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <div class="day-badge">Day 6 · Lock In</div>
+    <div class="lesson-title">Prove Your Build</div>
+    <div class="lesson-sub">Balance the budget · prove the math · lock in Season 1</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Step 1 -->
+  <div class="section-card">
+    <div class="section-heading">Step 1 — Build Your Loadout</div>
+
+    <div class="loadout-row">
+      We are going with Loadout
+      <input class="loadout-input" id="loadoutName" type="text"
+        placeholder="name your bot" autocomplete="off">.
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-cell">
+        <div class="stat-label">Speed</div>
+        <input class="stat-input" id="st-s" type="number" min="0" max="20"
+          placeholder="—" oninput="updateStats()">
+      </div>
+      <div class="stat-dot">·</div>
+      <div class="stat-cell">
+        <div class="stat-label">Endurance</div>
+        <input class="stat-input" id="st-e" type="number" min="0" max="20"
+          placeholder="—" oninput="updateStats()">
+      </div>
+      <div class="stat-dot">·</div>
+      <div class="stat-cell">
+        <div class="stat-label">Turning</div>
+        <input class="stat-input" id="st-t" type="number" min="0" max="20"
+          placeholder="—" oninput="updateStats()">
+      </div>
+      <div class="stat-dot">·</div>
+      <div class="stat-cell">
+        <div class="stat-label">Power</div>
+        <input class="stat-input" id="st-p" type="number" min="0" max="20"
+          placeholder="—" oninput="updateStats()">
+      </div>
+    </div>
+
+    <div class="budget-bar">
+      Budget:
+      <span class="bv" id="bv-s">—</span>
+      <span class="bop">+</span>
+      <span class="bv" id="bv-e">—</span>
+      <span class="bop">+</span>
+      <span class="bv" id="bv-t">—</span>
+      <span class="bop">+</span>
+      <span class="bv" id="bv-p">—</span>
+      <span class="bop">=</span>
+      <span class="budget-total low" id="budgetTotal">?</span>
+      <span class="budget-msg" id="budgetMsg"></span>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="section-card formulas-wrap" id="formulasWrap">
+    <div class="section-heading">Step 2 — Prove the Math</div>
+    <p class="formulas-note">
+      For each formula below, select the concept tag that describes its mathematical structure.
+      All six must be confirmed before you can lock in.
+    </p>
+    <div id="formulaRows"></div>
+
+    <div class="lockin-wrap">
+      <button class="lockin-btn" id="lockinBtn" onclick="lockIn()">
+        Lock In Season 1
+      </button>
+    </div>
+  </div>
+
+  <!-- Loadout Card -->
+  <div class="loadout-card" id="loadoutCard">
+    <div class="lc-eyebrow">Season 1 · Velocity Arena</div>
+    <div class="lc-locked-badge">✓ Locked In</div>
+    <div class="lc-name" id="lcName"></div>
+    <div class="lc-stats-row" id="lcStats"></div>
+    <div class="lc-outputs" id="lcOutputs"></div>
+    <div class="lc-math">
+      <div class="lc-math-label">Math Confirmed</div>
+      <div class="lc-pills" id="lcPills"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Storage endpoint ───────────────────────────────────────────────────
+// Paste the Google Apps Script web-app URL here (same one used by the
+// individual stat lessons). Empty = lesson runs locally only.
+const SAVE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzV0_UPT5vyy-PNRS9Vw4jvPT0Bcx22k0hHV62-fLFj7nKmp3Mem2Z1szmv_dJy4OJk/exec';
+
+// ── Tag definitions ───────────────────────────────────────────────────
+const TAGS = [
+  { id: 'unit-rate',            label: 'unit rate',            color: '#00b8d4' },
+  { id: 'linear-decay',         label: 'linear decay',         color: '#ff9100' },
+  { id: 'linear-function',      label: 'linear function',      color: '#00e676' },
+  { id: 'nonlinear-function',   label: 'nonlinear function',   color: '#ce93d8' },
+  { id: 'proportional-scaling', label: 'proportional scaling', color: '#4fc3f7' },
+  { id: 'ratio',                label: 'ratio',                color: '#ffd600' },
+];
+
+// ── Formula definitions ───────────────────────────────────────────────
+const FORMULAS = [
+  {
+    id: 'motor',
+    label: 'Motor Power',
+    deps: ['s'],
+    expr: v => `${v.s} × 5`,
+    calc: v => ({ val: v.s * 5, unit: '%', dec: 0 }),
+    correctTag: 'unit-rate',
+    why: 'Every 1 point of Speed adds exactly 5% motor power — a fixed rate with no starting offset and no exponent.',
+  },
+  {
+    id: 'endurance',
+    label: 'Power at t = 3 min',
+    deps: ['e'],
+    expr: v => `100 − (20 − ${v.e}) × 1.5 × 3`,
+    calc: v => ({ val: 100 - (20 - v.e) * 4.5, unit: '%', dec: 0 }),
+    correctTag: 'linear-decay',
+    why: 'Power starts at 100% and drops by a constant amount each minute. The rate of loss is fixed — that\'s linear decay.',
+  },
+  {
+    id: 'turning',
+    label: 'Turn Ratio',
+    deps: ['t'],
+    expr: v => `0.2 + (${v.t} × 0.02)`,
+    calc: v => ({ val: 0.2 + v.t * 0.02, unit: '', dec: 2 }),
+    correctTag: 'linear-function',
+    why: 'Turn Ratio starts at 0.2 (not zero) and increases at a constant rate of 0.02 per stat point. Non-zero intercept + constant slope = linear function.',
+  },
+  {
+    id: 'charge',
+    label: 'Charge Speed',
+    deps: ['p'],
+    expr: v => `${v.p}²`,
+    calc: v => ({ val: v.p * v.p, unit: '%', dec: 0 }),
+    correctTag: 'nonlinear-function',
+    why: 'P² grows by a larger amount each time P increases by 1 — going from P=4 to P=5 adds 9%, but P=5 to P=6 adds 11%. The change grows. That\'s nonlinear.',
+  },
+  {
+    id: 'follow',
+    label: 'Follow-Through',
+    deps: ['p'],
+    expr: v => `${v.p} × 200`,
+    calc: v => ({ val: v.p * 200, unit: ' ms', dec: 0 }),
+    correctTag: 'proportional-scaling',
+    why: 'Follow-through scales in direct proportion to Power from zero — double the Power, double the time. No offset, no exponent.',
+  },
+  {
+    id: 'budget',
+    label: 'Budget Constraint',
+    deps: ['s', 'e', 't', 'p'],
+    expr: v => `${v.s} + ${v.e} + ${v.t} + ${v.p} = 20`,
+    calc: null,
+    correctTag: 'ratio',
+    why: 'Each stat is a share of 20 total points — a part-to-whole relationship within a fixed total. That\'s a ratio.',
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+const state = {
+  stats: { s: null, e: null, t: null, p: null },
+  confirmed: {},
+  budgetOk: false,
+};
+
+// ── Stat update ───────────────────────────────────────────────────────
+function updateStats() {
+  ['s', 'e', 't', 'p'].forEach(k => {
+    const raw = document.getElementById('st-' + k).value;
+    state.stats[k] = raw === '' ? null : parseInt(raw, 10);
+  });
+
+  // Any stat change resets all tag confirmations
+  state.confirmed = {};
+  state.budgetOk = false;
+
+  const v = state.stats;
+  ['s', 'e', 't', 'p'].forEach(k => {
+    document.getElementById('bv-' + k).textContent = v[k] !== null ? v[k] : '—';
+  });
+
+  const allSet = ['s', 'e', 't', 'p'].every(k => v[k] !== null);
+  const total  = allSet ? v.s + v.e + v.t + v.p : null;
+  const totEl  = document.getElementById('budgetTotal');
+  const msgEl  = document.getElementById('budgetMsg');
+
+  if (!allSet) {
+    totEl.textContent = '?';  totEl.className = 'budget-total low';
+    msgEl.textContent = '';   msgEl.className = 'budget-msg';
+  } else if (total === 20) {
+    totEl.textContent = 20;   totEl.className = 'budget-total ok';
+    msgEl.textContent = '✓ Budget balanced'; msgEl.className = 'budget-msg ok';
+    state.budgetOk = true;
+  } else if (total > 20) {
+    totEl.textContent = total; totEl.className = 'budget-total over';
+    msgEl.textContent = `Over by ${total - 20}`; msgEl.className = 'budget-msg';
+  } else {
+    totEl.textContent = total; totEl.className = 'budget-total low';
+    msgEl.textContent = `${20 - total} unallocated`; msgEl.className = 'budget-msg';
+  }
+
+  renderFormulas();
+  checkLockIn();
+}
+
+// ── Render formula rows ───────────────────────────────────────────────
+function renderFormulas() {
+  document.getElementById('formulasWrap').classList.toggle('active', state.budgetOk);
+
+  const v = state.stats;
+  document.getElementById('formulaRows').innerHTML = FORMULAS.map(f => {
+    const depsSet   = f.deps.every(d => v[d] !== null);
+    const confirmed = !!state.confirmed[f.id];
+    const result    = depsSet && f.calc ? f.calc(v) : null;
+
+    // Value display
+    let valueHTML, exprHTML;
+    if (f.id === 'budget') {
+      valueHTML = depsSet
+        ? `<span class="fr-value budget-eq">${f.expr(v)}</span>`
+        : `<span class="fr-value ph">—</span>`;
+      exprHTML = '';
+    } else {
+      valueHTML = result
+        ? `<span class="fr-value">${result.val.toFixed(result.dec)}${result.unit}</span>`
+        : `<span class="fr-value ph">—</span>`;
+      exprHTML = depsSet ? `<div class="fr-expr">${f.expr(v)}</div>` : '';
+    }
+
+    // Tag chips
+    const chipsHTML = TAGS.map(tag => {
+      let style, extraCls = '';
+      if (confirmed && tag.id === f.correctTag) {
+        style = `background:${tag.color}25; color:${tag.color}; border-color:${tag.color};`;
+        extraCls = ' locked';
+      } else if (confirmed) {
+        style = `background:rgba(255,255,255,.03); color:rgba(255,255,255,.18); border-color:rgba(255,255,255,.1);`;
+        extraCls = ' locked';
+      } else {
+        style = `background:${tag.color}12; color:${tag.color}bb; border-color:${tag.color}40;`;
+      }
+      return `<button class="tag-chip${extraCls}" data-tag="${tag.id}"
+        style="${style}" onclick="selectTag('${f.id}','${tag.id}')">${tag.label}</button>`;
+    }).join('');
+
+    const msgHTML = confirmed
+      ? `<div class="fr-confirm-msg visible">✓ ${f.why}</div>`
+      : `<div class="fr-confirm-msg"></div>`;
+
+    return `
+      <div class="formula-row${confirmed ? ' confirmed' : ''}" id="fr-${f.id}">
+        <div class="fr-top">
+          <div class="fr-meta">
+            <div class="fr-label">${f.label}</div>
+            ${exprHTML}
+          </div>
+          ${valueHTML}
+        </div>
+        <div class="fr-prompt">This formula is a —</div>
+        <div class="fr-chips">${chipsHTML}</div>
+        ${msgHTML}
+      </div>`;
+  }).join('');
+}
+
+// ── Tag selection ─────────────────────────────────────────────────────
+function selectTag(formulaId, tagId) {
+  if (!state.budgetOk || state.confirmed[formulaId]) return;
+
+  const f = FORMULAS.find(f => f.id === formulaId);
+  if (tagId === f.correctTag) {
+    state.confirmed[formulaId] = true;
+    renderFormulas();
+    checkLockIn();
+  } else {
+    const chip = document.querySelector(`#fr-${formulaId} [data-tag="${tagId}"]`);
+    if (chip) {
+      chip.classList.add('wrong-flash');
+      setTimeout(() => chip.classList.remove('wrong-flash'), 420);
+    }
+  }
+}
+
+// ── Lock In gating ────────────────────────────────────────────────────
+function checkLockIn() {
+  const allDone = FORMULAS.every(f => state.confirmed[f.id]);
+  document.getElementById('lockinBtn').classList.toggle('ready', state.budgetOk && allDone);
+}
+
+// ── Lock In reveal ────────────────────────────────────────────────────
+function lockIn() {
+  if (!document.getElementById('lockinBtn').classList.contains('ready')) return;
+
+  const v    = state.stats;
+  const name = document.getElementById('loadoutName').value.trim() || 'Unnamed Loadout';
+
+  document.getElementById('lcName').textContent = name;
+
+  // Stats
+  const KEYS   = ['s', 'e', 't', 'p'];
+  const LABELS = ['Speed', 'Endurance', 'Turning', 'Power'];
+  document.getElementById('lcStats').innerHTML = KEYS.map((k, i) =>
+    `<div class="lc-stat">
+      <div class="lc-stat-k">${LABELS[i]}</div>
+      <div class="lc-stat-v">${v[k]}</div>
+    </div>
+    ${i < 3 ? '<div class="lc-stat-sep"></div>' : ''}`
+  ).join('');
+
+  // Outputs (formulas with a calc function only)
+  document.getElementById('lcOutputs').innerHTML = FORMULAS
+    .filter(f => f.calc)
+    .map(f => {
+      const r = f.calc(v);
+      return `<div class="lc-out">
+        <div class="lc-out-lbl">${f.label}</div>
+        <div class="lc-out-val">${r.val.toFixed(r.dec)}${r.unit}</div>
+      </div>`;
+    }).join('');
+
+  // Confirmed tag pills
+  document.getElementById('lcPills').innerHTML = TAGS.map(t =>
+    `<span class="lc-pill" style="background:${t.color}20; color:${t.color}; border:1.5px solid ${t.color}55;">${t.label}</span>`
+  ).join('');
+
+  const card = document.getElementById('loadoutCard');
+  card.classList.add('visible');
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+
+  // Fire-and-forget save to the team loadout sheet. The UI proceeds whether
+  // or not the network call succeeds — facilitator reconciles from the sheet.
+  // No Content-Type header → simple CORS request (Apps Script can't respond
+  // to OPTIONS preflight).
+  if (SAVE_ENDPOINT) {
+    try {
+      fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          kind: 'team',
+          loadoutName: name,
+          site: localStorage.getItem('va_selected_site') || '',
+          season: 1,
+          speed: v.s,
+          endurance: v.e,
+          turning: v.t,
+          power: v.p,
+          motorPower:    v.s * 5,
+          decayRate:     (20 - v.e) * 1.5,
+          arcSegments:   v.t,
+          turnRatio:     0.2 + v.t * 0.02,
+          charge:        v.p * v.p,
+          followThrough: v.p * 200,
+          lesson: 'prove-your-build',
+          ts: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch (_e) {}
+  }
+}
+
+// Init
+renderFormulas();
+</script>
+</body>
+</html>
