@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endurance Decay Equations — Day 7 · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ─── DESIGN TOKENS ─── */
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --white:       #FFFFFF;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+      --space-1:  0.25rem;
+      --space-2:  0.5rem;
+      --space-3:  0.75rem;
+      --space-4:  1rem;
+      --space-5:  1.25rem;
+      --space-6:  1.5rem;
+      --space-8:  2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      scroll-padding-top: 5rem;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    input, button, textarea, select { font: inherit; color: inherit; }
+    h1, h2, h3, h4 { text-wrap: balance; line-height: 1.15; }
+    p, li { text-wrap: pretty; }
+    button { cursor: pointer; background: none; border: none; }
+
+    /* ─── HEADER ─── */
+    .site-header {
+      background: var(--navy);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 var(--space-8);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 0 0.625rem;
+      gap: var(--space-4);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .back-link {
+      color: var(--slate);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      transition: color var(--transition);
+      white-space: nowrap;
+    }
+    .back-link:hover { color: var(--cyan); }
+    .header-divider {
+      width: 1px;
+      height: 1.25rem;
+      background: var(--card-border);
+    }
+    .header-title-block {}
+    .header-lesson {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+    .header-day-badge {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--cyan);
+      padding: 2px 8px;
+      border-radius: var(--radius-full, 9999px);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-bar-wrap {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 var(--space-8);
+    }
+    .progress-bar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-3) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .progress-label {
+      font-size: var(--text-xs);
+      color: var(--slate);
+      font-weight: 500;
+      white-space: nowrap;
+      min-width: 7rem;
+    }
+    .progress-track {
+      flex: 1;
+      height: 4px;
+      background: var(--navy3);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--teal));
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 0%;
+    }
+    .progress-pct {
+      font-size: var(--text-xs);
+      color: var(--cyan);
+      font-weight: 700;
+      min-width: 2.5rem;
+      text-align: right;
+    }
+
+    /* ─── SECTION NAV TABS ─── */
+    .section-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 var(--space-8);
+    }
+    .section-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.75rem 1.25rem 0.875rem;
+      border-bottom: 3px solid transparent;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color var(--transition), border-color var(--transition);
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--white); }
+    .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .tab-num {
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 50%;
+      background: var(--navy3);
+      font-size: 0.6875rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+    .tab-btn.active .tab-num { background: var(--cyan); color: var(--navy); }
+    .tab-btn.done .tab-num { background: var(--green); color: var(--navy); }
+    .tab-btn.done { color: var(--green); border-bottom-color: transparent; }
+
+    /* ─── MAIN LAYOUT ─── */
+    .main-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-8) var(--space-12);
+    }
+
+    /* ─── SECTION PANELS ─── */
+    .section-panel { display: none; }
+    .section-panel.active { display: block; }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      margin-bottom: var(--space-8);
+    }
+    .section-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-2);
+    }
+    .section-title {
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .section-subtitle {
+      font-size: var(--text-base);
+      color: var(--slate);
+      margin-top: var(--space-2);
+    }
+
+    /* ─── FORMULA BOARD ─── */
+    .formula-board {
+      background: linear-gradient(135deg, #001922 0%, #001429 100%);
+      border: 1.5px solid var(--cyan);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6) var(--space-8);
+      margin-bottom: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+    .formula-board::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(0, 229, 255, 0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .formula-board-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-3);
+    }
+    .formula-display {
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: -0.01em;
+      font-feature-settings: "kern";
+    }
+    .formula-display .sub { font-size: 0.7em; vertical-align: -0.15em; }
+    .formula-display .comment {
+      font-size: var(--text-sm);
+      font-weight: 400;
+      color: var(--slate);
+      margin-top: var(--space-2);
+    }
+
+    /* ─── EXPLAIN BLOCK ─── */
+    .explain-block {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+      font-size: var(--text-base);
+      color: var(--slate);
+    }
+    .explain-block strong { color: var(--white); }
+    .explain-block .em { color: var(--cyan); font-weight: 700; }
+
+    /* ─── STEP REVEAL ─── */
+    .step-box {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .step-box-title {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-5);
+    }
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      list-style: none;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+    .step-item.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      background: var(--navy3);
+      border: 1.5px solid var(--card-border);
+      font-size: var(--text-xs);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--slate);
+    }
+    .step-item.revealed .step-num {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--navy);
+    }
+    .step-content {
+      flex: 1;
+      padding-top: 0.2rem;
+    }
+    .step-math {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: var(--space-1);
+    }
+    .step-explain {
+      font-size: var(--text-sm);
+      color: var(--slate);
+    }
+    .step-explain .hi { color: var(--yellow); font-weight: 600; }
+    .step-explain .hi-green { color: var(--green); font-weight: 600; }
+    .step-explain .hi-purple { color: var(--purple); font-weight: 600; }
+
+    .reveal-btn {
+      margin-top: var(--space-5);
+      padding: var(--space-2) var(--space-6);
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      color: var(--white);
+      font-weight: 700;
+      font-size: var(--text-sm);
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+    .reveal-btn:hover { background: var(--navy2); border-color: var(--teal); color: var(--cyan); }
+    .reveal-btn.done { background: var(--green); border-color: var(--green); color: var(--navy); }
+
+    /* ─── E INPUT SECTION ─── */
+    .e-input-section {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .e-input-label {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-4);
+    }
+    .e-input-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .e-input-label-inline {
+      font-size: var(--text-base);
+      font-weight: 500;
+      color: var(--white);
+    }
+    .e-number-input {
+      width: 9rem;
+      padding: var(--space-2) var(--space-4);
+      background: var(--navy3);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-md);
+      color: var(--white);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      text-align: center;
+      transition: border-color var(--transition);
+    }
+    .e-number-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+    .e-number-input.valid { border-color: var(--green); }
+    .e-number-input.invalid { border-color: var(--red); }
+    .e-hint {
+      font-size: var(--text-xs);
+      color: var(--slate);
+      flex: 1;
+    }
+
+    /* ─── LIVE RESULT CARDS ─── */
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+    .result-card {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      transition: border-color var(--transition), opacity var(--transition);
+    }
+    .result-card.active { border-color: var(--cyan); }
+    .result-card-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-3);
+    }
+    .result-card-math {
+      font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.5;
+      font-feature-settings: "kern";
+    }
+    .result-card-math .val { color: var(--cyan); }
+    .result-card-math .val-green { color: var(--green); }
+    .result-card-math .empty { color: var(--navy3); background: var(--navy3); border-radius: 3px; }
+
+    /* ─── CALLOUT ─── */
+    .callout {
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-6);
+      margin-bottom: var(--space-6);
+      font-size: var(--text-base);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+    .callout.cyan {
+      background: rgba(0, 229, 255, 0.07);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      color: var(--white);
+    }
+    .callout.yellow {
+      background: rgba(255, 209, 102, 0.07);
+      border: 1px solid rgba(255, 209, 102, 0.25);
+      color: var(--white);
+    }
+    .callout.green {
+      background: rgba(0, 201, 122, 0.07);
+      border: 1px solid rgba(0, 201, 122, 0.25);
+      color: var(--white);
+    }
+    .callout-icon {
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      margin-top: 0.15rem;
+    }
+    .callout p { max-width: unset; }
+
+    /* ─── SECTION 1 CONTINUE BUTTON ─── */
+    .continue-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-8);
+      background: var(--cyan);
+      color: var(--navy);
+      font-weight: 800;
+      font-size: var(--text-sm);
+      border-radius: var(--radius-md);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .continue-btn:hover { background: #33ecff; transform: translateY(-1px); }
+    .continue-btn.locked {
+      background: var(--navy3);
+      color: var(--slate);
+      pointer-events: none;
+    }
+
+    /* ─── SECTION 2 ─── */
+    .solve-steps {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .solve-steps-title {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-5);
+    }
+    .solve-eq {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: var(--space-2);
+    }
+    .solve-eq .arrow { color: var(--slate); font-weight: 400; margin: 0 var(--space-2); }
+    .solve-eq .highlight { color: var(--cyan); }
+    .solve-eq .result { color: var(--green); }
+
+    /* ─── WORKED EXAMPLE ─── */
+    .worked-example {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--yellow);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .worked-example-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-4);
+    }
+    .worked-line {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: var(--space-2);
+    }
+    .worked-line .dim { color: var(--slate); font-weight: 400; }
+    .worked-line .em { color: var(--yellow); }
+
+    /* ─── STUDENT CALCULATOR ─── */
+    .student-calc {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .calc-steps-out {
+      margin-top: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .calc-step-row {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      font-weight: 600;
+      color: var(--white);
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .calc-step-row.show {
+      opacity: 1;
+      transform: none;
+    }
+    .calc-step-row .c { color: var(--cyan); }
+    .calc-step-row .g { color: var(--green); }
+    .calc-step-row .y { color: var(--yellow); }
+    .calc-step-row .s { color: var(--slate); }
+
+    /* ─── INTERPRETATION ─── */
+    .interp-section {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .interp-question {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: var(--space-4);
+    }
+    .choice-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-5);
+    }
+    .choice-btn {
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--card-border);
+      background: var(--navy3);
+      color: var(--slate);
+      font-weight: 700;
+      font-size: var(--text-sm);
+      transition: all var(--transition);
+    }
+    .choice-btn:hover { border-color: var(--teal); color: var(--white); }
+    .choice-btn.selected { border-color: var(--cyan); background: rgba(0,229,255,0.1); color: var(--cyan); }
+
+    .interp-textarea {
+      width: 100%;
+      background: var(--navy3);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-md);
+      color: var(--white);
+      font-size: var(--text-sm);
+      padding: var(--space-4);
+      resize: vertical;
+      min-height: 5rem;
+      transition: border-color var(--transition);
+    }
+    .interp-textarea:focus { outline: none; border-color: var(--cyan); }
+    .interp-textarea.valid { border-color: var(--green); }
+    .char-count {
+      font-size: var(--text-xs);
+      color: var(--slate);
+      text-align: right;
+      margin-top: var(--space-1);
+    }
+    .char-count.ok { color: var(--green); }
+
+    /* ─── MINI TABLE ─── */
+    .mini-table-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      overflow-x: auto;
+    }
+    .mini-table-title {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-4);
+    }
+    table.comparison {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.comparison th {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: var(--space-2) var(--space-4);
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+    table.comparison td {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--white);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid rgba(34,40,64,0.5);
+    }
+    table.comparison tr:last-child td { border-bottom: none; }
+    table.comparison tr.highlight-row td {
+      color: var(--cyan);
+      font-weight: 700;
+      background: rgba(0,229,255,0.04);
+    }
+    table.comparison .bar-cell {
+      position: relative;
+    }
+    .bar-vis {
+      height: 6px;
+      border-radius: 99px;
+      background: var(--teal);
+      min-width: 4px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: var(--space-2);
+    }
+    .bar-vis.hi { background: var(--cyan); }
+
+    /* ─── SECTION 3 ─── */
+    .personal-eq-card {
+      background: linear-gradient(135deg, #001922 0%, #001429 100%);
+      border: 1.5px solid var(--cyan);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6) var(--space-8);
+      margin-bottom: var(--space-6);
+      text-align: center;
+    }
+    .personal-eq-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-3);
+    }
+    .personal-eq-display {
+      font-size: clamp(1.4rem, 4vw, 2.5rem);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .personal-eq-display .val { color: var(--cyan); }
+    .personal-eq-display .dim { color: var(--slate); font-size: 0.6em; font-weight: 400; }
+
+    /* ─── SVG GRAPH ─── */
+    .graph-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .graph-title {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-4);
+    }
+    #decay-svg {
+      width: 100%;
+      height: auto;
+    }
+
+    /* ─── REFLECTION ─── */
+    .reflection-block {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-5);
+    }
+    .reflection-block + .reflection-block {
+      margin-top: 0;
+    }
+    .reflection-q-num {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-2);
+    }
+    .reflection-q {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: var(--space-4);
+    }
+    .sentence-frame {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-sm);
+      color: var(--slate);
+      margin-bottom: var(--space-3);
+      line-height: 1.8;
+    }
+    .sentence-frame .autofill {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+    .sentence-frame .autofill-pct {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .generic-input {
+      width: 100%;
+      background: var(--navy3);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-md);
+      color: var(--white);
+      font-size: var(--text-sm);
+      padding: var(--space-3) var(--space-4);
+      transition: border-color var(--transition);
+    }
+    .generic-input:focus { outline: none; border-color: var(--cyan); }
+    .generic-input.valid { border-color: var(--green); }
+    .generic-input.invalid { border-color: var(--red); }
+
+    .validation-msg {
+      font-size: var(--text-xs);
+      margin-top: var(--space-2);
+      min-height: 1rem;
+      transition: opacity var(--transition);
+    }
+    .validation-msg.ok { color: var(--green); }
+    .validation-msg.err { color: var(--red); }
+
+    /* ─── DONE BUTTON ─── */
+    .done-btn-wrap {
+      display: flex;
+      justify-content: center;
+      padding-top: var(--space-4);
+    }
+    .done-btn {
+      padding: var(--space-4) var(--space-12);
+      background: var(--green);
+      color: var(--navy);
+      font-weight: 800;
+      font-size: var(--text-base);
+      border-radius: var(--radius-md);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .done-btn:hover { background: #33e898; transform: translateY(-2px); }
+    .done-btn.locked {
+      background: var(--navy3);
+      color: var(--slate);
+      pointer-events: none;
+    }
+
+    /* ─── NAV BUTTONS ─── */
+    .nav-btn-row {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: flex-end;
+      margin-top: var(--space-8);
+    }
+    .nav-btn {
+      padding: var(--space-3) var(--space-8);
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all var(--transition);
+    }
+    .nav-btn.primary {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+    .nav-btn.primary:hover { background: #33ecff; transform: translateY(-1px); }
+    .nav-btn.primary.locked {
+      background: var(--navy3);
+      color: var(--slate);
+      pointer-events: none;
+    }
+    .nav-btn.secondary {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      color: var(--slate);
+    }
+    .nav-btn.secondary:hover { color: var(--white); border-color: var(--teal); }
+
+    /* ─── VOCABULARY TOOLTIPS ─── */
+    .vocab {
+      border-bottom: 2px dashed var(--teal);
+      cursor: pointer;
+      position: relative;
+      color: var(--cyan);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .vocab-popup {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--navy3);
+      border: 1.5px solid var(--cyan);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      min-width: 200px;
+      max-width: 260px;
+      font-size: var(--text-xs);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.5;
+      z-index: 100;
+      pointer-events: none;
+      text-transform: none;
+      letter-spacing: 0;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .vocab-popup::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--cyan);
+    }
+    .vocab:hover .vocab-popup,
+    .vocab.open .vocab-popup { display: block; }
+    .vocab-term { font-weight: 800; color: var(--cyan); display: block; margin-bottom: 4px; }
+
+    /* ─── FORMULA ANATOMY ─── */
+    .formula-anatomy {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .formula-anatomy-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .anatomy-formula-row {
+      font-size: clamp(1rem, 2.2vw, 1.4rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: var(--space-5);
+    }
+    .anat-p   { color: var(--cyan);   }
+    .anat-100 { color: var(--green);  }
+    .anat-m   { color: var(--yellow); }
+    .anat-t   { color: var(--purple); }
+    .anat-op  { color: var(--slate);  font-weight: 400; padding: 0 2px; }
+    .anatomy-parts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-3);
+    }
+    .anatomy-part {
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      border-left: 3px solid;
+      background: var(--navy2);
+    }
+    .anatomy-part .part-token {
+      font-size: var(--text-sm);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .anatomy-part .part-name {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+    .anatomy-part .part-plain {
+      font-size: var(--text-xs);
+      color: var(--slate);
+      line-height: 1.4;
+    }
+    .anatomy-part.cyan-part   { border-color: var(--cyan);   }
+    .anatomy-part.green-part  { border-color: var(--green);  }
+    .anatomy-part.yellow-part { border-color: var(--yellow); }
+    .anatomy-part.purple-part { border-color: var(--purple); }
+
+    /* ─── SLOPE-INTERCEPT MAPPING ─── */
+    .slope-map {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .slope-map-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .slope-map-rows { display: flex; flex-direction: column; gap: var(--space-3); }
+    .slope-map-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+      font-weight: 700;
+    }
+    .slope-map-row .sm-op { color: var(--slate); font-weight: 400; }
+    .sm-y  { color: var(--cyan); }
+    .sm-m  { color: var(--yellow); background: rgba(255,209,102,0.12); padding: 2px 7px; border-radius: 4px; }
+    .sm-x  { color: var(--purple); }
+    .sm-b  { color: var(--green); background: rgba(0,201,122,0.12); padding: 2px 7px; border-radius: 4px; }
+    .slope-map-connector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) 0;
+      font-size: var(--text-xs);
+      color: var(--slate);
+    }
+    .sm-arrow { flex: 1; height: 1px; background: var(--card-border); position: relative; }
+    .sm-arrow::after { content: '→'; position: absolute; right: -8px; top: -8px; color: var(--slate); }
+    .slope-map-legend {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--card-border);
+    }
+    .sm-legend-item {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .sm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ─── MATCH TIMELINE ─── */
+    .match-timeline-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .match-timeline-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .timeline-row-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      min-width: 5.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .timeline-bar-bg {
+      flex: 1;
+      height: 30px;
+      background: var(--navy3);
+      border-radius: var(--radius-sm);
+      position: relative;
+      overflow: visible;
+    }
+    .timeline-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding-left: var(--space-3);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 0;
+    }
+    #tl-match-fill {
+      background: linear-gradient(90deg, rgba(0,229,255,0.35), rgba(0,229,255,0.12));
+      width: 60%;   /* 3 min out of 5-min scale: (3/5)*100 = 60% */
+      color: var(--cyan);
+    }
+    #tl-bot-fill {
+      background: var(--navy3);
+      width: 60%;
+      color: var(--slate);
+    }
+    #tl-bot-fill.alive { background: linear-gradient(90deg, rgba(0,201,122,0.45), rgba(0,201,122,0.15)); color: var(--green); }
+    #tl-bot-fill.dying { background: linear-gradient(90deg, rgba(255,77,106,0.45), rgba(255,77,106,0.15)); color: var(--red); }
+    .tl-end-marker {
+      position: absolute;
+      top: -4px; bottom: -4px;
+      width: 2px;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .tl-end-marker-label {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .timeline-time-row {
+      position: relative;
+      margin-left: calc(5.5rem + var(--space-3));
+      height: 16px;
+      font-size: 10px;
+      color: var(--slate);
+      margin-top: 2px;
+    }
+    .tl-time-tick {
+      position: absolute;
+      transform: translateX(-50%);
+    }
+    .tl-time-tick:first-child { transform: none; left: 0; }
+    .tl-time-tick:last-child  { transform: none; right: 0; left: auto; }
+    .timeline-verdict {
+      margin-top: var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .timeline-verdict.show { opacity: 1; }
+    .timeline-verdict.ok  { background: rgba(0,201,122,0.12); color: var(--green); border: 1px solid rgba(0,201,122,0.3); }
+    .timeline-verdict.bad { background: rgba(255,77,106,0.12); color: var(--red);   border: 1px solid rgba(255,77,106,0.3); }
+
+    /* ─── ANIMATED POWER BAR ─── */
+    .power-bar-demo {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .pbd-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .pbd-outer {
+      height: 44px;
+      background: var(--navy3);
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .pbd-fill {
+      position: absolute;
+      left: 0; top: 0; height: 100%;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: var(--navy);
+      white-space: nowrap;
+      overflow: hidden;
+      animation: pbd-drain 7s cubic-bezier(0.4, 0, 0.8, 1) infinite;
+    }
+    @keyframes pbd-drain {
+      0%   { width: 100%; background: #00C97A; }
+      15%  { width: 85%;  background: #00C97A; }
+      45%  { width: 52%;  background: #FFD166; }
+      70%  { width: 22%;  background: #FF4D6A; }
+      90%  { width: 2%;   background: #FF4D6A; }
+      91%  { width: 100%; background: #00C97A; }
+      100% { width: 100%; background: #00C97A; }
+    }
+    .pbd-tick-row {
+      display: flex;
+      font-size: 10px;
+      color: var(--slate);
+      padding: 0 2px;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+    .pbd-tick-row span:nth-child(3) { color: var(--yellow); }
+    .pbd-caption {
+      font-size: var(--text-xs);
+      color: var(--slate);
+      text-align: center;
+      padding-top: var(--space-2);
+      border-top: 1px solid var(--card-border);
+    }
+    .pbd-caption strong { color: var(--white); }
+
+    /* ─── SLOPE COMPARISON CHART ─── */
+    .slope-compare-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+    .slope-compare-title {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .slope-compare-svg { width: 100%; height: auto; }
+    .slope-compare-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--card-border);
+    }
+    .sc-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+    .sc-legend-line {
+      width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0;
+    }
+
+    /* ─── MINI WORKED CHART ─── */
+    .worked-mini-chart {
+      margin-top: var(--space-4);
+      background: var(--navy2);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+    }
+    .worked-mini-chart-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-2);
+    }
+    .worked-mini-svg { width: 100%; height: auto; }
+
+    /* ─── WORD BANK ─── */
+    .word-bank {
+      margin-bottom: var(--space-3);
+    }
+    .word-bank-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-2);
+    }
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+    .word-chip {
+      padding: 3px 10px;
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--slate);
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .word-chip:hover  { border-color: var(--teal); color: var(--white); }
+    .word-chip.used   { border-color: var(--purple); color: var(--purple); background: rgba(155,138,255,0.1); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .site-header, .progress-bar-wrap, .section-nav { padding: 0 var(--space-4); }
+      .main-content { padding: var(--space-6) var(--space-4) var(--space-10); }
+      .formula-board { padding: var(--space-4); }
+      .header-inner { padding: 0.75rem 0 0.5rem; }
+      .tab-btn { padding: 0.6rem 0.875rem 0.75rem; font-size: 0.7rem; }
+      .personal-eq-card { padding: var(--space-5); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a href="today.html" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Today
+      </a>
+      <div class="header-divider"></div>
+      <span class="header-lesson">Endurance Decay Equations</span>
+    </div>
+    <span class="header-day-badge">Day 7</span>
+  </div>
+</header>
+
+<!-- ─── PROGRESS BAR ─── -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <span class="progress-label" id="progress-label">Section 1 of 3</span>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+  </div>
+</div>
+
+<!-- ─── SECTION NAV TABS ─── -->
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner">
+    <button class="tab-btn active" data-tab="1" onclick="goToTab(1)">
+      <span class="tab-num">1</span>
+      From Formula to Equation
+    </button>
+    <button class="tab-btn" data-tab="2" onclick="goToTab(2)">
+      <span class="tab-num">2</span>
+      Find the X-Intercept
+    </button>
+    <button class="tab-btn" data-tab="3" onclick="goToTab(3)">
+      <span class="tab-num">3</span>
+      Your Personalized Equation
+    </button>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<main class="main-content">
+
+  <!-- ══════════════════════════════════════════
+       SECTION 1 · From Formula to Equation
+  ══════════════════════════════════════════ -->
+  <section class="section-panel active" id="panel-1">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 1 of 3</div>
+      <h1 class="section-title">From Formula to Equation</h1>
+      <p class="section-subtitle">Your P(t) formula is already linear — let's write it in slope-intercept form.</p>
+    </div>
+
+    <!-- Formula board -->
+    <div class="formula-board">
+      <div class="formula-board-label">The Endurance Decay Formula</div>
+      <div class="formula-display">
+        P(t) = 100 − (20 − E) × 1.5 × t
+      </div>
+      <div class="formula-display comment">
+        P(t) = motor power % &nbsp;·&nbsp; t = time in minutes &nbsp;·&nbsp; E = your Endurance stat
+      </div>
+    </div>
+
+    <!-- Formula anatomy -->
+    <div class="formula-anatomy">
+      <div class="formula-anatomy-label">🔍 What does each part mean?</div>
+      <div class="anatomy-formula-row">
+        <span class="anat-p">P(t)</span>
+        <span class="anat-op">=</span>
+        <span class="anat-100">100</span>
+        <span class="anat-op">−</span>
+        <span class="anat-m">(20 − E) × 1.5</span>
+        <span class="anat-op">×</span>
+        <span class="anat-t">t</span>
+      </div>
+      <div class="anatomy-parts-grid">
+        <div class="anatomy-part cyan-part">
+          <div class="part-token anat-p">P(t)</div>
+          <div class="part-name">Power right now</div>
+          <div class="part-plain">How much power your bot has at any moment in the match. Starts high, goes down.</div>
+        </div>
+        <div class="anatomy-part green-part">
+          <div class="part-token anat-100">100</div>
+          <div class="part-name">Starting power</div>
+          <div class="part-plain">Every bot starts at 100% power — no matter what your E value is.</div>
+        </div>
+        <div class="anatomy-part yellow-part">
+          <div class="part-token anat-m">(20 − E) × 1.5</div>
+          <div class="part-name">Power lost per minute</div>
+          <div class="part-plain">Higher E → smaller number → less power lost each minute. This is your <strong style="color:var(--white)">slope</strong>.</div>
+        </div>
+        <div class="anatomy-part purple-part">
+          <div class="part-token anat-t">t</div>
+          <div class="part-name">Time (minutes)</div>
+          <div class="part-plain">How long the match has been running. Multiply time × decay rate to get total power lost.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animated power bar demo -->
+    <div class="power-bar-demo">
+      <div class="pbd-label">⚡ P(t) is a power bar — watch it drain over the match</div>
+      <div class="pbd-outer">
+        <div class="pbd-fill">POWER</div>
+      </div>
+      <div class="pbd-tick-row">
+        <span>t = 0 min &nbsp;(100%)</span>
+        <span>t = 2 min</span>
+        <span>t = 3 min ← match ends</span>
+      </div>
+      <div class="pbd-caption">
+        <strong>P(t)</strong> = the height of the bar at any moment in time. In Velocity Arena, power stops draining at 20% — the game engine holds it there.
+        A <strong>higher E stat</strong> slows the drain.
+      </div>
+    </div>
+
+    <!-- Explain -->
+    <div class="explain-block">
+      <p>This is <strong>already a</strong> <span class="vocab">linear equation<span class="vocab-popup"><span class="vocab-term">Linear equation</span>An equation that makes a straight line when graphed. Power goes down at a steady rate — no curves.</span></span>. You've seen them in math class written as
+      <span class="em">y = mx + b</span>. Let's rewrite P(t) in that exact form — same equation, different look.</p>
+    </div>
+
+    <!-- Step-by-step reveal -->
+    <div class="step-box">
+      <div class="step-box-title">Rewrite in slope-intercept form — click to reveal each step</div>
+      <ol class="steps-list" id="steps-list">
+        <li class="step-item revealed" id="step-1">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-math">P(t) = 100 − (20 − E) × 1.5 × t</div>
+            <div class="step-explain">Start with the original formula. Notice: 100 is at the front, and the variable term (with t) is at the end.</div>
+          </div>
+        </li>
+        <li class="step-item" id="step-2">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-math">P(t) = <span class="hi">−[(20 − E) × 1.5]</span> × t + <span class="hi-green">100</span></div>
+            <div class="step-explain">
+              Group the <span class="vocab">coefficient<span class="vocab-popup"><span class="vocab-term">Coefficient</span>The number multiplied by a variable. In 3x, the coefficient is 3. Here, everything multiplied by t is the coefficient.</span></span>: the term being multiplied by t is negative.
+              We flip the subtraction into <span class="hi">a negative <span class="vocab">slope<span class="vocab-popup"><span class="vocab-term">Slope (m)</span>How steep the line is. Negative slope = line goes down. Here it means power decreases over time.</span></span></span>,
+              and move the constant <span class="hi-green">+100</span> to the end.
+            </div>
+          </div>
+        </li>
+        <li class="step-item" id="step-3">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-math">y = <span class="hi">m</span> · x + <span class="hi-green">b</span></div>
+            <div class="step-explain">
+              Match to <em>y = mx + b</em>:&nbsp;
+              <span class="hi">m = −(20 − E) × 1.5</span> (the slope),&nbsp;
+              <span class="hi-green">b = 100</span> (the y-intercept).
+              <br>y = P(t) and x = t.
+            </div>
+          </div>
+        </li>
+      </ol>
+      <button class="reveal-btn" id="reveal-btn" onclick="revealNextStep()">Reveal Step 2 →</button>
+    </div>
+
+    <!-- Slope-intercept visual map -->
+    <div class="slope-map">
+      <div class="slope-map-label">🗺 How P(t) maps to y = mx + b</div>
+      <div class="slope-map-rows">
+        <div class="slope-map-row">
+          <span class="sm-y">y</span>
+          <span class="sm-op">=</span>
+          <span class="sm-m">m</span>
+          <span class="sm-op">·</span>
+          <span class="sm-x">x</span>
+          <span class="sm-op">+</span>
+          <span class="sm-b">b</span>
+          <span style="color:var(--slate);font-size:var(--text-xs);margin-left:var(--space-3);">← standard form</span>
+        </div>
+        <div class="slope-map-row" style="font-size:var(--text-xs);font-weight:500;gap:var(--space-2);padding:0 2px;">
+          <span style="color:var(--cyan);min-width:2ch;text-align:center;">↕</span>
+          <span style="color:var(--slate);padding:0 2px;"></span>
+          <span style="color:var(--yellow);min-width:6ch;text-align:center;">↕</span>
+          <span style="color:var(--slate);padding:0 2px;"></span>
+          <span style="color:var(--purple);min-width:2ch;text-align:center;">↕</span>
+          <span style="color:var(--slate);padding:0 2px;"></span>
+          <span style="color:var(--green);min-width:2ch;text-align:center;">↕</span>
+        </div>
+        <div class="slope-map-row">
+          <span class="sm-y">P(t)</span>
+          <span class="sm-op">=</span>
+          <span class="sm-m">−(20−E)×1.5</span>
+          <span class="sm-op">·</span>
+          <span class="sm-x">t</span>
+          <span class="sm-op">+</span>
+          <span class="sm-b">100</span>
+          <span style="color:var(--slate);font-size:var(--text-xs);margin-left:var(--space-3);">← your decay equation</span>
+        </div>
+      </div>
+      <div class="slope-map-legend">
+        <div class="sm-legend-item"><div class="sm-dot" style="background:var(--yellow)"></div><span style="color:var(--yellow)">m (slope)</span> = how fast power drops per minute</div>
+        <div class="sm-legend-item"><div class="sm-dot" style="background:var(--green)"></div><span style="color:var(--green)">b (y-intercept)</span> = starting power (always 100)</div>
+        <div class="sm-legend-item"><div class="sm-dot" style="background:var(--purple)"></div><span style="color:var(--purple)">x</span> = time t in minutes</div>
+        <div class="sm-legend-item"><div class="sm-dot" style="background:var(--cyan)"></div><span style="color:var(--cyan)">y</span> = power P(t) as a %</div>
+      </div>
+    </div>
+
+    <!-- Slope comparison chart -->
+    <div class="slope-compare-wrap">
+      <div class="slope-compare-title">📉 How E value changes the slope — three bots compared</div>
+      <!--
+        Plot area: x 55→455 (400px wide = 0–5 min), y 12→192 (180px tall = 100%→0%)
+        toSvgX(t) = 55 + (t/5)*400
+        toSvgY(p) = 192 - (p/100)*180
+
+        E=2:  m=-27, floor-hit=80/27≈2.963 → x=55+(2.963/5)*400=292, y=192-(20/100)*180=156
+        E=8:  m=-18, t=5→P=10   → line (55,12)→(455, 192-(10/100)*180)  = (455,174)
+        E=16: m=-6,  t=5→P=70   → line (55,12)→(455, 192-(70/100)*180)  = (455,66)
+        Match t=3: x=55+(3/5)*400=295   Floor P=20%: y=192-(20/100)*180=156
+      -->
+      <svg class="slope-compare-svg" viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Slope comparison for E=2, E=8, and E=16">
+
+        <!-- Chart background -->
+        <rect x="55" y="12" width="400" height="180" fill="#0D0D1A" rx="4"/>
+
+        <!-- Horizontal grid lines -->
+        <line x1="55" y1="12"  x2="455" y2="12"  stroke="#222840" stroke-width="1"/>
+        <line x1="55" y1="57"  x2="455" y2="57"  stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="55" y1="102" x2="455" y2="102" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="55" y1="147" x2="455" y2="147" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="55" y1="192" x2="455" y2="192" stroke="#222840" stroke-width="1"/>
+
+        <!-- Vertical grid lines -->
+        <line x1="55"  y1="12" x2="55"  y2="192" stroke="#8899AA" stroke-width="1.5"/>
+        <line x1="135" y1="12" x2="135" y2="192" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="215" y1="12" x2="215" y2="192" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="295" y1="12" x2="295" y2="192" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="295" y1="4"  x2="295" y2="200" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <line x1="455" y1="12" x2="455" y2="192" stroke="#222840" stroke-width="1"/>
+
+        <!-- Y-axis labels -->
+        <text x="49" y="16"  text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">100%</text>
+        <text x="49" y="61"  text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">75%</text>
+        <text x="49" y="106" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">50%</text>
+        <text x="49" y="151" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">25%</text>
+        <text x="49" y="196" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">0%</text>
+
+        <!-- X-axis labels -->
+        <text x="55"  y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">0</text>
+        <text x="135" y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">1</text>
+        <text x="215" y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">2</text>
+        <text x="295" y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#FFD166">3</text>
+        <text x="375" y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">4</text>
+        <text x="455" y="208" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#8899AA">5</text>
+
+        <!-- Axis titles -->
+        <text x="255" y="220" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#8899AA">Time (minutes)</text>
+        <text x="10"  y="102" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#8899AA" transform="rotate(-90,10,102)">Power %</text>
+
+        <!-- Match end label -->
+        <text x="298" y="11" font-family="DM Sans,sans-serif" font-size="9" fill="#FFD166" font-weight="700">Match ends</text>
+
+        <!-- Shaded "alive zone" (before t=3 match end) -->
+        <rect x="55" y="12" width="240" height="180" fill="rgba(0,201,122,0.04)" rx="0"/>
+
+        <!-- 20% power floor line -->
+        <line x1="55" y1="156" x2="455" y2="156" stroke="#9B8AFF" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+        <text x="459" y="159" text-anchor="start" font-family="DM Sans,sans-serif" font-size="8" fill="#9B8AFF">20% floor</text>
+
+        <!-- ── E=2 line (red, steep) — stops at 20% floor ── -->
+        <!-- floor-hit at t=80/27≈2.963 → SVG x=55+(2.963/5)*400=292, y=192-(20/100)*180=156 -->
+        <line x1="55" y1="12" x2="292" y2="156" stroke="#FF4D6A" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- floor-hit dot -->
+        <circle cx="292" cy="156" r="6" fill="#FF4D6A" stroke="#0D0D1A" stroke-width="2"/>
+        <!-- floor-hit label -->
+        <text x="285" y="150" text-anchor="end" font-family="DM Sans,sans-serif" font-size="10" fill="#FF4D6A" font-weight="700">⚡ floor at 2.96 min</text>
+
+        <!-- ── E=8 line (yellow, moderate) ── -->
+        <!-- at t=5, P=10 → SVG y=192-(10/100)*180=174 -->
+        <line x1="55" y1="12" x2="455" y2="174" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="459" y="178" text-anchor="start" font-family="DM Sans,sans-serif" font-size="10" fill="#FFD166" font-weight="700">E=8</text>
+        <text x="459" y="189" text-anchor="start" font-family="DM Sans,sans-serif" font-size="9" fill="#FFD166">10% at end</text>
+
+        <!-- ── E=16 line (green, gentle) ── -->
+        <!-- at t=5, P=70 → SVG y=192-(70/100)*180=66 -->
+        <line x1="55" y1="12" x2="455" y2="66" stroke="#00C97A" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="459" y="70" text-anchor="start" font-family="DM Sans,sans-serif" font-size="10" fill="#00C97A" font-weight="700">E=16</text>
+        <text x="459" y="81" text-anchor="start" font-family="DM Sans,sans-serif" font-size="9" fill="#00C97A">70% at end</text>
+
+        <!-- Start dot (all lines start here) -->
+        <circle cx="55" cy="12" r="5" fill="#FFFFFF" stroke="#0D0D1A" stroke-width="2"/>
+        <text x="60" y="10" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">All bots start at 100%</text>
+
+        <!-- E=2 label mid-line -->
+        <text x="160" y="82" font-family="DM Sans,sans-serif" font-size="10" fill="#FF4D6A" font-weight="700" transform="rotate(-34,160,82)">E=2 (steep!)</text>
+      </svg>
+
+      <div class="slope-compare-legend">
+        <div class="sc-legend-item">
+          <div class="sc-legend-line" style="background:#FF4D6A"></div>
+          <span style="color:#FF4D6A">E = 2 → slope = −27 → hits 20% floor at 2.96 min ⚡</span>
+        </div>
+        <div class="sc-legend-item">
+          <div class="sc-legend-line" style="background:#FFD166"></div>
+          <span style="color:#FFD166">E = 8 → slope = −18 → survives with 10% left ✓</span>
+        </div>
+        <div class="sc-legend-item">
+          <div class="sc-legend-line" style="background:#00C97A"></div>
+          <span style="color:#00C97A">E = 16 → slope = −6 → survives with 70% left ✓✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Callout: y-intercept meaning -->
+    <div class="callout cyan">
+      <div class="callout-icon">💡</div>
+      <p><strong>The <span class="vocab">y-intercept<span class="vocab-popup"><span class="vocab-term">Y-intercept (b)</span>Where the line crosses the y-axis — the starting value when x = 0. Here it means: power at the very start of the match.</span></span> is always 100.</strong> Why? Because at t = 0, your bot just started the match — it's always at <strong>full power (100%)</strong>. No matter what your E value is, every bot starts at 100%.</p>
+    </div>
+
+    <!-- E input + live results -->
+    <div class="e-input-section">
+      <div class="e-input-label">Enter your Endurance value to see your equation</div>
+      <div class="e-input-row">
+        <span class="e-input-label-inline">E =</span>
+        <input
+          type="number"
+          class="e-number-input"
+          id="s1-e-input"
+          min="1" max="19"
+          placeholder="1–19"
+          oninput="updateS1()"
+          aria-label="Your Endurance value (1 to 19)"
+        >
+        <span class="e-hint">Enter a value from 1 to 19</span>
+      </div>
+
+      <div class="result-grid" id="s1-result-grid">
+        <!-- m card -->
+        <div class="result-card" id="card-m">
+          <div class="result-card-label">Slope (m)</div>
+          <div class="result-card-math" id="m-display">
+            m = −(20 − <span style="color:var(--slate)">__</span>) × 1.5 = <span style="color:var(--slate)">__</span>
+          </div>
+        </div>
+        <!-- b card -->
+        <div class="result-card active" id="card-b">
+          <div class="result-card-label">Y-Intercept (b)</div>
+          <div class="result-card-math">
+            b = <span class="val-green">100</span> &nbsp;<span style="color:var(--slate);font-size:0.85em">(always)</span>
+          </div>
+        </div>
+        <!-- equation card -->
+        <div class="result-card" id="card-eq">
+          <div class="result-card-label">Your Equation</div>
+          <div class="result-card-math" id="eq-display">
+            y = <span style="color:var(--slate)">___</span>x + 100
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-btn-row">
+      <button class="nav-btn primary locked" id="s1-next-btn" onclick="goToTab(2)">Next: Find the X-Intercept →</button>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2 · Find the X-Intercept
+  ══════════════════════════════════════════ -->
+  <section class="section-panel" id="panel-2">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 2 of 3</div>
+      <h1 class="section-title">Find the X-Intercept</h1>
+      <p class="section-subtitle">When does your bot hit the 20% power floor?</p>
+    </div>
+
+    <!-- Explain -->
+    <div class="explain-block">
+      <p>In Velocity Arena, power never drops below 20% — the game engine holds it there. So the real question is: <strong>when does P(t) hit 20?</strong> That's our <span class="vocab">x-intercept<span class="vocab-popup"><span class="vocab-term">X-intercept</span>Where the line meets a threshold — here, the moment P(t) reaches 20%, the in-game power floor. After this point, power stays locked at 20%.</span></span> for this lesson. If that moment comes before the 3-minute match ends, your bot is stuck at minimum power. If it comes after, your bot finishes strong.</p>
+    </div>
+
+    <!-- Solve steps -->
+    <div class="solve-steps">
+      <div class="solve-steps-title">Solving for t when P(t) = 20 (the power floor)</div>
+      <div class="solve-eq">20 = m · t + 100</div>
+      <div class="solve-eq">
+        <span class="highlight">−80</span> = m · t
+        <span class="arrow" style="color:var(--slate);font-weight:400"> (subtract 100 from both sides → 20 − 100 = −80)</span>
+      </div>
+      <div class="solve-eq">
+        t = <span class="highlight">−80 / m</span>
+        <span class="arrow" style="color:var(--slate);font-weight:400"> (divide by m — m is negative, so t is positive!)</span>
+      </div>
+      <div class="solve-eq" style="margin-top:var(--space-3);">
+        t = <span class="result">80 / ((20 − E) × 1.5)</span>
+      </div>
+    </div>
+
+    <!-- Worked example E=6 -->
+    <div class="worked-example">
+      <div class="worked-example-label">Worked Example · E = 6</div>
+      <div class="worked-line">m = −(20 − 6) × 1.5 = −14 × 1.5 = <span class="em">−21</span></div>
+      <div class="worked-line">t = 80 / ((20 − 6) × 1.5) = 80 / (14 × 1.5) = 80 / 21 ≈ <span class="em">3.81 minutes</span></div>
+      <div class="worked-line dim" style="margin-top:var(--space-3);">A bot with E = 6 hits the 20% power floor at 3.81 minutes — <strong style="color:var(--green)">after</strong> the 3-minute match ends. It survives!</div>
+
+      <!-- Mini chart for E=6 worked example -->
+      <div class="worked-mini-chart">
+        <div class="worked-mini-chart-label">Graph: E = 6 decay line</div>
+        <!--
+          Plot: x 30→310 (width=280=0-5min), y 8→148 (height=140=100%→0%)
+          toX(t) = 30+(t/5)*280   toY(p) = 148-(p/100)*140
+          E=6: m=-21, floor-hit at t=80/21≈3.810 → x=30+(3.810/5)*280=30+213.4=243, y=toY(20)=148-28=120
+          At t=3 (match end): P=100-21*3=37% → x=30+(3/5)*280=198, y=148-(37/100)*140=148-51.8≈96
+          Floor line at y=120 (P=20%)
+          Match end t=3: x=198
+        -->
+        <svg class="worked-mini-svg" viewBox="0 0 340 170" xmlns="http://www.w3.org/2000/svg">
+          <!-- bg -->
+          <rect x="30" y="8" width="280" height="140" fill="#0D0D1A" rx="3"/>
+          <!-- grid h -->
+          <line x1="30" y1="8"   x2="310" y2="8"   stroke="#222840" stroke-width="1"/>
+          <line x1="30" y1="43"  x2="310" y2="43"  stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="30" y1="78"  x2="310" y2="78"  stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="30" y1="113" x2="310" y2="113" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="30" y1="148" x2="310" y2="148" stroke="#222840" stroke-width="1"/>
+          <!-- grid v -->
+          <line x1="30"  y1="8" x2="30"  y2="148" stroke="#8899AA" stroke-width="1"/>
+          <line x1="86"  y1="8" x2="86"  y2="148" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="142" y1="8" x2="142" y2="148" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="198" y1="8" x2="198" y2="148" stroke="#222840" stroke-width="1" stroke-dasharray="3,3"/>
+          <!-- match end t=3 → x=198 -->
+          <line x1="198" y1="4" x2="198" y2="152" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <!-- 20% power floor at y=120 -->
+          <line x1="30" y1="120" x2="310" y2="120" stroke="#9B8AFF" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
+          <line x1="310" y1="8" x2="310" y2="148" stroke="#222840" stroke-width="1"/>
+          <!-- y labels -->
+          <text x="26" y="12"  text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">100</text>
+          <text x="26" y="82"  text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">50</text>
+          <text x="26" y="124" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#9B8AFF">20</text>
+          <text x="26" y="151" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">0</text>
+          <!-- x labels -->
+          <text x="30"  y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">0</text>
+          <text x="86"  y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">1</text>
+          <text x="142" y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">2</text>
+          <text x="198" y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#FFD166">3</text>
+          <text x="254" y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">4</text>
+          <text x="310" y="160" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">5</text>
+          <!-- axis labels -->
+          <text x="170" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#8899AA">time (min)</text>
+          <!-- match end label -->
+          <text x="201" y="14" font-family="DM Sans,sans-serif" font-size="8" fill="#FFD166">match ends</text>
+          <!-- floor label -->
+          <text x="313" y="124" font-family="DM Sans,sans-serif" font-size="8" fill="#9B8AFF">20% floor</text>
+          <!-- E=6 decay line: (30,8) → (243,120) where 243=30+(3.810/5)*280, 120=toY(20%) -->
+          <line x1="30" y1="8" x2="243" y2="120" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- floor-hit dot at t=3.81 → (243,120) -->
+          <circle cx="243" cy="120" r="6" fill="#9B8AFF" stroke="#0D0D1A" stroke-width="2"/>
+          <text x="237" y="115" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#9B8AFF" font-weight="700">⚡ floor at 3.81 min</text>
+          <!-- Start dot -->
+          <circle cx="30" cy="8" r="5" fill="#00C97A" stroke="#0D0D1A" stroke-width="2"/>
+          <text x="34" y="8" font-family="DM Sans,sans-serif" font-size="8" fill="#00C97A">100%</text>
+          <!-- power at t=3 (match end): P=37%, dot at (198, 96) -->
+          <!-- y = 148 - (37/100)*140 = 148-51.8 = 96.2 ≈ 96 -->
+          <circle cx="198" cy="96" r="4" fill="#FFD166" stroke="#0D0D1A" stroke-width="1.5"/>
+          <text x="189" y="91" text-anchor="end" font-family="DM Sans,sans-serif" font-size="8" fill="#FFD166">37% at match end</text>
+          <!-- Slope annotation -->
+          <text x="90" y="50" font-family="DM Sans,sans-serif" font-size="9" fill="#FFD166" font-weight="700" transform="rotate(-27,90,50)">slope = −21</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Student calculator — comes first so E input is visible before the timeline -->
+    <div class="student-calc">
+      <div class="e-input-label">Your X-Intercept Calculator</div>
+      <div class="e-input-row">
+        <span class="e-input-label-inline">E =</span>
+        <input
+          type="number"
+          class="e-number-input"
+          id="s2-e-input"
+          min="1" max="19"
+          placeholder="1–19"
+          oninput="updateS2Calc()"
+          aria-label="Your Endurance value for x-intercept calculation"
+        >
+        <span class="e-hint">Type your Endurance value (1–19) to see the full solution</span>
+      </div>
+      <div class="calc-steps-out" id="s2-calc-out"></div>
+    </div>
+
+    <!-- Match timeline visual — updates automatically once E is entered above -->
+    <div class="match-timeline-wrap">
+      <div class="match-timeline-label">⏱ Visual: Does your bot survive the 3-minute match?</div>
+      <div class="timeline-row">
+        <div class="timeline-row-label">Match</div>
+        <div class="timeline-bar-bg">
+          <div class="timeline-bar-fill" id="tl-match-fill">3 min match</div>
+          <div class="tl-end-marker" style="left:60%;background:var(--yellow);">
+            <div class="tl-end-marker-label" style="color:var(--yellow);">3 min</div>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-row-label">Your bot</div>
+        <div class="timeline-bar-bg" style="overflow:visible;">
+          <div class="timeline-bar-fill" id="tl-bot-fill" style="color:var(--slate);font-style:italic;">← enter E above</div>
+          <div class="tl-end-marker" id="tl-bot-marker" style="left:60%;background:var(--red);display:none;">
+            <div class="tl-end-marker-label" id="tl-bot-marker-label" style="color:var(--red);">💀</div>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-time-row">
+        <div class="tl-time-tick">0 min</div>
+        <div class="tl-time-tick" style="left:20%;">1 min</div>
+        <div class="tl-time-tick" style="left:40%;">2 min</div>
+        <div class="tl-time-tick" style="left:60%;color:var(--yellow);font-weight:700;">3 min</div>
+        <div class="tl-time-tick" style="left:80%;">4 min</div>
+        <div class="tl-time-tick">5 min</div>
+      </div>
+      <div class="timeline-verdict" id="tl-verdict"></div>
+    </div>
+
+    <!-- Interpretation -->
+    <div class="interp-section" id="interp-section">
+      <div class="interp-question" id="interp-q">
+        Your bot hits the 20% power floor at t = <span id="interp-t" style="color:var(--cyan);font-weight:800">?</span> minutes.
+        Matches last 3 minutes. Does your bot hit the power floor before the match ends?
+      </div>
+      <div class="choice-row">
+        <button class="choice-btn" data-choice="yes" onclick="selectChoice(this)">Yes</button>
+        <button class="choice-btn" data-choice="no" onclick="selectChoice(this)">No</button>
+        <button class="choice-btn" data-choice="depends" onclick="selectChoice(this)">It depends</button>
+      </div>
+      <div class="word-bank">
+        <div class="word-bank-label">💬 Word bank — click to add to your answer</div>
+        <div class="word-chips" id="wb-interp">
+          <span class="word-chip" onclick="addChip(this,'interp-text')">my bot survives</span>
+          <span class="word-chip" onclick="addChip(this,'interp-text')">dies before the match ends</span>
+          <span class="word-chip" onclick="addChip(this,'interp-text')">hits floor after 3 minutes</span>
+          <span class="word-chip" onclick="addChip(this,'interp-text')">hits floor before 3 minutes</span>
+          <span class="word-chip" onclick="addChip(this,'interp-text')">I should increase E</span>
+          <span class="word-chip" onclick="addChip(this,'interp-text')">no problem</span>
+        </div>
+      </div>
+      <textarea
+        class="interp-textarea"
+        id="interp-text"
+        placeholder="Explain your reasoning… (10 characters minimum)"
+        rows="3"
+        oninput="checkInterpText()"
+      ></textarea>
+      <div class="char-count" id="interp-char">0 / 10 minimum</div>
+    </div>
+
+    <!-- Mini comparison table -->
+    <div class="mini-table-wrap">
+      <div class="mini-table-title">Endurance vs. Time-to-Zero Comparison</div>
+      <table class="comparison" aria-label="Endurance stat vs bot power-out time">
+        <thead>
+          <tr>
+            <th>E Value</th>
+            <th>Slope (m)</th>
+            <th>Time to 20% floor (min)</th>
+            <th>Relative to 3-min match</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>E = 2</td>
+            <td style="color:var(--red)">−27</td>
+            <td>≈ 2.96 min</td>
+            <td><span class="bar-vis" style="width:50px"></span><span style="color:var(--red);font-size:0.85em">Hits floor before match ends</span></td>
+          </tr>
+          <tr>
+            <td>E = 6</td>
+            <td style="color:var(--yellow)">−21</td>
+            <td>≈ 3.81 min</td>
+            <td><span class="bar-vis" style="width:65px"></span><span style="color:var(--yellow);font-size:0.85em">Survives full match</span></td>
+          </tr>
+          <tr>
+            <td>E = 12</td>
+            <td style="color:var(--green)">−12</td>
+            <td>≈ 5.33 min</td>
+            <td><span class="bar-vis hi" style="width:100px"></span><span style="color:var(--green);font-size:0.85em">Twice the match length</span></td>
+          </tr>
+          <tr class="highlight-row" id="s2-your-row">
+            <td id="s2-your-e">Your E = ?</td>
+            <td id="s2-your-m">—</td>
+            <td id="s2-your-t">—</td>
+            <td id="s2-your-note">Enter your E above</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="nav-btn-row">
+      <button class="nav-btn secondary" onclick="goToTab(1)">← Back</button>
+      <button class="nav-btn primary locked" id="s2-next-btn" onclick="goToTab(3)">Next: Your Personalized Equation →</button>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3 · Your Personalized Equation
+  ══════════════════════════════════════════ -->
+  <section class="section-panel" id="panel-3">
+    <div class="section-header">
+      <div class="section-eyebrow">Section 3 of 3</div>
+      <h1 class="section-title">Your Personalized Equation</h1>
+      <p class="section-subtitle">Build your decay equation from your stat card and reflect on what it means.</p>
+    </div>
+
+    <!-- E input + live equation display -->
+    <div class="e-input-section">
+      <div class="e-input-label">Enter your actual E value from your stat card</div>
+      <div class="e-input-row">
+        <span class="e-input-label-inline">E =</span>
+        <input
+          type="number"
+          class="e-number-input"
+          id="s3-e-input"
+          min="1" max="19"
+          placeholder="1–19"
+          oninput="updateS3()"
+          aria-label="Your actual Endurance stat"
+        >
+        <span class="e-hint">From your stat card</span>
+      </div>
+    </div>
+
+    <!-- Personalized equation card -->
+    <div class="personal-eq-card">
+      <div class="personal-eq-label">My Decay Equation</div>
+      <div class="personal-eq-display" id="s3-eq-display">
+        y = <span class="val" id="s3-slope-display">___</span>x + 100
+      </div>
+    </div>
+
+    <!-- SVG Graph -->
+    <div class="graph-wrap">
+      <div class="graph-title">Power Decay Graph</div>
+      <svg id="decay-svg" viewBox="0 0 520 280" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Graph showing power decay over time for your E value">
+
+        <!-- Grid lines -->
+        <defs>
+          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3 z" fill="#8899AA"/>
+          </marker>
+        </defs>
+
+        <!-- Background -->
+        <rect x="60" y="10" width="430" height="220" fill="#0D0D1A" rx="4"/>
+
+        <!-- Horizontal grid lines -->
+        <line x1="60" y1="10" x2="490" y2="10" stroke="#222840" stroke-width="1"/>
+        <line x1="60" y1="64" x2="490" y2="64" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="60" y1="120" x2="490" y2="120" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="60" y1="175" x2="490" y2="175" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="60" y1="230" x2="490" y2="230" stroke="#222840" stroke-width="1"/>
+
+        <!-- Y labels -->
+        <text x="52" y="14" text-anchor="end" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">100%</text>
+        <text x="52" y="68" text-anchor="end" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">75%</text>
+        <text x="52" y="123" text-anchor="end" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">50%</text>
+        <text x="52" y="178" text-anchor="end" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">25%</text>
+        <text x="52" y="233" text-anchor="end" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">0%</text>
+
+        <!-- Vertical grid lines & X labels (0–5 min) -->
+        <line x1="60" y1="10" x2="60" y2="230" stroke="#8899AA" stroke-width="1.5"/>
+        <line x1="146" y1="10" x2="146" y2="230" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="232" y1="10" x2="232" y2="230" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="318" y1="10" x2="318" y2="230" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="404" y1="10" x2="404" y2="230" stroke="#222840" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="490" y1="10" x2="490" y2="230" stroke="#222840" stroke-width="1"/>
+
+        <text x="60" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">0</text>
+        <text x="146" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">1</text>
+        <text x="232" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">2</text>
+        <text x="318" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#FFD166">3</text>
+        <text x="404" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">4</text>
+        <text x="490" y="248" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8899AA">5</text>
+
+        <!-- Axis labels -->
+        <text x="275" y="270" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#8899AA">Time (minutes)</text>
+        <text x="12" y="120" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#8899AA" transform="rotate(-90, 12, 120)">Power %</text>
+
+        <!-- 3-minute match line -->
+        <line x1="318" y1="10" x2="318" y2="230" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="6 3"/>
+        <text x="322" y="25" font-family="DM Sans, sans-serif" font-size="10" fill="#FFD166">Match ends</text>
+
+        <!-- 20% power floor line: toSvgY(20) = 230-(20/100)*220 = 186 -->
+        <line x1="60" y1="186" x2="490" y2="186" stroke="#9B8AFF" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+        <text x="493" y="189" text-anchor="start" font-family="DM Sans, sans-serif" font-size="9" fill="#9B8AFF">20%</text>
+
+        <!-- Decay line — updated by JS -->
+        <line id="graph-line" x1="60" y1="10" x2="490" y2="230"
+              stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+
+        <!-- X-intercept dot -->
+        <circle id="graph-dot" cx="490" cy="230" r="6"
+                fill="#FF4D6A" stroke="#0D0D1A" stroke-width="2" opacity="0.3"/>
+        <text id="graph-dot-label" x="490" y="220"
+              text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10"
+              fill="#FF4D6A" opacity="0.3"></text>
+
+        <!-- Placeholder text when no E entered -->
+        <text id="graph-placeholder" x="275" y="130" text-anchor="middle"
+              font-family="DM Sans, sans-serif" font-size="14" fill="#8899AA">
+          Enter your E value to see your decay line
+        </text>
+      </svg>
+    </div>
+
+    <!-- Reflection Q1 -->
+    <div class="reflection-block" id="r1-block">
+      <div class="reflection-q-num">Reflection 1</div>
+      <div class="reflection-q">What does your slope tell you about how quickly your bot loses power?</div>
+      <div class="sentence-frame">
+        My slope is <span class="autofill" id="r1-slope-fill">___</span>, which means my bot loses
+        <span class="autofill-pct" id="r1-pct-fill">___</span>% of power every minute.
+      </div>
+      <p style="font-size:var(--text-sm);color:var(--slate);margin-bottom:var(--space-3);">
+        The values above are auto-filled from your E. Confirm by typing a brief explanation:
+      </p>
+      <div class="word-bank">
+        <div class="word-bank-label">💬 Word bank — click to add to your answer</div>
+        <div class="word-chips" id="wb-r1">
+          <span class="word-chip" onclick="addChip(this,'r1-text')">loses power quickly</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">loses power slowly</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">steep slope</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">gentle slope</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">drops % per minute</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">higher E = less loss</span>
+          <span class="word-chip" onclick="addChip(this,'r1-text')">negative slope</span>
+        </div>
+      </div>
+      <textarea
+        class="interp-textarea"
+        id="r1-text"
+        placeholder="In your own words, describe what the slope means for your bot…"
+        rows="3"
+        oninput="checkR1()"
+      ></textarea>
+      <div class="char-count" id="r1-char">0 characters</div>
+    </div>
+
+    <!-- Reflection Q2 -->
+    <div class="reflection-block" id="r2-block">
+      <div class="reflection-q-num">Reflection 2</div>
+      <div class="reflection-q" id="r2-q">
+        Your bot hits the 20% power floor at t = <span id="r2-t">___</span> minutes. Matches last 3 minutes.
+        What does this mean for your Season 2 strategy?
+      </div>
+      <div class="word-bank">
+        <div class="word-bank-label">💬 Word bank — click to add to your answer</div>
+        <div class="word-chips" id="wb-r2">
+          <span class="word-chip" onclick="addChip(this,'r2-text')">survives the match</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">runs out of power</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">before 3 minutes</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">after 3 minutes</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">I need to raise E</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">E is already high enough</span>
+          <span class="word-chip" onclick="addChip(this,'r2-text')">x-intercept is</span>
+        </div>
+      </div>
+      <textarea
+        class="interp-textarea"
+        id="r2-text"
+        placeholder="Think about whether you need to change your E value, and why… (15 characters minimum)"
+        rows="3"
+        oninput="checkR2()"
+      ></textarea>
+      <div class="char-count" id="r2-char">0 / 15 minimum</div>
+    </div>
+
+    <!-- Reflection Q3 -->
+    <div class="reflection-block" id="r3-block">
+      <div class="reflection-q-num">Reflection 3</div>
+      <div class="reflection-q">A teammate has E = 2. Write their decay equation and find their x-intercept.</div>
+      <p style="font-size:var(--text-sm);color:var(--slate);margin-bottom:var(--space-4);">
+        Hint: m = −(20 − 2) × 1.5 = −27. Answer formats accepted: <code style="color:var(--cyan)">-27x + 100</code> or <code style="color:var(--cyan)">y = -27x + 100</code>. For x-intercept, solve for t when P = 20.
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-3);">
+        <div>
+          <label for="r3-eq" style="font-size:var(--text-xs);font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:var(--space-2);">Their equation</label>
+          <input type="text" class="generic-input" id="r3-eq" placeholder="-27x + 100 or y = -27x + 100" oninput="checkR3()">
+          <div class="validation-msg" id="r3-eq-msg"></div>
+        </div>
+        <div>
+          <label for="r3-xi" style="font-size:var(--text-xs);font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:var(--space-2);">Their x-intercept (minutes)</label>
+          <input type="text" class="generic-input" id="r3-xi" placeholder="2.96 or 2.963" oninput="checkR3()">
+          <div class="validation-msg" id="r3-xi-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done button -->
+    <div class="done-btn-wrap">
+      <button class="done-btn locked" id="done-btn" onclick="onDone()">
+        Mark Complete ✓
+      </button>
+    </div>
+
+    <div id="done-message" style="display:none;text-align:center;padding:var(--space-6);color:var(--green);font-weight:800;font-size:var(--text-lg);">
+      🎉 Lesson Complete! Great work on Day 7.
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+const state = {
+  currentTab: 1,
+  s1Done: false,
+  s2Done: false,
+  s3Done: false,
+  s1E: null,
+  s2E: null,
+  s3E: null,
+
+  // S1
+  stepsRevealed: 1,
+
+  // S2
+  s2ChoiceSelected: false,
+  s2TextOk: false,
+
+  // S3
+  r1TextOk: false,
+  r2TextOk: false,
+  r3EqOk: false,
+  r3XiOk: false,
+};
+
+/* ══════════════════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════════════════ */
+function parseE(val) {
+  const n = parseInt(val, 10);
+  if (isNaN(n) || n < 1 || n > 19) return null;
+  return n;
+}
+
+function calcM(E) { return -((20 - E) * 1.5); }
+function calcT(E) { return 80 / ((20 - E) * 1.5); }  // time until P hits 20% floor
+
+function fmt2(n) { return n.toFixed(2); }
+
+/* ══════════════════════════════════════════════════════════════
+   PROGRESS
+══════════════════════════════════════════════════════════════ */
+function updateProgress() {
+  const tab = state.currentTab;
+  // Progress: 0% start S1, 33% end S1 / start S2, 66% end S2 / start S3, 100% done
+  const completedSections = [state.s1Done, state.s2Done, state.s3Done].filter(Boolean).length;
+  const pct = Math.round((completedSections / 3) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-label').textContent =
+    'Section ' + tab + ' of 3';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════════════════════════════ */
+function goToTab(n) {
+  // Deactivate all
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    const idx = parseInt(b.dataset.tab);
+    if (idx < n && [state.s1Done, state.s2Done, state.s3Done][idx - 1]) {
+      b.classList.add('done');
+    } else {
+      b.classList.remove('done');
+    }
+  });
+
+  // Activate target
+  document.getElementById('panel-' + n).classList.add('active');
+  const activeTab = document.querySelector('[data-tab="' + n + '"]');
+  activeTab.classList.add('active');
+  activeTab.classList.remove('done');
+
+  state.currentTab = n;
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION 1 — STEP REVEAL
+══════════════════════════════════════════════════════════════ */
+function revealNextStep() {
+  const btn = document.getElementById('reveal-btn');
+  state.stepsRevealed += 1;
+
+  const step = document.getElementById('step-' + state.stepsRevealed);
+  if (step) step.classList.add('revealed');
+
+  if (state.stepsRevealed >= 3) {
+    btn.textContent = 'All steps shown ✓';
+    btn.classList.add('done');
+    btn.onclick = null;
+  } else {
+    btn.textContent = 'Reveal Step ' + (state.stepsRevealed + 1) + ' →';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION 1 — E INPUT
+══════════════════════════════════════════════════════════════ */
+function updateS1() {
+  const inp = document.getElementById('s1-e-input');
+  const E = parseE(inp.value);
+
+  inp.classList.remove('valid', 'invalid');
+
+  if (E === null) {
+    if (inp.value !== '') inp.classList.add('invalid');
+    // Reset displays
+    document.getElementById('m-display').innerHTML =
+      'm = −(20 − <span style="color:var(--slate)">__</span>) × 1.5 = <span style="color:var(--slate)">__</span>';
+    document.getElementById('eq-display').innerHTML =
+      'y = <span style="color:var(--slate)">___</span>x + 100';
+    document.getElementById('card-m').classList.remove('active');
+    document.getElementById('card-eq').classList.remove('active');
+    document.getElementById('s1-next-btn').classList.add('locked');
+    state.s1E = null;
+    state.s1Done = false;
+    updateProgress();
+    return;
+  }
+
+  inp.classList.add('valid');
+  state.s1E = E;
+
+  const m = calcM(E);
+  const mRounded = parseFloat(m.toFixed(1));
+
+  // m card
+  document.getElementById('m-display').innerHTML =
+    `m = −(20 − <span class="val">${E}</span>) × 1.5 = −(${20 - E}) × 1.5 = <span class="val">${mRounded}</span>`;
+  document.getElementById('card-m').classList.add('active');
+
+  // equation card
+  document.getElementById('eq-display').innerHTML =
+    `y = <span class="val">${mRounded}</span>x + 100`;
+  document.getElementById('card-eq').classList.add('active');
+
+  // Unlock next
+  state.s1Done = true;
+  document.getElementById('s1-next-btn').classList.remove('locked');
+  updateProgress();
+  updateTabDoneState();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION 2 — CALCULATOR
+══════════════════════════════════════════════════════════════ */
+function updateS2Calc() {
+  const inp = document.getElementById('s2-e-input');
+  const E = parseE(inp.value);
+  const out = document.getElementById('s2-calc-out');
+
+  inp.classList.remove('valid', 'invalid');
+  out.innerHTML = '';
+
+  if (E === null) {
+    if (inp.value !== '') inp.classList.add('invalid');
+    // Reset table row
+    resetS2TableRow();
+    updateS2NextBtn();
+    return;
+  }
+
+  inp.classList.add('valid');
+  state.s2E = E;
+
+  const m = calcM(E);
+  const mRounded = parseFloat(m.toFixed(1));
+  const t = calcT(E);
+  const tFormatted = fmt2(t);
+
+  // Build steps with staggered reveal
+  const steps = [
+    { label: 'Step 1: Find your slope', content: `m = −(20 − <span class="c">${E}</span>) × 1.5 = −<span class="c">${20 - E}</span> × 1.5 = <span class="y">${mRounded}</span>` },
+    { label: 'Step 2: Set up the equation', content: `20 = <span class="y">${mRounded}</span> × t + 100 <span style="color:var(--slate);font-size:0.85em">(set P = 20 — the power floor)</span>` },
+    { label: 'Step 3: Isolate t', content: `−80 = <span class="y">${mRounded}</span> × t` },
+    { label: 'Step 4: Divide', content: `t = −80 / <span class="y">${mRounded}</span> = 80 / ((20 − ${E}) × 1.5)` },
+    { label: 'Result:', content: `t = 80 / ${parseFloat(((20 - E) * 1.5).toFixed(1))} = <span class="g">≈ ${tFormatted} minutes</span>` },
+  ];
+
+  steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'calc-step-row';
+    div.innerHTML = `<span class="s">${s.label}</span>  ${s.content}`;
+    out.appendChild(div);
+    setTimeout(() => div.classList.add('show'), i * 120);
+  });
+
+  // Update interpretation
+  document.getElementById('interp-t').textContent = tFormatted;
+
+  // Update table row
+  const barWidth = Math.min(Math.max(t / 10 * 120, 4), 120);
+  const color = t < 3 ? 'var(--red)' : t < 5 ? 'var(--yellow)' : 'var(--green)';
+  const note = t < 3 ? '⚠ Hits floor before match ends' : t < 5 ? '✓ Survives full match' : '✓✓ Well beyond match';
+
+  document.getElementById('s2-your-e').textContent = `Your E = ${E}`;
+  document.getElementById('s2-your-m').innerHTML = `<span style="color:${color}">${mRounded}</span>`;
+  document.getElementById('s2-your-t').innerHTML = `≈ ${tFormatted} min`;
+  document.getElementById('s2-your-note').innerHTML =
+    `<span class="bar-vis" style="width:${barWidth}px;background:${color}"></span><span style="color:${color};font-size:0.85em">${note}</span>`;
+
+  updateS2NextBtn();
+}
+
+function resetS2TableRow() {
+  state.s2E = null;
+  document.getElementById('s2-your-e').textContent = 'Your E = ?';
+  document.getElementById('s2-your-m').textContent = '—';
+  document.getElementById('s2-your-t').textContent = '—';
+  document.getElementById('s2-your-note').textContent = 'Enter your E above';
+  document.getElementById('interp-t').textContent = '?';
+}
+
+let s2ChoiceValue = null;
+function selectChoice(btn) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  s2ChoiceValue = btn.dataset.choice;
+  state.s2ChoiceSelected = true;
+  updateS2NextBtn();
+}
+
+function checkInterpText() {
+  const txt = document.getElementById('interp-text').value.trim();
+  const charEl = document.getElementById('interp-char');
+  const len = txt.length;
+  charEl.textContent = len + ' / 10 minimum';
+  state.s2TextOk = len >= 10;
+  if (state.s2TextOk) {
+    charEl.classList.add('ok');
+    document.getElementById('interp-text').classList.add('valid');
+  } else {
+    charEl.classList.remove('ok');
+    document.getElementById('interp-text').classList.remove('valid');
+  }
+  updateS2NextBtn();
+}
+
+function updateS2NextBtn() {
+  const ok = state.s2E !== null && state.s2ChoiceSelected && state.s2TextOk;
+  const btn = document.getElementById('s2-next-btn');
+  if (ok) {
+    btn.classList.remove('locked');
+    state.s2Done = true;
+  } else {
+    btn.classList.add('locked');
+    state.s2Done = false;
+  }
+  updateProgress();
+  updateTabDoneState();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION 3 — PERSONAL EQUATION + GRAPH
+══════════════════════════════════════════════════════════════ */
+// Graph coordinate helpers
+// x-axis: 0–5 minutes → SVG x: 60–490 (range 430px)
+// y-axis: 0–100% → SVG y: 230–10 (range 220px, inverted)
+function toSvgX(t) { return 60 + (t / 5) * 430; }
+function toSvgY(pct) { return 230 - (pct / 100) * 220; }
+
+function updateS3() {
+  const inp = document.getElementById('s3-e-input');
+  const E = parseE(inp.value);
+
+  inp.classList.remove('valid', 'invalid');
+
+  if (E === null) {
+    if (inp.value !== '') inp.classList.add('invalid');
+    state.s3E = null;
+    // Reset equation display
+    document.getElementById('s3-slope-display').textContent = '___';
+    // Reset graph
+    resetGraph();
+    // Reset reflection autofill
+    document.getElementById('r1-slope-fill').textContent = '___';
+    document.getElementById('r1-pct-fill').textContent = '___';
+    document.getElementById('r2-t').textContent = '___';
+    checkDoneBtn();
+    return;
+  }
+
+  inp.classList.add('valid');
+  state.s3E = E;
+
+  const m = calcM(E);
+  const mRounded = parseFloat(m.toFixed(1));
+  const t = calcT(E);
+
+  // Update equation display
+  document.getElementById('s3-slope-display').textContent = mRounded;
+
+  // Update reflection autofill
+  document.getElementById('r1-slope-fill').textContent = mRounded;
+  document.getElementById('r1-pct-fill').textContent = Math.abs(mRounded).toFixed(1);
+  document.getElementById('r2-t').textContent = fmt2(t);
+
+  // Update graph
+  updateGraph(E, m, t);
+
+  checkDoneBtn();
+}
+
+function resetGraph() {
+  const line = document.getElementById('graph-line');
+  const dot = document.getElementById('graph-dot');
+  const dotLabel = document.getElementById('graph-dot-label');
+  const placeholder = document.getElementById('graph-placeholder');
+  line.setAttribute('opacity', '0.2');
+  dot.setAttribute('opacity', '0.2');
+  dotLabel.setAttribute('opacity', '0.2');
+  placeholder.setAttribute('display', '');
+}
+
+function updateGraph(E, m, t) {
+  const placeholder = document.getElementById('graph-placeholder');
+  placeholder.setAttribute('display', 'none');
+
+  const line = document.getElementById('graph-line');
+  const dot = document.getElementById('graph-dot');
+  const dotLabel = document.getElementById('graph-dot-label');
+
+  // Line: from t=0, P=100 to t=5 (or floor-hit if earlier within x-axis range)
+  const x0 = toSvgX(0);
+  const y0 = toSvgY(100); // always 100% at t=0
+
+  // P at t=5: P(5) = 100 + m*5
+  const p5 = 100 + m * 5;
+
+  let x1, y1;
+  if (p5 >= 20) {
+    // Line goes to t=5 (stays above floor)
+    x1 = toSvgX(5);
+    y1 = toSvgY(p5);
+  } else {
+    // Line clips at P=20 (20% power floor)
+    x1 = toSvgX(t);
+    y1 = toSvgY(20);
+  }
+
+  line.setAttribute('x1', x0);
+  line.setAttribute('y1', y0);
+  line.setAttribute('x2', x1);
+  line.setAttribute('y2', y1);
+  line.setAttribute('opacity', '1');
+
+  // Dot at floor-hit (P=20%) if within 0–5 range
+  if (t <= 5) {
+    const dx = toSvgX(t);
+    const dy = toSvgY(20);  // 20% floor
+    dot.setAttribute('cx', dx);
+    dot.setAttribute('cy', dy);
+    dot.setAttribute('opacity', '1');
+    dotLabel.setAttribute('x', dx);
+    dotLabel.setAttribute('y', dy - 10);
+    dotLabel.textContent = '⚡ floor at t = ' + fmt2(t) + ' min';
+    dotLabel.setAttribute('opacity', '1');
+  } else {
+    dot.setAttribute('opacity', '0');
+    dotLabel.setAttribute('opacity', '0');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECTION 3 — REFLECTIONS
+══════════════════════════════════════════════════════════════ */
+function checkR1() {
+  const txt = document.getElementById('r1-text').value.trim();
+  const charEl = document.getElementById('r1-char');
+  charEl.textContent = txt.length + ' characters';
+  state.r1TextOk = txt.length > 0;
+  if (state.r1TextOk) charEl.classList.add('ok');
+  else charEl.classList.remove('ok');
+  checkDoneBtn();
+}
+
+function checkR2() {
+  const txt = document.getElementById('r2-text').value.trim();
+  const charEl = document.getElementById('r2-char');
+  charEl.textContent = txt.length + ' / 15 minimum';
+  state.r2TextOk = txt.length >= 15;
+  if (state.r2TextOk) {
+    charEl.classList.add('ok');
+    document.getElementById('r2-text').classList.add('valid');
+  } else {
+    charEl.classList.remove('ok');
+    document.getElementById('r2-text').classList.remove('valid');
+  }
+  checkDoneBtn();
+}
+
+/* Validation for teammate question (E=2):
+   - m = −(20−2)×1.5 = −27
+   - t = 80/27 ≈ 2.963... (time to hit 20% floor)
+   - Accept "-27x + 100", "y = -27x + 100", "-27x+100", "y=-27x+100" etc.
+   - X-intercept: accept within ±0.1 of 2.963...
+*/
+const correctT_E2 = 80 / 27; // ≈ 2.963 (when E=2 hits 20% floor)
+
+function checkR3() {
+  const eqInp = document.getElementById('r3-eq');
+  const xiInp = document.getElementById('r3-xi');
+  const eqMsg = document.getElementById('r3-eq-msg');
+  const xiMsg = document.getElementById('r3-xi-msg');
+
+  // Equation check
+  const rawEq = eqInp.value.trim().replace(/\s/g, '').toLowerCase();
+  // Valid forms: -27x+100, y=-27x+100, p(t)=-27x+100, etc.
+  const eqValid = /^(y=|p\(t\)=)?-27x\+100$/.test(rawEq) || /^(y=|p\(t\)=)?-27x\+100\.0*$/.test(rawEq);
+
+  state.r3EqOk = eqValid;
+  eqInp.classList.remove('valid', 'invalid');
+  eqMsg.className = 'validation-msg';
+
+  if (eqInp.value.trim().length > 0) {
+    if (eqValid) {
+      eqInp.classList.add('valid');
+      eqMsg.textContent = '✓ Correct!';
+      eqMsg.classList.add('ok');
+    } else {
+      eqInp.classList.add('invalid');
+      eqMsg.textContent = 'Check your work — hint: m = −27, b = 100';
+      eqMsg.classList.add('err');
+    }
+  }
+
+  // X-intercept check
+  const xiRaw = xiInp.value.trim();
+  const xiNum = parseFloat(xiRaw);
+  const xiValid = !isNaN(xiNum) && Math.abs(xiNum - correctT_E2) <= 0.1;
+
+  state.r3XiOk = xiValid;
+  xiInp.classList.remove('valid', 'invalid');
+  xiMsg.className = 'validation-msg';
+
+  if (xiRaw.length > 0) {
+    if (xiValid) {
+      xiInp.classList.add('valid');
+      xiMsg.textContent = '✓ Correct! (' + correctT_E2.toFixed(2) + ' min — when E=2 hits 20% floor)';
+      xiMsg.classList.add('ok');
+    } else {
+      xiInp.classList.add('invalid');
+      xiMsg.textContent = 'Not quite — use the formula t = 80 / ((20−E) × 1.5)';
+      xiMsg.classList.add('err');
+    }
+  }
+
+  checkDoneBtn();
+}
+
+function checkDoneBtn() {
+  const btn = document.getElementById('done-btn');
+  const allOk = state.s3E !== null &&
+                 state.r1TextOk &&
+                 state.r2TextOk &&
+                 state.r3EqOk &&
+                 state.r3XiOk;
+  if (allOk) {
+    btn.classList.remove('locked');
+    state.s3Done = true;
+    updateProgress();
+    updateTabDoneState();
+  } else {
+    btn.classList.add('locked');
+    state.s3Done = false;
+    updateProgress();
+    updateTabDoneState();
+  }
+}
+
+function onDone() {
+  document.getElementById('done-btn').style.display = 'none';
+  document.getElementById('done-message').style.display = 'block';
+  state.s3Done = true;
+  updateProgress();
+  updateTabDoneState();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TAB DONE STATE
+══════════════════════════════════════════════════════════════ */
+function updateTabDoneState() {
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(btn => {
+    const idx = parseInt(btn.dataset.tab);
+    const done = [state.s1Done, state.s2Done, state.s3Done][idx - 1];
+    if (done && idx !== state.currentTab) {
+      btn.classList.add('done');
+    } else if (!done || idx === state.currentTab) {
+      btn.classList.remove('done');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   VOCABULARY TOOLTIPS (tap to toggle on mobile)
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('click', function(e) {
+  const vocab = e.target.closest('.vocab');
+  if (!vocab) {
+    document.querySelectorAll('.vocab.open').forEach(v => v.classList.remove('open'));
+    return;
+  }
+  const wasOpen = vocab.classList.contains('open');
+  document.querySelectorAll('.vocab.open').forEach(v => v.classList.remove('open'));
+  if (!wasOpen) vocab.classList.add('open');
+  e.stopPropagation();
+});
+
+/* ══════════════════════════════════════════════════════════════
+   WORD BANK — chip click appends text to textarea
+══════════════════════════════════════════════════════════════ */
+function addChip(chip, targetId) {
+  const ta = document.getElementById(targetId);
+  if (!ta) return;
+  const text = chip.textContent.trim();
+  const cur = ta.value;
+  ta.value = cur ? cur + ' ' + text : text;
+  chip.classList.toggle('used');
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MATCH TIMELINE — updates when S2 E value changes
+══════════════════════════════════════════════════════════════ */
+function updateMatchTimeline(E) {
+  const botFill    = document.getElementById('tl-bot-fill');
+  const botMarker  = document.getElementById('tl-bot-marker');
+  const botLabel   = document.getElementById('tl-bot-marker-label');
+  const verdict    = document.getElementById('tl-verdict');
+
+  if (E === null) {
+    botFill.style.width = '60%';
+    botFill.textContent = 'Enter E →';
+    botFill.className = 'timeline-bar-fill';
+    if (botMarker) botMarker.style.display = 'none';
+    verdict.className = 'timeline-verdict';
+    return;
+  }
+
+  const t = calcT(E);        // minutes until P hits 20% floor
+  const maxT = 5;            // timeline shows 0–5 min
+  const matchPct = (3 / maxT) * 100; // match end = 60% of bar width (t=3 of 5-min scale)
+
+  // Bot bar: capped at maxT
+  const botPct = Math.min((t / maxT) * 100, 100);
+  botFill.style.width = botPct + '%';
+  botFill.textContent = t.toFixed(2) + ' min';
+
+  const survives = t >= 3;
+  botFill.className = 'timeline-bar-fill ' + (survives ? 'alive' : 'dying');
+
+  // Marker at bot's end (if within view)
+  if (botMarker && t <= maxT) {
+    botMarker.style.display = 'block';
+    botMarker.style.left = botPct + '%';
+    if (botLabel) botLabel.textContent = survives ? '✓' : '💀 ' + t.toFixed(2) + ' min';
+    botMarker.style.background = survives ? 'var(--green)' : 'var(--red)';
+    if (botLabel) botLabel.style.color = survives ? 'var(--green)' : 'var(--red)';
+  } else if (botMarker) {
+    botMarker.style.display = 'none';
+  }
+
+  // Verdict
+  verdict.classList.remove('show', 'ok', 'bad');
+  void verdict.offsetWidth; // reflow for transition
+  if (survives) {
+    verdict.textContent = '✅ Your bot survives the 3-minute match (hits 20% floor at ' + t.toFixed(2) + ' min).';
+    verdict.className = 'timeline-verdict ok show';
+  } else {
+    verdict.textContent = '⚠ Your bot hits the 20% power floor at ' + t.toFixed(2) + ' min — before the match ends at 3 min.';
+    verdict.className = 'timeline-verdict bad show';
+  }
+}
+
+// Hook timeline into the S2 calculator
+const _origUpdateS2Calc = updateS2Calc;
+// Patch S2 calc to also fire timeline
+const _s2EInput = document.getElementById('s2-e-input');
+if (_s2EInput) {
+  _s2EInput.addEventListener('input', function() {
+    const E = parseE(this.value);
+    updateMatchTimeline(E);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+(function init() {
+  updateProgress();
+})();
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>
