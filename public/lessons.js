@@ -11,5 +11,6 @@ const ACTIVITY_LESSONS = {
   'First Bot Drive: Speed in Real Life': '/lessons/first-bot-drive.html',
   'Endurance Stat Challenge: Drawing the Decay': '/lessons/endurance-stat.html',
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
+  'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power.html',
 };
