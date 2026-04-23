@@ -165,6 +165,8 @@
 .act-mins{font-size:0.75rem;font-weight:700;color:var(--cyan);min-width:2.5rem;flex-shrink:0;padding-top:0.125rem;}
 .act-name{font-size:0.9375rem;font-weight:700;color:var(--white);}
 .act-block{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:0.25rem;}
+.act-lesson-link{display:inline-block;margin-top:0.375rem;font-size:0.75rem;font-weight:700;color:var(--cyan);text-decoration:none;letter-spacing:.04em;}
+.act-lesson-link:hover{text-decoration:underline;}
 
 /* ── OFFDAY ─────────────────────────────────────────────────────────────── */
 .offday{background:var(--navy2);border:0.0625rem solid var(--card-border);
@@ -306,7 +308,7 @@
 
 <!-- REFERENCE CARD MODAL (Zoom 4) -->
 <div class="modal-backdrop" id="ref-modal" onclick="if(event.target===this)closeRefCard()">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:660px">
     <button class="modal-close" onclick="closeRefCard()">✕</button>
     <div style="font-size:1.25rem;font-weight:800;margin-bottom:.25rem">Reference Card</div>
     <div style="font-size:.8125rem;color:var(--slate);margin-bottom:1rem">On your team table for all 20 days.</div>
@@ -691,15 +693,28 @@ function renderDay(dayNum) {
       </div>
     </div>`;
 
+  // Activities with a companion interactive lesson page — surfaces an
+  // "Interactive lesson →" link under the activity name in the day's list.
+  const ACTIVITY_LESSONS = {
+    'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
+  };
+
   // Build the selected day's activity list (full, for right column)
-  const actRows = (day.activities||[]).map(a => `
+  const actRows = (day.activities||[]).map(a => {
+    const lessonUrl = ACTIVITY_LESSONS[a.name];
+    const lessonLink = lessonUrl
+      ? `<a class="act-lesson-link" href="${lessonUrl}">Interactive lesson →</a>`
+      : '';
+    return `
     <div class="act-row">
       <div class="act-mins">${a.mins}m</div>
       <div>
         <div class="act-name">${a.name}</div>
         <div class="act-block ${blockCls(a.block)}">${blockLbl(a.block)}</div>
+        ${lessonLink}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   main.innerHTML = `
     <!-- HERO: day title + math anchor -->

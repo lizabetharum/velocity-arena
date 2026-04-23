@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endurance Stat Challenge · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0D0D1A;
+      --navy2:      #161A2E;
+      --navy3:      #1E2240;
+      --cyan:       #00E5FF;
+      --teal:       #007A99;
+      --slate:      #8899AA;
+      --card-border:#222840;
+      --card-bg:    #161A2E;
+      --green:      #00C97A;
+      --red:        #FF4D6A;
+      --yellow:     #FFD166;
+      --purple:     #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--cyan);
+      transition: width .5s ease; z-index: 100;
+      width: 0%;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* ── Section nav ── */
+    .section-nav {
+      display: flex; gap: 0;
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .section-nav button {
+      flex-shrink: 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .section-nav button:hover:not(.active) { color: #E8EAF2; }
+
+    /* ── Sections ── */
+    .section {
+      display: none; max-width: 720px; margin: 2rem auto 0;
+      padding: 0 1.25rem; animation: fadeUp .3s ease both;
+    }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Typography ── */
+    .section-heading { font-size: 1.25rem; font-weight: 800; letter-spacing: .01em; margin-bottom: .5rem; }
+    .section-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; margin-bottom: 1.25rem; }
+    .label-tag {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .75rem;
+    }
+
+    /* ── Formula board ── */
+    .formula-board {
+      background: var(--navy3); border: 1.5px solid var(--cyan);
+      border-radius: 8px; padding: 1.75rem 1.5rem; text-align: center; margin: 1rem 0 1.5rem;
+    }
+    .formula-board .formula-text {
+      font-size: 1.375rem; font-weight: 800; color: var(--cyan);
+      letter-spacing: .02em; line-height: 1.3;
+    }
+    .formula-board .formula-sub {
+      font-size: .8125rem; color: var(--slate); margin-top: .5rem; font-weight: 500;
+    }
+
+    /* ── Floor callout ── */
+    .floor-callout {
+      display: flex; align-items: flex-start; gap: .75rem;
+      background: rgba(255,77,106,.07); border: 1px solid rgba(255,77,106,.25);
+      border-radius: 8px; padding: .875rem 1rem; margin: .75rem 0 1rem;
+    }
+    .floor-callout .fc-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: .1rem; }
+    .floor-callout .fc-body { font-size: .875rem; color: #E8EAF2; line-height: 1.55; }
+    .floor-callout .fc-body strong { color: var(--yellow); }
+
+    /* ── Variable definition table ── */
+    .var-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .var-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .var-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .875rem; vertical-align: top;
+    }
+    .var-table tr:last-child td { border-bottom: none; }
+    .var-name { color: var(--cyan); font-weight: 800; font-size: .9375rem; }
+    .var-range { color: var(--yellow); font-size: .8125rem; font-weight: 500; }
+
+    /* ── Worked example table ── */
+    .calc-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .calc-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .calc-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .875rem; vertical-align: middle;
+    }
+    .calc-table tr:last-child td { border-bottom: none; }
+    .t-val { font-weight: 800; color: #E8EAF2; font-size: 1rem; }
+    .calc-expr { color: var(--slate); font-size: .8125rem; }
+    .p-val  { font-weight: 800; color: var(--cyan);   font-size: 1rem; }
+    .p-zero { color: var(--red);    font-weight: 800; font-size: 1rem; }
+    /* Floored value — yellow to signal the floor kicked in */
+    .p-floor { color: var(--yellow); font-weight: 800; font-size: 1rem; }
+
+    /* ── Input cells ── */
+    .work-input {
+      width: 90px; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .45rem .6rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      font-weight: 700; color: #E8EAF2; outline: none;
+      transition: border-color .15s; text-align: center;
+    }
+    .work-input:focus { border-color: var(--teal); }
+    .work-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .work-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    /* ── Hint box ── */
+    .hint-box {
+      background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25);
+      border-radius: 6px; padding: .625rem .875rem; margin-top: .375rem;
+      font-size: .8125rem; color: var(--yellow); line-height: 1.5; display: none;
+    }
+    .hint-box.visible { display: block; }
+
+    /* ── Row check button ── */
+    .row-check-btn {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700;
+      padding: .375rem .875rem; border-radius: 5px; border: 1px solid var(--teal);
+      background: transparent; color: var(--teal); cursor: pointer;
+      transition: background .15s, color .15s; white-space: nowrap;
+    }
+    .row-check-btn:hover { background: rgba(0,122,153,.12); color: var(--cyan); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--cyan); color: var(--navy); }
+    .btn-primary:hover:not(.locked) { opacity: .88; }
+    .btn-primary.locked { opacity: .35; cursor: not-allowed; pointer-events: none; }
+    .btn-ghost {
+      background: transparent; color: var(--slate);
+      border: 1px solid var(--card-border);
+    }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+    .btn-success { background: var(--green); color: var(--navy); }
+    .btn-success:hover { opacity: .88; }
+
+    /* ── Nav row ── */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--card-border);
+    }
+
+    /* ── Section badge ── */
+    .section-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan);
+      background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    /* ── Scaffolded section badge ── */
+    .scaffold-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--yellow);
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    /* ── Independent badge ── */
+    .indep-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--purple);
+      background: rgba(155,138,255,.08); border: 1px solid rgba(155,138,255,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    /* ── Slider ── */
+    .slider-wrap { margin: 1.25rem 0; }
+    .slider-label-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: .5rem;
+    }
+    .slider-label-row label { font-size: .875rem; font-weight: 700; color: #E8EAF2; }
+    .slider-value-display { font-size: 1.75rem; font-weight: 800; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; background: var(--navy3);
+      border-radius: 3px; outline: none; margin: .5rem 0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(0,229,255,.2);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer; border: none;
+    }
+    .slider-range-labels {
+      display: flex; justify-content: space-between;
+      font-size: .6875rem; color: var(--slate); font-weight: 500;
+    }
+
+    /* ── Live stat info ── */
+    .stat-info-row {
+      display: flex; gap: 1.25rem; flex-wrap: wrap; margin: 1rem 0;
+    }
+    .stat-chip {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .625rem 1rem; flex: 1; min-width: 140px;
+    }
+    .stat-chip .sc-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .25rem;
+    }
+    .stat-chip .sc-value { font-size: 1.125rem; font-weight: 800; color: var(--cyan); }
+    .stat-chip .sc-value.warn { color: var(--yellow); }
+    .stat-chip .sc-value.inf { color: var(--green); }
+
+    /* ── Live power table ── */
+    .live-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .live-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .4rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .live-table td {
+      padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.5);
+      font-size: .875rem;
+    }
+    .live-table tr:last-child td { border-bottom: none; }
+    .live-p-bar { height: 6px; background: var(--navy3); border-radius: 3px; margin-top: .375rem; overflow: hidden; }
+    .live-p-fill { height: 100%; border-radius: 3px; transition: width .3s ease, background .3s ease; }
+
+    /* ── SVG graph ── */
+    .graph-wrap {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem; margin: 1rem 0;
+      overflow-x: auto;
+    }
+    .graph-wrap svg { display: block; max-width: 100%; }
+
+    /* ── Graph legend ── */
+    .graph-legend {
+      display: flex; gap: 1.25rem; flex-wrap: wrap;
+      font-size: .75rem; color: var(--slate); margin-top: .5rem; padding: 0 .25rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: .375rem; }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .legend-line {
+      width: 18px; height: 2px; flex-shrink: 0;
+    }
+
+    /* ── Compare panel ── */
+    .compare-panel {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+    }
+    .compare-panel .cp-card {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1.125rem;
+    }
+    .cp-card .cp-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+    .cp-card .cp-val {
+      font-size: 2rem; font-weight: 800; color: var(--cyan); margin-bottom: .25rem;
+    }
+    .cp-card .cp-sub { font-size: .8125rem; color: var(--slate); }
+    .compare-result {
+      background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.2);
+      border-radius: 7px; padding: .875rem 1.125rem; margin-top: .5rem;
+      font-size: .9375rem; color: #C8CDD8; line-height: 1.5; min-height: 3rem;
+    }
+
+    .cp-input {
+      width: 70px; background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .4rem .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--cyan); outline: none; text-align: center;
+      transition: border-color .15s;
+    }
+    .cp-input:focus { border-color: var(--teal); }
+
+    /* ── Reflect textareas ── */
+    .reflect-textarea {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .875rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      color: #E8EAF2; resize: vertical; min-height: 90px;
+      outline: none; transition: border-color .15s; line-height: 1.55;
+    }
+    .reflect-textarea:focus { border-color: var(--teal); }
+    .reflect-textarea.ready { border-color: rgba(0,201,122,.4); }
+
+    .char-count { font-size: .75rem; color: var(--slate); text-align: right; margin-top: .25rem; }
+    .char-count.ready { color: var(--green); }
+
+    /* ── Sentence frame ── */
+    .sentence-frame {
+      background: rgba(0,229,255,.05); border-left: 3px solid rgba(0,229,255,.3);
+      border-radius: 0 6px 6px 0; padding: .625rem .875rem; margin-bottom: .75rem;
+      font-size: .8125rem; color: var(--slate); line-height: 1.5;
+      font-style: italic;
+    }
+    .sentence-frame strong { color: var(--cyan); font-style: normal; }
+
+    /* ── Number input ── */
+    .num-input {
+      width: 90px; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .5rem .6rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      color: #E8EAF2; outline: none; text-align: center;
+      transition: border-color .15s;
+    }
+    .num-input:focus { border-color: var(--teal); }
+    .num-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .num-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    /* ── Auto-calc hint ── */
+    .auto-hint {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-size: .8125rem; color: var(--slate); margin-top: .375rem;
+    }
+    .auto-hint .ah-check { color: var(--green); font-size: 1rem; }
+    .auto-hint .ah-warn  { color: var(--yellow); font-size: 1rem; }
+
+    /* ── Done banner ── */
+    .done-banner {
+      background: rgba(0,201,122,.08); border: 1px solid rgba(0,201,122,.3);
+      border-radius: 10px; padding: 1.5rem; text-align: center;
+      margin-top: 1.5rem; display: none;
+    }
+    .done-banner.visible { display: block; }
+    .done-banner h3 { font-size: 1.125rem; font-weight: 800; color: var(--green); margin-bottom: .5rem; }
+    .done-banner p { font-size: .9375rem; color: #C8CDD8; }
+
+    /* ── Reveal row ── */
+    .answer-reveal {
+      background: rgba(0,201,122,.06); border: 1px solid rgba(0,201,122,.2);
+      border-radius: 6px; padding: .5rem .875rem; margin-top: .25rem;
+      font-size: .875rem; color: var(--green); display: none; font-weight: 700;
+    }
+    .answer-reveal.visible { display: block; }
+    .answer-wrong-reveal {
+      background: rgba(255,77,106,.06); border: 1px solid rgba(255,77,106,.2);
+      border-radius: 6px; padding: .5rem .875rem; margin-top: .25rem;
+      font-size: .875rem; color: var(--red); display: none; font-weight: 700;
+    }
+    .answer-wrong-reveal.visible { display: block; }
+
+    /* ── Submit all row ── */
+    .submit-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap; }
+
+    /* ── Divider ── */
+    .section-divider {
+      height: 1px; background: var(--card-border); margin: 1.75rem 0;
+    }
+
+    /* ── Inline result badge ── */
+    .inline-result {
+      display: inline-block; font-size: .8125rem; font-weight: 700;
+      padding: .2em .6em; border-radius: 4px;
+    }
+    .inline-result.ok { background: rgba(0,201,122,.12); color: var(--green); border: 1px solid rgba(0,201,122,.25); }
+    .inline-result.ng { background: rgba(255,77,106,.12); color: var(--red); border: 1px solid rgba(255,77,106,.25); }
+
+    /* ── Lock-in section (mirrors speed-stat Phase 5) ─────────────────────── */
+    .stat-card-visual {
+      background: var(--navy3); border: 2px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin: 1rem 0;
+    }
+    .stat-card-visual .sc-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: 1rem;
+    }
+    .stat-card-visual .stat-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .625rem 0; border-bottom: 1px solid var(--card-border);
+    }
+    .stat-card-visual .stat-row:last-child { border-bottom: none; }
+    .stat-name {
+      font-size: .8125rem; font-weight: 700; color: var(--slate);
+      width: 80px; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .stat-name.active { color: var(--cyan); }
+    .stat-name.locked-row { color: var(--green); }
+    .stat-points-display {
+      font-size: 1.25rem; font-weight: 800; color: #E8EAF2; min-width: 2rem;
+    }
+    .stat-pct-display { font-size: .8125rem; color: var(--slate); }
+    .stat-locked {
+      margin-left: auto; font-size: .6875rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--slate);
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .2em .6em;
+    }
+    .stat-locked.endurance-locked {
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.3);
+    }
+    .stat-locked.prior-locked {
+      color: var(--green); background: rgba(0,201,122,.08);
+      border-color: rgba(0,201,122,.3);
+    }
+
+    .budget-bar-wrap { margin: 1rem 0; }
+    .budget-bar-label { font-size: .75rem; color: var(--slate); margin-bottom: .375rem; font-weight: 500; }
+    .budget-bar-track { height: 8px; background: var(--navy3); border-radius: 4px; overflow: hidden; display: flex; gap: 2px; }
+    .budget-bar-fill { height: 100%; background: var(--cyan); transition: width .25s ease; }
+    .budget-bar-fill.prior { background: var(--green); opacity: .7; }
+    .budget-note { font-size: .75rem; color: var(--slate); margin-top: .375rem; }
+    .budget-note.warning { color: var(--yellow); }
+    .budget-note.ok { color: var(--green); }
+
+    .name-input {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .5rem .75rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      color: #E8EAF2; outline: none; transition: border-color .15s;
+    }
+    .name-input:focus { border-color: var(--teal); }
+
+    .btn-lock {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+      background: var(--red); color: #fff;
+    }
+    .btn-lock:not(:disabled):hover { opacity: .88; }
+    .btn-lock:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-lock:active { transform: scale(.97); }
+
+    /* Lock modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,13,26,.8); backdrop-filter: blur(4px);
+      z-index: 200; align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 2rem; max-width: 440px; width: 100%;
+      animation: fadeUp .25s ease both;
+    }
+    .modal-box h2 { font-size: 1.1875rem; font-weight: 800; margin-bottom: .75rem; }
+    .modal-box p { font-size: .9375rem; color: #C8CDD8; line-height: 1.6; margin-bottom: 1.5rem; }
+    .modal-box .modal-value {
+      font-size: 2.5rem; font-weight: 800; color: var(--cyan);
+      text-align: center; margin: 1rem 0;
+    }
+    .modal-box .modal-decay {
+      font-size: 1rem; color: var(--slate); text-align: center;
+      margin-top: -.5rem; margin-bottom: 1.25rem;
+    }
+    .modal-actions { display: flex; gap: .75rem; }
+    .modal-actions .btn, .modal-actions .btn-lock { flex: 1; justify-content: center; }
+
+    /* Locked display */
+    .locked-display { text-align: center; padding: 2rem 1rem; }
+    .locked-display .lock-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+    .locked-display h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: .375rem; }
+    .locked-display p { font-size: .875rem; color: var(--slate); line-height: 1.5; }
+    .locked-stat-chip {
+      display: inline-flex; align-items: baseline; gap: .375rem;
+      background: rgba(0,229,255,.08); border: 1.5px solid rgba(0,229,255,.3);
+      border-radius: 8px; padding: .625rem 1.25rem; margin: 1rem 0;
+    }
+    .locked-stat-chip .pts { font-size: 2rem; font-weight: 800; color: var(--cyan); }
+    .locked-stat-chip .label { font-size: .875rem; color: var(--slate); font-weight: 500; }
+
+    /* Already-locked notice */
+    .lock-notice {
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.3);
+      border-radius: 8px; padding: .875rem 1.125rem; margin-bottom: 1.25rem;
+      color: var(--yellow); font-size: .875rem; line-height: 1.5;
+    }
+    .lock-notice strong { color: var(--yellow); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Header -->
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Endurance Stat Challenge</h1>
+  <span class="day-tag">DAY 2</span>
+</header>
+
+<!-- Section nav -->
+<nav class="section-nav">
+  <button class="active" onclick="goSection(0)">The Formula</button>
+  <button onclick="goSection(1)">Calculate Your Decay</button>
+  <button onclick="goSection(2)">Your Decay Graph</button>
+  <button onclick="goSection(3)">Reflect</button>
+  <button onclick="goSection(4)">Lock In</button>
+</nav>
+
+<!-- ═══════════════════════════════ SECTION 1: The Formula ═══════════════════════════════ -->
+<section class="section active" id="sec-0">
+
+  <div class="section-badge">Section 1 · The Formula</div>
+  <h2 class="section-heading">Power Decay Over Time</h2>
+  <p class="section-sub">
+    Every bot loses power as the match wears on — unless your Endurance stat is high enough to slow the drain.
+    This formula shows exactly how much power your bot has at any minute of a match.
+  </p>
+
+  <!-- Formula board -->
+  <div class="formula-board">
+    <div class="formula-text">P(t) = 100 − (20 − E) × 1.5 × t</div>
+    <div class="formula-sub">Power at time t = Base power minus decay</div>
+  </div>
+
+  <!-- 20% floor callout -->
+  <div class="floor-callout">
+    <div class="fc-icon">⚡</div>
+    <div class="fc-body">
+      <strong>Power Floor: 20%</strong><br>
+      The game engine never lets power drop below <strong>20%</strong>. Once the formula would give a result below 20%, power stays locked at 20% for the rest of the match. Your bot never fully dies.
+    </div>
+  </div>
+
+  <!-- Variable table -->
+  <div class="card">
+    <div class="card-title">Variable Definitions</div>
+    <table class="var-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Meaning</th>
+          <th>Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="var-name">P(t)</span></td>
+          <td>Bot power at minute t (% of full power)</td>
+          <td><span class="var-range">20% – 100%</span></td>
+        </tr>
+        <tr>
+          <td><span class="var-name">E</span></td>
+          <td>Endurance allocation — stat points invested in stamina</td>
+          <td><span class="var-range">1 – 20</span></td>
+        </tr>
+        <tr>
+          <td><span class="var-name">t</span></td>
+          <td>Minutes elapsed since match start</td>
+          <td><span class="var-range">0 – 5 min</span></td>
+        </tr>
+        <tr>
+          <td><span class="var-name">1.5</span></td>
+          <td>Decay constant — how fast the game environment drains power</td>
+          <td><span class="var-range">fixed</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.8125rem;color:var(--slate);margin-top:.5rem;">
+      ⚡ If the formula gives less than 20%, power is <strong style="color:var(--yellow)">capped at 20%</strong> — that's the power floor.
+    </p>
+  </div>
+
+  <!-- Worked example -->
+  <div class="card">
+    <div class="card-title">Worked Example · E = 6</div>
+    <p class="section-sub" style="margin-bottom:.75rem;">
+      With E = 6, the decay rate each minute is:<br>
+      <strong style="color:var(--cyan)">(20 − 6) × 1.5 = 14 × 1.5 = <span style="color:var(--yellow)">21% per minute</span></strong>
+    </p>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:1rem;">
+      The 20% floor kicks in at: <strong style="color:var(--red)">t = 80 ÷ 21 ≈ 3.81 min</strong> — after that, power stays locked at 20%.
+    </p>
+    <table class="calc-table">
+      <thead>
+        <tr>
+          <th>t (min)</th>
+          <th>Calculation</th>
+          <th>P(t)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="t-val">0</span></td>
+          <td class="calc-expr">100 − 21 × 0 = 100 − 0</td>
+          <td><span class="p-val">100%</span></td>
+        </tr>
+        <tr>
+          <td><span class="t-val">1</span></td>
+          <td class="calc-expr">100 − 21 × 1 = 100 − 21</td>
+          <td><span class="p-val">79%</span></td>
+        </tr>
+        <tr>
+          <td><span class="t-val">2</span></td>
+          <td class="calc-expr">100 − 21 × 2 = 100 − 42</td>
+          <td><span class="p-val">58%</span></td>
+        </tr>
+        <tr>
+          <td><span class="t-val">3</span></td>
+          <td class="calc-expr">100 − 21 × 3 = 100 − 63</td>
+          <td><span class="p-val">37%</span></td>
+        </tr>
+        <tr style="background:rgba(255,209,102,.04);">
+          <td><span class="t-val">4</span></td>
+          <td class="calc-expr">100 − 21 × 4 = 16 → <strong style="color:var(--yellow)">⚡ floor</strong></td>
+          <td><span class="p-floor">20%</span></td>
+        </tr>
+        <tr style="background:rgba(255,209,102,.04);">
+          <td><span class="t-val">5</span></td>
+          <td class="calc-expr">100 − 21 × 5 = −5 → <strong style="color:var(--yellow)">⚡ floor</strong></td>
+          <td><span class="p-floor">20%</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.8125rem;color:var(--slate);margin-top:.5rem;">
+      Rows highlighted in yellow hit the 20% floor — the formula result was below 20%, so the game engine locked power at 20%.
+    </p>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goSection(1)">Next →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 2: Calculate Your Decay ═══════════════════════════════ -->
+<section class="section" id="sec-1">
+
+  <div class="section-badge">Section 2 · Calculate Your Decay</div>
+  <h2 class="section-heading">Practice Tables</h2>
+  <p class="section-sub">Fill in the missing values. Use the formula: <strong style="color:var(--cyan)">P(t) = 100 − (20 − E) × 1.5 × t</strong></p>
+
+  <div class="floor-callout" style="margin-bottom:1.25rem;">
+    <div class="fc-icon">⚡</div>
+    <div class="fc-body">Remember: if your calculation gives less than <strong>20%</strong>, write <strong>20</strong> — that's the power floor.</div>
+  </div>
+
+  <!-- PART A: Scaffolded E=4 -->
+  <div class="card">
+    <div class="scaffold-badge">Scaffolded · E = 4</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">
+      With E = 4, the decay rate is <strong style="color:var(--cyan)">(20 − 4) × 1.5 = 24% per minute</strong>.
+      Fill in the product (24 × t) and then P(t) for each row. Submit each row when ready.
+    </p>
+
+    <table class="calc-table" id="scaffolded-table">
+      <thead>
+        <tr>
+          <th>t</th>
+          <th>24 × t = ?</th>
+          <th>P(t) = 100 − ?</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="scaffolded-body">
+        <!-- rows inserted by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- PART B: Independent E=2 -->
+  <div class="card">
+    <div class="indep-badge">Independent · E = 2</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">
+      Now on your own. With E = 2, calculate the full product (decay × t) and P(t) for each minute.
+      <em style="color:var(--slate)">No hints this time.</em>
+    </p>
+
+    <table class="calc-table" id="indep-table">
+      <thead>
+        <tr>
+          <th>t</th>
+          <th>Full product</th>
+          <th>P(t)</th>
+        </tr>
+      </thead>
+      <tbody id="indep-body">
+        <!-- rows inserted by JS -->
+      </tbody>
+    </table>
+
+    <div class="submit-row">
+      <button class="btn btn-primary" id="submit-all-btn" onclick="submitIndep()">Submit All</button>
+      <span id="submit-status" style="font-size:.8125rem;color:var(--slate);"></span>
+    </div>
+    <div id="indep-results" style="margin-top:1rem;display:none;"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(0)">← Back</button>
+    <button class="btn btn-primary" onclick="goSection(2)">Next →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 3: Decay Graph ═══════════════════════════════ -->
+<section class="section" id="sec-2">
+
+  <div class="section-badge">Section 3 · Your Decay Graph</div>
+  <h2 class="section-heading">Visualize the Drop</h2>
+  <p class="section-sub">Drag the Endurance slider and watch the power curve update live. The <span style="color:var(--red);font-weight:700;">red dashed line</span> is the 20% floor. The <span style="color:var(--yellow);font-weight:700;">yellow dashed line</span> marks the 3-minute match end.</p>
+
+  <!-- Slider -->
+  <div class="card">
+    <div class="slider-wrap">
+      <div class="slider-label-row">
+        <label for="e-slider">Endurance (E)</label>
+        <div><span class="slider-value-display" id="e-display">10</span></div>
+      </div>
+      <input type="range" id="e-slider" min="1" max="20" value="10" oninput="updateGraph()">
+      <div class="slider-range-labels"><span>1</span><span>20</span></div>
+    </div>
+
+    <!-- Stat chips -->
+    <div class="stat-info-row">
+      <div class="stat-chip">
+        <div class="sc-label">Decay Rate</div>
+        <div class="sc-value" id="decay-rate-display">15%/min</div>
+      </div>
+      <div class="stat-chip">
+        <div class="sc-label">Hits 20% Floor at</div>
+        <div class="sc-value" id="hits-zero-display">t = 6.7 min</div>
+      </div>
+    </div>
+
+    <!-- Live table -->
+    <table class="live-table" id="live-table">
+      <thead>
+        <tr>
+          <th>t (min)</th>
+          <th>P(t)</th>
+          <th>Power bar</th>
+        </tr>
+      </thead>
+      <tbody id="live-table-body">
+        <!-- rows by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SVG Graph -->
+  <div class="graph-wrap">
+    <svg id="decay-svg" viewBox="0 0 520 265" width="520" height="265" xmlns="http://www.w3.org/2000/svg">
+      <!-- Axes -->
+      <line x1="60" y1="20" x2="60" y2="220" stroke="#222840" stroke-width="1"/>
+      <line x1="60" y1="220" x2="500" y2="220" stroke="#222840" stroke-width="1"/>
+      <!-- Horizontal grid lines -->
+      <line x1="60" y1="20"  x2="500" y2="20"  stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="60" y1="70"  x2="500" y2="70"  stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="60" y1="120" x2="500" y2="120" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="60" y1="170" x2="500" y2="170" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Vertical grid lines -->
+      <line x1="148" y1="20" x2="148" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="236" y1="20" x2="236" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="324" y1="20" x2="324" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="412" y1="20" x2="412" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="500" y1="20" x2="500" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- 20% floor line (P=20 → y = 220 − 20×2 = 180) -->
+      <line x1="60" y1="180" x2="500" y2="180" stroke="#FF4D6A" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.55"/>
+      <!-- 3-min match end line (t=3 → x = 60 + 3×88 = 324) -->
+      <line x1="324" y1="20" x2="324" y2="220" stroke="#FFD166" stroke-width="2" stroke-dasharray="5,3" opacity="0.65"/>
+      <text x="324" y="14" text-anchor="middle" font-size="10" fill="#FFD166" font-family="DM Sans,sans-serif" font-weight="700">3 min</text>
+      <!-- Y axis labels -->
+      <text x="50" y="24"  text-anchor="end" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">100%</text>
+      <text x="50" y="74"  text-anchor="end" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">75%</text>
+      <text x="50" y="124" text-anchor="end" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">50%</text>
+      <text x="50" y="174" text-anchor="end" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">25%</text>
+      <text x="50" y="184" text-anchor="end" font-size="10" fill="#FF4D6A" font-family="DM Sans,sans-serif" font-weight="700">20%</text>
+      <text x="50" y="224" text-anchor="end" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">0%</text>
+      <!-- X axis labels -->
+      <text x="60"  y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">0</text>
+      <text x="148" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">1</text>
+      <text x="236" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">2</text>
+      <text x="324" y="237" text-anchor="middle" font-size="11" fill="#FFD166" font-family="DM Sans,sans-serif" font-weight="700">3</text>
+      <text x="412" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">4</text>
+      <text x="500" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">5</text>
+      <text x="280" y="255" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif">Minutes elapsed</text>
+      <!-- Y axis title -->
+      <text x="12" y="125" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif" transform="rotate(-90,12,125)">Power %</text>
+      <!-- Dynamic decay line -->
+      <polyline id="decay-line" points="" fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- Dynamic dots -->
+      <g id="decay-dots"></g>
+    </svg>
+    <!-- Legend -->
+    <div class="graph-legend">
+      <div class="legend-item">
+        <div class="legend-line" style="background:var(--cyan);height:2.5px;border-radius:2px;"></div>
+        <span>Power curve</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:var(--red);opacity:0.6;border-radius:2px;"></div>
+        <span>20% floor</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line" style="background:var(--yellow);opacity:0.7;border-radius:2px;"></div>
+        <span>3-min match end</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--red);"></div>
+        <span>⚡ Floor hit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare panel -->
+  <div class="card">
+    <div class="card-title">Compare Two Bots at t = 3 min</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;">Enter two E values to compare mid-match power.</p>
+    <div class="compare-panel">
+      <div class="cp-card">
+        <div class="cp-label">Our Bot's E</div>
+        <input type="number" class="cp-input" id="cp-our" min="1" max="20" value="10" oninput="updateCompare()">
+        <div class="cp-val" id="cp-our-val">55%</div>
+        <div class="cp-sub">power at t=3</div>
+      </div>
+      <div class="cp-card">
+        <div class="cp-label">Their Bot's E</div>
+        <input type="number" class="cp-input" id="cp-their" min="1" max="20" value="6" oninput="updateCompare()">
+        <div class="cp-val" id="cp-their-val">37%</div>
+        <div class="cp-sub">power at t=3</div>
+      </div>
+    </div>
+    <div class="compare-result" id="compare-result">
+      Our bot has <strong style="color:var(--cyan)">55%</strong> vs their <strong style="color:var(--cyan)">37%</strong> at t=3 — we hold a <strong style="color:var(--green)">+18%</strong> power advantage.
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goSection(3)">Next →</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 4: Reflect ═══════════════════════════════ -->
+<section class="section" id="sec-3">
+
+  <div class="section-badge">Section 4 · Reflect</div>
+  <h2 class="section-heading">Connect It to the Match</h2>
+  <p class="section-sub">Answer all three questions. Use the sentence frames as a starting point, then make it your own.</p>
+
+  <!-- Q1 -->
+  <div class="card">
+    <div class="card-title">Question 1 of 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      What shape does your graph make? Why does that shape matter for a match?
+    </p>
+    <div class="sentence-frame">
+      <strong>Starter:</strong> "The graph makes a ___ shape because as time increases, power decreases at a ___ rate. During a match, this means..."
+    </div>
+    <textarea class="reflect-textarea" id="q1-text" placeholder="Type your answer here..." oninput="checkReflect('q1-text','q1-count',10)"></textarea>
+    <div class="char-count" id="q1-count">0 / 10 min</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="card">
+    <div class="card-title">Question 2 of 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      At what minute does your bot drop below 50% power? Show your work.
+    </p>
+    <div class="sentence-frame">
+      <strong>Formula:</strong> Solve 100 − (20 − E) × 1.5 × t = 50, so t = 50 ÷ ((20 − E) × 1.5)
+    </div>
+
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem;">
+      <label style="font-size:.875rem;font-weight:700;">Use E =</label>
+      <input type="number" class="num-input" id="q2-e" min="1" max="20" value="10" oninput="calcQ2()" style="width:70px;">
+      <span style="font-size:.875rem;color:var(--slate);">→ drops below 50% at t ≈</span>
+      <input type="number" step="0.1" class="num-input" id="q2-answer" placeholder="?" oninput="checkQ2()">
+      <span style="font-size:.875rem;color:var(--slate);">min</span>
+      <span id="q2-icon" style="font-size:1rem;"></span>
+    </div>
+    <div id="q2-auto" class="auto-hint" style="display:none;"></div>
+
+    <p style="font-size:.8125rem;color:var(--slate);margin:.75rem 0 .375rem;">Show your work:</p>
+    <textarea class="reflect-textarea" id="q2-work" placeholder="50 ÷ ((20 − E) × 1.5) = ..." style="min-height:70px;" oninput="checkReflect('q2-work','q2-work-count',5)"></textarea>
+    <div class="char-count" id="q2-work-count">0 / 5 min</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="card">
+    <div class="card-title">Question 3 of 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      A teammate has E = 10. Will their bot hit the 20% floor faster or slower than yours? Why?
+    </p>
+    <div class="sentence-frame">
+      <strong>Starter:</strong> "With E = 10, their decay rate is ___, so they reach 20% at t ≈ ___. Compared to my E = ___, their bot is ___ because..."
+    </div>
+    <textarea class="reflect-textarea" id="q3-text" placeholder="Type your answer here..." oninput="checkReflect('q3-text','q3-count',10)"></textarea>
+    <div class="char-count" id="q3-count">0 / 10 min</div>
+  </div>
+
+  <div id="done-btn-wrap" style="text-align:center;margin-top:1.25rem;display:none;">
+    <button class="btn btn-success" onclick="goSection(4)">Continue to Lock In →</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(2)">← Back</button>
+    <span></span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 5: Lock In ═══════════════════════════════ -->
+<section class="section" id="sec-4">
+
+  <div class="section-badge">Section 5 · Lock In</div>
+  <h2 class="section-heading">Lock in your Endurance allocation.</h2>
+  <p class="section-sub">
+    You've seen how Endurance shapes your bot's power curve. Pick a number now — this is binding for Week 1.
+    You don't know Turning or Power costs yet, but you'll need to leave at least 2 points for them (1 each).
+  </p>
+
+  <div class="card" id="sec4-main">
+    <!-- Stat card visual -->
+    <div class="stat-card-visual">
+      <div class="sc-title">Stat Card · Week 1</div>
+      <div class="stat-row" id="sr-speed">
+        <div class="stat-name locked-row" id="sc-speed-name">Speed</div>
+        <div class="stat-points-display" id="sc-speed-pts">—</div>
+        <div class="stat-pct-display" id="sc-speed-sub">Day 1</div>
+        <div class="stat-locked prior-locked" id="sc-speed-tag" style="display:none;">Locked</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name active">Endurance</div>
+        <div class="stat-points-display" id="sc-endurance-pts">—</div>
+        <div class="stat-pct-display" id="sc-endurance-sub"></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Turning</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Day 3</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Power</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Day 4</div>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <div class="slider-wrap">
+      <div class="slider-label-row">
+        <label>Endurance points</label>
+        <div>
+          <span class="slider-value-display" id="lock-slider-val">10</span>
+          <span class="slider-pct" id="lock-decay-display" style="font-size:.875rem;color:var(--slate);margin-left:.25rem;">decay 15/min</span>
+        </div>
+      </div>
+      <input type="range" id="lock-slider" min="1" max="18" value="10" oninput="onLockSliderChange()" />
+      <div class="slider-range-labels">
+        <span id="lock-slider-min-lbl">1 pt</span>
+        <span id="lock-slider-max-lbl">18 pts</span>
+      </div>
+    </div>
+
+    <!-- Budget bar -->
+    <div class="budget-bar-wrap">
+      <div class="budget-bar-label" id="budget-label">Using 10 of your 20-point budget</div>
+      <div class="budget-bar-track">
+        <div class="budget-bar-fill prior" id="budget-fill-prior" style="width:0%"></div>
+        <div class="budget-bar-fill" id="budget-fill" style="width:50%"></div>
+      </div>
+      <div class="budget-note ok" id="budget-note">10 points remain for Turning and Power (Days 3–4)</div>
+    </div>
+
+    <!-- Name input -->
+    <div style="margin-top:1.5rem;margin-bottom:1rem;">
+      <label for="student-name" style="display:block;font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Your name</label>
+      <input type="text" id="student-name" class="name-input" placeholder="First name, last initial — e.g. Alex M." oninput="onNameInput()" autocomplete="off" />
+    </div>
+
+    <div>
+      <button class="btn-lock" id="lock-btn" onclick="openLockModal()" disabled>
+        🔒 Lock in Endurance allocation
+      </button>
+    </div>
+  </div>
+
+  <!-- Locked state (shown after commit) -->
+  <div class="card" id="sec4-locked" style="display:none;">
+    <div class="lock-notice" id="lock-notice" style="display:none;"></div>
+    <div class="locked-display">
+      <div class="lock-icon">🔒</div>
+      <h3>Endurance locked for Week 1</h3>
+      <div class="locked-stat-chip">
+        <span class="pts" id="locked-pts">—</span>
+        <span class="label" id="locked-decay-label">pts · decay — /min</span>
+      </div>
+      <p id="locked-message"></p>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(3)">← Back</button>
+    <span></span>
+  </div>
+</section>
+
+<!-- Lock confirmation modal -->
+<div class="modal-overlay" id="lock-modal">
+  <div class="modal-box">
+    <h2>Lock in your Endurance?</h2>
+    <p>Individual allocations are one-way for Week 1. You'll see Turning on Day 3 and Power on Day 4, and the team picks a fresh loadout on Friday.</p>
+    <div class="modal-value" id="modal-val">—</div>
+    <div class="modal-decay" id="modal-decay">points · decay — /min</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeLockModal()">Not yet</button>
+      <button class="btn-lock" onclick="confirmLock()">🔒 Lock it in</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Storage endpoint ─────────────────────────────────────────────────────────
+// Paste the Google Apps Script web-app URL here after deploying (shared across
+// lessons, same sheet). Leave empty to disable remote save — the lesson still
+// works via localStorage only.
+const SAVE_ENDPOINT = '';
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+// 20% is the power floor — the game engine never lets power drop below 20%
+function clampPower(v) { return Math.max(20, Math.round(v)); }
+function calcP(E, t) {
+  const raw = 100 - (20 - E) * 1.5 * t;
+  return Math.max(20, raw);
+}
+function powerColor(p) {
+  if (p >= 60) return '#00E5FF';
+  if (p >= 30) return '#FFD166';
+  return '#FF4D6A';
+}
+
+// ── Section navigation ────────────────────────────────────────────────────────
+const SECTION_COUNT = 5;
+function goSection(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.section-nav button').forEach((b,i) => b.classList.toggle('active', i===idx));
+  const pct = ((idx+1)/SECTION_COUNT*100).toFixed(0);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── Section 2: Scaffolded table (E=4) ────────────────────────────────────────
+// decay = (20-4)*1.5 = 24/min
+// tFloor = 80/24 ≈ 3.33 min → t=4 and t=5 hit the 20% floor
+const scaffData = [
+  { t:1, product:24,  pt:76 },
+  { t:2, product:48,  pt:52 },
+  { t:3, product:72,  pt:28 },
+  { t:4, product:96,  pt:20 },  // raw=4 → floored at 20%
+  { t:5, product:120, pt:20 },  // raw=-20 → floored at 20%
+];
+
+function buildScaffolded() {
+  const tbody = document.getElementById('scaffolded-body');
+  scaffData.forEach(row => {
+    const floorRow = row.pt === 20 && row.t >= 4;
+    const hintText = floorRow
+      ? `Hint: 24×${row.t} = ${row.product} → 100 − ${row.product} = ${100 - row.product} → ⚡ below 20%, so P = 20 (floor)`
+      : `Hint: (20−4)×1.5×${row.t} = 24×${row.t} = ?  →  100 − that = ?`;
+    const tr = document.createElement('tr');
+    if (floorRow) tr.style.background = 'rgba(255,209,102,.03)';
+    tr.id = 'sr-' + row.t;
+    tr.innerHTML = `
+      <td class="t-val">${row.t}</td>
+      <td>
+        <input type="number" class="work-input" id="sp-${row.t}" placeholder="?" aria-label="24 × ${row.t}">
+      </td>
+      <td>
+        <input type="number" class="work-input" id="spt-${row.t}" placeholder="?" aria-label="P(${row.t})">
+      </td>
+      <td>
+        <button class="row-check-btn" onclick="checkScaffRow(${row.t})">Check</button>
+        <span id="si-${row.t}" style="margin-left:.375rem;font-size:1rem;"></span>
+        <div class="hint-box" id="sh-${row.t}">${hintText}</div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function checkScaffRow(t) {
+  const row = scaffData.find(r => r.t === t);
+  const prodEl = document.getElementById('sp-' + t);
+  const ptEl   = document.getElementById('spt-' + t);
+  const hint   = document.getElementById('sh-' + t);
+  const icon   = document.getElementById('si-' + t);
+
+  const prodVal = parseFloat(prodEl.value);
+  const ptVal   = parseFloat(ptEl.value);
+  let allOk = true;
+
+  if (prodVal === row.product) {
+    prodEl.classList.add('correct'); prodEl.classList.remove('error');
+  } else {
+    prodEl.classList.add('error'); prodEl.classList.remove('correct'); allOk = false;
+  }
+  if (ptVal === row.pt) {
+    ptEl.classList.add('correct'); ptEl.classList.remove('error');
+  } else {
+    ptEl.classList.add('error'); ptEl.classList.remove('correct'); allOk = false;
+  }
+
+  if (allOk) {
+    hint.classList.remove('visible');
+    icon.textContent = '✓';
+    icon.style.color = 'var(--green)';
+  } else {
+    hint.classList.add('visible');
+    icon.textContent = '✗';
+    icon.style.color = 'var(--red)';
+  }
+}
+
+// ── Section 2: Independent table (E=2) ───────────────────────────────────────
+// decay = (20-2)*1.5 = 27/min
+// tFloor = 80/27 ≈ 2.96 min → t=3, t=4, t=5 all hit the 20% floor
+// t=3: raw=100-81=19 → clamped to 20
+// t=4: raw=100-108=-8 → clamped to 20
+// t=5: raw=100-135=-35 → clamped to 20
+const indepData = [
+  { t:1, product:27,  pt:73 },
+  { t:2, product:54,  pt:46 },
+  { t:3, product:81,  pt:20 },  // raw=19 → floored at 20%
+  { t:4, product:108, pt:20 },  // raw=-8 → floored at 20%
+  { t:5, product:135, pt:20 },  // raw=-35 → floored at 20%
+];
+
+function buildIndep() {
+  const tbody = document.getElementById('indep-body');
+  indepData.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="t-val">${row.t}</td>
+      <td><input type="number" class="work-input" id="ip-${row.t}" placeholder="?"></td>
+      <td><input type="number" class="work-input" id="ipt-${row.t}" placeholder="?"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function submitIndep() {
+  const results = document.getElementById('indep-results');
+  results.style.display = 'block';
+  let html = '<table class="calc-table"><thead><tr><th>t</th><th>Product</th><th>P(t) you entered</th><th>Correct P(t)</th><th></th></tr></thead><tbody>';
+
+  indepData.forEach(row => {
+    const pv  = parseFloat(document.getElementById('ip-' + row.t).value);
+    const ptv = parseFloat(document.getElementById('ipt-' + row.t).value);
+    const pOk  = pv  === row.product;
+    const ptOk = ptv === row.pt;
+    const pCls  = pOk  ? 'correct-val' : 'wrong-val';
+    const ptCls = ptOk ? 'correct-val' : 'wrong-val';
+    const icon  = (pOk && ptOk) ? '<span style="color:var(--green)">✓</span>' : '<span style="color:var(--red)">✗</span>';
+    const floorNote = row.pt === 20 && row.t >= 3 ? ' <span style="color:var(--yellow);font-size:.75rem">⚡ floor</span>' : '';
+    html += `<tr>
+      <td class="t-val">${row.t}</td>
+      <td class="${pCls}">${isNaN(pv)?'—':pv} <span style="color:var(--slate);font-size:.8rem">(ans: ${row.product})</span></td>
+      <td class="${ptCls}">${isNaN(ptv)?'—':ptv}%</td>
+      <td class="correct-val">${row.pt}%${floorNote}</td>
+      <td>${icon}</td>
+    </tr>`;
+    // color the inputs
+    const pipEl  = document.getElementById('ip-'  + row.t);
+    const iptEl  = document.getElementById('ipt-' + row.t);
+    pipEl.classList.toggle('correct', pOk);  pipEl.classList.toggle('error', !pOk);
+    iptEl.classList.toggle('correct', ptOk); iptEl.classList.toggle('error', !ptOk);
+  });
+
+  html += '</tbody></table>';
+  results.innerHTML = html;
+  document.getElementById('submit-status').textContent = 'Answers revealed below ↓';
+}
+
+// ── Section 3: Graph ──────────────────────────────────────────────────────────
+// SVG coordinate mapping:
+// x: t=0→60, t=5→500  → x = 60 + t*88
+// y: p=100→20, p=0→220 → y = 220 - p*2
+// P=20% → y = 180   (the floor line)
+// t=3   → x = 324   (the match end line)
+
+function tToX(t) { return 60 + t * 88; }
+function pToY(p) { return 220 - p * 2; }
+
+function updateGraph() {
+  const E = parseInt(document.getElementById('e-slider').value);
+  document.getElementById('e-display').textContent = E;
+
+  const decayRate = (20 - E) * 1.5;
+  const infiniteMatch = E >= 20;
+
+  // Decay rate display
+  document.getElementById('decay-rate-display').textContent = infiniteMatch
+    ? '0%/min'
+    : decayRate.toFixed(1) + '%/min';
+
+  // Floor-hit time: when does P drop to 20%?
+  // P(t) = 100 − decayRate×t = 20  →  t = 80 / decayRate
+  const hzEl = document.getElementById('hits-zero-display');
+  const tFloor = infiniteMatch ? Infinity : (80 / decayRate);
+  if (infiniteMatch) {
+    hzEl.textContent = '∞ (no decay)';
+    hzEl.className = 'sc-value inf';
+  } else if (tFloor <= 5) {
+    hzEl.textContent = 't = ' + tFloor.toFixed(1) + ' min';
+    hzEl.className = 'sc-value warn';
+  } else {
+    hzEl.textContent = 't > 5 min';
+    hzEl.className = 'sc-value';
+  }
+
+  // Live table (calcP already applies the 20% floor)
+  const tbody = document.getElementById('live-table-body');
+  tbody.innerHTML = '';
+  for (let t = 0; t <= 5; t++) {
+    const p = calcP(E, t);
+    const barW = p + '%';
+    const barColor = powerColor(p);
+    const floorTag = (!infiniteMatch && t > 0 && p === 20 && tFloor <= t) ? ' <span style="color:var(--yellow);font-size:.75rem">⚡</span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${t}</td>
+      <td style="font-weight:800;color:${barColor}">${p}%${floorTag}</td>
+      <td style="min-width:80px;">
+        <div class="live-p-bar"><div class="live-p-fill" style="width:${barW};background:${barColor}"></div></div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // SVG line — piecewise: linear decline then flat at 20%
+  // We build the minimum set of waypoints needed for a clean piecewise line
+  const svgPts = [];
+  svgPts.push([0, 100]);
+
+  if (!infiniteMatch) {
+    if (tFloor <= 5) {
+      // Exact floor-hit point, then flat to t=5
+      svgPts.push([tFloor, 20]);
+      svgPts.push([5, 20]);
+    } else {
+      // Doesn't hit floor within 5 min — just plot declining curve
+      for (let t = 1; t <= 5; t++) {
+        svgPts.push([t, Math.max(20, 100 - decayRate * t)]);
+      }
+    }
+  }
+
+  const svgPointsStr = svgPts.map(([t, p]) => tToX(t) + ',' + pToY(p)).join(' ');
+  document.getElementById('decay-line').setAttribute('points', svgPointsStr);
+
+  // SVG dots at integer t values
+  const dotsG = document.getElementById('decay-dots');
+  dotsG.innerHTML = '';
+  for (let t = 0; t <= 5; t++) {
+    const p = calcP(E, t);
+    const cx = tToX(t), cy = pToY(p);
+    const col = powerColor(p);
+    dotsG.innerHTML += `<circle cx="${cx}" cy="${cy}" r="4" fill="${col}" stroke="#0D0D1A" stroke-width="2"/>`;
+  }
+
+  // Special floor-hit dot with annotation
+  if (!infiniteMatch && tFloor > 0 && tFloor <= 5) {
+    const fx = tToX(tFloor);
+    const fy = pToY(20); // = 180
+    dotsG.innerHTML += `<circle cx="${fx}" cy="${fy}" r="5.5" fill="#FF4D6A" stroke="#0D0D1A" stroke-width="2"/>`;
+    // Position label so it doesn't clip at edges
+    const labelX = fx > 440 ? fx - 7 : fx + 7;
+    const anchor  = fx > 440 ? 'end' : 'start';
+    dotsG.innerHTML += `<text x="${labelX}" y="${fy - 8}" text-anchor="${anchor}" font-size="10" fill="#FF4D6A" font-family="DM Sans,sans-serif" font-weight="700">⚡ ${tFloor.toFixed(1)} min</text>`;
+  }
+
+  // Also update compare panel
+  updateCompare();
+}
+
+function updateCompare() {
+  let ourE   = parseInt(document.getElementById('cp-our').value)   || 10;
+  let theirE = parseInt(document.getElementById('cp-their').value) || 6;
+  ourE   = Math.min(20, Math.max(1, ourE));
+  theirE = Math.min(20, Math.max(1, theirE));
+
+  const ourP   = Math.round(calcP(ourE,   3));
+  const theirP = Math.round(calcP(theirE, 3));
+
+  const ourEl   = document.getElementById('cp-our-val');
+  const theirEl = document.getElementById('cp-their-val');
+  ourEl.textContent   = ourP   + '%';
+  theirEl.textContent = theirP + '%';
+  ourEl.style.color   = powerColor(ourP);
+  theirEl.style.color = powerColor(theirP);
+
+  const diff = ourP - theirP;
+  const resultEl = document.getElementById('compare-result');
+  if (ourP === theirP) {
+    resultEl.innerHTML = `Both bots have <strong style="color:var(--cyan)">${ourP}%</strong> power at t=3 — it's even.`;
+  } else if (ourP > theirP) {
+    resultEl.innerHTML = `Our bot has <strong style="color:var(--green)">${ourP}%</strong> vs their <strong style="color:var(--red)">${theirP}%</strong> at t=3 — we hold a <strong style="color:var(--green)">+${diff}%</strong> power advantage.`;
+  } else {
+    resultEl.innerHTML = `Our bot has <strong style="color:var(--red)">${ourP}%</strong> vs their <strong style="color:var(--green)">${theirP}%</strong> at t=3 — they have a <strong style="color:var(--yellow)">+${Math.abs(diff)}%</strong> power advantage.`;
+  }
+}
+
+// ── Section 4: Reflect ────────────────────────────────────────────────────────
+function checkReflect(textId, countId, minLen) {
+  const el   = document.getElementById(textId);
+  const cEl  = document.getElementById(countId);
+  const len  = el.value.trim().length;
+  const ready = len >= minLen;
+  cEl.textContent = len + ' / ' + minLen + ' min';
+  cEl.classList.toggle('ready', ready);
+  el.classList.toggle('ready', ready);
+  checkAllReflect();
+}
+
+function calcQ2() {
+  const E = parseInt(document.getElementById('q2-e').value) || 10;
+  const eClamped = Math.min(20, Math.max(1, E));
+  const decayRate = (20 - eClamped) * 1.5;
+  const autoEl = document.getElementById('q2-auto');
+
+  if (eClamped >= 20) {
+    autoEl.style.display = 'flex';
+    autoEl.innerHTML = '<span class="ah-warn">⚠</span> E=20 means no decay — bot never drops below 50%.';
+    return;
+  }
+
+  const tExact = 50 / decayRate;
+  autoEl.style.display = 'flex';
+  autoEl.innerHTML = `<span class="ah-check">→</span> Auto-calc: t = 50 ÷ (${decayRate.toFixed(1)}) = <strong style="color:var(--cyan)">${tExact.toFixed(2)} min</strong>`;
+  checkQ2();
+}
+
+function checkQ2() {
+  const E = parseInt(document.getElementById('q2-e').value) || 10;
+  const eClamped = Math.min(20, Math.max(1, E));
+  const decayRate = (20 - eClamped) * 1.5;
+  if (eClamped >= 20) return;
+
+  const tExact = 50 / decayRate;
+  const userAns = parseFloat(document.getElementById('q2-answer').value);
+  const icon = document.getElementById('q2-icon');
+
+  if (isNaN(userAns)) { icon.textContent = ''; return; }
+  const within = Math.abs(userAns - tExact) < 0.15;
+  icon.textContent = within ? '✓' : '✗';
+  icon.style.color = within ? 'var(--green)' : 'var(--red)';
+  checkAllReflect();
+}
+
+function checkAllReflect() {
+  const q1ok = document.getElementById('q1-text').value.trim().length >= 10;
+  const q2ans = parseFloat(document.getElementById('q2-answer').value);
+  const q2workOk = document.getElementById('q2-work').value.trim().length >= 5;
+  const q3ok = document.getElementById('q3-text').value.trim().length >= 10;
+
+  const E = parseInt(document.getElementById('q2-e').value) || 10;
+  const eClamped = Math.min(20, Math.max(1, E));
+  const decayRate = (20 - eClamped) * 1.5;
+  const tExact = eClamped >= 20 ? null : 50 / decayRate;
+  const q2numOk = tExact !== null ? (!isNaN(q2ans) && Math.abs(q2ans - tExact) < 0.15) : true;
+
+  const allDone = q1ok && q2numOk && q2workOk && q3ok;
+  const doneBtnWrap = document.getElementById('done-btn-wrap');
+  doneBtnWrap.style.display = allDone ? 'block' : 'none';
+}
+
+// ── Section 5: Lock in Endurance ─────────────────────────────────────────────
+// Read Speed from the previous lesson if the student did it. This constrains
+// the Endurance slider max and populates the Stat Card's Speed row.
+function getPriorSpeed() {
+  const v = parseInt(localStorage.getItem('va_speed_locked'));
+  return isNaN(v) ? null : v;
+}
+
+function initLockSection() {
+  const priorSpeed = getPriorSpeed();
+  const speedPts = document.getElementById('sc-speed-pts');
+  const speedSub = document.getElementById('sc-speed-sub');
+  const speedTag = document.getElementById('sc-speed-tag');
+
+  if (priorSpeed !== null) {
+    speedPts.textContent = priorSpeed;
+    speedPts.style.color = 'var(--green)';
+    speedSub.textContent = (priorSpeed * 5) + '% motor power';
+    speedTag.style.display = 'inline-block';
+  } else {
+    speedPts.textContent = '?';
+    speedSub.textContent = 'Day 1 (not yet)';
+  }
+
+  // Slider max: reserve at least 1 pt each for Turning + Power.
+  // If Speed was locked, also subtract that. If not, cap at 18 (20 − 2).
+  const reserved = (priorSpeed || 0) + 2;
+  const maxE = Math.max(1, 20 - reserved);
+  const slider = document.getElementById('lock-slider');
+  slider.max = maxE;
+  if (parseInt(slider.value) > maxE) slider.value = maxE;
+  document.getElementById('lock-slider-max-lbl').textContent = maxE + ' pts';
+
+  // Prefill name from localStorage if available
+  const savedName = localStorage.getItem('va_student_name');
+  const nameInput = document.getElementById('student-name');
+  if (savedName && nameInput) { nameInput.value = savedName; onNameInput(); }
+
+  onLockSliderChange();
+}
+
+function onLockSliderChange() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  const decayRate = (20 - pts) * 1.5;
+  const priorSpeed = getPriorSpeed() || 0;
+  const totalUsed = priorSpeed + pts;
+  const remaining = 20 - totalUsed;
+
+  document.getElementById('lock-slider-val').textContent = pts;
+  document.getElementById('lock-decay-display').textContent = 'decay ' + decayRate.toFixed(1) + '/min';
+  document.getElementById('sc-endurance-pts').textContent = pts;
+  document.getElementById('sc-endurance-sub').textContent = 'decay ' + decayRate.toFixed(1) + '%/min';
+
+  // Budget bar: two fills — prior (Speed, green) + this stat (Endurance, cyan)
+  document.getElementById('budget-fill-prior').style.width = (priorSpeed / 20 * 100) + '%';
+  document.getElementById('budget-fill').style.width = (pts / 20 * 100) + '%';
+  document.getElementById('budget-label').textContent = 'Using ' + totalUsed + ' of your 20-point budget';
+
+  const note = document.getElementById('budget-note');
+  if (remaining < 2) {
+    note.textContent = 'Only ' + remaining + ' point' + (remaining !== 1 ? 's' : '') + ' left — you need at least 1 each for Turning and Power.';
+    note.className = 'budget-note warning';
+  } else {
+    note.textContent = remaining + ' points remain for Turning and Power (Days 3–4)';
+    note.className = 'budget-note ok';
+  }
+}
+
+function onNameInput() {
+  const name = document.getElementById('student-name').value.trim();
+  document.getElementById('lock-btn').disabled = name.length < 1;
+}
+
+function openLockModal() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  const decayRate = (20 - pts) * 1.5;
+  document.getElementById('modal-val').textContent = pts;
+  document.getElementById('modal-decay').textContent = 'points · decay ' + decayRate.toFixed(1) + '/min';
+  document.getElementById('lock-modal').classList.add('open');
+}
+
+function closeLockModal() {
+  document.getElementById('lock-modal').classList.remove('open');
+}
+
+async function confirmLock() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  const name = document.getElementById('student-name').value.trim();
+  closeLockModal();
+  localStorage.setItem('va_student_name', name);
+
+  let lockedPts = pts;
+
+  // No Content-Type header → simple request, no CORS preflight.
+  if (SAVE_ENDPOINT) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          site: localStorage.getItem('va_selected_site') || '',
+          stat: 'endurance',
+          points: pts,
+          decayRate: (20 - pts) * 1.5,
+          lesson: 'endurance-stat',
+          ts: new Date().toISOString(),
+        }),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.ok === false && result.error === 'already_locked') {
+        const existing = Number(result.existing);
+        if (!isNaN(existing)) {
+          lockedPts = existing;
+          showAlreadyLockedNotice(name, existing);
+        }
+      }
+    } catch (_e) {
+      // Network failure — proceed with the student's pick; facilitator reconciles.
+    }
+  }
+
+  localStorage.setItem('va_endurance_locked', lockedPts);
+  showLockedState(lockedPts);
+}
+
+function showAlreadyLockedNotice(name, existing) {
+  const el = document.getElementById('lock-notice');
+  if (!el) return;
+  const decayRate = ((20 - existing) * 1.5).toFixed(1);
+  el.innerHTML =
+    '<strong>Already locked.</strong> ' +
+    name + '’s Endurance was set to <strong>' + existing + ' pts (decay ' + decayRate + '/min)</strong> ' +
+    'earlier this week. Week 1 individual allocations are one-way — you’re seeing your actual commitment now.';
+  el.style.display = 'block';
+}
+
+function showLockedState(pts) {
+  const decayRate = (20 - pts) * 1.5;
+  document.getElementById('sec4-main').style.display = 'none';
+  document.getElementById('sec4-locked').style.display = 'block';
+  document.getElementById('locked-pts').textContent = pts;
+  document.getElementById('locked-decay-label').textContent = 'pts · decay ' + decayRate.toFixed(1) + '/min';
+
+  let msg = '';
+  if (pts <= 3) msg = 'Fast decay — your bot runs out of juice quickly. You saved budget for other stats.';
+  else if (pts <= 8) msg = 'Balanced decay. You stay competitive most of the match.';
+  else if (pts <= 14) msg = 'Endurance-heavy. Your bot holds power longer than most — you gave up elsewhere for it.';
+  else msg = 'Maximum endurance. Your bot barely loses power. Three stats left will show you what that cost.';
+  document.getElementById('locked-message').textContent = msg;
+
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildScaffolded();
+buildIndep();
+updateGraph();
+calcQ2();
+initLockSection();
+// Set initial progress (section 0 of 5 = 20%)
+document.getElementById('progress-bar').style.width = '20%';
+</script>
+</body>
+</html>
