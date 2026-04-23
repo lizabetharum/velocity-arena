@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation Matches · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy); color: #E8EAF2;
+      min-height: 100vh; padding-bottom: 5rem;
+    }
+
+    /* Header */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    main {
+      max-width: 820px; margin: 2rem auto 0; padding: 0 1.25rem;
+    }
+
+    .hero {
+      border-left: 4px solid var(--cyan);
+      padding: 0 0 1.25rem 1.25rem; margin-bottom: 2rem;
+    }
+    .hero .eyebrow {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .hero h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -.01em; margin-bottom: .5rem; }
+    .hero p { font-size: 1rem; color: #C8CDD8; line-height: 1.65; max-width: 60ch; }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .section-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem;
+    }
+    .section-heading {
+      font-size: 1.125rem; font-weight: 800; margin-bottom: .75rem;
+    }
+    .muted {
+      font-size: .875rem; color: var(--slate); line-height: 1.65;
+    }
+
+    /* Loadout banner — personalized from localStorage */
+    .loadout-banner {
+      background: linear-gradient(180deg, rgba(0,229,255,.06), rgba(0,229,255,.02));
+      border: 1px solid rgba(0,229,255,.25); border-left: 4px solid var(--cyan);
+      border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+    }
+    .loadout-banner .lb-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem;
+    }
+    .loadout-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: .625rem; margin-bottom: 1rem;
+    }
+    .loadout-chip {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .625rem .75rem; text-align: center;
+    }
+    .loadout-chip .lc-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .25rem;
+    }
+    .loadout-chip .lc-val { font-size: 1.375rem; font-weight: 800; color: var(--cyan); }
+    .loadout-chip.missing .lc-val { color: var(--slate); }
+    .loadout-total {
+      font-size: .8125rem; color: var(--slate);
+      text-align: center; margin-bottom: 1rem;
+    }
+    .loadout-total strong.ok   { color: var(--green); }
+    .loadout-total strong.off  { color: var(--yellow); }
+
+    /* Step list */
+    .step-list { counter-reset: step; list-style: none; padding: 0; }
+    .step-list li {
+      counter-increment: step;
+      display: grid; grid-template-columns: 2.75rem 1fr;
+      gap: 1rem; align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .step-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-list li::before {
+      content: counter(step);
+      width: 2.25rem; height: 2.25rem;
+      border-radius: 50%;
+      background: rgba(0,229,255,.1);
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-list .step-title {
+      font-size: 1rem; font-weight: 700; margin-bottom: .25rem;
+    }
+    .step-list .step-body { font-size: .9rem; color: #C8CDD8; line-height: 1.6; }
+    .step-list .step-body a {
+      color: var(--cyan); text-decoration: none; font-weight: 700; border-bottom: 1px dashed var(--cyan);
+    }
+    .step-list .step-body a:hover { border-bottom-style: solid; }
+    .step-list code {
+      font-family: 'JetBrains Mono', monospace; font-size: .8125rem;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .15em .4em;
+    }
+    .step-list kbd {
+      font-family: inherit; font-size: .75rem; font-weight: 700;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-bottom-width: 2px; border-radius: 4px;
+      padding: .15em .5em; color: #E8EAF2;
+    }
+
+    /* Code block */
+    .code-wrap {
+      background: #0A0A14; border: 1px solid var(--card-border);
+      border-radius: 10px; overflow: hidden; margin-top: 1rem;
+    }
+    .code-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .625rem 1rem;
+      background: var(--navy2); border-bottom: 1px solid var(--card-border);
+      gap: .75rem; flex-wrap: wrap;
+    }
+    .code-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .copy-group { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'DM Sans', sans-serif; font-size: .8125rem; font-weight: 700;
+      padding: .45rem .9rem; border-radius: 6px; border: 1px solid var(--teal);
+      background: transparent; color: var(--cyan); cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s, transform .1s;
+    }
+    .btn-copy:hover { background: rgba(0,229,255,.08); }
+    .btn-copy:active { transform: scale(.97); }
+    .btn-copy.primary {
+      background: var(--cyan); color: var(--navy); border-color: var(--cyan);
+    }
+    .btn-copy.primary:hover { opacity: .88; }
+    .btn-copy.copied {
+      background: var(--green); color: var(--navy); border-color: var(--green);
+    }
+    pre.code-block {
+      margin: 0; padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .75rem; line-height: 1.6; color: #D4D8E0;
+      background: #0A0A14;
+      max-height: 560px; overflow: auto;
+      white-space: pre;
+    }
+    pre.code-block::-webkit-scrollbar { width: 10px; height: 10px; }
+    pre.code-block::-webkit-scrollbar-track { background: #0A0A14; }
+    pre.code-block::-webkit-scrollbar-thumb {
+      background: var(--card-border); border-radius: 10px;
+    }
+
+    /* Student Zone callouts */
+    .zone-callout {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1rem; align-items: start;
+      background: rgba(255,209,102,.06);
+      border: 1px solid rgba(255,209,102,.25);
+      border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+    }
+    .zone-callout .zc-badge {
+      font-size: 1.75rem; line-height: 1; padding-top: .15rem;
+    }
+    .zone-callout h4 {
+      font-size: 1rem; font-weight: 800; color: var(--yellow);
+      margin-bottom: .375rem;
+    }
+    .zone-callout p { font-size: .875rem; color: #C8CDD8; line-height: 1.6; }
+    .zone-callout p + p { margin-top: .5rem; }
+    .zone-callout strong { color: var(--yellow); }
+
+    /* Reminder row */
+    .reminder {
+      background: rgba(255,77,106,.05);
+      border: 1px solid rgba(255,77,106,.2);
+      border-radius: 8px; padding: .875rem 1.125rem;
+      font-size: .875rem; color: #C8CDD8; line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+    .reminder strong { color: var(--red); }
+
+    @media (max-width: 540px) {
+      .loadout-row { grid-template-columns: 1fr 1fr; }
+      pre.code-block { font-size: .7rem; padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Simulation Matches</h1>
+  <span class="day-tag">DAY 5</span>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="eyebrow">Simulation matches · Day 5</div>
+    <h2>Upload your loadout to your bot.</h2>
+    <p>
+      You've locked Speed, Endurance, Turning, and Power. Time to put the loadout on the field.
+      Follow the five steps below to open MakeCode, add the Cutebot Pro extension, switch to
+      JavaScript mode, and paste the match template. Then you'll change exactly two things:
+      your four stats, and your launch sequence.
+    </p>
+  </section>
+
+  <!-- Personalized loadout -->
+  <div class="loadout-banner" id="loadout-banner">
+    <div class="lb-title">Your loadout (from Days 1–4)</div>
+    <div class="loadout-row" id="loadout-row">
+      <!-- chips injected by JS -->
+    </div>
+    <div class="loadout-total" id="loadout-total">—</div>
+    <p class="muted" style="font-size:.8125rem;" id="loadout-note">
+      The "Copy with my values" button below drops your four numbers straight into the code template. No retyping.
+    </p>
+  </div>
+
+  <!-- Setup steps -->
+  <div class="card">
+    <div class="section-label">Setup</div>
+    <h3 class="section-heading">Open MakeCode and prep the project</h3>
+    <ol class="step-list">
+      <li>
+        <div>
+          <div class="step-title">Open MakeCode for micro:bit</div>
+          <div class="step-body">
+            Go to <a href="https://makecode.microbit.org" target="_blank" rel="noopener">makecode.microbit.org</a>.
+            You do not need to sign in.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Create a new project</div>
+          <div class="step-body">
+            Click <strong>New Project</strong>, name it <code>velocity-match</code>, and hit Create.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Add the Cutebot Pro extension</div>
+          <div class="step-body">
+            Click the gear icon (top right) → <strong>Extensions</strong>.
+            Search for <code>cutebot pro</code> and click the tile to add it.
+            New block categories appear in the sidebar when it's installed.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Switch from Blocks to JavaScript</div>
+          <div class="step-body">
+            At the top of the editor, you'll see a toggle with <kbd>Blocks</kbd> and <kbd>JavaScript</kbd>.
+            Click <kbd>JavaScript</kbd>. The block-based workspace swaps for a text editor.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Replace everything with the match template</div>
+          <div class="step-body">
+            Select all the default code (<kbd>⌘ A</kbd> on Mac, <kbd>Ctrl A</kbd> on Windows/ChromeOS)
+            and delete it. Then paste the code from the block below. Use <strong>Copy with my values</strong>
+            if you want your stats pre-filled; use <strong>Copy template</strong> to paste the raw version.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Bring in your launch sequence from your earlier project</div>
+          <div class="step-body">
+            You already wrote a launch sequence in the <strong>First Bot Drive</strong> project. Pull it into this one:
+            <ol style="margin:.5rem 0 .5rem 1.25rem; padding-left:.5rem; font-size:.875rem; color:#C8CDD8; line-height:1.65;">
+              <li>Open your earlier MakeCode project in a new tab (Home → your projects → the one with your launch sequence).</li>
+              <li>At the top, click <kbd>Blocks</kbd> to see your launch sequence as blocks — this is the quickest way to confirm you're looking at the right function.</li>
+              <li>Click <kbd>JavaScript</kbd> so you can read and copy the text.</li>
+              <li>Find the lines <strong>between</strong> <code>launchActive = true</code> and <code>launchActive = false</code> inside <code>launchSequence()</code>. That's your opening-move code. Select just those lines and copy (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>).</li>
+              <li>Switch back to <code>velocity-match</code>. In the new code, find the same spot — right where it says <code>// ← YOUR CODE HERE</code>. Paste your lines there.</li>
+            </ol>
+            Leave the two <code>launchActive = true</code> / <code>launchActive = false</code> lines alone — they're already in place and must not be duplicated.
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Code block -->
+  <div class="card">
+    <div class="section-label">Match template</div>
+    <h3 class="section-heading">The code</h3>
+    <div class="muted" style="margin-bottom:.5rem;">
+      Read the comments. They tell you which lines never to delete. Search (<kbd>⌘ F</kbd>) for
+      <code>STUDENT ZONE</code> to jump between the two spots you need to edit.
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-toolbar">
+        <span class="code-title">match-template.ts</span>
+        <div class="copy-group">
+          <button class="btn-copy" id="copy-raw-btn" onclick="copyTemplate(false)">Copy template</button>
+          <button class="btn-copy primary" id="copy-filled-btn" onclick="copyTemplate(true)">Copy with my values</button>
+        </div>
+      </div>
+      <pre class="code-block" id="code-display"></pre>
+    </div>
+  </div>
+
+  <!-- Student zones explanation -->
+  <div class="card">
+    <div class="section-label">What you change</div>
+    <h3 class="section-heading">Two student zones</h3>
+
+    <div class="zone-callout">
+      <div class="zc-badge">★</div>
+      <div>
+        <h4>Zone A — Stat Allocation</h4>
+        <p>
+          Near the bottom of the code, find the lines starting with <code>SPEED =</code>,
+          <code>ENDURANCE =</code>, <code>TURNING =</code>, <code>POWER =</code>. Replace
+          the placeholder 5s with <strong>your locked values from Days 1–4</strong>.
+          They must add up to exactly <strong>20</strong>.
+        </p>
+        <p>
+          If you used the "Copy with my values" button above, these are already filled in for you.
+          Double-check them against your stat card anyway.
+        </p>
+      </div>
+    </div>
+
+    <div class="zone-callout">
+      <div class="zc-badge">★</div>
+      <div>
+        <h4>Zone B — Launch Sequence</h4>
+        <p>
+          Near the top of the code, inside the <code>launchSequence()</code> function, there's a
+          comment line that says <code>// ← YOUR CODE HERE</code>. This runs <strong>once</strong>
+          when the match starts (Button A). Program your bot's opening move — a short drive,
+          a turn, whatever your team's strategy calls for.
+        </p>
+        <p>
+          <strong>Reuse your First Bot Drive launch code.</strong> Step 6 above walks you through
+          opening your earlier project, clicking <kbd>Blocks</kbd> to confirm, switching to JavaScript,
+          and copying the lines between <code>launchActive = true</code> and <code>launchActive = false</code>
+          into this new project.
+        </p>
+        <p>
+          Do <strong>not</strong> delete the <code>launchActive = true</code> and <code>launchActive = false</code>
+          lines in the new code — they're already in place and they protect your bot from false
+          border triggers while you're turning.
+        </p>
+      </div>
+    </div>
+
+    <div class="reminder">
+      <strong>Do not change anything outside the two zones.</strong> The rest of the code runs
+      match timing, ball detection, border handling, and charge/follow-through. If something
+      feels "wrong" outside the zones, raise your hand — don't edit it.
+    </div>
+  </div>
+
+  <!-- Run it -->
+  <div class="card">
+    <div class="section-label">Run the match</div>
+    <h3 class="section-heading">Launch and observe</h3>
+    <div class="muted">
+      Download the program to your micro:bit. Place the bot on your goal line facing the field.
+      Press <kbd>A</kbd> to start the match. Press <kbd>A + B</kbd> together at any time to
+      emergency-stop. The match auto-ends after 3 minutes (180 seconds).
+    </div>
+    <div class="muted" style="margin-top:.75rem;">
+      Record what you see in your match log: how long did Endurance hold? Did your launch put
+      you in a good position? Did the 5 Turning value make your arcs feel too tight or too wide?
+      You'll adjust for tomorrow's matches — but your Week 1 loadout itself is locked.
+    </div>
+  </div>
+
+</main>
+
+<!-- Code source (hidden; read by the copy buttons). The textContent below is
+     the single source of truth for both the display and the clipboard. -->
+<script id="code-source" type="text/plain">
+/**
+ * ══════════════════════════════════════════════════════════════════════
+ *  VELOCITY ARENA — MATCH CODE TEMPLATE
+ * ══════════════════════════════════════════════════════════════════════
+ *
+ *  HOW TO USE THIS FILE
+ *  ─────────────────────
+ *  1. Find the sections marked  ★ STUDENT ZONE ★
+ *  2. Read the instructions in each zone carefully
+ *  3. Add your team's code where it says  // ← YOUR CODE HERE
+ *  4. Leave everything else exactly as-is — it controls match timing,
+ *     border detection, and ball tracking
+ *
+ *  There are TWO student zones in this file:
+ *    A. Stat Allocation  (bottom of file, easy to find)
+ *    B. Launch Sequence  (your bot's opening move)
+ *
+ * ══════════════════════════════════════════════════════════════════════
+ */
+
+
+// ── Variable declarations ─────────────────────────────────────────────
+
+
+// ── Launch sequence ───────────────────────────────────────────────────
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE B — LAUNCH SEQUENCE ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  This function runs once when the match starts (Button A).        ║
+ * ║  Program your bot's opening move here.                            ║
+ * ║                                                                   ║
+ * ║  RULES:                                                           ║
+ * ║  • Do NOT delete the launchActive lines — they protect your       ║
+ * ║    bot from false border triggers during turns.                   ║
+ * ║  • Your bot starts at your goal line facing the field.            ║
+ * ║  • Ball detection turns ON automatically after this function ends.║
+ * ║                                                                   ║
+ * ║  USEFUL COMMANDS (copy exactly as shown):                         ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 90)    ║
+ * ║    → spins left 90° in place                                      ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)   ║
+ * ║    → spins right 90° in place                                     ║
+ * ║  • CutebotPro.pwmCruiseControl(motorPower, motorPower)             ║
+ * ║    → drives forward at your bot's roam speed                      ║
+ * ║  • CutebotPro.runBlockCnt(2)                                      ║
+ * ║    → drives exactly 2 units (30 cm each), then stops             ║
+ * ║  • CutebotPro.stopImmediately(CutebotProMotors.ALL)               ║
+ * ║    → stops all motors                                             ║
+ * ║  • basic.pause(500)                                               ║
+ * ║    → waits 500 milliseconds (0.5 seconds)                        ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+function launchSequence() {
+    launchActive = true   // ← DO NOT DELETE — disables border check during turns
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES BELOW THIS LINE ───────────────
+
+    // ← YOUR CODE HERE
+
+
+
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES ABOVE THIS LINE ───────────────
+
+    launchActive = false  // ← DO NOT DELETE — re-enables border check after turns
+}
+
+
+// ── Start match ───────────────────────────────────────────────────────
+input.onButtonPressed(Button.A, function () {
+    if (!(matchRunning)) {
+        computeStats()
+        t = 0
+        matchStartTime = input.runningTime()
+        matchRunning = true
+        ballDetected = false
+        showPhase("\"GO\"")
+        launchSequence()
+        isRoaming = true
+        matchLoop()
+    }
+})
+
+// ── Endurance bar on LED ──────────────────────────────────────────────
+function showEnduranceBar(num: number) {
+    rows = Math.round(num * 5)
+    basic.clearScreen()
+    for (let index = 0; index <= 4; index++) {
+        if (index >= 5 - rows) {
+            led.plot(2, index)
+        }
+    }
+}
+
+// ── Border detection ──────────────────────────────────────────────────
+function checkBorder() {
+    CutebotPro.trackbitStateValue()
+    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+
+function borderOnlyWatch(ms: number) {
+    watchResult = 0
+    elapsed2 = 0
+    while (elapsed2 < ms) {
+        chunk = Math.min(BORDER_CHECK_MS, ms - elapsed2)
+        basic.pause(chunk)
+        elapsed2 += chunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+    }
+}
+
+// ── Charge + Follow-Through (border-aware throughout) ─────────────────
+function chargeAndFollowThrough() {
+    chargeHitBorder = false
+    CutebotPro.pwmCruiseControl(chargePower, chargePower)
+    followStart = input.runningTime()
+    while (input.runningTime() - followStart < CHARGE_DURATION_MS) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            handleBorder()
+            chargeHitBorder = true
+            break
+        }
+        basic.pause(CHARGE_CHECK_MS)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    if (!chargeHitBorder) {
+        CutebotPro.pwmCruiseControl(motorPower, motorPower)
+        followStart = input.runningTime()
+        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
+            borderSide = checkBorder()
+            if (borderSide > 0) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                handleBorder()
+                break
+            }
+            basic.pause(CHARGE_CHECK_MS)
+        }
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    }
+}
+
+// ── Main match loop ───────────────────────────────────────────────────
+function matchLoop() {
+    while (matchRunning) {
+        t = (input.runningTime() - matchStartTime) / 1000
+        if (t >= 180) {
+            endMatch()
+            break;
+        }
+        if (ballDetected) {
+            isRoaming = false
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(500)
+            chargeAndFollowThrough()
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(500)
+            ballDetected = false
+            isRoaming = true
+            continue;
+        }
+        endurancePercent = 100 - DECAY_RATE * t / 40
+        endurancePercent = Math.max(endurancePercent, 20)
+        enduranceFactor = endurancePercent / 100
+        effectiveDuration = Math.round(thisDuration * enduranceFactor)
+        lastTurnWasLeft = !(lastTurnWasLeft)
+        for (let index = 0; index < TURNING; index++) {
+            if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(motorPower * (1 - turnRatio), motorPower * (1 + turnRatio))
+            } else {
+                CutebotPro.pwmCruiseControl(motorPower * (1 + turnRatio), motorPower * (1 - turnRatio))
+            }
+            driveAndWatch(effectiveDuration)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            if (watchResult == 1) {
+                handleBorder()
+                break;
+            }
+            if (watchResult == 2) {
+                ballDetected = true
+                break;
+            }
+        }
+        if (!(ballDetected)) {
+            showEnduranceBar(enduranceFactor)
+        }
+    }
+}
+
+// ── Polling helpers ───────────────────────────────────────────────────
+function driveAndWatch(ms: number) {
+    watchResult = 0
+    elapsed = 0
+    while (elapsed < ms) {
+        halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(halfChunk)
+        elapsed += halfChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        if (elapsed >= ms) {
+            return
+        }
+        remainChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(remainChunk)
+        elapsed += remainChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist > 0 && dist < BALL_DETECT_CM) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 2
+            return
+        }
+    }
+}
+
+// ── Emergency stop ────────────────────────────────────────────────────
+input.onButtonPressed(Button.AB, function () {
+    matchRunning = false
+    isRoaming = false
+    ballDetected = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+
+// ── Compute stats from 20-point budget ───────────────────────────────
+function computeStats() {
+    motorPower = SPEED * 100 / 20
+    chargePower = POWER * POWER
+    FOLLOW_THROUGH_MS = POWER * 200
+    totalArcTime = BASE_SEGMENT_MS * 12
+    thisDuration = Math.round(totalArcTime / TURNING)
+    turnRatio = 0.2 + TURNING * 0.02
+    DECAY_RATE = 20 - ENDURANCE
+}
+
+// ── Handle border ─────────────────────────────────────────────────────
+function handleBorder() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (borderSide == 1) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS)
+        lastTurnWasLeft = false
+    } else if (borderSide == 2) {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS)
+        lastTurnWasLeft = true
+    } else {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS * 2)
+        lastTurnWasLeft = false
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    recheck = checkBorder()
+    if (recheck > 0) {
+        borderSide = recheck
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+    }
+    isRoaming = true
+}
+
+function showPhase(text: string) {
+    basic.showString(text)
+    basic.pause(300)
+    basic.clearScreen()
+}
+
+function endMatch() {
+    matchRunning = false
+    isRoaming = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+// ── Variable initializations ──────────────────────────────────────────
+let recheck = 0
+let isCharging = false
+let totalArcTime = 0
+let chargePower = 0
+let dist = 0
+let remainChunk = 0
+let halfChunk = 0
+let elapsed = 0
+let turnRatio = 0
+let lastTurnWasLeft = false
+let thisDuration = 0
+let effectiveDuration = 0
+let enduranceFactor = 0
+let endurancePercent = 0
+let borderSide = 0
+let chunk = 0
+let elapsed2 = 0
+let sensor4State = 0
+let sensor3State = 0
+let sensor2State = 0
+let sensor1State = 0
+let rows = 0
+let ballDetected = false
+let matchStartTime = 0
+let t = 0
+let isRoaming = false
+let matchRunning = false
+let watchResult = 0
+let motorPower = 0
+let msPerUnit = 0
+let launchActive = false
+let DECAY_RATE = 0
+let POWER = 0
+let TURNING = 0
+let ENDURANCE = 0
+let SPEED = 0
+let UNIT_CM = 0
+let CHARGE_DURATION_MS = 0
+let BORDER_THRESHOLD = 0
+let BASE_SEGMENT_MS = 0
+let BALL_DETECT_CM = 0
+let BACKUP_MS = 0
+let BORDER_PIVOT_POWER = 0
+let BORDER_PIVOT_MS = 0
+let BORDER_CHECK_MS = 0
+let pivotLeft = false
+let FOLLOW_THROUGH_MS = 0
+let followStart = 0
+let chargeHitBorder = false
+let CHARGE_CHECK_MS = 0
+
+// ── System constants (do not change) ─────────────────────────────────
+let DRIVE_CHUNK_MS = 150
+BORDER_CHECK_MS = 60
+CHARGE_CHECK_MS = 20
+let PIVOT_MS = 400
+BORDER_PIVOT_MS = 700
+BORDER_PIVOT_POWER = 40
+BACKUP_MS = 600
+BALL_DETECT_CM = 40
+BASE_SEGMENT_MS = 320
+BORDER_THRESHOLD = 200
+CHARGE_DURATION_MS = 800
+let MATCH_DURATION = 180000
+UNIT_CM = 30
+let LAUNCH_RIGHT_TURN = 85
+DECAY_RATE = 20 - ENDURANCE
+
+
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE A — STAT ALLOCATION ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  Set your four stats below. They MUST add up to exactly 20.       ║
+ * ║  Each stat must be between 1 and 17 (you need at least 1 in each).║
+ * ║                                                                   ║
+ * ║  SPEED     → how fast your bot roams the field                    ║
+ * ║  ENDURANCE → how well your bot maintains speed late in the match  ║
+ * ║  TURNING   → how tightly your bot arcs when searching             ║
+ * ║  POWER     → how hard your bot charges when it sees the ball      ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+SPEED = 5        // ← YOUR VALUE HERE  (current total: 20)
+ENDURANCE = 5    // ← YOUR VALUE HERE
+TURNING = 5      // ← YOUR VALUE HERE
+POWER = 5        // ← YOUR VALUE HERE
+// ─────────────────────────────────────────────────────────────────────
+
+
+// ── Forever loop: safety-net border check during roaming ──────────────
+basic.forever(function () {
+    if (matchRunning && isRoaming && !(launchActive)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            handleBorder()
+        }
+        basic.pause(30)
+    }
+})
+</script>
+
+<script>
+// ── Read locked stats from localStorage (set by the Day 1–4 lessons) ──
+// Turning has no interactive lesson page, so `va_turning_locked` is never
+// stored. We infer it from the other three: Turning = 20 − S − E − P.
+function getLocked(key) {
+  const v = parseInt(localStorage.getItem('va_' + key + '_locked'));
+  return isNaN(v) ? null : v;
+}
+
+// Resolve a complete loadout. Turning is inferred from the other three
+// unless explicitly stored (forward-compat for if a turning lesson is
+// added later).
+function resolveLoadout() {
+  const speed     = getLocked('speed');
+  const endurance = getLocked('endurance');
+  const power     = getLocked('power');
+  let   turning   = getLocked('turning');
+  let   inferredTurning = false;
+  if (turning === null && speed !== null && endurance !== null && power !== null) {
+    turning = 20 - speed - endurance - power;
+    inferredTurning = true;
+  }
+  const allResolved = [speed, endurance, turning, power].every(v => v !== null);
+  const turningValid = turning === null ? false : (turning >= 1 && turning <= 17);
+  return { speed, endurance, turning, power, inferredTurning, allResolved, turningValid };
+}
+
+function getCodeSource() {
+  // textContent of the hidden <script type="text/plain"> is the canonical
+  // source. We leave the leading newline from the opening <script> tag
+  // alone — MakeCode doesn't care, and it keeps the paste visually clean.
+  return document.getElementById('code-source').textContent;
+}
+
+function personalizeCode(src) {
+  const { speed, endurance, turning, power, allResolved } = resolveLoadout();
+  if (!allResolved) return src;  // bail to raw template if anything unknown
+
+  const total = speed + endurance + turning + power;
+  return src
+    .replace(/^SPEED\s*=\s*\d+.*$/m,     'SPEED = '     + speed     + '        // ← YOUR VALUE HERE  (current total: ' + total + ')')
+    .replace(/^ENDURANCE\s*=\s*\d+.*$/m, 'ENDURANCE = ' + endurance + '    // ← YOUR VALUE HERE')
+    .replace(/^TURNING\s*=\s*\d+.*$/m,   'TURNING = '   + turning   + '      // ← YOUR VALUE HERE  (inferred: 20 − S − E − P)')
+    .replace(/^POWER\s*=\s*\d+.*$/m,     'POWER = '     + power     + '        // ← YOUR VALUE HERE');
+}
+
+// ── Render the code block to the page ────────────────────────────────
+document.getElementById('code-display').textContent = getCodeSource();
+
+// ── Render the personalized loadout banner ───────────────────────────
+(function renderLoadout() {
+  const loadout = resolveLoadout();
+  const stats = [
+    { key: 'speed',     label: 'Speed',     val: loadout.speed,     inferred: false                   },
+    { key: 'endurance', label: 'Endurance', val: loadout.endurance, inferred: false                   },
+    { key: 'turning',   label: 'Turning',   val: loadout.turning,   inferred: loadout.inferredTurning },
+    { key: 'power',     label: 'Power',     val: loadout.power,     inferred: false                   },
+  ];
+  const row = document.getElementById('loadout-row');
+  row.innerHTML = stats.map(s => {
+    const missing = s.val === null ? ' missing' : '';
+    const inferredTag = s.inferred
+      ? '<div style="font-size:.5625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-top:.25rem;">inferred</div>'
+      : '';
+    return '<div class="loadout-chip' + missing + '">' +
+             '<div class="lc-label">' + s.label + '</div>' +
+             '<div class="lc-val">' + (s.val === null ? '—' : s.val) + '</div>' +
+             inferredTag +
+           '</div>';
+  }).join('');
+
+  const totalEl = document.getElementById('loadout-total');
+  const noteEl  = document.getElementById('loadout-note');
+  const copyBtn = document.getElementById('copy-filled-btn');
+
+  const { speed, endurance, power, turning, allResolved, inferredTurning, turningValid } = loadout;
+  const total = (speed || 0) + (endurance || 0) + (turning || 0) + (power || 0);
+  const storedMissing = [speed, endurance, power].filter(v => v === null).length;
+
+  if (storedMissing > 0) {
+    totalEl.innerHTML = storedMissing + ' stat' + (storedMissing === 1 ? '' : 's') + ' not yet locked (Speed/Endurance/Power) — "Copy with my values" is disabled until all three are set.';
+    noteEl.textContent = 'Complete the Day 1, 2, and 4 lessons to auto-fill your loadout. Turning is inferred from the others, so you don\'t need a separate lesson for it. For now, use "Copy template" and type your numbers into the code manually.';
+    copyBtn.disabled = true;
+    copyBtn.style.opacity = '.5';
+    copyBtn.style.cursor = 'not-allowed';
+  } else if (!turningValid) {
+    totalEl.innerHTML = 'Turning would be <strong class="off">' + turning + '</strong> (20 − ' + speed + ' − ' + endurance + ' − ' + power + '). That\'s outside the 1–17 range — your Speed + Endurance + Power must leave at least 1 point for Turning.';
+    noteEl.textContent = 'Revisit your stat cards with a facilitator — something sums wrong.';
+    copyBtn.disabled = true;
+    copyBtn.style.opacity = '.5';
+    copyBtn.style.cursor = 'not-allowed';
+  } else if (total === 20) {
+    totalEl.innerHTML = 'Total: <strong class="ok">' + total + ' / 20 ✓</strong>' +
+      (inferredTurning ? ' · Turning inferred as <strong class="ok">' + turning + '</strong>' : '');
+  } else {
+    totalEl.innerHTML = 'Total: <strong class="off">' + total + ' / 20</strong> — your four stats should add to 20.';
+  }
+})();
+
+// ── Copy handlers ────────────────────────────────────────────────────
+async function copyTemplate(personalized) {
+  const src = personalized ? personalizeCode(getCodeSource()) : getCodeSource();
+  const btn = document.getElementById(personalized ? 'copy-filled-btn' : 'copy-raw-btn');
+  if (btn.disabled) return;
+
+  try {
+    await navigator.clipboard.writeText(src);
+  } catch (_e) {
+    // Fallback: select + copy via a temp textarea (older browsers / iframes)
+    const ta = document.createElement('textarea');
+    ta.value = src;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (_ignored) {}
+    document.body.removeChild(ta);
+  }
+
+  const originalText = btn.textContent;
+  btn.textContent = '✓ Copied';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.classList.remove('copied');
+  }, 1600);
+}
+</script>
+
+</body>
+</html>

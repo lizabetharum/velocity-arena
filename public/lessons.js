@@ -13,4 +13,5 @@ const ACTIVITY_LESSONS = {
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
   'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power.html',
+  'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
 };
