@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Power Stat Challenge · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    /* ── Design tokens ── */
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--cyan);
+      transition: width .5s ease; z-index: 100;
+      width: 0%;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* ── Section nav ── */
+    .section-nav {
+      display: flex; gap: 0;
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .section-nav button {
+      flex-shrink: 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .section-nav button:hover:not(.active) { color: #E8EAF2; }
+    .section-nav button.locked {
+      pointer-events: none;
+      opacity: .4;
+    }
+
+    /* ── Sections ── */
+    .section {
+      display: none; max-width: 720px;
+      margin: 2rem auto 0; padding: 0 1.25rem;
+      animation: fadeUp .3s ease both;
+    }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Typography ── */
+    .section-heading { font-size: 1.25rem; font-weight: 800; letter-spacing: .01em; margin-bottom: .5rem; }
+    .section-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; margin-bottom: 1.25rem; }
+    .label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+
+    /* ── Formula board ── */
+    .formula-board {
+      background: var(--navy3);
+      border: 1.5px solid var(--cyan);
+      border-radius: 8px; padding: 1.75rem 1.5rem;
+      text-align: center; margin: 0 0 1.25rem;
+    }
+    .formula-board .formula-text {
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--cyan); letter-spacing: .02em;
+    }
+    .formula-board .formula-sup {
+      font-size: .875rem; vertical-align: super;
+    }
+    .formula-board .formula-sub-text {
+      font-size: .8125rem; color: var(--slate);
+      margin-top: .5rem; font-weight: 500;
+    }
+
+    /* ── Calculation table ── */
+    .calc-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 1.25rem;
+    }
+    .calc-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate);
+      text-align: left; padding: .5rem .75rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .calc-table td {
+      padding: .625rem .75rem;
+      border-bottom: 1px solid rgba(34,40,64,.7);
+      vertical-align: middle;
+    }
+    .calc-table tr:last-child td { border-bottom: none; }
+    .power-val {
+      font-size: 1.125rem; font-weight: 800; color: var(--yellow);
+    }
+
+    /* ── Inputs ── */
+    .field-input {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .4rem .65rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem;
+      color: #E8EAF2; width: 100%; outline: none;
+      transition: border-color .2s;
+    }
+    .field-input:focus { border-color: var(--teal); }
+    .field-input.correct { border-color: var(--green); background: rgba(0,201,122,.06); }
+    .field-input.wrong { border-color: var(--red); background: rgba(255,77,106,.06); }
+
+    .hint-msg {
+      font-size: .78rem; margin-top: .35rem; line-height: 1.5;
+      min-height: 1.2em;
+    }
+    .hint-msg.hint-wrong { color: var(--yellow); }
+    .hint-msg.hint-correct { color: var(--green); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      font-weight: 700; padding: .75rem 1.5rem; border-radius: 7px;
+      border: none; cursor: pointer;
+      transition: opacity .15s, transform .1s; letter-spacing: .01em;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--cyan); color: var(--navy); }
+    .btn-primary:hover:not(.locked) { opacity: .88; }
+    .btn-primary.locked { pointer-events: none; opacity: .35; }
+    .btn-ghost {
+      background: transparent; color: var(--slate);
+      border: 1px solid var(--card-border);
+    }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+
+    /* ── Pick buttons ── */
+    .pick-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+    .pick-btn {
+      font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 700;
+      padding: .45rem 1rem; border-radius: 6px; border: 1.5px solid var(--card-border);
+      background: var(--navy3); color: #E8EAF2; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .pick-btn:hover { border-color: var(--slate); }
+    .pick-btn.selected-correct { border-color: var(--green); background: rgba(0,201,122,.12); color: var(--green); }
+    .pick-btn.selected-wrong   { border-color: var(--red); background: rgba(255,77,106,.1); color: var(--red); }
+
+    /* ── Callout ── */
+    .callout {
+      border-left: 3px solid var(--cyan); background: rgba(0,229,255,.05);
+      border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1rem 0;
+    }
+    .callout.yellow { border-left-color: var(--yellow); background: rgba(255,209,102,.05); }
+    .callout.green  { border-left-color: var(--green);  background: rgba(0,201,122,.05); }
+    .callout.purple { border-left-color: var(--purple); background: rgba(155,138,255,.07); }
+    .callout p { font-size: .9rem; line-height: 1.65; color: #C8CDD8; }
+    .callout strong { color: #E8EAF2; }
+
+    /* ── Reveal badge ── */
+    .reveal-badge {
+      display: inline-block; font-size: .6875rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: .2em .7em; border-radius: 4px; margin-bottom: .75rem;
+    }
+    .badge-linear  { background: rgba(0,229,255,.12); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .badge-quadratic { background: rgba(155,138,255,.12); color: var(--purple); border: 1px solid rgba(155,138,255,.3); }
+
+    /* ── Comparison table ── */
+    .compare-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .compare-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; padding: .5rem .75rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .compare-table th.col-speed { color: var(--cyan); }
+    .compare-table th.col-power { color: var(--yellow); }
+    .compare-table td {
+      padding: .65rem .75rem; font-size: .9rem;
+      border-bottom: 1px solid rgba(34,40,64,.6);
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .val-speed { color: var(--cyan); font-weight: 700; }
+    .compare-table .val-power { color: var(--yellow); font-weight: 700; }
+
+    /* ── SVG charts ── */
+    .charts-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    .chart-box {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem;
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+    }
+    .chart-box svg { width: 100%; height: auto; }
+    .chart-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    /* ── Interactive calculator ── */
+    .calc-row {
+      display: flex; gap: .75rem; align-items: center; margin-top: .75rem;
+      flex-wrap: wrap;
+    }
+    .calc-row .field-input { width: 80px; flex-shrink: 0; }
+    .calc-result {
+      font-size: 1rem; font-weight: 800; color: var(--purple);
+    }
+    .calc-compare {
+      font-size: .85rem; color: var(--slate);
+    }
+
+    /* ── Stat card inputs ── */
+    .stat-row {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: .75rem; flex-wrap: wrap;
+    }
+    .stat-row label { font-size: .875rem; font-weight: 500; color: #C8CDD8; min-width: 160px; }
+    .stat-input {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .4rem .65rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem;
+      color: #E8EAF2; width: 70px; outline: none;
+      transition: border-color .2s; text-align: center;
+    }
+    .stat-input:focus { border-color: var(--teal); }
+    .stat-output {
+      font-size: .9rem; font-weight: 700; color: var(--cyan);
+      min-width: 60px;
+    }
+    .stat-output.yellow { color: var(--yellow); }
+
+    .budget-bar {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+    }
+    .budget-label { font-size: .8125rem; font-weight: 500; color: var(--slate); }
+    .budget-remaining {
+      font-size: 1.25rem; font-weight: 800; color: var(--green);
+      transition: color .2s;
+    }
+    .budget-remaining.over { color: var(--red); }
+    .budget-equation {
+      font-size: .8125rem; font-weight: 500; color: var(--slate); margin-left: auto;
+    }
+
+    textarea.field-input {
+      resize: vertical; min-height: 80px; width: 100%;
+    }
+    .char-count {
+      font-size: .75rem; color: var(--slate); text-align: right; margin-top: .25rem;
+    }
+    .char-count.ready { color: var(--green); }
+
+    /* ── Ratio prompt (hidden initially) ── */
+    .ratio-prompt { display: none; animation: fadeUp .35s ease both; }
+    .ratio-prompt.visible { display: block; }
+
+    /* ── Section complete banner ── */
+    .complete-banner {
+      background: rgba(0,201,122,.08); border: 1px solid rgba(0,201,122,.3);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1rem;
+      display: flex; align-items: center; gap: .75rem;
+      animation: fadeUp .3s ease both;
+    }
+    .complete-banner .icon { font-size: 1.25rem; }
+    .complete-banner p { font-size: .9rem; color: var(--green); font-weight: 500; }
+
+    /* ── Nav button (next section) ── */
+    .nav-btn-row { margin-top: 1.5rem; display: flex; gap: .75rem; justify-content: flex-end; }
+
+    /* ── Inline small input ── */
+    .inline-input {
+      display: inline-block; width: 60px;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .25rem .5rem; margin: 0 .2rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; color: #E8EAF2;
+      outline: none; text-align: center; transition: border-color .2s;
+    }
+    .inline-input:focus { border-color: var(--teal); }
+    .inline-input.correct { border-color: var(--green); }
+    .inline-input.wrong   { border-color: var(--red); }
+
+    /* ── Dropdown ── */
+    .pick-dropdown {
+      font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+      background: var(--navy3); border: 1.5px solid var(--card-border);
+      border-radius: 5px; color: #E8EAF2; padding: .35rem .6rem;
+      cursor: pointer; outline: none; transition: border-color .2s;
+    }
+    .pick-dropdown:focus { border-color: var(--teal); }
+    .pick-dropdown.correct { border-color: var(--green); color: var(--green); }
+    .pick-dropdown.wrong   { border-color: var(--red); color: var(--red); }
+
+    /* responsive tweaks */
+    @media (max-width: 540px) {
+      .charts-row { grid-template-columns: 1fr; }
+      .stat-row label { min-width: 100%; }
+    }
+
+    /* ── Lock-in section (Section 4 rework) ────────────────────────────── */
+    .stat-card-visual {
+      background: var(--navy3); border: 2px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin: 1rem 0;
+    }
+    .stat-card-visual .scv-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: 1rem;
+    }
+    .stat-card-visual .scv-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .625rem 0; border-bottom: 1px solid var(--card-border);
+    }
+    .stat-card-visual .scv-row:last-child { border-bottom: none; }
+    .scv-name {
+      font-size: .8125rem; font-weight: 700; color: var(--slate);
+      width: 90px; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .scv-name.active { color: var(--cyan); }
+    .scv-name.locked-row { color: var(--green); }
+    .scv-pts { font-size: 1.25rem; font-weight: 800; color: #E8EAF2; min-width: 2rem; }
+    .scv-sub { font-size: .8125rem; color: var(--slate); }
+    .scv-tag {
+      margin-left: auto; font-size: .6875rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--slate);
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .2em .6em;
+    }
+    .scv-tag.prior-locked {
+      color: var(--green); background: rgba(0,201,122,.08);
+      border-color: rgba(0,201,122,.3);
+    }
+
+    .lock-slider-wrap { margin: 1.25rem 0; }
+    .lock-slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .5rem; }
+    .lock-slider-row label { font-size: .875rem; font-weight: 700; color: #E8EAF2; }
+    .lock-slider-val { font-size: 1.75rem; font-weight: 800; color: var(--cyan); }
+    .lock-slider-labels {
+      display: flex; justify-content: space-between;
+      font-size: .6875rem; color: var(--slate); font-weight: 500;
+    }
+    .lock-slider-wrap input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; background: var(--navy3);
+      border-radius: 3px; outline: none; margin: .5rem 0;
+    }
+    .lock-slider-wrap input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(0,229,255,.2);
+    }
+    .lock-slider-wrap input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer; border: none;
+    }
+
+    .lock-budget-wrap { margin: 1rem 0; }
+    .lock-budget-label { font-size: .75rem; color: var(--slate); margin-bottom: .375rem; font-weight: 500; }
+    .lock-budget-track {
+      height: 8px; background: var(--navy3); border-radius: 4px;
+      overflow: hidden; display: flex; gap: 2px;
+    }
+    .lock-budget-fill { height: 100%; background: var(--cyan); transition: width .25s ease; }
+    .lock-budget-fill.prior { background: var(--green); opacity: .7; }
+    .lock-budget-note { font-size: .75rem; color: var(--slate); margin-top: .375rem; }
+    .lock-budget-note.warning { color: var(--yellow); }
+    .lock-budget-note.ok { color: var(--green); }
+    .lock-budget-note.over { color: var(--red); }
+
+    .lock-name-input {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .5rem .75rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      color: #E8EAF2; outline: none; transition: border-color .15s;
+    }
+    .lock-name-input:focus { border-color: var(--teal); }
+
+    .btn-lock {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+      background: var(--red); color: #fff;
+    }
+    .btn-lock:not(:disabled):hover { opacity: .88; }
+    .btn-lock:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-lock:active { transform: scale(.97); }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,13,26,.8); backdrop-filter: blur(4px);
+      z-index: 200; align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 2rem; max-width: 460px; width: 100%;
+      animation: fadeUp .25s ease both;
+    }
+    .modal-box h2 { font-size: 1.1875rem; font-weight: 800; margin-bottom: .75rem; }
+    .modal-box p { font-size: .9375rem; color: #C8CDD8; line-height: 1.6; margin-bottom: 1.5rem; }
+    .modal-val {
+      font-size: 2.5rem; font-weight: 800; color: var(--cyan);
+      text-align: center; margin: 1rem 0;
+    }
+    .modal-sub {
+      font-size: .9375rem; color: var(--slate); text-align: center;
+      margin-top: -.5rem; margin-bottom: 1.25rem;
+    }
+    .modal-actions { display: flex; gap: .75rem; }
+    .modal-actions .btn, .modal-actions .btn-lock { flex: 1; justify-content: center; }
+
+    .locked-display { text-align: center; padding: 2rem 1rem; }
+    .lock-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+    .locked-display h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: .375rem; }
+    .locked-display p { font-size: .875rem; color: var(--slate); line-height: 1.5; }
+    .locked-stat-chip {
+      display: inline-flex; align-items: baseline; gap: .375rem;
+      background: rgba(0,229,255,.08); border: 1.5px solid rgba(0,229,255,.3);
+      border-radius: 8px; padding: .625rem 1.25rem; margin: 1rem 0;
+    }
+    .locked-stat-chip .pts { font-size: 2rem; font-weight: 800; color: var(--cyan); }
+    .locked-stat-chip .label { font-size: .875rem; color: var(--slate); font-weight: 500; }
+
+    .lock-notice {
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.3);
+      border-radius: 8px; padding: .875rem 1.125rem; margin-bottom: 1.25rem;
+      color: var(--yellow); font-size: .875rem; line-height: 1.5;
+    }
+    .lock-notice strong { color: var(--yellow); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Page header -->
+<header class="page-header">
+  <a href="today.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Power Stat Challenge</h1>
+  <span class="day-tag">Day 4</span>
+</header>
+
+<!-- Section nav -->
+<nav class="section-nav" id="section-nav">
+  <button onclick="showSection(0)" class="active" data-idx="0">1 · Calculate</button>
+  <button onclick="showSection(1)" class="locked" data-idx="1">2 · Compare</button>
+  <button onclick="showSection(2)" class="locked" data-idx="2">3 · The Reveal</button>
+  <button onclick="showSection(3)" class="locked" data-idx="3">4 · Lock In</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — Calculate
+════════════════════════════════════════════ -->
+<section class="section active" id="sec-0">
+  <h2 class="section-heading">Calculate Power²</h2>
+  <p class="section-sub">Your bot's Charge Speed depends on how many Power points you've allocated. Work through the formula for each value.</p>
+
+  <!-- Formula board -->
+  <div class="formula-board">
+    <div class="formula-text">Charge Speed = Power<span class="formula-sup">2</span></div>
+    <div class="formula-sub-text">Result is expressed as a percentage (%). Power points: 1, 2, 4, 8</div>
+  </div>
+
+  <!-- Calculation table -->
+  <div class="card">
+    <div class="label">Fill in each row — show your work, then write the answer</div>
+    <table class="calc-table" id="calc-table">
+      <thead>
+        <tr>
+          <th>Power pts</th>
+          <th>Show your work</th>
+          <th>Power² = ?</th>
+          <th>Charge Speed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row: Power = 1 -->
+        <tr id="row-0">
+          <td><span class="power-val">1</span></td>
+          <td>
+            <input class="field-input" id="work-0" placeholder="e.g. 1×1" autocomplete="off" />
+            <div class="hint-msg" id="hint-work-0"></div>
+          </td>
+          <td>
+            <input class="field-input" id="ans-0" placeholder="?" autocomplete="off" style="width:70px;" />
+            <div class="hint-msg" id="hint-ans-0"></div>
+          </td>
+          <td id="speed-0" style="font-weight:700; color:var(--slate);">—</td>
+        </tr>
+        <!-- Row: Power = 2 -->
+        <tr id="row-1">
+          <td><span class="power-val">2</span></td>
+          <td>
+            <input class="field-input" id="work-1" placeholder="e.g. 2×2" autocomplete="off" />
+            <div class="hint-msg" id="hint-work-1"></div>
+          </td>
+          <td>
+            <input class="field-input" id="ans-1" placeholder="?" autocomplete="off" style="width:70px;" />
+            <div class="hint-msg" id="hint-ans-1"></div>
+          </td>
+          <td id="speed-1" style="font-weight:700; color:var(--slate);">—</td>
+        </tr>
+        <!-- Row: Power = 4 -->
+        <tr id="row-2">
+          <td><span class="power-val">4</span></td>
+          <td>
+            <input class="field-input" id="work-2" placeholder="e.g. 4×4" autocomplete="off" />
+            <div class="hint-msg" id="hint-work-2"></div>
+          </td>
+          <td>
+            <input class="field-input" id="ans-2" placeholder="?" autocomplete="off" style="width:70px;" />
+            <div class="hint-msg" id="hint-ans-2"></div>
+          </td>
+          <td id="speed-2" style="font-weight:700; color:var(--slate);">—</td>
+        </tr>
+        <!-- Row: Power = 8 -->
+        <tr id="row-3">
+          <td><span class="power-val">8</span></td>
+          <td>
+            <input class="field-input" id="work-3" placeholder="e.g. 8×8" autocomplete="off" />
+            <div class="hint-msg" id="hint-work-3"></div>
+          </td>
+          <td>
+            <input class="field-input" id="ans-3" placeholder="?" autocomplete="off" style="width:70px;" />
+            <div class="hint-msg" id="hint-ans-3"></div>
+          </td>
+          <td id="speed-3" style="font-weight:700; color:var(--slate);">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ratio prompt — appears after all 4 correct -->
+  <div class="ratio-prompt" id="ratio-prompt">
+    <div class="card">
+      <div class="label">Now look at the pattern</div>
+
+      <p style="font-size:.9375rem; color:#C8CDD8; line-height:1.65; margin-bottom:1rem;">
+        You found: Power 2 → <strong style="color:var(--cyan)">4%</strong> and Power 4 → <strong style="color:var(--cyan)">16%</strong>.
+        What's the ratio? (4 : 16 simplifies to 1 : __)
+      </p>
+      <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.75rem;">
+        <span style="font-size:.9rem; color:#C8CDD8;">2→4 pts: charge speed went from 4% to 16% &nbsp;→&nbsp; 1 : </span>
+        <input class="inline-input" id="ratio-a" placeholder="?" maxlength="2" />
+        <div class="hint-msg" id="hint-ratio-a" style="margin-left:.5rem;"></div>
+      </div>
+
+      <p style="font-size:.9375rem; color:#C8CDD8; line-height:1.65; margin-bottom:1rem;">
+        Now Power 4 → <strong style="color:var(--cyan)">16%</strong> and Power 8 → <strong style="color:var(--cyan)">64%</strong>.
+        What's that ratio? (16 : 64 simplifies to 1 : __)
+      </p>
+      <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:1.25rem;">
+        <span style="font-size:.9rem; color:#C8CDD8;">4→8 pts: charge speed went from 16% to 64% &nbsp;→&nbsp; 1 : </span>
+        <input class="inline-input" id="ratio-b" placeholder="?" maxlength="2" />
+        <div class="hint-msg" id="hint-ratio-b" style="margin-left:.5rem;"></div>
+      </div>
+
+      <!-- Multiple choice -->
+      <div id="double-q" style="display:none; animation: fadeUp .3s ease both;">
+        <p style="font-size:.9375rem; color:#C8CDD8; line-height:1.65; margin-bottom:.75rem;">
+          When you doubled the Power points, charge speed&nbsp;___
+        </p>
+        <div class="pick-row" id="pick-double">
+          <button class="pick-btn" onclick="pickDouble(this,'doubled')">doubled</button>
+          <button class="pick-btn" onclick="pickDouble(this,'quadrupled')">quadrupled</button>
+          <button class="pick-btn" onclick="pickDouble(this,'stayed the same')">stayed the same</button>
+        </div>
+        <div class="hint-msg" id="hint-double" style="margin-top:.5rem;"></div>
+      </div>
+    </div>
+
+    <div id="s1-complete" style="display:none;" class="complete-banner">
+      <span class="icon">✓</span>
+      <p>Nice work! You've cracked the pattern. Move on to compare Power with Speed.</p>
+    </div>
+    <div class="nav-btn-row">
+      <button class="btn btn-primary locked" id="s1-next" onclick="showSection(1)">Next: Compare with Speed →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — Compare with Speed
+════════════════════════════════════════════ -->
+<section class="section" id="sec-1">
+  <h2 class="section-heading">Compare with Speed</h2>
+  <p class="section-sub">Here are both formulas side by side. Fill in the blanks to describe what you see.</p>
+
+  <!-- Two-formula cards -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+    <div class="formula-board" style="border-color:var(--cyan);">
+      <div style="font-size:.6875rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:.5rem;">Speed</div>
+      <div class="formula-text" style="font-size:1.1rem;">motorPower = Speed × 5</div>
+      <div class="formula-sub-text">Output grows by 5 for each point</div>
+    </div>
+    <div class="formula-board" style="border-color:var(--yellow);">
+      <div style="font-size:.6875rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:.5rem;">Power</div>
+      <div class="formula-text" style="font-size:1.1rem; color:var(--yellow);">chargeSpeed = Power<span class="formula-sup">2</span></div>
+      <div class="formula-sub-text">Output grows by Power × Power</div>
+    </div>
+  </div>
+
+  <!-- Comparison table (pre-filled) -->
+  <div class="card">
+    <div class="label">Side-by-side comparison</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="color:var(--slate);">Points</th>
+          <th class="col-speed">Speed → motorPower</th>
+          <th class="col-power" style="color:var(--yellow);">Power → chargeSpeed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;">2 pts</td>
+          <td><span class="val-speed">10%</span></td>
+          <td><span class="val-power" style="color:var(--yellow);">4%</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">4 pts</td>
+          <td><span class="val-speed">20%</span></td>
+          <td><span class="val-power" style="color:var(--yellow);">16%</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">8 pts</td>
+          <td><span class="val-speed">40%</span></td>
+          <td><span class="val-power" style="color:var(--yellow);">64%</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Fill-in questions -->
+  <div class="card">
+    <div class="label">What do you notice?</div>
+
+    <p style="font-size:.9rem; color:#C8CDD8; line-height:1.7; margin-bottom:.75rem;">
+      When you doubled Speed from 2 to 4, the motor output
+      <select class="pick-dropdown" id="q-speed-drop" onchange="checkSpeedDrop()">
+        <option value="">— pick one —</option>
+        <option value="doubled">doubled</option>
+        <option value="quadrupled">quadrupled</option>
+        <option value="stayed">stayed the same</option>
+      </select>
+    </p>
+    <div class="hint-msg" id="hint-speed-drop" style="margin-bottom:.75rem;"></div>
+
+    <p style="font-size:.9rem; color:#C8CDD8; line-height:1.7; margin-bottom:.75rem;">
+      When you doubled Power from 2 to 4, the charge speed
+      <select class="pick-dropdown" id="q-power-drop" onchange="checkPowerDrop()">
+        <option value="">— pick one —</option>
+        <option value="doubled">doubled</option>
+        <option value="quadrupled">quadrupled</option>
+        <option value="stayed">stayed the same</option>
+      </select>
+    </p>
+    <div class="hint-msg" id="hint-power-drop" style="margin-bottom:.5rem;"></div>
+  </div>
+
+  <!-- Callout -->
+  <div class="callout yellow">
+    <p>The difference matters. Look at <strong>Speed 8 → 40%</strong> vs <strong style="color:var(--yellow);">Power 8 → 64%</strong>. Same number of points. Very different results. Why?</p>
+  </div>
+
+  <div id="s2-complete" style="display:none;" class="complete-banner">
+    <span class="icon">✓</span>
+    <p>You've seen the difference. Section 3 gives it a name.</p>
+  </div>
+  <div class="nav-btn-row">
+    <button class="btn btn-ghost" onclick="showSection(0)">← Back</button>
+    <button class="btn btn-primary locked" id="s2-next" onclick="showSection(2)">Next: The Reveal →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — The Reveal
+════════════════════════════════════════════ -->
+<section class="section" id="sec-2">
+  <h2 class="section-heading">The Reveal</h2>
+  <p class="section-sub">You've already seen the pattern. Now it gets a name.</p>
+
+  <div class="card">
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem;">
+      <div style="flex:1; min-width:220px;">
+        <span class="reveal-badge badge-linear">Linear</span>
+        <p style="font-size:1rem; font-weight:800; color:var(--cyan); margin-bottom:.4rem;">Speed formula</p>
+        <p style="font-size:.9rem; color:#C8CDD8; line-height:1.65;">Equal steps produce <strong>equal jumps</strong>. Every extra point of Speed adds exactly 5% motorPower, no matter where you start.</p>
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <span class="reveal-badge badge-quadratic">Quadratic</span>
+        <p style="font-size:1rem; font-weight:800; color:var(--purple); margin-bottom:.4rem;">Power formula</p>
+        <p style="font-size:.9rem; color:#C8CDD8; line-height:1.65;">Equal steps produce <strong>bigger and bigger jumps</strong>. Doubling Power points doesn't double the output — it quadruples it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SVG Charts -->
+  <div class="charts-row">
+    <!-- Speed chart — straight line -->
+    <div class="chart-box">
+      <div class="chart-title" style="color:var(--cyan);">Speed (Linear)</div>
+      <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-label="Linear speed chart — straight diagonal line">
+        <!-- axes -->
+        <line x1="24" y1="100" x2="148" y2="100" stroke="#222840" stroke-width="1.5"/>
+        <line x1="24" y1="100" x2="24" y2="8"   stroke="#222840" stroke-width="1.5"/>
+        <!-- axis labels -->
+        <text x="24" y="112" font-size="8" fill="#8899AA" text-anchor="middle">0</text>
+        <text x="56" y="112" font-size="8" fill="#8899AA" text-anchor="middle">2</text>
+        <text x="88" y="112" font-size="8" fill="#8899AA" text-anchor="middle">4</text>
+        <text x="120" y="112" font-size="8" fill="#8899AA" text-anchor="middle">6</text>
+        <text x="148" y="112" font-size="8" fill="#8899AA" text-anchor="middle">8</text>
+        <text x="12" y="100" font-size="8" fill="#8899AA" text-anchor="middle">0%</text>
+        <text x="12" y="60"  font-size="8" fill="#8899AA" text-anchor="middle">50%</text>
+        <text x="12" y="16"  font-size="8" fill="#8899AA" text-anchor="middle">100%</text>
+        <!-- y gridlines -->
+        <line x1="24" y1="60" x2="148" y2="60" stroke="#222840" stroke-width=".75" stroke-dasharray="3,3"/>
+        <line x1="24" y1="20" x2="148" y2="20" stroke="#222840" stroke-width=".75" stroke-dasharray="3,3"/>
+        <!-- straight line: Speed×5, 0→0%, 8→40% -->
+        <!-- mapped: x: 24 + pts*(124/8), y: 100 - pct*(80/100) -->
+        <!-- points: (0,0%),(2,10%),(4,20%),(6,30%),(8,40%) -->
+        <polyline
+          points="24,100 56,92 88,84 120,76 148,68"
+          fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- dots -->
+        <circle cx="56" cy="92" r="3" fill="#00E5FF"/>
+        <circle cx="88" cy="84" r="3" fill="#00E5FF"/>
+        <circle cx="148" cy="68" r="3" fill="#00E5FF"/>
+      </svg>
+      <div style="font-size:.72rem; color:var(--slate);">motorPower = Speed × 5</div>
+    </div>
+
+    <!-- Power chart — curve -->
+    <div class="chart-box">
+      <div class="chart-title" style="color:var(--purple);">Power (Quadratic)</div>
+      <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-label="Quadratic power chart — curved line that steepens">
+        <!-- axes -->
+        <line x1="24" y1="100" x2="148" y2="100" stroke="#222840" stroke-width="1.5"/>
+        <line x1="24" y1="100" x2="24" y2="8"   stroke="#222840" stroke-width="1.5"/>
+        <!-- axis labels -->
+        <text x="24" y="112" font-size="8" fill="#8899AA" text-anchor="middle">0</text>
+        <text x="56" y="112" font-size="8" fill="#8899AA" text-anchor="middle">2</text>
+        <text x="88" y="112" font-size="8" fill="#8899AA" text-anchor="middle">4</text>
+        <text x="120" y="112" font-size="8" fill="#8899AA" text-anchor="middle">6</text>
+        <text x="148" y="112" font-size="8" fill="#8899AA" text-anchor="middle">8</text>
+        <text x="12" y="100" font-size="8" fill="#8899AA" text-anchor="middle">0%</text>
+        <text x="12" y="60"  font-size="8" fill="#8899AA" text-anchor="middle">50%</text>
+        <text x="12" y="16"  font-size="8" fill="#8899AA" text-anchor="middle">100%</text>
+        <!-- y gridlines -->
+        <line x1="24" y1="60" x2="148" y2="60" stroke="#222840" stroke-width=".75" stroke-dasharray="3,3"/>
+        <line x1="24" y1="20" x2="148" y2="20" stroke="#222840" stroke-width=".75" stroke-dasharray="3,3"/>
+        <!-- curve: Power² mapped to 0-100%
+             pts 0→0%, 1→1%, 2→4%, 3→9%, 4→16%, 5→25%, 6→36%, 7→49%, 8→64%
+             x = 24 + pts*(124/8) = 24 + pts*15.5
+             y = 100 - pct*(80/100) = 100 - pct*0.8 -->
+        <path d="M24,100 C40,99 56,96.8 71.5,92.8 S103.5,84 119,87.2 S141,79.2 148,48.8"
+              fill="none" stroke="#9B8AFF" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- better: use polyline with real computed points -->
+        <!-- pts: 0→(24,100), 1→(39.5,99.2), 2→(55,96.8), 3→(70.5,92.8), 4→(86,87.2), 5→(101.5,80), 6→(117,71.2), 7→(132.5,60.8), 8→(148,48.8) -->
+        <polyline
+          points="24,100 39.5,99.2 55,96.8 70.5,92.8 86,87.2 101.5,80 117,71.2 132.5,60.8 148,48.8"
+          fill="none" stroke="#9B8AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- key dots -->
+        <circle cx="55"  cy="96.8" r="3" fill="#9B8AFF"/>
+        <circle cx="86"  cy="87.2" r="3" fill="#9B8AFF"/>
+        <circle cx="148" cy="48.8" r="3" fill="#9B8AFF"/>
+      </svg>
+      <div style="font-size:.72rem; color:var(--slate);">chargeSpeed = Power²</div>
+    </div>
+  </div>
+
+  <div class="callout purple">
+    <p><strong>Linear</strong> means equal steps → equal jumps (straight line). <strong>Quadratic</strong> means equal steps → bigger and bigger jumps (curve that steepens). Both formulas use the same stat points, but the shapes are completely different.</p>
+  </div>
+
+  <!-- Interactive explorer -->
+  <div class="card">
+    <div class="label">Try it yourself</div>
+    <p style="font-size:.9rem; color:#C8CDD8; margin-bottom:.75rem; line-height:1.65;">Enter any Power value from 1 to 8 and see both results instantly.</p>
+    <div class="calc-row">
+      <label style="font-size:.875rem; font-weight:500; color:#C8CDD8;">Power =</label>
+      <input class="field-input" id="explore-power" type="number" min="1" max="8" placeholder="1–8" style="width:80px;" oninput="exploreCalc()" />
+    </div>
+    <div id="explore-result" style="display:none; margin-top:1rem; animation: fadeUp .25s ease both;">
+      <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+        <div style="background:var(--navy3); border:1px solid var(--card-border); border-radius:7px; padding:.75rem 1.25rem; flex:1; min-width:140px;">
+          <div style="font-size:.6875rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:.3rem;">chargeSpeed (Power²)</div>
+          <div class="calc-result" id="explore-power-out" style="color:var(--purple);">—</div>
+        </div>
+        <div style="background:var(--navy3); border:1px solid var(--card-border); border-radius:7px; padding:.75rem 1.25rem; flex:1; min-width:140px;">
+          <div style="font-size:.6875rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:.3rem;">motorPower (Speed×5, same pts)</div>
+          <div class="calc-result" id="explore-speed-out" style="color:var(--cyan);">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow-through -->
+  <div class="card">
+    <div class="label">Bonus formula — Follow-through</div>
+    <div class="formula-board" style="margin-bottom:1rem;">
+      <div class="formula-text" style="font-size:1.25rem;">Follow-through = Power × 200 ms</div>
+      <div class="formula-sub-text">How long the bot applies its charge force after impact</div>
+    </div>
+    <p style="font-size:.9rem; color:#C8CDD8; line-height:1.65; margin-bottom:.75rem;">
+      More Power points = longer follow-through. This one <em>is</em> linear — each point adds exactly 200 ms.
+    </p>
+    <div class="calc-row">
+      <label style="font-size:.875rem; font-weight:500; color:#C8CDD8;">Power =</label>
+      <input class="field-input" id="ft-power" type="number" min="1" max="20" placeholder="any" style="width:80px;" oninput="ftCalc()" />
+    </div>
+    <div id="ft-result" style="display:none; margin-top:.75rem; animation: fadeUp .25s ease both;">
+      <div style="background:var(--navy3); border:1px solid var(--card-border); border-radius:7px; padding:.75rem 1.25rem; display:inline-block; min-width:180px;">
+        <div style="font-size:.6875rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:.3rem;">Follow-through</div>
+        <div class="calc-result" id="ft-out" style="color:var(--green);">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btn-row">
+    <button class="btn btn-ghost" onclick="showSection(1)">← Back</button>
+    <button class="btn btn-primary" onclick="showSection(3)">Next: Your Stat Card →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4 — Stat Card
+════════════════════════════════════════════ -->
+<section class="section" id="sec-3">
+  <h2 class="section-heading">Lock in your Power allocation.</h2>
+  <p class="section-sub">
+    You've seen what Power does — quadratic growth on charge, linear follow-through. Pick a number now
+    from whatever remains of your 20-point budget. This is binding for Week 1.
+  </p>
+
+  <div class="card" id="sec4-main">
+    <!-- Stat card visual -->
+    <div class="stat-card-visual">
+      <div class="scv-title">Stat Card · Week 1</div>
+      <div class="scv-row">
+        <div class="scv-name locked-row">Speed</div>
+        <div class="scv-pts" id="sc-speed-pts">—</div>
+        <div class="scv-sub" id="sc-speed-sub">Day 1</div>
+        <div class="scv-tag prior-locked" id="sc-speed-tag" style="display:none;">Locked</div>
+      </div>
+      <div class="scv-row">
+        <div class="scv-name locked-row">Endurance</div>
+        <div class="scv-pts" id="sc-endurance-pts">—</div>
+        <div class="scv-sub" id="sc-endurance-sub">Day 2</div>
+        <div class="scv-tag prior-locked" id="sc-endurance-tag" style="display:none;">Locked</div>
+      </div>
+      <div class="scv-row">
+        <div class="scv-name locked-row">Turning</div>
+        <div class="scv-pts" id="sc-turning-pts">—</div>
+        <div class="scv-sub" id="sc-turning-sub">Day 3</div>
+        <div class="scv-tag prior-locked" id="sc-turning-tag" style="display:none;">Locked</div>
+      </div>
+      <div class="scv-row">
+        <div class="scv-name active">Power</div>
+        <div class="scv-pts" id="sc-power-pts">—</div>
+        <div class="scv-sub" id="sc-power-sub"></div>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <div class="lock-slider-wrap">
+      <div class="lock-slider-row">
+        <label>Power points</label>
+        <div>
+          <span class="lock-slider-val" id="lock-slider-val">3</span>
+          <span id="lock-derived-display" style="font-size:.875rem;color:var(--slate);margin-left:.25rem;">charge 9 · follow 600ms</span>
+        </div>
+      </div>
+      <input type="range" id="lock-slider" min="1" max="17" value="3" oninput="onLockSliderChange()" />
+      <div class="lock-slider-labels">
+        <span id="lock-slider-min-lbl">1 pt</span>
+        <span id="lock-slider-max-lbl">17 pts</span>
+      </div>
+    </div>
+
+    <!-- Budget bar -->
+    <div class="lock-budget-wrap">
+      <div class="lock-budget-label" id="budget-label">Using 3 of your 20-point budget</div>
+      <div class="lock-budget-track">
+        <div class="lock-budget-fill prior" id="budget-fill-prior" style="width:0%"></div>
+        <div class="lock-budget-fill" id="budget-fill" style="width:15%"></div>
+      </div>
+      <div class="lock-budget-note ok" id="budget-note">Pick the Power points you want to allocate.</div>
+    </div>
+
+    <!-- Name input -->
+    <div style="margin-top:1.5rem;margin-bottom:1rem;">
+      <label for="student-name" style="display:block;font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Your name</label>
+      <input type="text" id="student-name" class="lock-name-input" placeholder="First name, last initial — e.g. Alex M." oninput="onNameInput()" autocomplete="off" />
+    </div>
+
+    <div>
+      <button class="btn-lock" id="lock-btn" onclick="openLockModal()" disabled>
+        🔒 Lock in Power allocation
+      </button>
+    </div>
+  </div>
+
+  <!-- Locked state (shown after commit) -->
+  <div class="card" id="sec4-locked" style="display:none;">
+    <div class="lock-notice" id="lock-notice" style="display:none;"></div>
+    <div class="locked-display">
+      <div class="lock-icon">🔒</div>
+      <h3>Power locked for Week 1</h3>
+      <div class="locked-stat-chip">
+        <span class="pts" id="locked-pts">—</span>
+        <span class="label" id="locked-sub">pts · charge — · follow —ms</span>
+      </div>
+      <p id="locked-message"></p>
+    </div>
+  </div>
+
+  <div class="nav-btn-row">
+    <button class="btn btn-ghost" onclick="showSection(2)">← Back</button>
+  </div>
+</section>
+
+<!-- Lock confirmation modal -->
+<div class="modal-overlay" id="lock-modal">
+  <div class="modal-box">
+    <h2>Lock in your Power?</h2>
+    <p>Individual allocations are one-way for Week 1. The team picks a fresh loadout on Friday.</p>
+    <div class="modal-val" id="modal-val">—</div>
+    <div class="modal-sub" id="modal-sub">points · charge — · follow —ms</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeLockModal()">Not yet</button>
+      <button class="btn-lock" onclick="confirmLock()">🔒 Lock it in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════ -->
+<script>
+/* ──────────────────────────────────────────
+   Storage endpoint
+   Paste the Google Apps Script web-app URL below after deploying (shared
+   across lessons, same sheet). Empty string = skip remote save; lesson
+   still works via localStorage only.
+───────────────────────────────────────────*/
+const SAVE_ENDPOINT = '';
+
+/* ──────────────────────────────────────────
+   State
+───────────────────────────────────────────*/
+const state = {
+  correct: [false, false, false, false],    // calc rows answered correctly
+  ratioA: false,
+  ratioB: false,
+  doubled: false,
+  speedDrop: false,
+  powerDrop: false,
+  section1Done: false,
+  section2Done: false,
+};
+
+/* Power values and answers */
+const POWERS   = [1, 2, 4, 8];
+const ANSWERS  = [1, 4, 16, 64];   // Power²
+const SPEEDS   = ['1%', '4%', '16%', '64%'];
+
+/* ──────────────────────────────────────────
+   Section nav
+───────────────────────────────────────────*/
+function showSection(idx) {
+  document.querySelectorAll('.section').forEach((s, i) => s.classList.toggle('active', i === idx));
+  document.querySelectorAll('.section-nav button').forEach((b, i) => b.classList.toggle('active', i === idx));
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function unlockTab(idx) {
+  const btns = document.querySelectorAll('.section-nav button');
+  btns[idx].classList.remove('locked');
+}
+
+function updateProgress() {
+  const activeIdx = [...document.querySelectorAll('.section')].findIndex(s => s.classList.contains('active'));
+  const pct = Math.round(((activeIdx) / 3) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+/* ──────────────────────────────────────────
+   Section 1 — validate calculation table
+───────────────────────────────────────────*/
+/* Work-input hints (branching) */
+function workHint(idx, val) {
+  const p = POWERS[idx];
+  const v = val.trim().toLowerCase();
+  const hintEl = document.getElementById('hint-work-' + idx);
+  if (!v) { hintEl.textContent = ''; hintEl.className = 'hint-msg'; return; }
+
+  // Detect common patterns
+  if (v.includes('×') || v.includes('x') || v.includes('*')) {
+    const goodPattern = new RegExp(`${p}\\s*[×x\\*]\\s*${p}`);
+    if (goodPattern.test(v)) {
+      hintEl.textContent = 'Good notation! Now what does that equal?';
+      hintEl.className = 'hint-msg hint-correct';
+    } else {
+      hintEl.textContent = `The formula is ${p}² — try writing ${p} × ${p}`;
+      hintEl.className = 'hint-msg hint-wrong';
+    }
+  } else {
+    hintEl.textContent = 'Show how you multiply — write it as ' + p + ' × ' + p;
+    hintEl.className = 'hint-msg hint-wrong';
+  }
+}
+
+/* Answer-input hints (branching) */
+function ansHint(idx, val) {
+  const p = POWERS[idx];
+  const correct = ANSWERS[idx];
+  const v = parseFloat(val.trim());
+  const hintEl = document.getElementById('hint-ans-' + idx);
+
+  if (val.trim() === '') { hintEl.textContent = ''; hintEl.className = 'hint-msg'; return; }
+
+  if (v === correct) {
+    hintEl.textContent = '✓ Correct! ' + p + '² = ' + correct;
+    hintEl.className = 'hint-msg hint-correct';
+    markRowCorrect(idx);
+  } else {
+    // Branching wrong-answer hints
+    let hint = '';
+    if (v === p * 2) {
+      hint = `That's ${p}×2, but the formula says ${p}² — what's ${p}×${p}?`;
+    } else if (v === p + p) {
+      hint = `You added — the formula squares it. What is ${p} × ${p}?`;
+    } else if (idx === 1 && v === 4 && p === 2) {
+      hint = 'Good work! Now what does that mean as a %? (Hint: 4% = 4)';
+    } else {
+      hint = `Not quite. Remember: ${p}² means ${p} × ${p}. Try again.`;
+    }
+    hintEl.textContent = hint;
+    hintEl.className = 'hint-msg hint-wrong';
+    document.getElementById('ans-' + idx).classList.add('wrong');
+    document.getElementById('ans-' + idx).classList.remove('correct');
+  }
+}
+
+function markRowCorrect(idx) {
+  state.correct[idx] = true;
+  const el = document.getElementById('ans-' + idx);
+  el.classList.remove('wrong');
+  el.classList.add('correct');
+
+  // Show charge speed in table
+  document.getElementById('speed-' + idx).textContent = SPEEDS[idx];
+  document.getElementById('speed-' + idx).style.color = 'var(--green)';
+
+  checkAllCalcCorrect();
+}
+
+function checkAllCalcCorrect() {
+  if (state.correct.every(Boolean)) {
+    document.getElementById('ratio-prompt').classList.add('visible');
+  }
+}
+
+/* Wire up calc table inputs */
+function wireCalcTable() {
+  for (let i = 0; i < 4; i++) {
+    const workEl = document.getElementById('work-' + i);
+    const ansEl  = document.getElementById('ans-' + i);
+
+    workEl.addEventListener('blur',  () => workHint(i, workEl.value));
+    workEl.addEventListener('keyup', e => { if (e.key === 'Enter') ansEl.focus(); });
+
+    ansEl.addEventListener('blur',  () => ansHint(i, ansEl.value));
+    ansEl.addEventListener('keyup', e => {
+      if (e.key === 'Enter') {
+        ansHint(i, ansEl.value);
+        if (i < 3 && !state.correct[i]) document.getElementById('work-' + (i+1)).focus();
+      }
+    });
+  }
+}
+
+/* ──────────────────────────────────────────
+   Section 1 — Ratio prompt
+───────────────────────────────────────────*/
+function wireRatioInputs() {
+  const raEl = document.getElementById('ratio-a');
+  const rbEl = document.getElementById('ratio-b');
+
+  raEl.addEventListener('blur', () => checkRatio('a'));
+  raEl.addEventListener('keyup', e => { if (e.key === 'Enter') checkRatio('a'); });
+  rbEl.addEventListener('blur', () => checkRatio('b'));
+  rbEl.addEventListener('keyup', e => { if (e.key === 'Enter') checkRatio('b'); });
+}
+
+function checkRatio(which) {
+  const el = document.getElementById('ratio-' + which);
+  const hintEl = document.getElementById('hint-ratio-' + which);
+  const v = parseFloat(el.value.trim());
+
+  if (v === 4) {
+    el.classList.add('correct'); el.classList.remove('wrong');
+    hintEl.textContent = '✓ Correct! 1:4 — charge speed went up 4×';
+    hintEl.className = 'hint-msg hint-correct';
+    if (which === 'a') state.ratioA = true;
+    else state.ratioB = true;
+    checkBothRatios();
+  } else if (!isNaN(v)) {
+    el.classList.add('wrong'); el.classList.remove('correct');
+    hintEl.textContent = which === 'a'
+      ? 'The values are 4% and 16%. What do you multiply 4 by to get 16?'
+      : 'The values are 16% and 64%. What do you multiply 16 by to get 64?';
+    hintEl.className = 'hint-msg hint-wrong';
+  }
+}
+
+function checkBothRatios() {
+  if (state.ratioA && state.ratioB) {
+    document.getElementById('double-q').style.display = 'block';
+  }
+}
+
+function pickDouble(btn, val) {
+  const hintEl = document.getElementById('hint-double');
+  document.querySelectorAll('#pick-double .pick-btn').forEach(b => {
+    b.classList.remove('selected-correct', 'selected-wrong');
+  });
+  if (val === 'quadrupled') {
+    btn.classList.add('selected-correct');
+    hintEl.textContent = '✓ Exactly — doubling the points quadruples the output!';
+    hintEl.className = 'hint-msg hint-correct';
+    state.doubled = true;
+    finishSection1();
+  } else {
+    btn.classList.add('selected-wrong');
+    hintEl.textContent = val === 'doubled'
+      ? 'Check your ratios — 4% went to 16%, not 8%. What multiple is that?'
+      : 'Look at the numbers — 4% to 16% is definitely a change. What factor?';
+    hintEl.className = 'hint-msg hint-wrong';
+  }
+}
+
+function finishSection1() {
+  state.section1Done = true;
+  document.getElementById('s1-complete').style.display = 'flex';
+  document.getElementById('s1-next').classList.remove('locked');
+  unlockTab(1);
+  document.getElementById('progress-bar').style.width = '33%';
+}
+
+/* ──────────────────────────────────────────
+   Section 2 — Compare dropdowns
+───────────────────────────────────────────*/
+function checkSpeedDrop() {
+  const el = document.getElementById('q-speed-drop');
+  const hintEl = document.getElementById('hint-speed-drop');
+  const val = el.value;
+  if (val === 'doubled') {
+    el.classList.add('correct'); el.classList.remove('wrong');
+    hintEl.textContent = '✓ Right — Speed is linear. 2→4 pts doubles motorPower from 10% to 20%.';
+    hintEl.className = 'hint-msg hint-correct';
+    state.speedDrop = true;
+    checkSection2();
+  } else if (val) {
+    el.classList.add('wrong'); el.classList.remove('correct');
+    hintEl.textContent = val === 'quadrupled'
+      ? 'Look at the table — 10% went to 20%. That\'s a 2× increase, not 4×.'
+      : 'Compare 10% and 20% in the table — what happened to that number?';
+    hintEl.className = 'hint-msg hint-wrong';
+  }
+}
+
+function checkPowerDrop() {
+  const el = document.getElementById('q-power-drop');
+  const hintEl = document.getElementById('hint-power-drop');
+  const val = el.value;
+  if (val === 'quadrupled') {
+    el.classList.add('correct'); el.classList.remove('wrong');
+    hintEl.textContent = '✓ Correct — Power is different. 4% → 16% is 4× the output!';
+    hintEl.className = 'hint-msg hint-correct';
+    state.powerDrop = true;
+    checkSection2();
+  } else if (val) {
+    el.classList.add('wrong'); el.classList.remove('correct');
+    hintEl.textContent = val === 'doubled'
+      ? 'Check the table — 4% went to 16%. Is 16 double or quadruple 4?'
+      : 'Look at 4% and 16% in the table. That\'s definitely not the same — what changed?';
+    hintEl.className = 'hint-msg hint-wrong';
+  }
+}
+
+function checkSection2() {
+  if (state.speedDrop && state.powerDrop) {
+    state.section2Done = true;
+    document.getElementById('s2-complete').style.display = 'flex';
+    document.getElementById('s2-next').classList.remove('locked');
+    unlockTab(2);
+    unlockTab(3); // unlock Reveal and Stat Card both
+    document.getElementById('progress-bar').style.width = '66%';
+  }
+}
+
+/* ──────────────────────────────────────────
+   Section 3 — Interactive calculators
+───────────────────────────────────────────*/
+function exploreCalc() {
+  const inp = document.getElementById('explore-power');
+  const resDiv = document.getElementById('explore-result');
+  const powerOut = document.getElementById('explore-power-out');
+  const speedOut = document.getElementById('explore-speed-out');
+  const v = parseFloat(inp.value);
+
+  if (isNaN(v) || v < 1 || v > 8) {
+    resDiv.style.display = 'none';
+    return;
+  }
+  resDiv.style.display = 'block';
+  powerOut.textContent = Math.round(v * v) + '%';
+  speedOut.textContent = Math.round(v * 5) + '%';
+}
+
+function ftCalc() {
+  const inp = document.getElementById('ft-power');
+  const resDiv = document.getElementById('ft-result');
+  const out = document.getElementById('ft-out');
+  const v = parseFloat(inp.value);
+
+  if (isNaN(v) || v <= 0) {
+    resDiv.style.display = 'none';
+    return;
+  }
+  resDiv.style.display = 'block';
+  out.textContent = Math.round(v * 200) + ' ms';
+}
+
+/* ──────────────────────────────────────────
+   Section 4 — Lock In Power (mirrors speed-stat / endurance-stat)
+───────────────────────────────────────────*/
+function getPriorStat(key) {
+  const v = parseInt(localStorage.getItem('va_' + key + '_locked'));
+  return isNaN(v) ? null : v;
+}
+
+function initLockSection() {
+  const speed     = getPriorStat('speed');
+  const endurance = getPriorStat('endurance');
+  const turning   = getPriorStat('turning');
+
+  function fillRow(prefix, pts, subWhenLocked) {
+    const ptsEl = document.getElementById('sc-' + prefix + '-pts');
+    const subEl = document.getElementById('sc-' + prefix + '-sub');
+    const tagEl = document.getElementById('sc-' + prefix + '-tag');
+    if (pts !== null) {
+      ptsEl.textContent = pts;
+      ptsEl.style.color = 'var(--green)';
+      subEl.textContent = subWhenLocked;
+      if (tagEl) tagEl.style.display = 'inline-block';
+    } else {
+      ptsEl.textContent = '?';
+      ptsEl.style.color = 'var(--slate)';
+    }
+  }
+
+  fillRow('speed',     speed,     speed === null     ? 'Day 1' : (speed * 5) + '% motor power');
+  fillRow('endurance', endurance, endurance === null ? 'Day 2' : 'decay ' + ((20 - endurance) * 1.5).toFixed(1) + '/min');
+  fillRow('turning',   turning,   turning === null   ? 'Day 3' : 'arc ' + turning + ' · ratio ' + (0.2 + turning * 0.02).toFixed(2));
+
+  // Slider max: 20 − (locked sum) − (unlocked prior count × 1 reserved).
+  // Clamped to at least 1 so the slider always has a valid range.
+  const lockedSum = (speed || 0) + (endurance || 0) + (turning || 0);
+  const unlockedCount = (speed === null ? 1 : 0) + (endurance === null ? 1 : 0) + (turning === null ? 1 : 0);
+  const maxP = Math.max(1, 20 - lockedSum - unlockedCount);
+  const slider = document.getElementById('lock-slider');
+  slider.max = maxP;
+  if (parseInt(slider.value) > maxP) slider.value = maxP;
+  document.getElementById('lock-slider-max-lbl').textContent = maxP + ' pts';
+
+  // Prefill name if saved by a prior lesson
+  const savedName = localStorage.getItem('va_student_name');
+  const nameInput = document.getElementById('student-name');
+  if (savedName && nameInput) { nameInput.value = savedName; onNameInput(); }
+
+  onLockSliderChange();
+}
+
+function onLockSliderChange() {
+  const pts           = parseInt(document.getElementById('lock-slider').value);
+  const charge        = pts * pts;
+  const followThrough = pts * 200;
+  const lockedSum     = (getPriorStat('speed') || 0) + (getPriorStat('endurance') || 0) + (getPriorStat('turning') || 0);
+  const totalUsed     = lockedSum + pts;
+  const remaining     = 20 - totalUsed;
+
+  document.getElementById('lock-slider-val').textContent = pts;
+  document.getElementById('lock-derived-display').textContent =
+    'charge ' + charge + ' · follow ' + followThrough + 'ms';
+  document.getElementById('sc-power-pts').textContent = pts;
+  document.getElementById('sc-power-sub').textContent =
+    'charge ' + charge + ' · follow ' + followThrough + 'ms';
+
+  // Budget bar: green prior + cyan current
+  document.getElementById('budget-fill-prior').style.width = (lockedSum / 20 * 100) + '%';
+  document.getElementById('budget-fill').style.width       = (pts       / 20 * 100) + '%';
+  document.getElementById('budget-label').textContent      = 'Using ' + totalUsed + ' of your 20-point budget';
+
+  const note = document.getElementById('budget-note');
+  if (remaining < 0) {
+    note.textContent = 'Over budget by ' + Math.abs(remaining) + ' pts. Lower Power or recheck prior stats.';
+    note.className = 'lock-budget-note over';
+  } else if (remaining === 0) {
+    note.textContent = 'Exactly 20 — budget fully committed.';
+    note.className = 'lock-budget-note ok';
+  } else {
+    note.textContent = remaining + ' pt' + (remaining === 1 ? '' : 's') + ' unused. Power is the last stat — any remainder just stays unallocated.';
+    note.className = 'lock-budget-note warning';
+  }
+}
+
+function onNameInput() {
+  const name = document.getElementById('student-name').value.trim();
+  document.getElementById('lock-btn').disabled = name.length < 1;
+}
+
+function openLockModal() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  document.getElementById('modal-val').textContent = pts;
+  document.getElementById('modal-sub').textContent =
+    'points · charge ' + (pts * pts) + ' · follow ' + (pts * 200) + 'ms';
+  document.getElementById('lock-modal').classList.add('open');
+}
+
+function closeLockModal() {
+  document.getElementById('lock-modal').classList.remove('open');
+}
+
+async function confirmLock() {
+  const pts  = parseInt(document.getElementById('lock-slider').value);
+  const name = document.getElementById('student-name').value.trim();
+  closeLockModal();
+  localStorage.setItem('va_student_name', name);
+
+  let lockedPts = pts;
+
+  // No Content-Type header → simple CORS request (Apps Script can't respond
+  // to OPTIONS preflight, so any application/json would fail silently).
+  if (SAVE_ENDPOINT) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          site: localStorage.getItem('va_selected_site') || '',
+          stat: 'power',
+          points: pts,
+          charge: pts * pts,
+          followThrough: pts * 200,
+          lesson: 'power',
+          ts: new Date().toISOString(),
+        }),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.ok === false && result.error === 'already_locked') {
+        const existing = Number(result.existing);
+        if (!isNaN(existing)) {
+          lockedPts = existing;
+          showAlreadyLockedNotice(name, existing);
+        }
+      }
+    } catch (_e) {
+      // Network failure — proceed with the student's pick; facilitator reconciles.
+    }
+  }
+
+  localStorage.setItem('va_power_locked', lockedPts);
+  showLockedState(lockedPts);
+}
+
+function showAlreadyLockedNotice(name, existing) {
+  const el = document.getElementById('lock-notice');
+  if (!el) return;
+  el.innerHTML =
+    '<strong>Already locked.</strong> ' +
+    name + '’s Power was set to <strong>' + existing + ' pts (charge ' + (existing * existing) + ', follow ' + (existing * 200) + 'ms)</strong> ' +
+    'earlier this week. Week 1 individual allocations are one-way — you’re seeing your actual commitment now.';
+  el.style.display = 'block';
+}
+
+function showLockedState(pts) {
+  document.getElementById('sec4-main').style.display = 'none';
+  document.getElementById('sec4-locked').style.display = 'block';
+  document.getElementById('locked-pts').textContent = pts;
+  document.getElementById('locked-sub').textContent =
+    'pts · charge ' + (pts * pts) + ' · follow ' + (pts * 200) + 'ms';
+
+  let msg = '';
+  if (pts <= 2)      msg = 'Very light on charge. You saved budget for other stats — expect short bursts only.';
+  else if (pts <= 4) msg = 'Moderate charge. Balanced against the other stats.';
+  else if (pts <= 7) msg = 'Strong charge — the quadratic growth really shows here.';
+  else               msg = 'Max charge build. Power² is doing a LOT of work.';
+  document.getElementById('locked-message').textContent = msg;
+
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+/* ──────────────────────────────────────────
+   Init
+───────────────────────────────────────────*/
+document.addEventListener('DOMContentLoaded', () => {
+  wireCalcTable();
+  wireRatioInputs();
+  initLockSection();
+  updateProgress();
+});
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>
