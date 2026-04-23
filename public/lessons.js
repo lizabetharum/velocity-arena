@@ -8,6 +8,7 @@
 // here with the activity's exact name from days.js as the key.
 const ACTIVITY_LESSONS = {
   'Speed Stat Challenge: What Does Motor Power Actually Mean?': '/lessons/speed-stat.html',
+  'First Bot Drive: Speed in Real Life': '/lessons/first-bot-drive.html',
   'Endurance Stat Challenge: Drawing the Decay': '/lessons/endurance-stat.html',
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power.html',
