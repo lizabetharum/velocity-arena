@@ -18,8 +18,8 @@ const ACTIVITY_LESSONS = {
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power.html',
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Official Stat Allocation: Interleaved Problem Set': [
-    { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
-    { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
+    { url: '/lessons/problem-set.html',      label: 'Problem set' },
+    { url: '/lessons/prove-your-build.html', label: 'Prove your build' },
   ],
 };
 
