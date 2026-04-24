@@ -19,6 +19,7 @@ const ACTIVITY_LESSONS = {
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
+    { url: '/lessons/p-squared-lab.html',           label: 'P² Lab' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
   ],
 };
