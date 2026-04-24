@@ -388,7 +388,7 @@ const DAYS = [
         "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
-        "name": "Official Stat Allocation: Interleaved Problem Set",
+        "name": "Interleaved Problem Set + Official Stat Allocation",
         "mins": 50,
         "block": "Challenge Block",
         "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool.",

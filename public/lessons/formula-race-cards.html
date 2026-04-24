@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formula Race — Print Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ─── PRINT SETUP ──────────────────────────────────── */
+@page { size: letter portrait; margin: 0.45in; }
+@media print {
+  .no-print { display: none !important; }
+  .page-break { page-break-after: always; break-after: page; }
+  body { background: white; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+
+/* ─── BASE ─────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f0f2f5; color: #111; }
+
+/* ─── SCREEN HEADER ────────────────────────────────── */
+.screen-header {
+  background: #0d1b2a; color: white; padding: 20px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.screen-header h1 { font-size: 18px; font-weight: 800; }
+.screen-header p { font-size: 12px; color: #7a9cc0; margin-top: 2px; }
+.print-all-btn {
+  background: #ffd600; color: #0d1b2a;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
+  border: none; border-radius: 10px; padding: 10px 24px; cursor: pointer;
+}
+.print-all-btn:hover { background: #ffe033; }
+
+.instructions-bar {
+  max-width: 900px; margin: 20px auto; padding: 0 20px;
+  background: white; border-radius: 12px; border-left: 4px solid #ffd600;
+  padding: 14px 20px; font-size: 13px; color: #444; line-height: 1.6;
+}
+.instructions-bar strong { color: #0d1b2a; }
+.instructions-bar .steps { margin-top: 8px; padding-left: 20px; }
+.instructions-bar .steps li { margin-bottom: 3px; }
+
+/* ─── SECTION DIVIDERS (screen only) ──────────────── */
+.section-divider {
+  max-width: 900px; margin: 28px auto 12px; padding: 0 20px;
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: #666;
+  border-bottom: 2px solid #ddd; padding-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-divider span { font-weight: 400; color: #999; font-size: 10px; letter-spacing: 0; }
+
+/* ─── CARDS GRID ───────────────────────────────────── */
+.cards-page {
+  max-width: 900px; margin: 0 auto; padding: 0 20px 20px;
+}
+.cards-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+
+/* ─── CARD FRONT ───────────────────────────────────── */
+.card-front {
+  border-radius: 14px; overflow: hidden;
+  border: 2px solid #ddd; background: white;
+  display: flex; flex-direction: column;
+  page-break-inside: avoid; break-inside: avoid;
+  min-height: 280px;
+}
+
+.card-header {
+  padding: 13px 15px 12px; flex-shrink: 0;
+}
+.card-header-row1 {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.card-icon-name {
+  display: flex; align-items: center; gap: 8px;
+}
+.card-icon { font-size: 20px; line-height: 1; }
+.card-botname {
+  font-size: 17px; font-weight: 900; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.card-num {
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  opacity: 0.65; flex-shrink: 0;
+}
+.card-tagline {
+  font-size: 11px; font-style: italic;
+  opacity: 0.75; line-height: 1.3;
+}
+
+.card-body {
+  background: white; padding: 12px 15px 14px;
+  flex: 1; display: flex; flex-direction: column; gap: 9px;
+}
+
+.stat-chip {
+  display: inline-block;
+  background: #f5f7fb; border-radius: 6px;
+  padding: 5px 10px; font-size: 11px; font-weight: 700; color: #333;
+  border-left: 3px solid var(--chip-color, #ccc);
+}
+
+.card-question {
+  font-size: 12.5px; font-weight: 600; color: #111; line-height: 1.45;
+}
+
+.work-section {
+  flex: 1; display: flex; flex-direction: column; gap: 0;
+  border-top: 1.5px solid #f0f0f0; padding-top: 8px;
+}
+.work-label {
+  font-size: 9px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #bbb; margin-bottom: 5px;
+}
+.work-lines { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.work-line { border-bottom: 1px solid #e8e8e8; height: 19px; }
+
+.answer-field {
+  margin-top: 6px; background: #f9f9f9;
+  border: 1.5px solid #e0e0e0; border-radius: 7px;
+  padding: 7px 10px; font-size: 11.5px; font-weight: 700; color: #555;
+}
+
+/* ─── CARD BACK ────────────────────────────────────── */
+.card-back {
+  border-radius: 14px; overflow: hidden;
+  background: #0d1b2a;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  min-height: 280px;
+  page-break-inside: avoid; break-inside: avoid;
+  border: 2px solid #0d1b2a;
+}
+.back-top {
+  text-align: center; width: 100%;
+}
+.back-logo {
+  font-size: 9px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase; color: #ffd600; margin-bottom: 6px;
+}
+.back-title {
+  font-size: 20px; font-weight: 900; color: white; letter-spacing: 1px;
+  text-transform: uppercase; line-height: 1.1;
+}
+.back-subtitle {
+  font-size: 11px; color: #7a9cc0; margin-top: 3px; letter-spacing: 0.5px;
+}
+.back-divider {
+  width: 40px; height: 2px; background: #2a4060; margin: 10px auto;
+}
+.back-card-num {
+  font-size: 40px; font-weight: 900; color: #2a4060; text-align: center;
+}
+
+.back-formula-section {
+  width: 100%; background: #132033; border-radius: 8px;
+  padding: 8px 12px; margin: 8px 0;
+}
+.back-formula-label {
+  font-size: 8px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #7a9cc0; margin-bottom: 3px;
+}
+.back-formula-type {
+  font-size: 13px; font-weight: 800; color: white;
+}
+.back-answer-section {
+  width: 100%; background: #132033; border-radius: 8px; padding: 8px 12px;
+}
+.back-answer-label {
+  font-size: 8px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #7a9cc0; margin-bottom: 3px;
+}
+.back-answer-key {
+  font-size: 11px; font-weight: 700; color: #ffd600; line-height: 1.4;
+}
+
+/* ─── SORTING LABELS ───────────────────────────────── */
+.labels-grid {
+  max-width: 900px; margin: 0 auto; padding: 0 20px 40px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+}
+.sort-label {
+  border-radius: 14px; overflow: hidden;
+  page-break-inside: avoid; break-inside: avoid;
+  border: 3px solid;
+}
+.sort-label-header {
+  padding: 16px 18px 12px;
+}
+.sort-label-icon { font-size: 28px; margin-bottom: 6px; }
+.sort-label-name {
+  font-size: 22px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 1px; line-height: 1;
+}
+.sort-label-formula {
+  background: rgba(255,255,255,0.15); border-radius: 6px;
+  padding: 5px 10px; margin-top: 8px;
+  font-size: 12px; font-weight: 700; font-family: monospace;
+}
+.sort-label-body {
+  background: white; padding: 10px 18px 12px;
+}
+.sort-label-desc { font-size: 11px; color: #555; line-height: 1.4; }
+.sort-label-pile {
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #bbb; margin-top: 5px;
+}
+
+/* ─── DUPLEX PAGE LABELS (screen only) ────────────── */
+.page-pair-label {
+  max-width: 900px; margin: 20px auto 6px; padding: 0 20px;
+  font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #999;
+}
+.page-pair-label.back-label { color: #6a3db5; }
+
+/* ─── ANSWER KEY TABLE ─────────────────────────────── */
+.answer-key-page {
+  max-width: 900px; margin: 0 auto; padding: 0 20px 40px;
+}
+.ak-header {
+  background: #0d1b2a; color: white; border-radius: 12px 12px 0 0;
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ak-title { font-size: 15px; font-weight: 800; }
+.ak-sub { font-size: 11px; color: #7a9cc0; }
+.ak-table {
+  width: 100%; border-collapse: collapse;
+  border: 2px solid #ddd; border-top: none;
+  border-radius: 0 0 12px 12px; overflow: hidden;
+}
+.ak-table th {
+  background: #f5f7fb; font-size: 10px; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase; color: #666;
+  padding: 9px 12px; text-align: left; border-bottom: 2px solid #ddd;
+}
+.ak-table td {
+  padding: 8px 12px; font-size: 12px; color: #222;
+  border-bottom: 1px solid #f0f0f0; vertical-align: top;
+}
+.ak-table tr:last-child td { border-bottom: none; }
+.ak-table tr:nth-child(even) td { background: #fafafa; }
+.type-badge {
+  display: inline-block; border-radius: 4px; padding: 2px 7px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  color: white; white-space: nowrap;
+}
+.ak-answer { font-family: monospace; font-size: 11.5px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN HEADER -->
+<div class="screen-header no-print">
+  <div>
+    <h1>Formula Race — Print Kit</h1>
+    <p>Velocity Arena · 20 cards · 6 formula types · All assets included</p>
+  </div>
+  <button class="print-all-btn" onclick="window.print()">🖨 Print All</button>
+</div>
+
+<div class="instructions-bar no-print">
+  <strong>Duplex print — no taping or gluing needed.</strong> Fronts and backs are already paired and column-mirrored so they line up perfectly when flipped.
+  <ol class="steps">
+    <li><strong>Printer settings:</strong> Double-sided · Flip on long edge (standard portrait duplex)</li>
+    <li>Print pages 1–11 · Each front page is immediately followed by its matching back page</li>
+    <li>Cut cards apart · Shuffle · Done — every card front aligns with its back</li>
+    <li>Print page 12 · Cut the 7 sorting labels · Place face-up on table after race</li>
+    <li>Print page 13 · Keep the facilitator answer key at your station</li>
+  </ol>
+  <div style="margin-top:8px; font-size:11px; color:#888">On screen: front and back pages alternate below so you can preview both sides of each sheet.</div>
+</div>
+
+<!-- SECTION: CARDS (interleaved front+back for duplex) -->
+<div class="section-divider no-print">Cards — Fronts &amp; Backs Interleaved for Duplex Printing <span>front + back per sheet · 4 cards each</span></div>
+
+<div id="cards-container"></div>
+
+<!-- SECTION: SORTING LABELS -->
+<div class="section-divider no-print" style="margin-top:40px">Sorting Labels — Print Page 12, cut apart, place on table after race <span>7 labels</span></div>
+
+<div class="labels-grid page-break" id="labels-container"></div>
+
+<!-- SECTION: ANSWER KEY -->
+<div class="section-divider no-print" style="margin-top:40px">Facilitator Answer Key — Print Page 13, keep at your station</div>
+
+<div class="answer-key-page">
+  <div class="ak-header">
+    <div>
+      <div class="ak-title">Formula Race — Facilitator Answer Key</div>
+      <div class="ak-sub">Check student work against this before stamping. Formula type on back of each card.</div>
+    </div>
+  </div>
+  <table class="ak-table" id="ak-table"></table>
+</div>
+
+<script>
+// ─── CARD DATA ───────────────────────────────────────────
+const TYPE_META = {
+  speed:     { label: 'Speed — Motor Power',    color: '#e6a800', bg: '#ffd600', text: '#0d1b2a', badgeBg: '#ffd600', badgeText: '#0d1b2a' },
+  endurance: { label: 'Endurance — Power at t', color: '#007a40', bg: '#00b37d', text: '#ffffff', badgeBg: '#00b37d', badgeText: '#fff' },
+  turn:      { label: 'Turn Ratio',             color: '#007a8e', bg: '#00b8d4', text: '#0d1b2a', badgeBg: '#00b8d4', badgeText: '#0d1b2a' },
+  power:     { label: 'Power — Charge Speed',   color: '#6a3db5', bg: '#9c6fde', text: '#ffffff', badgeBg: '#9c6fde', badgeText: '#fff' },
+  follow:    { label: 'Follow-Through',         color: '#c06500', bg: '#ff9100', text: '#0d1b2a', badgeBg: '#ff9100', badgeText: '#0d1b2a' },
+  budget:    { label: 'Budget Constraint',      color: '#1a5fcc', bg: '#4285f4', text: '#ffffff', badgeBg: '#4285f4', badgeText: '#fff' },
+  scaling:   { label: 'Proportional Scaling',   color: '#c0392b', bg: '#e53935', text: '#ffffff', badgeBg: '#e53935', badgeText: '#fff' },
+};
+
+const CARDS = [
+  {
+    num: '01', type: 'speed', icon: '💨',
+    botName: 'THE BLITZ',
+    tagline: 'Built for the first 10 seconds.',
+    statDisplay: 'Speed = 7',
+    question: 'The Blitz runs Speed = 7. Calculate its motor power percentage.',
+    answerHint: 'Motor Power = _________ %',
+    answerKey: '7 × 5 = 35%',
+  },
+  {
+    num: '02', type: 'endurance', icon: '🛡️',
+    botName: 'MARATHON',
+    tagline: 'The longer it runs, the harder it gets.',
+    statDisplay: 'E = 6 · t = 3 min',
+    question: 'Marathon hits the final minute. E = 6, t = 3. What is its power output?',
+    answerHint: 'P(3) = _________ %',
+    answerKey: '100 − (20−6) × 1.5 × 3 = 100 − 63 = 37%',
+  },
+  {
+    num: '03', type: 'turn', icon: '🔄',
+    botName: 'CORNER CUT',
+    tagline: 'Every corner is an opportunity.',
+    statDisplay: 'Turning = 5',
+    question: 'Corner Cut built for agility: T = 5. Calculate its turn ratio.',
+    answerHint: 'Turn Ratio = _________',
+    answerKey: '0.2 + 5 × 0.02 = 0.2 + 0.10 = 0.30',
+  },
+  {
+    num: '04', type: 'power', icon: '⚡',
+    botName: 'CHARGED UP',
+    tagline: 'Maximum voltage. Maximum damage.',
+    statDisplay: 'Power = 5',
+    question: 'Charged Up carries P = 5. Calculate its charge speed percentage.',
+    answerHint: 'Charge Speed = _________ %',
+    answerKey: '5² = 5 × 5 = 25%',
+  },
+  {
+    num: '05', type: 'follow', icon: '💥',
+    botName: 'FULL SEND',
+    tagline: 'Commits to every hit. No half measures.',
+    statDisplay: 'Power = 6',
+    question: 'Full Send goes all in: P = 6. Calculate its follow-through time in milliseconds.',
+    answerHint: 'Follow-Through = _________ ms',
+    answerKey: '6 × 200 = 1,200 ms',
+  },
+  {
+    num: '06', type: 'endurance', icon: '🛡️',
+    botName: 'IRON WALL',
+    tagline: 'Built to outlast everything on the field.',
+    statDisplay: 'E = 10 · t = 2 min',
+    question: 'Iron Wall built for the long game: E = 10, t = 2. What is its power output?',
+    answerHint: 'P(2) = _________ %',
+    answerKey: '100 − (20−10) × 1.5 × 2 = 100 − 30 = 70%',
+  },
+  {
+    num: '07', type: 'speed', icon: '💨',
+    botName: 'OVERCLOCKED',
+    tagline: 'Someone pushed this bot past its limits.',
+    statDisplay: 'Speed = 12',
+    question: 'Overclocked pushed Speed to 12. Calculate its motor power percentage.',
+    answerHint: 'Motor Power = _________ %',
+    answerKey: '12 × 5 = 60%',
+  },
+  {
+    num: '08', type: 'budget', icon: '📊',
+    botName: 'TEAM STEALTH',
+    tagline: 'Nothing wasted. Every point has a purpose.',
+    statDisplay: 'S = 6 · P = 5 · T = 4 · Budget = 20',
+    question: 'Team Stealth runs S=6, P=5, T=4. Budget = 20. Find Endurance. Confirm the sum equals 20.',
+    answerHint: 'E = _____ · Check: ___+___+___+___ = 20',
+    answerKey: 'E = 20−6−5−4 = 5 · Check: 6+5+4+5 = 20 ✓',
+  },
+  {
+    num: '09', type: 'turn', icon: '🔄',
+    botName: 'THE SPINNER',
+    tagline: 'It doesn\'t just corner — it dominates corners.',
+    statDisplay: 'Turning = 8',
+    question: 'The Spinner lives for tight turns: T = 8. Calculate its turn ratio.',
+    answerHint: 'Turn Ratio = _________',
+    answerKey: '0.2 + 8 × 0.02 = 0.2 + 0.16 = 0.36',
+  },
+  {
+    num: '10', type: 'endurance', icon: '🛡️',
+    botName: 'THE SPRINTER',
+    tagline: 'Fast out of the gate. Fades fast too.',
+    statDisplay: 'E = 4 · t = 1 min',
+    question: 'The Sprinter: E = 4, t = 1. What is its power output at minute 1?',
+    answerHint: 'P(1) = _________ %',
+    answerKey: '100 − (20−4) × 1.5 × 1 = 100 − 24 = 76%',
+  },
+  {
+    num: '11', type: 'power', icon: '⚡',
+    botName: 'VOLTAGE',
+    tagline: 'P squared. The formula that surprises everyone.',
+    statDisplay: 'Power = 8',
+    question: 'Voltage is wired differently: P = 8. Calculate its charge speed percentage.',
+    answerHint: 'Charge Speed = _________ %',
+    answerKey: '8² = 8 × 8 = 64%',
+  },
+  {
+    num: '12', type: 'follow', icon: '💥',
+    botName: 'AFTERBURNER',
+    tagline: 'The hit doesn\'t stop when contact ends.',
+    statDisplay: 'Power = 9',
+    question: 'Afterburner runs P = 9. What is its follow-through time in milliseconds?',
+    answerHint: 'Follow-Through = _________ ms',
+    answerKey: '9 × 200 = 1,800 ms',
+  },
+  {
+    num: '13', type: 'speed', icon: '💨',
+    botName: 'THE TURTLE',
+    tagline: 'Slow and… slow.',
+    statDisplay: 'Speed = 4',
+    question: 'The Turtle crawls with Speed = 4. Calculate its motor power percentage.',
+    answerHint: 'Motor Power = _________ %',
+    answerKey: '4 × 5 = 20%',
+  },
+  {
+    num: '14', type: 'scaling', icon: '📐',
+    botName: 'SCOOP UPGRADE',
+    tagline: 'Bigger isn\'t always proportionally better.',
+    statDisplay: 'Original: 8 cm × 4 cm · Rival: 16 cm × 4 cm',
+    question: 'A rival doubles only the scoop length to 16 cm. Width stays 4 cm. Area = length × width. Does the area double? Show the calculation.',
+    answerHint: 'Original = _____ · New = _____ · Ratio = _____ · Yes / No',
+    answerKey: '8×4=32 cm² · 16×4=64 cm² · 64÷32=2 · Yes — area doubles',
+  },
+  {
+    num: '15', type: 'power', icon: '⚡',
+    botName: 'THE WEAK LINK',
+    tagline: 'Know your weaknesses. Fix them.',
+    statDisplay: 'Power = 3',
+    question: 'The Weak Link put only P = 3 into Power. What is its charge speed percentage?',
+    answerHint: 'Charge Speed = _________ %',
+    answerKey: '3² = 3 × 3 = 9%',
+  },
+  {
+    num: '16', type: 'endurance', icon: '🛡️',
+    botName: 'GRINDER',
+    tagline: 'Still running when everyone else has stopped.',
+    statDisplay: 'E = 8 · t = 3 min',
+    question: 'Grinder keeps grinding: E = 8, t = 3. What is its power output at the final minute?',
+    answerHint: 'P(3) = _________ %',
+    answerKey: '100 − (20−8) × 1.5 × 3 = 100 − 54 = 46%',
+  },
+  {
+    num: '17', type: 'turn', icon: '🔄',
+    botName: 'BRICKWALL',
+    tagline: 'Corners are for other bots.',
+    statDisplay: 'Turning = 1',
+    question: 'Brickwall basically goes straight: T = 1. Calculate its turn ratio.',
+    answerHint: 'Turn Ratio = _________',
+    answerKey: '0.2 + 1 × 0.02 = 0.2 + 0.02 = 0.22',
+  },
+  {
+    num: '18', type: 'follow', icon: '💥',
+    botName: 'QUICK TAP',
+    tagline: 'In and out. Minimal contact, maximum movement.',
+    statDisplay: 'Power = 4',
+    question: 'Quick Tap trades follow-through for other stats: P = 4. Calculate its follow-through time.',
+    answerHint: 'Follow-Through = _________ ms',
+    answerKey: '4 × 200 = 800 ms',
+  },
+  {
+    num: '19', type: 'budget', icon: '📊',
+    botName: 'FULL GAS',
+    tagline: 'Everything into forward motion. No regrets.',
+    statDisplay: 'S = 8 · E = 4 · T = 3 · Budget = 20',
+    question: 'Full Gas locked S=8, E=4, T=3. Budget = 20. Find Power. Confirm the sum equals 20.',
+    answerHint: 'P = _____ · Check: ___+___+___+___ = 20',
+    answerKey: 'P = 20−8−4−3 = 5 · Check: 8+4+3+5 = 20 ✓',
+  },
+  {
+    num: '20', type: 'scaling', icon: '📐',
+    botName: 'MEGA SCOOP',
+    tagline: 'Scaling two dimensions hits different.',
+    statDisplay: 'Original: 3 cm × 3 cm · Rival: 6 cm × 6 cm',
+    question: 'A rival\'s scoop is 6 cm × 6 cm vs. your 3 cm × 3 cm. Area = base × height. Does the area double? Show the calculation.',
+    answerHint: 'Original = _____ · New = _____ · Ratio = _____ · Yes / No',
+    answerKey: '3×3=9 cm² · 6×6=36 cm² · 36÷9=4 · No — area quadruples',
+  },
+];
+
+// ─── RENDER CARD FRONT ───────────────────────────────────
+function renderFront(card) {
+  const meta = TYPE_META[card.type];
+  const div = document.createElement('div');
+  div.className = 'card-front';
+  div.innerHTML = `
+    <div class="card-header" style="background:${meta.bg}; color:${meta.text}">
+      <div class="card-header-row1">
+        <div class="card-icon-name">
+          <span class="card-icon">${card.icon}</span>
+          <span class="card-botname" style="color:${meta.text}">${card.botName}</span>
+        </div>
+        <span class="card-num" style="color:${meta.text}">CARD #${card.num}</span>
+      </div>
+      <div class="card-tagline" style="color:${meta.text}">${card.tagline}</div>
+    </div>
+    <div class="card-body">
+      <div class="stat-chip" style="--chip-color:${meta.bg}">${card.statDisplay}</div>
+      <div class="card-question">${card.question}</div>
+      <div class="work-section">
+        <div class="work-label">Show every step</div>
+        <div class="work-lines">
+          <div class="work-line"></div>
+          <div class="work-line"></div>
+          <div class="work-line"></div>
+        </div>
+      </div>
+      <div class="answer-field">${card.answerHint}</div>
+    </div>
+  `;
+  return div;
+}
+
+// ─── RENDER CARD BACK ────────────────────────────────────
+function renderBack(card) {
+  const meta = TYPE_META[card.type];
+  const div = document.createElement('div');
+  div.className = 'card-back';
+  div.innerHTML = `
+    <div class="back-top">
+      <div class="back-logo">Velocity Arena</div>
+      <div class="back-title">Formula<br>Race</div>
+      <div class="back-subtitle">NYC FIRST · Challenge Card</div>
+    </div>
+    <div class="back-divider"></div>
+    <div class="back-card-num">#${card.num}</div>
+    <div class="back-formula-section" style="border-left: 3px solid ${meta.bg}">
+      <div class="back-formula-label">Formula Type (for sorting)</div>
+      <div class="back-formula-type">${meta.label}</div>
+    </div>
+    <div class="back-answer-section" style="border-left: 3px solid ${meta.bg}">
+      <div class="back-answer-label">Answer Key (facilitator only)</div>
+      <div class="back-answer-key">${card.answerKey}</div>
+    </div>
+  `;
+  return div;
+}
+
+// ─── RENDER PAGES (interleaved duplex) ───────────────────
+// Back pages mirror left↔right columns so cards align when
+// the sheet is flipped on the long edge (standard portrait duplex).
+// Front batch [a, b, c, d] → back page order [b, a, d, c]
+function renderDuplexPages() {
+  const container = document.getElementById('cards-container');
+  const totalPages = Math.ceil(CARDS.length / 4);
+
+  for (let i = 0; i < CARDS.length; i += 4) {
+    const batch = CARDS.slice(i, i + 4);
+    const sheetNum = (i / 4) + 1;
+    const cardNums = batch.map(c => '#' + c.num).join(', ');
+
+    // ── Screen label: front ──
+    const frontLabel = document.createElement('div');
+    frontLabel.className = 'page-pair-label no-print';
+    frontLabel.textContent = `Sheet ${sheetNum} of ${totalPages} — Front side: Cards ${cardNums}`;
+    container.appendChild(frontLabel);
+
+    // ── Front page ──
+    const frontPage = document.createElement('div');
+    frontPage.className = 'cards-page' + (i > 0 ? ' page-break' : '');
+    const frontGrid = document.createElement('div');
+    frontGrid.className = 'cards-grid';
+    batch.forEach(card => frontGrid.appendChild(renderFront(card)));
+    frontPage.appendChild(frontGrid);
+    container.appendChild(frontPage);
+
+    // ── Screen label: back ──
+    const backLabel = document.createElement('div');
+    backLabel.className = 'page-pair-label back-label no-print';
+    backLabel.textContent = `Sheet ${sheetNum} of ${totalPages} — Back side (columns mirrored for duplex alignment)`;
+    container.appendChild(backLabel);
+
+    // ── Back page — columns swapped: [a,b,c,d] → [b,a,d,c] ──
+    const backPage = document.createElement('div');
+    backPage.className = 'cards-page page-break';
+    const backGrid = document.createElement('div');
+    backGrid.className = 'cards-grid';
+    // Swap positions: index 0↔1 and 2↔3
+    // Mirror left↔right: front [a,b,c,d] → back [b,a,d,c]
+    // so TL↔TR and BL↔BR align after flipping on the long edge
+    const mirrored = [batch[1], batch[0], batch[3], batch[2]];
+    // 20 cards ÷ 4 = 5 exact batches, so mirrored always has 4 valid entries
+    mirrored.forEach(card => backGrid.appendChild(renderBack(card)));
+    backPage.appendChild(backGrid);
+    container.appendChild(backPage);
+  }
+}
+
+renderDuplexPages();
+
+// ─── SORTING LABELS ──────────────────────────────────────
+const SORT_LABELS = [
+  {
+    type: 'speed', icon: '💨', name: 'SPEED',
+    formula: 'Motor Power = S × 5',
+    desc: 'Cards showing Speed stat. Students calculate what percentage of motor power the bot has.',
+    cards: '01, 07, 13'
+  },
+  {
+    type: 'endurance', icon: '🛡️', name: 'ENDURANCE',
+    formula: 'P(t) = 100 − (20 − E) × 1.5 × t',
+    desc: 'Cards showing Endurance and time. Students calculate remaining power at a specific minute.',
+    cards: '02, 06, 10, 16'
+  },
+  {
+    type: 'turn', icon: '🔄', name: 'TURNING',
+    formula: 'Turn Ratio = 0.2 + T × 0.02',
+    desc: 'Cards showing Turning stat. Students calculate the bot\'s turn ratio.',
+    cards: '03, 09, 17'
+  },
+  {
+    type: 'power', icon: '⚡', name: 'POWER',
+    formula: 'Charge Speed = P²',
+    desc: 'Cards showing Power stat. Students calculate charge speed — a nonlinear result.',
+    cards: '04, 11, 15'
+  },
+  {
+    type: 'follow', icon: '💥', name: 'FOLLOW-THROUGH',
+    formula: 'Follow-Through = P × 200',
+    desc: 'Cards showing Power stat. Students calculate follow-through time in milliseconds.',
+    cards: '05, 12, 18'
+  },
+  {
+    type: 'budget', icon: '📊', name: 'BUDGET',
+    formula: 'S + E + T + P = 20',
+    desc: 'Cards with three stats given. Students find the fourth and confirm the sum equals 20.',
+    cards: '08, 19'
+  },
+  {
+    type: 'scaling', icon: '📐', name: 'PROPORTIONAL SCALING',
+    formula: 'Area = length × width',
+    desc: 'Scoop blade cards. Students determine whether scaling one or both dimensions is proportional.',
+    cards: '14, 20'
+  },
+];
+
+const labelsContainer = document.getElementById('labels-container');
+SORT_LABELS.forEach(label => {
+  const meta = TYPE_META[label.type];
+  const div = document.createElement('div');
+  div.className = 'sort-label';
+  div.style.borderColor = meta.color;
+  div.innerHTML = `
+    <div class="sort-label-header" style="background:${meta.bg}; color:${meta.text}">
+      <div class="sort-label-icon">${label.icon}</div>
+      <div class="sort-label-name" style="color:${meta.text}">${label.name}</div>
+      <div class="sort-label-formula" style="color:${meta.text}">${label.formula}</div>
+    </div>
+    <div class="sort-label-body">
+      <div class="sort-label-desc">${label.desc}</div>
+      <div class="sort-label-pile">Cards: ${label.cards}</div>
+    </div>
+  `;
+  labelsContainer.appendChild(div);
+});
+
+// ─── ANSWER KEY TABLE ────────────────────────────────────
+const akTable = document.getElementById('ak-table');
+akTable.innerHTML = `
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Bot Name</th>
+      <th>Formula Type</th>
+      <th>Answer</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${CARDS.map(card => {
+      const meta = TYPE_META[card.type];
+      return `<tr>
+        <td style="font-weight:800">${card.num}</td>
+        <td style="font-weight:700">${card.botName}</td>
+        <td><span class="type-badge" style="background:${meta.bg};color:${meta.text}">${meta.label}</span></td>
+        <td class="ak-answer">${card.answerKey}</td>
+      </tr>`;
+    }).join('')}
+  </tbody>
+`;
+</script>
+</body>
+</html>

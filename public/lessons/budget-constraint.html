@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 — Budget Constraint</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0d1b2a;
+  --surface: #132033;
+  --card:    #1a2d45;
+  --border:  #2a4060;
+  --green:   #00e676;
+  --yellow:  #ffd600;
+  --cyan:    #00e5ff;
+  --red:     #ff5252;
+  --orange:  #ff9100;
+  --purple:  #ce93d8;
+  --text:    #e8f0fe;
+  --muted:   #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #0d2a1a 100%);
+  border-bottom: 2px solid var(--green);
+  padding: 20px 24px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 860px; margin: 0 auto;
+}
+.day-badge {
+  background: var(--green); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+}
+.lesson-title { font-size: 20px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ── PROGRESS ────────────────────────────── */
+.progress-wrap  { max-width: 860px; margin: 12px auto 0; }
+.progress-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.5s ease; width: 33%; }
+.progress-labels{ display: flex; justify-content: space-between; margin-top: 6px; }
+.prog-tab {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color 0.2s;
+}
+.prog-tab.active { color: var(--green); }
+.prog-tab.done   { color: var(--cyan); }
+
+/* ── SECTIONS ────────────────────────────── */
+.section { display: none; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+.section.active { display: block; }
+
+/* ── CARDS ───────────────────────────────── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--green); margin-bottom: 14px;
+}
+
+/* ── SECTION HEADER ──────────────────────── */
+.sec-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.sec-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sec-icon.green  { background: rgba(0,230,118,.12); border: 2px solid var(--green); }
+.sec-icon.yellow { background: rgba(255,214,0,.10); border: 2px solid var(--yellow); }
+.sec-icon.cyan   { background: rgba(0,229,255,.12); border: 2px solid var(--cyan); }
+.sec-title    { font-size: 22px; font-weight: 800; }
+.sec-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+/* ── RULES / NOTICE ──────────────────────── */
+.rules-card {
+  background: rgba(0,230,118,.07); border: 1px solid rgba(0,230,118,.3);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
+.rules-title { font-size: 12px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.rules-card li { font-size: 14px; color: var(--text); margin-bottom: 5px; margin-left: 16px; }
+
+.notice {
+  background: rgba(255,82,82,.10); border: 1px solid rgba(255,82,82,.35);
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+  font-size: 14px; color: var(--text); line-height: 1.6;
+}
+.notice-title { font-weight: 800; color: var(--red); margin-bottom: 4px; }
+
+.key-idea {
+  background: rgba(0,229,255,.07); border-left: 4px solid var(--cyan);
+  border-radius: 0 10px 10px 0; padding: 14px 18px; margin-bottom: 20px;
+}
+.key-idea-label { font-size: 11px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.key-idea-text  { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+/* ── WORKSHEET CALLOUT ───────────────────── */
+.ws-callout {
+  background: rgba(255,214,0,.08); border: 2px solid rgba(255,214,0,.5);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.ws-icon  { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.ws-label { font-size: 11px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.ws-text  { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+/* ── LOADOUT BUILDER ─────────────────────── */
+.loadout-grid {
+  display: grid;
+  grid-template-columns: 110px repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.lg-header {
+  background: #0d1b2a; padding: 10px 12px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.lg-header.stat-label { text-align: left; color: var(--muted); }
+.lg-cell {
+  background: var(--card); padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+.lg-cell.stat-name {
+  border-left: none; justify-content: flex-start;
+  font-size: 14px; font-weight: 700; color: var(--text);
+}
+.lg-cell:last-child, .lg-header:last-child { }
+.lg-total-label {
+  background: #0f2035; border-left: none;
+  padding: 10px 12px; display: flex; align-items: center;
+  font-size: 13px; font-weight: 800; color: var(--muted);
+  border-top: 2px solid var(--border);
+}
+.lg-total-cell {
+  background: #0f2035; padding: 8px 12px;
+  border-left: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.stat-input {
+  width: 64px; height: 36px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.stat-input:focus { border-color: var(--green); }
+.stat-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.budget-pill {
+  font-size: 14px; font-weight: 800;
+  padding: 4px 10px; border-radius: 20px;
+  transition: background 0.3s, color 0.3s;
+}
+.budget-ok   { background: rgba(0,230,118,.2); color: var(--green); }
+.budget-over { background: rgba(255,82,82,.2);  color: var(--red); }
+.budget-low  { background: rgba(255,145,0,.15); color: var(--orange); }
+
+/* ── FORMULA REFERENCE ───────────────────── */
+.formula-ref {
+  background: linear-gradient(135deg, #0a1f10, #0d2a1a);
+  border: 1px solid rgba(0,230,118,.3); border-radius: 12px;
+  padding: 18px 20px; margin-bottom: 20px;
+}
+.formula-ref-title { font-size: 12px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.formula-row {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.formula-stat { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 70px; }
+.formula-expr { font-size: 14px; font-weight: 700; color: #fff; font-family: 'Courier New', monospace; }
+.formula-result { font-size: 12px; color: var(--muted); }
+
+/* ── OUTPUT CHECKER ──────────────────────── */
+.loadout-checker {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+}
+.lc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.lc-title { font-size: 16px; font-weight: 800; }
+.lc-stats {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.lc-stat-chip {
+  background: rgba(255,255,255,.06); border: 1px solid var(--border);
+  border-radius: 8px; padding: 3px 10px;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.lc-stat-chip span { color: var(--text); }
+
+.output-row {
+  display: grid; grid-template-columns: 1fr 130px 48px;
+  gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(42,64,96,.5);
+}
+.output-row:last-child { border-bottom: none; }
+.output-name { font-size: 13px; color: var(--text); font-weight: 600; }
+.output-formula { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: monospace; }
+.output-input {
+  width: 100%; height: 34px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.output-input:focus { border-color: var(--green); }
+.output-input.correct { border-color: var(--green); background: rgba(0,230,118,.08); }
+.output-input.wrong   { border-color: var(--red);   background: rgba(255,82,82,.08); }
+.output-status { font-size: 20px; text-align: center; }
+
+.check-btn {
+  display: block; width: 100%; margin-top: 14px;
+  padding: 10px; border-radius: 10px; border: 2px solid var(--green);
+  background: rgba(0,230,118,.1); color: var(--green);
+  font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 14px;
+  cursor: pointer; transition: background 0.2s;
+}
+.check-btn:hover { background: rgba(0,230,118,.2); }
+.check-btn:disabled { opacity: 0.4; cursor: default; }
+.check-feedback { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; display: none; }
+
+/* ── COMPARISON TABLE ────────────────────── */
+.compare-wrap { overflow-x: auto; }
+.compare-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-top: 4px;
+}
+.compare-table th {
+  background: #0f2035; padding: 8px 12px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 2px solid var(--border);
+}
+.compare-table th.output-col { text-align: left; }
+.compare-table td {
+  padding: 8px 12px; text-align: center;
+  border-bottom: 1px solid rgba(42,64,96,.5); font-weight: 600;
+}
+.compare-table td.output-col { text-align: left; color: var(--muted); font-weight: 400; }
+.compare-table tr:last-child td { border-bottom: none; }
+
+/* ── TRADE-OFF ───────────────────────────── */
+.tradeoff-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+}
+.tb-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.tb-badge {
+  padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+}
+
+.tradeoff-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid rgba(42,64,96,.5);
+  flex-wrap: wrap;
+}
+.tradeoff-row:last-child { border-bottom: none; }
+.tr-label { font-size: 13px; color: var(--muted); min-width: 140px; }
+.tr-value { font-size: 14px; font-weight: 700; color: var(--text); }
+.tr-input {
+  width: 60px; height: 32px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.tr-input:focus { border-color: var(--yellow); }
+.pte-total { font-size: 13px; font-weight: 700; margin-top: 10px; }
+
+/* ── IMPACT PANEL ────────────────────────── */
+.impact-panel {
+  margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;
+}
+.impact-placeholder {
+  background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.12);
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 13px; color: var(--muted); text-align: center;
+}
+.impact-content { display: none; }
+.impact-panel.visible .impact-placeholder { display: none; }
+.impact-panel.visible .impact-content { display: block; }
+.impact-header { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+
+/* Budget bars */
+.bb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bb-label { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 72px; text-align: right; }
+.bb-track {
+  flex: 1; height: 32px; display: flex; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.bb-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #000; overflow: hidden;
+  transition: width 0.4s ease; white-space: nowrap; padding: 0 4px;
+}
+.bb-seg.speed    { background: #00b8d4; }
+.bb-seg.power    { background: #ff9100; }
+.bb-seg.turning  { background: #ce93d8; }
+.bb-seg.endurance{ background: #00e676; }
+
+/* Output impact table */
+.out-impact {
+  display: grid; grid-template-columns: 1fr 80px 80px;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  margin-top: 14px;
+}
+.oi-head {
+  background: #0d1b2a; padding: 6px 10px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.oi-head.left { text-align: left; }
+.oi-cell {
+  padding: 7px 10px; font-size: 13px; font-weight: 600;
+  border-bottom: 1px solid rgba(42,64,96,.4);
+  text-align: center; border-left: 1px solid rgba(42,64,96,.4);
+}
+.oi-cell.left { text-align: left; border-left: none; font-size: 12px; color: var(--muted); font-weight: 400; }
+.oi-cell.up   { color: var(--green); }
+.oi-cell.down { color: var(--red); }
+.oi-cell.same { color: var(--muted); }
+.out-impact > *:nth-last-child(-n+3) .oi-cell,
+.out-impact > *:last-child { border-bottom: none; }
+.out-impact .oi-cell:nth-child(3n) { border-bottom: 1px solid rgba(42,64,96,.4); }
+.out-impact > div:nth-last-child(-n+3) { border-bottom: none; }
+
+.impact-summary {
+  background: rgba(255,214,0,.07); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 10px; padding: 11px 14px; font-size: 13px;
+  color: var(--text); line-height: 1.7; margin-top: 12px;
+}
+.impact-summary strong { color: var(--yellow); }
+
+.recalc-box {
+  background: #0a1a10; border: 1px solid rgba(0,230,118,.3);
+  border-radius: 12px; padding: 18px 20px; margin-top: 20px;
+}
+.recalc-title { font-size: 13px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+.recalc-row {
+  display: grid; grid-template-columns: 1fr 110px 44px;
+  gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(0,230,118,.15);
+}
+.recalc-row:last-child { border-bottom: none; }
+.recalc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.recalc-formula { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: monospace; }
+.recalc-input {
+  width: 100%; height: 34px;
+  background: #0d1b2a; border: 2px solid rgba(0,230,118,.4);
+  border-radius: 8px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.recalc-input:focus  { border-color: var(--green); }
+.recalc-input.correct{ border-color: var(--green); background: rgba(0,230,118,.08); }
+.recalc-input.wrong  { border-color: var(--red);   background: rgba(255,82,82,.08); }
+
+/* ── NAV BUTTON ──────────────────────────── */
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 12px; border: none;
+  background: var(--green); color: #000;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
+  cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
+}
+.nav-btn:hover { opacity: 0.85; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── LOADOUT CHOOSER ─────────────────────── */
+.loadout-chooser { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.choose-btn {
+  flex: 1; min-width: 120px; padding: 10px 16px;
+  border-radius: 10px; border: 2px solid var(--border);
+  background: var(--card); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.choose-btn:hover { border-color: var(--green); }
+.choose-btn.selected { border-color: var(--green); background: rgba(0,230,118,.1); color: var(--green); }
+
+/* ── SENTENCE STARTERS ───────────────────── */
+.sentence-starters {
+  background: rgba(255,214,0,.06); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
+.ss-title { font-size: 12px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.ss-line  { font-size: 13px; color: var(--text); line-height: 1.7; margin-bottom: 8px; font-style: italic; }
+
+/* ── UTIL ────────────────────────────────── */
+code {
+  background: rgba(0,229,255,.1); color: var(--cyan);
+  padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace;
+}
+</style>
+</head>
+<body>
+
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <div class="day-badge">Day 5 · Challenge Block</div>
+      <div class="lesson-title">The Budget Constraint</div>
+      <div class="lesson-sub">Design three loadouts · Calculate every output · Find what you give up</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-labels">
+      <span class="prog-tab active" id="pt0" onclick="goSection(0)">1 · Design Loadouts</span>
+      <span class="prog-tab"        id="pt1" onclick="goSection(1)">2 · Calculate Outputs</span>
+      <span class="prog-tab"        id="pt2" onclick="goSection(2)">3 · Trade-Off</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 — DESIGN LOADOUTS                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section active" id="sec0">
+
+  <div class="sec-header">
+    <div class="sec-icon green">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- budget scale / balance beam -->
+        <line x1="13" y1="4" x2="13" y2="22" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="5" y1="8" x2="21" y2="8" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="5" y1="8" x2="5" y2="16" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="21" y1="8" x2="21" y2="16" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+        <rect x="2" y="16" width="6" height="3" rx="1.5" fill="var(--green)" opacity="0.7"/>
+        <rect x="18" y="16" width="6" height="3" rx="1.5" fill="var(--green)" opacity="0.7"/>
+        <circle cx="13" cy="4" r="1.8" fill="var(--green)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">Design Your Loadouts</div>
+      <div class="sec-subtitle">20 points, four stats — each number you add somewhere must come from somewhere else</div>
+    </div>
+  </div>
+
+  <!-- Equation board -->
+  <div style="background:linear-gradient(135deg,#061a0e,#0d2a1a); border:2px solid var(--green); border-radius:16px; padding:22px 24px; text-align:center; margin-bottom:20px;">
+    <div style="font-size:11px; font-weight:800; color:var(--green); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">The Constraint</div>
+    <div style="font-size:22px; font-weight:800; color:#fff;">Speed + Power + Turning + Endurance = 20</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:10px;">Add 2 to Speed → remove 2 from somewhere else. Both sides always weigh the same.</div>
+  </div>
+
+  <!-- Rules -->
+  <div class="rules-card">
+    <div class="rules-title">Rules</div>
+    <ul>
+      <li>Each loadout must use <strong>exactly 20 points</strong> — no more, no less.</li>
+      <li>Every stat must be at least <strong>1 point</strong>.</li>
+      <li>None of your three loadouts can match any personal stat card exactly.</li>
+    </ul>
+  </div>
+
+  <!-- Loadout Builder -->
+  <div class="card" style="padding:20px 16px;">
+    <div class="card-title">Part 1 — Enter Your Stat Allocations</div>
+
+    <div class="loadout-grid">
+      <!-- Column headers -->
+      <div class="lg-header stat-label">Stat</div>
+      <div class="lg-header" style="color:var(--cyan);">Loadout 1</div>
+      <div class="lg-header" style="color:var(--orange);">Loadout 2</div>
+      <div class="lg-header" style="color:var(--purple);">Loadout 3</div>
+
+      <!-- Speed row -->
+      <div class="lg-cell stat-name">⚡ Speed</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Power row -->
+      <div class="lg-cell stat-name">🔋 Power</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Turning row -->
+      <div class="lg-cell stat-name">↩ Turning</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Endurance row -->
+      <div class="lg-cell stat-name">⏱ Endurance</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Totals row -->
+      <div class="lg-total-label">Total</div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot0">0 / 20</span></div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot1">0 / 20</span></div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot2">0 / 20</span></div>
+    </div>
+
+    <p style="font-size:13px; color:var(--muted);">All three totals must show <strong style="color:var(--green);">20 / 20</strong> before you move on.</p>
+  </div>
+
+  <button class="nav-btn" id="toCalcBtn" onclick="goSection(1)" disabled>
+    Calculate Outputs →
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 — CALCULATE OUTPUTS                                        -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec1">
+
+  <div class="sec-header">
+    <div class="sec-icon yellow">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="18" height="18" rx="3" stroke="var(--yellow)" stroke-width="1.6" fill="none"/>
+        <line x1="4" y1="10" x2="22" y2="10" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="4" y1="16" x2="22" y2="16" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="10" y1="4" x2="10" y2="22" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="16" y1="4" x2="16" y2="22" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <circle cx="13" cy="13" r="2.5" fill="var(--yellow)" opacity="0.9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">Calculate All Four Outputs</div>
+      <div class="sec-subtitle">One formula per stat — calculate on paper, then enter your answer to check</div>
+    </div>
+  </div>
+
+  <!-- Formula reference -->
+  <div class="formula-ref">
+    <div class="formula-ref-title">Formula Reference</div>
+    <div class="formula-row">
+      <span class="formula-stat">Speed →</span>
+      <span class="formula-expr">Motor Power % = (S × 100) ÷ 20</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">Endurance →</span>
+      <span class="formula-expr">Power at t=1 min = 100 − (20 − E) × 1.5</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">Turning →</span>
+      <span class="formula-expr">Arc Segments = T &nbsp;·&nbsp; Turn Ratio = 0.2 + (T × 0.02)</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">Power →</span>
+      <span class="formula-expr">Charge Speed = P² &nbsp;·&nbsp; Follow Through = P × 200</span>
+    </div>
+  </div>
+
+  <!-- Output checkers — generated by JS into this container -->
+  <div id="outputCheckers"></div>
+
+  <!-- Comparison table — shown after all 3 checked -->
+  <div class="card" id="compareCard" style="display:none;">
+    <div class="card-title">All Three Loadouts — Side by Side</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">Look across each row. When Speed is the same in two loadouts but other outputs differ — what caused the difference?</p>
+    <div class="compare-wrap">
+      <table class="compare-table" id="compareTable">
+        <thead>
+          <tr>
+            <th class="output-col">Output</th>
+            <th style="color:var(--cyan);">Loadout 1</th>
+            <th style="color:var(--orange);">Loadout 2</th>
+            <th style="color:var(--purple);">Loadout 3</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <button class="nav-btn" id="toTradeoffBtn" onclick="goSection(2)" disabled>
+    Trade-Off Analysis →
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 — TRADE-OFF                                                -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec2">
+
+  <div class="sec-header">
+    <div class="sec-icon cyan">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- two arrows showing trade-off -->
+        <polyline points="4,10 13,5 22,10" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="4,16 13,21 22,16" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="13" y1="5" x2="13" y2="21" stroke="var(--cyan)" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+        <circle cx="5" cy="10" r="1.5" fill="var(--cyan)"/>
+        <circle cx="21" cy="16" r="1.5" fill="var(--cyan)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">The Trade-Off</div>
+      <div class="sec-subtitle">If Speed = 8, what are you giving up? Show every number.</div>
+    </div>
+  </div>
+
+  <div class="key-idea">
+    <div class="key-idea-label">The Question</div>
+    <div class="key-idea-text">Speed = 8 uses 8 of your 20 points. That leaves <strong>12 points</strong> for Power, Turning, and Endurance combined. For each loadout: redistribute those 12 points, then recalculate all outputs. The answer is not "we give up 12 points" — it names which stat takes the reduction and what happens to that output.</div>
+  </div>
+
+  <!-- Trade-off blocks — generated by JS -->
+  <div id="tradeoffBlocks"></div>
+
+  <!-- Loadout chooser for recalculation -->
+  <div class="card" id="recalcPickCard" style="display:none;">
+    <div class="card-title">Part 3B — Recalculate One Revised Loadout</div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:4px;">Choose one of your three revised loadouts. Calculate all four outputs for Speed = 8 and your new P, T, E values. Enter your answers below.</p>
+    <div class="loadout-chooser" id="loadoutChooser">
+      <button class="choose-btn" id="chooseL0" onclick="pickLoadout(0)">Loadout 1</button>
+      <button class="choose-btn" id="chooseL1" onclick="pickLoadout(1)">Loadout 2</button>
+      <button class="choose-btn" id="chooseL2" onclick="pickLoadout(2)">Loadout 3</button>
+    </div>
+    <div class="recalc-box" id="recalcBox" style="display:none;">
+      <div class="recalc-title" id="recalcTitle">Recalculate — Loadout 1 (Speed = 8)</div>
+      <!-- rows injected by JS -->
+      <div id="recalcRows"></div>
+      <button class="check-btn" style="border-color:var(--green); color:var(--green); margin-top:14px;" onclick="checkRecalc()">Check My Recalculation</button>
+      <div class="check-feedback" id="recalcFeedback"></div>
+    </div>
+  </div>
+
+  <!-- Sentence starters -->
+  <div class="sentence-starters" id="sentenceCard" style="display:none;">
+    <div class="ss-title">📝 Sentence Starters — Use These on Your Worksheet</div>
+    <div class="ss-line">"In Loadout ___, I put ___ points into ___, which gave me ___. But that left only ___ points for ___, which dropped to ___. The trade-off is ___."</div>
+    <div class="ss-line">"The biggest trade-off I found is between ___ and ___. When I raised ___ by ___ points, ___ dropped by ___, which means ___."</div>
+  </div>
+
+  <!-- Worksheet Reflect callout -->
+  <div class="ws-callout" id="reflectCallout" style="display:none;">
+    <div class="ws-icon">📋</div>
+    <div>
+      <div class="ws-label">Worksheet — Reflect (3 questions)</div>
+      <div class="ws-text">
+        <strong>Question 1:</strong> The equation is S + P + T + E = 20. What does the equals sign mean? Explain in your own words.<br><br>
+        <strong>Question 2:</strong> None of your loadouts could match any personal stat card. Why was that the rule?<br><br>
+        <strong>Question 3:</strong> Which trade-off surprised your team most? Name the specific numbers — which stat, which loadout, and what the formula output was before and after.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────
+const STATS = ['s','p','t','e'];
+const STAT_LABELS = ['Speed','Power','Turning','Endurance'];
+const L_COLORS = ['var(--cyan)','var(--orange)','var(--purple)'];
+const L_NAMES  = ['Loadout 1','Loadout 2','Loadout 3'];
+
+let checkedLoadouts = [false, false, false];
+let tradeoffFilled  = [false, false, false];
+let chosenLoadout   = -1;
+
+// ── Read stat inputs ───────────────────────────────────────────────────
+function getStats(li) {
+  return {
+    S: parseInt(document.getElementById('s'+li).value) || 0,
+    P: parseInt(document.getElementById('p'+li).value) || 0,
+    T: parseInt(document.getElementById('t'+li).value) || 0,
+    E: parseInt(document.getElementById('e'+li).value) || 0,
+  };
+}
+
+function getTotal(li) {
+  const s = getStats(li);
+  return s.S + s.P + s.T + s.E;
+}
+
+// ── Formula calculations ───────────────────────────────────────────────
+function calcOutputs(S, P, T, E) {
+  return [
+    { name: 'Motor Power %',   formula: '(S × 100) ÷ 20',      value: S * 5,              unit: '%',  decimals: 0 },
+    { name: 'Power at t = 1',  formula: '100 − (20 − E) × 1.5',value: 100-(20-E)*1.5,     unit: '%',  decimals: 1 },
+    { name: 'Arc Segments',    formula: 'T',                    value: T,                  unit: '',   decimals: 0 },
+    { name: 'Turn Ratio',      formula: '0.2 + (T × 0.02)',     value: 0.2 + T * 0.02,     unit: '',   decimals: 2 },
+    { name: 'Charge Speed',    formula: 'P²',                   value: P * P,              unit: '%',  decimals: 0 },
+    { name: 'Follow Through',  formula: 'P × 200',              value: P * 200,            unit: '',   decimals: 0 },
+  ];
+}
+
+function calcRecalc(P, T, E) {
+  return [
+    { name: 'Motor Power %',   formula: '(8 × 100) ÷ 20',       value: 40,              unit: '%',  decimals: 0 },
+    { name: 'Power at t = 1',  formula: '100 − (20 − E) × 1.5', value: 100-(20-E)*1.5, unit: '%',  decimals: 1 },
+    { name: 'Turn Angle',      formula: '90 + (8 − T) × 5',     value: 90+(8-T)*5,     unit: '°',  decimals: 0 },
+    { name: 'Charge Speed',    formula: 'P²',                    value: P * P,          unit: '%',  decimals: 0 },
+  ];
+}
+
+function withinTol(userVal, correct, decimals) {
+  const tol = decimals === 0 ? 0.5 : (decimals === 1 ? 0.6 : 0.015);
+  return Math.abs(userVal - correct) <= tol;
+}
+
+// ── Budget live update ─────────────────────────────────────────────────
+function updateBudget() {
+  let allReady = true;
+  for (let i = 0; i < 3; i++) {
+    const tot = getTotal(i);
+    const pill = document.getElementById('tot'+i);
+    pill.textContent = tot + ' / 20';
+    if (tot === 20) {
+      pill.className = 'budget-pill budget-ok';
+    } else if (tot > 20) {
+      pill.className = 'budget-pill budget-over';
+      allReady = false;
+    } else {
+      pill.className = 'budget-pill budget-low';
+      allReady = false;
+    }
+  }
+  document.getElementById('toCalcBtn').disabled = !allReady;
+}
+
+// ── Build output checker cards ─────────────────────────────────────────
+function buildOutputCheckers() {
+  const container = document.getElementById('outputCheckers');
+  container.innerHTML = '';
+  for (let li = 0; li < 3; li++) {
+    const {S,P,T,E} = getStats(li);
+    const outputs = calcOutputs(S,P,T,E);
+    const color = L_COLORS[li];
+
+    const card = document.createElement('div');
+    card.className = 'loadout-checker';
+    card.id = 'lc'+li;
+
+    // Header
+    let headerHTML = `
+      <div class="lc-header">
+        <div class="lc-title" style="color:${color};">${L_NAMES[li]}</div>
+        <div class="lc-stats">
+          <div class="lc-stat-chip">S = <span>${S}</span></div>
+          <div class="lc-stat-chip">P = <span>${P}</span></div>
+          <div class="lc-stat-chip">T = <span>${T}</span></div>
+          <div class="lc-stat-chip">E = <span>${E}</span></div>
+        </div>
+      </div>`;
+
+    // Output rows
+    let rowsHTML = '';
+    outputs.forEach((out, oi) => {
+      rowsHTML += `
+        <div class="output-row">
+          <div>
+            <div class="output-name">${out.name}</div>
+            <div class="output-formula">${out.formula}</div>
+          </div>
+          <input class="output-input" type="number" step="any" id="out_${li}_${oi}" placeholder="your answer">
+          <div class="output-status" id="st_${li}_${oi}">○</div>
+        </div>`;
+    });
+
+    card.innerHTML = headerHTML + rowsHTML + `
+      <button class="check-btn" id="checkBtn${li}" onclick="checkLoadout(${li})">Check Loadout ${li+1}</button>
+      <div class="check-feedback" id="fb${li}"></div>`;
+
+    container.appendChild(card);
+  }
+}
+
+// ── Check one loadout ──────────────────────────────────────────────────
+function checkLoadout(li) {
+  const {S,P,T,E} = getStats(li);
+  const outputs = calcOutputs(S,P,T,E);
+  let allCorrect = true;
+  let wrongCount = 0;
+
+  outputs.forEach((out, oi) => {
+    const inp = document.getElementById(`out_${li}_${oi}`);
+    const st  = document.getElementById(`st_${li}_${oi}`);
+    const userVal = parseFloat(inp.value);
+
+    if (isNaN(userVal)) {
+      st.textContent = '—';
+      inp.className = 'output-input';
+      allCorrect = false;
+      return;
+    }
+
+    const correct = withinTol(userVal, out.value, out.decimals);
+    if (correct) {
+      inp.className = 'output-input correct';
+      st.textContent = '✓';
+    } else {
+      inp.className = 'output-input wrong';
+      const display = out.decimals > 0 ? out.value.toFixed(out.decimals) : Math.round(out.value);
+      st.textContent = '✗';
+      st.title = `Expected: ${display}${out.unit}`;
+      allCorrect = false;
+      wrongCount++;
+    }
+  });
+
+  const fb = document.getElementById(`fb${li}`);
+  fb.style.display = 'block';
+  if (allCorrect) {
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ All outputs correct. Loadout ' + (li+1) + ' complete.';
+    checkedLoadouts[li] = true;
+    document.getElementById(`checkBtn${li}`).textContent = '✓ Checked';
+  } else {
+    fb.style.color = 'var(--red)';
+    fb.textContent = wrongCount + ' answer' + (wrongCount > 1 ? 's' : '') + ' need fixing. Hover the ✗ to see what was expected.';
+  }
+
+  checkAllLoadoutsDone();
+}
+
+function checkAllLoadoutsDone() {
+  if (checkedLoadouts.every(Boolean)) {
+    buildCompareTable();
+    document.getElementById('compareCard').style.display = 'block';
+    document.getElementById('toTradeoffBtn').disabled = false;
+  }
+}
+
+// ── Comparison table ───────────────────────────────────────────────────
+function buildCompareTable() {
+  const outputs0 = calcOutputs(...Object.values(getStats(0)));
+  const outputs1 = calcOutputs(...Object.values(getStats(1)));
+  const outputs2 = calcOutputs(...Object.values(getStats(2)));
+  const body = document.getElementById('compareBody');
+  body.innerHTML = '';
+
+  outputs0.forEach((out, oi) => {
+    const v0 = outputs0[oi].value;
+    const v1 = outputs1[oi].value;
+    const v2 = outputs2[oi].value;
+
+    function fmt(v, d) {
+      return d > 0 ? v.toFixed(d) : Math.round(v);
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="output-col">${out.name}</td>
+      <td style="color:var(--cyan);">${fmt(v0,out.decimals)}${out.unit}</td>
+      <td style="color:var(--orange);">${fmt(v1,out.decimals)}${out.unit}</td>
+      <td style="color:var(--purple);">${fmt(v2,out.decimals)}${out.unit}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+// ── Build trade-off blocks ─────────────────────────────────────────────
+function buildTradeoffBlocks() {
+  const container = document.getElementById('tradeoffBlocks');
+  container.innerHTML = '';
+
+  for (let li = 0; li < 3; li++) {
+    const {S,P,T,E} = getStats(li);
+    const origPTE = P + T + E;
+    const delta   = 8 - S;
+    const deltaStr = delta > 0 ? '+'+delta : delta === 0 ? '0' : ''+delta;
+    const color   = L_COLORS[li];
+
+    const block = document.createElement('div');
+    block.className = 'tradeoff-block';
+    block.innerHTML = `
+      <div class="tb-header">
+        <div class="tb-badge" style="background:${color}22; color:${color}; border:1px solid ${color}44;">${L_NAMES[li]}</div>
+        <div style="font-size:13px; color:var(--muted);">S=${S} · P=${P} · T=${T} · E=${E}</div>
+      </div>
+
+      <div class="tradeoff-row">
+        <div class="tr-label">Speed changes</div>
+        <div class="tr-value">${S} pts → <strong style="color:${color};">8 pts</strong> &nbsp;(${deltaStr === '0' ? 'no change' : deltaStr + ' pts'})</div>
+      </div>
+      <div class="tradeoff-row">
+        <div class="tr-label">Remaining for P + T + E</div>
+        <div class="tr-value">20 − 8 = <strong style="color:var(--green);">12 pts</strong> &nbsp;(was ${origPTE})</div>
+      </div>
+      <div class="tradeoff-row">
+        <div class="tr-label">Your new P, T, E</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--muted);">P =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="tp${li}" oninput="updatePTE(${li})" placeholder="—">
+          <span style="font-size:13px; color:var(--muted);">T =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="tt${li}" oninput="updatePTE(${li})" placeholder="—">
+          <span style="font-size:13px; color:var(--muted);">E =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="te${li}" oninput="updatePTE(${li})" placeholder="—">
+        </div>
+      </div>
+      <div class="pte-total" id="pteTotal${li}" style="color:var(--orange);">P + T + E = 0 / 12</div>
+
+      <div class="impact-panel" id="impact${li}">
+        <div class="impact-placeholder">↑ Enter your new P, T, E above — the budget redistribution will appear here once they sum to 12.</div>
+        <div class="impact-content">
+          <div class="impact-header">Same 20 points — different distribution</div>
+          <div id="budgetBars${li}"></div>
+          <div class="impact-header" style="margin-top:16px;">What that does to your outputs</div>
+          <div class="out-impact" id="outputGrid${li}"></div>
+          <div class="impact-summary" id="impactSummary${li}"></div>
+        </div>
+      </div>`;
+
+    container.appendChild(block);
+  }
+}
+
+function fmtDelta(d, decimals) {
+  if (d === 0) return { text: '—', cls: 'delta-zero' };
+  const abs = decimals > 0 ? Math.abs(d).toFixed(decimals) : Math.abs(Math.round(d));
+  return { text: (d > 0 ? '▲ +' : '▼ ') + abs, cls: d > 0 ? 'delta-up' : 'delta-down' };
+}
+
+function fmtVal(v, decimals, unit) {
+  return (decimals > 0 ? v.toFixed(decimals) : Math.round(v)) + (unit || '');
+}
+
+function updatePTE(li) {
+  const newP = parseInt(document.getElementById('tp'+li).value) || 0;
+  const newT = parseInt(document.getElementById('tt'+li).value) || 0;
+  const newE = parseInt(document.getElementById('te'+li).value) || 0;
+  const tot  = newP + newT + newE;
+  const el   = document.getElementById('pteTotal'+li);
+  el.textContent = 'P + T + E = ' + tot + ' / 12';
+  el.style.color = tot === 12 ? 'var(--green)' : tot > 12 ? 'var(--red)' : 'var(--orange)';
+
+  const panel = document.getElementById('impact'+li);
+
+  if (tot === 12 && newP >= 1 && newT >= 1 && newE >= 1) {
+    const orig = getStats(li); // {S,P,T,E}
+    const before = { S: orig.S, P: orig.P, T: orig.T, E: orig.E };
+    const after  = { S: 8,      P: newP,   T: newT,   E: newE   };
+
+    // ── Budget bars ────────────────────────────────────────────────
+    function makeBudgetBar(label, S, P, T, E) {
+      const segs = [
+        { cls: 'speed',     val: S, name: 'S' },
+        { cls: 'power',     val: P, name: 'P' },
+        { cls: 'turning',   val: T, name: 'T' },
+        { cls: 'endurance', val: E, name: 'E' },
+      ];
+      const segsHTML = segs.map(seg => {
+        const pct = (seg.val / 20 * 100).toFixed(1);
+        const txt = seg.val >= 3 ? `${seg.name}=${seg.val}` : '';
+        return `<div class="bb-seg ${seg.cls}" style="width:${pct}%;">${txt}</div>`;
+      }).join('');
+      return `<div class="bb-row"><div class="bb-label">${label}</div><div class="bb-track">${segsHTML}</div></div>`;
+    }
+
+    document.getElementById('budgetBars'+li).innerHTML =
+      makeBudgetBar('Original', before.S, before.P, before.T, before.E) +
+      makeBudgetBar('Speed = 8', after.S, after.P, after.T, after.E);
+
+    // ── Output impact table ────────────────────────────────────────
+    const outsBef = calcOutputs(before.S, before.P, before.T, before.E);
+    const outsAft = calcOutputs(after.S,  after.P,  after.T,  after.E);
+
+    let outHTML = `
+      <div class="oi-head left">Output</div>
+      <div class="oi-head">Original</div>
+      <div class="oi-head">Speed = 8</div>`;
+    outsBef.forEach((out, oi) => {
+      const bv   = out.value;
+      const av   = outsAft[oi].value;
+      const diff = av - bv;
+      const cls  = diff > 0.009 ? 'up' : diff < -0.009 ? 'down' : 'same';
+      outHTML += `
+        <div class="oi-cell left">${out.name}</div>
+        <div class="oi-cell same">${fmtVal(bv, out.decimals, out.unit)}</div>
+        <div class="oi-cell ${cls}">${fmtVal(av, out.decimals, out.unit)}</div>`;
+    });
+    document.getElementById('outputGrid'+li).innerHTML = outHTML;
+
+    // ── Plain-language summary ─────────────────────────────────────
+    const losses  = [];
+    const gains   = [];
+    const neutral = [];
+    outsBef.forEach((out, oi) => {
+      const diff = outsAft[oi].value - out.value;
+      const absDiff = Math.abs(diff);
+      const fmt = out.decimals > 0 ? absDiff.toFixed(out.decimals) : Math.round(absDiff);
+      if (diff < -0.009)      losses.push(`<strong>${out.name}</strong> ↓ ${fmt}${out.unit}`);
+      else if (diff > 0.009)  gains.push(`<strong>${out.name}</strong> ↑ ${fmt}${out.unit}`);
+      else                     neutral.push(`<strong>${out.name}</strong> unchanged`);
+    });
+    let summary = '';
+    if (losses.length)  summary += `<span style="color:var(--red);">Dropped: ${losses.join(', ')}</span><br>`;
+    if (gains.length)   summary += `<span style="color:var(--green);">Gained: ${gains.join(', ')}</span><br>`;
+    if (neutral.length) summary += `<span style="color:var(--muted);">${neutral.join(' · ')}</span>`;
+    document.getElementById('impactSummary'+li).innerHTML = summary;
+
+    panel.classList.add('visible');
+    tradeoffFilled[li] = true;
+  } else {
+    panel.classList.remove('visible');
+    tradeoffFilled[li] = false;
+  }
+
+  if (tradeoffFilled.every(Boolean)) {
+    document.getElementById('recalcPickCard').style.display = 'block';
+  }
+}
+
+// ── Recalculation picker ───────────────────────────────────────────────
+function pickLoadout(li) {
+  chosenLoadout = li;
+  ['chooseL0','chooseL1','chooseL2'].forEach((id,i) => {
+    document.getElementById(id).className = 'choose-btn' + (i === li ? ' selected' : '');
+  });
+
+  const P = parseInt(document.getElementById('tp'+li).value) || 0;
+  const T = parseInt(document.getElementById('tt'+li).value) || 0;
+  const E = parseInt(document.getElementById('te'+li).value) || 0;
+  const recalcData = calcRecalc(P, T, E);
+  const color = L_COLORS[li];
+
+  document.getElementById('recalcTitle').textContent = 'Recalculate — ' + L_NAMES[li] + ' (Speed = 8, P=' + P + ', T=' + T + ', E=' + E + ')';
+  document.getElementById('recalcTitle').style.color = color;
+
+  let rowsHTML = '';
+  recalcData.forEach((row, ri) => {
+    const formulaDisplay = row.formula
+      .replace('E', E).replace('T', T).replace('P', P+'²').replace('P', P);
+    rowsHTML += `
+      <div class="recalc-row">
+        <div>
+          <div class="recalc-name">${row.name}</div>
+          <div class="recalc-formula">${row.formula} (your values)</div>
+        </div>
+        <input class="recalc-input" type="number" step="any" id="rc${ri}" placeholder="your answer">
+        <div class="output-status" id="rcs${ri}" style="font-size:18px;">○</div>
+      </div>`;
+  });
+
+  document.getElementById('recalcRows').innerHTML = rowsHTML;
+  document.getElementById('recalcBox').style.display = 'block';
+  document.getElementById('recalcFeedback').style.display = 'none';
+}
+
+function checkRecalc() {
+  const li = chosenLoadout;
+  if (li < 0) return;
+  const P = parseInt(document.getElementById('tp'+li).value) || 0;
+  const T = parseInt(document.getElementById('tt'+li).value) || 0;
+  const E = parseInt(document.getElementById('te'+li).value) || 0;
+  const recalcData = calcRecalc(P, T, E);
+
+  let allOk = true;
+  let wrongCount = 0;
+
+  recalcData.forEach((row, ri) => {
+    const inp = document.getElementById('rc'+ri);
+    const st  = document.getElementById('rcs'+ri);
+    const userVal = parseFloat(inp.value);
+    if (isNaN(userVal)) { allOk = false; return; }
+    const ok = withinTol(userVal, row.value, row.decimals);
+    inp.className = 'recalc-input ' + (ok ? 'correct' : 'wrong');
+    if (ok) {
+      st.textContent = '✓';
+    } else {
+      st.textContent = '✗';
+      const d = row.decimals > 0 ? row.value.toFixed(row.decimals) : Math.round(row.value);
+      st.title = 'Expected: ' + d + row.unit;
+      allOk = false;
+      wrongCount++;
+    }
+  });
+
+  const fb = document.getElementById('recalcFeedback');
+  fb.style.display = 'block';
+  if (allOk) {
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ All four outputs correct.';
+    document.getElementById('sentenceCard').style.display = 'block';
+    document.getElementById('reflectCallout').style.display = 'block';
+  } else {
+    fb.style.color = 'var(--red)';
+    fb.textContent = wrongCount + ' answer' + (wrongCount !== 1 ? 's' : '') + ' to fix. Hover ✗ to see expected value.';
+  }
+}
+
+// ── Section navigation ─────────────────────────────────────────────────
+const pcts = [33, 66, 100];
+
+function goSection(n) {
+  document.querySelectorAll('.section').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.prog-tab').forEach((t,i) => {
+    t.classList.remove('active','done');
+    if (i === n) t.classList.add('active');
+    else if (i < n) t.classList.add('done');
+  });
+  document.getElementById('progressFill').style.width = pcts[n] + '%';
+
+  if (n === 1) buildOutputCheckers();
+  if (n === 2) buildTradeoffBlocks();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Init ───────────────────────────────────────────────────────────────
+updateBudget();
+</script>
+</body>
+</html>

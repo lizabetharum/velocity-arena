@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building Linear Equations · Velocity Arena Day 13</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root {
+      --navy:       #0D0D1A;
+      --navy2:      #161A2E;
+      --navy3:      #1E2240;
+      --cyan:       #00E5FF;
+      --teal:       #007A99;
+      --slate:      #8899AA;
+      --card-border:#222840;
+      --card-bg:    #161A2E;
+      --green:      #00C97A;
+      --red:        #FF4D6A;
+      --yellow:     #FFD166;
+      --purple:     #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 6rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--cyan);
+      transition: width .5s ease; z-index: 100;
+      width: 0%;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: .75rem;
+      flex-wrap: wrap;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+      display: flex; align-items: center; gap: .35rem;
+      white-space: nowrap;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); font-size: 1rem; }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── Section nav ── */
+    .section-nav {
+      display: flex; gap: 0;
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .section-nav button {
+      flex-shrink: 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s;
+    }
+    .section-nav button:hover { color: #E8EAF2; }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+    /* ── Main layout ── */
+    .main { max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem; }
+
+    /* ── Section panel ── */
+    .section-panel { display: none; }
+    .section-panel.active { display: block; }
+
+    /* ── Variable reference table ── */
+    .ref-table-wrap {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .ref-table-wrap h3 {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .65rem 1rem;
+      background: rgba(0,0,0,.2);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .ref-table { width: 100%; border-collapse: collapse; }
+    .ref-table th, .ref-table td {
+      padding: .55rem 1rem;
+      text-align: left; font-size: .8125rem;
+    }
+    .ref-table th {
+      color: var(--slate); font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; font-size: .6875rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .ref-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      color: var(--cyan); font-size: .9375rem; font-weight: 500;
+      width: 40px;
+    }
+    .ref-table td:nth-child(2) { font-weight: 700; width: 110px; }
+    .ref-table td:last-child { color: var(--slate); }
+    .ref-table tr:not(:last-child) td { border-bottom: 1px solid rgba(34,40,64,.6); }
+
+    /* ── Step cards ── */
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .step-label {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1rem;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,229,255,.1); border: 1.5px solid rgba(0,229,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800; color: var(--cyan);
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: .9375rem; font-weight: 700; color: #E8EAF2;
+    }
+    .step-subtitle {
+      font-size: .8125rem; color: var(--slate); margin-top: .2rem;
+    }
+
+    /* ── Inputs ── */
+    input[type="text"], input[type="number"], select, textarea {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy3);
+      border: 1.5px solid var(--card-border);
+      border-radius: 6px;
+      color: #E8EAF2;
+      font-size: .875rem;
+      padding: .45rem .7rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    input[type="text"]:focus, input[type="number"]:focus,
+    select:focus, textarea:focus {
+      border-color: var(--teal);
+    }
+    input[type="text"].valid, input[type="number"].valid { border-color: var(--green); }
+    input[type="text"].invalid, input[type="number"].invalid { border-color: var(--red); }
+    input[type="number"] { width: 80px; text-align: center; }
+    input[type="number"].wide { width: 100px; }
+    input[type="number"].slim { width: 64px; }
+    input[type="text"].match-input { width: 90px; }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      padding-right: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238899AA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .7rem center;
+    }
+
+    textarea {
+      width: 100%; min-height: 80px; resize: vertical;
+      padding: .6rem .8rem; line-height: 1.55;
+    }
+
+    /* ── Formula display ── */
+    .formula-box {
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .9375rem;
+      color: var(--cyan);
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    /* ── Show-work rows ── */
+    .work-row {
+      display: flex; align-items: center; gap: .5rem;
+      margin-bottom: .75rem;
+      flex-wrap: wrap;
+    }
+    .work-label {
+      font-family: 'DM Mono', monospace;
+      font-size: .875rem; color: var(--slate);
+      white-space: nowrap;
+    }
+    .work-eq {
+      font-family: 'DM Mono', monospace;
+      font-size: .875rem; color: #E8EAF2;
+      white-space: nowrap;
+    }
+
+    /* ── Validation badges ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .75rem; font-weight: 700; letter-spacing: .04em;
+      border-radius: 4px; padding: .25em .6em;
+    }
+    .badge.correct { color: var(--green); background: rgba(0,201,122,.12); border: 1px solid rgba(0,201,122,.25); }
+    .badge.incorrect { color: var(--red); background: rgba(255,77,106,.12); border: 1px solid rgba(255,77,106,.25); }
+    .badge.hidden { display: none; }
+
+    /* ── Warning / info alerts ── */
+    .alert {
+      border-radius: 7px; padding: .6rem .9rem;
+      font-size: .8125rem; line-height: 1.5;
+      margin-top: .6rem;
+      display: none;
+    }
+    .alert.warn { background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.25); color: var(--yellow); }
+    .alert.info { background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.2); color: var(--cyan); }
+    .alert.show { display: block; }
+
+    /* ── Data-points table ── */
+    .dp-table { width: 100%; border-collapse: collapse; margin: .75rem 0; }
+    .dp-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .5rem; border-bottom: 1px solid var(--card-border);
+      text-align: left;
+    }
+    .dp-table td { padding: .5rem .5rem; vertical-align: middle; }
+
+    /* ── Chosen x display ── */
+    .chosen-x-display {
+      margin-top: .75rem; padding: .6rem .9rem;
+      background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.18);
+      border-radius: 7px;
+      font-size: .875rem; color: #E8EAF2;
+      display: none;
+    }
+    .chosen-x-display .stat-name { color: var(--cyan); font-weight: 700; }
+
+    /* ── Equation board ── */
+    .equation-board {
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .equation-board .board-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+    .equation-board .eq-display {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.25rem; font-weight: 500;
+      color: var(--slate); letter-spacing: .04em;
+    }
+    .equation-board .eq-display.locked-eq { color: var(--cyan); }
+
+    /* ── Lock button ── */
+    .lock-btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem; font-weight: 700;
+      background: var(--cyan); color: var(--navy);
+      border: none; border-radius: 8px;
+      padding: .65rem 1.4rem;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      margin-top: .85rem;
+    }
+    .lock-btn:hover:not(.locked) { opacity: .88; transform: translateY(-1px); }
+    .lock-btn.locked {
+      background: var(--navy3); color: var(--slate);
+      border: 1px solid var(--card-border);
+      pointer-events: none;
+    }
+
+    /* ── Part 2 residual table ── */
+    .resid-table { width: 100%; border-collapse: collapse; }
+    .resid-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .45rem .6rem; border-bottom: 1px solid var(--card-border);
+      text-align: left;
+    }
+    .resid-table td { padding: .5rem .6rem; vertical-align: middle; }
+    .resid-table tr:not(:last-child) td { border-bottom: 1px solid rgba(34,40,64,.5); }
+
+    .resid-val {
+      font-family: 'DM Mono', monospace;
+      font-size: .875rem; font-weight: 500;
+      padding: .25em .55em; border-radius: 5px;
+      display: inline-block; min-width: 60px; text-align: center;
+    }
+    .resid-val.over  { color: #FF9900; background: rgba(255,153,0,.12); }
+    .resid-val.under { color: #4D9FFF; background: rgba(77,159,255,.12); }
+    .resid-val.zero  { color: var(--green); background: rgba(0,201,122,.12); }
+    .resid-val.empty { color: var(--slate); background: transparent; }
+
+    .ypred-val {
+      font-family: 'DM Mono', monospace; font-size: .875rem;
+      color: var(--purple);
+    }
+
+    /* ── Pick buttons ── */
+    .pick-group { display: flex; gap: .5rem; flex-wrap: wrap; margin: .5rem 0; }
+    .pick-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .8125rem; font-weight: 700;
+      border: 1.5px solid var(--card-border);
+      background: var(--navy3); color: var(--slate);
+      border-radius: 6px; padding: .4em .9em;
+      cursor: pointer; transition: all .15s;
+    }
+    .pick-btn:hover { border-color: var(--teal); color: #E8EAF2; }
+    .pick-btn.selected { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,.08); }
+
+    /* ── Data log ── */
+    .data-log-row {
+      display: flex; align-items: baseline; gap: .35rem;
+      flex-wrap: wrap; line-height: 2.2;
+      font-size: .875rem; color: #E8EAF2;
+    }
+    .data-log-row input[type="text"] { width: 90px; }
+    .data-log-row input[type="number"] { width: 80px; }
+
+    /* ── Reflect checklist ── */
+    .checklist { list-style: none; margin: .75rem 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: .75rem;
+      padding: .65rem .75rem;
+      border-radius: 7px;
+      margin-bottom: .4rem;
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      font-size: .875rem; cursor: pointer;
+      transition: border-color .15s;
+    }
+    .checklist li:hover { border-color: var(--teal); }
+    .checklist li.checked { border-color: rgba(0,201,122,.3); background: rgba(0,201,122,.05); }
+    .check-box {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 1.5px solid var(--card-border);
+      background: var(--navy); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; margin-top: 1px;
+    }
+    .checklist li.checked .check-box {
+      background: var(--green); border-color: var(--green);
+    }
+    .check-mark { color: var(--navy); font-size: .75rem; font-weight: 800; display: none; }
+    .checklist li.checked .check-mark { display: block; }
+
+    /* ── Done button ── */
+    .done-btn {
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 800; letter-spacing: .04em;
+      background: linear-gradient(135deg, var(--cyan), #00B8CC);
+      color: var(--navy); border: none; border-radius: 10px;
+      padding: .9rem 2rem; cursor: pointer;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(0,229,255,.25);
+      margin-top: 1rem;
+    }
+    .done-btn:hover:not(.locked) { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0,229,255,.35); }
+    .done-btn.locked {
+      background: var(--navy3);
+      color: var(--slate); box-shadow: none;
+      border: 1px solid var(--card-border);
+      pointer-events: none;
+    }
+
+    /* ── Success state ── */
+    .success-banner {
+      background: rgba(0,201,122,.08);
+      border: 1px solid rgba(0,201,122,.25);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      display: none;
+    }
+    .success-banner.show { display: block; }
+    .success-banner .trophy { font-size: 2rem; margin-bottom: .5rem; }
+    .success-banner h2 { font-size: 1.125rem; font-weight: 800; color: var(--green); margin-bottom: .35rem; }
+    .success-banner p { font-size: .875rem; color: var(--slate); }
+
+    /* ── Section heading ── */
+    .section-heading {
+      margin-bottom: 1.5rem;
+    }
+    .section-heading .section-tag {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: .35rem;
+    }
+    .section-heading h2 {
+      font-size: 1.25rem; font-weight: 800; color: #E8EAF2;
+    }
+    .section-heading p {
+      font-size: .875rem; color: var(--slate); margin-top: .4rem; line-height: 1.55;
+    }
+
+    /* ── Equation line in step 5 ── */
+    .eq5-row {
+      display: flex; align-items: center; gap: .4rem;
+      font-family: 'DM Mono', monospace; font-size: 1.1rem;
+      flex-wrap: wrap;
+    }
+    .eq5-row span { color: var(--slate); }
+
+    /* ── Part 2 no-equation notice ── */
+    .no-eq-notice {
+      background: rgba(255,77,106,.08);
+      border: 1px solid rgba(255,77,106,.22);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-size: .875rem; color: #E8EAF2;
+      margin-bottom: 1.5rem;
+    }
+    .no-eq-notice strong { color: var(--red); }
+
+    /* ── Divider ── */
+    .divider-line {
+      border: none; border-top: 1px solid var(--card-border);
+      margin: 1.25rem 0;
+    }
+
+    /* ── Inline locked note ── */
+    .locked-note {
+      font-size: .75rem; color: var(--slate); margin-top: .4rem;
+    }
+
+    /* Input slim */
+    input.b-input { width: 90px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .page-header { gap: .4rem; }
+      .step-card { padding: 1.1rem 1rem; }
+      .resid-table, .dp-table { font-size: .75rem; }
+      .resid-table td, .dp-table td { padding: .4rem .3rem; }
+      input[type="number"] { width: 64px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ── Header ── -->
+<header class="page-header">
+  <a href="/index.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Building Linear Equations</h1>
+  <span class="day-tag">DAY 13</span>
+</header>
+
+<!-- ── Section nav ── -->
+<nav class="section-nav">
+  <button class="active" onclick="showSection(0,this)">Part 1 · Build</button>
+  <button onclick="showSection(1,this)">Part 2 · Test</button>
+  <button onclick="showSection(2,this)">Reflect</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — BUILD YOUR EQUATION
+══════════════════════════════════════════ -->
+<main class="main">
+
+<div class="section-panel active" id="panel-0">
+
+  <div class="section-heading">
+    <div class="section-tag">Part 1</div>
+    <h2>Build Your Equation</h2>
+    <p>You'll use two real match data points to calculate slope and y-intercept, then write your linear equation: <strong>y = mx + b</strong>.</p>
+  </div>
+
+  <!-- Variable reference -->
+  <div class="ref-table-wrap">
+    <h3>Variable Reference</h3>
+    <table class="ref-table">
+      <thead>
+        <tr><th>Symbol</th><th>Variable</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>y</td><td>Output</td><td>Win probability — what you're trying to predict</td></tr>
+        <tr><td>x</td><td>Input</td><td>Your chosen stat (the number you control)</td></tr>
+        <tr><td>m</td><td>Slope</td><td>(y₂−y₁) ÷ (x₂−x₁) — how much y changes per unit of x</td></tr>
+        <tr><td>b</td><td>Y-intercept</td><td>y − (m×x) — where the line crosses the y-axis</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Step 1 — Choose x -->
+  <div class="step-card" id="step1">
+    <div class="step-label">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Choose Your x Variable</div>
+        <div class="step-subtitle">Pick the stat you'll use as your input</div>
+      </div>
+    </div>
+    <select id="xvar-select" onchange="onXVarChange()">
+      <option value="">— Select a stat —</option>
+      <option value="Speed">Speed</option>
+      <option value="Endurance">Endurance</option>
+      <option value="Turning">Turning</option>
+      <option value="Power">Power</option>
+    </select>
+    <div class="chosen-x-display" id="chosen-x-display">
+      Your <strong>x = <span class="stat-name" id="chosen-stat-name"></span></strong>.&nbsp; Your <strong>y = win probability</strong>.
+    </div>
+  </div>
+
+  <!-- Step 2 — Record two data points -->
+  <div class="step-card" id="step2">
+    <div class="step-label">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Record Two Data Points</div>
+        <div class="step-subtitle">Find two matches with different x values</div>
+      </div>
+    </div>
+    <table class="dp-table">
+      <thead>
+        <tr>
+          <th>Point</th>
+          <th>Match #</th>
+          <th>x value</th>
+          <th>y value (win %)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--slate);font-weight:700;font-size:.8125rem;">(x₁, y₁)</td>
+          <td><input type="text" class="match-input" id="m1" placeholder="e.g. 4" oninput="onDataChange()" /></td>
+          <td><input type="number" id="x1" placeholder="0" step="any" oninput="onDataChange()" /></td>
+          <td><input type="number" id="y1" placeholder="0" step="any" min="0" max="100" oninput="onDataChange()" /></td>
+        </tr>
+        <tr>
+          <td style="color:var(--slate);font-weight:700;font-size:.8125rem;">(x₂, y₂)</td>
+          <td><input type="text" class="match-input" id="m2" placeholder="e.g. 7" oninput="onDataChange()" /></td>
+          <td><input type="number" id="x2" placeholder="0" step="any" oninput="onDataChange()" /></td>
+          <td><input type="number" id="y2" placeholder="0" step="any" min="0" max="100" oninput="onDataChange()" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert warn" id="warn-same-x">⚠ Same x value — choose different matches or a different stat.</div>
+  </div>
+
+  <!-- Step 3 — Calculate slope -->
+  <div class="step-card" id="step3">
+    <div class="step-label">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Calculate Slope (m)</div>
+        <div class="step-subtitle">Show your work step by step</div>
+      </div>
+    </div>
+    <div class="formula-box">m = (y₂ − y₁) ÷ (x₂ − x₁)</div>
+
+    <!-- Row 1: plug in values -->
+    <div class="work-row">
+      <span class="work-label">m&nbsp;=</span>
+      <span class="work-eq">(</span>
+      <input type="number" id="s_y2" placeholder="y₂" step="any" oninput="validateSlope()" />
+      <span class="work-eq">−</span>
+      <input type="number" id="s_y1" placeholder="y₁" step="any" oninput="validateSlope()" />
+      <span class="work-eq">)&nbsp;÷&nbsp;(</span>
+      <input type="number" id="s_x2" placeholder="x₂" step="any" oninput="validateSlope()" />
+      <span class="work-eq">−</span>
+      <input type="number" id="s_x1" placeholder="x₁" step="any" oninput="validateSlope()" />
+      <span class="work-eq">)</span>
+    </div>
+
+    <!-- Row 2: simplified -->
+    <div class="work-row">
+      <span class="work-label" style="padding-left:1.6rem">= </span>
+      <input type="number" id="s_num" placeholder="numerator" step="any" class="wide" oninput="validateSlope()" />
+      <span class="work-eq">÷</span>
+      <input type="number" id="s_den" placeholder="denominator" step="any" class="wide" oninput="validateSlope()" />
+    </div>
+
+    <!-- Row 3: final m -->
+    <div class="work-row">
+      <span class="work-label" style="padding-left:1.6rem">= </span>
+      <input type="number" id="s_m" placeholder="m" step="any" class="wide" oninput="validateSlope()" />
+      <span class="badge hidden" id="badge-m"></span>
+    </div>
+    <div class="alert warn" id="warn-m-large">⚠ Check that x and y aren't switched — slope looks very large.</div>
+    <div class="alert warn" id="warn-m-zero">⚠ Same win probability in both matches — try different matches.</div>
+  </div>
+
+  <!-- Step 4 — Calculate y-intercept -->
+  <div class="step-card" id="step4">
+    <div class="step-label">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Calculate Y-Intercept (b)</div>
+        <div class="step-subtitle">Use one of your data points from Step 2</div>
+      </div>
+    </div>
+    <div class="formula-box">b = y − (m × x)</div>
+
+    <!-- Row 1 -->
+    <div class="work-row">
+      <span class="work-label">b&nbsp;=</span>
+      <input type="number" id="b_y" placeholder="y" step="any" oninput="validateIntercept()" />
+      <span class="work-eq">−&nbsp;(</span>
+      <input type="number" id="b_m" placeholder="m" step="any" oninput="validateIntercept()" />
+      <span class="work-eq">×</span>
+      <input type="number" id="b_x" placeholder="x" step="any" oninput="validateIntercept()" />
+      <span class="work-eq">)</span>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="work-row">
+      <span class="work-label" style="padding-left:1.6rem">= </span>
+      <input type="number" id="b_y2" placeholder="y" step="any" class="wide" oninput="validateIntercept()" />
+      <span class="work-eq">−</span>
+      <input type="number" id="b_prod" placeholder="m×x" step="any" class="wide" oninput="validateIntercept()" />
+    </div>
+
+    <!-- Row 3 -->
+    <div class="work-row">
+      <span class="work-label" style="padding-left:1.6rem">= </span>
+      <input type="number" id="b_final" placeholder="b" step="any" class="wide" oninput="validateIntercept()" />
+      <span class="badge hidden" id="badge-b"></span>
+    </div>
+  </div>
+
+  <!-- Step 5 — Write equation -->
+  <div class="step-card" id="step5">
+    <div class="step-label">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Write Your Equation</div>
+        <div class="step-subtitle">Enter m and b from your calculations above</div>
+      </div>
+    </div>
+    <div class="eq5-row">
+      <span style="color:#E8EAF2;">y&nbsp;=</span>
+      <input type="number" id="eq_m" placeholder="m" step="any" class="wide" oninput="validateEquation()" />
+      <span>x&nbsp;+</span>
+      <input type="number" id="eq_b" placeholder="b" step="any" class="wide" oninput="validateEquation()" />
+      <span class="badge hidden" id="badge-eq"></span>
+    </div>
+
+    <div class="equation-board" id="eq-board">
+      <div class="board-label">Your Equation</div>
+      <div class="eq-display" id="eq-display">y = ___x + ___</div>
+    </div>
+
+    <div>
+      <button class="lock-btn locked" id="lock-btn" onclick="lockEquation()">
+        🔒 Lock My Equation
+      </button>
+      <p class="locked-note" id="lock-note">Validate m and b first to unlock.</p>
+    </div>
+  </div>
+
+</div><!-- /panel-0 -->
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — TEST (RESIDUALS)
+══════════════════════════════════════════ -->
+<div class="section-panel" id="panel-1">
+
+  <div class="section-heading">
+    <div class="section-tag">Part 2</div>
+    <h2>Test Your Equation</h2>
+    <p>Use your locked equation to predict win probability for 3 past matches you haven't used yet. Then compare predictions to actual results.</p>
+  </div>
+
+  <div class="no-eq-notice" id="no-eq-notice" style="display:none">
+    <strong>Equation not locked.</strong> Go back to Part 1 and lock your equation before testing.
+  </div>
+
+  <!-- Locked equation display -->
+  <div class="step-card" id="locked-eq-display">
+    <div class="step-label">
+      <div class="step-num" style="background:rgba(155,138,255,.1);border-color:rgba(155,138,255,.3);color:var(--purple);">📌</div>
+      <div>
+        <div class="step-title">Your Locked Equation</div>
+        <div class="step-subtitle">Predictions are calculated automatically from this</div>
+      </div>
+    </div>
+    <div class="formula-box" id="locked-eq-text" style="color:var(--purple);">y = ___x + ___</div>
+  </div>
+
+  <!-- Residual table -->
+  <div class="step-card">
+    <div class="step-label">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Choose 3 Past Matches</div>
+        <div class="step-subtitle">Not the same matches you used in Part 1</div>
+      </div>
+    </div>
+    <table class="resid-table">
+      <thead>
+        <tr>
+          <th>Match #</th>
+          <th>x actual</th>
+          <th>y predicted</th>
+          <th>y actual</th>
+          <th>Residual</th>
+        </tr>
+      </thead>
+      <tbody id="resid-body">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+    <p style="font-size:.75rem;color:var(--slate);margin-top:.6rem;">
+      Residual = predicted − actual.
+      <span style="color:#FF9900;">■ orange</span> over-predicted,
+      <span style="color:#4D9FFF;">■ blue</span> under-predicted,
+      <span style="color:var(--green);">■ green</span> exact.
+    </p>
+  </div>
+
+  <!-- Data log sentence -->
+  <div class="step-card">
+    <div class="step-label">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Data Log</div>
+        <div class="step-subtitle">Complete the sentence about your first test match</div>
+      </div>
+    </div>
+    <div class="data-log-row" id="data-log-sentence">
+      My equation predicted
+      <input type="number" id="log_pred" placeholder="___" step="any" />
+      for Match #
+      <input type="text" id="log_match" placeholder="___" style="width:70px;" />
+      , but the actual result was
+      <input type="number" id="log_actual" placeholder="___" step="any" />
+      . The residual was
+      <input type="number" id="log_resid" placeholder="___" step="any" />
+      .
+    </div>
+  </div>
+
+  <!-- Pattern question -->
+  <div class="step-card">
+    <div class="step-label">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Pattern Analysis</div>
+        <div class="step-subtitle">Look at all three residuals together</div>
+      </div>
+    </div>
+
+    <p style="font-size:.875rem;color:#E8EAF2;margin-bottom:.5rem;">My residuals are mostly:</p>
+    <div class="pick-group" id="pattern-pick">
+      <button class="pick-btn" onclick="pickPattern('positive',this)">Positive (over-predicted)</button>
+      <button class="pick-btn" onclick="pickPattern('negative',this)">Negative (under-predicted)</button>
+      <button class="pick-btn" onclick="pickPattern('mixed',this)">Mixed</button>
+    </div>
+
+    <p style="font-size:.875rem;color:#E8EAF2;margin-top:1rem;margin-bottom:.4rem;">This tells me my equation:</p>
+    <textarea id="pattern-explain" placeholder="This tells me my equation ___ because ___" oninput="checkPart2()"></textarea>
+    <p class="locked-note">Minimum 10 characters.</p>
+
+    <hr class="divider-line" />
+
+    <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.4rem;">
+      If you were going to pick a different x variable, what would it be and why?
+    </p>
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem;">
+      <select id="alt-x-select">
+        <option value="">— Different x —</option>
+        <option value="Speed">Speed</option>
+        <option value="Endurance">Endurance</option>
+        <option value="Turning">Turning</option>
+        <option value="Power">Power</option>
+      </select>
+    </div>
+    <textarea id="alt-x-why" placeholder="I would choose ___ because ___" oninput="checkPart2()"></textarea>
+    <p class="locked-note">Minimum 10 characters.</p>
+  </div>
+
+</div><!-- /panel-1 -->
+
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — REFLECT
+══════════════════════════════════════════ -->
+<div class="section-panel" id="panel-2">
+
+  <div class="section-heading">
+    <div class="section-tag">Reflect</div>
+    <h2>Match Gate + Reflection</h2>
+    <p>Check off each requirement, then complete your reflection to finish Day 13.</p>
+  </div>
+
+  <!-- Match gate checklist -->
+  <div class="step-card">
+    <div class="step-label">
+      <div class="step-num" style="background:rgba(255,209,102,.1);border-color:rgba(255,209,102,.3);color:var(--yellow);">✓</div>
+      <div>
+        <div class="step-title">Match Gate Checklist</div>
+        <div class="step-subtitle">All three must be checked before you can finish</div>
+      </div>
+    </div>
+    <ul class="checklist">
+      <li id="chk0" onclick="toggleCheck(0)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <span>My equation is written with both m and b filled in</span>
+      </li>
+      <li id="chk1" onclick="toggleCheck(1)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <span>I have at least 3 residuals calculated</span>
+      </li>
+      <li id="chk2" onclick="toggleCheck(2)">
+        <div class="check-box"><span class="check-mark">✓</span></div>
+        <span>My data log sentence is written</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Reflection -->
+  <div class="step-card">
+    <div class="step-label">
+      <div class="step-num">💭</div>
+      <div>
+        <div class="step-title">Reflection</div>
+        <div class="step-subtitle">Answer in at least 10 characters</div>
+      </div>
+    </div>
+    <p style="font-size:.875rem;color:#E8EAF2;margin-bottom:.5rem;font-weight:600;">
+      What surprised you about your residuals?
+    </p>
+    <textarea id="reflect-text" placeholder="I was surprised that..." oninput="checkDone()"></textarea>
+    <p class="locked-note">Minimum 10 characters.</p>
+  </div>
+
+  <!-- Done button -->
+  <button class="done-btn locked" id="done-btn" onclick="handleDone()">
+    🏁 &nbsp;Day 13 Complete
+  </button>
+  <p class="locked-note" id="done-note" style="text-align:center;margin-top:.5rem;">
+    Complete the checklist and reflection to finish.
+  </p>
+
+  <!-- Success banner (hidden until done) -->
+  <div class="success-banner" id="success-banner">
+    <div class="trophy">🏆</div>
+    <h2>Day 13 Done!</h2>
+    <p>You built a linear equation from real match data, tested it with residuals, and reflected on what it means. See you tomorrow.</p>
+  </div>
+
+</div><!-- /panel-2 -->
+
+</main>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ── State ──────────────────────────────────
+const state = {
+  xvar: '',
+  x1: null, y1: null, x2: null, y2: null,
+  m: null,  // calculated slope
+  b: null,  // calculated intercept
+  mValid: false,
+  bValid: false,
+  eqValid: false,
+  locked: false,
+  lockedM: null,
+  lockedB: null,
+  patternPicked: '',
+  checks: [false, false, false],
+};
+
+// ── Progress bar ────────────────────────────
+function updateProgress() {
+  let steps = 0, done = 0;
+  // Step 1
+  steps++; if (state.xvar) done++;
+  // Step 2
+  steps++; if (state.x1 !== null && state.y1 !== null && state.x2 !== null && state.y2 !== null) done++;
+  // Step 3
+  steps++; if (state.mValid) done++;
+  // Step 4
+  steps++; if (state.bValid) done++;
+  // Step 5
+  steps++; if (state.locked) done++;
+  // Part 2
+  const r0 = getResidRow(0); const r1 = getResidRow(1); const r2 = getResidRow(2);
+  steps++; if (r0.hasAll && r1.hasAll && r2.hasAll) done++;
+  // Pattern
+  const pe = document.getElementById('pattern-explain').value.trim();
+  steps++; if (state.patternPicked && pe.length >= 10) done++;
+  // Reflect
+  const rt = document.getElementById('reflect-text').value.trim();
+  steps++; if (rt.length >= 10) done++;
+  // Checklist
+  steps++; if (state.checks.every(Boolean)) done++;
+
+  const pct = Math.round((done / steps) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+// ── Section nav ─────────────────────────────
+function showSection(idx, btn) {
+  document.querySelectorAll('.section-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.section-nav button').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  if (idx === 1) refreshPart2();
+  updateProgress();
+}
+
+// ── Step 1 ──────────────────────────────────
+function onXVarChange() {
+  const sel = document.getElementById('xvar-select').value;
+  state.xvar = sel;
+  const disp = document.getElementById('chosen-x-display');
+  if (sel) {
+    document.getElementById('chosen-stat-name').textContent = sel;
+    disp.style.display = 'block';
+  } else {
+    disp.style.display = 'none';
+  }
+  updateProgress();
+}
+
+// ── Step 2 ──────────────────────────────────
+function onDataChange() {
+  const x1v = parseFloat(document.getElementById('x1').value);
+  const y1v = parseFloat(document.getElementById('y1').value);
+  const x2v = parseFloat(document.getElementById('x2').value);
+  const y2v = parseFloat(document.getElementById('y2').value);
+
+  state.x1 = isNaN(x1v) ? null : x1v;
+  state.y1 = isNaN(y1v) ? null : y1v;
+  state.x2 = isNaN(x2v) ? null : x2v;
+  state.y2 = isNaN(y2v) ? null : y2v;
+
+  // Warn same x
+  const warnSameX = document.getElementById('warn-same-x');
+  if (state.x1 !== null && state.x2 !== null && state.x1 === state.x2) {
+    warnSameX.classList.add('show');
+  } else {
+    warnSameX.classList.remove('show');
+  }
+
+  // Auto-fill slope plugging row from Step 3
+  if (state.y2 !== null) document.getElementById('s_y2').value = state.y2;
+  if (state.y1 !== null) document.getElementById('s_y1').value = state.y1;
+  if (state.x2 !== null) document.getElementById('s_x2').value = state.x2;
+  if (state.x1 !== null) document.getElementById('s_x1').value = state.x1;
+  validateSlope();
+
+  updateProgress();
+}
+
+// ── Step 3 — slope ──────────────────────────
+function validateSlope() {
+  const sy2 = parseFloat(document.getElementById('s_y2').value);
+  const sy1 = parseFloat(document.getElementById('s_y1').value);
+  const sx2 = parseFloat(document.getElementById('s_x2').value);
+  const sx1 = parseFloat(document.getElementById('s_x1').value);
+  const snum = parseFloat(document.getElementById('s_num').value);
+  const sden = parseFloat(document.getElementById('s_den').value);
+  const smVal = parseFloat(document.getElementById('s_m').value);
+
+  const badge = document.getElementById('badge-m');
+  const wLarge = document.getElementById('warn-m-large');
+  const wZero  = document.getElementById('warn-m-zero');
+
+  // Need at least final m entry
+  if (isNaN(smVal)) {
+    badge.className = 'badge hidden';
+    state.mValid = false;
+    state.m = null;
+    wLarge.classList.remove('show'); wZero.classList.remove('show');
+    updateEquationDisplay();
+    updateProgress();
+    return;
+  }
+
+  // Calculate true m from data
+  let trueM = null;
+  if (state.x1 !== null && state.x2 !== null && state.y1 !== null && state.y2 !== null) {
+    const dx = state.x2 - state.x1;
+    const dy = state.y2 - state.y1;
+    if (dx !== 0) trueM = dy / dx;
+  }
+
+  if (trueM !== null) {
+    const correct = Math.abs(smVal - trueM) <= 0.01;
+    state.mValid = correct;
+    state.m = smVal;
+    badge.className = correct ? 'badge correct' : 'badge incorrect';
+    badge.textContent = correct ? '✓ Correct' : '✗ Check your arithmetic';
+
+    // Sanity checks
+    wLarge.classList.toggle('show', correct && Math.abs(smVal) > 10);
+    wZero.classList.toggle('show', correct && trueM === 0);
+  } else {
+    // Can't verify — just store
+    state.mValid = false;
+    state.m = smVal;
+    badge.className = 'badge hidden';
+    wLarge.classList.remove('show'); wZero.classList.remove('show');
+  }
+
+  updateEquationDisplay();
+  checkLockReady();
+  updateProgress();
+}
+
+// ── Step 4 — intercept ──────────────────────
+function validateIntercept() {
+  const bFinal = parseFloat(document.getElementById('b_final').value);
+  const badge = document.getElementById('badge-b');
+
+  if (isNaN(bFinal)) {
+    badge.className = 'badge hidden';
+    state.bValid = false;
+    state.b = null;
+    updateEquationDisplay();
+    checkLockReady();
+    updateProgress();
+    return;
+  }
+
+  // Calculate true b — need m and a point
+  let trueB = null;
+  const mVal = state.mValid ? state.m : (state.m !== null ? state.m : null);
+  if (mVal !== null) {
+    // Try with point 1
+    if (state.x1 !== null && state.y1 !== null) {
+      trueB = state.y1 - mVal * state.x1;
+    } else if (state.x2 !== null && state.y2 !== null) {
+      trueB = state.y2 - mVal * state.x2;
+    }
+  }
+
+  if (trueB !== null) {
+    const correct = Math.abs(bFinal - trueB) <= 0.01;
+    state.bValid = correct;
+    state.b = bFinal;
+    badge.className = correct ? 'badge correct' : 'badge incorrect';
+    badge.textContent = correct ? '✓ Correct' : '✗ Check your arithmetic';
+  } else {
+    state.bValid = false;
+    state.b = bFinal;
+    badge.className = 'badge hidden';
+  }
+
+  updateEquationDisplay();
+  checkLockReady();
+  updateProgress();
+}
+
+// ── Step 5 — equation ───────────────────────
+function validateEquation() {
+  const eqM = parseFloat(document.getElementById('eq_m').value);
+  const eqB = parseFloat(document.getElementById('eq_b').value);
+  const badge = document.getElementById('badge-eq');
+
+  if (isNaN(eqM) || isNaN(eqB)) {
+    badge.className = 'badge hidden';
+    state.eqValid = false;
+    updateEquationDisplay();
+    checkLockReady();
+    return;
+  }
+
+  const mOk = state.m !== null && Math.abs(eqM - state.m) <= 0.01;
+  const bOk = state.b !== null && Math.abs(eqB - state.b) <= 0.01;
+  const correct = mOk && bOk && state.mValid && state.bValid;
+
+  state.eqValid = correct;
+  badge.className = correct ? 'badge correct' : 'badge incorrect';
+  badge.textContent = correct ? '✓ Matches your calculations' : '✗ Doesn't match Steps 3 & 4';
+
+  updateEquationDisplay();
+  checkLockReady();
+  updateProgress();
+}
+
+function updateEquationDisplay() {
+  const eqM = parseFloat(document.getElementById('eq_m').value);
+  const eqB = parseFloat(document.getElementById('eq_b').value);
+  const disp = document.getElementById('eq-display');
+  if (!isNaN(eqM) && !isNaN(eqB)) {
+    const bStr = eqB >= 0 ? '+ ' + fmt(eqB) : '− ' + fmt(Math.abs(eqB));
+    disp.textContent = `y = ${fmt(eqM)}x ${bStr}`;
+    disp.className = state.eqValid ? 'eq-display locked-eq' : 'eq-display';
+  } else {
+    disp.textContent = 'y = ___x + ___';
+    disp.className = 'eq-display';
+  }
+}
+
+function fmt(n) {
+  if (n === null || isNaN(n)) return '___';
+  const r = Math.round(n * 100) / 100;
+  return r.toString();
+}
+
+function checkLockReady() {
+  const btn = document.getElementById('lock-btn');
+  const note = document.getElementById('lock-note');
+  if (state.eqValid && state.mValid && state.bValid) {
+    btn.classList.remove('locked');
+    note.style.display = 'none';
+  } else {
+    btn.classList.add('locked');
+    note.style.display = 'block';
+  }
+}
+
+function lockEquation() {
+  if (!state.eqValid) return;
+  state.locked = true;
+  state.lockedM = state.m;
+  state.lockedB = state.b;
+  const btn = document.getElementById('lock-btn');
+  btn.textContent = '🔒 Equation Locked';
+  btn.classList.add('locked');
+  document.getElementById('lock-note').style.display = 'none';
+  document.getElementById('eq-display').className = 'eq-display locked-eq';
+  updateProgress();
+}
+
+// ── Part 2 ──────────────────────────────────
+function buildResidRows() {
+  const tbody = document.getElementById('resid-body');
+  tbody.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="match-input" id="r${i}_match" placeholder="Match #" oninput="onResidChange(${i})" /></td>
+      <td><input type="number" id="r${i}_x" placeholder="0" step="any" oninput="onResidChange(${i})" /></td>
+      <td><span class="ypred-val" id="r${i}_ypred">—</span></td>
+      <td><input type="number" id="r${i}_yact" placeholder="0" step="any" oninput="onResidChange(${i})" /></td>
+      <td><span class="resid-val empty" id="r${i}_resid">—</span></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function onResidChange(i) {
+  const xEl = document.getElementById(`r${i}_x`);
+  const xv = parseFloat(xEl.value);
+  const yactEl = document.getElementById(`r${i}_yact`);
+  const yactv = parseFloat(yactEl.value);
+  const ypredEl = document.getElementById(`r${i}_ypred`);
+  const residEl = document.getElementById(`r${i}_resid`);
+
+  if (!state.locked || state.lockedM === null || state.lockedB === null) {
+    ypredEl.textContent = '—';
+    residEl.textContent = '—';
+    residEl.className = 'resid-val empty';
+    return;
+  }
+
+  if (!isNaN(xv)) {
+    const pred = state.lockedM * xv + state.lockedB;
+    ypredEl.textContent = fmt(pred);
+
+    if (!isNaN(yactv)) {
+      const resid = pred - yactv;
+      const r = Math.round(resid * 100) / 100;
+      residEl.textContent = r > 0 ? '+' + r : r.toString();
+      if (Math.abs(r) < 0.001) residEl.className = 'resid-val zero';
+      else if (r > 0) residEl.className = 'resid-val over';
+      else residEl.className = 'resid-val under';
+
+      // Auto-fill log sentence from row 0
+      if (i === 0) {
+        document.getElementById('log_pred').value = fmt(pred);
+        const matchEl = document.getElementById(`r${i}_match`);
+        document.getElementById('log_match').value = matchEl.value || '';
+        document.getElementById('log_actual').value = yactv;
+        document.getElementById('log_resid').value = fmt(resid);
+      }
+    } else {
+      residEl.textContent = '—';
+      residEl.className = 'resid-val empty';
+    }
+  } else {
+    ypredEl.textContent = '—';
+    residEl.textContent = '—';
+    residEl.className = 'resid-val empty';
+  }
+  updateProgress();
+  checkPart2();
+}
+
+function getResidRow(i) {
+  const xv = parseFloat((document.getElementById(`r${i}_x`) || {}).value);
+  const yav = parseFloat((document.getElementById(`r${i}_yact`) || {}).value);
+  return { hasAll: !isNaN(xv) && !isNaN(yav) };
+}
+
+function refreshPart2() {
+  const noEq = document.getElementById('no-eq-notice');
+  const lockedDisplay = document.getElementById('locked-eq-display');
+  const lockedText = document.getElementById('locked-eq-text');
+
+  if (!state.locked) {
+    noEq.style.display = 'block';
+    lockedDisplay.style.display = 'none';
+  } else {
+    noEq.style.display = 'none';
+    lockedDisplay.style.display = 'block';
+    const bStr = state.lockedB >= 0 ? '+ ' + fmt(state.lockedB) : '− ' + fmt(Math.abs(state.lockedB));
+    lockedText.textContent = `y = ${fmt(state.lockedM)}x ${bStr}`;
+  }
+
+  // Rebuild rows if not yet built
+  if (!document.getElementById('r0_match')) buildResidRows();
+}
+
+function pickPattern(val, btn) {
+  state.patternPicked = val;
+  document.querySelectorAll('#pattern-pick .pick-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  checkPart2();
+  updateProgress();
+}
+
+function checkPart2() {
+  updateProgress();
+}
+
+// ── Section 3 — checklist + done ────────────
+function toggleCheck(idx) {
+  state.checks[idx] = !state.checks[idx];
+  const li = document.getElementById('chk' + idx);
+  li.classList.toggle('checked', state.checks[idx]);
+  checkDone();
+  updateProgress();
+}
+
+function checkDone() {
+  const reflectOk = document.getElementById('reflect-text').value.trim().length >= 10;
+  const checksOk = state.checks.every(Boolean);
+  const btn = document.getElementById('done-btn');
+  const note = document.getElementById('done-note');
+
+  if (checksOk && reflectOk) {
+    btn.classList.remove('locked');
+    note.style.display = 'none';
+  } else {
+    btn.classList.add('locked');
+    note.style.display = 'block';
+  }
+  updateProgress();
+}
+
+function handleDone() {
+  if (document.getElementById('done-btn').classList.contains('locked')) return;
+  document.getElementById('done-btn').style.display = 'none';
+  document.getElementById('done-note').style.display = 'none';
+  document.getElementById('success-banner').classList.add('show');
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+// ── Init ────────────────────────────────────
+buildResidRows();
+updateProgress();
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proportional Scaling — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1b2a; --card:#1a2d45; --card2:#132033; --border:#2a4060;
+  --yellow:#ffd600; --green:#00c97a; --red:#ff4d6d; --muted:#7a9cc0;
+  --text:#e8f0f8; --purple:#9c6fde; --speed-col:#ffd600; --power-col:#9c6fde;
+  --radius:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#0d1b2a,#132033);border-bottom:2px solid var(--border);padding:18px 22px}
+.badge{display:inline-block;background:var(--yellow);color:var(--bg);font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:7px}
+.header h1{font-size:22px;font-weight:900;color:#fff;line-height:1.15}
+.header p{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* TEAM + STAT ENTRY */
+.stat-entry{margin:16px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.entry-head{background:var(--card2);padding:11px 18px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.entry-title{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--yellow)}
+.entry-body{padding:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.stat-field{display:flex;flex-direction:column;gap:6px}
+.stat-label{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
+.stat-input{background:var(--card2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800;text-align:center;padding:10px;width:72px;outline:none;-moz-appearance:textfield}
+.stat-input::-webkit-inner-spin-button,.stat-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.stat-input:focus{border-color:var(--yellow)}
+.stat-input.speed-themed{border-color:rgba(255,214,0,0.4)}
+.stat-input.power-themed{border-color:rgba(156,111,222,0.4)}
+.start-btn{background:var(--yellow);color:var(--bg);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;margin-left:auto}
+.start-btn:hover{background:#ffe033}
+.start-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* FORMULA BAR */
+.formula-bar{margin:0 18px 4px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;display:flex;gap:20px;flex-wrap:wrap}
+.formula-item{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.formula-item span{color:var(--text);font-weight:700}
+
+/* PHASES */
+.phase{margin:14px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;opacity:.45;pointer-events:none;transition:opacity .3s}
+.phase.active{opacity:1;pointer-events:all}
+.phase-head{padding:13px 18px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--border)}
+.phase-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0}
+.phase-title{font-size:13px;font-weight:800;color:var(--text)}
+.phase-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.phase-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+
+/* STEP ROWS */
+.step{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.step-q{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.5}
+.step-q .q-accent{font-weight:900}
+.step-input-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calc-input{background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;text-align:center;padding:9px 10px;width:90px;outline:none;-moz-appearance:textfield}
+.calc-input::-webkit-inner-spin-button,.calc-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.calc-input:focus{border-color:var(--yellow)}
+.check-btn{background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;padding:9px 16px;cursor:pointer;transition:all .2s}
+.check-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+.feedback{margin-top:8px;font-size:12px;font-weight:700;min-height:18px;line-height:1.5}
+.feedback.ok{color:var(--green)}
+.feedback.wrong{color:var(--red)}
+.feedback.hint{color:var(--muted)}
+.step-eq{font-size:12px;color:var(--muted);font-family:monospace;margin-bottom:6px}
+
+/* COMPARISON PANEL */
+.compare-panel{border-radius:10px;overflow:hidden;display:none}
+.compare-panel.visible{display:block}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border)}
+.compare-col{background:var(--card2);padding:16px}
+.compare-col-head{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.compare-col.speed-col .compare-col-head{color:var(--speed-col)}
+.compare-col.power-col .compare-col-head{color:var(--power-col)}
+.compare-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px}
+.compare-row:last-of-type{border-bottom:none}
+.compare-key{color:var(--muted);font-size:12px}
+.compare-val{font-weight:800}
+.verdict{margin-top:12px;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:700;line-height:1.5}
+.verdict.proportional{background:rgba(0,201,122,0.12);border:1.5px solid rgba(0,201,122,0.3);color:var(--green)}
+.verdict.not-proportional{background:rgba(156,111,222,0.12);border:1.5px solid rgba(156,111,222,0.3);color:var(--purple)}
+
+/* REVEAL BANNER */
+.reveal-banner{margin:14px 18px;background:rgba(255,214,0,0.07);border:2px solid rgba(255,214,0,0.35);border-radius:var(--radius);padding:18px 20px;display:none}
+.reveal-banner.visible{display:block}
+.reveal-headline{font-size:18px;font-weight:900;color:var(--yellow);margin-bottom:8px}
+.reveal-body{font-size:13px;color:var(--text);line-height:1.65}
+.reveal-body strong{color:var(--yellow)}
+
+/* PROPOSAL BRIDGE */
+.bridge{margin:14px 18px;background:var(--card2);border:1.5px dashed var(--border);border-radius:var(--radius);padding:16px 18px}
+.bridge-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bridge h3{font-size:15px;font-weight:800;color:var(--text);margin-bottom:5px}
+.bridge p{font-size:13px;color:var(--muted);line-height:1.6}
+.rules-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.rule-item{display:flex;gap:8px;font-size:12px;color:var(--text);line-height:1.4}
+.rule-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;flex-shrink:0;margin-top:1px}
+.rule-allow{background:rgba(0,201,122,0.2);color:var(--green)}
+.rule-deny{background:rgba(255,77,109,0.2);color:var(--red)}
+
+/* ─── ELL ENHANCEMENTS ───────────────────────────────── */
+/* Vocabulary strip */
+.key-terms{margin:12px 18px 4px;display:flex;gap:8px;flex-wrap:wrap}
+.key-term{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:130px}
+.key-term-word{font-size:11px;font-weight:900;color:var(--yellow);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.key-term-def{font-size:11px;color:var(--muted);line-height:1.45}
+.key-term-eg{font-size:11px;font-weight:700;color:var(--text);margin-top:4px}
+
+/* Operation badges */
+.op-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;border-radius:5px;padding:3px 9px;margin-bottom:8px}
+.op-calc{background:rgba(74,144,226,0.12);color:#4a90e2;border:1px solid rgba(74,144,226,0.22)}
+.op-scale{background:rgba(255,145,0,0.12);color:#ff9100;border:1px solid rgba(255,145,0,0.22)}
+.op-pct{background:rgba(0,201,122,0.12);color:#00c97a;border:1px solid rgba(0,201,122,0.22)}
+
+/* Scale bar visual (50% more) */
+.scale-visual{background:var(--card);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.scale-vis-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.scale-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.scale-row:last-child{margin-bottom:0}
+.scale-row-label{font-size:10px;font-weight:800;color:var(--muted);width:60px;flex-shrink:0;text-align:right;line-height:1.3}
+.scale-bar-wrap{display:flex;align-items:center;gap:8px;flex:1}
+.scale-bar{height:14px;border-radius:3px;min-width:4px;transition:width .5s ease;display:flex;align-items:center;padding-left:6px}
+.scale-bar.s-orig{background:rgba(255,214,0,0.25);border:1px solid rgba(255,214,0,0.4)}
+.scale-bar.s-scaled{background:rgba(255,214,0,0.6)}
+.scale-bar.p-orig{background:rgba(156,111,222,0.2);border:1px solid rgba(156,111,222,0.4)}
+.scale-bar.p-scaled{background:rgba(156,111,222,0.7)}
+.scale-num{font-size:12px;font-weight:800;color:var(--text);flex-shrink:0}
+.scale-tag{font-size:9px;font-weight:900;color:var(--green);letter-spacing:1px;background:rgba(0,201,122,0.12);border-radius:4px;padding:2px 7px}
+
+/* % change formula scaffold */
+.pct-formula-row{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.pct-box{display:flex;flex-direction:column;align-items:center;gap:3px}
+.pct-box-lbl{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1px;text-align:center}
+.pct-inp{background:var(--card2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;text-align:center;padding:6px 4px;width:60px;outline:none;-moz-appearance:textfield}
+.pct-inp::-webkit-inner-spin-button,.pct-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.pct-inp:focus{border-color:var(--yellow)}
+.pct-op{font-size:14px;color:var(--muted);font-weight:700;padding-bottom:18px}
+.pct-result .pct-box-val{font-size:15px;font-weight:900;color:var(--yellow)}
+
+/* % change bar graphic (reveal after correct) */
+.pct-visual{background:var(--card);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.pct-vis-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pctbar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.pctbar-row-lbl{font-size:10px;font-weight:800;color:var(--muted);width:56px;flex-shrink:0;text-align:right;line-height:1.3}
+.pctbar-track{display:flex;align-items:stretch;height:24px;border-radius:5px;overflow:hidden;background:var(--card2);border:1px solid var(--border);flex:1}
+.pb-orig{background:rgba(122,156,192,0.25);flex-shrink:0;transition:flex-basis .5s ease}
+.pb-same{background:rgba(122,156,192,0.15);flex-shrink:0;transition:flex-basis .5s ease}
+.pb-diff-s{background:rgba(255,214,0,0.7);flex-shrink:0;transition:flex-basis .5s ease}
+.pb-diff-p{background:rgba(156,111,222,0.8);flex-shrink:0;transition:flex-basis .5s ease}
+.pb-empty{flex:1;background:transparent}
+.pctbar-note{margin-left:66px;font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px}
+.pctbar-note strong{color:var(--text)}
+.pctbar-key{display:flex;gap:10px;margin-left:66px;margin-top:8px;flex-wrap:wrap}
+.pctbar-key-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.pctbar-key-swatch{width:12px;height:12px;border-radius:2px}
+
+/* Reveal visual comparison */
+.reveal-bars{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.rv-col{background:var(--card2);border-radius:10px;padding:14px}
+.rv-head{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.rv-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rv-row-lbl{font-size:10px;color:var(--muted);width:48px;flex-shrink:0;text-align:right}
+.rv-bar{height:20px;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:800;min-width:40px;white-space:nowrap;transition:width .6s ease}
+.rv-bar.rv-in{background:rgba(122,156,192,0.25);color:var(--muted)}
+.rv-bar.rv-match{background:rgba(255,214,0,0.55);color:#0d1b2a}
+.rv-bar.rv-bigger{color:#fff}
+.rv-verdict{font-size:11px;font-weight:700;margin-top:10px;padding:7px 10px;border-radius:6px;line-height:1.4}
+.rv-verdict.vyes{background:rgba(0,201,122,0.12);color:var(--green)}
+.rv-verdict.vno{background:rgba(156,111,222,0.12);color:var(--purple)}
+
+@media(max-width:560px){
+  .compare-grid{grid-template-columns:1fr}
+  .entry-body{flex-direction:column}
+  .start-btn{width:100%;margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="badge">Velocity Arena · Day 11 · Phase 1</div>
+  <h1>Proportional Scaling</h1>
+  <p>Does scaling a stat by 50% scale the bot output by 50%? Find out.</p>
+</div>
+
+<!-- FORMULAS BAR -->
+<div class="formula-bar">
+  <div class="formula-item"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h7.5" stroke="#ffd600" stroke-width="1.6" stroke-linecap="round"/><path d="M2 5.5h4M2 10.5h4" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round" opacity=".5"/><path d="M7.5 4.5l5 3.5-5 3.5" stroke="#ffd600" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Motor Power = <span>Speed × 5</span></div>
+  <div class="formula-item"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10 1.5L4.5 9H8.5L6 14.5L11.5 7H7.5L10 1.5z" stroke="#9c6fde" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Charge Speed = <span>Power²</span></div>
+  <div class="formula-item"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="9.5" width="3" height="5" rx="0.8" stroke="#7a9cc0" stroke-width="1.4"/><rect x="6.5" y="6.5" width="3" height="8" rx="0.8" stroke="#7a9cc0" stroke-width="1.4"/><rect x="11.5" y="3.5" width="3" height="11" rx="0.8" stroke="#7a9cc0" stroke-width="1.4"/></svg> Budget = <span>20 − S − E − T − P</span></div>
+</div>
+
+<!-- KEY TERMS -->
+<div class="key-terms">
+  <div class="key-term">
+    <div class="key-term-word">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="5" width="3" height="6" rx=".6" stroke="#ffd600" stroke-width="1.2"/><rect x="4.5" y="3" width="3" height="8" rx=".6" stroke="#ffd600" stroke-width="1.2"/><rect x="8" y="1" width="3" height="10" rx=".6" stroke="#ffd600" stroke-width="1.2"/></svg>
+      Scale × 1.5
+    </div>
+    <div class="key-term-def">Multiply by 1.5 = 50% more than before</div>
+    <div class="key-term-eg">e.g. 6 × 1.5 = 9</div>
+  </div>
+  <div class="key-term">
+    <div class="key-term-word">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="1" y1="6" x2="11" y2="6" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round"/><path d="M7.5 3l3 3-3 3" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Proportional
+    </div>
+    <div class="key-term-def">Input grows 50% → Output grows 50%<br>Same rate. Even growth.</div>
+  </div>
+  <div class="key-term">
+    <div class="key-term-word">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L2 7h3.5L4 10.5 9 5H5.5L6 1.5z" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Quadratic
+    </div>
+    <div class="key-term-def">Output grows <em>much faster</em> than input<br>Because P² = P × P</div>
+  </div>
+  <div class="key-term">
+    <div class="key-term-word">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="#ffd600" stroke-width="1.2"/><path d="M4 6h4M6 4v4" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round"/></svg>
+      % Change
+    </div>
+    <div class="key-term-def">How much it grew, shown as a percent</div>
+    <div class="key-term-eg">(new − old) ÷ old × 100</div>
+  </div>
+</div>
+
+<!-- STAT ENTRY -->
+<div class="stat-entry">
+  <div class="entry-head">
+    <span class="entry-title">Step 0 — Enter your Season 1 stats</span>
+  </div>
+  <div class="entry-body">
+    <div class="stat-field">
+      <div class="stat-label" style="color:var(--speed-col)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8h7.5" stroke="#ffd600" stroke-width="1.6" stroke-linecap="round"/><path d="M2 5.5h4M2 10.5h4" stroke="#ffd600" stroke-width="1.3" stroke-linecap="round" opacity=".5"/><path d="M7.5 4.5l5 3.5-5 3.5" stroke="#ffd600" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Speed (S)</div>
+      <input class="stat-input speed-themed" type="number" id="inp-s" min="1" max="18" placeholder="—">
+    </div>
+    <div class="stat-field">
+      <div class="stat-label" style="color:var(--power-col)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 1.5L4.5 9H8.5L6 14.5L11.5 7H7.5L10 1.5z" stroke="#9c6fde" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Power (P)</div>
+      <input class="stat-input power-themed" type="number" id="inp-p" min="1" max="18" placeholder="—">
+    </div>
+    <button class="start-btn" id="start-btn" onclick="startCalc()" disabled style="display:flex;align-items:center;gap:8px">Start Calculating <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 3.5l4 3.5-4 3.5" stroke="#0d1b2a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+</div>
+
+<!-- PHASE 1: SPEED -->
+<div class="phase" id="phase-speed">
+  <div class="phase-head" style="background:rgba(255,214,0,0.06)">
+    <div class="phase-icon" style="background:rgba(255,214,0,0.12);border:1.5px solid rgba(255,214,0,0.25)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M2 8h7.5" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round"/><path d="M2 5.5h4M2 10.5h4" stroke="#ffd600" stroke-width="1.4" stroke-linecap="round" opacity=".55"/><path d="M7.5 4.5l5 3.5-5 3.5" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+    <div>
+      <div class="phase-title">Part A — Speed · Motor Power</div>
+      <div class="phase-sub">Formula: Motor Power = Speed × 5</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="step" id="step-s1">
+      <span class="op-badge op-calc"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 5h3M5 3.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Multiply</span>
+      <div class="step-eq" id="s1-eq">Motor Power = ? × 5</div>
+      <div class="step-q">Calculate your <span class="q-accent">original motor power</span> using your Season 1 Speed.</div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="s1-ans" placeholder="  %"
+          oninput="clearFeedback('s1-fb')" onkeydown="if(event.key==='Enter')checkStep('s1')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('s1')">Check</button>
+      </div>
+      <div class="feedback" id="s1-fb"></div>
+    </div>
+
+    <div class="step" id="step-s2" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-scale"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 8L8 2M5.5 2H8v2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Scale up 50%</span>
+      <div class="step-eq" id="s2-eq">Scaled Speed = ? × 1.5 = ?</div>
+      <div class="step-q">Scale Speed up by <span class="q-accent">50%</span>. What is the new Speed value?</div>
+      <div class="scale-visual">
+        <div class="scale-vis-label">50% more = multiply by 1.5</div>
+        <div class="scale-row">
+          <div class="scale-row-label">Original</div>
+          <div class="scale-bar-wrap">
+            <div class="scale-bar s-orig" id="sb-s-orig" style="width:0px"></div>
+            <div class="scale-num" id="sb-s-orig-val"></div>
+          </div>
+        </div>
+        <div class="scale-row">
+          <div class="scale-row-label">× 1.5<br><span style="color:var(--green);font-size:9px">+50%</span></div>
+          <div class="scale-bar-wrap">
+            <div class="scale-bar s-scaled" id="sb-s-new" style="width:0px"></div>
+            <div class="scale-num" id="sb-s-new-val"></div>
+            <span class="scale-tag" id="sb-s-tag" style="display:none">+50%</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="s2-ans" placeholder="  " step="0.1"
+          oninput="clearFeedback('s2-fb')" onkeydown="if(event.key==='Enter')checkStep('s2')">
+        <button class="check-btn" onclick="checkStep('s2')">Check</button>
+      </div>
+      <div class="feedback" id="s2-fb"></div>
+    </div>
+
+    <div class="step" id="step-s3" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-calc"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 5h3M5 3.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Multiply</span>
+      <div class="step-eq" id="s3-eq">New Motor Power = ? × 5</div>
+      <div class="step-q">Calculate <span class="q-accent">new motor power</span> using the scaled Speed.</div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="s3-ans" placeholder="  %" step="0.1"
+          oninput="clearFeedback('s3-fb')" onkeydown="if(event.key==='Enter')checkStep('s3')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('s3')">Check</button>
+      </div>
+      <div class="feedback" id="s3-fb"></div>
+    </div>
+
+    <div class="step" id="step-s4" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-pct"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><circle cx="3" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="8" x2="8" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Find % Change</span>
+      <div class="step-eq" id="s4-eq">% change = (new − old) ÷ old × 100</div>
+      <div class="step-q">What is the <span class="q-accent">percent change</span> in motor power? Use the formula above.</div>
+      <div class="pct-visual">
+        <div class="pct-vis-label">Fill in your numbers, then calculate</div>
+        <div class="pct-formula-row">
+          <div class="pct-box">
+            <input class="pct-inp" id="s4-new" type="number" placeholder="New" step="0.1" oninput="calcPctDisplay('s4')">
+            <div class="pct-box-lbl">New MP</div>
+          </div>
+          <div class="pct-op">−</div>
+          <div class="pct-box">
+            <input class="pct-inp" id="s4-old" type="number" placeholder="Orig" step="0.1" oninput="calcPctDisplay('s4')">
+            <div class="pct-box-lbl">Original MP</div>
+          </div>
+          <div class="pct-op">÷</div>
+          <div class="pct-box">
+            <input class="pct-inp" id="s4-old2" type="number" placeholder="Orig" step="0.1" oninput="calcPctDisplay('s4')">
+            <div class="pct-box-lbl">Original MP</div>
+          </div>
+          <div class="pct-op">× 100 =</div>
+          <div class="pct-box pct-result">
+            <div class="pct-box-val" id="s4-calc-result">?%</div>
+            <div class="pct-box-lbl">Answer ↓</div>
+          </div>
+        </div>
+      </div>
+      <!-- Bar reveal — shown after correct answer -->
+      <div class="pct-visual" id="s4-bar-reveal" style="display:none">
+        <div class="pct-vis-label">What that looks like</div>
+        <div class="pctbar-row">
+          <div class="pctbar-row-lbl">Before</div>
+          <div class="pctbar-track">
+            <div class="pb-orig" id="pbs-before" style="flex-basis:0%"></div>
+            <div class="pb-empty"></div>
+          </div>
+        </div>
+        <div class="pctbar-row">
+          <div class="pctbar-row-lbl">After</div>
+          <div class="pctbar-track">
+            <div class="pb-same" id="pbs-same" style="flex-basis:0%"></div>
+            <div class="pb-diff-s" id="pbs-diff" style="flex-basis:0%"></div>
+          </div>
+        </div>
+        <div class="pctbar-note">The <strong>yellow portion</strong> is the gain you just calculated.</div>
+        <div class="pctbar-key">
+          <div class="pctbar-key-item"><div class="pctbar-key-swatch" style="background:rgba(122,156,192,0.25);border:1px solid var(--border)"></div> Original</div>
+          <div class="pctbar-key-item"><div class="pctbar-key-swatch" style="background:rgba(255,214,0,0.7)"></div> Gain</div>
+        </div>
+      </div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="s4-ans" placeholder="  %" step="0.1"
+          oninput="clearFeedback('s4-fb')" onkeydown="if(event.key==='Enter')checkStep('s4')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('s4')">Check</button>
+      </div>
+      <div class="feedback" id="s4-fb"></div>
+    </div>
+
+    <!-- Speed compare panel -->
+    <div class="compare-panel" id="speed-compare">
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col speed-col">
+          <div class="compare-col-head">Speed Results</div>
+          <div class="compare-row"><span class="compare-key">Stat increase</span><span class="compare-val" id="sc-stat-inc">—</span></div>
+          <div class="compare-row"><span class="compare-key">Output increase</span><span class="compare-val" id="sc-out-inc">—</span></div>
+          <div class="verdict proportional">✓ Proportional — input and output scaled by the same factor.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PHASE 2: POWER -->
+<div class="phase" id="phase-power">
+  <div class="phase-head" style="background:rgba(156,111,222,0.06)">
+    <div class="phase-icon" style="background:rgba(156,111,222,0.12);border:1.5px solid rgba(156,111,222,0.25)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M10 1.5L4.5 9H8.5L6 14.5L11.5 7H7.5L10 1.5z" stroke="#9c6fde" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div>
+      <div class="phase-title">Part B — Power · Charge Speed</div>
+      <div class="phase-sub">Formula: Charge Speed = Power²</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="step" id="step-p1">
+      <span class="op-badge op-calc"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 5h3M5 3.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Multiply (P × P)</span>
+      <div class="step-eq" id="p1-eq">Charge Speed = ?²</div>
+      <div class="step-q">Calculate your <span class="q-accent">original charge speed</span> using your Season 1 Power.</div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="p1-ans" placeholder="  %"
+          oninput="clearFeedback('p1-fb')" onkeydown="if(event.key==='Enter')checkStep('p1')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('p1')">Check</button>
+      </div>
+      <div class="feedback" id="p1-fb"></div>
+    </div>
+
+    <div class="step" id="step-p2" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-scale"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 8L8 2M5.5 2H8v2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Scale up 50%</span>
+      <div class="step-eq" id="p2-eq">Scaled Power = ? × 1.5 = ?</div>
+      <div class="step-q">Scale Power up by <span class="q-accent">50%</span>. What is the new Power value?</div>
+      <div class="scale-visual">
+        <div class="scale-vis-label">50% more = multiply by 1.5</div>
+        <div class="scale-row">
+          <div class="scale-row-label">Original</div>
+          <div class="scale-bar-wrap">
+            <div class="scale-bar p-orig" id="sb-p-orig" style="width:0px"></div>
+            <div class="scale-num" id="sb-p-orig-val"></div>
+          </div>
+        </div>
+        <div class="scale-row">
+          <div class="scale-row-label">× 1.5<br><span style="color:var(--green);font-size:9px">+50%</span></div>
+          <div class="scale-bar-wrap">
+            <div class="scale-bar p-scaled" id="sb-p-new" style="width:0px"></div>
+            <div class="scale-num" id="sb-p-new-val"></div>
+            <span class="scale-tag" id="sb-p-tag" style="display:none">+50%</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="p2-ans" placeholder="  " step="0.1"
+          oninput="clearFeedback('p2-fb')" onkeydown="if(event.key==='Enter')checkStep('p2')">
+        <button class="check-btn" onclick="checkStep('p2')">Check</button>
+      </div>
+      <div class="feedback" id="p2-fb"></div>
+    </div>
+
+    <div class="step" id="step-p3" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-calc"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 5h3M5 3.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Multiply (P × P)</span>
+      <div class="step-eq" id="p3-eq">New Charge Speed = ?²</div>
+      <div class="step-q">Calculate <span class="q-accent">new charge speed</span> using the scaled Power. Remember: Power squared.</div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="p3-ans" placeholder="  %" step="0.1"
+          oninput="clearFeedback('p3-fb')" onkeydown="if(event.key==='Enter')checkStep('p3')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('p3')">Check</button>
+      </div>
+      <div class="feedback" id="p3-fb"></div>
+    </div>
+
+    <div class="step" id="step-p4" style="opacity:.4;pointer-events:none">
+      <span class="op-badge op-pct"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><circle cx="3" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="8" x2="8" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Find % Change</span>
+      <div class="step-eq" id="p4-eq">% change = (new − old) ÷ old × 100</div>
+      <div class="step-q">What is the <span class="q-accent">percent change</span> in charge speed? Use the same formula as before.</div>
+      <div class="pct-visual">
+        <div class="pct-vis-label">Fill in your numbers, then calculate</div>
+        <div class="pct-formula-row">
+          <div class="pct-box">
+            <input class="pct-inp" id="p4-new" type="number" placeholder="New" step="0.1" oninput="calcPctDisplay('p4')">
+            <div class="pct-box-lbl">New CS</div>
+          </div>
+          <div class="pct-op">−</div>
+          <div class="pct-box">
+            <input class="pct-inp" id="p4-old" type="number" placeholder="Orig" step="0.1" oninput="calcPctDisplay('p4')">
+            <div class="pct-box-lbl">Original CS</div>
+          </div>
+          <div class="pct-op">÷</div>
+          <div class="pct-box">
+            <input class="pct-inp" id="p4-old2" type="number" placeholder="Orig" step="0.1" oninput="calcPctDisplay('p4')">
+            <div class="pct-box-lbl">Original CS</div>
+          </div>
+          <div class="pct-op">× 100 =</div>
+          <div class="pct-box pct-result">
+            <div class="pct-box-val" id="p4-calc-result">?%</div>
+            <div class="pct-box-lbl">Answer ↓</div>
+          </div>
+        </div>
+      </div>
+      <!-- Bar reveal — shown after correct answer -->
+      <div class="pct-visual" id="p4-bar-reveal" style="display:none">
+        <div class="pct-vis-label">What that looks like</div>
+        <div class="pctbar-row">
+          <div class="pctbar-row-lbl">Before</div>
+          <div class="pctbar-track">
+            <div class="pb-orig" id="pbp-before" style="flex-basis:0%"></div>
+            <div class="pb-empty"></div>
+          </div>
+        </div>
+        <div class="pctbar-row">
+          <div class="pctbar-row-lbl">After</div>
+          <div class="pctbar-track">
+            <div class="pb-same" id="pbp-same" style="flex-basis:0%"></div>
+            <div class="pb-diff-p" id="pbp-diff" style="flex-basis:0%"></div>
+          </div>
+        </div>
+        <div class="pctbar-note">The <strong>purple portion</strong> is the gain you just calculated.</div>
+        <div class="pctbar-key">
+          <div class="pctbar-key-item"><div class="pctbar-key-swatch" style="background:rgba(122,156,192,0.25);border:1px solid var(--border)"></div> Original</div>
+          <div class="pctbar-key-item"><div class="pctbar-key-swatch" style="background:rgba(156,111,222,0.8)"></div> Gain</div>
+        </div>
+      </div>
+      <div class="step-input-row">
+        <input class="calc-input" type="number" id="p4-ans" placeholder="  %" step="0.1"
+          oninput="clearFeedback('p4-fb')" onkeydown="if(event.key==='Enter')checkStep('p4')">
+        <span style="font-size:12px;color:var(--muted)">%</span>
+        <button class="check-btn" onclick="checkStep('p4')">Check</button>
+      </div>
+      <div class="feedback" id="p4-fb"></div>
+    </div>
+
+    <!-- Power compare panel -->
+    <div class="compare-panel" id="power-compare">
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col power-col">
+          <div class="compare-col-head">Power Results</div>
+          <div class="compare-row"><span class="compare-key">Stat increase</span><span class="compare-val" id="pc-stat-inc">—</span></div>
+          <div class="compare-row"><span class="compare-key">Output increase</span><span class="compare-val" id="pc-out-inc">—</span></div>
+          <div class="verdict not-proportional" id="power-verdict">✗ Not proportional — the output grew by more than the input.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FINAL REVEAL -->
+<div class="reveal-banner" id="reveal-banner">
+  <div class="reveal-headline" style="display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M10 1.5L4.5 9H8.5L6 14.5L11.5 7H7.5L10 1.5z" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Here's the difference</div>
+  <div class="reveal-body" id="reveal-body">
+    Speed scaled proportionally. Power did not. When you increased Speed by 50%, motor power went up by exactly 50%. When you increased Power by 50%, charge speed went up by <strong id="reveal-pct">125%</strong> — not 50%. That's because charge speed = P², a quadratic formula. The same input scaling produces a much larger output jump.
+    <div class="reveal-bars">
+      <div class="rv-col">
+        <div class="rv-head" style="color:var(--speed-col)">Speed → Motor Power</div>
+        <div class="rv-row">
+          <span class="rv-row-lbl">Stat ↑</span>
+          <div class="rv-bar rv-in" style="width:50%">+50%</div>
+        </div>
+        <div class="rv-row">
+          <span class="rv-row-lbl">Output ↑</span>
+          <div class="rv-bar rv-match" style="width:50%">+50%</div>
+        </div>
+        <div class="rv-verdict vyes">Same growth rate = Proportional</div>
+      </div>
+      <div class="rv-col">
+        <div class="rv-head" style="color:var(--power-col)">Power → Charge Speed</div>
+        <div class="rv-row">
+          <span class="rv-row-lbl">Stat ↑</span>
+          <div class="rv-bar rv-in" style="width:50%">+50%</div>
+        </div>
+        <div class="rv-row">
+          <span class="rv-row-lbl">Output ↑</span>
+          <div class="rv-bar rv-bigger" id="reveal-power-bar" style="width:100%;background:var(--purple)">+<span id="reveal-pct-bar">125</span>%</div>
+        </div>
+        <div class="rv-verdict vno" id="reveal-power-verdict">Much bigger growth = NOT Proportional</div>
+      </div>
+    </div>
+    <br>
+    <strong>Why this matters for your proposal:</strong> if you argue for raising a stat cap, you need to know which formula it feeds into. Raising a Speed cap is proportional — predictable. Raising a Power cap is not — the effect grows faster than the stat.
+  </div>
+</div>
+
+<!-- PROPOSAL BRIDGE -->
+<div class="bridge" id="bridge-section" style="display:none">
+  <div class="bridge-label">Next — Phase 2 (25 min)</div>
+  <h3>Commissioner Proposal Prep</h3>
+  <p>Use your Phase 1 numbers as data evidence. Your proposal needs one specific rule change, two numbers from your Season 1 dashboard, and a statement on how the change affects the last-place team.</p>
+  <div class="rules-list">
+    <div class="rule-item"><div class="rule-dot rule-allow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 3.8,7.5 8.5,2" stroke="#00c97a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>A rule <strong>may</strong> cap a stat or set a floor (e.g., "no team may have Speed above 10")</div></div>
+    <div class="rule-item"><div class="rule-dot rule-deny"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><line x1="2" y1="2" x2="8" y2="8" stroke="#ff4d6d" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="2" x2="2" y2="8" stroke="#ff4d6d" stroke-width="1.8" stroke-linecap="round"/></svg></div><div>A rule may <strong>not</strong> force a specific value (e.g., "all teams must set Power to 5")</div></div>
+    <div class="rule-item"><div class="rule-dot rule-deny"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><line x1="2" y1="2" x2="8" y2="8" stroke="#ff4d6d" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="2" x2="2" y2="8" stroke="#ff4d6d" stroke-width="1.8" stroke-linecap="round"/></svg></div><div>A rule may <strong>not</strong> change the formulas or the budget constraint</div></div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────
+let S = 0, P = 0;
+let scaledS = 0, scaledP = 0;
+let origMP = 0, newMP = 0;
+let origCS = 0, newCS = 0;
+const TOLERANCE = 0.6; // allow rounding tolerance in student answers
+
+// ─── SETUP ───────────────────────────────────────────────
+['inp-s','inp-p'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const sv = +document.getElementById('inp-s').value;
+    const pv = +document.getElementById('inp-p').value;
+    document.getElementById('start-btn').disabled = !(sv >= 1 && sv <= 18 && pv >= 1 && pv <= 18);
+  });
+});
+
+function startCalc() {
+  S = +document.getElementById('inp-s').value;
+  P = +document.getElementById('inp-p').value;
+  scaledS = S * 1.5;
+  scaledP = P * 1.5;
+  origMP = S * 5;
+  newMP = scaledS * 5;
+  origCS = P * P;
+  newCS = scaledP * scaledP;
+
+  // Update equation hints
+  document.getElementById('s1-eq').textContent = `Motor Power = ${S} × 5`;
+  document.getElementById('s2-eq').textContent = `Scaled Speed = ${S} × 1.5 = ?`;
+  document.getElementById('s3-eq').textContent = `New Motor Power = ${scaledS} × 5`;
+  document.getElementById('s4-eq').textContent = `% change = (new − ${origMP}) ÷ ${origMP} × 100`;
+  document.getElementById('p1-eq').textContent = `Charge Speed = ${P}²`;
+  document.getElementById('p2-eq').textContent = `Scaled Power = ${P} × 1.5 = ?`;
+  document.getElementById('p3-eq').textContent = `New Charge Speed = ${scaledP}²`;
+  document.getElementById('p4-eq').textContent = `% change = (new − ${origCS}) ÷ ${origCS} × 100`;
+
+  // ── Populate scale bar visuals ──
+  const MAX_BAR = 160; // px for the max stat value
+  const barUnit = MAX_BAR / 20; // 20 is max budget
+  const sOrigPx = Math.round(S * barUnit);
+  const sNewPx  = Math.round(scaledS * barUnit);
+  const pOrigPx = Math.round(P * barUnit);
+  const pNewPx  = Math.round(scaledP * barUnit);
+
+  // Scale bars show the CONCEPT of growth — numbers removed so students still calculate
+  document.getElementById('sb-s-orig').style.width  = sOrigPx + 'px';
+  document.getElementById('sb-s-orig-val').textContent = S;   // already-entered stat, not an answer
+  document.getElementById('sb-s-new').style.width   = sNewPx + 'px';
+  document.getElementById('sb-s-new-val').textContent = '?'; // answer is what student must find
+  document.getElementById('sb-s-tag').style.display = 'inline';
+
+  document.getElementById('sb-p-orig').style.width  = pOrigPx + 'px';
+  document.getElementById('sb-p-orig-val').textContent = P;   // already-entered stat, not an answer
+  document.getElementById('sb-p-new').style.width   = pNewPx + 'px';
+  document.getElementById('sb-p-new-val').textContent = '?'; // answer is what student must find
+  document.getElementById('sb-p-tag').style.display = 'inline';
+
+  // ── Populate % change bar visuals ──
+  // Speed (s4): newMP is the full track; origMP is the "before" portion
+  // origMP/newMP = 1/1.5 ≈ 66.7% — "before" bar is shorter, yellow gain fills the rest
+  const sBefore = Math.round(origMP / newMP * 100);
+  const sDiff   = 100 - sBefore;
+  document.getElementById('pbs-before').style.flexBasis = sBefore + '%';
+  document.getElementById('pbs-same').style.flexBasis   = sBefore + '%';
+  document.getElementById('pbs-diff').style.flexBasis   = sDiff + '%';
+
+  // Power (p4): newCS is the full track; origCS is the "before" portion
+  // origCS/newCS = P²/(P*1.5)² = 1/2.25 ≈ 44.4% — purple gain is bigger than original
+  const pBefore = Math.round(origCS / newCS * 100);
+  const pDiff   = 100 - pBefore;
+  document.getElementById('pbp-before').style.flexBasis = pBefore + '%';
+  document.getElementById('pbp-same').style.flexBasis   = pBefore + '%';
+  document.getElementById('pbp-diff').style.flexBasis   = pDiff + '%';
+
+  // Activate speed phase
+  document.getElementById('phase-speed').classList.add('active');
+  document.getElementById('phase-speed').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('start-btn').disabled = true;
+  document.querySelector('.stat-entry').style.opacity = '0.7';
+}
+
+// ─── STEP CHECKING ────────────────────────────────────────
+const STEPS = {
+  s1: { correct: () => origMP,     next: 's2', hint: () => `${S} × 5 = ${origMP}` },
+  s2: { correct: () => scaledS,    next: 's3', hint: () => `${S} × 1.5 = ${scaledS}` },
+  s3: { correct: () => newMP,      next: 's4', hint: () => `${scaledS} × 5 = ${newMP}` },
+  s4: { correct: () => 50,         next: null,  hint: () => `(${newMP} − ${origMP}) ÷ ${origMP} × 100 = 50%`, phase:'speed' },
+  p1: { correct: () => origCS,     next: 'p2', hint: () => `${P}² = ${P} × ${P} = ${origCS}` },
+  p2: { correct: () => scaledP,    next: 'p3', hint: () => `${P} × 1.5 = ${scaledP}` },
+  p3: { correct: () => newCS,      next: 'p4', hint: () => `${scaledP}² = ${scaledP} × ${scaledP} = ${newCS}` },
+  p4: { correct: () => Math.round((newCS-origCS)/origCS*100), next: null, hint: () => {
+    const pct = Math.round((newCS-origCS)/origCS*100);
+    return `(${newCS} − ${origCS}) ÷ ${origCS} × 100 = ${pct}%`;
+  }, phase:'power' },
+};
+
+function checkStep(id) {
+  const cfg = STEPS[id];
+  const inp = document.getElementById(id + '-ans');
+  const fb = document.getElementById(id + '-fb');
+  const val = parseFloat(inp.value);
+  const correct = cfg.correct();
+
+  if (isNaN(val)) {
+    fb.textContent = 'Enter a number first.';
+    fb.className = 'feedback hint';
+    return;
+  }
+
+  if (Math.abs(val - correct) <= TOLERANCE) {
+    fb.className = 'feedback ok';
+    fb.textContent = `✓ Correct! ${cfg.hint()}`;
+    inp.style.borderColor = 'var(--green)';
+    inp.disabled = true;
+
+    if (cfg.next) {
+      unlockStep(cfg.next);
+    } else if (cfg.phase === 'speed') {
+      showSpeedCompare();
+    } else if (cfg.phase === 'power') {
+      showPowerCompare();
+    }
+  } else {
+    fb.className = 'feedback wrong';
+    // Give a direction hint
+    if (val !== correct) {
+      const diff = Math.abs(val - correct);
+      if (id === 's4' || id === 'p4') {
+        fb.textContent = `✗ Not quite. Use the percent-change formula: (new − old) ÷ old × 100. Show each step.`;
+      } else if (id === 'p3') {
+        fb.textContent = `✗ Remember: Power squared means Power × Power. Try again.`;
+      } else {
+        fb.textContent = `✗ Check your arithmetic. Try again.`;
+      }
+    }
+  }
+}
+
+function unlockStep(id) {
+  const stepEl = document.getElementById('step-' + id);
+  if (stepEl) {
+    stepEl.style.opacity = '1';
+    stepEl.style.pointerEvents = 'all';
+    setTimeout(() => {
+      stepEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+      const inp = stepEl.querySelector('input');
+      if (inp) inp.focus();
+    }, 300);
+  }
+  // If unlocking p1, activate power phase
+  if (id === 'p1') {
+    document.getElementById('phase-power').classList.add('active');
+  }
+}
+
+function calcPctDisplay(prefix) {
+  const nv  = parseFloat(document.getElementById(prefix + '-new').value);
+  const ov  = parseFloat(document.getElementById(prefix + '-old').value);
+  const ov2 = parseFloat(document.getElementById(prefix + '-old2').value);
+  const el  = document.getElementById(prefix + '-calc-result');
+  if (!isNaN(nv) && !isNaN(ov) && !isNaN(ov2) && ov2 !== 0) {
+    const result = Math.round((nv - ov) / ov2 * 1000) / 10; // 1 decimal place
+    el.textContent = result + '%';
+    el.style.color = 'var(--green)';
+  } else {
+    el.textContent = '?%';
+    el.style.color = 'var(--yellow)';
+  }
+}
+
+function clearFeedback(id) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = '';
+}
+
+function showSpeedCompare() {
+  document.getElementById('sc-stat-inc').textContent = '50%';
+  document.getElementById('sc-out-inc').textContent = '50%';
+  // Reveal bar graphic
+  document.getElementById('s4-bar-reveal').style.display = 'block';
+  const panel = document.getElementById('speed-compare');
+  panel.classList.add('visible');
+  setTimeout(() => panel.scrollIntoView({behavior:'smooth', block:'nearest'}), 200);
+  // After a beat, unlock power phase
+  setTimeout(() => unlockStep('p1'), 800);
+}
+
+function showPowerCompare() {
+  // Reveal bar graphic
+  document.getElementById('p4-bar-reveal').style.display = 'block';
+  const pct = Math.round((newCS - origCS) / origCS * 100);
+  document.getElementById('pc-stat-inc').textContent = '50%';
+  document.getElementById('pc-out-inc').textContent = pct + '%';
+  document.getElementById('power-verdict').innerHTML =
+    `✗ Not proportional — input went up 50%, output went up <strong>${pct}%</strong>. That's the quadratic effect.`;
+  const panel = document.getElementById('power-compare');
+  panel.classList.add('visible');
+
+  // Update reveal text and bar
+  document.getElementById('reveal-pct').textContent = pct + '%';
+  document.getElementById('reveal-pct-bar').textContent = pct;
+  // Scale the power bar: 50% input bar = ~50% width; power bar should be proportionally wider
+  // Cap at container width visually but show correct label
+  const powerBarPct = Math.min(pct, 200); // cap visual at 200% for layout
+  document.getElementById('reveal-power-bar').style.width = powerBarPct + '%';
+  document.getElementById('reveal-power-verdict').textContent = `Output grew ${pct}% vs 50% stat increase = NOT Proportional`;
+  const reveal = document.getElementById('reveal-banner');
+  reveal.style.display = 'block';
+  const bridge = document.getElementById('bridge-section');
+  bridge.style.display = 'block';
+
+  setTimeout(() => reveal.scrollIntoView({behavior:'smooth', block:'start'}), 300);
+}
+</script>
+</body>
+</html>

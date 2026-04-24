@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Power Stat Challenge · Day 4 · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --navy4:       #252A4A;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+      --orange:      #FF9F43;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 4px; background: linear-gradient(90deg, var(--cyan), var(--purple));
+      transition: width .5s ease; z-index: 100; width: 0%;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link { color: var(--slate); text-decoration: none; font-size: .8125rem; font-weight: 500; }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--orange); background: rgba(255,159,67,.1);
+      border: 1px solid rgba(255,159,67,.3); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* ── Section nav ── */
+    .section-nav {
+      display: flex; background: var(--navy2);
+      border-bottom: 1px solid var(--card-border); overflow-x: auto;
+    }
+    .section-nav button {
+      flex-shrink: 0; font-family: 'DM Sans', sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem; border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s; white-space: nowrap;
+    }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .section-nav button:hover:not(.active) { color: #E8EAF2; }
+
+    /* ── Sections ── */
+    .section { display: none; max-width: 740px; margin: 2rem auto 0; padding: 0 1.25rem; animation: fadeUp .3s ease both; }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Typography ── */
+    .section-heading { font-size: 1.375rem; font-weight: 800; margin-bottom: .4rem; }
+    .section-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; margin-bottom: 1.25rem; }
+
+    /* ── Badges ── */
+    .section-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--cyan); background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+    .badge-orange {
+      color: var(--orange); background: rgba(255,159,67,.08); border-color: rgba(255,159,67,.25);
+    }
+    .badge-purple {
+      color: var(--purple); background: rgba(155,138,255,.08); border-color: rgba(155,138,255,.25);
+    }
+    .badge-green {
+      color: var(--green); background: rgba(0,201,122,.08); border-color: rgba(0,201,122,.25);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .875rem;
+    }
+
+    /* ── Formula board ── */
+    .formula-board {
+      background: var(--navy3); border: 2px solid var(--orange);
+      border-radius: 10px; padding: 2rem 1.5rem; text-align: center; margin: 1rem 0 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .formula-board::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,159,67,.08) 0%, transparent 70%);
+    }
+    .formula-board .fml-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .625rem;
+    }
+    .formula-board .fml-text {
+      font-size: 2.25rem; font-weight: 800; color: var(--orange); line-height: 1.2;
+    }
+    .formula-board .fml-text sup { font-size: 1.25rem; }
+    .formula-board .fml-note {
+      font-size: .875rem; color: var(--slate); margin-top: .625rem;
+    }
+    .formula-board .fml-note strong { color: #E8EAF2; }
+
+    /* ── Vocab callout ── */
+    .vocab-box {
+      display: flex; gap: .875rem; align-items: flex-start;
+      background: rgba(155,138,255,.07); border: 1px solid rgba(155,138,255,.2);
+      border-radius: 8px; padding: .875rem 1rem; margin: .75rem 0 1.25rem;
+    }
+    .vocab-box .vb-icon { font-size: 1.375rem; flex-shrink: 0; }
+    .vocab-box .vb-body { font-size: .875rem; color: #C8CDD8; line-height: 1.6; }
+    .vocab-box .vb-body strong { color: var(--purple); }
+
+    /* ── Key callout ── */
+    .key-callout {
+      display: flex; gap: .75rem; align-items: flex-start;
+      background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25);
+      border-radius: 8px; padding: .875rem 1rem; margin: .875rem 0;
+    }
+    .key-callout .kc-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: .1rem; }
+    .key-callout .kc-body { font-size: .875rem; color: #E8EAF2; line-height: 1.55; }
+    .key-callout .kc-body strong { color: var(--yellow); }
+
+    /* ── Power selector (Section 1) ── */
+    .power-selector {
+      display: flex; gap: .625rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+    }
+    .pwr-btn {
+      flex: 1; min-width: 80px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      padding: .75rem .5rem; border-radius: 8px;
+      border: 2px solid var(--card-border); background: var(--navy3);
+      color: var(--slate); cursor: pointer; transition: all .15s; text-align: center;
+    }
+    .pwr-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .pwr-btn.active { border-color: var(--orange); background: rgba(255,159,67,.1); color: var(--orange); }
+    .pwr-btn .pwr-label { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--slate); display: block; margin-bottom: .2rem; }
+    .pwr-btn.active .pwr-label { color: rgba(255,159,67,.7); }
+
+    /* ── Squaring demo ── */
+    .sq-demo {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 1rem; align-items: center; padding: 1.25rem;
+      background: var(--navy3); border-radius: 8px; margin-bottom: 1rem;
+    }
+    .sq-left { text-align: center; }
+    .sq-left .sq-title { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .5rem; }
+    .sq-visual-wrap { display: flex; justify-content: center; align-items: center; height: 100px; }
+    .sq-square {
+      background: var(--orange); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .875rem; color: var(--navy);
+      transition: width .4s ease, height .4s ease, background .3s ease;
+      min-width: 12px; min-height: 12px;
+    }
+    .sq-arrow { font-size: 1.75rem; color: var(--slate); text-align: center; }
+    .sq-right { text-align: center; }
+    .sq-right .sq-title { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .5rem; }
+    .sq-calc { font-size: 1.75rem; font-weight: 800; color: var(--orange); margin-bottom: .5rem; }
+    .sq-speed-label { font-size: .8125rem; color: var(--slate); margin-bottom: .375rem; }
+    .sq-speed-bar-wrap { background: var(--navy); border-radius: 4px; height: 10px; overflow: hidden; }
+    .sq-speed-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--yellow)); border-radius: 4px; transition: width .5s ease; }
+    .sq-speed-pct { font-size: 1.25rem; font-weight: 800; color: var(--yellow); margin-top: .375rem; }
+
+    /* ── Linear vs Quadratic SVG panel ── */
+    .compare-chart-wrap {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem 1rem .5rem; margin-bottom: 1rem;
+    }
+    .compare-chart-title { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .625rem; text-align: center; }
+
+    /* ── Table ── */
+    .calc-table { width: 100%; border-collapse: collapse; }
+    .calc-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .calc-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .9375rem; vertical-align: middle;
+    }
+    .calc-table tr:last-child td { border-bottom: none; }
+    .cell-big { font-weight: 800; color: #E8EAF2; font-size: 1.125rem; }
+    .cell-ans { font-weight: 800; color: var(--orange); font-size: 1.125rem; }
+    .table-input {
+      width: 80px; background: var(--navy3); border: 1.5px solid var(--card-border);
+      border-radius: 6px; padding: .4rem .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      color: #E8EAF2; outline: none; text-align: center; transition: border-color .15s;
+    }
+    .table-input:focus { border-color: var(--teal); }
+    .table-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .table-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    /* ── Bar chart ── */
+    .bar-chart {
+      display: flex; align-items: flex-end; gap: .75rem; height: 140px;
+      padding: 0 .5rem; margin: 1rem 0 .25rem;
+    }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .375rem; }
+    .bar-fill {
+      width: 100%; border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, var(--orange), rgba(255,159,67,.5));
+      transition: height .6s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+    }
+    .bar-fill.lit { box-shadow: 0 0 12px rgba(255,159,67,.4); }
+    .bar-label-top { font-size: .8125rem; font-weight: 800; color: var(--orange); }
+    .bar-label-bot { font-size: .75rem; font-weight: 700; color: var(--slate); }
+    .bar-chart-axis { height: 1px; background: var(--card-border); margin: 0 .5rem .25rem; }
+
+    /* ── Ratio boxes ── */
+    .ratio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .875rem; margin: 1rem 0; }
+    .ratio-card {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem;
+    }
+    .ratio-card .rc-label { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .5rem; }
+    .ratio-display { display: flex; align-items: center; gap: .5rem; font-size: 1rem; font-weight: 700; margin-bottom: .625rem; }
+    .ratio-display .rd-num { font-size: 1.5rem; font-weight: 800; color: var(--cyan); }
+    .ratio-display .rd-sep { color: var(--slate); }
+    .ratio-input {
+      width: 60px; background: var(--navy2); border: 1.5px solid var(--card-border);
+      border-radius: 6px; padding: .375rem .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      color: var(--cyan); outline: none; text-align: center; transition: border-color .15s;
+    }
+    .ratio-input:focus { border-color: var(--teal); }
+    .ratio-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .ratio-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+    .ratio-note { font-size: .8125rem; color: var(--slate); line-height: 1.4; }
+
+    /* ── Reveal banner ── */
+    .reveal-banner {
+      background: rgba(0,201,122,.08); border: 1px solid rgba(0,201,122,.25);
+      border-radius: 8px; padding: .875rem 1rem; margin-top: .875rem;
+      font-size: .9375rem; color: var(--green); display: none; line-height: 1.5;
+    }
+    .reveal-banner.visible { display: block; }
+
+    /* ── Data log (Section 3) ── */
+    .data-log-row {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1.125rem; margin-bottom: .75rem;
+    }
+    .dlr-header {
+      display: flex; align-items: center; gap: .75rem; margin-bottom: .875rem;
+    }
+    .dlr-badge {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: .25em .75em; border-radius: 4px; white-space: nowrap;
+    }
+    .dlr-badge.p4 { color: var(--cyan); background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.2); }
+    .dlr-badge.p8 { color: var(--orange); background: rgba(255,159,67,.1); border: 1px solid rgba(255,159,67,.25); }
+    .dlr-speed { font-size: .875rem; color: var(--slate); }
+    .dlr-speed strong { color: #E8EAF2; }
+    .dlr-inputs { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+    .dlr-inputs label { font-size: .875rem; font-weight: 700; color: #C8CDD8; }
+    .cm-input {
+      width: 90px; background: var(--navy2); border: 1.5px solid var(--card-border);
+      border-radius: 6px; padding: .45rem .6rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      color: #E8EAF2; outline: none; text-align: center; transition: border-color .15s;
+    }
+    .cm-input:focus { border-color: var(--teal); }
+
+    /* ── Gap calculator ── */
+    .gap-calc {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1.25rem; margin: 1rem 0;
+    }
+    .gap-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: .875rem;
+    }
+    .gap-cell { text-align: center; }
+    .gap-cell .gc-label { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .375rem; }
+    .gap-cell .gc-value { font-size: 1.625rem; font-weight: 800; color: var(--cyan); }
+    .gap-cell .gc-value.predicted { color: var(--purple); }
+    .gap-cell .gc-value.actual { color: var(--orange); }
+    .gap-cell .gc-value.gap-num { color: var(--yellow); }
+    .gap-cell .gc-note { font-size: .75rem; color: var(--slate); margin-top: .2rem; }
+    .gap-math { font-size: .8125rem; color: var(--slate); text-align: center; padding-top: .625rem; border-top: 1px solid var(--card-border); }
+
+    /* ── Ratio result ── */
+    .ratio-result-wrap {
+      display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+      background: var(--navy3); border-radius: 8px; padding: 1rem; margin: .875rem 0;
+    }
+    .rr-item { text-align: center; flex: 1; min-width: 100px; }
+    .rr-item .rr-label { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); }
+    .rr-item .rr-val { font-size: 1.5rem; font-weight: 800; margin-top: .25rem; }
+    .rr-item .rr-sub { font-size: .75rem; color: var(--slate); margin-top: .2rem; }
+
+    /* ── Sentence builder ── */
+    .sentence-builder {
+      background: rgba(0,229,255,.05); border: 1px solid rgba(0,229,255,.15);
+      border-radius: 8px; padding: 1.125rem; margin: .875rem 0;
+    }
+    .sb-title { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem; }
+    .sentence-output {
+      font-size: .9375rem; line-height: 1.7; color: #E8EAF2;
+      min-height: 2.5rem;
+    }
+    .sentence-output .so-fill { color: var(--cyan); font-weight: 700; }
+    .sentence-output .so-blank { color: var(--slate); font-style: italic; }
+
+    /* ── Gap verdict ── */
+    .verdict-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+    .verdict-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      padding: 1.25rem 1rem; border-radius: 10px; border: 2px solid var(--card-border);
+      background: var(--navy3); color: var(--slate); cursor: pointer;
+      transition: all .2s; text-align: center; line-height: 1.4;
+    }
+    .verdict-btn .vb-emoji { font-size: 2rem; display: block; margin-bottom: .5rem; }
+    .verdict-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .verdict-btn.selected-problem { border-color: var(--red); background: rgba(255,77,106,.08); color: var(--red); }
+    .verdict-btn.selected-info { border-color: var(--green); background: rgba(0,201,122,.08); color: var(--green); }
+    .verdict-response {
+      background: var(--navy3); border-radius: 8px; padding: 1rem;
+      margin-top: .5rem; font-size: .9375rem; color: #C8CDD8; line-height: 1.6;
+      display: none;
+    }
+    .verdict-response.visible { display: block; }
+
+    /* ── Reflect textareas ── */
+    .reflect-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 1.25rem; margin-bottom: .875rem; }
+    .reflect-q { font-size: .9375rem; font-weight: 700; color: #E8EAF2; margin-bottom: .625rem; line-height: 1.5; }
+    .sentence-frame {
+      background: rgba(0,229,255,.05); border-left: 3px solid rgba(0,229,255,.3);
+      border-radius: 0 6px 6px 0; padding: .625rem .875rem; margin-bottom: .625rem;
+      font-size: .8125rem; color: var(--slate); line-height: 1.55; font-style: italic;
+    }
+    .sentence-frame strong { color: var(--cyan); font-style: normal; }
+    .reflect-textarea {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .875rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem;
+      color: #E8EAF2; resize: vertical; min-height: 80px;
+      outline: none; transition: border-color .15s; line-height: 1.55;
+    }
+    .reflect-textarea:focus { border-color: var(--teal); }
+    .reflect-textarea.ready { border-color: rgba(0,201,122,.4); }
+    .char-count { font-size: .75rem; color: var(--slate); text-align: right; margin-top: .25rem; }
+    .char-count.ready { color: var(--green); }
+
+    /* ── Check buttons ── */
+    .check-btn {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700;
+      padding: .375rem .875rem; border-radius: 5px; border: 1px solid var(--teal);
+      background: transparent; color: var(--teal); cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .check-btn:hover { background: rgba(0,122,153,.12); color: var(--cyan); }
+
+    /* ── Nav / buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--cyan); color: var(--navy); }
+    .btn-primary:hover { opacity: .88; }
+    .btn-ghost { background: transparent; color: var(--slate); border: 1px solid var(--card-border); }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+    .btn-success { background: var(--green); color: var(--navy); }
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--card-border);
+    }
+
+    /* ── Stat card ── */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(255,159,67,.1) 0%, rgba(0,229,255,.05) 100%);
+      border: 2px solid rgba(255,159,67,.4); border-radius: 10px; padding: 1.5rem;
+      margin-top: 1.25rem; text-align: center;
+    }
+    .stat-card h3 { font-size: 1rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--orange); margin-bottom: 1rem; }
+    .sc-row { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+    .sc-item .sc-label { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate); margin-bottom: .25rem; }
+    .sc-item .sc-val { font-size: 2rem; font-weight: 800; color: var(--orange); }
+    .sc-num-input {
+      width: 90px; background: var(--navy3); border: 2px solid rgba(255,159,67,.4);
+      border-radius: 6px; padding: .5rem; font-family: 'DM Sans', sans-serif;
+      font-size: 1.5rem; font-weight: 800; color: var(--orange); text-align: center; outline: none;
+    }
+    .sc-num-input:focus { border-color: var(--orange); }
+
+    /* ── Done banner ── */
+    .done-banner {
+      background: rgba(0,201,122,.08); border: 1px solid rgba(0,201,122,.3);
+      border-radius: 10px; padding: 1.5rem; text-align: center;
+      margin-top: 1.5rem; display: none;
+    }
+    .done-banner.visible { display: block; }
+    .done-banner h3 { font-size: 1.125rem; font-weight: 800; color: var(--green); margin-bottom: .5rem; }
+    .done-banner p { font-size: .9375rem; color: #C8CDD8; }
+
+    /* ── Section divider ── */
+    .s-divider { height: 1px; background: var(--card-border); margin: 1.5rem 0; }
+
+    /* ── Hint chip ── */
+    .hint-chip {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .75rem; color: var(--yellow); background: rgba(255,209,102,.07);
+      border: 1px solid rgba(255,209,102,.2); border-radius: 4px;
+      padding: .2em .6em; margin-left: .5rem;
+    }
+
+    /* ── Check row icon ── */
+    .row-icon { font-size: 1.1rem; margin-left: .375rem; }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Power Stat Challenge</h1>
+  <span class="day-tag">DAY 4</span>
+</header>
+
+<nav class="section-nav">
+  <button class="active" onclick="goSection(0)">⚡ The Formula</button>
+  <button onclick="goSection(1)">🔢 Calculate</button>
+  <button onclick="goSection(2)">🤖 Test Results</button>
+  <button onclick="goSection(3)">💬 Reflect</button>
+</nav>
+
+<!-- ══════════════════════ SECTION 1: THE FORMULA ══════════════════════ -->
+<section class="section active" id="sec-0">
+
+  <div class="section-badge">Section 1 · The Formula</div>
+  <h2 class="section-heading">Charge Speed = Power²</h2>
+  <p class="section-sub">Your bot charges at full speed — but only if your Power stat is high enough. The formula tells you exactly how fast.</p>
+
+  <!-- Formula board -->
+  <div class="formula-board">
+    <div class="fml-label">The Rule</div>
+    <div class="fml-text">Charge Speed = Power<sup>2</sup></div>
+    <div class="fml-note">If Power = 4 → Speed = 4 × 4 = <strong>16%</strong> &nbsp;|&nbsp; If Power = 8 → Speed = 8 × 8 = <strong>64%</strong></div>
+  </div>
+
+  <!-- Vocab box -->
+  <div class="vocab-box">
+    <div class="vb-icon">📖</div>
+    <div class="vb-body">
+      <strong>Squared (²)</strong> means multiply a number <em>by itself</em>.<br>
+      4² = 4 × 4 = 16. &nbsp; 8² = 8 × 8 = 64. &nbsp; It is <em>not</em> the same as doubling (4 × 2 = 8). Squaring is much bigger.
+    </div>
+  </div>
+
+  <!-- Interactive power selector -->
+  <div class="card">
+    <div class="card-title">Try it — Pick a Power Stat</div>
+    <div class="power-selector">
+      <button class="pwr-btn" onclick="selectPower(1)"><span class="pwr-label">Power</span>1</button>
+      <button class="pwr-btn" onclick="selectPower(2)"><span class="pwr-label">Power</span>2</button>
+      <button class="pwr-btn active" onclick="selectPower(4)"><span class="pwr-label">Power</span>4</button>
+      <button class="pwr-btn" onclick="selectPower(8)"><span class="pwr-label">Power</span>8</button>
+    </div>
+
+    <!-- Squaring demo -->
+    <div class="sq-demo">
+      <!-- Left: visual square -->
+      <div class="sq-left">
+        <div class="sq-title">The Square</div>
+        <div class="sq-visual-wrap">
+          <div class="sq-square" id="sq-square" style="width:64px;height:64px;"></div>
+        </div>
+        <div style="font-size:.75rem;color:var(--slate);margin-top:.375rem;text-align:center;" id="sq-dim-label">4 × 4 units</div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="sq-arrow">→</div>
+
+      <!-- Right: result -->
+      <div class="sq-right">
+        <div class="sq-title">Charge Speed</div>
+        <div class="sq-calc" id="sq-calc">4 × 4 = 16</div>
+        <div class="sq-speed-label">Motor speed</div>
+        <div class="sq-speed-bar-wrap"><div class="sq-speed-fill" id="sq-fill" style="width:16%;"></div></div>
+        <div class="sq-speed-pct" id="sq-pct">16%</div>
+      </div>
+    </div>
+
+    <!-- Insight -->
+    <div id="pwr-insight" class="key-callout" style="display:none;">
+      <div class="kc-icon">💡</div>
+      <div class="kc-body" id="pwr-insight-text"></div>
+    </div>
+  </div>
+
+  <!-- Linear vs Quadratic comparison chart -->
+  <div class="compare-chart-wrap">
+    <div class="compare-chart-title">Speed stat vs Power stat — Same numbers, totally different results</div>
+    <svg viewBox="0 0 520 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background -->
+      <rect x="40" y="10" width="220" height="170" rx="6" fill="#1E2240" opacity="0.7"/>
+      <rect x="280" y="10" width="220" height="170" rx="6" fill="#1E2240" opacity="0.7"/>
+      <!-- Titles -->
+      <text x="150" y="28" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif" font-weight="700" letter-spacing="1">SPEED STAT (LINEAR)</text>
+      <text x="390" y="28" text-anchor="middle" font-size="11" fill="#8899AA" font-family="DM Sans,sans-serif" font-weight="700" letter-spacing="1">POWER STAT (QUADRATIC)</text>
+      <!-- Speed bars: 1→5%, 2→10%, 4→20%, 8→40% (proportional for Speed formula) -->
+      <!-- x positions: 68,100,132,164 | max bar height = 115 at 100% | scale: 115/100 = 1.15 -->
+      <!-- Speed 1 = 5%, h=5.75 | Speed 2 = 10%, h=11.5 | Speed 4 = 20%, h=23 | Speed 8 = 40%, h=46 -->
+      <rect x="68" y="154.25" width="28" height="5.75" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="100" y="148.5" width="28" height="11.5" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="132" y="137" width="28" height="23" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="164" y="114" width="28" height="46" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <!-- Speed bar labels -->
+      <text x="82"  y="151" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="DM Sans,sans-serif">5%</text>
+      <text x="114" y="145" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="DM Sans,sans-serif">10%</text>
+      <text x="146" y="133" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="DM Sans,sans-serif">20%</text>
+      <text x="178" y="110" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="DM Sans,sans-serif">40%</text>
+      <!-- Speed x labels -->
+      <text x="82"  y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Spd 1</text>
+      <text x="114" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Spd 2</text>
+      <text x="146" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Spd 4</text>
+      <text x="178" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Spd 8</text>
+      <!-- Caption Speed -->
+      <text x="150" y="185" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Double stat → double output ✓</text>
+      <!-- Axis line Speed -->
+      <line x1="55" y1="160" x2="205" y2="160" stroke="#222840" stroke-width="1"/>
+      <!-- Power bars: 1→1%, 2→4%, 4→16%, 8→64% -->
+      <!-- scale 115/100=1.15; h: 1.15, 4.6, 18.4, 73.6 -->
+      <rect x="308" y="158.85" width="28" height="1.15" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="340" y="155.4" width="28" height="4.6"  fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="372" y="141.6" width="28" height="18.4" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="404"  y="86.4" width="28" height="73.6" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <!-- Power bar labels -->
+      <text x="322" y="155"  text-anchor="middle" font-size="9" fill="#FF9F43" font-family="DM Sans,sans-serif">1%</text>
+      <text x="354" y="151"  text-anchor="middle" font-size="9" fill="#FF9F43" font-family="DM Sans,sans-serif">4%</text>
+      <text x="386" y="137"  text-anchor="middle" font-size="9" fill="#FF9F43" font-family="DM Sans,sans-serif">16%</text>
+      <text x="418" y="82"   text-anchor="middle" font-size="9" fill="#FF9F43" font-family="DM Sans,sans-serif">64%</text>
+      <!-- Power x labels -->
+      <text x="322" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Pwr 1</text>
+      <text x="354" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Pwr 2</text>
+      <text x="386" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Pwr 4</text>
+      <text x="418" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="DM Sans,sans-serif">Pwr 8</text>
+      <!-- Caption Power -->
+      <text x="390" y="185" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="DM Sans,sans-serif">Double stat → QUADRUPLE output ⚡</text>
+      <!-- Axis line Power -->
+      <line x1="295" y1="160" x2="445" y2="160" stroke="#222840" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <!-- Key insight -->
+  <div class="key-callout">
+    <div class="kc-icon">⚡</div>
+    <div class="kc-body">
+      <strong>Power is not linear.</strong> Every time you double your Power stat, charge speed <strong>multiplies by 4</strong>. This is called <em>quadratic</em> — it grows much faster than a straight line.
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goSection(1)">Next → Calculate</button>
+  </div>
+</section>
+
+<!-- ══════════════════════ SECTION 2: CALCULATE ══════════════════════ -->
+<section class="section" id="sec-1">
+
+  <div class="section-badge badge-orange">Section 2 · Calculate</div>
+  <h2 class="section-heading">Fill the Table</h2>
+  <p class="section-sub">Square each Power stat to find its charge speed. Use the formula: <strong style="color:var(--orange)">Speed = Power × Power</strong></p>
+
+  <div class="card">
+    <div class="card-title">Part 1 — Power² Table</div>
+    <table class="calc-table" style="margin-bottom:.5rem;">
+      <thead>
+        <tr>
+          <th>Power Points</th>
+          <th>Power × Power = ?</th>
+          <th>Charge Speed %</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="row-1">
+          <td><span class="cell-big">1</span></td>
+          <td><input type="number" class="table-input" id="calc-sq-1" placeholder="?" aria-label="1 squared"></td>
+          <td><input type="number" class="table-input" id="calc-sp-1" placeholder="?%" aria-label="Speed 1"></td>
+          <td>
+            <button class="check-btn" onclick="checkCalcRow(1)">Check</button>
+            <span class="row-icon" id="ri-1"></span>
+          </td>
+        </tr>
+        <tr id="row-2">
+          <td><span class="cell-big">2</span></td>
+          <td><input type="number" class="table-input" id="calc-sq-2" placeholder="?" aria-label="2 squared"></td>
+          <td><input type="number" class="table-input" id="calc-sp-2" placeholder="?%" aria-label="Speed 2"></td>
+          <td>
+            <button class="check-btn" onclick="checkCalcRow(2)">Check</button>
+            <span class="row-icon" id="ri-2"></span>
+          </td>
+        </tr>
+        <tr id="row-4">
+          <td><span class="cell-big">4</span></td>
+          <td><input type="number" class="table-input" id="calc-sq-4" placeholder="?" aria-label="4 squared"></td>
+          <td><input type="number" class="table-input" id="calc-sp-4" placeholder="?%" aria-label="Speed 4"></td>
+          <td>
+            <button class="check-btn" onclick="checkCalcRow(4)">Check</button>
+            <span class="row-icon" id="ri-4"></span>
+          </td>
+        </tr>
+        <tr id="row-8">
+          <td><span class="cell-big">8</span></td>
+          <td><input type="number" class="table-input" id="calc-sq-8" placeholder="?" aria-label="8 squared"></td>
+          <td><input type="number" class="table-input" id="calc-sp-8" placeholder="?%" aria-label="Speed 8"></td>
+          <td>
+            <button class="check-btn" onclick="checkCalcRow(8)">Check</button>
+            <span class="row-icon" id="ri-8"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Bar chart (hidden until table complete) -->
+    <div id="bar-chart-section" style="display:none;">
+      <div class="s-divider"></div>
+      <div class="card-title">Your results — see the jump at Power 8!</div>
+      <div class="bar-chart" id="bar-chart">
+        <div class="bar-col">
+          <div class="bar-label-top" id="bl-1">1%</div>
+          <div class="bar-fill" id="bf-1" style="height:2px;"></div>
+          <div class="bar-label-bot">Power 1</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-label-top" id="bl-2">4%</div>
+          <div class="bar-fill" id="bf-2" style="height:2px;"></div>
+          <div class="bar-label-bot">Power 2</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-label-top" id="bl-4">16%</div>
+          <div class="bar-fill" id="bf-4" style="height:2px;"></div>
+          <div class="bar-label-bot">Power 4</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar-label-top" id="bl-8">64%</div>
+          <div class="bar-fill" id="bf-8" style="height:2px;"></div>
+          <div class="bar-label-bot">Power 8</div>
+        </div>
+      </div>
+      <div class="bar-chart-axis"></div>
+      <p style="font-size:.8125rem;color:var(--slate);text-align:center;">Each bar = charge speed. The last jump is NOT double — it's 4× bigger than Power 4.</p>
+    </div>
+  </div>
+
+  <!-- Ratio discovery -->
+  <div class="card">
+    <div class="card-title">Part 2 — Find the Ratios</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">
+      When you <em>doubled</em> Power points, what happened to charge speed? Fill in each ratio — write "1 : ___"
+    </p>
+    <div class="ratio-grid">
+      <div class="ratio-card">
+        <div class="rc-label">Power 2 → Power 4</div>
+        <div class="ratio-display">
+          <span class="rd-num">4%</span>
+          <span class="rd-sep">to</span>
+          <span class="rd-num">16%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+          <span style="font-size:.875rem;color:var(--slate);">Ratio: 1 :</span>
+          <input type="number" class="ratio-input" id="ratio-a" placeholder="?" aria-label="Ratio A">
+          <button class="check-btn" onclick="checkRatioA()">Check</button>
+        </div>
+        <div class="ratio-note" id="ratio-a-note"></div>
+      </div>
+      <div class="ratio-card">
+        <div class="rc-label">Power 4 → Power 8</div>
+        <div class="ratio-display">
+          <span class="rd-num">16%</span>
+          <span class="rd-sep">to</span>
+          <span class="rd-num">64%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+          <span style="font-size:.875rem;color:var(--slate);">Ratio: 1 :</span>
+          <input type="number" class="ratio-input" id="ratio-b" placeholder="?" aria-label="Ratio B">
+          <button class="check-btn" onclick="checkRatioB()">Check</button>
+        </div>
+        <div class="ratio-note" id="ratio-b-note"></div>
+      </div>
+    </div>
+
+    <div class="reveal-banner" id="ratio-reveal">
+      ✅ <strong>Both ratios are 1:4.</strong> Every time you double Power points, charge speed multiplies by <strong>4</strong> — not 2. That is what squaring does.
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(0)">← Back</button>
+    <button class="btn btn-primary" onclick="goSection(2)">Next → Test Results</button>
+  </div>
+</section>
+
+<!-- ══════════════════════ SECTION 3: TEST RESULTS ══════════════════════ -->
+<section class="section" id="sec-2">
+
+  <div class="section-badge badge-purple">Section 3 · Test Results</div>
+  <h2 class="section-heading">Enter Your Real Data</h2>
+  <p class="section-sub">After running both physical tests, enter your results below. The math updates automatically.</p>
+
+  <!-- Setup reminder -->
+  <div class="key-callout" style="margin-bottom:1rem;">
+    <div class="kc-icon">📋</div>
+    <div class="kc-body">
+      <strong>Setup check before you enter data:</strong> Bot nose on TAPE 1. Ball on TAPE 2. Measure from TAPE 2 to where the ball stops. Same every run.
+    </div>
+  </div>
+
+  <!-- Data entry -->
+  <div class="card">
+    <div class="card-title">Run Results</div>
+
+    <div class="data-log-row">
+      <div class="dlr-header">
+        <span class="dlr-badge p4">Power 4</span>
+        <span class="dlr-speed">Motor speed: <strong>16%</strong></span>
+      </div>
+      <div class="dlr-inputs">
+        <label>Ball traveled:</label>
+        <input type="number" class="cm-input" id="p4-actual" placeholder="?" oninput="updateCalcs()" min="0" max="500" step="0.5">
+        <span style="font-size:.875rem;color:var(--slate);">cm</span>
+      </div>
+    </div>
+
+    <div class="data-log-row">
+      <div class="dlr-header">
+        <span class="dlr-badge p8">Power 8</span>
+        <span class="dlr-speed">Motor speed: <strong>64%</strong></span>
+      </div>
+      <div class="dlr-inputs">
+        <label>Ball traveled:</label>
+        <input type="number" class="cm-input" id="p8-actual" placeholder="?" oninput="updateCalcs()" min="0" max="500" step="0.5">
+        <span style="font-size:.875rem;color:var(--slate);">cm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gap calculator -->
+  <div class="gap-calc" id="gap-calc" style="display:none;">
+    <div class="card-title" style="margin-bottom:.875rem;">Your Numbers</div>
+    <div class="gap-row">
+      <div class="gap-cell">
+        <div class="gc-label">Power 4 actual</div>
+        <div class="gc-value actual" id="gc-p4">—</div>
+        <div class="gc-note">cm</div>
+      </div>
+      <div class="gap-cell">
+        <div class="gc-label">Formula predicted</div>
+        <div class="gc-value predicted" id="gc-pred">—</div>
+        <div class="gc-note">cm (= P4 × 4)</div>
+      </div>
+      <div class="gap-cell">
+        <div class="gc-label">Power 8 actual</div>
+        <div class="gc-value actual" id="gc-p8">—</div>
+        <div class="gc-note">cm</div>
+      </div>
+    </div>
+
+    <!-- Ratio comparison -->
+    <div class="ratio-result-wrap">
+      <div class="rr-item">
+        <div class="rr-label">Formula ratio</div>
+        <div class="rr-val" style="color:var(--purple);">1 : 4</div>
+        <div class="rr-sub">what math says</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--slate);">vs</div>
+      <div class="rr-item">
+        <div class="rr-label">Actual ratio</div>
+        <div class="rr-val" id="rr-actual" style="color:var(--orange);">1 : —</div>
+        <div class="rr-sub">what you measured</div>
+      </div>
+      <div style="font-size:1.5rem;color:var(--slate);">→</div>
+      <div class="rr-item">
+        <div class="rr-label">Gap</div>
+        <div class="rr-val gap-num" id="rr-gap" style="color:var(--yellow);">— cm</div>
+        <div class="rr-sub">predicted − actual</div>
+      </div>
+    </div>
+
+    <div class="gap-math" id="gap-math"></div>
+  </div>
+
+  <!-- Sentence builder -->
+  <div class="sentence-builder" id="sentence-section" style="display:none;">
+    <div class="sb-title">✏ Your Sentence (one sentence only)</div>
+    <div class="sentence-output" id="sentence-out"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goSection(3)">Next → Reflect</button>
+  </div>
+</section>
+
+<!-- ══════════════════════ SECTION 4: REFLECT ══════════════════════ -->
+<section class="section" id="sec-3">
+
+  <div class="section-badge badge-green">Section 4 · Reflect</div>
+  <h2 class="section-heading">Connect the Math to the Match</h2>
+  <p class="section-sub">Your formula predicted one number. The bot produced another. Now decide what that means.</p>
+
+  <!-- Gap verdict -->
+  <div class="card">
+    <div class="card-title">The Key Question</div>
+    <p style="font-size:1.125rem;font-weight:700;color:#E8EAF2;margin-bottom:1rem;line-height:1.4;">
+      You measured a gap between the formula's prediction and what the bot actually did.<br>
+      <span style="color:var(--yellow);">Is that gap a <em>problem</em> — or is it <em>information</em>?</span>
+    </p>
+    <div class="verdict-wrap">
+      <button class="verdict-btn" id="vb-problem" onclick="selectVerdict('problem')">
+        <span class="vb-emoji">❌</span>
+        <strong>It's a problem.</strong><br>
+        <span style="font-size:.875rem;font-weight:400;">We did something wrong.</span>
+      </button>
+      <button class="verdict-btn" id="vb-info" onclick="selectVerdict('info')">
+        <span class="vb-emoji">🔬</span>
+        <strong>It's information.</strong><br>
+        <span style="font-size:.875rem;font-weight:400;">The formula has limits.</span>
+      </button>
+    </div>
+    <div class="verdict-response" id="vr-problem">
+      <strong style="color:var(--yellow);">Think again →</strong> Did you follow the setup exactly — same tape marks, same reset every run? If yes, the gap didn't come from your error. It came from something the formula doesn't know about. What might the formula be missing?
+    </div>
+    <div class="verdict-response" id="vr-info">
+      <strong style="color:var(--green);">Exactly right.</strong> The formula models the motor code — it says nothing about real-world physics. Friction, acceleration time, ball weight — those aren't in the formula. The gap is evidence. Engineers use gaps to find what their models don't account for yet.
+    </div>
+  </div>
+
+  <div class="s-divider"></div>
+
+  <!-- Q1 -->
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Question 1 of 3</div>
+    <div class="reflect-q">Did kick distance quadruple when you went from Power 4 to Power 8? What ratio did you actually measure?</div>
+    <div class="sentence-frame">
+      <strong>Sentence starter:</strong> "When I doubled Power from ___ to ___, charge speed went from ___% to ___%. That is ___ times more, not ___ times, because squaring works by ___."
+    </div>
+    <textarea class="reflect-textarea" id="q1-text" placeholder="Write your answer here..." oninput="checkChar('q1-text','q1-count',15)"></textarea>
+    <div class="char-count" id="q1-count">0 / 15 min</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Question 2 of 3</div>
+    <div class="reflect-q">Is your gap a problem or information? Name <em>one thing</em> the formula did not account for.</div>
+    <div class="sentence-frame">
+      <strong>Ideas:</strong> friction? acceleration? ball weight? floor surface? motor stall time? Pick one and explain it in your own words.
+    </div>
+    <textarea class="reflect-textarea" id="q2-text" placeholder="Write your answer here..." oninput="checkChar('q2-text','q2-count',10)"></textarea>
+    <div class="char-count" id="q2-count">0 / 10 min</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Question 3 of 3</div>
+    <div class="reflect-q">Speed gives you a direct stat (double points = double output). Power gives you a squared stat (double points = 4× output). Which one would you put more points in — and why?</div>
+    <div class="sentence-frame">
+      <strong>Sentence starter:</strong> "I would put more points into ___ because it gives me ___ for every point I invest. In a match, that means..."
+    </div>
+    <textarea class="reflect-textarea" id="q3-text" placeholder="Write your answer here..." oninput="checkChar('q3-text','q3-count',15)"></textarea>
+    <div class="char-count" id="q3-count">0 / 15 min</div>
+  </div>
+
+  <!-- Stat card -->
+  <div class="stat-card">
+    <h3>⚡ Stat Card — Record Your Power Choice</h3>
+    <div class="sc-row">
+      <div class="sc-item">
+        <div class="sc-label">Power Points Chosen</div>
+        <input type="number" class="sc-num-input" id="sc-power" min="1" max="8" placeholder="?" oninput="updateStatCard()">
+      </div>
+      <div class="sc-item">
+        <div class="sc-label">Charge Speed</div>
+        <div class="sc-val" id="sc-speed">?%</div>
+      </div>
+    </div>
+    <p style="font-size:.8125rem;color:var(--slate);margin-top:.875rem;">This goes on your individual stat card before you leave the table.</p>
+  </div>
+
+  <!-- Done banner -->
+  <div class="done-banner" id="done-banner">
+    <h3>Challenge Complete! ⚡</h3>
+    <p>You found the formula, ran the test, measured the gap, and decided what it means. That's engineering thinking.</p>
+  </div>
+  <div id="done-btn-wrap" style="text-align:center;margin-top:1.25rem;display:none;">
+    <button class="btn btn-success" onclick="finishLesson()">Done ✓</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(2)">← Back</button>
+    <span></span>
+  </div>
+</section>
+
+<script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const POWER_VALS = { 1:1, 2:4, 4:16, 8:64 };
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goSection(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.section-nav button').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('progress-bar').style.width = ((idx+1)/4*100).toFixed(0) + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── Section 1: Power selector ─────────────────────────────────────────────────
+const SQ_SIZES = { 1:18, 2:36, 4:72, 8:144 };
+const COLORS = { 1:'#8899AA', 2:'#00E5FF', 4:'#FF9F43', 8:'#FF4D6A' };
+const INSIGHTS = {
+  1: 'Power 1 → only <strong style="color:var(--yellow)">1% speed</strong>. Very slow charge.',
+  2: 'Power 2 → <strong style="color:var(--yellow)">4% speed</strong>. Still pretty slow — twice the power, but 4× the output.',
+  4: 'Power 4 → <strong style="color:var(--yellow)">16% speed</strong>. Now we\'re moving. Notice that Power 4 = 4× Power 2 speed, not 2×.',
+  8: 'Power 8 → <strong style="color:var(--yellow)">64% speed</strong>! That\'s 4× Power 4. Double the stat, quadruple the speed.'
+};
+
+function selectPower(p) {
+  document.querySelectorAll('.pwr-btn').forEach(b => b.classList.remove('active'));
+  const btn = [...document.querySelectorAll('.pwr-btn')].find(b => parseInt(b.textContent) === p);
+  if (btn) btn.classList.add('active');
+
+  const speed = POWER_VALS[p];
+  const sz = SQ_SIZES[p];
+  const col = COLORS[p];
+
+  const sq = document.getElementById('sq-square');
+  sq.style.width = sz + 'px';
+  sq.style.height = sz + 'px';
+  sq.style.background = col;
+  sq.textContent = sz < 30 ? '' : p + '×' + p;
+
+  document.getElementById('sq-dim-label').textContent = p + ' × ' + p + ' units';
+  document.getElementById('sq-calc').textContent = p + ' × ' + p + ' = ' + speed;
+  document.getElementById('sq-fill').style.width = speed + '%';
+  document.getElementById('sq-pct').textContent = speed + '%';
+  document.getElementById('sq-pct').style.color = col;
+
+  const insightEl = document.getElementById('pwr-insight');
+  insightEl.style.display = 'flex';
+  document.getElementById('pwr-insight-text').innerHTML = INSIGHTS[p];
+}
+
+// ── Section 2: Table ──────────────────────────────────────────────────────────
+let rowsCorrect = { 1:false, 2:false, 4:false, 8:false };
+
+function checkCalcRow(p) {
+  const sq   = parseFloat(document.getElementById('calc-sq-' + p).value);
+  const sp   = parseFloat(document.getElementById('calc-sp-' + p).value);
+  const sqEl = document.getElementById('calc-sq-' + p);
+  const spEl = document.getElementById('calc-sp-' + p);
+  const icon = document.getElementById('ri-' + p);
+  const correct = p * p;
+
+  const sqOk = sq === correct;
+  const spOk = sp === correct;
+
+  sqEl.classList.toggle('correct', sqOk);  sqEl.classList.toggle('error', !sqOk);
+  spEl.classList.toggle('correct', spOk);  spEl.classList.toggle('error', !spOk);
+
+  if (sqOk && spOk) {
+    icon.textContent = '✓'; icon.style.color = 'var(--green)';
+    rowsCorrect[p] = true;
+  } else {
+    icon.textContent = '✗'; icon.style.color = 'var(--red)';
+    rowsCorrect[p] = false;
+  }
+
+  if (Object.values(rowsCorrect).every(Boolean)) animateBars();
+}
+
+function animateBars() {
+  const section = document.getElementById('bar-chart-section');
+  section.style.display = 'block';
+
+  // Heights as % of max (64): 1→1.5%, 4→6.25%, 16→25%, 64→100%
+  const maxH = 110; // px
+  const pcts = { 1: 1/64, 2: 4/64, 4: 16/64, 8: 64/64 };
+  const vals = { 1:'1%', 2:'4%', 4:'16%', 8:'64%' };
+
+  setTimeout(() => {
+    [1,2,4,8].forEach(p => {
+      const bar = document.getElementById('bf-' + p);
+      bar.style.height = Math.max(4, Math.round(pcts[p] * maxH)) + 'px';
+      bar.classList.add('lit');
+      document.getElementById('bl-' + p).textContent = vals[p];
+    });
+  }, 100);
+}
+
+// ── Section 2: Ratios ─────────────────────────────────────────────────────────
+let ratioAok = false, ratioBok = false;
+
+function checkRatioA() {
+  const v = parseFloat(document.getElementById('ratio-a').value);
+  const el = document.getElementById('ratio-a');
+  const note = document.getElementById('ratio-a-note');
+  ratioAok = (v === 4);
+  el.classList.toggle('correct', ratioAok);
+  el.classList.toggle('error', !ratioAok);
+  note.textContent = ratioAok
+    ? '✓ 4% → 16% is 1:4. Speed quadrupled!'
+    : '✗ Hint: 16 ÷ 4 = ?';
+  note.style.color = ratioAok ? 'var(--green)' : 'var(--yellow)';
+  checkRatioReveal();
+}
+
+function checkRatioB() {
+  const v = parseFloat(document.getElementById('ratio-b').value);
+  const el = document.getElementById('ratio-b');
+  const note = document.getElementById('ratio-b-note');
+  ratioBok = (v === 4);
+  el.classList.toggle('correct', ratioBok);
+  el.classList.toggle('error', !ratioBok);
+  note.textContent = ratioBok
+    ? '✓ 16% → 64% is 1:4. Quadruples again!'
+    : '✗ Hint: 64 ÷ 16 = ?';
+  note.style.color = ratioBok ? 'var(--green)' : 'var(--yellow)';
+  checkRatioReveal();
+}
+
+function checkRatioReveal() {
+  document.getElementById('ratio-reveal').classList.toggle('visible', ratioAok && ratioBok);
+}
+
+// ── Section 3: Data log ───────────────────────────────────────────────────────
+function updateCalcs() {
+  const p4 = parseFloat(document.getElementById('p4-actual').value);
+  const p8 = parseFloat(document.getElementById('p8-actual').value);
+
+  if (!isNaN(p4) && p4 > 0) {
+    const predicted = parseFloat((p4 * 4).toFixed(1));
+    document.getElementById('gc-p4').textContent = p4 + ' cm';
+    document.getElementById('gc-pred').textContent = predicted + ' cm';
+    document.getElementById('gap-calc').style.display = 'block';
+
+    if (!isNaN(p8) && p8 > 0) {
+      const gap = parseFloat((predicted - p8).toFixed(1));
+      const ratio = parseFloat((p8 / p4).toFixed(2));
+      document.getElementById('gc-p8').textContent = p8 + ' cm';
+      document.getElementById('rr-actual').textContent = '1 : ' + ratio;
+      document.getElementById('rr-gap').textContent = gap + ' cm';
+      document.getElementById('gap-math').textContent =
+        'Predicted: ' + p4 + ' × 4 = ' + predicted + ' cm  |  Actual: ' + p8 + ' cm  |  Gap: ' + predicted + ' − ' + p8 + ' = ' + gap + ' cm';
+
+      // Sentence
+      document.getElementById('sentence-section').style.display = 'block';
+      document.getElementById('sentence-out').innerHTML =
+        '"The ratio predicted <span class="so-fill">' + predicted + '</span> cm. ' +
+        'The bot did <span class="so-fill">' + p8 + '</span> cm. ' +
+        'The gap is <span class="so-fill">' + gap + '</span> cm."';
+    }
+  }
+}
+
+// ── Section 4: Verdict ────────────────────────────────────────────────────────
+function selectVerdict(v) {
+  document.getElementById('vb-problem').className = 'verdict-btn' + (v==='problem' ? ' selected-problem' : '');
+  document.getElementById('vb-info').className    = 'verdict-btn' + (v==='info'    ? ' selected-info'    : '');
+  document.getElementById('vr-problem').classList.toggle('visible', v === 'problem');
+  document.getElementById('vr-info').classList.toggle('visible',    v === 'info');
+  checkDone();
+}
+
+// ── Section 4: Char count + done ──────────────────────────────────────────────
+function checkChar(textId, countId, minLen) {
+  const el = document.getElementById(textId);
+  const cEl = document.getElementById(countId);
+  const len = el.value.trim().length;
+  const ready = len >= minLen;
+  cEl.textContent = len + ' / ' + minLen + ' min';
+  cEl.classList.toggle('ready', ready);
+  el.classList.toggle('ready', ready);
+  checkDone();
+}
+
+function checkDone() {
+  const q1ok = document.getElementById('q1-text').value.trim().length >= 15;
+  const q2ok = document.getElementById('q2-text').value.trim().length >= 10;
+  const q3ok = document.getElementById('q3-text').value.trim().length >= 15;
+  const verdictOk = document.getElementById('vb-info').classList.contains('selected-info') ||
+                    document.getElementById('vb-problem').classList.contains('selected-problem');
+  document.getElementById('done-btn-wrap').style.display = (q1ok && q2ok && q3ok && verdictOk) ? 'block' : 'none';
+}
+
+function updateStatCard() {
+  const p = parseInt(document.getElementById('sc-power').value);
+  if (!isNaN(p) && [1,2,4,8].includes(p)) {
+    document.getElementById('sc-speed').textContent = (p * p) + '%';
+    document.getElementById('sc-speed').style.color = COLORS[p] || 'var(--orange)';
+  } else if (!isNaN(p) && p > 0) {
+    document.getElementById('sc-speed').textContent = (p * p) + '%';
+  } else {
+    document.getElementById('sc-speed').textContent = '?%';
+  }
+}
+
+function finishLesson() {
+  document.getElementById('done-banner').classList.add('visible');
+  document.getElementById('done-btn-wrap').style.display = 'none';
+  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+selectPower(4);
+document.getElementById('progress-bar').style.width = '25%';
+</script>
+</body>
+</html>

@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Systems of Inequalities · Velocity Arena Day 11</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 6rem;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--cyan);
+      width: 0%; transition: width .5s ease; z-index: 200;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: .75rem;
+      flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* ── Section nav ── */
+    .section-nav {
+      display: flex; gap: 0;
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+      position: sticky; top: 53px; z-index: 99;
+    }
+    .section-nav button {
+      flex-shrink: 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .section-nav button:hover:not(.active) { color: #E8EAF2; }
+
+    /* ── Sections ── */
+    .section {
+      display: none; max-width: 720px;
+      margin: 2rem auto 0; padding: 0 1.25rem;
+      animation: fadeUp .3s ease both;
+    }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Typography ── */
+    .section-heading { font-size: 1.25rem; font-weight: 800; letter-spacing: .01em; margin-bottom: .5rem; }
+    .section-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; margin-bottom: 1.5rem; }
+    .label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+
+    /* ── Constraint cards ── */
+    .constraint-grid {
+      display: grid; grid-template-columns: 1fr; gap: .875rem; margin-bottom: 1.5rem;
+    }
+    .constraint-card {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      display: flex; gap: 1.25rem; align-items: flex-start;
+    }
+    .constraint-card.highlight { border-color: rgba(0,229,255,.3); }
+    .constraint-num {
+      flex-shrink: 0; width: 2rem; height: 2rem; border-radius: 50%;
+      background: rgba(0,229,255,.12); border: 1.5px solid rgba(0,229,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8125rem; font-weight: 800; color: var(--cyan);
+    }
+    .constraint-body { flex: 1; }
+    .constraint-formula {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.0625rem; font-weight: 500;
+      color: var(--cyan); margin-bottom: .5rem;
+      letter-spacing: .02em;
+    }
+    .constraint-formula .ineq-sym { color: var(--yellow); }
+    .constraint-explain { font-size: .875rem; color: #C8CDD8; line-height: 1.55; }
+
+    /* ── Answer input ── */
+    .qa-block {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .qa-question {
+      font-size: .9375rem; font-weight: 700; color: #E8EAF2;
+      margin-bottom: .875rem; line-height: 1.5;
+    }
+    .qa-row {
+      display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+    }
+    .answer-input {
+      width: 80px; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .5rem .625rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.125rem; font-weight: 800; color: var(--cyan);
+      outline: none; text-align: center; transition: border-color .15s;
+    }
+    .answer-input:focus { border-color: var(--teal); }
+    .answer-input.correct { border-color: var(--green); color: var(--green); }
+    .answer-input.wrong   { border-color: var(--red);   color: var(--red);   }
+
+    .check-btn {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .5rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 700;
+      color: #E8EAF2; cursor: pointer; transition: all .15s;
+    }
+    .check-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .qa-feedback {
+      margin-top: .75rem; font-size: .875rem; line-height: 1.55;
+      min-height: 1.4em;
+    }
+    .qa-feedback.correct { color: var(--green); }
+    .qa-feedback.hint    { color: var(--yellow); }
+
+    /* ── Callout ── */
+    .callout {
+      border-left: 3px solid var(--cyan); background: rgba(0,229,255,.05);
+      border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin: 1.25rem 0;
+    }
+    .callout .callout-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .375rem;
+    }
+    .callout p { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; }
+    .callout strong { color: #E8EAF2; }
+
+    /* ── Loadout builder ── */
+    .builder-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 480px) {
+      .builder-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-input-block { display: flex; flex-direction: column; gap: .5rem; }
+    .stat-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .stat-input {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .625rem .75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.25rem; font-weight: 800; color: var(--cyan);
+      text-align: center; outline: none; transition: border-color .15s;
+      width: 100%;
+      -moz-appearance: textfield;
+    }
+    .stat-input::-webkit-inner-spin-button,
+    .stat-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .stat-input:focus { border-color: var(--teal); }
+    .stat-name { font-size: .75rem; color: var(--slate); text-align: center; }
+
+    /* ── Validation panel ── */
+    .validation-panel {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+      display: flex; flex-direction: column; gap: .625rem;
+    }
+    .val-row {
+      display: flex; align-items: center; gap: .75rem; font-size: .875rem;
+    }
+    .val-icon {
+      width: 1.25rem; height: 1.25rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800; flex-shrink: 0;
+      transition: all .2s;
+    }
+    .val-icon.pass { background: rgba(0,201,122,.15); color: var(--green); }
+    .val-icon.fail { background: rgba(255,77,106,.12); color: var(--red);   }
+    .val-icon.idle { background: var(--navy2); color: var(--slate);         }
+    .val-text { color: #C8CDD8; flex: 1; }
+    .val-value {
+      font-family: 'DM Mono', monospace; font-size: .8125rem;
+      font-weight: 500; color: var(--slate);
+      background: var(--navy2); border-radius: 4px;
+      padding: .15em .5em;
+    }
+
+    /* ── Add button ── */
+    .add-btn {
+      width: 100%; padding: .75rem;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      border-radius: 7px; border: 1.5px solid var(--cyan);
+      background: rgba(0,229,255,.08); color: var(--cyan);
+      cursor: pointer; transition: all .2s;
+      margin-bottom: 1rem;
+    }
+    .add-btn:hover:not(.locked) {
+      background: rgba(0,229,255,.16);
+    }
+    .add-btn.locked {
+      border-color: var(--card-border); color: var(--slate);
+      background: var(--navy3); pointer-events: none;
+      opacity: .6;
+    }
+
+    /* ── Loadout counter ── */
+    .loadout-counter {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1rem;
+    }
+    .counter-pips { display: flex; gap: .375rem; }
+    .counter-pip {
+      width: .5rem; height: .5rem; border-radius: 50%;
+      background: var(--card-border); transition: background .3s;
+    }
+    .counter-pip.filled { background: var(--green); }
+    .counter-text { font-size: .875rem; color: var(--slate); }
+    .counter-text strong { color: #E8EAF2; }
+
+    /* ── Loadout table ── */
+    .loadout-table-wrap {
+      overflow-x: auto; margin-bottom: 1.5rem;
+      border: 1px solid var(--card-border); border-radius: 8px;
+    }
+    .loadout-table {
+      width: 100%; border-collapse: collapse; font-size: .8125rem;
+    }
+    .loadout-table th {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+      background: var(--navy2); text-align: center;
+    }
+    .loadout-table th:first-child { text-align: left; padding-left: 1rem; }
+    .loadout-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.5);
+      text-align: center; font-family: 'DM Mono', monospace;
+    }
+    .loadout-table td:first-child { text-align: left; padding-left: 1rem; font-family: 'DM Sans', sans-serif; font-weight: 700; color: var(--slate); }
+    .loadout-table tr:last-child td { border-bottom: none; }
+    .loadout-table .valid-check { color: var(--green); font-size: .9375rem; }
+    .loadout-table .s-val { color: var(--cyan); font-weight: 700; }
+    .loadout-table .e-val { color: var(--purple); font-weight: 700; }
+    .loadout-table .sum-val { color: var(--green); font-weight: 700; }
+    .loadout-empty {
+      padding: 1.5rem; text-align: center;
+      color: var(--slate); font-size: .875rem; font-style: italic;
+    }
+
+    /* ── Continue button ── */
+    .continue-btn {
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      padding: .875rem 2rem; margin: 1.5rem auto 0;
+      font-family: 'DM Sans', sans-serif; font-size: .9375rem; font-weight: 700;
+      border-radius: 8px; border: 1.5px solid var(--green);
+      background: rgba(0,201,122,.08); color: var(--green);
+      cursor: pointer; transition: all .2s;
+    }
+    .continue-btn:hover:not(.locked) { background: rgba(0,201,122,.18); }
+    .continue-btn.locked {
+      border-color: var(--card-border); color: var(--slate);
+      background: var(--navy3); pointer-events: none; opacity: .5;
+    }
+    .continue-arrow { font-size: 1.1rem; transition: transform .2s; }
+    .continue-btn:hover:not(.locked) .continue-arrow { transform: translateX(4px); }
+
+    /* ── Reflection questions ── */
+    .reflect-q {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .reflect-q-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--purple); margin-bottom: .5rem;
+    }
+    .reflect-q-text { font-size: .9375rem; font-weight: 700; color: #E8EAF2; margin-bottom: .875rem; line-height: 1.5; }
+    .reflect-textarea {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .875rem 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .875rem; color: #E8EAF2;
+      resize: vertical; min-height: 80px; outline: none;
+      transition: border-color .15s; line-height: 1.55;
+    }
+    .reflect-textarea:focus { border-color: var(--teal); }
+    .reflect-textarea.has-content { border-color: rgba(155,138,255,.35); }
+
+    /* ── S1 comparison row ── */
+    .s1-row {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: .625rem;
+      margin-bottom: .875rem;
+    }
+    @media (max-width: 480px) { .s1-row { grid-template-columns: repeat(2,1fr); } }
+    .s1-stat-block { display: flex; flex-direction: column; gap: .375rem; }
+    .s1-input {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .5rem .625rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--yellow); text-align: center; outline: none; transition: border-color .15s;
+      width: 100%;
+      -moz-appearance: textfield;
+    }
+    .s1-input::-webkit-inner-spin-button, .s1-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .s1-input:focus { border-color: var(--yellow); }
+
+    .s1-dropdown {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .625rem .75rem;
+      font-family: 'DM Sans', sans-serif; font-size: .875rem; color: #E8EAF2;
+      outline: none; cursor: pointer; transition: border-color .15s;
+      margin-top: .375rem;
+    }
+    .s1-dropdown:focus { border-color: var(--teal); }
+
+    /* ── Section 3 callout ── */
+    .commissioner-card {
+      background: linear-gradient(135deg, rgba(0,229,255,.07), rgba(155,138,255,.07));
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .commissioner-eyebrow {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .commissioner-text { font-size: 1rem; font-weight: 700; color: #E8EAF2; line-height: 1.55; }
+
+    /* ── Challenge block ── */
+    .challenge-block {
+      background: var(--navy3); border: 1px solid rgba(255,209,102,.25);
+      border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .challenge-tag {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--yellow); margin-bottom: .5rem;
+    }
+    .challenge-text { font-size: .9375rem; color: #C8CDD8; line-height: 1.6; margin-bottom: 1rem; }
+    .challenge-text strong { color: #E8EAF2; }
+
+    /* ── Mini constraint checker in S3 ── */
+    .mini-builder {
+      display: flex; gap: .625rem; flex-wrap: wrap; align-items: flex-end;
+      margin-bottom: .875rem;
+    }
+    .mini-stat {
+      display: flex; flex-direction: column; gap: .3rem;
+    }
+    .mini-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .mini-input {
+      width: 56px; background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .4rem .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      color: var(--cyan); text-align: center; outline: none; transition: border-color .15s;
+      -moz-appearance: textfield;
+    }
+    .mini-input::-webkit-inner-spin-button, .mini-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .mini-input:focus { border-color: var(--teal); }
+    .mini-checks {
+      display: flex; flex-direction: column; gap: .375rem;
+      margin-top: .5rem;
+    }
+    .mini-check-row {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .8125rem; color: #C8CDD8;
+    }
+    .mini-icon {
+      width: 1.1rem; height: 1.1rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 800; flex-shrink: 0;
+    }
+    .mini-icon.pass { background: rgba(0,201,122,.15); color: var(--green); }
+    .mini-icon.fail { background: rgba(255,77,106,.12); color: var(--red);   }
+    .mini-icon.idle { background: var(--navy3); color: var(--slate);         }
+
+    /* ── Done button ── */
+    .done-btn {
+      width: 100%; padding: .875rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      border-radius: 8px; border: 1.5px solid var(--cyan);
+      background: rgba(0,229,255,.08); color: var(--cyan);
+      cursor: pointer; transition: all .2s; margin-top: 1.5rem;
+      letter-spacing: .02em;
+    }
+    .done-btn:hover:not(.locked) { background: rgba(0,229,255,.18); }
+    .done-btn.locked {
+      border-color: var(--card-border); color: var(--slate);
+      background: var(--navy3); pointer-events: none; opacity: .5;
+    }
+
+    /* ── Completion state ── */
+    .completion-banner {
+      display: none; text-align: center; padding: 2rem 1rem;
+    }
+    .completion-banner.show { display: block; }
+    .completion-icon { font-size: 3rem; margin-bottom: .75rem; }
+    .completion-title { font-size: 1.375rem; font-weight: 800; color: var(--green); margin-bottom: .5rem; }
+    .completion-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; }
+
+    /* ── Divider ── */
+    .divider-line {
+      height: 1px; background: var(--card-border); margin: 1.5rem 0;
+    }
+
+    /* ── Scrollbar styling ── */
+    * { scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ── Header ── -->
+<header class="page-header">
+  <a href="/index.html" class="back-link">← Today</a>
+  <span class="divider">|</span>
+  <h1>Systems of Inequalities</h1>
+  <span class="day-tag">DAY 11</span>
+</header>
+
+<!-- ── Section nav ── -->
+<nav class="section-nav" role="tablist">
+  <button class="active" onclick="showSection(0)" id="tab-0" role="tab" aria-selected="true">1 · The Constraints</button>
+  <button onclick="showSection(1)" id="tab-1" role="tab" aria-selected="false">2 · Find Valid Loadouts</button>
+  <button onclick="showSection(2)" id="tab-2" role="tab" aria-selected="false">3 · Reflect</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     SECTION 1 · The Constraints
+════════════════════════════════════════ -->
+<section class="section active" id="section-0">
+
+  <p class="section-heading">The Rules of the Arena</p>
+  <p class="section-sub">Before you can build any valid loadout, your configuration must satisfy <strong>all three constraints</strong> at the same time. Miss even one — and your robot doesn't clear the starting gate.</p>
+
+  <!-- Three constraint cards -->
+  <div class="constraint-grid">
+    <div class="constraint-card highlight">
+      <div class="constraint-num">1</div>
+      <div class="constraint-body">
+        <div class="constraint-formula">Speed <span class="ineq-sym">&gt;</span> 5</div>
+        <div class="constraint-explain">You need <strong>at least 6 Speed points</strong> for a valid loadout. A Speed of 5 or lower disqualifies your robot.</div>
+      </div>
+    </div>
+    <div class="constraint-card highlight">
+      <div class="constraint-num">2</div>
+      <div class="constraint-body">
+        <div class="constraint-formula">Endurance <span class="ineq-sym">&gt;</span> 3</div>
+        <div class="constraint-explain">You need <strong>at least 4 Endurance points</strong>. An Endurance of 3 or lower means your robot runs out of energy mid-match.</div>
+      </div>
+    </div>
+    <div class="constraint-card highlight">
+      <div class="constraint-num">3</div>
+      <div class="constraint-body">
+        <div class="constraint-formula">S + E + T + P <span class="ineq-sym">=</span> 20</div>
+        <div class="constraint-explain">All four stats — Speed, Endurance, Turning, Power — must add to <strong>exactly 20</strong>. No more, no less. (Each stat must be at least 1.)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="qa-block">
+    <div class="qa-question">What is the minimum possible value of Speed + Endurance?</div>
+    <div class="qa-row">
+      <input class="answer-input" type="number" id="q1-input" placeholder="?" min="1" max="20" />
+      <button class="check-btn" onclick="checkQ1()">Check</button>
+    </div>
+    <div class="qa-feedback" id="q1-feedback"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="qa-block" id="q2-block" style="opacity:.4; transition: opacity .4s;">
+    <div class="qa-question">That means T + P can be at most ___.</div>
+    <div class="qa-row">
+      <input class="answer-input" type="number" id="q2-input" placeholder="?" min="1" max="20" />
+      <button class="check-btn" onclick="checkQ2()">Check</button>
+    </div>
+    <div class="qa-feedback" id="q2-feedback"></div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Key Concept</div>
+    <p>A <strong>system of inequalities</strong> is a set of conditions that must <strong>ALL be true at the same time.</strong> Satisfying two out of three doesn't count — partial satisfaction doesn't qualify your robot.</p>
+  </div>
+
+  <button class="continue-btn locked" id="s1-continue" onclick="showSection(1)">
+    Continue to Find Valid Loadouts <span class="continue-arrow">→</span>
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 · Find Valid Loadouts
+════════════════════════════════════════ -->
+<section class="section" id="section-1">
+
+  <p class="section-heading">Build Valid Loadouts</p>
+  <p class="section-sub">Enter values for all four stats below. The validation panel checks each constraint in real time. When all three pass, you can add that loadout to your list. <strong>Find at least 3 valid loadouts</strong> to continue.</p>
+
+  <!-- Loadout builder inputs -->
+  <div class="card">
+    <div class="label" style="margin-bottom:.875rem;">Loadout Builder</div>
+    <div class="builder-grid">
+      <div class="stat-input-block">
+        <div class="stat-label">Speed</div>
+        <input class="stat-input" type="number" id="b-speed" min="1" max="17" placeholder="–" oninput="validateLoadout()" />
+        <div class="stat-name">S</div>
+      </div>
+      <div class="stat-input-block">
+        <div class="stat-label">Endurance</div>
+        <input class="stat-input" type="number" id="b-end" min="1" max="17" placeholder="–" oninput="validateLoadout()" />
+        <div class="stat-name">E</div>
+      </div>
+      <div class="stat-input-block">
+        <div class="stat-label">Turning</div>
+        <input class="stat-input" type="number" id="b-turn" min="1" max="17" placeholder="–" oninput="validateLoadout()" />
+        <div class="stat-name">T</div>
+      </div>
+      <div class="stat-input-block">
+        <div class="stat-label">Power</div>
+        <input class="stat-input" type="number" id="b-power" min="1" max="17" placeholder="–" oninput="validateLoadout()" />
+        <div class="stat-name">P</div>
+      </div>
+    </div>
+
+    <!-- Validation panel -->
+    <div class="validation-panel">
+      <div class="val-row">
+        <div class="val-icon idle" id="v1-icon">?</div>
+        <span class="val-text">Speed > 5</span>
+        <span class="val-value" id="v1-val">Speed = –</span>
+      </div>
+      <div class="val-row">
+        <div class="val-icon idle" id="v2-icon">?</div>
+        <span class="val-text">Endurance > 3</span>
+        <span class="val-value" id="v2-val">Endurance = –</span>
+      </div>
+      <div class="val-row">
+        <div class="val-icon idle" id="v3-icon">?</div>
+        <span class="val-text">S + E + T + P = 20</span>
+        <span class="val-value" id="v3-val">Sum = –</span>
+      </div>
+    </div>
+
+    <button class="add-btn locked" id="add-btn" onclick="addLoadout()">+ Add to My List</button>
+  </div>
+
+  <!-- Loadout counter -->
+  <div class="loadout-counter">
+    <div class="counter-pips">
+      <div class="counter-pip" id="pip-0"></div>
+      <div class="counter-pip" id="pip-1"></div>
+      <div class="counter-pip" id="pip-2"></div>
+      <div class="counter-pip" id="pip-3"></div>
+      <div class="counter-pip" id="pip-4"></div>
+    </div>
+    <div class="counter-text"><strong id="found-count">0</strong> / 3 valid loadouts found</div>
+  </div>
+
+  <!-- Loadout table -->
+  <div class="loadout-table-wrap">
+    <table class="loadout-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Speed</th>
+          <th>Endurance</th>
+          <th>Turning</th>
+          <th>Power</th>
+          <th>Sum</th>
+          <th>Valid</th>
+        </tr>
+      </thead>
+      <tbody id="loadout-tbody">
+        <tr><td colspan="7" class="loadout-empty">No loadouts added yet. Build one above.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Reflection questions -->
+  <div class="divider-line"></div>
+  <p class="label">Worksheet Reflections</p>
+
+  <div class="reflect-q">
+    <div class="reflect-q-label">Question 1</div>
+    <div class="reflect-q-text">What is the minimum possible value of Speed + Endurance in any valid loadout? Show why.</div>
+    <textarea class="reflect-textarea" id="rq1"
+      placeholder="The minimum value is ___ because Speed > 5 means Speed ≥ ___ and Endurance > 3 means Endurance ≥ ___, so together they use at least ___ of the 20 points."
+      oninput="checkReflectQ1()"></textarea>
+  </div>
+
+  <div class="reflect-q">
+    <div class="reflect-q-label">Question 2</div>
+    <div class="reflect-q-text">Which of your valid loadouts is closest to your Season 1 configuration?</div>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.75rem;">Enter your Season 1 stats, then pick the closest loadout from your list.</p>
+    <div class="s1-row">
+      <div class="s1-stat-block">
+        <div class="stat-label">Speed</div>
+        <input class="s1-input" type="number" id="s1-speed" min="1" max="20" placeholder="–" />
+      </div>
+      <div class="s1-stat-block">
+        <div class="stat-label">Endurance</div>
+        <input class="s1-input" type="number" id="s1-end" min="1" max="20" placeholder="–" />
+      </div>
+      <div class="s1-stat-block">
+        <div class="stat-label">Turning</div>
+        <input class="s1-input" type="number" id="s1-turn" min="1" max="20" placeholder="–" />
+      </div>
+      <div class="s1-stat-block">
+        <div class="stat-label">Power</div>
+        <input class="s1-input" type="number" id="s1-power" min="1" max="20" placeholder="–" />
+      </div>
+    </div>
+    <div class="label" style="margin-bottom:.5rem;">Closest loadout from my list:</div>
+    <select class="s1-dropdown" id="s1-dropdown">
+      <option value="">— Select a loadout —</option>
+    </select>
+  </div>
+
+  <button class="continue-btn locked" id="s2-continue" onclick="showSection(2)">
+    Continue to Reflect <span class="continue-arrow">→</span>
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 3 · Reflect
+════════════════════════════════════════ -->
+<section class="section" id="section-2">
+
+  <div class="commissioner-card">
+    <div class="commissioner-eyebrow">Commissioner's Week</div>
+    <div class="commissioner-text">The Commissioner's Week begins now. Your proposal must satisfy these constraints — otherwise the math won't hold.</div>
+  </div>
+
+  <!-- Reflect 1 -->
+  <div class="reflect-q">
+    <div class="reflect-q-label">Prompt 1</div>
+    <div class="reflect-q-text">Did any of your valid loadouts surprise you? Which one — and why?</div>
+    <textarea class="reflect-textarea" id="r1" rows="3"
+      placeholder="Write your response here…"
+      oninput="checkDone()"></textarea>
+  </div>
+
+  <!-- Reflect 2 -->
+  <div class="reflect-q">
+    <div class="reflect-q-label">Prompt 2</div>
+    <div class="reflect-q-text">If Speed &gt; 5 and Endurance &gt; 3 are required, what does that tell you about the designers' strategy priorities?</div>
+    <textarea class="reflect-textarea" id="r2" rows="3"
+      placeholder="Write your response here…"
+      oninput="checkDone()"></textarea>
+  </div>
+
+  <!-- Challenge -->
+  <div class="challenge-block">
+    <div class="challenge-tag">Challenge</div>
+    <div class="challenge-text">Find a loadout where <strong>Speed and Endurance are as equal as possible</strong> while still satisfying both constraints. Use the checker below to test it. Is it valid?</div>
+
+    <div class="mini-builder">
+      <div class="mini-stat">
+        <div class="mini-label">Speed</div>
+        <input class="mini-input" type="number" id="ch-speed" min="1" max="17" placeholder="–" oninput="checkChallenge()" />
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Endurance</div>
+        <input class="mini-input" type="number" id="ch-end" min="1" max="17" placeholder="–" oninput="checkChallenge()" />
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Turning</div>
+        <input class="mini-input" type="number" id="ch-turn" min="1" max="17" placeholder="–" oninput="checkChallenge()" />
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Power</div>
+        <input class="mini-input" type="number" id="ch-power" min="1" max="17" placeholder="–" oninput="checkChallenge()" />
+      </div>
+    </div>
+    <div class="mini-checks">
+      <div class="mini-check-row">
+        <div class="mini-icon idle" id="ch-v1">?</div>
+        <span id="ch-t1">Speed > 5</span>
+      </div>
+      <div class="mini-check-row">
+        <div class="mini-icon idle" id="ch-v2">?</div>
+        <span id="ch-t2">Endurance > 3</span>
+      </div>
+      <div class="mini-check-row">
+        <div class="mini-icon idle" id="ch-v3">?</div>
+        <span id="ch-t3">S + E + T + P = 20</span>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:1rem;margin-bottom:.5rem;">Your written response:</div>
+    <textarea class="reflect-textarea" id="r3" rows="3"
+      placeholder="Describe the loadout you found, and explain whether it's valid…"
+      oninput="checkDone()"></textarea>
+  </div>
+
+  <button class="done-btn locked" id="done-btn" onclick="finish()">Mark as Done ✓</button>
+
+  <div class="completion-banner" id="completion">
+    <div class="completion-icon">🏁</div>
+    <div class="completion-title">Day 11 Complete!</div>
+    <div class="completion-sub">You've built a system of inequalities and found valid solutions.<br>The Commissioner is watching. Your math held up.</div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════ -->
+<script>
+  /* ── State ── */
+  const loadouts = [];
+  let q1Done = false;
+  let q2Done = false;
+
+  /* ── Progress bar ── */
+  function updateProgress() {
+    const sections = ['section-0','section-1','section-2'];
+    const activeIdx = sections.findIndex(id => document.getElementById(id).classList.contains('active'));
+    const pct = [0, 33, 66, 100];
+    document.getElementById('progress-bar').style.width = pct[activeIdx] + '%';
+  }
+
+  /* ── Section nav ── */
+  function showSection(idx) {
+    document.querySelectorAll('.section').forEach((s,i) => {
+      s.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.section-nav button').forEach((b,i) => {
+      b.classList.toggle('active', i === idx);
+      b.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+    });
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ════════════════════
+     SECTION 1 LOGIC
+  ════════════════════ */
+
+  function checkQ1() {
+    const val = parseInt(document.getElementById('q1-input').value, 10);
+    const input = document.getElementById('q1-input');
+    const fb = document.getElementById('q1-feedback');
+
+    if (val === 10) {
+      input.classList.add('correct'); input.classList.remove('wrong');
+      fb.textContent = '✓ Correct! Speed ≥ 6 and Endurance ≥ 4, so together they need at least 6 + 4 = 10 points.';
+      fb.className = 'qa-feedback correct';
+      q1Done = true;
+      // unlock Q2
+      document.getElementById('q2-block').style.opacity = '1';
+      checkS1Continue();
+    } else {
+      input.classList.add('wrong'); input.classList.remove('correct');
+      fb.textContent = 'Hint: Speed > 5 means Speed ≥ 6 (minimum 6). Endurance > 3 means Endurance ≥ 4 (minimum 4). Add them together.';
+      fb.className = 'qa-feedback hint';
+    }
+  }
+
+  function checkQ2() {
+    const val = parseInt(document.getElementById('q2-input').value, 10);
+    const input = document.getElementById('q2-input');
+    const fb = document.getElementById('q2-feedback');
+
+    if (val === 10) {
+      input.classList.add('correct'); input.classList.remove('wrong');
+      fb.textContent = '✓ Correct! If Speed + Endurance uses at least 10, then Turning + Power has at most 20 − 10 = 10 points left.';
+      fb.className = 'qa-feedback correct';
+      q2Done = true;
+      checkS1Continue();
+    } else {
+      input.classList.add('wrong'); input.classList.remove('correct');
+      fb.textContent = 'Hint: The total budget is 20. If Speed + Endurance takes at least 10, subtract to find the max left for T + P.';
+      fb.className = 'qa-feedback hint';
+    }
+  }
+
+  function checkS1Continue() {
+    if (q1Done && q2Done) {
+      document.getElementById('s1-continue').classList.remove('locked');
+    }
+  }
+
+  /* Also allow Enter key */
+  document.getElementById('q1-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkQ1(); });
+  document.getElementById('q2-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkQ2(); });
+
+  /* ════════════════════
+     SECTION 2 LOGIC
+  ════════════════════ */
+
+  function getBuilderVals() {
+    return {
+      s: parseInt(document.getElementById('b-speed').value, 10) || 0,
+      e: parseInt(document.getElementById('b-end').value,   10) || 0,
+      t: parseInt(document.getElementById('b-turn').value,  10) || 0,
+      p: parseInt(document.getElementById('b-power').value, 10) || 0,
+    };
+  }
+
+  function iconClass(pass) { return pass ? 'pass' : 'fail'; }
+  function iconChar(pass)  { return pass ? '✓' : '✗'; }
+
+  function validateLoadout() {
+    const { s, e, t, p } = getBuilderVals();
+    const hasAny = s || e || t || p;
+    const sum = s + e + t + p;
+
+    const c1 = s > 5;
+    const c2 = e > 3;
+    const c3 = sum === 20 && s >= 1 && e >= 1 && t >= 1 && p >= 1;
+
+    // icon states
+    const setIcon = (id, cls, char) => {
+      const el = document.getElementById(id);
+      el.className = 'val-icon ' + (hasAny ? cls : 'idle');
+      el.textContent = hasAny ? char : '?';
+    };
+
+    setIcon('v1-icon', iconClass(c1), iconChar(c1));
+    setIcon('v2-icon', iconClass(c2), iconChar(c2));
+    setIcon('v3-icon', iconClass(c3), iconChar(c3));
+
+    document.getElementById('v1-val').textContent = s || s === 0 && hasAny ? `Speed = ${s}` : 'Speed = –';
+    document.getElementById('v2-val').textContent = e || e === 0 && hasAny ? `Endurance = ${e}` : 'Endurance = –';
+    document.getElementById('v3-val').textContent = hasAny ? `Sum = ${sum}` : 'Sum = –';
+
+    const allPass = c1 && c2 && c3;
+    const addBtn = document.getElementById('add-btn');
+    if (allPass) {
+      addBtn.classList.remove('locked');
+      addBtn.textContent = '+ Add to My List';
+    } else {
+      addBtn.classList.add('locked');
+      addBtn.textContent = '+ Add to My List';
+    }
+  }
+
+  function addLoadout() {
+    if (loadouts.length >= 5) return;
+    const { s, e, t, p } = getBuilderVals();
+    const sum = s + e + t + p;
+    if (!(s > 5 && e > 3 && sum === 20 && s >= 1 && e >= 1 && t >= 1 && p >= 1)) return;
+
+    // Check duplicate
+    const isDupe = loadouts.some(l => l.s === s && l.e === e && l.t === t && l.p === p);
+    if (isDupe) {
+      const btn = document.getElementById('add-btn');
+      btn.textContent = 'Already in list!';
+      setTimeout(() => { btn.textContent = '+ Add to My List'; }, 1500);
+      return;
+    }
+
+    loadouts.push({ s, e, t, p });
+    renderLoadouts();
+    updateDropdown();
+    updateCounter();
+
+    // Reset inputs
+    ['b-speed','b-end','b-turn','b-power'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    validateLoadout();
+  }
+
+  function renderLoadouts() {
+    const tbody = document.getElementById('loadout-tbody');
+    if (loadouts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="loadout-empty">No loadouts added yet. Build one above.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = loadouts.map((l, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="s-val">${l.s}</td>
+        <td class="e-val">${l.e}</td>
+        <td>${l.t}</td>
+        <td>${l.p}</td>
+        <td class="sum-val">${l.s + l.e + l.t + l.p}</td>
+        <td><span class="valid-check">✓</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function updateCounter() {
+    const n = loadouts.length;
+    document.getElementById('found-count').textContent = n;
+    for (let i = 0; i < 5; i++) {
+      document.getElementById(`pip-${i}`).classList.toggle('filled', i < n);
+    }
+    if (n >= 3) {
+      checkS2Continue();
+    }
+  }
+
+  function updateDropdown() {
+    const sel = document.getElementById('s1-dropdown');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select a loadout —</option>' +
+      loadouts.map((l, i) =>
+        `<option value="${i}" ${cur == i ? 'selected' : ''}>#${i+1}: S=${l.s} E=${l.e} T=${l.t} P=${l.p}</option>`
+      ).join('');
+  }
+
+  function checkReflectQ1() {
+    const val = document.getElementById('rq1').value.trim();
+    document.getElementById('rq1').classList.toggle('has-content', val.length >= 5);
+    checkS2Continue();
+  }
+
+  function checkS2Continue() {
+    const rq1 = document.getElementById('rq1').value.trim();
+    const sel  = document.getElementById('s1-dropdown').value;
+    if (loadouts.length >= 3 && rq1.length >= 5 && sel !== '') {
+      document.getElementById('s2-continue').classList.remove('locked');
+    }
+  }
+
+  document.getElementById('s1-dropdown').addEventListener('change', checkS2Continue);
+
+  /* ════════════════════
+     SECTION 3 LOGIC
+  ════════════════════ */
+
+  function checkChallenge() {
+    const s = parseInt(document.getElementById('ch-speed').value, 10) || 0;
+    const e = parseInt(document.getElementById('ch-end').value,   10) || 0;
+    const t = parseInt(document.getElementById('ch-turn').value,  10) || 0;
+    const p = parseInt(document.getElementById('ch-power').value, 10) || 0;
+    const hasAny = s || e || t || p;
+    const sum = s + e + t + p;
+
+    const c1 = s > 5;
+    const c2 = e > 3;
+    const c3 = sum === 20 && s >= 1 && e >= 1 && t >= 1 && p >= 1;
+
+    const setMini = (vid, tid, pass, label, detail) => {
+      const iconEl = document.getElementById(vid);
+      iconEl.className = 'mini-icon ' + (hasAny ? iconClass(pass) : 'idle');
+      iconEl.textContent = hasAny ? iconChar(pass) : '?';
+      document.getElementById(tid).textContent = hasAny
+        ? `${label} → ${detail} (${pass ? 'PASS' : 'FAIL'})`
+        : label;
+    };
+
+    setMini('ch-v1','ch-t1', c1, 'Speed > 5', `Speed = ${s}`);
+    setMini('ch-v2','ch-t2', c2, 'Endurance > 3', `Endurance = ${e}`);
+    setMini('ch-v3','ch-t3', c3, 'S+E+T+P = 20', `Sum = ${sum}`);
+  }
+
+  function checkDone() {
+    const r1 = document.getElementById('r1').value.trim();
+    const r2 = document.getElementById('r2').value.trim();
+    const r3 = document.getElementById('r3').value.trim();
+
+    [['r1',r1],['r2',r2],['r3',r3]].forEach(([id, val]) => {
+      document.getElementById(id).classList.toggle('has-content', val.length >= 10);
+    });
+
+    if (r1.length >= 10 && r2.length >= 10 && r3.length >= 10) {
+      document.getElementById('done-btn').classList.remove('locked');
+    } else {
+      document.getElementById('done-btn').classList.add('locked');
+    }
+  }
+
+  function finish() {
+    document.getElementById('done-btn').style.display = 'none';
+    document.getElementById('completion').classList.add('show');
+    document.getElementById('progress-bar').style.width = '100%';
+  }
+
+  /* ── Init ── */
+  updateProgress();
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>
