@@ -22,6 +22,10 @@ const ACTIVITY_LESSONS = {
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
+  'Proportional Scaling + Commissioner Proposal Prep': [
+    { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
+    { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
+  ],
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
