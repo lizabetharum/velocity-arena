@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crack the Bot — Day 6</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1b2a; --surface: #132033; --card: #1a2d45; --border: #2a4060;
+  --yellow: #ffd600; --cyan: #00b8d4; --orange: #ff9100;
+  --green: #00e676; --red: #ff5252; --text: #e8f0fe; --muted: #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; line-height: 1.6;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a, #1a1600);
+  border-bottom: 2px solid var(--yellow);
+  padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 680px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.day-badge {
+  background: var(--yellow); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+  display: inline-block; margin-bottom: 4px;
+}
+.lesson-title { font-size: 18px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 12px; color: var(--muted); }
+
+/* round dots */
+.round-dots { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.r-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--border); transition: all 0.3s;
+}
+.r-dot.done    { background: var(--green); }
+.r-dot.current { background: var(--yellow); transform: scale(1.3); }
+
+/* ── LAYOUT ─────────────────────────────── */
+.container { max-width: 680px; margin: 0 auto; padding: 24px 20px 60px; }
+
+/* ── PRACTICE NOTE ──────────────────────── */
+.practice-note {
+  background: rgba(0,184,212,.08); border: 1px solid rgba(0,184,212,.25);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;
+}
+.practice-note strong { color: var(--cyan); }
+
+/* ── DOSSIER CARD ───────────────────────── */
+.dossier {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; margin-bottom: 20px;
+}
+.dossier-header {
+  background: rgba(255,214,0,.08); border-bottom: 1px solid rgba(255,214,0,.2);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.classified-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--yellow); opacity: 0.7;
+}
+.bot-round { font-size: 12px; color: var(--muted); font-weight: 700; }
+
+.dossier-identity {
+  padding: 18px 20px 14px;
+  display: flex; align-items: center; gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.bot-icon {
+  flex-shrink: 0; width: 52px; height: 52px;
+}
+.bot-codename-wrap {}
+.bot-codename {
+  font-size: 20px; font-weight: 800; color: var(--yellow);
+  letter-spacing: 0.5px;
+}
+.bot-codename.redacted {
+  color: transparent; background: rgba(255,214,0,.3);
+  border-radius: 4px; user-select: none;
+  letter-spacing: 8px;
+}
+.bot-flavor { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.dossier-outputs { padding: 16px 20px; }
+.outputs-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--muted); margin-bottom: 12px;
+}
+.output-rows { display: flex; flex-direction: column; gap: 8px; }
+
+.output-row {
+  display: flex; align-items: baseline;
+  justify-content: space-between; gap: 8px;
+}
+.or-left { display: flex; align-items: baseline; gap: 8px; flex: 1; min-width: 0; }
+.or-label { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.or-dots {
+  flex: 1; border-bottom: 1px dotted rgba(255,255,255,.15);
+  margin: 0 4px; min-width: 20px; height: 12px;
+}
+.or-formula { font-size: 11px; color: var(--muted); font-family: monospace; white-space: nowrap; }
+.or-value { font-size: 15px; font-weight: 800; color: var(--yellow); white-space: nowrap; }
+
+.output-row.hint-active .or-label { color: var(--orange); }
+.hint-row {
+  display: none; margin-top: 4px; margin-left: 0;
+  font-size: 11.5px; color: var(--orange); line-height: 1.5;
+  background: rgba(255,145,0,.08); border-radius: 6px;
+  padding: 6px 10px; font-family: monospace;
+}
+.hint-row.visible { display: block; }
+
+/* ── INPUT SECTION ──────────────────────── */
+.input-section {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+}
+.input-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--muted); margin-bottom: 16px;
+}
+.stat-inputs {
+  display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.si-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.si-key {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted);
+}
+.si-input {
+  width: 60px; height: 60px;
+  background: rgba(255,255,255,.04); border: 2px solid var(--border);
+  border-radius: 10px; color: var(--yellow);
+  font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800;
+  text-align: center; padding: 4px; outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+}
+.si-input::-webkit-inner-spin-button,
+.si-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.si-input:focus { border-color: rgba(255,214,0,.5); }
+.si-input.correct { border-color: var(--green); background: rgba(0,230,118,.08); color: var(--green); pointer-events: none; }
+.si-input.wrong   { border-color: var(--red);   background: rgba(255,82,82,.08); }
+.si-dot { font-size: 20px; font-weight: 800; color: var(--border); padding-top: 32px; }
+
+.budget-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 14px; font-weight: 700; padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.bv { color: var(--yellow); font-size: 16px; font-weight: 800; min-width: 20px; text-align: center; }
+.bop { color: var(--muted); }
+.budget-total {
+  font-size: 16px; font-weight: 800; padding: 3px 12px; border-radius: 8px; transition: all 0.3s;
+}
+.budget-total.ok   { background: rgba(0,230,118,.15); color: var(--green); border: 2px solid var(--green); }
+.budget-total.over { background: rgba(255,82,82,.15);  color: var(--red);   border: 2px solid var(--red); }
+.budget-total.low  { background: rgba(255,145,0,.1);   color: var(--orange); border: 2px solid var(--orange); }
+
+/* ── SUBMIT BUTTON ──────────────────────── */
+.submit-wrap { text-align: center; }
+.submit-btn {
+  background: var(--yellow); color: #000;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
+  border: none; border-radius: 12px; padding: 13px 40px;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+}
+.submit-btn:hover { background: #ffe033; transform: translateY(-1px); }
+.attempt-count { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* ── CRACKED STATE ──────────────────────── */
+.cracked-card {
+  display: none;
+  background: linear-gradient(140deg, #091a0e 0%, #0d1b2a 100%);
+  border: 2px solid var(--green); border-radius: 14px;
+  padding: 24px; margin-bottom: 20px;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cracked-card.visible { display: block; }
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.cracked-badge {
+  display: inline-block;
+  background: var(--green); color: #000;
+  font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 3px 12px; border-radius: 20px;
+  margin-bottom: 10px;
+}
+.cracked-name { font-size: 22px; font-weight: 800; color: var(--green); margin-bottom: 6px; }
+.cracked-stats { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.cracked-flavor { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.cracked-attempts { font-size: 12px; color: var(--muted); }
+
+.next-btn {
+  background: var(--green); color: #000;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 800;
+  border: none; border-radius: 12px; padding: 12px 36px;
+  cursor: pointer; transition: all 0.2s;
+}
+.next-btn:hover { background: #33f090; transform: translateY(-1px); }
+
+/* ── SUMMARY ─────────────────────────────── */
+.summary-card {
+  display: none;
+  background: var(--card); border: 2px solid var(--yellow);
+  border-radius: 14px; padding: 28px 24px; text-align: center;
+}
+.summary-card.visible { display: block; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.summary-icon { font-size: 48px; margin-bottom: 10px; }
+.summary-title { font-size: 22px; font-weight: 800; color: var(--yellow); margin-bottom: 6px; }
+.summary-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.summary-stat { font-size: 14px; color: var(--text); margin-bottom: 6px; }
+.summary-stat strong { color: var(--yellow); }
+.live-note {
+  margin-top: 20px; padding: 14px;
+  background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.25);
+  border-radius: 10px; font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+.live-note strong { color: var(--yellow); }
+</style>
+</head>
+<body>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <div>
+      <div class="day-badge">Day 6 · Practice</div>
+      <div class="lesson-title">Crack the Bot</div>
+      <div class="lesson-sub">Reverse-engineer the stat allocation from the outputs</div>
+    </div>
+    <div class="round-dots" id="roundDots"></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="practice-note">
+    <strong>Practice mode</strong> — formula labels are shown to help you learn the reversal.
+    In the live activity, you'll only see the output values. Race your team to call it first.
+  </div>
+
+  <!-- Dossier -->
+  <div class="dossier" id="dossier">
+    <div class="dossier-header">
+      <div class="classified-label">░░░ Classified Intel ░░░</div>
+      <div class="bot-round" id="botRoundLabel"></div>
+    </div>
+    <div class="dossier-identity">
+      <svg class="bot-icon" id="botIcon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="14" y="8"  width="24" height="18" rx="4" fill="#1a2d45" stroke="#ffd600" stroke-width="1.5"/>
+        <rect x="20" y="13" width="5"  height="5"  rx="1" fill="#ffd600" opacity="0.9"/>
+        <rect x="27" y="13" width="5"  height="5"  rx="1" fill="#ffd600" opacity="0.9"/>
+        <rect x="22" y="20" width="8"  height="2"  rx="1" fill="#ffd600" opacity="0.5"/>
+        <rect x="10" y="28" width="32" height="16" rx="4" fill="#1a2d45" stroke="#ffd600" stroke-width="1.5"/>
+        <rect x="6"  y="30" width="4"  height="10" rx="2" fill="#2a4060" stroke="#ffd600" stroke-width="1"/>
+        <rect x="42" y="30" width="4"  height="10" rx="2" fill="#2a4060" stroke="#ffd600" stroke-width="1"/>
+        <line x1="22" y1="26" x2="22" y2="28" stroke="#ffd600" stroke-width="1.5"/>
+        <line x1="30" y1="26" x2="30" y2="28" stroke="#ffd600" stroke-width="1.5"/>
+        <rect x="16" y="33" width="6"  height="5"  rx="1" fill="#ffd600" opacity="0.25"/>
+        <rect x="25" y="33" width="6"  height="5"  rx="1" fill="#ffd600" opacity="0.25"/>
+        <line x1="26" y1="4"  x2="26" y2="8"  stroke="#ffd600" stroke-width="1.5"/>
+        <circle cx="26" cy="3" r="2" fill="#ffd600"/>
+      </svg>
+      <div class="bot-codename-wrap">
+        <div class="bot-codename redacted" id="botCodename">████████████</div>
+        <div class="bot-flavor" id="botFlavor">Identity unknown. Crack the stats to reveal.</div>
+      </div>
+    </div>
+    <div class="dossier-outputs">
+      <div class="outputs-label">Known Performance Data</div>
+      <div class="output-rows" id="outputRows"></div>
+    </div>
+  </div>
+
+  <!-- Inputs -->
+  <div class="input-section">
+    <div class="input-label">Enter the Stat Allocation</div>
+    <div class="stat-inputs">
+      <div class="si-cell">
+        <div class="si-key">Speed</div>
+        <input class="si-input" id="inp-s" type="number" min="0" max="20" placeholder="—" oninput="updateBudget()">
+      </div>
+      <div class="si-dot">·</div>
+      <div class="si-cell">
+        <div class="si-key">Endurance</div>
+        <input class="si-input" id="inp-e" type="number" min="0" max="20" placeholder="—" oninput="updateBudget()">
+      </div>
+      <div class="si-dot">·</div>
+      <div class="si-cell">
+        <div class="si-key">Turning</div>
+        <input class="si-input" id="inp-t" type="number" min="0" max="20" placeholder="—" oninput="updateBudget()">
+      </div>
+      <div class="si-dot">·</div>
+      <div class="si-cell">
+        <div class="si-key">Power</div>
+        <input class="si-input" id="inp-p" type="number" min="0" max="20" placeholder="—" oninput="updateBudget()">
+      </div>
+    </div>
+    <div class="budget-row">
+      Budget:
+      <span class="bv" id="bv-s">—</span><span class="bop">+</span>
+      <span class="bv" id="bv-e">—</span><span class="bop">+</span>
+      <span class="bv" id="bv-t">—</span><span class="bop">+</span>
+      <span class="bv" id="bv-p">—</span><span class="bop">=</span>
+      <span class="budget-total low" id="budgetTotal">?</span>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" onclick="submitGuess()">Submit Guess</button>
+    <div class="attempt-count" id="attemptCount"></div>
+  </div>
+
+  <!-- Cracked reveal -->
+  <div class="cracked-card" id="crackedCard">
+    <div class="cracked-badge">✓ Cracked</div>
+    <div class="cracked-name" id="crackedName"></div>
+    <div class="cracked-stats" id="crackedStats"></div>
+    <div class="cracked-flavor" id="crackedFlavor"></div>
+    <div class="cracked-attempts" id="crackedAttempts"></div>
+    <div style="margin-top:18px;">
+      <button class="next-btn" id="nextBtn" onclick="nextRound()">Next Bot →</button>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-card" id="summaryCard">
+    <div class="summary-icon">🤖</div>
+    <div class="summary-title">All 4 Bots Cracked</div>
+    <div class="summary-sub">You can work the formulas forwards and backwards.<br>You're ready for the live game.</div>
+    <div class="summary-stat" id="summaryAttempts"></div>
+    <div class="live-note">
+      <strong>Live game rules:</strong> No formula labels. Output values only.
+      Team calls out all four stats simultaneously. First correct answer wins the round.
+      Budget must equal 20 — wrong budget means wrong answer.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Bot data ──────────────────────────────────────────────────────────
+const BOTS = [
+  {
+    codename: 'THE MARATHON',
+    flavor: 'Built to last. High endurance, balanced everywhere else.',
+    stats: { s: 4, e: 8, t: 4, p: 4 },
+    outputs: [
+      { label: 'Motor Power',    formula: 'S × 5',                 display: '20%',     statKey: 's' },
+      { label: 'Power at t = 3', formula: '100 − (20 − E) × 4.5', display: '46%',     statKey: 'e' },
+      { label: 'Turn Ratio',     formula: '0.2 + (T × 0.02)',      display: '0.28',    statKey: 't' },
+      { label: 'Charge Speed',   formula: 'P²',                    display: '16%',     statKey: 'p' },
+      { label: 'Follow-Through', formula: 'P × 200',               display: '800 ms',  statKey: 'p' },
+    ],
+    hints: {
+      s: 'Motor Power = S × 5  →  S = 20 ÷ 5',
+      e: 'P(3) = 100 − (20 − E) × 4.5  →  E = 20 − (100 − 46) ÷ 4.5',
+      t: 'Turn Ratio = 0.2 + (T × 0.02)  →  T = (0.28 − 0.2) ÷ 0.02',
+      p: 'Charge = P²  →  P = √16  |  Check: P × 200 = 800',
+    },
+  },
+  {
+    codename: 'THE SPRINTER',
+    flavor: 'Maximum speed and turning. Fades fast in a long match.',
+    stats: { s: 8, e: 4, t: 6, p: 2 },
+    outputs: [
+      { label: 'Motor Power',    formula: 'S × 5',                 display: '40%',     statKey: 's' },
+      { label: 'Power at t = 3', formula: '100 − (20 − E) × 4.5', display: '28%',     statKey: 'e' },
+      { label: 'Turn Ratio',     formula: '0.2 + (T × 0.02)',      display: '0.32',    statKey: 't' },
+      { label: 'Charge Speed',   formula: 'P²',                    display: '4%',      statKey: 'p' },
+      { label: 'Follow-Through', formula: 'P × 200',               display: '400 ms',  statKey: 'p' },
+    ],
+    hints: {
+      s: 'Motor Power = S × 5  →  S = 40 ÷ 5',
+      e: 'P(3) = 100 − (20 − E) × 4.5 = 28  →  (20 − E) = 72 ÷ 4.5 = 16  →  E = 4',
+      t: 'Turn Ratio = 0.2 + (T × 0.02)  →  T = (0.32 − 0.2) ÷ 0.02',
+      p: 'Charge = P²  →  P = √4 = 2  |  Check: P × 200 = 400',
+    },
+  },
+  {
+    codename: 'THE TANK',
+    flavor: 'Extreme endurance. Built to outlast, not outrun.',
+    stats: { s: 4, e: 10, t: 2, p: 4 },
+    outputs: [
+      { label: 'Motor Power',    formula: 'S × 5',                 display: '20%',     statKey: 's' },
+      { label: 'Power at t = 3', formula: '100 − (20 − E) × 4.5', display: '55%',     statKey: 'e' },
+      { label: 'Turn Ratio',     formula: '0.2 + (T × 0.02)',      display: '0.24',    statKey: 't' },
+      { label: 'Charge Speed',   formula: 'P²',                    display: '16%',     statKey: 'p' },
+      { label: 'Follow-Through', formula: 'P × 200',               display: '800 ms',  statKey: 'p' },
+    ],
+    hints: {
+      s: 'Motor Power = S × 5  →  S = 20 ÷ 5',
+      e: 'P(3) = 55  →  (100 − 55) = 45  →  45 ÷ 4.5 = 10  →  E = 20 − 10 = 10',
+      t: 'Turn Ratio = 0.2 + (T × 0.02)  →  T = (0.24 − 0.2) ÷ 0.02',
+      p: 'Charge = P²  →  P = √16 = 4  |  Check: 4 × 200 = 800',
+    },
+  },
+  {
+    codename: 'THE CHARGER',
+    flavor: 'High power output with solid endurance. Slow but relentless.',
+    stats: { s: 6, e: 6, t: 2, p: 6 },
+    outputs: [
+      { label: 'Motor Power',    formula: 'S × 5',                 display: '30%',     statKey: 's' },
+      { label: 'Power at t = 3', formula: '100 − (20 − E) × 4.5', display: '37%',     statKey: 'e' },
+      { label: 'Turn Ratio',     formula: '0.2 + (T × 0.02)',      display: '0.24',    statKey: 't' },
+      { label: 'Charge Speed',   formula: 'P²',                    display: '36%',     statKey: 'p' },
+      { label: 'Follow-Through', formula: 'P × 200',               display: '1200 ms', statKey: 'p' },
+    ],
+    hints: {
+      s: 'Motor Power = S × 5  →  S = 30 ÷ 5',
+      e: 'P(3) = 37  →  (100 − 37) = 63  →  63 ÷ 4.5 = 14  →  E = 20 − 14 = 6',
+      t: 'Turn Ratio = 0.2 + (T × 0.02)  →  T = (0.24 − 0.2) ÷ 0.02',
+      p: 'Charge = P²  →  P = √36 = 6  |  Check: 6 × 200 = 1200',
+    },
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+const state = {
+  round: 0,
+  attempts: 0,
+  totalAttempts: 0,
+};
+
+// ── Init ──────────────────────────────────────────────────────────────
+function init() {
+  renderDots();
+  renderRound();
+}
+
+function renderDots() {
+  document.getElementById('roundDots').innerHTML = BOTS.map((_, i) => {
+    let cls = 'r-dot';
+    if (i < state.round) cls += ' done';
+    else if (i === state.round) cls += ' current';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+// ── Render current round ──────────────────────────────────────────────
+function renderRound() {
+  const bot = BOTS[state.round];
+
+  document.getElementById('botRoundLabel').textContent = `Bot ${state.round + 1} of ${BOTS.length}`;
+  document.getElementById('botCodename').textContent   = '████████████';
+  document.getElementById('botCodename').className     = 'bot-codename redacted';
+  document.getElementById('botFlavor').textContent     = 'Identity unknown. Crack the stats to reveal.';
+
+  // Output rows
+  document.getElementById('outputRows').innerHTML = bot.outputs.map((o, i) => `
+    <div class="output-row" id="or-${i}">
+      <div class="or-left">
+        <span class="or-label">${o.label}</span>
+        <div class="or-dots"></div>
+        <span class="or-formula">${o.formula}</span>
+      </div>
+      <span class="or-value">${o.display}</span>
+    </div>
+    <div class="hint-row" id="hint-${o.statKey}"></div>
+  `).join('');
+
+  // Clear inputs
+  ['s','e','t','p'].forEach(k => {
+    const el = document.getElementById('inp-'+k);
+    el.value = '';
+    el.className = 'si-input';
+    el.removeAttribute('disabled');
+    document.getElementById('bv-'+k).textContent = '—';
+  });
+  const totEl = document.getElementById('budgetTotal');
+  totEl.textContent = '?'; totEl.className = 'budget-total low';
+
+  // Reset state
+  state.attempts = 0;
+  document.getElementById('attemptCount').textContent = '';
+  document.getElementById('crackedCard').classList.remove('visible');
+  document.getElementById('summaryCard').classList.remove('visible');
+
+  renderDots();
+}
+
+// ── Budget ────────────────────────────────────────────────────────────
+function updateBudget() {
+  const vals = getInputVals();
+  ['s','e','t','p'].forEach(k => {
+    document.getElementById('bv-'+k).textContent = vals[k] !== null ? vals[k] : '—';
+  });
+  const allSet = ['s','e','t','p'].every(k => vals[k] !== null);
+  const total  = allSet ? vals.s + vals.e + vals.t + vals.p : null;
+  const totEl  = document.getElementById('budgetTotal');
+  if (!allSet) {
+    totEl.textContent = '?'; totEl.className = 'budget-total low';
+  } else if (total === 20) {
+    totEl.textContent = 20; totEl.className = 'budget-total ok';
+  } else if (total > 20) {
+    totEl.textContent = total; totEl.className = 'budget-total over';
+  } else {
+    totEl.textContent = total; totEl.className = 'budget-total low';
+  }
+}
+
+function getInputVals() {
+  const vals = {};
+  ['s','e','t','p'].forEach(k => {
+    const raw = document.getElementById('inp-'+k).value;
+    vals[k] = raw === '' ? null : parseInt(raw, 10);
+  });
+  return vals;
+}
+
+// ── Submit ────────────────────────────────────────────────────────────
+function submitGuess() {
+  const bot  = BOTS[state.round];
+  const vals = getInputVals();
+
+  if (['s','e','t','p'].some(k => vals[k] === null)) {
+    shake(document.querySelector('.input-section'));
+    return;
+  }
+
+  state.attempts++;
+  state.totalAttempts++;
+
+  const keys   = ['s','e','t','p'];
+  const wrong  = keys.filter(k => vals[k] !== bot.stats[k]);
+  const budget = vals.s + vals.e + vals.t + vals.p;
+
+  // Update input borders
+  keys.forEach(k => {
+    const el = document.getElementById('inp-'+k);
+    el.className = 'si-input ' + (vals[k] === bot.stats[k] ? 'correct' : 'wrong');
+    if (vals[k] === bot.stats[k]) el.setAttribute('disabled', true);
+  });
+
+  // Budget wrong?
+  if (budget !== 20) {
+    const totEl = document.getElementById('budgetTotal');
+    totEl.textContent = budget;
+    totEl.className = budget > 20 ? 'budget-total over' : 'budget-total low';
+  }
+
+  // Update attempt counter
+  document.getElementById('attemptCount').textContent =
+    `Attempt ${state.attempts}${wrong.length ? ` — ${wrong.length} stat${wrong.length > 1 ? 's' : ''} incorrect` : ''}`;
+
+  // Show hints for wrong stats
+  // Clear all hints first
+  bot.outputs.forEach((o, i) => {
+    const hintEl = document.getElementById('hint-'+o.statKey);
+    if (hintEl) { hintEl.innerHTML = ''; hintEl.classList.remove('visible'); }
+    document.getElementById('or-'+i).classList.remove('hint-active');
+  });
+
+  if (wrong.length > 0 && budget !== 20) {
+    // Also treat budget as a prompt
+    wrong.forEach(k => showHint(bot, k));
+  } else if (wrong.length > 0) {
+    wrong.forEach(k => showHint(bot, k));
+  }
+
+  // If all correct
+  if (wrong.length === 0 && budget === 20) {
+    cracked(bot);
+  }
+}
+
+function showHint(bot, statKey) {
+  const hintEl = document.getElementById('hint-'+statKey);
+  if (!hintEl) return;
+  hintEl.textContent = '↳ ' + bot.hints[statKey];
+  hintEl.classList.add('visible');
+  // Highlight the relevant output row(s)
+  bot.outputs.forEach((o, i) => {
+    if (o.statKey === statKey) {
+      document.getElementById('or-'+i).classList.add('hint-active');
+    }
+  });
+}
+
+// ── Cracked ───────────────────────────────────────────────────────────
+function cracked(bot) {
+  // Reveal identity
+  const nameEl = document.getElementById('botCodename');
+  nameEl.textContent = bot.codename;
+  nameEl.className   = 'bot-codename';
+  document.getElementById('botFlavor').textContent = bot.flavor;
+
+  // Cracked card
+  document.getElementById('crackedName').textContent    = bot.codename;
+  document.getElementById('crackedStats').textContent   =
+    `S = ${bot.stats.s}  ·  E = ${bot.stats.e}  ·  T = ${bot.stats.t}  ·  P = ${bot.stats.p}`;
+  document.getElementById('crackedFlavor').textContent  = bot.flavor;
+  document.getElementById('crackedAttempts').textContent =
+    `Cracked in ${state.attempts} attempt${state.attempts > 1 ? 's' : ''}`;
+
+  const isLast = state.round === BOTS.length - 1;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = isLast ? 'See Results' : 'Next Bot →';
+
+  const card = document.getElementById('crackedCard');
+  card.classList.add('visible');
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+}
+
+// ── Next round ────────────────────────────────────────────────────────
+function nextRound() {
+  if (state.round === BOTS.length - 1) {
+    showSummary();
+    return;
+  }
+  state.round++;
+  renderRound();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showSummary() {
+  document.getElementById('dossier').style.display       = 'none';
+  document.querySelector('.input-section').style.display = 'none';
+  document.querySelector('.submit-wrap').style.display   = 'none';
+  document.getElementById('crackedCard').style.display   = 'none';
+
+  document.getElementById('summaryAttempts').innerHTML =
+    `Total attempts across all 4 bots: <strong>${state.totalAttempts}</strong>`;
+
+  const card = document.getElementById('summaryCard');
+  card.classList.add('visible');
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+
+  renderDots();
+}
+
+// ── Shake util ────────────────────────────────────────────────────────
+function shake(el) {
+  el.style.animation = 'none';
+  el.offsetHeight; // reflow
+  el.style.animation = 'shakeEl 0.35s ease';
+  setTimeout(() => el.style.animation = '', 400);
+}
+
+// Init
+init();
+</script>
+<style>
+@keyframes shakeEl {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+</style>
+</body>
+</html>

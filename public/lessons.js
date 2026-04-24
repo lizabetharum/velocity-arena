@@ -15,12 +15,15 @@ const ACTIVITY_LESSONS = {
   'Endurance Stat Challenge: Drawing the Decay': '/lessons/endurance-stat.html',
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
   'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
-  'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power.html',
+  'Power Stat Challenge: Ratio and Motor Speed': [
+    { url: '/lessons/power.html',         label: 'Interactive lesson' },
+    { url: '/lessons/p-squared-lab.html', label: 'P² Lab' },
+  ],
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
-    { url: '/lessons/p-squared-lab.html',           label: 'P² Lab' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
+    { url: '/lessons/crack-the-bot.html',           label: 'Crack the bot' },
   ],
 };
 
