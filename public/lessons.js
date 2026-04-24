@@ -21,6 +21,7 @@ const ACTIVITY_LESSONS = {
   ],
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
+  'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },

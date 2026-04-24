@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance Formula — Velocity Arena Day 10</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+:root{
+  --bg:#0d1b2a;--surface:#132033;--card:#1a2d45;--border:#2a4060;
+  --cyan:#00e5ff;--yellow:#ffd600;--green:#00e676;--red:#ff5252;
+  --orange:#ff9100;--purple:#ce93d8;--text:#e8f0fe;--muted:#7a9cc0;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
+
+/* HEADER */
+.lesson-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);}
+.lh-top{display:flex;align-items:center;gap:12px;padding:12px 20px 10px;}
+.day-badge{background:var(--cyan);color:#0d1b2a;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.lh-title{font-size:16px;font-weight:800;color:var(--text);flex:1;}
+.lh-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.prog-bar-wrap{height:4px;background:var(--border);}
+.prog-fill{height:4px;background:var(--cyan);transition:width .4s ease;width:20%;}
+.prog-tabs{display:flex;border-top:1px solid var(--border);}
+.prog-tab{flex:1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:7px 4px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;white-space:nowrap;}
+.prog-tab.active{color:var(--cyan);}
+.prog-tab.done{color:var(--green);}
+
+/* SECTIONS */
+.section{display:none;padding:20px;max-width:680px;margin:0 auto;}
+.section.visible{display:block;}
+
+/* SECTION HEADER */
+.sec-header{margin-bottom:20px;}
+.sec-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px;}
+.sec-icon.cyan{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);}
+.sec-icon.yellow{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.25);}
+.sec-icon.orange{background:rgba(255,145,0,.12);border:1px solid rgba(255,145,0,.25);}
+.sec-icon.green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);}
+.sec-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.sec-sub{font-size:13px;color:var(--muted);}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:12px;}
+.card-title.yellow{color:var(--yellow);}
+.card-title.green{color:var(--green);}
+.card-title.orange{color:var(--orange);}
+.card-title.red{color:var(--red);}
+
+/* VOCAB */
+.vocab-box{border-left:4px solid var(--cyan);padding-left:14px;}
+.vocab-row{display:flex;gap:12px;padding:7px 0;border-bottom:1px solid rgba(42,64,96,.7);align-items:flex-start;}
+.vocab-row:last-child{border-bottom:none;}
+.vocab-term{font-size:13px;font-weight:700;color:var(--yellow);min-width:120px;flex-shrink:0;}
+.vocab-def{font-size:13px;color:var(--text);line-height:1.5;}
+
+/* FORMULA BOARD */
+.formula-board{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,229,255,.03));border:1px solid rgba(0,229,255,.3);border-radius:12px;padding:20px;text-align:center;margin-bottom:14px;}
+.formula-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.formula-big{font-size:20px;font-weight:800;color:var(--text);line-height:1.5;font-family:monospace;}
+.formula-big .fc{color:var(--cyan);}
+.formula-big .fy{color:var(--yellow);}
+.formula-big .fg{color:var(--green);}
+.formula-note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5;}
+
+/* FORMULA PART LEGEND */
+.formula-parts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.fp{border-radius:8px;padding:10px 12px;}
+.fp.cyan{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);}
+.fp.yellow{background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);}
+.fp.green{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);}
+.fp.orange{background:rgba(255,145,0,.08);border:1px solid rgba(255,145,0,.2);}
+.fp-sym{font-size:15px;font-weight:800;font-family:monospace;}
+.fp.cyan .fp-sym{color:var(--cyan);}
+.fp.yellow .fp-sym{color:var(--yellow);}
+.fp.green .fp-sym{color:var(--green);}
+.fp.orange .fp-sym{color:var(--orange);}
+.fp-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* VSTEPS */
+.vstep-list{display:flex;flex-direction:column;gap:10px;}
+.vstep{display:flex;gap:12px;align-items:flex-start;}
+.vstep-num{width:26px;height:26px;border-radius:50%;background:var(--cyan);color:#0d1b2a;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.vstep-num.y{background:var(--yellow);}
+.vstep-num.g{background:var(--green);}
+.vstep-num.r{background:var(--red);}
+.vstep-text{font-size:13px;color:var(--text);line-height:1.6;padding-top:2px;}
+.vstep-text strong{color:var(--yellow);}
+.vstep-text code{background:rgba(0,229,255,.1);color:var(--cyan);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;}
+
+/* PHASE */
+.phase{border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+.phase.cyan{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.phase.yellow{background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.2);}
+.phase.orange{background:rgba(255,145,0,.06);border:1px solid rgba(255,145,0,.2);}
+.phase.green{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);}
+.phase.red{background:rgba(255,82,82,.06);border:1px solid rgba(255,82,82,.2);}
+.phase-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.phase.cyan .phase-label{color:var(--cyan);}
+.phase.yellow .phase-label{color:var(--yellow);}
+.phase.orange .phase-label{color:var(--orange);}
+.phase.green .phase-label{color:var(--green);}
+.phase.red .phase-label{color:var(--red);}
+
+/* HINT */
+.hint-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--orange);background:rgba(255,145,0,.1);border:1px solid rgba(255,145,0,.25);border-radius:20px;padding:4px 10px;cursor:pointer;margin:8px 0 4px;transition:background .15s;user-select:none;}
+.hint-pill:hover{background:rgba(255,145,0,.2);}
+.hint-text{display:none;background:rgba(255,145,0,.07);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px;}
+.hint-text.show{display:block;}
+
+/* GRID SVG */
+.grid-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;overflow:hidden;}
+.grid-svg{width:100%;cursor:crosshair;display:block;}
+.grid-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;}
+.gl-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.gl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+
+/* COORD DISPLAY */
+.coord-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.coord-box{border-radius:10px;padding:12px;text-align:center;}
+.coord-box.a{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);}
+.coord-box.b{background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);}
+.coord-box.g{background:rgba(255,145,0,.08);border:1px solid rgba(255,145,0,.25);}
+.coord-letter{font-size:18px;font-weight:800;margin-bottom:4px;}
+.coord-box.a .coord-letter{color:var(--cyan);}
+.coord-box.b .coord-letter{color:var(--yellow);}
+.coord-box.g .coord-letter{color:var(--orange);}
+.coord-value{font-size:13px;font-weight:700;color:var(--text);}
+.coord-label{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+
+/* CALC STEPS */
+.calc-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.calc-block-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.calc-step{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.cs-label{font-size:13px;color:var(--muted);flex-shrink:0;}
+.cs-expr{font-size:13px;font-family:monospace;color:var(--text);flex-shrink:0;}
+.cs-blank{width:52px;height:34px;background:var(--card);border:2px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-moz-appearance:textfield;}
+.cs-blank::-webkit-outer-spin-button,.cs-blank::-webkit-inner-spin-button{-webkit-appearance:none;}
+.cs-blank:focus{border-color:var(--cyan);}
+.cs-blank.correct{border-color:var(--green);background:rgba(0,230,118,.08);}
+.cs-blank.wrong{border-color:var(--red);background:rgba(255,82,82,.08);}
+.cs-blank:disabled{opacity:.6;cursor:not-allowed;}
+.cs-result{font-size:12px;font-weight:700;margin-left:4px;}
+.cs-result.ok{color:var(--green);}
+.cs-result.err{color:var(--red);}
+.cs-pre{font-size:13px;color:var(--text);font-family:monospace;}
+.cs-given{font-size:13px;font-weight:700;color:var(--cyan);font-family:monospace;}
+
+/* ERROR MESSAGE */
+.err-box{display:none;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--red);line-height:1.5;margin-bottom:8px;}
+.err-box.show{display:block;}
+
+/* DISTANCE BARS */
+.dist-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.dist-row{display:flex;align-items:center;gap:10px;}
+.dist-label{font-size:12px;font-weight:700;min-width:80px;flex-shrink:0;}
+.dist-track{flex:1;height:28px;background:rgba(42,64,96,.5);border-radius:6px;overflow:hidden;position:relative;}
+.dist-fill{height:100%;border-radius:6px;transition:width .6s ease;display:flex;align-items:center;padding-left:8px;min-width:0;}
+.dist-fill span{font-size:11px;font-weight:800;color:#0d1b2a;white-space:nowrap;}
+.dist-val{font-size:13px;font-weight:800;min-width:42px;text-align:right;flex-shrink:0;}
+
+/* SUMMARY TABLE */
+.sum-table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+.sum-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.sum-table td{font-size:13px;padding:10px 10px;border-bottom:1px solid rgba(42,64,96,.5);}
+.sum-table tr:last-child td{border-bottom:none;}
+.sum-table .route{font-weight:700;font-family:monospace;}
+.sum-table .dist-num{font-weight:800;color:var(--cyan);}
+.sum-table .check-col{color:var(--muted);font-size:12px;}
+
+/* REFLECT */
+.reflect-q{margin-bottom:16px;}
+.reflect-q-num{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+.reflect-q-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.5;}
+.reflect-frame{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--muted);line-height:1.6;}
+.reflect-frame strong{color:var(--cyan);}
+.reflect-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;resize:vertical;min-height:68px;line-height:1.6;}
+.reflect-input:focus{border-color:var(--cyan);}
+.reflect-input::placeholder{color:var(--muted);}
+
+/* CONGRATS */
+.congrats-box{display:none;background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,229,255,.06));border:1px solid rgba(0,230,118,.3);border-radius:14px;padding:24px;text-align:center;margin-top:20px;}
+.congrats-box.show{display:block;}
+.congrats-emoji{font-size:48px;margin-bottom:12px;}
+.congrats-title{font-size:20px;font-weight:800;color:var(--green);margin-bottom:8px;}
+.congrats-sub{font-size:13px;color:var(--muted);line-height:1.65;max-width:46ch;margin:0 auto;}
+
+/* REMINDER BOX */
+.reminder{background:rgba(255,145,0,.07);border:1px solid rgba(255,145,0,.25);border-left:4px solid var(--orange);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.6;}
+.reminder strong{color:var(--orange);}
+
+/* BUTTONS */
+.btn-next{width:100%;background:var(--cyan);color:#0d1b2a;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:14px;border-radius:10px;border:none;cursor:pointer;margin-top:16px;transition:opacity .15s;}
+.btn-next:hover{opacity:.88;}
+.btn-secondary{background:transparent;color:var(--cyan);border:1px solid rgba(0,229,255,.4);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:10px 16px;border-radius:8px;cursor:pointer;transition:all .15s;}
+.btn-secondary:hover{background:rgba(0,229,255,.08);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* FIELD NOTE */
+.field-note{background:rgba(0,229,255,.05);border:1px dashed rgba(0,229,255,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.55;}
+.field-note strong{color:var(--cyan);}
+
+/* STEP DIVIDER */
+.step-divider{display:flex;align-items:center;gap:10px;margin:16px 0 12px;}
+.step-divider-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.step-divider-num.cyan{background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);}
+.step-divider-num.yellow{background:rgba(255,214,0,.15);color:var(--yellow);border:1px solid rgba(255,214,0,.3);}
+.step-divider-num.orange{background:rgba(255,145,0,.15);color:var(--orange);border:1px solid rgba(255,145,0,.3);}
+.step-divider-line{flex:1;height:1px;background:var(--border);}
+.step-divider-label{font-size:13px;font-weight:700;color:var(--text);}
+
+/* VISUAL DEMO */
+.demo-steps{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.demo-step{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(42,64,96,.4);color:var(--muted);border:1px solid var(--border);transition:all .4s;}
+.demo-step.active.s1{background:rgba(232,240,254,.15);color:var(--text);border-color:rgba(232,240,254,.3);}
+.demo-step.active.s2{background:rgba(0,229,255,.2);color:var(--cyan);border-color:rgba(0,229,255,.4);}
+.demo-step.active.s3{background:rgba(255,214,0,.2);color:var(--yellow);border-color:rgba(255,214,0,.4);}
+.demo-step.active.s4{background:rgba(0,230,118,.2);color:var(--green);border-color:rgba(0,230,118,.4);}
+.demo-replay{background:transparent;color:var(--muted);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;cursor:pointer;margin-top:8px;transition:all .15s;}
+.demo-replay:hover{border-color:var(--cyan);color:var(--cyan);}
+.concept-chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.concept-chip{flex:1;min-width:90px;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5;}
+.concept-chip strong{display:block;margin-bottom:2px;}
+.concept-chip.cc-cyan{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+.concept-chip.cc-yellow{background:rgba(255,214,0,.07);border:1px solid rgba(255,214,0,.2);color:var(--yellow);}
+.concept-chip.cc-green{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);color:var(--green);}
+.concept-chip .chip-sub{color:var(--muted);font-size:11px;}
+
+/* VSTEP HOVER */
+.vstep{cursor:pointer;border-radius:8px;padding:4px 4px 4px 0;transition:background .15s;}
+.vstep:hover,.vstep:focus{background:rgba(42,64,96,.3);}
+
+/* MISTAKE VISUAL */
+.mistake-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.mistake-col{border-radius:10px;padding:12px;text-align:center;}
+.mistake-col.mc-wrong{background:rgba(255,82,82,.07);border:1px solid rgba(255,82,82,.3);}
+.mistake-col.mc-right{background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.3);}
+.mc-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07);}
+.mc-wrong .mc-head{color:var(--red);}
+.mc-right .mc-head{color:var(--green);}
+.mc-row{font-size:12px;font-weight:700;color:var(--text);padding:2px 0;font-family:monospace;}
+.mc-arrow{font-size:10px;color:var(--muted);margin:2px 0;line-height:1.3;}
+.mc-bad-arrow{font-size:10px;color:var(--red);margin:2px 0;line-height:1.3;font-weight:700;}
+.mc-result{font-size:15px;font-weight:800;padding:7px 4px;border-radius:7px;margin-top:6px;font-family:monospace;}
+.mc-wrong .mc-result{background:rgba(255,82,82,.12);color:var(--red);}
+.mc-right .mc-result{background:rgba(0,230,118,.12);color:var(--green);}
+.mc-split{display:flex;gap:6px;justify-content:center;margin:4px 0;}
+.mc-item{flex:1;background:rgba(255,255,255,.04);border-radius:6px;padding:6px 3px;font-size:12px;font-weight:700;color:var(--text);font-family:monospace;line-height:1.9;}
+
+@media(max-width:480px){
+  .coord-row{grid-template-columns:1fr;}
+  .formula-parts{grid-template-columns:1fr;}
+  .prog-tab{font-size:9px;padding:7px 3px;}
+}
+</style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<header class="lesson-header">
+  <div class="lh-top">
+    <span class="day-badge">Day 10</span>
+    <div>
+      <div class="lh-title">Distance Formula</div>
+      <div class="lh-sub">How Far Did Your Ball Actually Travel?</div>
+    </div>
+  </div>
+  <div class="prog-bar-wrap"><div class="prog-fill" id="progFill"></div></div>
+  <div class="prog-tabs">
+    <button class="prog-tab active" id="ptab1" onclick="goSection(1)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;"><polygon points="2,14 8,2 14,14" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/><line x1="8" y1="8" x2="8" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>The Formula</button>
+    <button class="prog-tab" id="ptab2" onclick="goSection(2)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><line x1="2" y1="6" x2="14" y2="6" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.2"/><line x1="6" y1="2" x2="6" y2="14" stroke="currentColor" stroke-width="1.2"/><line x1="10" y1="2" x2="10" y2="14" stroke="currentColor" stroke-width="1.2"/></svg>Mark the Field</button>
+    <button class="prog-tab" id="ptab3" onclick="goSection(3)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;"><circle cx="8" cy="4" r="2.5" stroke="currentColor" stroke-width="1.7"/><circle cx="4" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="6.5" x2="5" y2="10.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="6.5" x2="11" y2="10.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Calculate</button>
+    <button class="prog-tab" id="ptab4" onclick="goSection(4)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:5px;"><rect x="2" y="10" width="3" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="7" width="3" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="4" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>Compare + Reflect</button>
+  </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1 — THE FORMULA
+═══════════════════════════════════════════════ -->
+<section class="section visible" id="sec1">
+  <div class="sec-header">
+    <div class="sec-icon cyan"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><polygon points="8,40 24,8 40,40" stroke="#00e5ff" stroke-width="2.5" stroke-linejoin="round" fill="none"/><line x1="24" y1="22" x2="24" y2="31" stroke="#00e5ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="24" cy="36" r="2" fill="#00e5ff"/></svg></div>
+    <div class="sec-title">The Distance Formula</div>
+    <div class="sec-sub">The shortest path between two points on a grid</div>
+  </div>
+
+  <!-- KEY WORDS -->
+  <div class="card">
+    <div class="card-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Key Words</div>
+    <div class="vocab-box">
+      <div class="vocab-row">
+        <div class="vocab-term">Coordinate</div>
+        <div class="vocab-def">Two numbers that name a spot on a grid — written <strong>(x, y)</strong>. Example: (4, 2) means 4 across, 2 up.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">Distance</div>
+        <div class="vocab-def">How far apart two points are — measured in a straight line.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">Grid Unit</div>
+        <div class="vocab-def">One square on the field. The field is <strong>8 units wide</strong> and <strong>4 units tall</strong>.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">√ (square root)</div>
+        <div class="vocab-def">The opposite of squaring. √16 = 4 because 4 × 4 = 16. Your calculator has a √ button.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISUAL DEMO -->
+  <div class="card">
+    <div class="card-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><ellipse cx="10" cy="10" rx="8" ry="5" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="10" r="2.5" fill="currentColor" opacity=".85"/></svg>See It First — What Is Distance?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Distance is the <strong style="color:var(--green);">straight line</strong> between two points. Watch how it builds from two simpler pieces.</div>
+    <div style="background:var(--surface);border-radius:10px;overflow:hidden;margin-bottom:12px;">
+      <svg id="demoSvg" viewBox="0 0 320 200" style="width:100%;display:block;">
+        <g id="demoGrid"></g>
+        <g id="demoLabels"></g>
+        <!-- H leg (cyan): A(80,136)→corner(240,136), length=160 -->
+        <line id="demoH" x1="80" y1="136" x2="240" y2="136"
+          stroke="var(--cyan)" stroke-width="3.5"
+          stroke-dasharray="162" stroke-dashoffset="162"/>
+        <text id="demoHLabel" x="160" y="125" fill="var(--cyan)" font-size="10" font-weight="800"
+          text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0">← x₂ − x₁ = 4 units →</text>
+        <!-- V leg (yellow): corner(240,136)→B(240,72), length=64 -->
+        <line id="demoV" x1="240" y1="136" x2="240" y2="72"
+          stroke="var(--yellow)" stroke-width="3.5"
+          stroke-dasharray="66" stroke-dashoffset="66"/>
+        <text id="demoVLabel" x="264" y="103" fill="var(--yellow)" font-size="10" font-weight="800"
+          text-anchor="start" font-family="DM Sans,sans-serif" opacity="0">y₂ − y₁</text>
+        <text id="demoVLabel2" x="264" y="116" fill="var(--yellow)" font-size="10" font-weight="800"
+          text-anchor="start" font-family="DM Sans,sans-serif" opacity="0">= 2 units ↑</text>
+        <!-- Right angle marker at corner (240,136) -->
+        <polyline id="demoRightAngle" points="232,136 232,128 240,128"
+          fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" opacity="0"/>
+        <!-- Hypotenuse (green): A(80,136)→B(240,72), length≈175 -->
+        <line id="demoDist" x1="80" y1="136" x2="240" y2="72"
+          stroke="var(--green)" stroke-width="4"
+          stroke-dasharray="176" stroke-dashoffset="176"/>
+        <text id="demoDistLabel" x="148" y="93" fill="var(--green)" font-size="12" font-weight="800"
+          text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0"
+          transform="rotate(-22,148,93)">d = DISTANCE</text>
+        <!-- Point A (80,136) -->
+        <circle id="demoA" cx="80" cy="136" r="0" fill="var(--cyan)" stroke="#0d1b2a" stroke-width="2"/>
+        <text id="demoALbl" x="65" y="133" fill="var(--cyan)" font-size="13" font-weight="800"
+          text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0">A</text>
+        <text id="demoACoord" x="65" y="156" fill="var(--muted)" font-size="10"
+          text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0">(1,1)</text>
+        <!-- Point B (240,72) -->
+        <circle id="demoB" cx="240" cy="72" r="0" fill="var(--yellow)" stroke="#0d1b2a" stroke-width="2"/>
+        <text id="demoBLbl" x="253" y="67" fill="var(--yellow)" font-size="13" font-weight="800"
+          text-anchor="start" font-family="DM Sans,sans-serif" opacity="0">B</text>
+        <text id="demoBCoord" x="253" y="80" fill="var(--muted)" font-size="10"
+          text-anchor="start" font-family="DM Sans,sans-serif" opacity="0">(5,3)</text>
+      </svg>
+    </div>
+    <div class="demo-steps">
+      <div class="demo-step s1" id="ds1">① Two Points</div>
+      <div class="demo-step s2" id="ds2">② Across →</div>
+      <div class="demo-step s3" id="ds3">③ Up ↑</div>
+      <div class="demo-step s4" id="ds4">④ Distance ↗</div>
+    </div>
+    <button class="demo-replay" onclick="playDemo()">▶ Replay</button>
+    <div class="concept-chips">
+      <div class="concept-chip cc-cyan"><strong>Across →</strong><span class="chip-sub">How far left or right?<br>(x₂ − x₁)</span></div>
+      <div class="concept-chip cc-yellow"><strong>Up/Down ↑</strong><span class="chip-sub">How far up or down?<br>(y₂ − y₁)</span></div>
+      <div class="concept-chip cc-green"><strong>Distance ↗</strong><span class="chip-sub">The straight line.<br>= d (what we find)</span></div>
+    </div>
+  </div>
+
+  <!-- FORMULA BOARD -->
+  <div class="card">
+    <div class="card-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><polygon points="2,18 10,2 18,18" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/><line x1="10" y1="9" x2="10" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="15.5" r="1.2" fill="currentColor"/></svg>The Formula</div>
+    <div class="formula-board">
+      <div class="formula-label">Distance between two points</div>
+      <div class="formula-big">
+        d = √ ( <span class="fc">(x₂ − x₁)²</span> + <span class="fy">(y₂ − y₁)²</span> )
+      </div>
+      <div class="formula-note">d = the distance &nbsp;·&nbsp; x₁, y₁ = first point &nbsp;·&nbsp; x₂, y₂ = second point</div>
+    </div>
+
+    <div class="formula-parts">
+      <div class="fp cyan">
+        <div class="fp-sym">(x₂ − x₁)²</div>
+        <div class="fp-desc">Subtract the x-values. Then square it (multiply by itself).</div>
+      </div>
+      <div class="fp yellow">
+        <div class="fp-sym">(y₂ − y₁)²</div>
+        <div class="fp-desc">Subtract the y-values. Then square it.</div>
+      </div>
+      <div class="fp green">
+        <div class="fp-sym">+ (add)</div>
+        <div class="fp-desc">Add the two squared numbers together.</div>
+      </div>
+      <div class="fp orange">
+        <div class="fp-sym">√ (root)</div>
+        <div class="fp-desc">Take the square root of the total. That's your distance.</div>
+      </div>
+    </div>
+
+    <!-- ORDER WARNING — visual two-path comparison -->
+    <div style="margin-bottom:0;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><polygon points="10,2 19,18 1,18" stroke="#ff5252" stroke-width="1.8" stroke-linejoin="round" fill="rgba(255,82,82,.1)"/><line x1="10" y1="8" x2="10" y2="13" stroke="#ff5252" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="15.5" r="1.2" fill="#ff5252"/></svg>Common Mistake — Two Different Paths</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Using x = 3 and y = 4 — same numbers, different order — different answers:</div>
+      <div class="mistake-grid">
+        <div class="mistake-col mc-wrong">
+          <div class="mc-head">✗ Wrong Order</div>
+          <div class="mc-row">x = 3 &nbsp; y = 4</div>
+          <div class="mc-bad-arrow">↓ add first ← ERROR</div>
+          <div class="mc-row">3 + 4 = 7</div>
+          <div class="mc-arrow">↓ then square</div>
+          <div class="mc-row">7² = 49</div>
+          <div class="mc-arrow">↓ root</div>
+          <div class="mc-result">√49 = 7 ✗</div>
+        </div>
+        <div class="mistake-col mc-right">
+          <div class="mc-head">✓ Right Order</div>
+          <div class="mc-arrow" style="color:var(--green);font-weight:700;">↓ square each first</div>
+          <div class="mc-split">
+            <div class="mc-item">x=3<br>3²=<strong>9</strong></div>
+            <div class="mc-item">y=4<br>4²=<strong>16</strong></div>
+          </div>
+          <div class="mc-arrow">↓ then add</div>
+          <div class="mc-row">9 + 16 = 25</div>
+          <div class="mc-arrow">↓ root</div>
+          <div class="mc-result">√25 = 5 ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKED EXAMPLE -->
+  <div class="card">
+    <div class="card-title yellow"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="14" x2="16" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="12" x2="14" y2="16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Worked Example — Watch Each Step</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Distance from <strong style="color:var(--cyan);">A = (1, 1)</strong> to <strong style="color:var(--yellow);">B = (4, 5)</strong></p>
+
+    <!-- RIGHT TRIANGLE VISUAL for worked example -->
+    <div style="background:var(--surface);border-radius:10px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;text-align:center;">The Right Triangle — A(1,1) to B(4,5)</div>
+      <svg id="exSvg" viewBox="0 0 240 175" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+        <!-- faint guide lines -->
+        <line x1="30" y1="15" x2="30" y2="140" stroke="rgba(42,64,96,.35)" stroke-width="1" stroke-dasharray="4,3"/>
+        <line x1="30" y1="140" x2="175" y2="140" stroke="rgba(42,64,96,.35)" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- Hypotenuse drawn FIRST so legs sit on top -->
+        <line id="ex-hypo" x1="30" y1="135" x2="120" y2="15" stroke="var(--green)" stroke-width="4" style="transition:stroke-width .2s,filter .2s;"/>
+        <!-- Distance badge group -->
+        <g id="ex-badge" style="transition:filter .2s;">
+          <rect x="10" y="56" width="92" height="36" rx="7" fill="rgba(0,230,118,.12)" stroke="rgba(0,230,118,.35)" stroke-width="1.5"/>
+          <text x="56" y="70" fill="var(--green)" font-size="11" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif">d = √(3² + 4²)</text>
+          <text x="56" y="84" fill="var(--green)" font-size="12" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif">= √25 = 5 ✓</text>
+        </g>
+        <!-- H leg (cyan): A→corner -->
+        <line id="ex-h-leg" x1="30" y1="135" x2="120" y2="135" stroke="var(--cyan)" stroke-width="3.5" style="transition:stroke-width .2s,filter .2s;"/>
+        <g id="ex-h-labels" style="transition:filter .2s;">
+          <text x="75" y="153" fill="var(--cyan)" font-size="11" font-weight="800" text-anchor="middle" font-family="DM Sans,sans-serif">3 units across</text>
+          <text x="75" y="165" fill="var(--muted)" font-size="10" text-anchor="middle" font-family="DM Sans,sans-serif">(x₂ − x₁ = 4 − 1)</text>
+        </g>
+        <!-- V leg (yellow): corner→B -->
+        <line id="ex-v-leg" x1="120" y1="135" x2="120" y2="15" stroke="var(--yellow)" stroke-width="3.5" style="transition:stroke-width .2s,filter .2s;"/>
+        <g id="ex-v-labels" style="transition:filter .2s;">
+          <text x="155" y="78" fill="var(--yellow)" font-size="11" font-weight="800" text-anchor="start" font-family="DM Sans,sans-serif">4 units</text>
+          <text x="155" y="91" fill="var(--yellow)" font-size="11" font-weight="800" text-anchor="start" font-family="DM Sans,sans-serif">up</text>
+          <text x="155" y="104" fill="var(--muted)" font-size="10" text-anchor="start" font-family="DM Sans,sans-serif">(y₂ − y₁)</text>
+        </g>
+        <!-- Right angle marker -->
+        <polyline points="112,135 112,127 120,127" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <!-- Point A group (cyan) -->
+        <g id="ex-pt-a" style="transition:filter .2s;">
+          <circle id="ex-circ-a" cx="30" cy="135" r="9" fill="var(--cyan)" stroke="#0d1b2a" stroke-width="2" style="transition:r .2s;"/>
+          <text x="30" y="139" fill="#0d1b2a" font-size="10" font-weight="800" text-anchor="middle" dominant-baseline="middle">A</text>
+        </g>
+        <text id="ex-coord-a" x="14" y="122" fill="var(--muted)" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif" style="transition:filter .2s;">(1,1)</text>
+        <!-- Point B group (yellow) -->
+        <g id="ex-pt-b" style="transition:filter .2s;">
+          <circle id="ex-circ-b" cx="120" cy="15" r="9" fill="var(--yellow)" stroke="#0d1b2a" stroke-width="2" style="transition:r .2s;"/>
+          <text x="120" y="19" fill="#0d1b2a" font-size="10" font-weight="800" text-anchor="middle" dominant-baseline="middle">B</text>
+        </g>
+        <text id="ex-coord-b" x="135" y="11" fill="var(--muted)" font-size="9" text-anchor="start" font-family="DM Sans,sans-serif" style="transition:filter .2s;">(4,5)</text>
+        <!-- Corner dot -->
+        <circle cx="120" cy="135" r="5" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+      </svg>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.5;">
+        Square <strong style="color:var(--cyan);">3</strong> and <strong style="color:var(--yellow);">4</strong> separately → add → square root = <strong style="color:var(--green);">5</strong>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);text-align:center;padding:7px 12px;background:rgba(255,145,0,.06);border:1px solid rgba(255,145,0,.15);border-radius:7px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#ff9100" stroke-width="1.5"/><line x1="8" y1="7" x2="8" y2="11" stroke="#ff9100" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="5" r="1.1" fill="#ff9100"/></svg>Hover (or tap) each step — it lights up in the diagram above</div>
+
+    <div class="vstep-list">
+      <div class="vstep" onpointerenter="exStep(1,true)" onpointerleave="exStep(1,false)">
+        <div class="vstep-num">1</div>
+        <div class="vstep-text">Write the two points.<br>
+          <strong style="color:var(--cyan);">A = (1, 1)</strong> &nbsp;·&nbsp; <strong style="color:var(--yellow);">B = (4, 5)</strong>
+        </div>
+      </div>
+      <div class="vstep" onpointerenter="exStep(2,true)" onpointerleave="exStep(2,false)">
+        <div class="vstep-num">2</div>
+        <div class="vstep-text">Subtract <strong style="color:var(--cyan);">x-values</strong>: <strong>4 − 1 = 3</strong><br>Square it: <strong>3² = 9</strong></div>
+      </div>
+      <div class="vstep" onpointerenter="exStep(3,true)" onpointerleave="exStep(3,false)">
+        <div class="vstep-num y">3</div>
+        <div class="vstep-text">Subtract <strong style="color:var(--yellow);">y-values</strong>: <strong>5 − 1 = 4</strong><br>Square it: <strong>4² = 16</strong></div>
+      </div>
+      <div class="vstep" onpointerenter="exStep(4,true)" onpointerleave="exStep(4,false)">
+        <div class="vstep-num g">4</div>
+        <div class="vstep-text">Add both squared results: <strong>9 + 16 = 25</strong></div>
+      </div>
+      <div class="vstep" onpointerenter="exStep(5,true)" onpointerleave="exStep(5,false)">
+        <div class="vstep-num" style="background:var(--green);">5</div>
+        <div class="vstep-text">Square root: <strong>√25 = 5</strong><br>Distance = <strong style="color:var(--green);">5 grid units</strong> ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY'S FIXED POINTS -->
+  <div class="card">
+    <div class="card-title orange"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M10 2C6.7 2 4 4.7 4 8c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6z" stroke="currentColor" stroke-width="1.7" fill="none"/><circle cx="10" cy="8" r="2" fill="currentColor"/></svg>Today's Fixed Points — These Never Change</div>
+    <div class="coord-row">
+      <div class="coord-box a">
+        <div class="coord-letter">A</div>
+        <div class="coord-value">(4, 2)</div>
+        <div class="coord-label">Tip-off — always</div>
+      </div>
+      <div class="coord-box b" style="border-style:dashed;">
+        <div class="coord-letter">B</div>
+        <div class="coord-value">( ? , ? )</div>
+        <div class="coord-label">You pick this next</div>
+      </div>
+      <div class="coord-box g">
+        <div class="coord-letter">G</div>
+        <div class="coord-value">(8, 2)</div>
+        <div class="coord-label">Opponent's goal</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.55;">B is where the ball landed after your bot's best charge in Season 1. You will place it on the grid in the next section.</p>
+  </div>
+
+  <button class="btn-next" onclick="goSection(2)">I understand the formula → Mark the Field 📍</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2 — MARK THE FIELD
+═══════════════════════════════════════════════ -->
+<section class="section" id="sec2">
+  <div class="sec-header">
+    <div class="sec-icon yellow"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><path d="M24 6C17.4 6 12 11.4 12 18c0 9 12 24 12 24s12-15 12-24c0-6.6-5.4-12-12-12z" stroke="#ffd600" stroke-width="2.5" fill="none"/><circle cx="24" cy="18" r="4" fill="#ffd600"/></svg></div>
+    <div class="sec-title">Mark the Field</div>
+    <div class="sec-sub">Tap the grid to place Point B — where did the ball land?</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><polyline points="5,16 7,9 11,13 14,7 16,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>The 8 × 4 Field — Tap to Place Point B</div>
+    <div class="field-note">
+      <strong>Think back to Season 1.</strong> After your bot's best charge — which grid square did the ball end up in? Tap that square. B is your estimate — it does not need to be perfect. The math works either way.
+    </div>
+
+    <div class="grid-wrap">
+      <svg id="fieldSvg" class="grid-svg" viewBox="0 0 480 270" onclick="placeB(event)">
+        <!-- Grid lines -->
+        <g id="gridLines"></g>
+        <!-- Axis labels -->
+        <g id="axisLabels"></g>
+        <!-- Distance lines (drawn when B is placed) -->
+        <line id="lineAG" x1="0" y1="0" x2="0" y2="0" stroke="rgba(0,229,255,.25)" stroke-width="2" stroke-dasharray="6,4"/>
+        <line id="lineAB" x1="0" y1="0" x2="0" y2="0" stroke="rgba(255,214,0,.6)" stroke-width="2.5" stroke-dasharray="none"/>
+        <line id="lineBG" x1="0" y1="0" x2="0" y2="0" stroke="rgba(255,145,0,.6)" stroke-width="2.5" stroke-dasharray="none"/>
+        <!-- Fixed points -->
+        <circle id="dotA" cx="0" cy="0" r="9" fill="#00e5ff" stroke="#0d1b2a" stroke-width="2"/>
+        <text id="labelA" x="0" y="0" fill="#0d1b2a" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="middle">A</text>
+        <circle id="dotG" cx="0" cy="0" r="9" fill="#ff9100" stroke="#0d1b2a" stroke-width="2"/>
+        <text id="labelG" x="0" y="0" fill="#0d1b2a" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="middle">G</text>
+        <!-- Point B (hidden until placed) -->
+        <circle id="dotB" cx="0" cy="0" r="9" fill="#ffd600" stroke="#0d1b2a" stroke-width="2" display="none"/>
+        <text id="labelB" x="0" y="0" fill="#0d1b2a" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="middle" display="none">B</text>
+        <!-- Hover indicator -->
+        <circle id="hoverDot" cx="-100" cy="-100" r="7" fill="rgba(255,214,0,.3)" stroke="rgba(255,214,0,.6)" stroke-width="1.5" pointer-events="none"/>
+      </svg>
+      <div class="grid-legend">
+        <div class="gl-item"><div class="gl-dot" style="background:#00e5ff;"></div>A = Tip-off (4,2)</div>
+        <div class="gl-item"><div class="gl-dot" style="background:#ff9100;"></div>G = Opponent Goal (8,2)</div>
+        <div class="gl-item"><div class="gl-dot" style="background:#ffd600;"></div>B = Your Ball Position (tap to place)</div>
+      </div>
+    </div>
+
+    <div class="coord-row" id="coordDisplay">
+      <div class="coord-box a">
+        <div class="coord-letter">A</div>
+        <div class="coord-value">(4, 2)</div>
+        <div class="coord-label">Tip-off · fixed</div>
+      </div>
+      <div class="coord-box b" id="bCoordBox" style="border-style:dashed;opacity:.5;">
+        <div class="coord-letter">B</div>
+        <div class="coord-value" id="bCoordVal">Tap grid ↑</div>
+        <div class="coord-label">Your ball position</div>
+      </div>
+      <div class="coord-box g">
+        <div class="coord-letter">G</div>
+        <div class="coord-value">(8, 2)</div>
+        <div class="coord-label">Opponent goal · fixed</div>
+      </div>
+    </div>
+
+    <div id="bPlacedMsg" style="display:none;" class="phase green">
+      <div class="phase-label">✅ Point B Placed</div>
+      <p style="font-size:13px;color:var(--text);">You placed B at <strong id="bCoordConfirm" style="color:var(--yellow);"></strong>. You can tap a different square to move it. When you're happy, continue below.</p>
+    </div>
+    <div id="bNotPlacedMsg" class="phase yellow">
+      <div class="phase-label">👆 Tap the Grid Above</div>
+      <p style="font-size:13px;color:var(--text);">Tap anywhere on the field to place Point B. Choose the square closest to where the ball actually landed.</p>
+    </div>
+  </div>
+
+  <button class="btn-next" id="sec2Next" onclick="confirmB()" style="opacity:.5;">Point B is placed → Start Calculating 🔢</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3 — THREE CALCULATIONS
+═══════════════════════════════════════════════ -->
+<section class="section" id="sec3">
+  <div class="sec-header">
+    <div class="sec-icon orange"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="14" height="14" rx="3" stroke="#ff9100" stroke-width="2.5"/><rect x="26" y="8" width="14" height="14" rx="3" stroke="#ff9100" stroke-width="2.5"/><rect x="8" y="26" width="14" height="14" rx="3" stroke="#ff9100" stroke-width="2.5"/><rect x="26" y="26" width="14" height="14" rx="3" stroke="#ff9100" stroke-width="2.5"/><line x1="13" y1="33" x2="17" y2="33" stroke="#ff9100" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="31" x2="15" y2="35" stroke="#ff9100" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="sec-title">Three Calculations</div>
+    <div class="sec-sub">Fill in each blank. The formula guides you step by step.</div>
+  </div>
+
+  <!-- RULE FLOW DIAGRAM -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Rule: Square each part separately — then add
+    </div>
+    <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;">
+      <!-- x box -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="background:rgba(0,229,255,.12);border:1.5px solid rgba(0,229,255,.35);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--cyan);min-width:52px;text-align:center;">x = 3</div>
+        <svg width="12" height="16" viewBox="0 0 12 16"><line x1="6" y1="0" x2="6" y2="10" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/><polygon points="2,10 10,10 6,15" fill="#00e5ff"/></svg>
+        <div style="background:rgba(0,229,255,.2);border:1.5px solid rgba(0,229,255,.5);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--cyan);min-width:52px;text-align:center;">3² = 9</div>
+      </div>
+      <!-- merge arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;margin-top:20px;">
+        <div style="font-size:18px;color:var(--muted);line-height:1;">+</div>
+      </div>
+      <!-- y box -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="background:rgba(255,214,0,.12);border:1.5px solid rgba(255,214,0,.35);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--yellow);min-width:52px;text-align:center;">y = 4</div>
+        <svg width="12" height="16" viewBox="0 0 12 16"><line x1="6" y1="0" x2="6" y2="10" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round"/><polygon points="2,10 10,10 6,15" fill="#ffd600"/></svg>
+        <div style="background:rgba(255,214,0,.2);border:1.5px solid rgba(255,214,0,.5);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--yellow);min-width:52px;text-align:center;">4² = 16</div>
+      </div>
+      <!-- right arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;margin-top:20px;">
+        <svg width="20" height="14" viewBox="0 0 20 14"><line x1="0" y1="7" x2="14" y2="7" stroke="#7a9cc0" stroke-width="1.8" stroke-linecap="round"/><polygon points="10,3 18,7 10,11" fill="#7a9cc0"/></svg>
+      </div>
+      <!-- add box -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:20px;">
+        <div style="background:rgba(122,156,192,.1);border:1.5px solid rgba(122,156,192,.25);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--text);min-width:64px;text-align:center;">9+16=25</div>
+      </div>
+      <!-- right arrow -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;margin-top:20px;">
+        <svg width="20" height="14" viewBox="0 0 20 14"><line x1="0" y1="7" x2="14" y2="7" stroke="#7a9cc0" stroke-width="1.8" stroke-linecap="round"/><polygon points="10,3 18,7 10,11" fill="#7a9cc0"/></svg>
+      </div>
+      <!-- result box -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:20px;">
+        <div style="background:rgba(0,230,118,.15);border:2px solid rgba(0,230,118,.45);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:800;color:var(--green);min-width:60px;text-align:center;">√25 = 5 ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── A → G ── -->
+  <div class="step-divider">
+    <div class="step-divider-num cyan">1</div>
+    <div class="step-divider-label">Distance A → G &nbsp;<span style="font-size:11px;color:var(--muted);font-weight:400;">(Tip-off to Opponent's Goal)</span></div>
+    <div class="step-divider-line"></div>
+  </div>
+
+  <div class="calc-block" id="ag-block">
+    <div class="calc-block-title" style="color:var(--cyan);">
+      <span style="background:rgba(0,229,255,.15);border-radius:6px;padding:3px 10px;font-family:monospace;">A = (4, 2) → G = (8, 2)</span>
+      <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">Both given — just follow the steps.</span>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 2 — x values:</span>
+      <span class="cs-pre">x₂ − x₁ = 8 − 4 = </span>
+      <input type="number" class="cs-blank" id="ag2a" placeholder="?" onchange="checkAG()">
+      <span class="cs-pre">&nbsp;→ squared: (</span>
+      <input type="number" class="cs-blank" id="ag2b" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre">)² = </span>
+      <input type="number" class="cs-blank" id="ag2c" placeholder="?" onchange="checkAG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 3 — y values:</span>
+      <span class="cs-pre">y₂ − y₁ = 2 − 2 = </span>
+      <input type="number" class="cs-blank" id="ag3a" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre">&nbsp;→ squared: (</span>
+      <input type="number" class="cs-blank" id="ag3b" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre">)² = </span>
+      <input type="number" class="cs-blank" id="ag3c" placeholder="?" onchange="checkAG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 4 — add:</span>
+      <input type="number" class="cs-blank" id="ag4a" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre"> + </span>
+      <input type="number" class="cs-blank" id="ag4b" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="ag4c" placeholder="?" onchange="checkAG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 5 — √ :</span>
+      <span class="cs-pre">d = √</span>
+      <input type="number" class="cs-blank" id="ag5a" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="ag5b" placeholder="?" onchange="checkAG()" disabled>
+      <span class="cs-pre"> grid units</span>
+    </div>
+
+    <div class="err-box" id="ag-err"></div>
+    <div class="hint-pill" onclick="toggleHint('hag')">💡 I'm getting a different number</div>
+    <div class="hint-text" id="hag">Check Step 2: 8 − 4 = 4, then 4² = 16. Check Step 3: 2 − 2 = 0, then 0² = 0. Step 4: 16 + 0 = 16. Step 5: √16 = 4. The answer for A→G is always exactly <strong>4 grid units</strong>.</div>
+
+    <div id="ag-done" style="display:none;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--green);font-weight:700;margin-top:8px;">
+      ✅ A→G = 4 grid units. The ball needs to travel 4 units to reach the goal from tip-off.
+    </div>
+  </div>
+
+  <!-- ── B → G ── -->
+  <div class="step-divider">
+    <div class="step-divider-num yellow">2</div>
+    <div class="step-divider-label">Distance B → G &nbsp;<span style="font-size:11px;color:var(--muted);font-weight:400;">(Your Ball to the Goal)</span></div>
+    <div class="step-divider-line"></div>
+  </div>
+
+  <div class="calc-block" id="bg-block" style="opacity:.4;pointer-events:none;">
+    <div class="calc-block-title" style="color:var(--yellow);">
+      <span style="background:rgba(255,214,0,.12);border-radius:6px;padding:3px 10px;font-family:monospace;" id="bg-header">B = (?, ?) → G = (8, 2)</span>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 2 — x values:</span>
+      <span class="cs-pre">x₂ − x₁ = 8 − </span>
+      <span class="cs-given" id="bg2-bx">?</span>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="bg2a" placeholder="?" onchange="checkBG()">
+      <span class="cs-pre">&nbsp;→ squared: </span>
+      <input type="number" class="cs-blank" id="bg2b" placeholder="?" onchange="checkBG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 3 — y values:</span>
+      <span class="cs-pre">y₂ − y₁ = 2 − </span>
+      <span class="cs-given" id="bg3-by">?</span>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="bg3a" placeholder="?" onchange="checkBG()" disabled>
+      <span class="cs-pre">&nbsp;→ squared: </span>
+      <input type="number" class="cs-blank" id="bg3b" placeholder="?" onchange="checkBG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 4 — add:</span>
+      <input type="number" class="cs-blank" id="bg4a" placeholder="?" onchange="checkBG()" disabled>
+      <span class="cs-pre"> + </span>
+      <input type="number" class="cs-blank" id="bg4b" placeholder="?" onchange="checkBG()" disabled>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="bg4c" placeholder="?" onchange="checkBG()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 5 — √ :</span>
+      <span class="cs-pre">d = √</span>
+      <input type="number" class="cs-blank" id="bg5a" placeholder="?" onchange="checkBG()" disabled>
+      <span class="cs-pre"> ≈ </span>
+      <input type="number" class="cs-blank" id="bg5b" placeholder="?" onchange="checkBG()" disabled>
+      <span class="cs-pre"> grid units</span>
+    </div>
+
+    <div class="err-box" id="bg-err"></div>
+    <div class="hint-pill" onclick="toggleHint('hbg')">💡 Hint for B → G</div>
+    <div class="hint-text" id="hbg" id="hbg-text">Follow the same steps as A→G. Use your B coordinates from the grid. For Step 5, use your calculator's √ button and round to the nearest whole number.</div>
+    <div id="bg-done" style="display:none;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.25);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--yellow);font-weight:700;margin-top:8px;"></div>
+  </div>
+
+  <!-- ── A → B ── -->
+  <div class="step-divider">
+    <div class="step-divider-num orange">3</div>
+    <div class="step-divider-label">Distance A → B &nbsp;<span style="font-size:11px;color:var(--muted);font-weight:400;">(How Far Did the Charge Move the Ball?)</span></div>
+    <div class="step-divider-line"></div>
+  </div>
+
+  <div class="calc-block" id="ab-block" style="opacity:.4;pointer-events:none;">
+    <div class="calc-block-title" style="color:var(--orange);">
+      <span style="background:rgba(255,145,0,.12);border-radius:6px;padding:3px 10px;font-family:monospace;" id="ab-header">A = (4, 2) → B = (?, ?)</span>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 2 — x values:</span>
+      <span class="cs-pre">x₂ − x₁ = </span>
+      <span class="cs-given" id="ab2-bx">?</span>
+      <span class="cs-pre"> − 4 = </span>
+      <input type="number" class="cs-blank" id="ab2a" placeholder="?" onchange="checkAB()">
+      <span class="cs-pre">&nbsp;→ squared: </span>
+      <input type="number" class="cs-blank" id="ab2b" placeholder="?" onchange="checkAB()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 3 — y values:</span>
+      <span class="cs-pre">y₂ − y₁ = </span>
+      <span class="cs-given" id="ab3-by">?</span>
+      <span class="cs-pre"> − 2 = </span>
+      <input type="number" class="cs-blank" id="ab3a" placeholder="?" onchange="checkAB()" disabled>
+      <span class="cs-pre">&nbsp;→ squared: </span>
+      <input type="number" class="cs-blank" id="ab3b" placeholder="?" onchange="checkAB()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 4 — add:</span>
+      <input type="number" class="cs-blank" id="ab4a" placeholder="?" onchange="checkAB()" disabled>
+      <span class="cs-pre"> + </span>
+      <input type="number" class="cs-blank" id="ab4b" placeholder="?" onchange="checkAB()" disabled>
+      <span class="cs-pre"> = </span>
+      <input type="number" class="cs-blank" id="ab4c" placeholder="?" onchange="checkAB()" disabled>
+    </div>
+
+    <div class="calc-step">
+      <span class="cs-label">Step 5 — √ :</span>
+      <span class="cs-pre">d = √</span>
+      <input type="number" class="cs-blank" id="ab5a" placeholder="?" onchange="checkAB()" disabled>
+      <span class="cs-pre"> ≈ </span>
+      <input type="number" class="cs-blank" id="ab5b" placeholder="?" onchange="checkAB()" disabled>
+      <span class="cs-pre"> grid units</span>
+    </div>
+
+    <div class="err-box" id="ab-err"></div>
+    <div class="hint-pill" onclick="toggleHint('hab')">💡 Hint for A → B</div>
+    <div class="hint-text" id="hab">A is always (4,2). B is your placed coordinate. Subtract: B_x − 4 for x, B_y − 2 for y. Square each. Add. Take the square root.</div>
+    <div id="ab-done" style="display:none;background:rgba(255,145,0,.08);border:1px solid rgba(255,145,0,.25);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--orange);font-weight:700;margin-top:8px;"></div>
+  </div>
+
+  <button class="btn-next" id="sec3Next" onclick="goSection(4)" style="opacity:.5;pointer-events:none;">See My Results 📊</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4 — COMPARE + REFLECT
+═══════════════════════════════════════════════ -->
+<section class="section" id="sec4">
+  <div class="sec-header">
+    <div class="sec-icon green"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><rect x="7" y="30" width="7" height="12" rx="2" stroke="#00e676" stroke-width="2.5"/><rect x="20.5" y="22" width="7" height="20" rx="2" stroke="#00e676" stroke-width="2.5"/><rect x="34" y="14" width="7" height="28" rx="2" stroke="#00e676" stroke-width="2.5"/><polyline points="10,28 24,18 37,12" stroke="#00e676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="sec-title">Compare + Reflect</div>
+    <div class="sec-sub">See your three distances — then answer four questions</div>
+  </div>
+
+  <!-- VISUAL DISTANCE BARS -->
+  <div class="card">
+    <div class="card-title green"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="2" y="11" width="4" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="8" y="7" width="4" height="11" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="4" height="15" rx="1" stroke="currentColor" stroke-width="1.5"/><polyline points="4,10 10,7 16,4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Your Three Distances</div>
+    <div class="dist-bars" id="distBars">
+      <div class="dist-row">
+        <div class="dist-label" style="color:var(--cyan);">A → G</div>
+        <div class="dist-track"><div class="dist-fill" id="barAG" style="background:rgba(0,229,255,.5);width:0%"><span id="barAGlabel"></span></div></div>
+        <div class="dist-val" style="color:var(--cyan);" id="valAG">—</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" style="color:var(--yellow);">A → B</div>
+        <div class="dist-track"><div class="dist-fill" id="barAB" style="background:rgba(255,214,0,.7);width:0%"><span id="barABlabel"></span></div></div>
+        <div class="dist-val" style="color:var(--yellow);" id="valAB">—</div>
+      </div>
+      <div class="dist-row">
+        <div class="dist-label" style="color:var(--orange);">B → G</div>
+        <div class="dist-track"><div class="dist-fill" id="barBG" style="background:rgba(255,145,0,.7);width:0%"><span id="barBGlabel"></span></div></div>
+        <div class="dist-val" style="color:var(--orange);" id="valBG">—</div>
+      </div>
+    </div>
+
+    <!-- SUMMARY TABLE -->
+    <table class="sum-table">
+      <tr><th>Distance</th><th>Your Formula Result</th><th>Grid Count Check</th></tr>
+      <tr>
+        <td class="route" style="color:var(--cyan);">A → G (tip-off to goal)</td>
+        <td class="dist-num" id="tAG">—</td>
+        <td class="check-col"><input type="number" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:4px;text-align:center;outline:none;" placeholder="count"></td>
+      </tr>
+      <tr>
+        <td class="route" style="color:var(--yellow);">A → B (charge distance)</td>
+        <td class="dist-num" id="tAB">—</td>
+        <td class="check-col"><input type="number" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:4px;text-align:center;outline:none;" placeholder="count"></td>
+      </tr>
+      <tr>
+        <td class="route" style="color:var(--orange);">B → G (remaining to goal)</td>
+        <td class="dist-num" id="tBG">—</td>
+        <td class="check-col"><input type="number" style="width:52px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:4px;text-align:center;outline:none;" placeholder="count"></td>
+      </tr>
+    </table>
+
+    <div class="reminder">
+      <strong>📏 Grid Count Check:</strong> Walk to the field. Count squares diagonally between each pair of points. Write those counts in the table above. If your count is more than 1 off from the formula, check Step 2 of that calculation.
+    </div>
+  </div>
+
+  <!-- REFLECT -->
+  <div class="card">
+    <div class="card-title"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M3 4h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H7l-4 3v-3H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/></svg>Reflect — Answer as a Team</div>
+
+    <!-- Q1 -->
+    <div class="reflect-q">
+      <div class="reflect-q-num">Question 1</div>
+      <div class="reflect-q-text">How much of the full A→G distance did your charge close? Write it as a fraction and a percent.</div>
+      <div class="reflect-frame">
+        A→G = <strong id="q1ag">?</strong> units &nbsp;·&nbsp; A→B = <strong id="q1ab">?</strong> units<br>
+        <strong>Fraction:</strong> A→B ÷ A→G = _____ &nbsp;·&nbsp; <strong>Percent:</strong> _____ %
+      </div>
+      <div class="hint-pill" onclick="toggleHint('hq1')">💡 How do I write it as a fraction?</div>
+      <div class="hint-text" id="hq1">Divide: A→B ÷ A→G. Example: if A→B = 2 and A→G = 4, the fraction is 2/4 = 1/2 = 50%. Your charge closed half the distance.</div>
+      <textarea class="reflect-input" id="r1ans" placeholder="Your charge moved the ball _____ units. That is _____ out of 4 total units, which is _____%."></textarea>
+    </div>
+
+    <!-- Q2 -->
+    <div class="reflect-q">
+      <div class="reflect-q-num">Question 2</div>
+      <div class="reflect-q-text">How many straight-line charges like this would theoretically be needed to score from tip-off?</div>
+      <div class="reflect-frame">
+        Divide A→G by A→B. Round up to the nearest whole number.<br>
+        <strong>Example:</strong> If A→G = 4 and A→B = 2, you need 4 ÷ 2 = <strong>2 charges</strong> (minimum).
+      </div>
+      <div class="hint-pill" onclick="toggleHint('hq2')">💡 What if I get 1?</div>
+      <div class="hint-text" id="hq2">Getting 1 means your charge is long enough to score in one shot — theoretically. Did that actually happen in your match? If not, think about why: the path may not be perfectly straight, or contact may have been off-center.</div>
+      <textarea class="reflect-input" id="r2ans" placeholder="A→G ÷ A→B = _____ ÷ _____ ≈ _____. So you would need about _____ charges to score."></textarea>
+    </div>
+
+    <!-- Q3 -->
+    <div class="reflect-q">
+      <div class="reflect-q-num">Question 3</div>
+      <div class="reflect-q-text">The formula gives a straight-line distance. Why might your calculated A→B be different from where the ball actually ended up?</div>
+      <div class="hint-pill" onclick="toggleHint('hq3')">💡 Think about what happened during the charge</div>
+      <div class="hint-text" id="hq3">Your B is an estimate from memory — not an exact measurement. Also think about: did the scoop hit the ball in the center? Did the ball roll straight, or curve? A straight-line formula can't account for roll or off-center contact.</div>
+      <textarea class="reflect-input" id="r3ans" placeholder="The formula might differ from reality because…"></textarea>
+    </div>
+
+    <!-- Q4 -->
+    <div class="reflect-q">
+      <div class="reflect-q-num">Question 4 — Season 2 Decision</div>
+      <div class="reflect-q-text" style="color:var(--yellow);">Name one stat you would change for Season 2 to close more distance in a single charge. What is the tradeoff?</div>
+      <div class="reflect-frame">
+        <strong>Power</strong> controls charge speed and follow-through distance.<br>
+        Increasing Power costs points from another stat.<br>
+        <strong>Name the stat you'd increase, the stat you'd reduce, and why that tradeoff makes sense.</strong>
+      </div>
+      <div class="hint-pill" onclick="toggleHint('hq4')">💡 I'm not sure what to reduce</div>
+      <div class="hint-text" id="hq4">Look at your Season 1 stat card. Which stats did you put the most points into? If you increase Power by 2, you need to take 2 points from somewhere. Ask: which stat matters less for closing distance — Speed, Endurance, or Turning?</div>
+      <textarea class="reflect-input" id="r4ans" placeholder="I would increase _____ because _____. I would reduce _____ because that tradeoff is worth it because _____."></textarea>
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="finishActivity()">✅ Submit Reflections</button>
+
+  <div class="congrats-box" id="congratsBox">
+    <div class="congrats-emoji"><svg width="48" height="48" viewBox="0 0 56 56" fill="none"><polygon points="28,6 52,50 4,50" stroke="#00e5ff" stroke-width="2.8" stroke-linejoin="round" fill="rgba(0,229,255,.08)"/><line x1="28" y1="22" x2="28" y2="36" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="28" cy="42" r="2.5" fill="#00e5ff"/></svg></div>
+    <div class="congrats-title">Calculations Complete!</div>
+    <div class="congrats-sub">You used the distance formula three times, compared formula results to real-world distances, and named a Season 2 stat decision. Your Q4 answer goes into your reallocation next week.</div>
+    <div style="margin-top:16px;">
+      <button class="btn-secondary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+</section>
+
+
+<script>
+// ── GRID SETUP ───────────────────────────────────────────────
+const GX0=50, GY0=230, GW=390, GH=200; // grid area in SVG coords
+const COLS=8, ROWS=4;
+const CW=GX0+GW, CH=GY0; // clamp bounds
+
+let bX=null, bY=null; // placed B in grid units
+const dists={ag:null,bg:null,ab:null};
+
+function gsvg(gx,gy){
+  return {x: GX0+(gx/COLS)*GW, y: GY0-(gy/ROWS)*GH};
+}
+function sgrid(sx,sy){
+  return {
+    x: Math.round(Math.max(0,Math.min(COLS,(sx-GX0)/GW*COLS))),
+    y: Math.round(Math.max(0,Math.min(ROWS,(GY0-sy)/GH*ROWS)))
+  };
+}
+
+function initGrid(){
+  const svg=document.getElementById('fieldSvg');
+  const glLines=document.getElementById('gridLines');
+  const glLabels=document.getElementById('axisLabels');
+
+  // Grid lines
+  for(let i=0;i<=COLS;i++){
+    const px=GX0+(i/COLS)*GW;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',px); line.setAttribute('y1',GY0-GH);
+    line.setAttribute('x2',px); line.setAttribute('y2',GY0);
+    line.setAttribute('stroke',i===0||i===COLS?'rgba(42,64,96,1)':'rgba(42,64,96,.6)');
+    line.setAttribute('stroke-width',i===0||i===COLS?'2':'1');
+    glLines.appendChild(line);
+    // x label
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',px); txt.setAttribute('y',GY0+16);
+    txt.setAttribute('fill','#7a9cc0'); txt.setAttribute('font-size','11');
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-family','DM Sans,sans-serif');
+    txt.textContent=i;
+    glLabels.appendChild(txt);
+  }
+  for(let j=0;j<=ROWS;j++){
+    const py=GY0-(j/ROWS)*GH;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',GX0); line.setAttribute('y1',py);
+    line.setAttribute('x2',GX0+GW); line.setAttribute('y2',py);
+    line.setAttribute('stroke',j===0||j===ROWS?'rgba(42,64,96,1)':'rgba(42,64,96,.6)');
+    line.setAttribute('stroke-width',j===0||j===ROWS?'2':'1');
+    glLines.appendChild(line);
+    // y label
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',GX0-10); txt.setAttribute('y',py+4);
+    txt.setAttribute('fill','#7a9cc0'); txt.setAttribute('font-size','11');
+    txt.setAttribute('text-anchor','end'); txt.setAttribute('font-family','DM Sans,sans-serif');
+    txt.textContent=j;
+    glLabels.appendChild(txt);
+  }
+
+  // Fixed points
+  const pA=gsvg(4,2), pG=gsvg(8,2);
+  document.getElementById('dotA').setAttribute('cx',pA.x);
+  document.getElementById('dotA').setAttribute('cy',pA.y);
+  document.getElementById('labelA').setAttribute('x',pA.x);
+  document.getElementById('labelA').setAttribute('y',pA.y);
+  document.getElementById('dotG').setAttribute('cx',pG.x);
+  document.getElementById('dotG').setAttribute('cy',pG.y);
+  document.getElementById('labelG').setAttribute('x',pG.x);
+  document.getElementById('labelG').setAttribute('y',pG.y);
+
+  // A→G line (fixed, always shown)
+  document.getElementById('lineAG').setAttribute('x1',pA.x);
+  document.getElementById('lineAG').setAttribute('y1',pA.y);
+  document.getElementById('lineAG').setAttribute('x2',pG.x);
+  document.getElementById('lineAG').setAttribute('y2',pG.y);
+
+  // Hover
+  document.getElementById('fieldSvg').addEventListener('mousemove',function(e){
+    const pt=svgPoint(e);
+    const g=sgrid(pt.x,pt.y);
+    const sp=gsvg(g.x,g.y);
+    document.getElementById('hoverDot').setAttribute('cx',sp.x);
+    document.getElementById('hoverDot').setAttribute('cy',sp.y);
+  });
+}
+
+function svgPoint(e){
+  const svg=document.getElementById('fieldSvg');
+  const rect=svg.getBoundingClientRect();
+  const scaleX=480/rect.width, scaleY=270/rect.height;
+  const clientX=(e.touches?e.touches[0].clientX:e.clientX);
+  const clientY=(e.touches?e.touches[0].clientY:e.clientY);
+  return {x:(clientX-rect.left)*scaleX, y:(clientY-rect.top)*scaleY};
+}
+
+function placeB(e){
+  const pt=svgPoint(e);
+  const g=sgrid(pt.x,pt.y);
+  // Don't allow B on top of A or G
+  if((g.x===4&&g.y===2)||(g.x===8&&g.y===2)) return;
+  if(g.x<0||g.x>8||g.y<0||g.y>4) return;
+
+  bX=g.x; bY=g.y;
+  const pB=gsvg(bX,bY);
+  const pA=gsvg(4,2), pG=gsvg(8,2);
+
+  // Show dot
+  const dB=document.getElementById('dotB'), lB=document.getElementById('labelB');
+  dB.setAttribute('cx',pB.x); dB.setAttribute('cy',pB.y);
+  lB.setAttribute('x',pB.x); lB.setAttribute('y',pB.y);
+  dB.setAttribute('display',''); lB.setAttribute('display','');
+
+  // Draw lines
+  document.getElementById('lineAB').setAttribute('x1',pA.x);
+  document.getElementById('lineAB').setAttribute('y1',pA.y);
+  document.getElementById('lineAB').setAttribute('x2',pB.x);
+  document.getElementById('lineAB').setAttribute('y2',pB.y);
+  document.getElementById('lineBG').setAttribute('x1',pB.x);
+  document.getElementById('lineBG').setAttribute('y1',pB.y);
+  document.getElementById('lineBG').setAttribute('x2',pG.x);
+  document.getElementById('lineBG').setAttribute('y2',pG.y);
+
+  // Update UI
+  document.getElementById('bCoordVal').textContent=`(${bX}, ${bY})`;
+  document.getElementById('bCoordBox').style.opacity='1';
+  document.getElementById('bCoordBox').style.borderStyle='solid';
+  document.getElementById('bCoordConfirm').textContent=`(${bX}, ${bY})`;
+  document.getElementById('bPlacedMsg').style.display='block';
+  document.getElementById('bNotPlacedMsg').style.display='none';
+
+  const nb=document.getElementById('sec2Next');
+  nb.style.opacity='1'; nb.style.pointerEvents='auto';
+}
+
+// ── WORKED EXAMPLE HOVER ──────────────────────────────────────
+function exStep(n, on) {
+  // Restore all elements to defaults
+  const restoreLine=(id,sw)=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke-width',sw);el.style.filter='';}};
+  const restoreGroup=(id)=>{const el=document.getElementById(id);if(el) el.style.filter='';};
+  const restoreCircle=(id,r)=>{const el=document.getElementById(id);if(el) el.setAttribute('r',r);};
+  restoreLine('ex-h-leg','3.5');
+  restoreLine('ex-v-leg','3.5');
+  restoreLine('ex-hypo','4');
+  restoreGroup('ex-h-labels');
+  restoreGroup('ex-v-labels');
+  restoreGroup('ex-badge');
+  restoreGroup('ex-pt-a');
+  restoreGroup('ex-pt-b');
+  restoreGroup('ex-coord-a');
+  restoreGroup('ex-coord-b');
+  restoreCircle('ex-circ-a','9');
+  restoreCircle('ex-circ-b','9');
+  if(!on) return;
+
+  const glowLine=(id,sw,color)=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke-width',sw);el.style.filter='drop-shadow(0 0 5px '+color+')';}};
+  const glowGroup=(id,color)=>{const el=document.getElementById(id);if(el) el.style.filter='drop-shadow(0 0 4px '+color+')';};
+  const popCircle=(id,r)=>{const el=document.getElementById(id);if(el) el.setAttribute('r',r);};
+
+  if(n===1){ // Write the points — highlight A and B
+    glowGroup('ex-pt-a','rgba(0,229,255,.8)');
+    glowGroup('ex-pt-b','rgba(255,214,0,.8)');
+    glowGroup('ex-coord-a','rgba(0,229,255,.6)');
+    glowGroup('ex-coord-b','rgba(255,214,0,.6)');
+    popCircle('ex-circ-a','12');
+    popCircle('ex-circ-b','12');
+  } else if(n===2){ // x-values → H leg
+    glowLine('ex-h-leg','5.5','rgba(0,229,255,.8)');
+    glowGroup('ex-h-labels','rgba(0,229,255,.6)');
+  } else if(n===3){ // y-values → V leg
+    glowLine('ex-v-leg','5.5','rgba(255,214,0,.8)');
+    glowGroup('ex-v-labels','rgba(255,214,0,.6)');
+  } else if(n===4){ // add both → both legs light up
+    glowLine('ex-h-leg','5','rgba(0,229,255,.6)');
+    glowLine('ex-v-leg','5','rgba(255,214,0,.6)');
+  } else if(n===5){ // square root = distance → hypotenuse + badge
+    glowLine('ex-hypo','6.5','rgba(0,230,118,.9)');
+    glowGroup('ex-badge','rgba(0,230,118,.7)');
+  }
+}
+
+// ── VISUAL DEMO ───────────────────────────────────────────────
+function initDemoGrid(){
+  const g=document.getElementById('demoGrid');
+  const lbl=document.getElementById('demoLabels');
+  if(!g||!lbl) return;
+  const GX=40,GY=168,CW=40,CH=32,COLS=6,ROWS=4;
+  for(let i=0;i<=COLS;i++){
+    const x=GX+i*CW;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x);line.setAttribute('y1',GY-ROWS*CH);
+    line.setAttribute('x2',x);line.setAttribute('y2',GY);
+    line.setAttribute('stroke',i===0||i===COLS?'rgba(42,64,96,.9)':'rgba(42,64,96,.4)');
+    line.setAttribute('stroke-width','1');
+    g.appendChild(line);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',x);t.setAttribute('y',GY+15);
+    t.setAttribute('fill','#7a9cc0');t.setAttribute('font-size','10');
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-family','DM Sans,sans-serif');
+    t.textContent=i;lbl.appendChild(t);
+  }
+  for(let j=0;j<=ROWS;j++){
+    const y=GY-j*CH;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',GX);line.setAttribute('y1',y);
+    line.setAttribute('x2',GX+COLS*CW);line.setAttribute('y2',y);
+    line.setAttribute('stroke',j===0||j===ROWS?'rgba(42,64,96,.9)':'rgba(42,64,96,.4)');
+    line.setAttribute('stroke-width','1');
+    g.appendChild(line);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',GX-9);t.setAttribute('y',y+4);
+    t.setAttribute('fill','#7a9cc0');t.setAttribute('font-size','10');
+    t.setAttribute('text-anchor','end');t.setAttribute('font-family','DM Sans,sans-serif');
+    t.textContent=j;lbl.appendChild(t);
+  }
+}
+
+let _demoTimers=[];
+function playDemo(){
+  _demoTimers.forEach(t=>clearTimeout(t));_demoTimers=[];
+
+  // Reset with no transition, then re-enable after brief pause
+  const resetAttr=(id,attr,val)=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.style.transition='none';el.setAttribute(attr,val);
+  };
+  resetAttr('demoH','stroke-dashoffset','162');
+  resetAttr('demoV','stroke-dashoffset','66');
+  resetAttr('demoDist','stroke-dashoffset','176');
+  ['demoHLabel','demoVLabel','demoVLabel2','demoDistLabel','demoALbl','demoACoord','demoBLbl','demoBCoord'].forEach(id=>resetAttr(id,'opacity','0'));
+  resetAttr('demoRightAngle','opacity','0');
+  resetAttr('demoA','r','0');
+  resetAttr('demoB','r','0');
+  ['ds1','ds2','ds3','ds4'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+
+  // Phase 1 — two points appear (0.6s)
+  _demoTimers.push(setTimeout(()=>{
+    const show=(id,attr,val,trans)=>{
+      const el=document.getElementById(id);if(!el)return;
+      el.style.transition=trans;el.setAttribute(attr,val);
+    };
+    show('demoA','r','9','r .5s ease');
+    show('demoB','r','9','r .5s ease');
+    ['demoALbl','demoACoord','demoBLbl','demoBCoord'].forEach(id=>{
+      const el=document.getElementById(id);if(el){el.style.transition='opacity .5s';el.setAttribute('opacity','1');}
+    });
+    document.getElementById('ds1').classList.add('active');
+  },600));
+
+  // Phase 2 — horizontal line (2.2s)
+  _demoTimers.push(setTimeout(()=>{
+    const el=document.getElementById('demoH');
+    el.style.transition='stroke-dashoffset 1s ease';
+    el.setAttribute('stroke-dashoffset','0');
+    document.getElementById('ds2').classList.add('active');
+    _demoTimers.push(setTimeout(()=>{
+      ['demoHLabel'].forEach(id=>{
+        const l=document.getElementById(id);if(l){l.style.transition='opacity .5s';l.setAttribute('opacity','1');}
+      });
+    },900));
+  },2200));
+
+  // Phase 3 — vertical line (4.1s)
+  _demoTimers.push(setTimeout(()=>{
+    const el=document.getElementById('demoV');
+    el.style.transition='stroke-dashoffset 0.8s ease';
+    el.setAttribute('stroke-dashoffset','0');
+    document.getElementById('demoRightAngle').setAttribute('opacity','1');
+    document.getElementById('ds3').classList.add('active');
+    _demoTimers.push(setTimeout(()=>{
+      ['demoVLabel','demoVLabel2'].forEach(id=>{
+        const l=document.getElementById(id);if(l){l.style.transition='opacity .5s';l.setAttribute('opacity','1');}
+      });
+    },700));
+  },4100));
+
+  // Phase 4 — hypotenuse = the distance (5.9s)
+  _demoTimers.push(setTimeout(()=>{
+    const el=document.getElementById('demoDist');
+    el.style.transition='stroke-dashoffset 1.1s ease';
+    el.setAttribute('stroke-dashoffset','0');
+    document.getElementById('ds4').classList.add('active');
+    _demoTimers.push(setTimeout(()=>{
+      const l=document.getElementById('demoDistLabel');
+      if(l){l.style.transition='opacity .6s';l.setAttribute('opacity','1');}
+    },1000));
+  },5900));
+}
+
+// Touch support
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('fieldSvg').addEventListener('touchstart',function(e){
+    e.preventDefault(); placeB(e);
+  },{passive:false});
+  initGrid();
+  initDemoGrid();
+  // Auto-play demo after a short delay so page has rendered
+  setTimeout(playDemo, 400);
+});
+
+function confirmB(){
+  if(bX===null){alert('Tap the grid to place Point B first.');return;}
+  // Pre-fill calc section with B coords
+  document.getElementById('bg-header').textContent=`B = (${bX}, ${bY}) → G = (8, 2)`;
+  document.getElementById('ab-header').textContent=`A = (4, 2) → B = (${bX}, ${bY})`;
+  document.getElementById('bg2-bx').textContent=bX;
+  document.getElementById('bg3-by').textContent=bY;
+  document.getElementById('ab2-bx').textContent=bX;
+  document.getElementById('ab3-by').textContent=bY;
+  // Update hint text for BG
+  document.getElementById('hbg').innerHTML=`Your B = (${bX}, ${bY}). Step 2: 8 − ${bX} = ${8-bX}, squared = ${(8-bX)**2}. Step 3: 2 − ${bY} = ${2-bY}, squared = ${(2-bY)**2}. Step 4: ${(8-bX)**2} + ${(2-bY)**2} = ${(8-bX)**2+(2-bY)**2}. Step 5: √${(8-bX)**2+(2-bY)**2} ≈ ${Math.round(Math.sqrt((8-bX)**2+(2-bY)**2))}.`;
+  document.getElementById('hab').innerHTML=`Your B = (${bX}, ${bY}). Step 2: ${bX} − 4 = ${bX-4}, squared = ${(bX-4)**2}. Step 3: ${bY} − 2 = ${bY-2}, squared = ${(bY-2)**2}. Step 4: ${(bX-4)**2} + ${(bY-2)**2} = ${(bX-4)**2+(bY-2)**2}. Step 5: √${(bX-4)**2+(bY-2)**2} ≈ ${Math.round(Math.sqrt((bX-4)**2+(bY-2)**2))}.`;
+  goSection(3);
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────
+const PROG=[20,45,75,100];
+function goSection(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('sec'+i).classList.toggle('visible',i===n);
+    document.getElementById('ptab'+i).classList.remove('active');
+  });
+  document.getElementById('ptab'+n).classList.add('active');
+  document.getElementById('progFill').style.width=PROG[n-1]+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── HINT ──────────────────────────────────────────────────────
+function toggleHint(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+// ── A→G CALCULATION ────────────────────────────────────────────
+function checkAG(){
+  const v=parseFloat;
+  const a=v(document.getElementById('ag2a').value);
+  // Step 2a
+  if(!isNaN(a)){
+    const ok=a===4;
+    mark('ag2a',ok);
+    if(ok){
+      unlock('ag2b'); document.getElementById('ag2b').value=4;
+      unlock('ag2c');
+    }
+  }
+  const b=v(document.getElementById('ag2b').value);
+  const c=v(document.getElementById('ag2c').value);
+  if(!isNaN(c)){
+    const ok=c===16;
+    mark('ag2c',ok);
+    if(ok) unlock('ag3a');
+  }
+  const d=v(document.getElementById('ag3a').value);
+  if(!isNaN(d)){
+    mark('ag3a',d===0);
+    if(d===0){unlock('ag3b');document.getElementById('ag3b').value=0;unlock('ag3c');}
+  }
+  const f=v(document.getElementById('ag3c').value);
+  if(!isNaN(f)){
+    mark('ag3c',f===0);
+    if(f===0) unlock('ag4a');
+  }
+  const g=v(document.getElementById('ag4a').value), h=v(document.getElementById('ag4b').value);
+  if(!isNaN(g)){mark('ag4a',g===16); if(g===16){document.getElementById('ag4b').value=0;unlock('ag4b');unlock('ag4c');}}
+  const ic=v(document.getElementById('ag4c').value);
+  if(!isNaN(ic)){
+    // Catch common error: squared sum = (16+0)^2 = 256
+    if(ic===256){showErr('ag-err','⚠️ It looks like you squared the total (256 = 16²). Instead: add first (16 + 0 = 16), then take √16 in the next step.');mark('ag4c',false);}
+    else{mark('ag4c',ic===16);if(ic===16) unlock('ag5a');}
+  }
+  const j=v(document.getElementById('ag5a').value);
+  if(!isNaN(j)){mark('ag5a',j===16);if(j===16) unlock('ag5b');}
+  const k=v(document.getElementById('ag5b').value);
+  if(!isNaN(k)){
+    mark('ag5b',k===4);
+    if(k===4){
+      dists.ag=4;
+      document.getElementById('ag-done').style.display='block';
+      clearErr('ag-err');
+      // Unlock B→G
+      const bgb=document.getElementById('bg-block');
+      bgb.style.opacity='1'; bgb.style.pointerEvents='auto';
+      document.getElementById('ptab2').classList.add('done');
+    }
+  }
+}
+
+// ── B→G CALCULATION ────────────────────────────────────────────
+function checkBG(){
+  if(bX===null) return;
+  const dx=8-bX, dy=2-bY;
+  const dx2=dx*dx, dy2=dy*dy;
+  const sum=dx2+dy2;
+  const dist=Math.round(Math.sqrt(sum));
+  const v=parseFloat;
+
+  const a=v(document.getElementById('bg2a').value);
+  if(!isNaN(a)){mark('bg2a',a===dx);if(a===dx) unlock('bg2b');}
+  const b=v(document.getElementById('bg2b').value);
+  if(!isNaN(b)){mark('bg2b',b===dx2);if(b===dx2) unlock('bg3a');}
+  const c=v(document.getElementById('bg3a').value);
+  if(!isNaN(c)){mark('bg3a',c===dy);if(c===dy) unlock('bg3b');}
+  const d=v(document.getElementById('bg3b').value);
+  if(!isNaN(d)){mark('bg3b',d===dy2);if(d===dy2) unlock('bg4a');}
+  const e=v(document.getElementById('bg4a').value), f=v(document.getElementById('bg4b').value);
+  if(!isNaN(e)){mark('bg4a',e===dx2);if(e===dx2){document.getElementById('bg4b').value=dy2;unlock('bg4b');unlock('bg4c');}}
+  const g=v(document.getElementById('bg4c').value);
+  if(!isNaN(g)){
+    if(g===(dx+dy)*(dx+dy)){showErr('bg-err','⚠️ Looks like you added first then squared. Square each part first: '+dx+'² = '+dx2+' and '+dy+'² = '+dy2+'. Then add: '+sum);}
+    else{mark('bg4c',g===sum);if(g===sum){clearErr('bg-err');unlock('bg5a');}}
+  }
+  const h=v(document.getElementById('bg5a').value);
+  if(!isNaN(h)){mark('bg5a',h===sum);if(h===sum) unlock('bg5b');}
+  const i=v(document.getElementById('bg5b').value);
+  if(!isNaN(i)){
+    mark('bg5b',i===dist);
+    if(i===dist){
+      dists.bg=dist;
+      document.getElementById('bg-done').textContent=`✅ B→G = ${dist} grid unit${dist!==1?'s':''}. Your ball has ${dist} unit${dist!==1?'s':''} left to reach the goal.`;
+      document.getElementById('bg-done').style.display='block';
+      // Unlock A→B
+      document.getElementById('ab-block').style.opacity='1';
+      document.getElementById('ab-block').style.pointerEvents='auto';
+    }
+  }
+}
+
+// ── A→B CALCULATION ────────────────────────────────────────────
+function checkAB(){
+  if(bX===null) return;
+  const dx=bX-4, dy=bY-2;
+  const dx2=dx*dx, dy2=dy*dy;
+  const sum=dx2+dy2;
+  const dist=Math.round(Math.sqrt(sum));
+  const v=parseFloat;
+
+  const a=v(document.getElementById('ab2a').value);
+  if(!isNaN(a)){mark('ab2a',a===dx);if(a===dx) unlock('ab2b');}
+  const b=v(document.getElementById('ab2b').value);
+  if(!isNaN(b)){mark('ab2b',b===dx2);if(b===dx2) unlock('ab3a');}
+  const c=v(document.getElementById('ab3a').value);
+  if(!isNaN(c)){mark('ab3a',c===dy);if(c===dy) unlock('ab3b');}
+  const d=v(document.getElementById('ab3b').value);
+  if(!isNaN(d)){mark('ab3b',d===dy2);if(d===dy2) unlock('ab4a');}
+  const e=v(document.getElementById('ab4a').value);
+  if(!isNaN(e)){mark('ab4a',e===dx2);if(e===dx2){document.getElementById('ab4b').value=dy2;unlock('ab4b');unlock('ab4c');}}
+  const g=v(document.getElementById('ab4c').value);
+  if(!isNaN(g)){
+    if(g===(dx+dy)*(dx+dy)){showErr('ab-err','⚠️ Square each part separately first, then add. '+dx+'² = '+dx2+', '+dy+'² = '+dy2+', sum = '+sum);}
+    else{mark('ab4c',g===sum);if(g===sum){clearErr('ab-err');unlock('ab5a');}}
+  }
+  const h=v(document.getElementById('ab5a').value);
+  if(!isNaN(h)){mark('ab5a',h===sum);if(h===sum) unlock('ab5b');}
+  const i=v(document.getElementById('ab5b').value);
+  if(!isNaN(i)){
+    mark('ab5b',i===dist);
+    if(i===dist){
+      dists.ab=dist;
+      document.getElementById('ab-done').textContent=`✅ A→B = ${dist} grid unit${dist!==1?'s':''}. Your charge moved the ball ${dist} unit${dist!==1?'s':''} from tip-off.`;
+      document.getElementById('ab-done').style.display='block';
+      enableSection4();
+    }
+  }
+}
+
+function mark(id,ok){
+  const el=document.getElementById(id);
+  el.classList.toggle('correct',ok);
+  el.classList.toggle('wrong',!ok);
+}
+function unlock(id){
+  const el=document.getElementById(id);
+  el.disabled=false;
+  el.style.borderColor='rgba(0,229,255,.4)';
+}
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  el.textContent=msg; el.classList.add('show');
+}
+function clearErr(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+function enableSection4(){
+  const nb=document.getElementById('sec3Next');
+  nb.style.opacity='1'; nb.style.pointerEvents='auto';
+}
+
+// ── SECTION 4 SETUP ────────────────────────────────────────────
+function loadSection4(){
+  const ag=dists.ag||4, ab=dists.ab||0, bg=dists.bg||0;
+  const mx=Math.max(ag,ab,bg,1);
+  document.getElementById('barAG').style.width=(ag/mx*100)+'%';
+  document.getElementById('barAGlabel').textContent=ag+' units';
+  document.getElementById('barAB').style.width=(ab/mx*100)+'%';
+  document.getElementById('barABlabel').textContent=ab+' units';
+  document.getElementById('barBG').style.width=(bg/mx*100)+'%';
+  document.getElementById('barBGlabel').textContent=bg+' units';
+  document.getElementById('valAG').textContent=ag+' units';
+  document.getElementById('valAB').textContent=ab+' units';
+  document.getElementById('valBG').textContent=bg+' units';
+  document.getElementById('tAG').textContent=ag+' units';
+  document.getElementById('tAB').textContent=ab+' units';
+  document.getElementById('tBG').textContent=bg+' units';
+  document.getElementById('q1ag').textContent=ag;
+  document.getElementById('q1ab').textContent=ab;
+}
+
+// ── FINISH ─────────────────────────────────────────────────────
+function finishActivity(){
+  const r1=document.getElementById('r1ans').value.trim();
+  const r4=document.getElementById('r4ans').value.trim();
+  if(!r1){alert('Answer Question 1 first.');return;}
+  if(!r4){alert('Answer Question 4 — it feeds into your Season 2 decision.');return;}
+  document.getElementById('congratsBox').classList.add('show');
+  document.getElementById('congratsBox').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('ptab4').classList.add('done');
+}
+
+// Override goSection to load bars when entering sec4
+const _go=goSection;
+window.goSection=function(n){
+  _go(n);
+  if(n===4) setTimeout(loadSection4,100);
+};
+</script>
+</body>
+</html>
