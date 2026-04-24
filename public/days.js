@@ -402,12 +402,26 @@ const DAYS = [
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
       {
-        "name": "Scoop Finalization + MakeCode Programming",
-        "mins": 90,
+        "name": " Field Geometry + Approach Planning",
+        "mins": 35,
+        "block": "Challenge",
+        "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
+  "facilitatorDescription": "Teams plot three coordinate points -- starting position, tip-off at (4, 2), and goal at (8, 2) -- then calculate approach distance and use the Speed formula to predict travel time. The sentence justification is a quality gate: vague reasoning gets sent back once, no repeat explanations. Common issue: teams conflate straight-line distance with actual bot path. Don't correct the geometry -- let the testing block surface it. The prediction they write here is the number they'll check against real bot behavior in the next block."
+ },
+       {
+        "name": "Launch Sequence Programming + Testing",
+        "mins": 50,
         "block": "Match-Build-Make",
-        "description": "Finalize your front scoop with one last adjustment, then lock it in with hot glue. Open MakeCode and program your full stat loadout -- all four stats translated into code. Verify your Speed by driving the bot. Does the behavior match the number you coded?",
-        "facilitatorDescription": "Teams finalize the scoop with one last adjustment, lock it in with hot glue, and program the full four-stat loadout into MakeCode. Speed gets verified by a live drive -- behavior vs. coded number. Season 1 begins tomorrow, so the build must be locked tonight. Misconception correction on proportional scaling may come up here; keep any correction to one example, one pass, no repeat explanations."
-      },
+        "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
+  "facilitatorDescription": "Teams program the launch sequence as a routine separate from the stat loadout coded in the morning. Two test runs, both timed, both logged. The comparison to the Speed prediction is the math moment: a mismatch is not a failure, it is data. If a team's times are off, ask one question only: 'What did your formula predict, and what did you observe?' Then let them work. Some teams will have approach angles that add distance not captured in their straight-line calculation -- that is the right kind of confusion to carry into Season 1. Do not resolve it for them."
+ },
+      {
+        "name": "Launch Showcase",
+        "mins": 45,
+        "block": "Match-Build-Make",
+         "description": "Commit to your final sequence and write down your run order -- that is what locks for Season 1. Each team runs their launch sequence once in front of the room. While another team runs, write one specific observation in your dashboard: not 'they were fast' but 'their bot reached the ball in under 3 seconds, which suggests their Speed allocation is above 8.' After all teams have run, you have 10 minutes for one final adjustment. Then sequences lock.",
+  "facilitatorDescription": "Enforce the 2-minute commitment window before the showcase starts. Teams that haven't committed will stall the room. During each team's run, prompt observers writing vague notes: 'What number would make that observation useful?' The 10-minute adjustment window after all sequences have run is the highest-value moment in the block -- teams are adjusting based on what they saw, not just what they predicted. Let that happen without interruption. Sequences lock at the end of the 10 minutes with no exceptions. Season 1 begins tomorrow."
+} ,
       {
         "name": "Break",
         "mins": 5,
