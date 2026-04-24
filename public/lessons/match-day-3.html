@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Day 3 — Velocity Arena</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+:root{
+  --bg:#0d1b2a;--surface:#132033;--card:#1a2d45;--border:#2a4060;
+  --cyan:#00e5ff;--yellow:#ffd600;--green:#00e676;--red:#ff5252;
+  --orange:#ff9100;--purple:#ce93d8;
+  --text:#e8f0fe;--muted:#7a9cc0;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
+
+/* ── STICKY HEADER ─────────────────────────────── */
+.lesson-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);}
+.lh-top{display:flex;align-items:center;gap:12px;padding:12px 20px 10px;}
+.day-badge{background:var(--cyan);color:#0d1b2a;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.lh-title{font-size:16px;font-weight:800;color:var(--text);flex:1;}
+.lh-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.prog-bar-wrap{height:4px;background:var(--border);position:relative;}
+.prog-fill{height:4px;background:var(--cyan);transition:width .4s ease;width:25%;}
+.prog-tabs{display:flex;border-top:1px solid var(--border);}
+.prog-tab{flex:1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:7px 8px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;white-space:nowrap;}
+.prog-tab.active{color:var(--cyan);}
+.prog-tab.done{color:var(--green);}
+
+/* ── SECTIONS ──────────────────────────────────── */
+.section{display:none;padding:20px;max-width:700px;margin:0 auto;}
+.section.visible{display:block;}
+
+/* ── SECTION HEADER ────────────────────────────── */
+.sec-header{margin-bottom:20px;}
+.sec-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px;}
+.sec-icon.cyan{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);}
+.sec-icon.yellow{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.25);}
+.sec-icon.orange{background:rgba(255,145,0,.12);border:1px solid rgba(255,145,0,.25);}
+.sec-icon.green{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);}
+.sec-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.sec-sub{font-size:13px;color:var(--muted);}
+
+/* ── CARDS ─────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:12px;}
+.card-title.yellow{color:var(--yellow);}
+.card-title.green{color:var(--green);}
+.card-title.orange{color:var(--orange);}
+.card-title.red{color:var(--red);}
+
+/* ── VOCAB BOX ─────────────────────────────────── */
+.vocab-box{border-left:4px solid var(--cyan);padding-left:14px;}
+.vocab-row{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(42,64,96,.7);align-items:flex-start;}
+.vocab-row:last-child{border-bottom:none;}
+.vocab-term{font-size:13px;font-weight:700;color:var(--yellow);min-width:110px;flex-shrink:0;}
+.vocab-def{font-size:13px;color:var(--text);line-height:1.5;}
+
+/* ── FORMULA BOARD ─────────────────────────────── */
+.formula-board{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,229,255,.03));border:1px solid rgba(0,229,255,.25);border-radius:12px;padding:20px;text-align:center;margin-bottom:14px;}
+.formula-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.formula-eq{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.4;}
+.formula-eq .hl{color:var(--cyan);}
+.formula-note{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* ── VISUAL STEPS ──────────────────────────────── */
+.vstep-list{display:flex;flex-direction:column;gap:10px;}
+.vstep{display:flex;gap:12px;align-items:flex-start;}
+.vstep-num{width:26px;height:26px;border-radius:50%;background:var(--cyan);color:#0d1b2a;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.vstep-num.yellow{background:var(--yellow);}
+.vstep-num.green{background:var(--green);}
+.vstep-num.red{background:var(--red);}
+.vstep-text{font-size:13px;color:var(--text);line-height:1.55;padding-top:3px;}
+.vstep-text strong{color:var(--yellow);}
+
+/* ── EXAMPLE CARDS ─────────────────────────────── */
+.example-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ex-card{border-radius:10px;padding:12px;text-align:center;}
+.ex-card.over{background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.3);}
+.ex-card.ok{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);}
+.ex-emoji{font-size:24px;margin-bottom:6px;}
+.ex-nums{font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.ex-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.ex-card.over .ex-label{color:var(--red);}
+.ex-card.ok .ex-label{color:var(--green);}
+.ex-result{font-size:12px;color:var(--muted);margin-top:4px;}
+
+/* ── INTERACTIVE CALCULATOR ────────────────────── */
+.calc-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.calc-block label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;}
+.calc-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:24px;font-weight:800;padding:10px 14px;text-align:center;outline:none;transition:border-color .15s;-moz-appearance:textfield;}
+.calc-input::-webkit-outer-spin-button,.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.calc-input:focus{border-color:var(--cyan);}
+
+.gap-display{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;}
+.gap-math-steps{font-size:12px;color:var(--muted);line-height:2.2;font-family:monospace;}
+.gap-math-steps .val{color:var(--yellow);font-weight:700;}
+.gap-math-steps .result{color:var(--cyan);font-size:16px;font-weight:800;}
+
+/* VISUAL BAR */
+.bar-compare{margin:12px 0;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-row-label{font-size:11px;font-weight:700;color:var(--muted);width:72px;flex-shrink:0;text-align:right;}
+.bar-track{flex:1;height:22px;background:rgba(42,64,96,.5);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s ease;display:flex;align-items:center;padding-left:8px;}
+.bar-fill.pred{background:rgba(0,229,255,.5);}
+.bar-fill.actual{background:rgba(255,214,0,.7);}
+.bar-fill span{font-size:11px;font-weight:700;color:#0d1b2a;}
+
+.gap-verdict-big{border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;}
+.verdict-over{background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.35);color:var(--red);}
+.verdict-ok{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.35);color:var(--green);}
+.verdict-empty{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+
+/* ── ROUND FORM ────────────────────────────────── */
+.field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;display:block;}
+.text-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;}
+.text-input:focus{border-color:var(--cyan);}
+.text-input::placeholder{color:var(--muted);}
+textarea.text-input{resize:vertical;min-height:72px;line-height:1.6;}
+
+.wl-row{display:flex;gap:8px;margin-bottom:14px;}
+.wl-btn{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.wl-btn:hover{border-color:var(--cyan);}
+.wl-btn.sel-w{background:rgba(0,230,118,.15);border-color:var(--green);color:var(--green);}
+.wl-btn.sel-l{background:rgba(255,82,82,.15);border-color:var(--red);color:var(--red);}
+.wl-btn.sel-d{background:rgba(255,214,0,.15);border-color:var(--yellow);color:var(--yellow);}
+
+.score-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.score-block label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;text-align:center;}
+.score-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;padding:10px;text-align:center;outline:none;transition:border-color .15s;-moz-appearance:textfield;}
+.score-input::-webkit-outer-spin-button,.score-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.score-input:focus{border-color:var(--cyan);}
+
+/* ── SENTENCE FRAME ────────────────────────────── */
+.reflect-frame{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--muted);line-height:1.6;}
+.reflect-frame strong{color:var(--cyan);}
+
+/* ── PHASE DIVIDER ─────────────────────────────── */
+.phase{border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.phase.cyan{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);}
+.phase.yellow{background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.2);}
+.phase.red{background:rgba(255,82,82,.06);border:1px solid rgba(255,82,82,.2);}
+.phase.green{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);}
+.phase-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.phase.cyan .phase-label{color:var(--cyan);}
+.phase.yellow .phase-label{color:var(--yellow);}
+.phase.red .phase-label{color:var(--red);}
+.phase.green .phase-label{color:var(--green);}
+
+/* ── HINT ──────────────────────────────────────── */
+.hint-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--orange);background:rgba(255,145,0,.1);border:1px solid rgba(255,145,0,.25);border-radius:20px;padding:4px 10px;cursor:pointer;margin-bottom:10px;transition:background .15s;user-select:none;}
+.hint-pill:hover{background:rgba(255,145,0,.18);}
+.hint-text{display:none;background:rgba(255,145,0,.08);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;margin-bottom:10px;}
+.hint-text.show{display:block;}
+
+/* ── ROUND RESULT BANNER ───────────────────────── */
+.result-banner{border-radius:10px;padding:14px 16px;margin-bottom:14px;display:none;}
+.result-banner.show{display:block;}
+.rb-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.rb-emoji{font-size:28px;}
+.rb-title{font-size:15px;font-weight:800;color:var(--text);}
+.rb-sub{font-size:12px;color:var(--muted);}
+.rb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rb-stat{background:rgba(0,0,0,.2);border-radius:8px;padding:8px;text-align:center;}
+.rb-stat-num{font-size:18px;font-weight:800;}
+.rb-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px;}
+
+/* ── CONGRATS ──────────────────────────────────── */
+.congrats-box{display:none;background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,229,255,.08));border:1px solid rgba(0,230,118,.3);border-radius:14px;padding:24px;text-align:center;margin-top:20px;}
+.congrats-box.show{display:block;}
+.congrats-emoji{font-size:48px;margin-bottom:12px;}
+.congrats-title{font-size:20px;font-weight:800;color:var(--green);margin-bottom:8px;}
+.congrats-sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:42ch;margin:0 auto;}
+.congrats-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;}
+.cs-box{background:rgba(0,0,0,.25);border-radius:10px;padding:12px;}
+.cs-num{font-size:22px;font-weight:800;color:var(--cyan);}
+.cs-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:4px;}
+.season-rows{text-align:left;margin-top:16px;}
+.srow{display:grid;grid-template-columns:2rem 1fr 1fr 3rem;gap:8px;align-items:center;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,.2);font-size:13px;}
+.srow-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 12px;display:grid;grid-template-columns:2rem 1fr 1fr 3rem;gap:8px;}
+.chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.chip.over{background:rgba(255,82,82,.2);color:var(--red);}
+.chip.ok{background:rgba(0,230,118,.2);color:var(--green);}
+.srow-r{font-weight:800;color:var(--cyan);}
+
+/* ── NEXT BUTTON ───────────────────────────────── */
+.btn-next{width:100%;background:var(--cyan);color:#0d1b2a;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:14px;border-radius:10px;border:none;cursor:pointer;margin-top:16px;transition:opacity .15s;}
+.btn-next:hover{opacity:.88;}
+.btn-secondary{background:transparent;color:var(--cyan);border:1px solid rgba(0,229,255,.4);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:10px 16px;border-radius:8px;cursor:pointer;transition:all .15s;}
+.btn-secondary:hover{background:rgba(0,229,255,.08);}
+.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+
+/* ── GAP LIVE CALCULATOR (Section 1) ──────────── */
+.live-calc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+
+/* ── INLINE GAP (in rounds) ───────────────────── */
+.inline-gap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.ig-steps{font-size:13px;color:var(--muted);line-height:2.2;}
+.ig-steps .val{color:var(--yellow);font-weight:700;}
+.ig-steps .big{color:var(--cyan);font-size:18px;font-weight:800;}
+
+@media(max-width:480px){
+  .example-grid,.calc-row,.score-row{grid-template-columns:1fr;}
+  .rb-stats,.congrats-stats{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── STICKY HEADER ─────────────────────────────────────── -->
+<header class="lesson-header">
+  <div class="lh-top">
+    <span class="day-badge">Day 9</span>
+    <div>
+      <div class="lh-title">Match Day 3</div>
+      <div class="lh-sub">Season 1 · Prediction + 20% Gap Rule</div>
+    </div>
+  </div>
+  <div class="prog-bar-wrap"><div class="prog-fill" id="progFill"></div></div>
+  <div class="prog-tabs">
+    <button class="prog-tab active" onclick="goSection(1)" id="ptab1">📐 The Rule</button>
+    <button class="prog-tab" onclick="goSection(2)" id="ptab2">⚔️ Round 1</button>
+    <button class="prog-tab" onclick="goSection(3)" id="ptab3">⚔️ Round 2</button>
+    <button class="prog-tab" onclick="goSection(4)" id="ptab4">⚔️ Round 3</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 1 — THE 20% GAP RULE
+═══════════════════════════════════════════════════════════ -->
+<section class="section visible" id="sec1">
+
+  <div class="sec-header">
+    <div class="sec-icon cyan">📐</div>
+    <div class="sec-title">The 20% Gap Rule</div>
+    <div class="sec-sub">One new thing today — learn it before Round 1 starts</div>
+  </div>
+
+  <!-- WHAT IS IT -->
+  <div class="card">
+    <div class="card-title">📖 Key Words</div>
+    <div class="vocab-box">
+      <div class="vocab-row">
+        <div class="vocab-term">Prediction</div>
+        <div class="vocab-def">The number of goals you <strong>think</strong> you will score — written <strong>before</strong> the match.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">Actual</div>
+        <div class="vocab-def">The number of goals you <strong>actually scored</strong> — recorded <strong>after</strong> the match.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">Gap</div>
+        <div class="vocab-def">How far off your prediction was. We show it as a <strong>percent (%)</strong>.</div>
+      </div>
+      <div class="vocab-row">
+        <div class="vocab-term">Variable</div>
+        <div class="vocab-def">A number in your formula that changes — like time, speed, or distance.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT DOES 20% LOOK LIKE -->
+  <div class="card">
+    <div class="card-title">👀 What Does 20% Look Like?</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Look at the bar. Blue = what you predicted. Yellow = what actually happened.</p>
+
+    <div class="example-grid">
+      <div class="ex-card ok">
+        <div class="ex-emoji">✅</div>
+        <div class="ex-nums">Predicted 5 → Scored 5</div>
+        <svg width="100%" height="40" style="margin:8px 0;">
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(0,229,255,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(255,214,0,.7)"/>
+        </svg>
+        <div class="ex-label">Gap = 0%</div>
+        <div class="ex-result">No sentence needed</div>
+      </div>
+      <div class="ex-card over">
+        <div class="ex-emoji">✍️</div>
+        <div class="ex-nums">Predicted 5 → Scored 3</div>
+        <svg width="100%" height="40" style="margin:8px 0;">
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(0,229,255,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="24" width="60%" height="14" rx="4" fill="rgba(255,214,0,.7)"/>
+        </svg>
+        <div class="ex-label">Gap = 40% → Write the sentence</div>
+        <div class="ex-result">Your model missed something</div>
+      </div>
+      <div class="ex-card ok">
+        <div class="ex-emoji">✅</div>
+        <div class="ex-nums">Predicted 4 → Scored 4</div>
+        <svg width="100%" height="40" style="margin:8px 0;">
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(0,229,255,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(255,214,0,.7)"/>
+        </svg>
+        <div class="ex-label">Gap = 0%</div>
+        <div class="ex-result">No sentence needed</div>
+      </div>
+      <div class="ex-card over">
+        <div class="ex-emoji">✍️</div>
+        <div class="ex-nums">Predicted 3 → Scored 4</div>
+        <svg width="100%" height="40" style="margin:8px 0;">
+          <rect x="0" y="8" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="8" width="75%" height="14" rx="4" fill="rgba(0,229,255,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(42,64,96,.5)"/>
+          <rect x="0" y="24" width="100%" height="14" rx="4" fill="rgba(255,214,0,.7)"/>
+        </svg>
+        <div class="ex-label">Gap = 33% → Write the sentence</div>
+        <div class="ex-result">Even scoring MORE triggers it</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE FORMULA -->
+  <div class="card">
+    <div class="card-title">📐 The Gap Formula</div>
+    <div class="formula-board">
+      <div class="formula-label">How to Calculate Gap %</div>
+      <div class="formula-eq">
+        gap = <span class="hl">| prediction − actual |</span><br>
+        <span style="font-size:14px;color:var(--muted);">divided by prediction, then × 100</span>
+      </div>
+      <div class="formula-note">The | | symbols mean "ignore the minus sign" — always a positive number.</div>
+    </div>
+
+    <div class="card-title" style="margin-top:4px;">🔢 Step-by-Step Example</div>
+    <div class="vstep-list">
+      <div class="vstep">
+        <div class="vstep-num">1</div>
+        <div class="vstep-text">Predicted <strong>5</strong> goals. Scored <strong>3</strong> goals.</div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num">2</div>
+        <div class="vstep-text">Find the difference: |5 − 3| = <strong>2</strong></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num">3</div>
+        <div class="vstep-text">Divide by your prediction: 2 ÷ 5 = <strong>0.4</strong></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num">4</div>
+        <div class="vstep-text">Multiply by 100: 0.4 × 100 = <strong>40%</strong></div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num" style="background:var(--red);color:#fff;">!</div>
+        <div class="vstep-text">40% is bigger than 20% → <strong>Write the sentence.</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE CALCULATOR -->
+  <div class="card">
+    <div class="card-title">🎮 Try It — Calculate Your Own Gap</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Type in two numbers. See the gap calculate automatically.</p>
+
+    <div class="calc-row">
+      <div class="calc-block">
+        <label>🔵 Predicted Goals</label>
+        <input type="number" class="calc-input" id="demoP" min="0" max="20" placeholder="5" oninput="updateDemo()">
+      </div>
+      <div class="calc-block">
+        <label>🟡 Actual Goals</label>
+        <input type="number" class="calc-input" id="demoA" min="0" max="20" placeholder="3" oninput="updateDemo()">
+      </div>
+    </div>
+
+    <div class="gap-display">
+      <div class="gap-math-steps" id="demoMath">Enter numbers above to see the calculation.</div>
+      <div class="bar-compare" id="demoBar" style="display:none;">
+        <div class="bar-row">
+          <div class="bar-row-label">🔵 Predicted</div>
+          <div class="bar-track"><div class="bar-fill pred" id="demoBarP"><span id="demoBarPNum"></span></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-row-label">🟡 Actual</div>
+          <div class="bar-track"><div class="bar-fill actual" id="demoBarA"><span id="demoBarANum"></span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="gap-verdict-big verdict-empty" id="demoVerdict">Enter your numbers above ↑</div>
+  </div>
+
+  <!-- THE SENTENCE -->
+  <div class="card">
+    <div class="card-title red">✍️ When Gap > 20% — Write This Sentence</div>
+    <div class="phase red">
+      <div class="phase-label">🗣️ The Sentence Frame</div>
+      <p style="font-size:16px;font-weight:800;color:var(--text);line-height:1.5;">
+        "The variable my model missed was <span style="color:var(--cyan);">_____</span> because <span style="color:var(--cyan);">_____."</span>
+      </p>
+    </div>
+    <div class="vstep-list">
+      <div class="vstep">
+        <div class="vstep-num" style="background:var(--cyan);">1</div>
+        <div class="vstep-text">Look at your prediction formula. What numbers did you plug in?</div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num" style="background:var(--cyan);">2</div>
+        <div class="vstep-text">Which number was <strong>wrong</strong> or <strong>approximate</strong>?</div>
+      </div>
+      <div class="vstep">
+        <div class="vstep-num" style="background:var(--cyan);">3</div>
+        <div class="vstep-text">That is your variable. Write one sentence. <strong>One is enough.</strong></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:6px;">Example sentence</div>
+      <div style="font-size:13px;color:var(--text);font-style:italic;line-height:1.6;">"The variable my model missed was <strong style="color:var(--yellow);">time</strong> because <strong style="color:var(--yellow);">our bot ran slower than normal today and I used the speed from yesterday.</strong>"</div>
+    </div>
+  </div>
+
+  <!-- TEAM SETUP -->
+  <div class="card">
+    <div class="card-title">👥 Your Team — Set Up Before Round 1</div>
+    <div style="margin-bottom:12px;">
+      <label class="field-label">Team Name</label>
+      <input type="text" class="text-input" id="teamName" placeholder="Enter your team name…">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label class="field-label">Your Formula Type (from Formula Relay this morning)</label>
+      <select class="text-input" id="formulaType" style="cursor:pointer;">
+        <option value="">Select your formula type…</option>
+        <option value="Endurance — P(t) = 100 − k·t">Endurance — P(t) = 100 − k·t</option>
+        <option value="Distance — d = √[(x₂−x₁)²+(y₂−y₁)²]">Distance — d = √[(x₂−x₁)²+(y₂−y₁)²]</option>
+        <option value="Linear — y = mx + b">Linear — y = mx + b</option>
+        <option value="Percent Change — |A−B|÷B × 100">Percent Change — |A−B|÷B × 100</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div id="formulaOtherWrap" style="display:none;margin-bottom:12px;">
+      <label class="field-label">Write Your Formula Type</label>
+      <input type="text" class="text-input" id="formulaOther" placeholder="e.g. P = 50 + 3x">
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="finishSection1()">I understand the 20% rule → Go to Round 1 ⚔️</button>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 2 — ROUND 1
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="sec2">
+  <div class="sec-header">
+    <div class="sec-icon yellow">⚔️</div>
+    <div class="sec-title">Round 1</div>
+    <div class="sec-sub">Predict → Play → Record → Check Gap</div>
+  </div>
+
+  <!-- PHASE 1: PREDICT -->
+  <div class="phase cyan">
+    <div class="phase-label">📝 Phase 1 — Before the Match: Write Your Prediction</div>
+    <p style="font-size:13px;color:var(--text);margin-bottom:12px;">Your prediction must use your Formula Relay formula. Show the formula, the numbers, and the answer.</p>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Opponent Team (Round 1)</label>
+      <input type="text" class="text-input" id="r1-opp" placeholder="Who are you playing?">
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Show Your Formula Work</label>
+      <div class="reflect-frame">
+        <strong>Formula →</strong> plug in numbers → get a goal count. Example:<br>
+        P(t) = 100 − 8·3 = 76 → "I predict 3 goals"
+      </div>
+      <textarea class="text-input" id="r1-work" placeholder="Write your formula and calculation here…"></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">🔵 My Prediction (number of goals)</label>
+      <input type="number" class="calc-input" id="r1-pred" min="0" placeholder="?" style="max-width:120px;font-size:28px;">
+    </div>
+    <div class="hint-pill" onclick="toggleHint('h1p')">💡 I'm not sure what number to write</div>
+    <div class="hint-text" id="h1p">Look at your formula. Plug in the numbers from today's match (time = 3 minutes, your speed stat, etc.). The answer from the formula is your predicted goals. Round to the nearest whole number.</div>
+    <button class="btn-secondary" onclick="lockPred(1)">🔒 Lock In Prediction</button>
+  </div>
+
+  <!-- PHASE 2: RECORD -->
+  <div class="phase yellow" id="r1-phase2" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">🎮 Phase 2 — After the Match: Record the Score</div>
+    <p style="font-size:13px;color:var(--text);margin-bottom:12px;">Write down exactly what happened. Be accurate.</p>
+    <div class="score-row">
+      <div class="score-block">
+        <label>⚡ Your Goals</label>
+        <input type="number" class="score-input" id="r1-for" min="0" placeholder="0">
+      </div>
+      <div class="score-block">
+        <label>🤖 Opponent Goals</label>
+        <input type="number" class="score-input" id="r1-ag" min="0" placeholder="0">
+      </div>
+    </div>
+    <label class="field-label">Result</label>
+    <div class="wl-row">
+      <button class="wl-btn" id="r1-wb" onclick="setWL(1,'W')">🏆 Win</button>
+      <button class="wl-btn" id="r1-lb" onclick="setWL(1,'L')">❌ Loss</button>
+      <button class="wl-btn" id="r1-db" onclick="setWL(1,'D')">🤝 Draw</button>
+    </div>
+    <button class="btn-secondary" onclick="lockScore(1)">✅ Record Score</button>
+  </div>
+
+  <!-- PHASE 3: GAP CHECK -->
+  <div class="phase red" id="r1-phase3" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">📐 Phase 3 — Check the Gap</div>
+    <div class="inline-gap" id="r1-gap-box">
+      <div class="ig-steps" id="r1-gap-math">Complete Phase 2 first.</div>
+    </div>
+    <div class="gap-verdict-big verdict-empty" id="r1-verdict">Waiting for score…</div>
+
+    <!-- REFLECTION — shown only if gap > 20% -->
+    <div id="r1-reflect-wrap" style="display:none;margin-top:14px;">
+      <div class="phase-label" style="margin-bottom:8px;color:var(--red);">✍️ Gap Over 20% — Write Your Sentence</div>
+      <div class="reflect-frame">
+        <strong>"The variable my model missed was <span style="color:var(--cyan);">_____</span> because <span style="color:var(--cyan);">_____."</span></strong>
+        <br><span style="color:var(--muted);">Look at your formula. Which input number was wrong? Name it.</span>
+      </div>
+      <div class="hint-pill" onclick="toggleHint('h1r')">💡 I don't know what variable to name</div>
+      <div class="hint-text" id="h1r">Go back to your formula work. Find the numbers you plugged in (speed, time, etc.). Which one was different in the actual match? That's your variable.</div>
+      <textarea class="text-input" id="r1-reflection" placeholder="The variable my model missed was _____ because _____." rows="3"></textarea>
+    </div>
+    <div id="r1-no-reflect" style="display:none;padding:10px 0;font-size:13px;color:var(--green);font-weight:700;">✅ Gap under 20% — no sentence needed this round. Great prediction!</div>
+
+    <button class="btn-secondary" id="r1-complete-btn" style="margin-top:14px;display:none;" onclick="completeRound(1)">✅ Complete Round 1 →</button>
+  </div>
+
+  <div class="result-banner" id="r1-banner"></div>
+  <button class="btn-next" id="r1-next" style="display:none;" onclick="goSection(3)">Go to Round 2 ⚔️</button>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 3 — ROUND 2
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="sec3">
+  <div class="sec-header">
+    <div class="sec-icon orange">⚔️</div>
+    <div class="sec-title">Round 2</div>
+    <div class="sec-sub">Same process — adjust your formula inputs if Round 1 showed gaps</div>
+  </div>
+
+  <div class="phase cyan">
+    <div class="phase-label">📝 Phase 1 — Prediction</div>
+    <p style="font-size:13px;color:var(--text);margin-bottom:12px;">Use the same formula type. You may change the numbers if Round 1 taught you something.</p>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Opponent Team (Round 2)</label>
+      <input type="text" class="text-input" id="r2-opp" placeholder="Who are you playing?">
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Show Your Formula Work</label>
+      <textarea class="text-input" id="r2-work" placeholder="Formula → numbers → predicted goals…"></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">🔵 My Prediction</label>
+      <input type="number" class="calc-input" id="r2-pred" min="0" placeholder="?" style="max-width:120px;font-size:28px;">
+    </div>
+    <button class="btn-secondary" onclick="lockPred(2)">🔒 Lock In Prediction</button>
+  </div>
+
+  <div class="phase yellow" id="r2-phase2" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">🎮 Phase 2 — Record the Score</div>
+    <div class="score-row">
+      <div class="score-block">
+        <label>⚡ Your Goals</label>
+        <input type="number" class="score-input" id="r2-for" min="0" placeholder="0">
+      </div>
+      <div class="score-block">
+        <label>🤖 Opponent Goals</label>
+        <input type="number" class="score-input" id="r2-ag" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="wl-row">
+      <button class="wl-btn" id="r2-wb" onclick="setWL(2,'W')">🏆 Win</button>
+      <button class="wl-btn" id="r2-lb" onclick="setWL(2,'L')">❌ Loss</button>
+      <button class="wl-btn" id="r2-db" onclick="setWL(2,'D')">🤝 Draw</button>
+    </div>
+    <button class="btn-secondary" onclick="lockScore(2)">✅ Record Score</button>
+  </div>
+
+  <div class="phase red" id="r2-phase3" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">📐 Phase 3 — Check the Gap</div>
+    <div class="inline-gap"><div class="ig-steps" id="r2-gap-math">Complete Phase 2 first.</div></div>
+    <div class="gap-verdict-big verdict-empty" id="r2-verdict">Waiting for score…</div>
+    <div id="r2-reflect-wrap" style="display:none;margin-top:14px;">
+      <div class="phase-label" style="color:var(--red);">✍️ Gap Over 20% — Write Your Sentence</div>
+      <div class="reflect-frame" style="margin-top:8px;"><strong>"The variable my model missed was <span style="color:var(--cyan);">_____</span> because <span style="color:var(--cyan);">_____."</span></strong></div>
+      <div class="hint-pill" onclick="toggleHint('h2r')">💡 I don't know what variable to name</div>
+      <div class="hint-text" id="h2r">Compare Round 1 and Round 2. Is the same variable off? That's a pattern — name it.</div>
+      <textarea class="text-input" id="r2-reflection" placeholder="The variable my model missed was _____ because _____." rows="3"></textarea>
+    </div>
+    <div id="r2-no-reflect" style="display:none;padding:10px 0;font-size:13px;color:var(--green);font-weight:700;">✅ Gap under 20% — great prediction!</div>
+    <button class="btn-secondary" id="r2-complete-btn" style="margin-top:14px;display:none;" onclick="completeRound(2)">✅ Complete Round 2 →</button>
+  </div>
+
+  <div class="result-banner" id="r2-banner"></div>
+  <button class="btn-next" id="r2-next" style="display:none;" onclick="goSection(4)">Go to Round 3 ⚔️</button>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SECTION 4 — ROUND 3
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="sec4">
+  <div class="sec-header">
+    <div class="sec-icon green">⚔️</div>
+    <div class="sec-title">Round 3</div>
+    <div class="sec-sub">Final round — don't leave the prediction blank</div>
+  </div>
+
+  <div class="phase cyan">
+    <div class="phase-label">📝 Phase 1 — Final Prediction</div>
+    <div style="background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--yellow);">
+      ⚠️ A blank prediction row is not acceptable. You must write something with a formula.
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Opponent Team (Round 3)</label>
+      <input type="text" class="text-input" id="r3-opp" placeholder="Who are you playing?">
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">Show Your Formula Work</label>
+      <textarea class="text-input" id="r3-work" placeholder="Formula → numbers → predicted goals…"></textarea>
+    </div>
+    <div style="margin-bottom:10px;">
+      <label class="field-label">🔵 My Prediction</label>
+      <input type="number" class="calc-input" id="r3-pred" min="0" placeholder="?" style="max-width:120px;font-size:28px;">
+    </div>
+    <button class="btn-secondary" onclick="lockPred(3)">🔒 Lock In Prediction</button>
+  </div>
+
+  <div class="phase yellow" id="r3-phase2" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">🎮 Phase 2 — Record the Score</div>
+    <div class="score-row">
+      <div class="score-block">
+        <label>⚡ Your Goals</label>
+        <input type="number" class="score-input" id="r3-for" min="0" placeholder="0">
+      </div>
+      <div class="score-block">
+        <label>🤖 Opponent Goals</label>
+        <input type="number" class="score-input" id="r3-ag" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="wl-row">
+      <button class="wl-btn" id="r3-wb" onclick="setWL(3,'W')">🏆 Win</button>
+      <button class="wl-btn" id="r3-lb" onclick="setWL(3,'L')">❌ Loss</button>
+      <button class="wl-btn" id="r3-db" onclick="setWL(3,'D')">🤝 Draw</button>
+    </div>
+    <button class="btn-secondary" onclick="lockScore(3)">✅ Record Score</button>
+  </div>
+
+  <div class="phase red" id="r3-phase3" style="opacity:.4;pointer-events:none;">
+    <div class="phase-label">📐 Phase 3 — Check the Gap</div>
+    <div class="inline-gap"><div class="ig-steps" id="r3-gap-math">Complete Phase 2 first.</div></div>
+    <div class="gap-verdict-big verdict-empty" id="r3-verdict">Waiting for score…</div>
+    <div id="r3-reflect-wrap" style="display:none;margin-top:14px;">
+      <div class="phase-label" style="color:var(--red);">✍️ Gap Over 20% — Write Your Sentence</div>
+      <div class="reflect-frame" style="margin-top:8px;"><strong>"The variable my model missed was <span style="color:var(--cyan);">_____</span> because <span style="color:var(--cyan);">_____."</span></strong></div>
+      <div class="hint-pill" onclick="toggleHint('h3r')">💡 I don't know what variable to name</div>
+      <div class="hint-text" id="h3r">You've now had three matches. Look at all three prediction formulas. Which input number kept being wrong? That's the variable your model consistently missed.</div>
+      <textarea class="text-input" id="r3-reflection" placeholder="The variable my model missed was _____ because _____." rows="3"></textarea>
+    </div>
+    <div id="r3-no-reflect" style="display:none;padding:10px 0;font-size:13px;color:var(--green);font-weight:700;">✅ Gap under 20% — great prediction!</div>
+    <button class="btn-secondary" id="r3-complete-btn" style="margin-top:14px;display:none;" onclick="completeRound(3)">✅ Complete Round 3</button>
+  </div>
+
+  <div class="result-banner" id="r3-banner"></div>
+
+  <!-- SEASON SUMMARY -->
+  <div class="congrats-box" id="congratsBox">
+    <div class="congrats-emoji">🏆</div>
+    <div class="congrats-title">Match Day 3 Complete!</div>
+    <div class="congrats-sub">Three rounds. You predicted, played, and reflected. Your gap entries are what Open Lab this afternoon is built on.</div>
+    <div class="congrats-stats" id="cs-stats"></div>
+    <div class="season-rows" id="season-rows"></div>
+    <div id="ss-insight" style="margin-top:14px;background:rgba(0,0,0,.2);border-radius:10px;padding:14px;font-size:13px;color:var(--muted);line-height:1.65;"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:16px;">
+      <button class="btn-secondary" onclick="copyLog()">📋 Copy Log</button>
+      <button class="btn-secondary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── JAVASCRIPT ──────────────────────────────────────────── -->
+<script>
+// ── STATE ────────────────────────────────────────────────────
+const S = {
+  team:'', formula:'',
+  rounds:[
+    {pred:null,actual:null,ag:null,wl:null,opp:'',work:'',reflection:'',gap:null,done:false},
+    {pred:null,actual:null,ag:null,wl:null,opp:'',work:'',reflection:'',gap:null,done:false},
+    {pred:null,actual:null,ag:null,wl:null,opp:'',work:'',reflection:'',gap:null,done:false}
+  ]
+};
+
+// ── PROGRESS ──────────────────────────────────────────────────
+const PROG = [25, 50, 75, 100];
+function goSection(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('sec'+i).classList.toggle('visible', i===n);
+    const tab = document.getElementById('ptab'+i);
+    tab.classList.remove('active');
+  });
+  document.getElementById('ptab'+n).classList.add('active');
+  document.getElementById('progFill').style.width = PROG[n-1]+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── FORMULA SELECT ─────────────────────────────────────────────
+document.getElementById('formulaType').addEventListener('change', function(){
+  document.getElementById('formulaOtherWrap').style.display = this.value==='Other'?'block':'none';
+});
+
+// ── SECTION 1 COMPLETE ────────────────────────────────────────
+function finishSection1() {
+  const team = document.getElementById('teamName').value.trim();
+  const ft = document.getElementById('formulaType').value;
+  if (!team) { alert('Enter your team name first.'); return; }
+  if (!ft) { alert('Select your formula type.'); return; }
+  S.team = team;
+  S.formula = ft==='Other' ? (document.getElementById('formulaOther').value.trim()||'Other') : ft;
+  document.getElementById('ptab2').classList.remove('done');
+  goSection(2);
+}
+
+// ── DEMO CALCULATOR ────────────────────────────────────────────
+function updateDemo() {
+  const p = parseFloat(document.getElementById('demoP').value);
+  const a = parseFloat(document.getElementById('demoA').value);
+  const mathEl = document.getElementById('demoMath');
+  const verdictEl = document.getElementById('demoVerdict');
+  const barEl = document.getElementById('demoBar');
+
+  if (isNaN(p) || isNaN(a)) {
+    mathEl.textContent = 'Enter numbers above to see the calculation.';
+    verdictEl.className='gap-verdict-big verdict-empty';
+    verdictEl.textContent='Enter your numbers above ↑';
+    barEl.style.display='none';
+    return;
+  }
+
+  let gap, edge=false;
+  if (p===0 && a>0) { gap=100; edge=true; }
+  else if (p===0) { gap=0; }
+  else { gap = Math.round(Math.abs(p-a)/p*100); }
+
+  mathEl.innerHTML =
+    `|<span class="val">${p}</span> − <span class="val">${a}</span>| ÷ <span class="val">${p}</span> × 100<br>` +
+    `= <span class="val">${Math.abs(p-a)}</span> ÷ <span class="val">${p||1}</span> × 100<br>` +
+    `= <span class="result">${gap}%</span>`;
+
+  // Bars
+  barEl.style.display='block';
+  const mx = Math.max(p,a,1);
+  document.getElementById('demoBarP').style.width = (p/mx*100)+'%';
+  document.getElementById('demoBarPNum').textContent = p;
+  document.getElementById('demoBarA').style.width = (a/mx*100)+'%';
+  document.getElementById('demoBarANum').textContent = a;
+
+  if (gap>20||edge) {
+    verdictEl.className='gap-verdict-big verdict-over';
+    verdictEl.textContent = `🔴 Gap is ${gap}% — over 20%. Write the sentence.`;
+  } else {
+    verdictEl.className='gap-verdict-big verdict-ok';
+    verdictEl.textContent = `🟢 Gap is ${gap}% — under 20%. No sentence needed.`;
+  }
+}
+
+// ── HINT TOGGLE ───────────────────────────────────────────────
+function toggleHint(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// ── W/L/D ─────────────────────────────────────────────────────
+function setWL(r, res) {
+  S.rounds[r-1].wl = res;
+  ['w','l','d'].forEach(x => {
+    const btn = document.getElementById(`r${r}-${x}b`);
+    btn.className = 'wl-btn';
+    if (x===res.toLowerCase()) btn.classList.add('sel-'+x);
+  });
+}
+
+// ── LOCK PREDICTION ────────────────────────────────────────────
+function lockPred(r) {
+  const opp = document.getElementById(`r${r}-opp`).value.trim();
+  const work = document.getElementById(`r${r}-work`).value.trim();
+  const pred = parseInt(document.getElementById(`r${r}-pred`).value, 10);
+  if (!opp) { alert('Enter your opponent\'s name.'); return; }
+  if (!work) { alert('Show your formula work first.'); return; }
+  if (isNaN(pred)||pred<0) { alert('Enter your prediction number.'); return; }
+  S.rounds[r-1].pred = pred;
+  S.rounds[r-1].opp = opp;
+  S.rounds[r-1].work = work;
+  // Unlock phase 2
+  const p2 = document.getElementById(`r${r}-phase2`);
+  p2.style.opacity='1'; p2.style.pointerEvents='auto';
+  p2.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── LOCK SCORE ─────────────────────────────────────────────────
+function lockScore(r) {
+  const gFor = parseInt(document.getElementById(`r${r}-for`).value,10);
+  const gAg = parseInt(document.getElementById(`r${r}-ag`).value,10);
+  const wl = S.rounds[r-1].wl;
+  if (isNaN(gFor)||gFor<0) { alert('Enter your goals scored.'); return; }
+  if (isNaN(gAg)||gAg<0) { alert('Enter opponent\'s goals.'); return; }
+  if (!wl) { alert('Select Win, Loss, or Draw.'); return; }
+
+  S.rounds[r-1].actual = gFor;
+  S.rounds[r-1].ag = gAg;
+
+  // Unlock phase 3 + compute gap
+  const p3 = document.getElementById(`r${r}-phase3`);
+  p3.style.opacity='1'; p3.style.pointerEvents='auto';
+  computeRoundGap(r);
+  p3.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── COMPUTE ROUND GAP ──────────────────────────────────────────
+function computeRoundGap(r) {
+  const rnd = S.rounds[r-1];
+  const pred = rnd.pred, actual = rnd.actual;
+  let gap, edge=false;
+  if (pred===0&&actual>0){gap=100;edge=true;}
+  else if (pred===0){gap=0;}
+  else{gap=Math.round(Math.abs(pred-actual)/pred*100);}
+  rnd.gap=gap; rnd.edge=edge;
+
+  const mathEl = document.getElementById(`r${r}-gap-math`);
+  const verdictEl = document.getElementById(`r${r}-verdict`);
+
+  if (edge) {
+    mathEl.innerHTML=`Prediction = <span class="val">0</span>, Actual = <span class="val">${actual}</span><br><span style="color:var(--orange);">Edge case: prediction was 0 and goals were scored.</span>`;
+  } else {
+    mathEl.innerHTML=
+      `|<span class="val">${pred}</span> − <span class="val">${actual}</span>| ÷ <span class="val">${pred}</span> × 100<br>` +
+      `= <span class="val">${Math.abs(pred-actual)}</span> ÷ <span class="val">${pred||1}</span> × 100 = <span class="big">${gap}%</span>`;
+  }
+
+  const needs = gap>20||edge;
+  if (needs) {
+    verdictEl.className='gap-verdict-big verdict-over';
+    verdictEl.innerHTML=`🔴 Gap = ${gap}% — over 20%.<br><strong style="font-size:12px;font-weight:600;">You need to write one sentence below.</strong>`;
+    document.getElementById(`r${r}-reflect-wrap`).style.display='block';
+    document.getElementById(`r${r}-no-reflect`).style.display='none';
+  } else {
+    verdictEl.className='gap-verdict-big verdict-ok';
+    verdictEl.textContent=`🟢 Gap = ${gap}% — under 20%. No sentence needed.`;
+    document.getElementById(`r${r}-reflect-wrap`).style.display='none';
+    document.getElementById(`r${r}-no-reflect`).style.display='block';
+  }
+  rnd.needsReflect=needs;
+  document.getElementById(`r${r}-complete-btn`).style.display='inline-block';
+}
+
+// ── COMPLETE ROUND ─────────────────────────────────────────────
+function completeRound(r) {
+  const rnd = S.rounds[r-1];
+  if (rnd.needsReflect) {
+    const txt = document.getElementById(`r${r}-reflection`).value.trim();
+    if (!txt||txt.length<8) {
+      alert('Write your reflection sentence first — one specific variable.');
+      return;
+    }
+    rnd.reflection=txt;
+  }
+  rnd.done=true;
+
+  // Show banner
+  const wlLabel = rnd.wl==='W'?'🏆 Win':rnd.wl==='L'?'❌ Loss':'🤝 Draw';
+  const gapColor = rnd.gap>20?'var(--red)':'var(--green)';
+  const banner = document.getElementById(`r${r}-banner`);
+  banner.style.background = rnd.wl==='W'?'rgba(0,230,118,.08)':rnd.wl==='L'?'rgba(255,82,82,.08)':'rgba(255,214,0,.08)';
+  banner.style.border = `1px solid ${rnd.wl==='W'?'rgba(0,230,118,.3)':rnd.wl==='L'?'rgba(255,82,82,.3)':'rgba(255,214,0,.3)'}`;
+  banner.style.borderRadius='10px';
+  banner.style.padding='14px 16px';
+  banner.innerHTML=`
+    <div class="rb-top">
+      <div class="rb-emoji">${rnd.wl==='W'?'🏆':rnd.wl==='L'?'😤':'🤝'}</div>
+      <div><div class="rb-title">Round ${r} Done — ${wlLabel} vs. ${rnd.opp}</div><div class="rb-sub">Gap: ${rnd.gap}% · ${rnd.reflection?'Sentence written ✍️':'No sentence needed ✅'}</div></div>
+    </div>
+    <div class="rb-stats">
+      <div class="rb-stat"><div class="rb-stat-num">${rnd.pred}</div><div class="rb-stat-label">Predicted</div></div>
+      <div class="rb-stat"><div class="rb-stat-num">${rnd.actual}</div><div class="rb-stat-label">Actual</div></div>
+      <div class="rb-stat"><div class="rb-stat-num" style="color:${gapColor}">${rnd.gap}%</div><div class="rb-stat-label">Gap</div></div>
+    </div>`;
+  banner.classList.add('show');
+
+  // Mark tab done
+  document.getElementById('ptab'+(r+1)).classList.add('done');
+
+  // Show next button or congrats
+  if (r<3) {
+    document.getElementById(`r${r}-next`).style.display='block';
+  } else {
+    showCongrats();
+  }
+}
+
+// ── SEASON SUMMARY ─────────────────────────────────────────────
+function showCongrats() {
+  const box = document.getElementById('congratsBox');
+  box.classList.add('show');
+
+  const rnds = S.rounds;
+  const wins = rnds.filter(r=>r.wl==='W').length;
+  const gaps = rnds.filter(r=>r.gap>20).length;
+  const totalGoals = rnds.reduce((s,r)=>s+(r.actual||0),0);
+
+  document.getElementById('cs-stats').innerHTML=`
+    <div class="cs-box"><div class="cs-num">${wins}</div><div class="cs-label">Wins</div></div>
+    <div class="cs-box"><div class="cs-num">${totalGoals}</div><div class="cs-label">Goals Scored</div></div>
+    <div class="cs-box"><div class="cs-num">${gaps}</div><div class="cs-label">Gap Entries</div></div>`;
+
+  const rowsEl = document.getElementById('season-rows');
+  rowsEl.innerHTML = `<div class="srow-head"><div>Rnd</div><div>Predicted</div><div>Actual</div><div>Gap</div></div>`;
+  rnds.forEach((r,i)=>{
+    const chip = r.gap>20?`<span class="chip over">${r.gap}%</span>`:`<span class="chip ok">${r.gap}%</span>`;
+    rowsEl.innerHTML+=`<div class="srow"><div class="srow-r">R${i+1}</div><div>${r.pred} goals</div><div>${r.actual} (${r.wl})</div><div>${chip}</div></div>`;
+  });
+
+  let insight = '';
+  if (gaps===0) insight='Every prediction was within 20%. Your model is accurate. In Open Lab, ask: what would break it?';
+  else if (gaps===1) insight='One gap entry. That sentence names the variable Open Lab is built on. Look at that input — was it a measurement error or a gap in your formula?';
+  else if (gaps===2) insight='Two gap entries. Do both sentences name the same variable? If yes, that\'s a pattern your model needs before Season 2.';
+  else insight='Three gap entries — every prediction missed by over 20%. That is the most data you generated today. In Open Lab: find the one variable that was consistently wrong across all three rounds.';
+  document.getElementById('ss-insight').textContent=insight;
+
+  box.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── COPY LOG ───────────────────────────────────────────────────
+function copyLog() {
+  let lines=['Velocity Arena — Match Day 3','Team: '+S.team,'Formula: '+S.formula,''];
+  S.rounds.forEach((r,i)=>{
+    lines.push(`Round ${i+1} vs. ${r.opp}`);
+    lines.push(`  Work: ${r.work}`);
+    lines.push(`  Predicted: ${r.pred} | Actual: ${r.actual} (${r.wl})`);
+    lines.push(`  Gap: ${r.gap}%`);
+    if (r.reflection) lines.push(`  Sentence: "${r.reflection}"`);
+    lines.push('');
+  });
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(()=>alert('Log copied!'))
+    .catch(()=>alert('Copy failed — use Print instead.'));
+}
+
+// Init demo
+updateDemo();
+</script>
+</body>
+</html>
