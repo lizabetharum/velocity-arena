@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard Chase — Card Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── BASE ──────────────────────────────────────── */
+:root {
+  --navy: #0d1b2a; --navy2: #132033; --navy3: #1a2d45;
+  --yellow: #ffd600; --blue: #1a4a7a; --blue-lt: #e8f2fb;
+  --orange: #8b5000; --orange-lt: #fdf3e3;
+  --green: #1a6b3a; --green-lt: #e6f4ec;
+  --red: #c0392b; --red-lt: #fdecea;
+  --muted: #6b7c8e; --border: #d0dae4; --text: #1a2433;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f2f5f8; color: var(--text); }
+
+/* ─── PRINT ONLY HIDES FORM ─────────────────────── */
+@page { size: letter portrait; margin: 0.45in; }
+@media print {
+  .no-print, #form-section, #print-bar { display: none !important; }
+  #print-section { display: block !important; background: white; }
+  body { background: white; }
+}
+
+/* ─── APP HEADER ────────────────────────────────── */
+.app-header {
+  background: var(--navy); padding: 16px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.app-header-left h1 { font-size: 17px; font-weight: 800; color: white; }
+.app-header-left p { font-size: 12px; color: #7a9cc0; margin-top: 1px; }
+.app-header-right { font-size: 11px; color: #7a9cc0; text-align: right; }
+.progress-bar-wrap { background: #2a4060; border-radius: 4px; height: 6px; width: 140px; margin-top: 4px; }
+.progress-bar-fill { background: var(--yellow); height: 100%; border-radius: 4px; transition: width 0.4s; }
+
+/* ─── MAIN LAYOUT ───────────────────────────────── */
+.main { max-width: 860px; margin: 0 auto; padding: 28px 20px 120px; }
+
+/* ─── INTRO BOX ─────────────────────────────────── */
+.intro-box {
+  background: white; border-radius: 12px;
+  border-left: 4px solid var(--yellow);
+  padding: 16px 20px; margin-bottom: 28px;
+  font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+.intro-box strong { color: var(--text); }
+
+/* ─── CARD FORM ─────────────────────────────────── */
+.card-form {
+  background: white; border-radius: 14px;
+  border: 1.5px solid var(--border); margin-bottom: 16px;
+  overflow: hidden; transition: box-shadow 0.2s;
+}
+.card-form.complete { border-color: #a8d5b5; }
+.card-form.error-state { border-color: #f5a0a0; }
+.card-form:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+
+.card-form-header {
+  padding: 14px 20px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; user-select: none;
+}
+.card-num-badge {
+  background: var(--blue); color: white;
+  font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  border-radius: 20px; padding: 3px 10px; flex-shrink: 0;
+}
+.card-form-title { font-size: 15px; font-weight: 700; flex: 1; }
+.card-form-subtitle { font-size: 12px; color: var(--muted); }
+.formula-pill {
+  background: var(--blue-lt); color: var(--blue);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  border-radius: 6px; padding: 3px 9px; flex-shrink: 0;
+}
+.complete-tick {
+  color: var(--green); font-size: 18px; flex-shrink: 0; display: none;
+}
+.card-form.complete .complete-tick { display: block; }
+.collapse-icon { color: var(--muted); font-size: 16px; flex-shrink: 0; transition: transform 0.2s; }
+.collapsed .collapse-icon { transform: rotate(-90deg); }
+
+.card-form-body { padding: 4px 20px 20px; border-top: 1px solid var(--border); }
+.card-form.collapsed .card-form-body { display: none; }
+
+/* Field rows */
+.fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.fields-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+.fields-row.quad { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+.field-label .required { color: var(--red); margin-left: 2px; }
+.field-input {
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 9px 12px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; color: var(--text); outline: none;
+  transition: border-color 0.2s;
+}
+.field-input:focus { border-color: var(--blue); }
+.field-input.error { border-color: var(--red); background: var(--red-lt); }
+.field-input[type=number] { -moz-appearance: textfield; }
+.field-input[type=number]::-webkit-inner-spin-button,
+.field-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+select.field-input { cursor: pointer; background: white; }
+
+/* Answer preview */
+.answer-preview {
+  margin-top: 14px; border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; background: var(--green-lt);
+  border: 1px solid #a8d5b5; display: flex; align-items: center; gap: 8px;
+}
+.answer-preview.empty { background: #f5f7fa; border-color: var(--border); color: var(--muted); }
+.answer-preview.invalid { background: var(--red-lt); border-color: #f5a0a0; color: var(--red); }
+.answer-icon { font-size: 16px; flex-shrink: 0; }
+.answer-work { font-family: monospace; font-size: 13px; font-weight: 600; }
+.answer-val { font-weight: 800; color: var(--green); margin-left: 4px; }
+
+/* ─── CHAIN PREVIEW ─────────────────────────────── */
+.chain-preview {
+  background: var(--navy); border-radius: 14px;
+  padding: 20px 24px; margin-top: 28px; margin-bottom: 12px;
+}
+.chain-preview h3 {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--yellow); margin-bottom: 14px;
+}
+.chain-nodes {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+}
+.chain-node {
+  background: #1a2d45; border: 1.5px solid #2a4060;
+  border-radius: 8px; padding: 6px 12px; text-align: center;
+  min-width: 80px;
+}
+.chain-node .cn-team { font-size: 12px; font-weight: 800; color: white; }
+.chain-node .cn-location { font-size: 10px; color: #7a9cc0; margin-top: 1px; }
+.chain-node .cn-answer { font-size: 10px; color: var(--yellow); margin-top: 2px; font-weight: 700; }
+.chain-arrow { color: #7a9cc0; font-size: 18px; }
+
+/* ─── GENERATE BUTTON ───────────────────────────── */
+.generate-section { text-align: center; margin-top: 28px; }
+.generate-btn {
+  background: var(--yellow); color: var(--navy);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+  border: none; border-radius: 12px; padding: 14px 40px;
+  cursor: pointer; transition: all 0.2s;
+}
+.generate-btn:hover { background: #ffe033; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+.generate-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+.validation-msg { font-size: 13px; color: var(--red); margin-top: 10px; }
+
+/* ─── PRINT BAR ─────────────────────────────────── */
+#print-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--navy); padding: 14px 28px;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  z-index: 200;
+}
+.print-btn {
+  background: var(--yellow); color: var(--navy);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800;
+  border: none; border-radius: 10px; padding: 12px 32px; cursor: pointer;
+  transition: all 0.2s;
+}
+.print-btn:hover { background: #ffe033; }
+.back-btn {
+  background: transparent; color: #7a9cc0;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+  border: 1.5px solid #2a4060; border-radius: 10px; padding: 11px 24px; cursor: pointer;
+}
+.back-btn:hover { color: white; border-color: #7a9cc0; }
+.print-bar-label { color: #7a9cc0; font-size: 13px; }
+
+/* ─── PRINT SECTION ─────────────────────────────── */
+#print-section { display: none; }
+#print-section.visible { display: block; background: white; padding: 20px 0; }
+
+.print-section-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase; color: #555; max-width: 760px;
+  margin: 28px auto 10px; padding: 0 24px;
+  border-bottom: 2px solid #ddd; padding-bottom: 6px;
+}
+.print-cards-grid {
+  max-width: 760px; margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.cut-line {
+  max-width: 760px; margin: 8px auto 8px; padding: 0 24px;
+  text-align: center; font-size: 9px; color: #aaa; letter-spacing: 2px;
+  border-top: 1px dashed #ccc; padding-top: 5px;
+}
+
+/* Problem card print */
+.p-card {
+  border: 2.5px solid #1a4a7a; border-radius: 10px;
+  overflow: hidden; background: white;
+  page-break-inside: avoid; break-inside: avoid;
+}
+.p-card-header {
+  background: #1a4a7a; color: white;
+  padding: 7px 12px; display: flex; align-items: center; justify-content: space-between;
+}
+.p-card-type { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+.p-card-num { font-size: 11px; font-weight: 800; color: #ffd600; }
+.p-card-front { padding: 10px 12px 8px; border-bottom: 1.5px dashed #bbb; }
+.p-card-back { padding: 10px 12px 11px; background: #f7f9fb; }
+.section-micro {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: #999; margin-bottom: 5px;
+}
+.p-card-front .section-micro { color: #1a4a7a; }
+.p-card-front .section-micro::after { content: ' ▸ VISIBLE WHEN POSTED'; font-weight: 400; }
+.p-card-back .section-micro::after { content: ' ▸ FLIP TO REVEAL'; font-weight: 400; }
+.team-name-print { font-size: 15px; font-weight: 800; color: #1a4a7a; margin-bottom: 3px; }
+.stat-line-print { font-size: 13px; color: #333; line-height: 1.5; }
+.location-tag-print {
+  display: inline-block; margin-top: 5px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: #888; border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px;
+}
+.question-print { font-size: 12px; color: #222; font-weight: 600; line-height: 1.4; margin-bottom: 5px; }
+.formula-hint-print { font-size: 11px; color: #666; font-style: italic; }
+.answer-key-print {
+  font-size: 10px; margin-top: 6px; background: #eef3f8;
+  border-left: 3px solid #1a4a7a; padding: 4px 8px; border-radius: 0 4px 4px 0;
+}
+
+/* Answer card print */
+.a-card {
+  border: 2.5px solid #8b5000; border-radius: 10px;
+  overflow: hidden; background: white;
+  page-break-inside: avoid; break-inside: avoid;
+}
+.a-card-header {
+  background: #8b5000; color: white;
+  padding: 7px 12px; display: flex; align-items: center; justify-content: space-between;
+}
+.a-card-face { padding: 12px 12px 8px; border-bottom: 1.5px dashed #bbb; }
+.a-card-back { padding: 10px 12px 11px; background: #fdf7ef; }
+.a-card-face .section-micro { color: #8b5000; }
+.a-card-face .section-micro::after { content: ' ▸ FACE DOWN ON TABLE'; font-weight: 400; color: #999; }
+.a-card-back .section-micro::after { content: ' ▸ STUDENT SEES AFTER MATCH'; font-weight: 400; }
+.answer-value-print { font-size: 28px; font-weight: 800; color: #8b5000; line-height: 1; margin-bottom: 2px; }
+.answer-formula-ref-print { font-size: 10px; color: #999; }
+.next-pointer-print { font-size: 13px; font-weight: 700; color: #222; margin-bottom: 4px; }
+.next-pointer-print .next-team { color: #8b5000; }
+.confirm-text-print { font-size: 11px; color: #666; line-height: 1.4; }
+
+/* Answer sheet print */
+.answer-sheet-wrap {
+  max-width: 760px; margin: 0 auto; padding: 0 24px 40px;
+  page-break-before: always;
+}
+.answer-sheet-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 16px;
+}
+.answer-sheet-title { font-size: 16px; font-weight: 800; }
+.answer-sheet-sub { font-size: 11px; color: #666; }
+.answer-sheet-fields { display: flex; gap: 20px; font-size: 12px; }
+.answer-sheet-field { border-bottom: 1px solid #999; width: 160px; padding-bottom: 2px; color: #999; }
+.answer-sheet-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.answer-box {
+  border: 1.5px solid #ddd; border-radius: 6px; padding: 9px 11px;
+}
+.answer-box-title { font-size: 11px; font-weight: 700; color: #333; margin-bottom: 3px; }
+.answer-box-formula { font-size: 10px; color: #999; margin-bottom: 6px; }
+.answer-box-work { border-bottom: 1px solid #ddd; height: 30px; }
+.answer-box-line {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #666; margin-top: 5px;
+}
+.answer-box-blank { border-bottom: 1px solid #999; flex: 1; height: 14px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ APP HEADER ════════════════════════════════════ -->
+<div class="app-header no-print">
+  <div class="app-header-left">
+    <h1>Leaderboard Chase — Card Builder</h1>
+    <p>Velocity Arena · Day 8 Morning Hook · 20 min</p>
+  </div>
+  <div class="app-header-right">
+    <div id="progress-label">0 of 8 cards complete</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FORM SECTION ══════════════════════════════════ -->
+<div id="form-section" class="no-print">
+<div class="main">
+
+  <div class="intro-box">
+    <strong>How to use this tool:</strong> Fill in the real team names, stat numbers, match results, and room locations from your Day 7 leaderboard. The tool calculates all answers and builds the cards automatically.
+    When all 8 cards are complete, click <strong>Generate Print View</strong> — then print.
+    Fields marked <span style="color:var(--red)">*</span> are required.
+  </div>
+
+  <!-- CARD FORMS generated by JS -->
+  <div id="cards-container"></div>
+
+  <!-- CHAIN PREVIEW -->
+  <div class="chain-preview">
+    <h3>Room Walk Preview — verify this loop works in your space</h3>
+    <div class="chain-nodes" id="chain-nodes"></div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="generate-section">
+    <button class="generate-btn" id="generate-btn" onclick="generatePrint()">
+      Generate Print View →
+    </button>
+    <div class="validation-msg" id="validation-msg"></div>
+  </div>
+
+</div><!-- end main -->
+</div><!-- end form-section -->
+
+<!-- ═══ PRINT SECTION ═════════════════════════════════ -->
+<div id="print-section">
+  <div class="print-section-title">Problem Cards — post around the room</div>
+  <div class="print-cards-grid" id="problem-cards-grid"></div>
+  <div class="cut-line">✂ &nbsp; cut &nbsp; ✂ &nbsp; cut &nbsp; ✂</div>
+  <div class="print-cards-grid" id="problem-cards-grid-2"></div>
+
+  <div class="print-section-title" style="margin-top:32px">Answer Cards — central table, face down</div>
+  <div class="print-cards-grid" id="answer-cards-grid"></div>
+  <div class="cut-line">✂ &nbsp; cut &nbsp; ✂ &nbsp; cut &nbsp; ✂</div>
+  <div class="print-cards-grid" id="answer-cards-grid-2"></div>
+
+  <div class="print-section-title" style="margin-top:32px">Personal Answer Sheet — print one per student</div>
+  <div class="answer-sheet-wrap" id="answer-sheet"></div>
+</div>
+
+<!-- ═══ PRINT BAR ══════════════════════════════════════ -->
+<div id="print-bar" style="display:none;">
+  <button class="back-btn" onclick="backToForm()">← Edit Data</button>
+  <span class="print-bar-label">Ready to print</span>
+  <button class="print-btn" onclick="window.print()">🖨 Print All Cards</button>
+</div>
+
+<script>
+// ─── CARD DEFINITIONS ────────────────────────────────────
+const CARD_DEFS = [
+  {
+    id: 1, formula: 'speed_budget',
+    formulaLabel: 'Speed % of Budget', formulaStr: 'S ÷ 20 × 100',
+    question: (d) => `What percentage of the 20-point budget did Team ${d.team} put into Speed? Show the calculation.`,
+    statFields: [{ key: 's', label: 'Speed allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const s = d.s;
+      const val = Math.round(s / 20 * 100);
+      return { work: `${s} ÷ 20 × 100 = ${val}%`, answer: `${val}%`, answerRaw: val };
+    },
+    wrongHint: (d) => `If you got ${d.s * 5}%, you used the motor power formula instead. This question asks about budget share.`
+  },
+  {
+    id: 2, formula: 'charge_speed',
+    formulaLabel: 'Charge Speed', formulaStr: 'P²',
+    question: (d) => `What is Team ${d.team}'s charge speed percentage? Show the calculation.`,
+    statFields: [{ key: 'p', label: 'Power allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const p = d.p;
+      const val = p * p;
+      return { work: `${p}² = ${p} × ${p} = ${val}%`, answer: `${val}%`, answerRaw: val };
+    },
+    wrongHint: (d) => `If you got ${d.p * 2}%, you multiplied by 2 instead of squaring. P² means P × P, not P × 2.`
+  },
+  {
+    id: 3, formula: 'power_at_3',
+    formulaLabel: 'Power at t = 3 min', formulaStr: '100 − (20 − E) × 4.5',
+    question: (d) => `What is Team ${d.team}'s power output at exactly minute 3? Show the calculation.`,
+    statFields: [{ key: 'e', label: 'Endurance allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const e = d.e;
+      const step1 = 20 - e;
+      const step2 = step1 * 4.5;
+      const val = 100 - step2;
+      return { work: `100 − (20 − ${e}) × 4.5 = 100 − ${step2} = ${val}%`, answer: `${val}%`, answerRaw: val };
+    },
+    wrongHint: (d) => `If you got a very high number, check that you used (20 − E), not just E. High Endurance means a smaller decay.`
+  },
+  {
+    id: 4, formula: 'find_e',
+    formulaLabel: 'Find Endurance from Budget', formulaStr: 'E = 20 − S − P − T',
+    question: (d) => `How many points did Team ${d.team} put into Endurance? Show the calculation.`,
+    statFields: [
+      { key: 's', label: 'Speed', unit: 'pts', min: 1, max: 17 },
+      { key: 'p', label: 'Power', unit: 'pts', min: 1, max: 17 },
+      { key: 't', label: 'Turning', unit: 'pts', min: 1, max: 17 }
+    ],
+    calc: (d) => {
+      const e = 20 - d.s - d.p - d.t;
+      return { work: `20 − ${d.s} − ${d.p} − ${d.t} = ${e}`, answer: `${e}`, answerRaw: e };
+    },
+    wrongHint: (d) => {
+      const e = 20 - d.s - d.p - d.t;
+      return e < 0 ? `Check: S + P + T must be less than 20 for a valid build.` : `If your answer is negative, recheck your subtraction. S + E + T + P must equal exactly 20.`;
+    }
+  },
+  {
+    id: 5, formula: 'motor_power',
+    formulaLabel: 'Motor Power', formulaStr: 'S × 5',
+    question: (d) => `What is Team ${d.team}'s motor power percentage? Show the calculation.`,
+    statFields: [{ key: 's', label: 'Speed allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const val = d.s * 5;
+      return { work: `${d.s} × 5 = ${val}%`, answer: `${val}%`, answerRaw: val };
+    },
+    wrongHint: () => `Motor power increases by exactly 5% per Speed point — this is a unit rate. Every Speed point is worth the same amount.`
+  },
+  {
+    id: 6, formula: 'turn_ratio',
+    formulaLabel: 'Turn Ratio', formulaStr: '0.2 + T × 0.02',
+    question: (d) => `What is Team ${d.team}'s turn ratio? Show the calculation.`,
+    statFields: [{ key: 't', label: 'Turning allocation', unit: 'points', min: 0, max: 19 }],
+    calc: (d) => {
+      const val = (0.2 + d.t * 0.02).toFixed(2);
+      return { work: `0.2 + ${d.t} × 0.02 = 0.2 + ${(d.t * 0.02).toFixed(2)} = ${val}`, answer: `${val}`, answerRaw: parseFloat(val) };
+    },
+    wrongHint: () => `The formula starts at 0.2 — a bot with T = 0 still turns. The 0.2 is the y-intercept, not a mistake.`
+  },
+  {
+    id: 7, formula: 'follow_through',
+    formulaLabel: 'Follow-Through', formulaStr: 'P × 200',
+    question: (d) => `What is Team ${d.team}'s follow-through time in milliseconds? Show the calculation.`,
+    statFields: [{ key: 'p', label: 'Power allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const val = d.p * 200;
+      return { work: `${d.p} × 200 = ${val} ms`, answer: `${val} ms`, answerRaw: val };
+    },
+    wrongHint: () => `Follow-through scales proportionally with Power — every Power point adds exactly 200 ms.`
+  },
+  {
+    id: 8, formula: 'decay_rate',
+    formulaLabel: 'Decay Rate (r)', formulaStr: '(20 − E) × 1.5',
+    question: (d) => `What is Team ${d.team}'s power decay rate (r)? Show the calculation.`,
+    statFields: [{ key: 'e', label: 'Endurance allocation', unit: 'points', min: 1, max: 19 }],
+    calc: (d) => {
+      const val = ((20 - d.e) * 1.5).toFixed(1);
+      return { work: `(20 − ${d.e}) × 1.5 = ${20 - d.e} × 1.5 = ${val}`, answer: `${val}`, answerRaw: parseFloat(val) };
+    },
+    wrongHint: () => `Higher Endurance means a smaller r. A large r means the bot loses power fast. Check that you subtracted E from 20 first.`
+  }
+];
+
+// ─── BUILD FORM ──────────────────────────────────────────
+function buildForms() {
+  const container = document.getElementById('cards-container');
+  CARD_DEFS.forEach((def, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card-form';
+    div.id = `card-form-${def.id}`;
+
+    const statInputsHTML = def.statFields.map(f =>
+      `<div class="field-group">
+        <label class="field-label">${f.label} <span class="required">*</span></label>
+        <input type="number" class="field-input" id="c${def.id}_${f.key}"
+          min="${f.min}" max="${f.max}" placeholder="0–20"
+          oninput="onFieldChange(${def.id})" onchange="onFieldChange(${def.id})">
+      </div>`
+    ).join('');
+
+    const statColsClass = def.statFields.length === 3 ? 'triple' : 'fields-row';
+
+    div.innerHTML = `
+      <div class="card-form-header" onclick="toggleCard(${def.id})">
+        <div class="card-num-badge">Card ${def.id}</div>
+        <div>
+          <div class="card-form-title">${def.formulaLabel}</div>
+        </div>
+        <div class="formula-pill">${def.formulaStr}</div>
+        <div class="complete-tick">✓</div>
+        <div class="collapse-icon">▾</div>
+      </div>
+      <div class="card-form-body">
+        <div class="fields-row">
+          <div class="field-group">
+            <label class="field-label">Team Name <span class="required">*</span></label>
+            <input type="text" class="field-input" id="c${def.id}_team"
+              placeholder="e.g. The Rockets"
+              oninput="onFieldChange(${def.id})">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Card Location <span class="required">*</span></label>
+            <input type="text" class="field-input" id="c${def.id}_location"
+              placeholder="e.g. Near the whiteboard"
+              oninput="onFieldChange(${def.id})">
+          </div>
+        </div>
+        <div class="fields-row ${statColsClass}" style="${def.statFields.length >= 3 ? 'grid-template-columns: repeat(' + def.statFields.length + ', 1fr)' : ''}">
+          ${statInputsHTML}
+          <div class="field-group">
+            <label class="field-label">Goals scored</label>
+            <input type="number" class="field-input" id="c${def.id}_goals"
+              min="0" max="20" placeholder="0"
+              oninput="onFieldChange(${def.id})">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Result</label>
+            <select class="field-input" id="c${def.id}_wld" onchange="onFieldChange(${def.id})">
+              <option value="">—</option>
+              <option value="W">Win (W)</option>
+              <option value="L">Loss (L)</option>
+              <option value="D">Draw (D)</option>
+            </select>
+          </div>
+        </div>
+        <div class="answer-preview empty" id="ans-preview-${def.id}">
+          <span class="answer-icon">→</span>
+          <span>Enter stat values to see the calculated answer.</span>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ─── TOGGLE CARD ─────────────────────────────────────────
+function toggleCard(id) {
+  const el = document.getElementById(`card-form-${id}`);
+  el.classList.toggle('collapsed');
+}
+
+// ─── GET FORM DATA ───────────────────────────────────────
+function getCardData(id) {
+  const def = CARD_DEFS[id - 1];
+  const team = document.getElementById(`c${id}_team`)?.value.trim() || '';
+  const location = document.getElementById(`c${id}_location`)?.value.trim() || '';
+  const goals = document.getElementById(`c${id}_goals`)?.value || '';
+  const wld = document.getElementById(`c${id}_wld`)?.value || '';
+  const stats = {};
+  def.statFields.forEach(f => {
+    const val = document.getElementById(`c${id}_${f.key}`)?.value;
+    stats[f.key] = val !== '' && val !== undefined ? parseInt(val) : null;
+  });
+  return { id, team, location, goals, wld, ...stats };
+}
+
+// ─── VALIDATE ────────────────────────────────────────────
+function isCardComplete(id) {
+  const def = CARD_DEFS[id - 1];
+  const d = getCardData(id);
+  if (!d.team || !d.location) return false;
+  for (const f of def.statFields) {
+    if (d[f.key] === null || isNaN(d[f.key])) return false;
+    if (d[f.key] < f.min || d[f.key] > f.max) return false;
+  }
+  if (def.formula === 'find_e') {
+    const e = 20 - d.s - d.p - d.t;
+    if (e < 0 || e > 19) return false;
+  }
+  return true;
+}
+
+// ─── ON FIELD CHANGE ─────────────────────────────────────
+function onFieldChange(id) {
+  const def = CARD_DEFS[id - 1];
+  const d = getCardData(id);
+  const preview = document.getElementById(`ans-preview-${id}`);
+  const form = document.getElementById(`card-form-${id}`);
+
+  // Check if stats are filled
+  const statsFilled = def.statFields.every(f => d[f.key] !== null && !isNaN(d[f.key]));
+
+  if (!statsFilled) {
+    preview.className = 'answer-preview empty';
+    preview.innerHTML = '<span class="answer-icon">→</span><span>Enter stat values to see the calculated answer.</span>';
+  } else {
+    try {
+      const result = def.calc(d);
+      if (def.formula === 'find_e' && (20 - d.s - d.p - d.t) < 0) {
+        preview.className = 'answer-preview invalid';
+        preview.innerHTML = `<span class="answer-icon">⚠</span><span>S + P + T = ${d.s + d.p + d.t} — exceeds budget of 20. Reduce one stat.</span>`;
+      } else {
+        preview.className = 'answer-preview';
+        preview.innerHTML = `<span class="answer-icon">✓</span>
+          <span>Answer: <span class="answer-work">${result.work}</span></span>`;
+      }
+    } catch(e) {
+      preview.className = 'answer-preview empty';
+      preview.innerHTML = '<span class="answer-icon">→</span><span>Enter stat values to see the calculated answer.</span>';
+    }
+  }
+
+  // Complete state
+  if (isCardComplete(id)) {
+    form.classList.add('complete');
+    form.classList.remove('error-state');
+  } else {
+    form.classList.remove('complete');
+  }
+
+  updateProgress();
+  updateChainPreview();
+}
+
+// ─── PROGRESS ────────────────────────────────────────────
+function updateProgress() {
+  let count = 0;
+  CARD_DEFS.forEach(def => { if (isCardComplete(def.id)) count++; });
+  document.getElementById('progress-label').textContent = `${count} of 8 cards complete`;
+  document.getElementById('progress-fill').style.width = `${(count / 8) * 100}%`;
+}
+
+// ─── CHAIN PREVIEW ───────────────────────────────────────
+function updateChainPreview() {
+  const container = document.getElementById('chain-nodes');
+  container.innerHTML = '';
+  CARD_DEFS.forEach((def, idx) => {
+    const d = getCardData(def.id);
+    const node = document.createElement('div');
+    node.className = 'chain-node';
+    const teamName = d.team || `Card ${def.id}`;
+    const loc = d.location || '—';
+    let answerText = '—';
+    if (isCardComplete(def.id)) {
+      try { answerText = def.calc(d).answer; } catch(e) {}
+    }
+    node.innerHTML = `
+      <div class="cn-team">${teamName}</div>
+      <div class="cn-location">${loc}</div>
+      <div class="cn-answer">→ ${answerText}</div>
+    `;
+    container.appendChild(node);
+    if (idx < CARD_DEFS.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.className = 'chain-arrow';
+      arrow.textContent = '→';
+      container.appendChild(arrow);
+    } else {
+      const loop = document.createElement('div');
+      loop.className = 'chain-arrow';
+      loop.textContent = '↩';
+      container.appendChild(loop);
+    }
+  });
+}
+
+// ─── GENERATE PRINT ──────────────────────────────────────
+function generatePrint() {
+  // Validate all cards
+  const incomplete = CARD_DEFS.filter(def => !isCardComplete(def.id));
+  if (incomplete.length > 0) {
+    const msg = document.getElementById('validation-msg');
+    msg.textContent = `Please complete Cards: ${incomplete.map(d => d.id).join(', ')} before generating.`;
+    incomplete.forEach(def => {
+      document.getElementById(`card-form-${def.id}`).classList.add('error-state');
+      document.getElementById(`card-form-${def.id}`).classList.remove('collapsed');
+    });
+    incomplete[0] && document.getElementById(`card-form-${incomplete[0].id}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  document.getElementById('validation-msg').textContent = '';
+
+  // Gather all data + calculated answers
+  const allData = CARD_DEFS.map(def => {
+    const d = getCardData(def.id);
+    const result = def.calc(d);
+    return { def, d, result };
+  });
+
+  // Render problem cards
+  renderProblemCards(allData);
+  renderAnswerCards(allData);
+  renderAnswerSheet(allData);
+
+  // Show print section
+  document.getElementById('print-section').classList.add('visible');
+  document.getElementById('print-bar').style.display = 'flex';
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('print-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ─── RENDER PROBLEM CARDS ────────────────────────────────
+function renderProblemCards(allData) {
+  const grid1 = document.getElementById('problem-cards-grid');
+  const grid2 = document.getElementById('problem-cards-grid-2');
+  grid1.innerHTML = ''; grid2.innerHTML = '';
+
+  allData.forEach((item, idx) => {
+    const { def, d, result } = item;
+    const statLines = def.statFields.map(f => {
+      const val = d[f.key];
+      const label = f.key === 's' ? 'Speed' : f.key === 'p' ? 'Power' : f.key === 'e' ? 'Endurance' : 'Turning';
+      return `<div class="stat-line-print">${label}: <strong>${val} points</strong></div>`;
+    }).join('');
+    const goalResult = (d.goals !== '' && d.wld) ? `<div class="stat-line-print">Match result: ${d.goals} goals, ${d.wld}</div>` : '';
+
+    const card = document.createElement('div');
+    card.className = 'p-card';
+    card.innerHTML = `
+      <div class="p-card-header">
+        <div class="p-card-type">Problem Card</div>
+        <div class="p-card-num">#${def.id}</div>
+      </div>
+      <div class="p-card-front">
+        <div class="section-micro">Front</div>
+        <div class="team-name-print">${d.team}</div>
+        ${statLines}
+        ${goalResult}
+        <div class="location-tag-print">Posted at: ${d.location}</div>
+      </div>
+      <div class="p-card-back">
+        <div class="section-micro">Back</div>
+        <div class="question-print">${def.question(d)}</div>
+        <div class="formula-hint-print">Formula: ${def.formulaStr}</div>
+        <div class="answer-key-print"><strong>Answer key:</strong> ${result.work}</div>
+      </div>
+    `;
+    (idx < 4 ? grid1 : grid2).appendChild(card);
+  });
+}
+
+// ─── RENDER ANSWER CARDS ─────────────────────────────────
+function renderAnswerCards(allData) {
+  const grid1 = document.getElementById('answer-cards-grid');
+  const grid2 = document.getElementById('answer-cards-grid-2');
+  grid1.innerHTML = ''; grid2.innerHTML = '';
+
+  allData.forEach((item, idx) => {
+    const { def, d, result } = item;
+    const nextIdx = (idx + 1) % allData.length;
+    const nextItem = allData[nextIdx];
+    const isLast = idx === allData.length - 1;
+    const nextText = isLast
+      ? `Chain complete — go back to <strong>${nextItem.d.team}'s card</strong> near ${nextItem.d.location}.`
+      : `Your answer is ${result.answer}. Now find <strong class="next-team">${nextItem.d.team}'s card</strong> near ${nextItem.d.location}.`;
+    const hint = def.wrongHint(d);
+
+    const card = document.createElement('div');
+    card.className = 'a-card';
+    card.innerHTML = `
+      <div class="a-card-header">
+        <div class="p-card-type">${isLast ? 'Answer Card — Loop Back' : 'Answer Card'}</div>
+        <div class="p-card-num">#${def.id}</div>
+      </div>
+      <div class="a-card-face">
+        <div class="section-micro">Face</div>
+        <div class="answer-value-print">${result.answer}</div>
+        <div class="answer-formula-ref-print">${def.formulaLabel} · ${def.formulaStr}</div>
+      </div>
+      <div class="a-card-back">
+        <div class="section-micro">Back</div>
+        <div class="next-pointer-print">✓ ${nextText}</div>
+        <div class="confirm-text-print">${hint}</div>
+      </div>
+    `;
+    (idx < 4 ? grid1 : grid2).appendChild(card);
+  });
+}
+
+// ─── RENDER ANSWER SHEET ─────────────────────────────────
+function renderAnswerSheet(allData) {
+  const wrap = document.getElementById('answer-sheet');
+  const boxesHTML = allData.map(({ def, d }) =>
+    `<div class="answer-box">
+      <div class="answer-box-title">Card #${def.id} — ${d.team}</div>
+      <div class="answer-box-formula">${def.formulaLabel} · ${def.formulaStr}</div>
+      <div class="answer-box-work"></div>
+      <div class="answer-box-line">Answer: <div class="answer-box-blank"></div></div>
+    </div>`
+  ).join('');
+
+  wrap.innerHTML = `
+    <div class="answer-sheet-header">
+      <div>
+        <div class="answer-sheet-title">Leaderboard Chase — Answer Sheet</div>
+        <div class="answer-sheet-sub">Show your calculation in each box. Record your final answer on the line.</div>
+      </div>
+      <div class="answer-sheet-fields">
+        <div>Name: <div class="answer-sheet-field"></div></div>
+        <div style="margin-left:12px">Team: <div class="answer-sheet-field"></div></div>
+      </div>
+    </div>
+    <div class="answer-sheet-grid">${boxesHTML}</div>
+  `;
+}
+
+// ─── BACK TO FORM ────────────────────────────────────────
+function backToForm() {
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('print-section').classList.remove('visible');
+  document.getElementById('print-bar').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── INIT ────────────────────────────────────────────────
+buildForms();
+updateProgress();
+updateChainPreview();
+</script>
+</body>
+</html>
