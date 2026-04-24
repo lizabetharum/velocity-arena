@@ -26,6 +26,7 @@ const ACTIVITY_LESSONS = {
     { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
     { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
   ],
+  'Final Proposal Verification': '/lessons/proposal-verification.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },

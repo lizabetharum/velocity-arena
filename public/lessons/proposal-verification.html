@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Proposal Verification — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1b2a; --card:#1a2d45; --card2:#132033; --border:#2a4060;
+  --yellow:#ffd600; --green:#00c97a; --red:#ff4d6d; --muted:#7a9cc0;
+  --text:#e8f0f8; --purple:#9c6fde; --radius:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#0d1b2a,#132033);border-bottom:2px solid var(--border);padding:18px 22px}
+.badge{display:inline-block;background:var(--yellow);color:var(--bg);font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:7px}
+.header h1{font-size:22px;font-weight:900;color:#fff;line-height:1.15}
+.header p{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* STATUS BANNER */
+.status-bar{margin:16px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.status-label{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);flex-shrink:0}
+.status-pills{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:var(--card2);border:1.5px solid var(--border);color:var(--muted);transition:all .3s}
+.pill.done{background:rgba(0,201,122,0.12);border-color:rgba(0,201,122,0.4);color:var(--green)}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.clear-banner{display:none;margin-left:auto;background:rgba(0,201,122,0.15);border:1.5px solid rgba(0,201,122,0.5);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:900;color:var(--green);letter-spacing:.5px}
+.clear-banner.visible{display:block}
+
+/* TEAM NAME */
+.team-row{margin:0 18px 4px;display:flex;gap:12px;align-items:center}
+.team-label{font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.team-input{background:var(--card);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:8px 14px;flex:1;max-width:280px;outline:none}
+.team-input:focus{border-color:var(--yellow)}
+
+/* SECTION CARDS */
+.section{margin:14px 18px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.section-head{padding:13px 18px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--border)}
+.section-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+.section-title{font-size:13px;font-weight:800;color:var(--text)}
+.section-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.section-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.section-complete-badge{margin-left:auto;font-size:10px;font-weight:800;color:var(--green);opacity:0;transition:opacity .3s}
+.section-complete-badge.visible{opacity:1}
+
+/* DATA POINT CARDS */
+.dp-card{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.dp-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.field-input{background:var(--card);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:8px 12px;outline:none;width:100%;resize:vertical}
+.field-input:focus{border-color:var(--yellow)}
+textarea.field-input{min-height:52px;resize:vertical}
+
+/* MATCH TOGGLE */
+.match-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.match-lbl{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.match-btns{display:flex;gap:6px}
+.match-btn{background:var(--card);border:1.5px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;padding:6px 14px;cursor:pointer;transition:all .2s}
+.match-btn.yes.active{background:rgba(0,201,122,0.15);border-color:rgba(0,201,122,0.5);color:var(--green)}
+.match-btn.no.active{background:rgba(255,77,109,0.12);border-color:rgba(255,77,109,0.4);color:var(--red)}
+.correction-row{display:none;margin-top:8px}
+.correction-row.visible{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.correction-label{font-size:11px;color:var(--red);font-weight:700;white-space:nowrap}
+.correction-input{background:var(--card);border:1.5px solid rgba(255,77,109,0.4);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;padding:7px 12px;width:120px;outline:none;text-align:center;-moz-appearance:textfield}
+.correction-input::-webkit-inner-spin-button,.correction-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.correction-input:focus{border-color:var(--red)}
+
+/* PERCENT CHANGE CALCULATOR */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border-radius:10px;overflow:hidden}
+.calc-col{background:var(--card2);padding:16px}
+.calc-col-head{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.lastplace-col .calc-col-head{color:var(--muted)}
+.yourteam-col .calc-col-head{color:var(--yellow)}
+.calc-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.calc-row-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.calc-row-hint{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;line-height:1.4;opacity:.8}
+.calc-formula{font-size:10px;font-weight:700;color:var(--muted);font-family:monospace;margin-bottom:5px;letter-spacing:.3px}
+.calc-input{background:var(--card);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;text-align:center;padding:8px;width:100%;outline:none;-moz-appearance:textfield}
+.calc-input::-webkit-inner-spin-button,.calc-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.calc-input:focus{border-color:var(--yellow)}
+.pct-result-box{background:var(--card);border:1.5px solid var(--border);border-radius:7px;padding:8px;text-align:center;font-size:18px;font-weight:900;color:var(--muted);min-height:40px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.pct-result-box.has-value{color:var(--green)}
+
+/* CONFLICT FLAG */
+.conflict-flag{display:none;background:rgba(255,77,109,0.1);border:1.5px solid rgba(255,77,109,0.4);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:700;color:var(--red);line-height:1.5}
+.conflict-flag.visible{display:block}
+.conflict-flag strong{display:block;margin-bottom:4px}
+.clear-flag{display:none;background:rgba(0,201,122,0.1);border:1.5px solid rgba(0,201,122,0.3);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:var(--green)}
+.clear-flag.visible{display:block}
+
+/* METRIC FIELD */
+.metric-field{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px}
+.metric-field .field-label{margin-bottom:5px}
+
+/* CONCEPT BUTTONS */
+.concept-grid{display:flex;gap:8px;flex-wrap:wrap}
+.concept-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;transition:all .2s;line-height:1.3;text-align:center}
+.concept-btn:hover{border-color:var(--yellow);color:var(--text)}
+.concept-btn.selected{background:rgba(255,214,0,0.12);border-color:rgba(255,214,0,0.5);color:var(--yellow)}
+
+/* ACCOUNTABILITY */
+.accountability-card{background:var(--card2);border:1.5px dashed var(--border);border-radius:10px;padding:14px 16px}
+.accountability-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:4px}
+.accountability-note{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.name-label{font-size:11px;font-weight:800;color:var(--text);white-space:nowrap}
+.name-input{background:var(--card);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:7px 12px;flex:1;max-width:260px;outline:none}
+.name-input:focus{border-color:var(--purple)}
+
+/* SECTION 3 COMPARISON */
+.s3-compare{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:2px}
+.s3-col{background:var(--card2);padding:14px 16px;text-align:center}
+.s3-col-head{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.s3-pct{font-size:28px;font-weight:900;color:var(--muted);line-height:1;transition:color .3s}
+.s3-pct.has-value{color:var(--text)}
+.s3-pct.winner{color:var(--green)}
+.s3-pct.loser{color:var(--red)}
+.s3-verdict{margin-top:10px;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;text-align:center;display:none}
+.s3-verdict.visible{display:block}
+.s3-verdict.lp-wins{background:rgba(0,201,122,0.1);border:1.5px solid rgba(0,201,122,0.3);color:var(--green)}
+.s3-verdict.yt-wins{background:rgba(255,77,109,0.1);border:1.5px solid rgba(255,77,109,0.3);color:var(--red)}
+.s3-verdict.tied{background:rgba(122,156,192,0.1);border:1.5px solid rgba(122,156,192,0.3);color:var(--muted)}
+
+/* SENTENCE STARTER */
+.starter-label{font-size:10px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.starter-fill{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.starter-fill strong{color:var(--text)}
+
+/* FINAL CLEAR PANEL */
+.final-clear{margin:14px 18px;background:rgba(0,201,122,0.07);border:2px solid rgba(0,201,122,0.35);border-radius:var(--radius);padding:18px 20px;display:none}
+.final-clear.visible{display:block}
+.final-clear-head{font-size:18px;font-weight:900;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.final-clear-body{font-size:13px;color:var(--text);line-height:1.65}
+
+/* PRESENTATION SUMMARY */
+.pres-summary{border-color:rgba(255,214,0,0.35)}
+.pres-step{display:flex;gap:12px;align-items:flex-start}
+.pres-num{width:26px;height:26px;border-radius:50%;background:rgba(255,214,0,0.15);border:1.5px solid rgba(255,214,0,0.35);color:var(--yellow);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.pres-content{flex:1}
+.pres-label{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.pres-value{font-size:13px;font-weight:700;color:var(--muted);line-height:1.55;font-style:italic;padding:9px 12px;background:var(--card2);border:1.5px solid var(--border);border-radius:7px;min-height:38px;transition:color .3s,border-color .3s}
+.pres-value.has-content{color:var(--text);border-color:rgba(255,214,0,0.25);font-style:normal}
+.pres-concept.has-content{color:var(--yellow)}
+.pres-divider{height:1px;background:rgba(255,214,0,0.12);margin:2px 0}
+
+@media(max-width:560px){
+  .calc-grid{grid-template-columns:1fr}
+  .status-pills{gap:5px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="badge">Velocity Arena · Day 12 · Final Proposal Verification</div>
+  <h1>Proposal Verification</h1>
+  <p>Check every number. Confirm the rule helps the last-place team. Name the math.</p>
+</div>
+
+<!-- STATUS BANNER -->
+<div class="status-bar">
+  <span class="status-label">Progress</span>
+  <div class="status-pills">
+    <div class="pill" id="pill-1"><span class="pill-dot"></span>1 · Data Check</div>
+    <div class="pill" id="pill-2"><span class="pill-dot"></span>2 · Rule Effect</div>
+    <div class="pill" id="pill-3"><span class="pill-dot"></span>3 · Conflict Check</div>
+    <div class="pill" id="pill-4"><span class="pill-dot"></span>4 · Concept + Name</div>
+  </div>
+  <div class="clear-banner" id="clear-banner">✓ Proposal Clear</div>
+</div>
+
+<!-- TEAM NAME -->
+<div class="team-row">
+  <span class="team-label">Team</span>
+  <input class="team-input" type="text" placeholder="Team name" oninput="checkAll()">
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- SECTION 1: DATA POINT VERIFICATION     -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="sec-1">
+  <div class="section-head" style="background:rgba(255,214,0,0.05)">
+    <div class="section-num" style="background:rgba(255,214,0,0.12);color:var(--yellow)">1</div>
+    <div>
+      <div class="section-title">Data Point Verification</div>
+      <div class="section-sub">Confirm both cited numbers against the dashboard — not memory.</div>
+    </div>
+    <div class="section-complete-badge" id="s1-badge">✓ Complete</div>
+  </div>
+  <div class="section-body">
+
+    <!-- DATA POINT 1 -->
+    <div class="dp-card">
+      <div class="dp-label">Data Point 1</div>
+      <div class="field">
+        <div class="field-label">Copy the sentence from your proposal that uses this number</div>
+        <textarea class="field-input" id="dp1-claim" placeholder="e.g., &quot;The last-place team has a Speed of 4, the lowest in the league.&quot;" oninput="checkAll()"></textarea>
+      </div>
+      <div class="field">
+        <div class="field-label">Where on the dashboard is this number?</div>
+        <input class="field-input" type="text" id="dp1-location" placeholder="e.g., Speed row, Team 3 column" oninput="checkAll()">
+      </div>
+      <div class="field">
+        <div class="field-label">Look it up on the dashboard. What number do you actually see?</div>
+        <input class="field-input" type="number" id="dp1-verified" placeholder="Type the number from the dashboard" step="any" oninput="checkAll()">
+      </div>
+      <div class="match-row">
+        <span class="match-lbl">Does the dashboard number match what your proposal says?</span>
+        <div class="match-btns">
+          <button class="match-btn yes" id="dp1-yes" onclick="setMatch(1,'yes')">✓ Yes — it matches</button>
+          <button class="match-btn no"  id="dp1-no"  onclick="setMatch(1,'no')">✗ No — my proposal was wrong</button>
+        </div>
+      </div>
+      <div class="correction-row" id="dp1-correction">
+        <span class="correction-label">Corrected to:</span>
+        <input class="correction-input" type="number" id="dp1-corrected" placeholder="New value" step="any" oninput="checkAll()">
+      </div>
+    </div>
+
+    <!-- DATA POINT 2 -->
+    <div class="dp-card">
+      <div class="dp-label">Data Point 2</div>
+      <div class="field">
+        <div class="field-label">Copy the sentence from your proposal that uses this number</div>
+        <textarea class="field-input" id="dp2-claim" placeholder="e.g., &quot;Under our rule, Speed could rise to 6 — a 50% increase.&quot;" oninput="checkAll()"></textarea>
+      </div>
+      <div class="field">
+        <div class="field-label">Where on the dashboard is this number?</div>
+        <input class="field-input" type="text" id="dp2-location" placeholder="e.g., Win % row, last-place team column" oninput="checkAll()">
+      </div>
+      <div class="field">
+        <div class="field-label">Look it up on the dashboard. What number do you actually see?</div>
+        <input class="field-input" type="number" id="dp2-verified" placeholder="Type the number from the dashboard" step="any" oninput="checkAll()">
+      </div>
+      <div class="match-row">
+        <span class="match-lbl">Does the dashboard number match what your proposal says?</span>
+        <div class="match-btns">
+          <button class="match-btn yes" id="dp2-yes" onclick="setMatch(2,'yes')">✓ Yes — it matches</button>
+          <button class="match-btn no"  id="dp2-no"  onclick="setMatch(2,'no')">✗ No — my proposal was wrong</button>
+        </div>
+      </div>
+      <div class="correction-row" id="dp2-correction">
+        <span class="correction-label">Corrected to:</span>
+        <input class="correction-input" type="number" id="dp2-corrected" placeholder="New value" step="any" oninput="checkAll()">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- SECTION 2: RULE EFFECT CALCULATION     -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="sec-2">
+  <div class="section-head" style="background:rgba(0,201,122,0.05)">
+    <div class="section-num" style="background:rgba(0,201,122,0.12);color:var(--green)">2</div>
+    <div>
+      <div class="section-title">Rule Effect Calculation</div>
+      <div class="section-sub">Calculate percent change your rule creates for the last-place team.</div>
+    </div>
+    <div class="section-complete-badge" id="s2-badge">✓ Complete</div>
+  </div>
+  <div class="section-body">
+
+    <div class="metric-field">
+      <div class="field-label">Which stat or metric does your rule change?</div>
+      <input class="field-input" type="text" id="metric" placeholder="e.g., Speed allocation, goals per match, win percentage" oninput="checkAll()" style="margin-top:5px">
+    </div>
+
+    <div class="calc-grid">
+      <div class="calc-col lastplace-col">
+        <div class="calc-col-head">Last-place team</div>
+        <div class="calc-row">
+          <div class="calc-row-label">Before the rule</div>
+          <div class="calc-row-hint">What is their current value for this metric, right now on the dashboard?</div>
+          <input class="calc-input" type="number" id="lp-before" placeholder="Current value" step="any" oninput="calcPct('lp');checkAll()">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-label">After the rule</div>
+          <div class="calc-row-hint">What would that same value be if your rule passes?</div>
+          <input class="calc-input" type="number" id="lp-after" placeholder="Value if rule passes" step="any" oninput="calcPct('lp');checkAll()">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-label">% Change</div>
+          <div class="calc-formula">(After − Before) ÷ Before × 100</div>
+          <div class="pct-result-box" id="lp-pct">—</div>
+        </div>
+      </div>
+      <div class="calc-col yourteam-col">
+        <div class="calc-col-head">Your team</div>
+        <div class="calc-row">
+          <div class="calc-row-label">Before the rule</div>
+          <div class="calc-row-hint">Same metric — what is your team's current value?</div>
+          <input class="calc-input" type="number" id="yt-before" placeholder="Current value" step="any" oninput="calcPct('yt');checkAll()">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-label">After the rule</div>
+          <div class="calc-row-hint">What would your team's value be if the rule passes?</div>
+          <input class="calc-input" type="number" id="yt-after" placeholder="Value if rule passes" step="any" oninput="calcPct('yt');checkAll()">
+        </div>
+        <div class="calc-row">
+          <div class="calc-row-label">% Change</div>
+          <div class="calc-formula">(After − Before) ÷ Before × 100</div>
+          <div class="pct-result-box" id="yt-pct">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFLICT FLAG -->
+    <div class="conflict-flag" id="conflict-flag">
+      <strong>⚠ Conflict of Interest — Revise your rule</strong>
+      Your team's % change is higher than the last-place team's. The Commissioner's Meeting will catch this. Adjust the rule so the last-place team is the primary beneficiary.
+    </div>
+    <div class="clear-flag" id="clear-flag">
+      ✓ Last-place team benefits more — no conflict of interest.
+    </div>
+
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- SECTION 3: EXPLANATION                 -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="sec-3">
+  <div class="section-head" style="background:rgba(122,156,192,0.05)">
+    <div class="section-num" style="background:rgba(122,156,192,0.12);color:var(--muted)">3</div>
+    <div>
+      <div class="section-title">Who Benefits More?</div>
+      <div class="section-sub">Compare the two percent changes. The numbers tell you the answer.</div>
+    </div>
+    <div class="section-complete-badge" id="s3-badge">✓ Complete</div>
+  </div>
+  <div class="section-body">
+
+    <div class="s3-compare">
+      <div class="s3-col">
+        <div class="s3-col-head">Last-place team % change</div>
+        <div class="s3-pct" id="s3-lp-display">—</div>
+      </div>
+      <div class="s3-col">
+        <div class="s3-col-head">Your team % change</div>
+        <div class="s3-pct" id="s3-yt-display">—</div>
+      </div>
+    </div>
+
+    <div class="s3-verdict lp-wins" id="s3-verdict-lp">✓ Last-place team benefits more. No conflict of interest.</div>
+    <div class="s3-verdict yt-wins" id="s3-verdict-yt">⚠ Your team benefits more. Revise the rule before the meeting.</div>
+    <div class="s3-verdict tied"    id="s3-verdict-tie">Both teams benefit equally. Explain why this still helps the last-place team.</div>
+
+    <div>
+      <div class="starter-label">Explain in one sentence</div>
+      <div class="starter-fill">Fill in the blanks: <strong>"The ___% change [helps / does not help] the last-place team because their ___ moves from ___ to ___, which means ___."</strong></div>
+      <textarea class="field-input" id="explanation" placeholder="Write your sentence here." rows="2" oninput="checkAll()"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- SECTION 4: CONCEPT + ACCOUNTABILITY    -->
+<!-- ──────────────────────────────────────── -->
+<div class="section" id="sec-4">
+  <div class="section-head" style="background:rgba(156,111,222,0.05)">
+    <div class="section-num" style="background:rgba(156,111,222,0.12);color:var(--purple)">4</div>
+    <div>
+      <div class="section-title">Concept + Accountability</div>
+      <div class="section-sub">Name the math type. Name the camper who can explain it.</div>
+    </div>
+    <div class="section-complete-badge" id="s4-badge">✓ Complete</div>
+  </div>
+  <div class="section-body">
+
+    <div>
+      <div class="field-label" style="margin-bottom:8px">Which concept does your calculation use?</div>
+      <div class="concept-grid">
+        <button class="concept-btn" onclick="selectConcept(this)">Proportional Scaling</button>
+        <button class="concept-btn" onclick="selectConcept(this)">Unit Rate</button>
+        <button class="concept-btn" onclick="selectConcept(this)">Ratio</button>
+        <button class="concept-btn" onclick="selectConcept(this)">Slope as Rate of Change</button>
+        <button class="concept-btn" onclick="selectConcept(this)">Linear Decay</button>
+      </div>
+    </div>
+
+    <div class="accountability-card">
+      <div class="accountability-label">Accountability Check</div>
+      <div class="accountability-note">Before the Commissioner's Meeting, the facilitator will ask one camper per team: "How did you calculate this number? What kind of math is that?" — from memory, no notes. Name that person now.</div>
+      <div class="name-row">
+        <span class="name-label">Camper who can explain from memory:</span>
+        <input class="name-input" type="text" id="accountability-name" placeholder="Name" oninput="checkAll()">
+      </div>
+    </div>
+
+    <div>
+      <div class="field-label" style="margin-bottom:10px">Get ready for pushback</div>
+      <div class="field" style="margin-bottom:10px">
+        <div class="field-label">Someone in the meeting might say:</div>
+        <textarea class="field-input" id="counter-arg" placeholder="e.g., &quot;This rule helps your team just as much as last-place.&quot;" rows="2" oninput="checkAll()"></textarea>
+      </div>
+      <div class="field">
+        <div class="field-label">Your team's answer:</div>
+        <textarea class="field-input" id="counter-response" placeholder="e.g., &quot;Our data shows last-place gains 40% vs. our 20%, so they benefit more.&quot;" rows="2" oninput="checkAll()"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FINAL CLEAR PANEL -->
+<div class="final-clear" id="final-clear">
+  <div class="final-clear-head">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#00c97a" stroke-width="1.6"/><polyline points="4.5,8 7,10.5 11.5,5.5" stroke="#00c97a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Proposal Clear
+  </div>
+  <div class="final-clear-body">
+    All four sections are complete. Your numbers are verified, the rule effect is calculated, and a camper is named for the accountability check. You're ready for the Commissioner's Meeting.
+  </div>
+</div>
+
+<!-- ──────────────────────────────────────── -->
+<!-- PRESENTATION SUMMARY                   -->
+<!-- ──────────────────────────────────────── -->
+<div class="section pres-summary" id="pres-summary">
+  <div class="section-head" style="background:rgba(255,214,0,0.06);border-bottom-color:rgba(255,214,0,0.2)">
+    <div class="section-num" style="background:rgba(255,214,0,0.12);color:var(--yellow)">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="4.5" y="1" width="5" height="8" rx="2.5" stroke="#ffd600" stroke-width="1.4"/><path d="M2 8c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="#ffd600" stroke-width="1.4" stroke-linecap="round"/><line x1="7" y1="13" x2="7" y2="11" stroke="#ffd600" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="section-title" style="color:var(--yellow)">Presentation Summary</div>
+      <div class="section-sub">Copy these 5 items onto your paper worksheet. Bring that into the meeting.</div>
+    </div>
+  </div>
+  <div style="background:rgba(255,214,0,0.08);border-bottom:1.5px solid rgba(255,214,0,0.2);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="10" height="10" rx="1.5" stroke="#ffd600" stroke-width="1.4"/><path d="M4 3V2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-1" stroke="#ffd600" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <span style="font-size:12px;font-weight:700;color:var(--yellow)">Copy items 1–5 onto your paper worksheet before lunch. You'll read from the paper, not this screen, during the meeting.</span>
+  </div>
+  <div class="section-body">
+
+    <div class="pres-step">
+      <div class="pres-num">1</div>
+      <div class="pres-content">
+        <div class="pres-label">Your rule — final wording</div>
+        <textarea class="field-input" id="rule-text" placeholder="Write the final rule exactly as you'll propose it." rows="2" oninput="checkAll()"></textarea>
+      </div>
+    </div>
+
+    <div class="pres-divider"></div>
+
+    <div class="pres-step">
+      <div class="pres-num">2</div>
+      <div class="pres-content">
+        <div class="pres-label">Data Point 1 — verified</div>
+        <div class="pres-value" id="sum-dp1">Fill in Section 1 above.</div>
+      </div>
+    </div>
+
+    <div class="pres-step">
+      <div class="pres-num">3</div>
+      <div class="pres-content">
+        <div class="pres-label">Data Point 2 — verified</div>
+        <div class="pres-value" id="sum-dp2">Fill in Section 1 above.</div>
+      </div>
+    </div>
+
+    <div class="pres-divider"></div>
+
+    <div class="pres-step">
+      <div class="pres-num">4</div>
+      <div class="pres-content">
+        <div class="pres-label">Effect on last-place team</div>
+        <div class="pres-value" id="sum-effect">Fill in Sections 2 and 3 above.</div>
+      </div>
+    </div>
+
+    <div class="pres-divider"></div>
+
+    <div class="pres-step">
+      <div class="pres-num">5</div>
+      <div class="pres-content">
+        <div class="pres-label">Math concept</div>
+        <div class="pres-value pres-concept" id="sum-concept">Select a concept in Section 4 above.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── MATCH STATE ──────────────────────────────────────
+const matchState = { 1: null, 2: null };
+
+function setMatch(n, val) {
+  matchState[n] = val;
+  document.getElementById('dp'+n+'-yes').classList.toggle('active', val === 'yes');
+  document.getElementById('dp'+n+'-no').classList.toggle('active', val === 'no');
+  const corrRow = document.getElementById('dp'+n+'-correction');
+  corrRow.classList.toggle('visible', val === 'no');
+  checkAll();
+}
+
+// ── PERCENT CHANGE ───────────────────────────────────
+function calcPct(prefix) {
+  const before = parseFloat(document.getElementById(prefix + '-before').value);
+  const after  = parseFloat(document.getElementById(prefix + '-after').value);
+  const el     = document.getElementById(prefix + '-pct');
+  if (!isNaN(before) && !isNaN(after) && before !== 0) {
+    const pct = Math.round((after - before) / before * 1000) / 10;
+    el.textContent = pct + '%';
+    el.classList.add('has-value');
+  } else {
+    el.textContent = '—';
+    el.classList.remove('has-value');
+  }
+  updateConflictFlag();
+}
+
+function getPctValue(prefix) {
+  const before = parseFloat(document.getElementById(prefix + '-before').value);
+  const after  = parseFloat(document.getElementById(prefix + '-after').value);
+  if (!isNaN(before) && !isNaN(after) && before !== 0) {
+    return (after - before) / before * 100;
+  }
+  return null;
+}
+
+function updateConflictFlag() {
+  const lpPct = getPctValue('lp');
+  const ytPct = getPctValue('yt');
+  const conflictEl = document.getElementById('conflict-flag');
+  const clearEl    = document.getElementById('clear-flag');
+
+  // Section 2 flags
+  if (lpPct !== null && ytPct !== null) {
+    if (ytPct > lpPct) {
+      conflictEl.classList.add('visible');
+      clearEl.classList.remove('visible');
+    } else {
+      conflictEl.classList.remove('visible');
+      clearEl.classList.add('visible');
+    }
+  } else {
+    conflictEl.classList.remove('visible');
+    clearEl.classList.remove('visible');
+  }
+
+  // Section 3 live display
+  const lpEl  = document.getElementById('s3-lp-display');
+  const ytEl  = document.getElementById('s3-yt-display');
+  const vLP   = document.getElementById('s3-verdict-lp');
+  const vYT   = document.getElementById('s3-verdict-yt');
+  const vTie  = document.getElementById('s3-verdict-tie');
+
+  const fmt = v => (Math.round(v * 10) / 10) + '%';
+
+  if (lpPct !== null && ytPct !== null) {
+    lpEl.textContent = fmt(lpPct);
+    ytEl.textContent = fmt(ytPct);
+    lpEl.classList.add('has-value');
+    ytEl.classList.add('has-value');
+
+    if (lpPct > ytPct) {
+      lpEl.classList.add('winner'); lpEl.classList.remove('loser');
+      ytEl.classList.add('loser');  ytEl.classList.remove('winner');
+      vLP.classList.add('visible'); vYT.classList.remove('visible'); vTie.classList.remove('visible');
+    } else if (ytPct > lpPct) {
+      ytEl.classList.add('winner'); ytEl.classList.remove('loser');
+      lpEl.classList.add('loser');  lpEl.classList.remove('winner');
+      vYT.classList.add('visible'); vLP.classList.remove('visible'); vTie.classList.remove('visible');
+    } else {
+      lpEl.classList.remove('winner','loser');
+      ytEl.classList.remove('winner','loser');
+      vTie.classList.add('visible'); vLP.classList.remove('visible'); vYT.classList.remove('visible');
+    }
+  } else {
+    const lpVal = lpPct !== null ? fmt(lpPct) : '—';
+    const ytVal = ytPct !== null ? fmt(ytPct) : '—';
+    lpEl.textContent = lpVal; ytEl.textContent = ytVal;
+    lpEl.className = 's3-pct' + (lpPct !== null ? ' has-value' : '');
+    ytEl.className = 's3-pct' + (ytPct !== null ? ' has-value' : '');
+    vLP.classList.remove('visible'); vYT.classList.remove('visible'); vTie.classList.remove('visible');
+  }
+}
+
+// ── CONCEPT SELECTION ────────────────────────────────
+let selectedConcept = null;
+function selectConcept(btn) {
+  document.querySelectorAll('.concept-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedConcept = btn.textContent;
+  checkAll();
+}
+
+// ── SECTION COMPLETION ───────────────────────────────
+function isSection1Complete() {
+  for (let n = 1; n <= 2; n++) {
+    const claim    = document.getElementById('dp'+n+'-claim').value.trim();
+    const location = document.getElementById('dp'+n+'-location').value.trim();
+    const verified = document.getElementById('dp'+n+'-verified').value.trim();
+    const match    = matchState[n];
+    if (!claim || !location || !verified || !match) return false;
+    if (match === 'no') {
+      const corrected = document.getElementById('dp'+n+'-corrected').value.trim();
+      if (!corrected) return false;
+    }
+  }
+  return true;
+}
+
+function isSection2Complete() {
+  const metric = document.getElementById('metric').value.trim();
+  const lpB = document.getElementById('lp-before').value.trim();
+  const lpA = document.getElementById('lp-after').value.trim();
+  const ytB = document.getElementById('yt-before').value.trim();
+  const ytA = document.getElementById('yt-after').value.trim();
+  return metric && lpB && lpA && ytB && ytA;
+}
+
+function isSection3Complete() {
+  return document.getElementById('explanation').value.trim().length > 20;
+}
+
+function isSection4Complete() {
+  const name = document.getElementById('accountability-name').value.trim();
+  return selectedConcept !== null && name.length > 0;
+}
+
+function checkAll() {
+  const s1 = isSection1Complete();
+  const s2 = isSection2Complete();
+  const s3 = isSection3Complete();
+  const s4 = isSection4Complete();
+
+  setPill(1, s1);
+  setPill(2, s2);
+  setPill(3, s3);
+  setPill(4, s4);
+
+  setBadge('s1-badge', s1);
+  setBadge('s2-badge', s2);
+  setBadge('s3-badge', s3);
+  setBadge('s4-badge', s4);
+
+  const allDone = s1 && s2 && s3 && s4;
+  document.getElementById('clear-banner').classList.toggle('visible', allDone);
+  document.getElementById('final-clear').classList.toggle('visible', allDone);
+
+  updateSummary();
+}
+
+// ── PRESENTATION SUMMARY ─────────────────────────────
+function updateSummary() {
+  // Data Point 1
+  const dp1claim = document.getElementById('dp1-claim').value.trim();
+  const dp1num   = matchState[1] === 'no'
+    ? document.getElementById('dp1-corrected').value.trim()
+    : document.getElementById('dp1-verified').value.trim();
+  setSummaryField('sum-dp1',
+    dp1claim && dp1num ? `"${dp1claim}" — verified as ${dp1num}` : dp1claim || null,
+    'Fill in Section 1 above.'
+  );
+
+  // Data Point 2
+  const dp2claim = document.getElementById('dp2-claim').value.trim();
+  const dp2num   = matchState[2] === 'no'
+    ? document.getElementById('dp2-corrected').value.trim()
+    : document.getElementById('dp2-verified').value.trim();
+  setSummaryField('sum-dp2',
+    dp2claim && dp2num ? `"${dp2claim}" — verified as ${dp2num}` : dp2claim || null,
+    'Fill in Section 1 above.'
+  );
+
+  // Effect: % change + explanation
+  const lpPctText  = document.getElementById('lp-pct').textContent;
+  const explanation = document.getElementById('explanation').value.trim();
+  const hasPct     = lpPctText && lpPctText !== '—';
+  let effectText   = null;
+  if (hasPct && explanation)      effectText = `${lpPctText} change for the last-place team — "${explanation}"`;
+  else if (hasPct)                effectText = `${lpPctText} change for the last-place team.`;
+  else if (explanation)           effectText = `"${explanation}"`;
+  setSummaryField('sum-effect', effectText, 'Fill in Sections 2 and 3 above.');
+
+  // Concept
+  const conceptEl = document.getElementById('sum-concept');
+  if (selectedConcept) {
+    conceptEl.textContent = selectedConcept;
+    conceptEl.classList.add('has-content');
+  } else {
+    conceptEl.textContent = 'Select a concept in Section 4 above.';
+    conceptEl.classList.remove('has-content');
+  }
+}
+
+function setSummaryField(id, value, placeholder) {
+  const el = document.getElementById(id);
+  if (value) {
+    el.textContent = value;
+    el.classList.add('has-content');
+  } else {
+    el.textContent = placeholder;
+    el.classList.remove('has-content');
+  }
+}
+
+function setPill(n, done) {
+  const pill = document.getElementById('pill-' + n);
+  pill.classList.toggle('done', done);
+}
+
+function setBadge(id, done) {
+  document.getElementById(id).classList.toggle('visible', done);
+}
+</script>
+</body>
+</html>
