@@ -32,6 +32,7 @@ const ACTIVITY_LESSONS = {
   'Percent Change: Season 1 to Season 2 Configurations': '/lessons/percent-change.html',
   'Scouting Report Completion: Sections 3 and 4': '/lessons/scouting-report-helper.html',
   'What-If? Analysis': '/lessons/what-if-analysis.html',
+  'Open Lab: Reflection Time': '/lessons/open-lab-reflection.html',
   'Post-Task Diagnostic: Prior Knowledge Reassessment': '/activities/diagnostic-post/index.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },

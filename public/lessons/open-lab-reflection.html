@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 18 — Open Lab + Reflection</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px}
+:root{
+  --bg:#0b1220;--surface:#101c2e;--card:#162032;--border:#1e3352;
+  --cyan:#00e5ff;--yellow:#ffd600;--green:#00e676;--red:#ff4d6a;
+  --orange:#ff9100;--purple:#b388ff;--teal:#00bfa5;--blue:#4fc3f7;
+  --text:#e4edf8;--muted:#5a85a8;--soft:#8ab4d4;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;line-height:1.55}
+
+/* ── TECH ICONS ─────────── */
+.ticon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;flex-shrink:0;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--cyan)}
+.ticon.sm{width:30px;height:30px;border-radius:8px}
+.ticon.lg{width:52px;height:52px;border-radius:12px}
+.ticon.y{background:rgba(255,214,0,.1);border-color:rgba(255,214,0,.2);color:var(--yellow)}
+.ticon.g{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.2);color:var(--green)}
+.ticon.o{background:rgba(255,145,0,.1);border-color:rgba(255,145,0,.2);color:var(--orange)}
+.ticon.p{background:rgba(179,136,255,.1);border-color:rgba(179,136,255,.2);color:var(--purple)}
+.ticon.t{background:rgba(0,191,165,.1);border-color:rgba(0,191,165,.2);color:var(--teal)}
+.ticon.b{background:rgba(79,195,247,.1);border-color:rgba(79,195,247,.2);color:var(--blue)}
+.ticon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ticon.sm svg{width:15px;height:15px}
+.ticon.lg svg{width:28px;height:28px}
+
+/* ── HEADER ─────────────── */
+.hdr{background:var(--surface);border-bottom:3px solid var(--green);padding:14px 20px;position:sticky;top:0;z-index:100}
+.hdr-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.day-chip{background:var(--green);color:#0b1220;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:5px 13px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.hdr-titles{flex:1}
+.hdr-title{font-size:16px;font-weight:800;line-height:1.2}
+.hdr-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.hdr-robot{flex-shrink:0}
+
+/* ── PROGRESS BAR ───────── */
+.prog-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
+.prog-bar{height:4px;background:var(--green);transition:width .4s ease}
+.prog-tabs{display:flex;max-width:720px;margin:0 auto}
+.ptab{flex:1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 4px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .2s;border-bottom:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;gap:3px}
+.ptab.active{color:var(--green);border-bottom-color:var(--green)}
+.ptab.done{color:var(--cyan);border-bottom-color:var(--cyan)}
+.ptab svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── LAYOUT ─────────────── */
+.main{max-width:720px;margin:0 auto;padding:24px 16px}
+.panel{display:none}.panel.active{display:block}
+
+/* ── SECTION HEADER ─────── */
+.sec-eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sec-title{font-size:28px;font-weight:900;color:var(--text);line-height:1.15;margin-bottom:10px}
+.sec-desc{font-size:17px;color:var(--soft);line-height:1.65;margin-bottom:24px;max-width:52ch}
+
+/* ── CARDS ──────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.card-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-label.yellow{color:var(--yellow)}.card-label.green{color:var(--green)}
+.card-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+
+/* ── MISSION CARDS ─────── */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.mission-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.mc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.mc-icon.c{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);color:var(--cyan)}
+.mc-icon.g{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);color:var(--green)}
+.mc-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mc-num{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.mc-time{font-size:22px;font-weight:900;color:var(--cyan)}
+.mc-time.g{color:var(--green)}
+.mc-title{font-size:17px;font-weight:800;color:var(--text)}
+.mc-desc{font-size:14px;color:var(--soft);line-height:1.55}
+
+/* ── PHASE TIMELINE ──────── */
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:14px;align-items:flex-start;padding:12px 0;position:relative}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;bottom:-12px;width:2px;background:var(--border)}
+.tl-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid;font-size:12px;font-weight:900}
+.tl-dot.c{background:rgba(0,229,255,.1);border-color:var(--cyan);color:var(--cyan)}
+.tl-dot.g{background:rgba(0,230,118,.1);border-color:var(--green);color:var(--green)}
+.tl-body{flex:1;padding-top:8px}
+.tl-time{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.tl-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:2px}
+.tl-desc{font-size:13px;color:var(--soft);line-height:1.5}
+
+/* ── PROMPT CARD ──────────── */
+.prompt-card{background:#0b1220;border:2px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;transition:border-color .3s}
+.prompt-card:focus-within{border-color:var(--green)}
+.prompt-card.filled{border-color:rgba(0,230,118,.5)}
+.prompt-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.3);color:var(--cyan);font-size:13px;font-weight:900;margin-bottom:10px}
+.prompt-q{font-size:18px;font-weight:800;color:var(--text);line-height:1.35;margin-bottom:6px}
+.prompt-sub{font-size:14px;color:var(--soft);line-height:1.55;margin-bottom:14px}
+.num-req{display:inline-flex;align-items:center;gap:5px;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.num-req svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* ── MEANING BOX ─── */
+.meaning-box{background:rgba(0,229,255,.04);border:1px dashed rgba(0,229,255,.25);border-radius:10px;padding:14px 16px;margin:0 0 14px;display:flex;gap:12px;align-items:flex-start}
+.meaning-text{font-size:14px;color:var(--soft);line-height:1.6}
+.meaning-text strong{color:var(--text)}
+
+/* ── FORMULA PRE-FILL INDICATOR ─── */
+.prefill-confirm{display:none;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--green);line-height:1.55;align-items:center;gap:8px}
+.prefill-confirm.show{display:flex}
+.prefill-confirm svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+
+/* ── SKILL CARDS ─────────── */
+.skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.skill-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;display:flex;gap:12px;align-items:flex-start;user-select:none}
+.skill-card:hover{border-color:var(--cyan);background:rgba(0,229,255,.04)}
+.skill-card.selected{border-color:var(--cyan);background:rgba(0,229,255,.06)}
+.skill-card.selected .skill-name{color:var(--cyan)}
+.skill-body{flex:1;min-width:0}
+.skill-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;transition:color .2s}
+.skill-formula{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);line-height:1.4;word-break:break-all}
+
+/* ── MOMENT CARDS ─────────── */
+.moment-row{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.moment-card{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:all .2s;display:flex;gap:12px;align-items:center;user-select:none}
+.moment-card:hover{border-color:var(--yellow);background:rgba(255,214,0,.03)}
+.moment-card.selected{border-color:var(--yellow);background:rgba(255,214,0,.05)}
+.moment-card.selected .moment-label{color:var(--yellow)}
+.moment-label{font-size:15px;font-weight:700;color:var(--text);flex:1;transition:color .2s;line-height:1.4}
+
+/* ── FORMULA REFERENCE ──── */
+.formula-ref-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
+.formula-ref-strip::-webkit-scrollbar{height:4px}
+.formula-ref-strip::-webkit-scrollbar-track{background:var(--border)}
+.formula-ref-strip::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.fref-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:180px;flex-shrink:0}
+.fref-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fref-name{font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
+.fref-formula{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--cyan);line-height:1.5;margin-bottom:5px;word-break:break-word}
+.fref-desc{font-size:11px;color:var(--muted);line-height:1.45}
+
+/* ── SENTENCE STARTERS ──── */
+.starters-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.starters-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+.starter-row{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.starter-btn{background:rgba(179,136,255,.06);border:1px solid rgba(179,136,255,.2);border-radius:10px;padding:13px 16px;cursor:pointer;transition:all .2s;text-align:left;font-family:'DM Sans',sans-serif;color:var(--soft);font-size:14px;line-height:1.65;display:flex;gap:10px;align-items:flex-start}
+.starter-btn:hover{border-color:var(--purple);background:rgba(179,136,255,.1);color:var(--text)}
+.starter-btn svg{width:14px;height:14px;stroke:var(--purple);fill:none;stroke-width:2.5;flex-shrink:0;margin-top:2px}
+
+/* ── INPUTS ─────────────── */
+.field-label{font-size:15px;font-weight:700;color:var(--soft);margin-bottom:6px;display:block}
+.field-hint{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;display:flex;align-items:flex-start;gap:6px}
+.field-hint svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px;opacity:.7}
+.field-group{margin-bottom:20px}
+input[type=text],textarea{
+  width:100%;background:#0b1220;border:2px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:17px;
+  padding:13px 15px;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--green)}
+textarea{min-height:110px;resize:vertical;font-size:16px;line-height:1.65}
+::placeholder{color:rgba(139,180,212,.35)}
+
+/* ── TOGGLE GROUPS ─────── */
+.toggle-group{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.toggle-btn{flex:1;border:2px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--muted);background:#0b1220;transition:all .2s;text-align:center;min-width:120px}
+.toggle-btn.y:hover,.toggle-btn.y.sel{background:rgba(0,230,118,.1);border-color:var(--green);color:var(--green)}
+.toggle-btn.n:hover,.toggle-btn.n.sel{background:rgba(255,77,106,.1);border-color:var(--red);color:var(--red)}
+.toggle-btn.p:hover,.toggle-btn.p.sel{background:rgba(255,214,0,.1);border-color:var(--yellow);color:var(--yellow)}
+
+/* ── INFO / WARN BOX ─────── */
+.warn-box{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.3);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:15px;color:var(--soft);line-height:1.65;display:flex;align-items:flex-start;gap:10px}
+.warn-box-body{flex:1}.warn-box strong{color:var(--yellow)}
+.err-box{background:rgba(255,77,106,.06);border:2px solid rgba(255,77,106,.3);border-radius:10px;padding:14px 16px;margin:12px 0;font-size:15px;color:#ffaaaa;line-height:1.5;display:none}
+
+/* ── VSTEPS ──────────────── */
+.vsteps{display:flex;flex-direction:column;gap:12px}
+.vstep{display:flex;gap:14px;align-items:flex-start;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:14px}
+.vstep-body{flex:1}
+.vstep-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.vstep-desc{font-size:14px;color:var(--soft);line-height:1.55}
+.vstep-desc code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan);background:rgba(0,229,255,.08);padding:2px 6px;border-radius:4px}
+
+/* ── TEAM DEBRIEF ─────────── */
+.debrief-card{background:#0b1220;border:2px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.debrief-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.debrief-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* ── BUTTONS ─────────────── */
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;padding:14px 24px;cursor:pointer;transition:opacity .2s;text-decoration:none;line-height:1}
+.btn:hover{opacity:.86}
+.btn-primary{background:var(--cyan);color:#0b1220}
+.btn-green{background:var(--green);color:#0b1220}
+.btn-ghost{background:transparent;color:var(--muted);border:2px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--soft)}
+.btn-print{background:rgba(179,136,255,.1);color:var(--purple);border:2px solid rgba(179,136,255,.3)}
+.btn-print:hover{background:rgba(179,136,255,.18);border-color:var(--purple)}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+
+/* ── DONE BOX ─────────────── */
+.done-box{text-align:center;padding:32px 20px;background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,230,118,.02));border:1px solid rgba(0,230,118,.2);border-radius:16px;margin-top:24px;margin-bottom:18px}
+.done-icon{width:72px;height:72px;border-radius:18px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.done-icon svg{width:36px;height:36px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.done-title{font-size:22px;font-weight:900;color:var(--green);margin-bottom:8px}
+.done-desc{font-size:16px;color:var(--soft);line-height:1.7;max-width:44ch;margin:0 auto}
+
+/* ── COPY TOAST ─────────── */
+#copyToast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--green);color:#0b1220;font-size:14px;font-weight:800;padding:12px 24px;border-radius:30px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:999}
+#copyToast.show{opacity:1}
+
+/* ── RESPONSIVE ─────────── */
+@media(max-width:520px){
+  .mission-grid{grid-template-columns:1fr}
+  .skill-grid{grid-template-columns:1fr}
+  .toggle-group{flex-direction:column}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{justify-content:center}
+}
+
+/* ── MATH PATTERNS PANEL ─────────────────── */
+.concept-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.cnav-btn{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em}
+.cnav-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.concept-block{margin-bottom:32px;scroll-margin-top:80px}
+.concept-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:10px}
+.badge-ur{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);color:var(--cyan)}
+.badge-lf{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.25);color:var(--green)}
+.badge-ld{background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.25);color:var(--blue)}
+.badge-nl{background:rgba(255,145,0,.1);border:1px solid rgba(255,145,0,.25);color:var(--orange)}
+.badge-ps{background:rgba(179,136,255,.1);border:1px solid rgba(179,136,255,.25);color:var(--purple)}
+.badge-ra{background:rgba(0,191,165,.1);border:1px solid rgba(0,191,165,.25);color:var(--teal)}
+
+.concept-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:6px}
+.concept-desc{font-size:15px;color:var(--soft);line-height:1.65;margin-bottom:16px;max-width:52ch}
+
+.cviz{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.cviz canvas{display:block;width:100%;border-radius:8px}
+
+.readout-row{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.readout-box{background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:120px;text-align:center}
+.readout-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.readout-val{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+
+.concept-slider{width:100%;margin:10px 0;accent-color:var(--cyan)}
+
+.mc-block{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px}
+.mc-q{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4}
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mc-btn{background:var(--card);border:2px solid var(--border);border-radius:9px;padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--soft);cursor:pointer;transition:all .2s;text-align:center}
+.mc-btn:hover{border-color:var(--cyan);color:var(--text)}
+.mc-btn.correct{border-color:var(--green);background:rgba(0,230,118,.1);color:var(--green)}
+.mc-btn.wrong{border-color:var(--red);background:rgba(255,77,106,.08);color:var(--red)}
+.mc-feedback{font-size:13px;line-height:1.55;min-height:1.5em;color:var(--soft)}
+.mc-feedback.show-correct{color:var(--green);font-weight:700}
+.mc-feedback.show-wrong{color:var(--orange)}
+
+.prop-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.prop-side{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.prop-side-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.prop-bar-track{width:100%;height:22px;background:var(--border);border-radius:6px;overflow:hidden;margin:8px 0;position:relative}
+.prop-bar-fill{height:100%;border-radius:6px;transition:width .35s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;font-weight:800;color:#0b1220}
+.prop-val{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:4px}
+.prop-formula{font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:6px}
+
+.ratio-display{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0}
+.ratio-stat{background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;flex:1;min-width:70px}
+.ratio-stat-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+.ratio-stat-val{font-size:18px;font-weight:900}
+.ratio-colon{font-size:20px;font-weight:900;color:var(--muted)}
+.ratio-result{background:rgba(0,191,165,.1);border:1px solid rgba(0,191,165,.25);border-radius:10px;padding:10px 16px;font-size:15px;font-weight:800;color:var(--teal);text-align:center;margin:10px 0}
+
+@media(max-width:520px){
+  .mc-grid{grid-template-columns:1fr}
+  .prop-compare{grid-template-columns:1fr}
+}
+
+/* ═══════════════════════════════════════════
+   PRINT STYLES
+═══════════════════════════════════════════ */
+@media print {
+  /* Hide the entire interactive UI */
+  .hdr,.prog-wrap,.btn-row,.starter-row,.starters-label,
+  .skill-grid,.moment-row,.formula-ref-strip,.meaning-box,
+  .warn-box,.card-label,.err-box,.prefill-confirm,
+  #copyToast{display:none !important}
+
+  /* Show only the print view */
+  body{background:#fff;color:#111;font-family:'DM Sans',sans-serif;font-size:12pt;padding:0;margin:0}
+  .main,.panel{display:none !important}
+  #printView{display:block !important}
+}
+
+/* ── PRINT VIEW (screen: hidden; print: visible) ── */
+#printView{display:none}
+#printView{font-family:'DM Sans',sans-serif;color:#111;padding:24pt 28pt;max-width:100%}
+.pv-header{border-bottom:3pt solid #00aa55;padding-bottom:10pt;margin-bottom:16pt;display:flex;justify-content:space-between;align-items:flex-end}
+.pv-title{font-size:18pt;font-weight:900;color:#111;margin-bottom:2pt}
+.pv-sub{font-size:9pt;color:#555;text-transform:uppercase;letter-spacing:.06em}
+.pv-name-line{font-size:10pt;color:#555;border-bottom:1pt solid #bbb;min-width:200pt;padding-bottom:2pt;text-align:right}
+.pv-name-val{font-size:12pt;font-weight:800;color:#111}
+.pv-block{margin-bottom:18pt;break-inside:avoid}
+.pv-block-label{font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#555;margin-bottom:5pt;display:flex;align-items:center;gap:4pt}
+.pv-block-q{font-size:12pt;font-weight:800;color:#111;margin-bottom:6pt;line-height:1.3}
+.pv-block-answer{font-size:11pt;color:#222;line-height:1.7;white-space:pre-wrap;background:#f8f8f8;border-left:3pt solid #00aa55;padding:8pt 12pt;border-radius:0 4pt 4pt 0}
+.pv-block-answer.empty{color:#999;font-style:italic;background:#fafafa;border-left-color:#ccc}
+.pv-debrief{margin-top:14pt;padding-top:14pt;border-top:1pt solid #ddd}
+.pv-debrief-label{font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#555;margin-bottom:8pt}
+.pv-debrief-row{display:flex;gap:18pt;margin-bottom:10pt}
+.pv-debrief-col{flex:1}
+.pv-debrief-col-label{font-size:9pt;font-weight:800;color:#333;margin-bottom:4pt}
+.pv-debrief-col-val{font-size:10pt;color:#222;line-height:1.6;white-space:pre-wrap;min-height:40pt;border-bottom:1pt solid #ddd;padding-bottom:6pt}
+.pv-debrief-col-val.empty{color:#aaa;font-style:italic}
+.pv-footer{margin-top:20pt;padding-top:10pt;border-top:1pt solid #ddd;font-size:8pt;color:#999;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="copyToast">Answers copied!</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="day-chip">Day 18</div>
+    <div class="hdr-titles">
+      <div class="hdr-title">Open Lab + Reflection</div>
+      <div class="hdr-sub">Final Block · 45 min · After Championship</div>
+    </div>
+    <div class="hdr-robot">
+      <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="42" height="42" rx="10" fill="rgba(0,230,118,0.1)" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+        <line x1="21" y1="5" x2="21" y2="10" stroke="#00e676" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="21" cy="4.5" r="2.2" fill="#00e676"/>
+        <rect x="11" y="10" width="20" height="14" rx="3.5" fill="#162032" stroke="#00e676" stroke-width="1.5"/>
+        <rect x="14" y="14" width="5" height="5" rx="1.2" fill="#00e676"/>
+        <rect x="23" y="14" width="5" height="5" rx="1.2" fill="#ffd600"/>
+        <rect x="13" y="26" width="16" height="11" rx="3" fill="#162032" stroke="#00e676" stroke-width="1.5"/>
+        <circle cx="21" cy="31.5" r="2.2" fill="#00e676" opacity="0.75"/>
+        <rect x="8" y="27" width="4.5" height="8" rx="2.2" fill="#162032" stroke="#00e676" stroke-width="1.3"/>
+        <rect x="29.5" y="27" width="4.5" height="8" rx="2.2" fill="#162032" stroke="#00e676" stroke-width="1.3"/>
+        <line x1="17" y1="29.5" x2="19.2" y2="29.5" stroke="#00e676" stroke-width="1" opacity="0.55"/>
+        <line x1="22.8" y1="29.5" x2="25" y2="29.5" stroke="#00e676" stroke-width="1" opacity="0.55"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-bar" id="progBar" style="width:33%"></div>
+  <div class="prog-tabs">
+    <button class="ptab active" onclick="goPanel(0)" id="tab0"><i data-lucide="flag"></i> Today</button>
+    <button class="ptab" onclick="goPanel(1)" id="tab1"><i data-lucide="edit-3"></i> Reflect</button>
+    <button class="ptab" onclick="goPanel(2)" id="tab2"><i data-lucide="bar-chart-2"></i> Patterns</button>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ════════════════════════════════════════
+     PANEL 0 · TODAY'S BLOCK
+════════════════════════════════════════ -->
+<div class="panel active" id="panel0">
+  <div class="sec-eyebrow">Day 18 · Final Block</div>
+  <h1 class="sec-title">You Did Real Data Science.</h1>
+  <p class="sec-desc">The matches are done. Answer 3 prompts. Every answer must include the formula written out with your actual numbers and your result.</p>
+
+  <div class="mission-grid">
+    <div class="mission-card">
+      <div class="mc-icon c"><i data-lucide="edit-3"></i></div>
+      <div class="mc-num">Step 1</div>
+      <div class="mc-time">15 min</div>
+      <div class="mc-title">Written Reflection</div>
+      <div class="mc-desc">Three prompts. Every answer needs <strong style="color:var(--yellow)">the formula written out</strong> with your actual numbers.</div>
+    </div>
+    <div class="mission-card">
+      <div class="mc-icon g"><i data-lucide="bar-chart-2"></i></div>
+      <div class="mc-num">Step 2</div>
+      <div class="mc-time g">10 min</div>
+      <div class="mc-title">Math Patterns</div>
+      <div class="mc-desc">Explore the 6 math concepts behind your bot's formulas — graphs, sliders, and questions.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label"><i data-lucide="clock"></i> This Tool Covers</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot c">1</div>
+        <div class="tl-body">
+          <div class="tl-time">0:00 – 5:00</div>
+          <div class="tl-title">Transition In</div>
+          <div class="tl-desc">Get your scouting report. Open this tool. Enter your name at the top of the Reflect screen.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot c">2</div>
+        <div class="tl-body">
+          <div class="tl-time">5:00 – 20:00</div>
+          <div class="tl-title">Individual Reflection</div>
+          <div class="tl-desc">Work alone. Answer all 3 prompts. Every answer needs a formula written out with your numbers and your result.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot g">3</div>
+        <div class="tl-body">
+          <div class="tl-time">20:00 – 30:00</div>
+          <div class="tl-title">Math Patterns</div>
+          <div class="tl-desc">Explore the 6 math concepts — unit rate, linear, decay, nonlinear, scaling, and ratio — with interactive graphs and questions.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-green" onclick="goPanel(1)">
+      Start: Written Reflection
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 1 · YOUR REFLECTION
+════════════════════════════════════════ -->
+<div class="panel" id="panel1">
+  <div class="sec-eyebrow">Step 1 · Individual Reflection</div>
+  <h1 class="sec-title">Your Reflection</h1>
+  <p class="sec-desc">Work alone. Answer all 3 prompts. Every answer must include the formula written out — with your actual stat numbers and your result.</p>
+
+  <!-- Name field -->
+  <div class="field-group" style="margin-bottom:20px">
+    <label class="field-label" style="margin-bottom:6px">Your name (for your printed copy):</label>
+    <input type="text" id="studentName" placeholder="First name" maxlength="60" style="max-width:300px">
+  </div>
+
+  <div class="warn-box">
+    <div class="ticon sm y"><i data-lucide="hash"></i></div>
+    <div class="warn-box-body">
+      <strong>Write the formula. Plug in your number. Show your result.</strong>
+      <div style="margin-top:8px">
+        <div style="color:var(--red);font-size:14px;text-decoration:line-through;opacity:.7;margin-bottom:4px">✗ &nbsp;"I used the Speed formula."</div>
+        <div style="color:var(--green);font-size:14px;font-weight:700">✓ &nbsp;"I used the formula motorPower% = S × 100 ÷ 20, and my S was 8, so my result was 40%."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROMPT 1 ── -->
+  <div class="prompt-card" id="p1card">
+    <div class="prompt-num">1</div>
+    <div class="prompt-q">The formula I used most in this camp was ___.</div>
+    <div class="prompt-sub">Tap a formula below — it will be written into your answer automatically. Then fill in your stat number and result. Describe one specific moment you used it.</div>
+    <div class="num-req"><i data-lucide="hash"></i> WRITE THE FORMULA WITH YOUR NUMBERS</div>
+
+    <div class="meaning-box">
+      <div class="ticon sm y"><i data-lucide="mouse-pointer-click"></i></div>
+      <div class="meaning-text"><strong>Tap a formula card</strong> — the formula will appear in your answer box, pre-written. You only need to fill in your stat number and your result. Then describe the moment.</div>
+    </div>
+
+    <div class="card-label"><i data-lucide="grid"></i> Tap the formula you used most</div>
+    <div class="skill-grid" id="skillGrid">
+      <div class="skill-card" onclick="selectSkill('speed', this)">
+        <div class="ticon sm"><i data-lucide="zap"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">Speed</div>
+          <div class="skill-formula">motorPower% = (S × 100) ÷ 20</div>
+        </div>
+      </div>
+      <div class="skill-card" onclick="selectSkill('endurance', this)">
+        <div class="ticon sm g"><i data-lucide="battery"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">Endurance</div>
+          <div class="skill-formula">P(t) = 100 − (20−E) × 1.5 × t</div>
+        </div>
+      </div>
+      <div class="skill-card" onclick="selectSkill('turning', this)">
+        <div class="ticon sm t"><i data-lucide="refresh-cw"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">Turning</div>
+          <div class="skill-formula">ratio = 0.2 + T × 0.02</div>
+        </div>
+      </div>
+      <div class="skill-card" onclick="selectSkill('power', this)">
+        <div class="ticon sm o"><i data-lucide="activity"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">Power</div>
+          <div class="skill-formula">charge = P² · followThrough = P × 200 ms</div>
+        </div>
+      </div>
+      <div class="skill-card" onclick="selectSkill('budget', this)">
+        <div class="ticon sm y"><i data-lucide="briefcase"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">Budget</div>
+          <div class="skill-formula">S + E + T + P = 20</div>
+        </div>
+      </div>
+      <div class="skill-card" onclick="selectSkill('percent', this)">
+        <div class="ticon sm p"><i data-lucide="trending-up"></i></div>
+        <div class="skill-body">
+          <div class="skill-name">% Change</div>
+          <div class="skill-formula">(New − Old) ÷ Old × 100</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prefill-confirm" id="p1prefill">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Formula written into your answer. Fill in your stat number and result, then describe the moment.
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Your answer:</label>
+      <div class="field-hint"><i data-lucide="alert-circle"></i><span>Fill in the blanks. Change anything you need. Add the moment when you used it.</span></div>
+      <textarea id="p1text" placeholder="Tap a formula card above to start..." oninput="checkPromptFilled('p1text','p1card')" rows="5"></textarea>
+    </div>
+  </div>
+
+  <!-- ── PROMPT 2 ── -->
+  <div class="prompt-card" id="p2card">
+    <div class="prompt-num">2</div>
+    <div class="prompt-q">The hardest moment was ___. Here is what I did:</div>
+    <div class="prompt-sub">Be specific. Name the exact moment. Describe what you actually did. Include at least one number — a stat, a round, a result.</div>
+    <div class="num-req"><i data-lucide="hash"></i> INCLUDE A NUMBER</div>
+
+    <div class="meaning-box">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text"><strong>Tap a moment type below</strong> to identify your hardest moment. Then use a sentence starter to begin writing. Include a specific number.</div>
+    </div>
+
+    <div class="card-label"><i data-lucide="search"></i> What type of hard moment was it?</div>
+    <div class="moment-row" id="momentGrid">
+      <div class="moment-card" onclick="selectMoment(0, this)">
+        <div class="ticon sm"><i data-lucide="cpu"></i></div>
+        <div class="moment-label">Our formula gave a wrong or unexpected answer</div>
+      </div>
+      <div class="moment-card" onclick="selectMoment(1, this)">
+        <div class="ticon sm y"><i data-lucide="alert-triangle"></i></div>
+        <div class="moment-label">A match didn't go the way I predicted</div>
+      </div>
+      <div class="moment-card" onclick="selectMoment(2, this)">
+        <div class="ticon sm o"><i data-lucide="tool"></i></div>
+        <div class="moment-label">I had to fix a calculation mistake</div>
+      </div>
+      <div class="moment-card" onclick="selectMoment(3, this)">
+        <div class="ticon sm p"><i data-lucide="help-circle"></i></div>
+        <div class="moment-label">I didn't understand a formula or concept</div>
+      </div>
+      <div class="moment-card" onclick="selectMoment(4, this)">
+        <div class="ticon sm t"><i data-lucide="users"></i></div>
+        <div class="moment-label">My team disagreed on a strategy or number</div>
+      </div>
+    </div>
+
+    <div class="starters-label"><i data-lucide="message-circle"></i> Sentence Starters — Tap one to use it</div>
+    <div class="starter-row">
+      <button class="starter-btn" onclick="useStarter('p2text', 0)">
+        <i data-lucide="corner-down-right"></i>
+        The hardest moment was when [describe the specific thing that happened]. At first I [what I tried]. Then I [what actually worked or what I noticed]. The number involved was ___.
+      </button>
+      <button class="starter-btn" onclick="useStarter('p2text', 1)">
+        <i data-lucide="corner-down-right"></i>
+        I struggled most with [the specific thing]. Here is what I did: [describe the steps]. Looking back, I now know that [what you understand now]. The key number was ___.
+      </button>
+      <button class="starter-btn" onclick="useStarter('p2text', 2)">
+        <i data-lucide="corner-down-right"></i>
+        My hardest moment was [describe it]. I didn't know what to do at first. What happened next was [honest description]. The number I was working with was ___, and [what that number told me].
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Write your answer:</label>
+      <div class="field-hint"><i data-lucide="alert-circle"></i><span>Describe a specific moment, what you did, and include a number.</span></div>
+      <textarea id="p2text" placeholder="Start writing here — or tap a sentence starter above..." oninput="checkPromptFilled('p2text','p2card')" rows="5"></textarea>
+    </div>
+  </div>
+
+  <!-- ── PROMPT 3 ── -->
+  <div class="prompt-card" id="p3card">
+    <div class="prompt-num">3</div>
+    <div class="prompt-q">If I scouted a new team today, here is the formula I would use:</div>
+    <div class="prompt-sub">Write the actual formula — the full expression. Plug in example numbers. Show what result you would get and what it tells you about the match.</div>
+    <div class="num-req"><i data-lucide="hash"></i> WRITE THE FORMULA WITH EXAMPLE NUMBERS</div>
+
+    <div class="meaning-box">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text"><strong>Use the formula reference below</strong> — scroll right to see all. Pick the formula you would use first. Write it out. Plug in numbers. Show your result.</div>
+    </div>
+
+    <div class="card-label"><i data-lucide="book-open"></i> Formula Reference — Scroll to see all</div>
+    <div class="formula-ref-strip">
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm"><i data-lucide="zap"></i></div><div class="fref-name">Speed</div></div>
+        <div class="fref-formula">motorPower% = (S × 100) ÷ 20</div>
+        <div class="fref-desc">S = 8 → (8 × 100) ÷ 20 = 40%</div>
+      </div>
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm g"><i data-lucide="battery"></i></div><div class="fref-name">Endurance</div></div>
+        <div class="fref-formula">P(t) = 100 − (20−E) × 1.5 × t</div>
+        <div class="fref-desc">Low E = power drops faster over time.</div>
+      </div>
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm t"><i data-lucide="refresh-cw"></i></div><div class="fref-name">Turning</div></div>
+        <div class="fref-formula">ratio = 0.2 + T × 0.02</div>
+        <div class="fref-desc">High T = tight turns. Low T = wide arcs.</div>
+      </div>
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm o"><i data-lucide="activity"></i></div><div class="fref-name">Power</div></div>
+        <div class="fref-formula">charge = P² · followThru = P × 200 ms</div>
+        <div class="fref-desc">P = 6 → charge = 36. P = 7 → charge = 49.</div>
+      </div>
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm y"><i data-lucide="briefcase"></i></div><div class="fref-name">Budget</div></div>
+        <div class="fref-formula">S + E + T + P = 20</div>
+        <div class="fref-desc">All four stats add up to exactly 20.</div>
+      </div>
+      <div class="fref-card">
+        <div class="fref-header"><div class="ticon sm p"><i data-lucide="trending-up"></i></div><div class="fref-name">% Change</div></div>
+        <div class="fref-formula">(New − Old) ÷ Old × 100</div>
+        <div class="fref-desc">How much a stat changed round to round.</div>
+      </div>
+    </div>
+
+    <div class="starters-label"><i data-lucide="message-circle"></i> Sentence Starters — Tap one to use it</div>
+    <div class="starter-row">
+      <button class="starter-btn" onclick="useStarter('p3text', 0)">
+        <i data-lucide="corner-down-right"></i>
+        If I scouted a new team today, I would use this formula: [write the full formula, e.g., motorPower% = S × 100 ÷ 20]. If their Speed stat was ___, I would calculate: ___ × 100 ÷ 20 = ___%. That tells me [what it means for the match].
+      </button>
+      <button class="starter-btn" onclick="useStarter('p3text', 1)">
+        <i data-lucide="corner-down-right"></i>
+        My scouting formula: Step 1 — find their [STAT]. Step 2 — calculate [write the formula]. If their stat is ___, the result is ___. Step 3 — compare that to my own result of ___. If their number is higher, I would [change strategy].
+      </button>
+      <button class="starter-btn" onclick="useStarter('p3text', 2)">
+        <i data-lucide="corner-down-right"></i>
+        I would use two formulas: [formula 1 written out] and [formula 2 written out]. For a team with [STAT 1] = ___ and [STAT 2] = ___, I would calculate ___ and ___. That would tell me [strategy decision].
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Write your formula or process:</label>
+      <div class="field-hint"><i data-lucide="alert-circle"></i><span>Write the full formula expression. Plug in example numbers. Show what you get.</span></div>
+      <textarea id="p3text" placeholder="Example: I would use motorPower% = S × 100 ÷ 20. If their S = 7, then 7 × 100 ÷ 20 = 35%. I would also check Power using charge = P². If P = 8, charge = 64..." oninput="checkPromptFilled('p3text','p3card')" rows="6"></textarea>
+    </div>
+  </div>
+
+  <div class="err-box" id="reflectErr">Fill in all 3 prompts above before moving on. Remember — every answer needs a formula written out with your numbers.</div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(0)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="checkReflectAndNext()">
+      Next: Math Patterns
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 2 · MATH PATTERNS
+════════════════════════════════════════ -->
+<div class="panel" id="panel2">
+  <div class="sec-eyebrow">Math Patterns</div>
+  <h1 class="sec-title">How the Math Works</h1>
+  <p class="sec-desc">Six math patterns power your bot. See each one with a graph and a question.</p>
+
+  <div class="concept-nav">
+    <button class="cnav-btn" onclick="scrollToConcept('c-unitrate')">Unit Rate</button>
+    <button class="cnav-btn" onclick="scrollToConcept('c-linear')">Linear</button>
+    <button class="cnav-btn" onclick="scrollToConcept('c-decay')">Decay</button>
+    <button class="cnav-btn" onclick="scrollToConcept('c-nonlinear')">Nonlinear</button>
+    <button class="cnav-btn" onclick="scrollToConcept('c-propscale')">Scaling</button>
+    <button class="cnav-btn" onclick="scrollToConcept('c-ratio')">Ratio</button>
+  </div>
+
+  <!-- ── 1. UNIT RATE ── -->
+  <div class="concept-block" id="c-unitrate">
+    <div class="concept-badge badge-ur">Unit Rate</div>
+    <div class="concept-title">Speed → Motor Power</div>
+    <p class="concept-desc">A <strong style="color:var(--cyan)">unit rate</strong> means one input always produces the same fixed output — in this case, every +1 Speed gives exactly +5% motor power. The rate is constant: 5% per Speed point.</p>
+
+    <div class="cviz">
+      <canvas id="urCanvas"></canvas>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span class="ticon sm"><i data-lucide="zap"></i></span>
+      <label style="font-size:14px;font-weight:700;color:var(--soft)">Speed (S):</label>
+      <span id="urSLabel" style="font-size:18px;font-weight:900;color:var(--cyan)">5</span>
+    </div>
+    <input type="range" class="concept-slider" id="urSlider" min="1" max="10" value="5">
+
+    <div class="readout-row">
+      <div class="readout-box">
+        <div class="readout-lbl">Speed (S)</div>
+        <div class="readout-val" id="urS" style="color:var(--cyan)">5</div>
+      </div>
+      <div class="readout-box" style="display:flex;align-items:center;justify-content:center">
+        <div style="font-size:24px;color:var(--muted)">×5 =</div>
+      </div>
+      <div class="readout-box">
+        <div class="readout-lbl">Motor Power %</div>
+        <div class="readout-val" id="urOut" style="color:var(--green)">25%</div>
+      </div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">Speed goes from 4 → 8. Motor power goes from 20% to ___?</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'ur',false)">24%</button>
+        <button class="mc-btn" onclick="checkMC(this,'ur',true)">40%</button>
+        <button class="mc-btn" onclick="checkMC(this,'ur',false)">80%</button>
+        <button class="mc-btn" onclick="checkMC(this,'ur',false)">25%</button>
+      </div>
+      <div class="mc-feedback" id="mc-ur">8 × 5 = ?</div>
+    </div>
+  </div>
+
+  <!-- ── 2. LINEAR FUNCTION ── -->
+  <div class="concept-block" id="c-linear">
+    <div class="concept-badge badge-lf">Linear Function</div>
+    <div class="concept-title">A Straight Line on a Graph</div>
+    <p class="concept-desc">When you plot Speed vs. Motor Power, you get a <strong style="color:var(--green)">straight line</strong>. That's the definition of a linear function — constant slope, no curves. Every point on the line follows the same rule: y = 5x.</p>
+
+    <div class="cviz">
+      <canvas id="lfCanvas"></canvas>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span class="ticon sm g"><i data-lucide="move-horizontal"></i></span>
+      <label style="font-size:14px;font-weight:700;color:var(--soft)">Move point (S):</label>
+      <span id="lfSLabel" style="font-size:18px;font-weight:900;color:var(--green)">5</span>
+    </div>
+    <input type="range" class="concept-slider" id="lfSlider" min="1" max="10" value="5" style="accent-color:var(--green)">
+
+    <div class="readout-row">
+      <div class="readout-box">
+        <div class="readout-lbl">Slope</div>
+        <div class="readout-val" style="color:var(--green)">5</div>
+      </div>
+      <div class="readout-box">
+        <div class="readout-lbl">Point on line</div>
+        <div class="readout-val" id="lfPoint" style="color:var(--text);font-size:16px">(5, 25%)</div>
+      </div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">The slope of motorPower% = S × 5 is ___. That means for every +1 Speed, motor power increases by ___.</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'lf',false)">Slope = 1, +1%</button>
+        <button class="mc-btn" onclick="checkMC(this,'lf',false)">Slope = 20, +20%</button>
+        <button class="mc-btn" onclick="checkMC(this,'lf',true)">Slope = 5, +5%</button>
+        <button class="mc-btn" onclick="checkMC(this,'lf',false)">Slope = 10, +10%</button>
+      </div>
+      <div class="mc-feedback" id="mc-lf">Think: rise ÷ run from (1,5) to (2,10).</div>
+    </div>
+  </div>
+
+  <!-- ── 3. LINEAR DECAY ── -->
+  <div class="concept-block" id="c-decay">
+    <div class="concept-badge badge-ld">Linear Decay</div>
+    <div class="concept-title">Endurance → Power Over Time</div>
+    <p class="concept-desc"><strong style="color:var(--blue)">Linear decay</strong> is a straight line going down. P(t) = 100 − (20 − E) × 1.5 × t. Low Endurance makes the slope steeper — the bot loses power faster. High Endurance means a shallower drop.</p>
+
+    <div class="cviz">
+      <canvas id="ldCanvas"></canvas>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span class="ticon sm b"><i data-lucide="battery"></i></span>
+      <label style="font-size:14px;font-weight:700;color:var(--soft)">Endurance (E):</label>
+      <span id="ldELabel" style="font-size:18px;font-weight:900;color:var(--blue)">10</span>
+    </div>
+    <input type="range" class="concept-slider" id="ldSlider" min="1" max="19" value="10" style="accent-color:var(--blue)">
+
+    <div class="readout-row">
+      <div class="readout-box">
+        <div class="readout-lbl">Endurance (E)</div>
+        <div class="readout-val" id="ldE" style="color:var(--blue)">10</div>
+      </div>
+      <div class="readout-box">
+        <div class="readout-lbl">Drop per round</div>
+        <div class="readout-val" id="ldDrop" style="color:var(--red);font-size:18px">−15%</div>
+      </div>
+      <div class="readout-box">
+        <div class="readout-lbl">Power at t=3</div>
+        <div class="readout-val" id="ldAt3" style="color:var(--text);font-size:18px">55%</div>
+      </div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">A bot with E = 20 (max endurance) loses ___ % power per round.</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'ld',false)">−15%</button>
+        <button class="mc-btn" onclick="checkMC(this,'ld',true)">0% (no decay)</button>
+        <button class="mc-btn" onclick="checkMC(this,'ld',false)">−5%</button>
+        <button class="mc-btn" onclick="checkMC(this,'ld',false)">−30%</button>
+      </div>
+      <div class="mc-feedback" id="mc-ld">Plug E=20 into (20 − E) × 1.5.</div>
+    </div>
+  </div>
+
+  <!-- ── 4. NONLINEAR FUNCTION ── -->
+  <div class="concept-block" id="c-nonlinear">
+    <div class="concept-badge badge-nl">Nonlinear Function</div>
+    <div class="concept-title">Power → Charge (P²)</div>
+    <p class="concept-desc">The Power formula is <strong style="color:var(--orange)">nonlinear</strong>: charge = P². Doubling P doesn't double charge — it quadruples it. The graph curves upward. Compare it to the straight Speed line.</p>
+
+    <div class="cviz">
+      <canvas id="nlCanvas"></canvas>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span class="ticon sm o"><i data-lucide="activity"></i></span>
+      <label style="font-size:14px;font-weight:700;color:var(--soft)">Stat value:</label>
+      <span id="nlLabel" style="font-size:18px;font-weight:900;color:var(--orange)">5</span>
+    </div>
+    <input type="range" class="concept-slider" id="nlSlider" min="1" max="10" value="5" style="accent-color:var(--orange)">
+
+    <div class="readout-row">
+      <div class="readout-box">
+        <div class="readout-lbl">Speed × 5 (linear)</div>
+        <div class="readout-val" id="nlLinear" style="color:var(--green)">25</div>
+      </div>
+      <div class="readout-box">
+        <div class="readout-lbl">Power² (nonlinear)</div>
+        <div class="readout-val" id="nlQuad" style="color:var(--orange)">25</div>
+      </div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">Power doubles: P goes from 3 → 6. Charge goes from 9 to ___?</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'nl',false)">18 (doubled)</button>
+        <button class="mc-btn" onclick="checkMC(this,'nl',true)">36 (quadrupled)</button>
+        <button class="mc-btn" onclick="checkMC(this,'nl',false)">12 (added 3)</button>
+        <button class="mc-btn" onclick="checkMC(this,'nl',false)">54 (×6)</button>
+      </div>
+      <div class="mc-feedback" id="mc-nl">6² = ?</div>
+    </div>
+  </div>
+
+  <!-- ── 5. PROPORTIONAL SCALING ── -->
+  <div class="concept-block" id="c-propscale">
+    <div class="concept-badge badge-ps">Proportional Scaling</div>
+    <div class="concept-title">Does Doubling the Input Double the Output?</div>
+    <p class="concept-desc"><strong style="color:var(--purple)">Proportional</strong> means input × k → output × k. Speed is proportional — double it, double motor power. Power is <em>not</em> proportional — double P, and charge quadruples.</p>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span class="ticon sm p"><i data-lucide="sliders"></i></span>
+      <label style="font-size:14px;font-weight:700;color:var(--soft)">Set stat value:</label>
+      <span id="psLabel" style="font-size:18px;font-weight:900;color:var(--purple)">4</span>
+    </div>
+    <input type="range" class="concept-slider" id="psSlider" min="1" max="10" value="4" style="accent-color:var(--purple)">
+
+    <div class="prop-compare">
+      <div class="prop-side" style="border-color:rgba(0,229,255,.25)">
+        <div class="prop-side-title" style="color:var(--cyan)">Speed → Motor Power<br><span style="font-size:10px;font-weight:400;font-family:'JetBrains Mono',monospace">motorPower% = S × 5</span></div>
+        <div class="prop-bar-track">
+          <div class="prop-bar-fill" id="psCyanBar" style="background:var(--cyan);width:20%">20%</div>
+        </div>
+        <div class="prop-val" id="psCyanVal" style="color:var(--cyan)">20%</div>
+        <div class="prop-formula" style="color:var(--muted)">S=<span id="psCyanS">4</span> → <span id="psCyanCalc">4×5=20%</span></div>
+      </div>
+      <div class="prop-side" style="border-color:rgba(255,145,0,.25)">
+        <div class="prop-side-title" style="color:var(--orange)">Power → Charge<br><span style="font-size:10px;font-weight:400;font-family:'JetBrains Mono',monospace">charge = P²</span></div>
+        <div class="prop-bar-track">
+          <div class="prop-bar-fill" id="psOrangeBar" style="background:var(--orange);width:16%">8</div>
+        </div>
+        <div class="prop-val" id="psOrangeVal" style="color:var(--orange)">8</div>
+        <div class="prop-formula" style="color:var(--muted)">P=<span id="psOrangeP">4</span> → <span id="psOrangeCalc">4²÷2=8</span></div>
+      </div>
+    </div>
+
+    <div class="mc-block">
+      <div class="mc-q">Speed goes from 5 → 10 (doubled). Motor power goes from 25% → ___. Is this proportional?</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'ps',false)">30%, not proportional</button>
+        <button class="mc-btn" onclick="checkMC(this,'ps',true)">50%, yes proportional</button>
+        <button class="mc-btn" onclick="checkMC(this,'ps',false)">100%, not proportional</button>
+        <button class="mc-btn" onclick="checkMC(this,'ps',false)">25%, no change</button>
+      </div>
+      <div class="mc-feedback" id="mc-ps">10 × 5 = ? Does it double from 25%?</div>
+    </div>
+  </div>
+
+  <!-- ── 6. RATIO ── -->
+  <div class="concept-block" id="c-ratio">
+    <div class="concept-badge badge-ra">Ratio</div>
+    <div class="concept-title">Comparing Stats to Each Other</div>
+    <p class="concept-desc">A <strong style="color:var(--teal)">ratio</strong> compares two numbers. S:E = 8:4 = 2:1 — your bot is twice as fast as it has endurance. Ratios reveal how you built your robot and what its strengths are.</p>
+
+    <div class="cviz" style="padding:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em">Your stat spread — drag to adjust</div>
+      <div style="display:grid;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;font-weight:800;color:var(--cyan);width:28px;flex-shrink:0">S</span>
+          <input type="range" class="concept-slider" id="rsS" min="1" max="17" value="8" style="flex:1;accent-color:var(--cyan)">
+          <span id="rsSv" style="font-size:16px;font-weight:900;color:var(--cyan);width:24px;text-align:right">8</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;font-weight:800;color:var(--green);width:28px;flex-shrink:0">E</span>
+          <input type="range" class="concept-slider" id="rsE" min="1" max="17" value="4" style="flex:1;accent-color:var(--green)">
+          <span id="rsEv" style="font-size:16px;font-weight:900;color:var(--green);width:24px;text-align:right">4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;font-weight:800;color:var(--teal);width:28px;flex-shrink:0">T</span>
+          <input type="range" class="concept-slider" id="rsT" min="1" max="17" value="4" style="flex:1;accent-color:var(--teal)">
+          <span id="rsTv" style="font-size:16px;font-weight:900;color:var(--teal);width:24px;text-align:right">4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;font-weight:800;color:var(--orange);width:28px;flex-shrink:0">P</span>
+          <input type="range" class="concept-slider" id="rsP" min="1" max="17" value="4" style="flex:1;accent-color:var(--orange)">
+          <span id="rsPv" style="font-size:16px;font-weight:900;color:var(--orange);width:24px;text-align:right">4</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:#0b1220;border-radius:10px;text-align:center">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Budget total</div>
+        <div id="rsBudget" style="font-size:20px;font-weight:900;color:var(--yellow)">20 ÷ 20</div>
+      </div>
+    </div>
+
+    <div class="ratio-result" id="ratioResult">S:E = 8:4 = 2:1 &nbsp;|&nbsp; S:P = 8:4 = 2:1</div>
+
+    <div class="mc-block">
+      <div class="mc-q">A bot has S = 12, E = 4. The S:E ratio in simplest form is ___.</div>
+      <div class="mc-grid">
+        <button class="mc-btn" onclick="checkMC(this,'ra',false)">1:3</button>
+        <button class="mc-btn" onclick="checkMC(this,'ra',true)">3:1</button>
+        <button class="mc-btn" onclick="checkMC(this,'ra',false)">12:4</button>
+        <button class="mc-btn" onclick="checkMC(this,'ra',false)">2:1</button>
+      </div>
+      <div class="mc-feedback" id="mc-ra">Divide both by GCD: 12÷4 = 3, 4÷4 = 1.</div>
+    </div>
+  </div>
+
+  <div class="done-box" style="margin-top:32px">
+    <div class="done-icon"><i data-lucide="check-circle"></i></div>
+    <div class="done-title">Reflection Complete</div>
+    <div class="done-desc">Save or print your answers before you leave.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:0">
+    <div class="card-label green"><i data-lucide="download"></i> Save Your Work</div>
+    <p style="font-size:15px;color:var(--soft);margin-bottom:18px;line-height:1.65">Print it, save as a PDF, or copy the text to email to yourself.</p>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-print" onclick="printWork()">
+        <i data-lucide="printer"></i>
+        Print / Save as PDF
+      </button>
+      <button class="btn btn-ghost" onclick="copyAnswers()">
+        <i data-lucide="clipboard"></i>
+        Copy Answers
+      </button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.55">
+      <strong style="color:var(--soft)">To email yourself:</strong> tap "Copy Answers" → open your email → paste → send to yourself.
+    </p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(1)">&#8592; Back to Reflect</button>
+  </div>
+</div>
+
+</main>
+
+<!-- ════════════════════════════════════════
+     PRINT VIEW (hidden on screen, shown when printing)
+════════════════════════════════════════ -->
+<div id="printView">
+  <div class="pv-header">
+    <div>
+      <div class="pv-title">Velocity Arena · Day 18 Reflection</div>
+      <div class="pv-sub">Open Lab · After Championship</div>
+    </div>
+    <div class="pv-name-line">
+      Name: &nbsp;<span id="pv-name" class="pv-name-val"></span>
+    </div>
+  </div>
+
+  <div class="pv-block">
+    <div class="pv-block-label">Prompt 1 · The formula I used most</div>
+    <div class="pv-block-answer" id="pv-p1"></div>
+  </div>
+
+  <div class="pv-block">
+    <div class="pv-block-label">Prompt 2 · The hardest moment</div>
+    <div class="pv-block-answer" id="pv-p2"></div>
+  </div>
+
+  <div class="pv-block">
+    <div class="pv-block-label">Prompt 3 · My scouting formula</div>
+    <div class="pv-block-answer" id="pv-p3"></div>
+  </div>
+
+
+  <div class="pv-footer">
+    <span>Velocity Arena · Day 18 · Open Lab Reflection</span>
+    <span id="pv-date"></span>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────
+const state = { selectedSkill: null, selectedMoment: null, agree: null };
+
+const p2starters = [
+  "The hardest moment was when [describe the specific thing that happened]. At first I [what I tried]. Then I [what actually worked or what I noticed]. The number involved was ___.",
+  "I struggled most with [the specific thing]. Here is what I did: [describe the steps]. Looking back, I now know that [what you understand now]. The key number was ___.",
+  "My hardest moment was [describe it]. I didn't know what to do at first. What happened next was [honest description]. The number I was working with was ___, and [what that number told me]."
+];
+const p3starters = [
+  "If I scouted a new team today, I would use this formula: [write the full formula, e.g., motorPower% = S × 100 ÷ 20]. If their Speed stat was ___, I would calculate: ___ × 100 ÷ 20 = ___%. That tells me [what it means for the match].",
+  "My scouting formula: Step 1 — find their [STAT]. Step 2 — calculate [write the formula]. If their stat is ___, the result is ___. Step 3 — compare that to my own result of ___. If their number is higher, I would [change strategy].",
+  "I would use two formulas: [formula 1 written out] and [formula 2 written out]. For a team with [STAT 1] = ___ and [STAT 2] = ___, I would calculate ___ and ___. That would tell me [strategy decision]."
+];
+
+// ── FORMULA PRE-FILLS ─────────────────────
+// When the student taps a formula card, this text goes into the P1 textarea.
+// The formula is written out. They just fill in the blanks.
+const formulaPrefills = {
+  speed:
+    'The formula I used most was Speed:\n' +
+    'motorPower% = (S × 100) ÷ 20\n\n' +
+    'My Speed stat was S = ___.\n' +
+    'I calculated: (___ × 100) ÷ 20 = ___% motor power.\n\n' +
+    'I used this formula when [describe the specific moment].',
+
+  endurance:
+    'The formula I used most was Endurance:\n' +
+    'P(t) = 100 − (20 − E) × 1.5 × t\n\n' +
+    'My Endurance stat was E = ___.\n' +
+    'At round t = ___, I calculated: 100 − (20 − ___) × 1.5 × ___ = ___% power remaining.\n\n' +
+    'I used this formula when [describe the specific moment].',
+
+  turning:
+    'The formula I used most was Turning:\n' +
+    'turnRatio = 0.2 + T × 0.02\n\n' +
+    'My Turning stat was T = ___.\n' +
+    'I calculated: 0.2 + ___ × 0.02 = ___ turn ratio.\n\n' +
+    'I used this formula when [describe the specific moment].',
+
+  power:
+    'The formula I used most was Power:\n' +
+    'charge = P²   and   followThrough = P × 200 ms\n\n' +
+    'My Power stat was P = ___.\n' +
+    'I calculated: charge = ___ × ___ = ___, and follow-through = ___ × 200 = ___ ms.\n\n' +
+    'I used this formula when [describe the specific moment].',
+
+  budget:
+    'The formula I used most was the Budget constraint:\n' +
+    'S + E + T + P = 20\n\n' +
+    'My stats were: S = ___, E = ___, T = ___, P = ___.\n' +
+    'Total: ___ + ___ + ___ + ___ = ___.\n\n' +
+    'This mattered when [describe the specific moment — what did you trade off?].',
+
+  percent:
+    'The formula I used most was Percent Change:\n' +
+    '% Change = (New − Old) ÷ Old × 100\n\n' +
+    'I tracked the change from ___ to ___:\n' +
+    '(___ − ___) ÷ ___ × 100 = ___% change.\n\n' +
+    'I used this formula when [describe the specific moment — what were you comparing?].'
+};
+
+// ── PANEL NAV ─────────────────────────────
+let currentPanel = 0;
+function goPanel(n) {
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
+  document.querySelectorAll('.ptab').forEach((t,i) => {
+    t.classList.remove('active','done');
+    if (i < n) t.classList.add('done');
+  });
+  document.querySelectorAll('.ptab')[n].classList.add('active');
+  document.getElementById('progBar').style.width = ((n+1)/3*100)+'%';
+  currentPanel = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (n===2) { setTimeout(initPanel3Charts, 80); }
+}
+
+// ── SKILL SELECTOR — PRE-FILLS TEXTAREA ───
+function selectSkill(key, el) {
+  state.selectedSkill = key;
+  document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const area = document.getElementById('p1text');
+  // Always pre-fill — the formula is already written, student just fills in numbers
+  area.value = formulaPrefills[key];
+  area.focus();
+  // Move cursor to first blank
+  const firstBlank = area.value.indexOf('___');
+  if (firstBlank !== -1) area.setSelectionRange(firstBlank, firstBlank + 3);
+
+  // Show confirmation
+  document.getElementById('p1prefill').classList.add('show');
+  checkPromptFilled('p1text','p1card');
+  lucide.createIcons();
+}
+
+// ── MOMENT SELECTOR ───────────────────────
+function selectMoment(idx, el) {
+  state.selectedMoment = idx;
+  document.querySelectorAll('.moment-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── SENTENCE STARTERS ─────────────────────
+function useStarter(fieldId, idx) {
+  const field = document.getElementById(fieldId);
+  const starters = fieldId === 'p2text' ? p2starters : p3starters;
+  field.value = starters[idx] + '\n\n';
+  field.focus();
+  const firstBlank = field.value.indexOf('[');
+  if (firstBlank !== -1) field.setSelectionRange(firstBlank, firstBlank);
+  if (fieldId === 'p2text') checkPromptFilled('p2text','p2card');
+  if (fieldId === 'p3text') checkPromptFilled('p3text','p3card');
+}
+
+// ── PROMPT FILLED CHECK ───────────────────
+function checkPromptFilled(textId, cardId) {
+  const val = document.getElementById(textId).value.trim();
+  document.getElementById(cardId).classList.toggle('filled', val.length > 10);
+}
+
+// ── TOGGLE GROUPS ─────────────────────────
+function setToggle(group, val, el) {
+  state[group] = val;
+  el.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ── SYNC DEBRIEF FORMULA ──────────────────
+function syncDebriefFormula() {
+  // (no-op — Compare Results card removed)
+}
+
+// ── REFLECT CHECK & NEXT ──────────────────
+function checkReflectAndNext() {
+  const p1 = document.getElementById('p1text').value.trim();
+  const p2 = document.getElementById('p2text').value.trim();
+  const p3 = document.getElementById('p3text').value.trim();
+  const err = document.getElementById('reflectErr');
+  if (!p1 || !p2 || !p3) {
+    err.style.display = 'block';
+    err.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  err.style.display = 'none';
+  goPanel(2);
+}
+
+// ── PRINT / SAVE AS PDF ───────────────────
+function printWork() {
+  // Populate print view with all current answers
+  const name = document.getElementById('studentName').value.trim();
+  const p1   = document.getElementById('p1text').value.trim();
+  const p2   = document.getElementById('p2text').value.trim();
+  const p3   = document.getElementById('p3text').value.trim();
+
+  const setField = (id, val, emptyMsg) => {
+    const el = document.getElementById(id);
+    if (val) {
+      el.textContent = val;
+      el.classList.remove('empty');
+    } else {
+      el.textContent = emptyMsg;
+      el.classList.add('empty');
+    }
+  };
+
+  document.getElementById('pv-name').textContent = name || '________________________';
+  document.getElementById('pv-date').textContent = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  setField('pv-p1', p1, 'Not answered.');
+  setField('pv-p2', p2, 'Not answered.');
+  setField('pv-p3', p3, 'Not answered.');
+
+  window.print();
+}
+
+// ── SCROLL TO CONCEPT ────────────────────
+function scrollToConcept(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── MULTIPLE CHOICE CHECK ─────────────────
+const mcAnswered = {};
+function checkMC(btn, id, correct) {
+  if (mcAnswered[id]) return;
+  const fb = document.getElementById('mc-' + id);
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  if (correct) {
+    fb.classList.add('show-correct');
+    fb.classList.remove('show-wrong');
+    launchConfetti();
+    mcAnswered[id] = true;
+  } else {
+    fb.classList.add('show-wrong');
+    fb.classList.remove('show-correct');
+    const feedbacks = {
+      ur: 'Not quite. 8 × 5 = 40%. The rate never changes.',
+      lf: 'The slope is rise ÷ run = (10−5) ÷ (2−1) = 5.',
+      ld: 'When E = 20: (20 − 20) × 1.5 = 0. No decay at all!',
+      nl: '6² = 36. Quadrupled, not doubled.',
+      ps: '10 × 5 = 50%. Same rate, so yes — proportional.',
+      ra: '12 ÷ 4 = 3 and 4 ÷ 4 = 1, so 3:1.'
+    };
+    fb.textContent = feedbacks[id] || 'Try again!';
+  }
+  if (correct) {
+    const success = {
+      ur: '✓ Correct! 8 × 5 = 40%. The rate is always 5% per Speed point.',
+      lf: '✓ Correct! Slope = 5. Every +1 Speed adds exactly +5% motor power.',
+      ld: '✓ Correct! E = 20 → (20−20) × 1.5 = 0 decay. Perfect endurance bot.',
+      nl: '✓ Correct! 6² = 36 — that\'s 4× the original 9, not 2×.',
+      ps: '✓ Correct! 10 × 5 = 50%. Double input, double output = proportional.',
+      ra: '✓ Correct! 12:4 simplifies to 3:1.'
+    };
+    fb.textContent = success[id] || '✓ Correct!';
+  }
+}
+
+// ── CONFETTI ─────────────────────────────
+function launchConfetti() {
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden';
+  document.body.appendChild(container);
+  const colors = ['#00e5ff','#00e676','#ffd600','#ff9100','#b388ff','#00bfa5'];
+  for (let i = 0; i < 48; i++) {
+    const p = document.createElement('div');
+    p.style.cssText = `position:absolute;top:-12px;left:${Math.random()*100}%;width:8px;height:8px;border-radius:2px;background:${colors[i%colors.length]};animation:confettiFall ${1+Math.random()*0.8}s ease-out ${Math.random()*0.4}s forwards`;
+    container.appendChild(p);
+  }
+  if (!document.getElementById('confettiStyle')) {
+    const s = document.createElement('style');
+    s.id = 'confettiStyle';
+    s.textContent = '@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}';
+    document.head.appendChild(s);
+  }
+  setTimeout(() => container.remove(), 2500);
+}
+
+// ── PANEL 3 CHARTS ───────────────────────
+let p3initialized = false;
+
+function initPanel3Charts() {
+  if (p3initialized) { redrawAll(); return; }
+  p3initialized = true;
+
+  // Unit Rate chart
+  const urSlider = document.getElementById('urSlider');
+  urSlider.addEventListener('input', () => {
+    const s = +urSlider.value;
+    document.getElementById('urSLabel').textContent = s;
+    document.getElementById('urS').textContent = s;
+    document.getElementById('urOut').textContent = (s*5) + '%';
+    drawUR(s);
+  });
+  drawUR(5);
+
+  // Linear Function chart
+  const lfSlider = document.getElementById('lfSlider');
+  lfSlider.addEventListener('input', () => {
+    const s = +lfSlider.value;
+    document.getElementById('lfSLabel').textContent = s;
+    document.getElementById('lfPoint').textContent = '(' + s + ', ' + (s*5) + '%)';
+    drawLF(s);
+  });
+  drawLF(5);
+
+  // Linear Decay chart
+  const ldSlider = document.getElementById('ldSlider');
+  ldSlider.addEventListener('input', () => {
+    const e = +ldSlider.value;
+    document.getElementById('ldELabel').textContent = e;
+    document.getElementById('ldE').textContent = e;
+    const dropPerRound = (20 - e) * 1.5;
+    document.getElementById('ldDrop').textContent = '−' + dropPerRound.toFixed(1) + '%';
+    const at3 = Math.max(0, 100 - dropPerRound * 3).toFixed(0);
+    document.getElementById('ldAt3').textContent = at3 + '%';
+    drawLD(e);
+  });
+  drawLD(10);
+
+  // Nonlinear chart
+  const nlSlider = document.getElementById('nlSlider');
+  nlSlider.addEventListener('input', () => {
+    const v = +nlSlider.value;
+    document.getElementById('nlLabel').textContent = v;
+    document.getElementById('nlLinear').textContent = v * 5;
+    document.getElementById('nlQuad').textContent = v * v;
+    drawNL(v);
+  });
+  drawNL(5);
+
+  // Proportional scaling
+  const psSlider = document.getElementById('psSlider');
+  psSlider.addEventListener('input', () => updatePS(+psSlider.value));
+  updatePS(4);
+
+  // Ratio sliders
+  ['S','E','T','P'].forEach(stat => {
+    document.getElementById('rs'+stat).addEventListener('input', updateRatio);
+  });
+  updateRatio();
+
+  window.addEventListener('resize', redrawAll);
+}
+
+function redrawAll() {
+  drawUR(+document.getElementById('urSlider').value);
+  drawLF(+document.getElementById('lfSlider').value);
+  drawLD(+document.getElementById('ldSlider').value);
+  drawNL(+document.getElementById('nlSlider').value);
+}
+
+// Helper: setup canvas DPR
+function setupCanvas(id) {
+  const canvas = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = Math.min(rect.width - 36, 640);
+  const h = Math.round(w * 0.52);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w, h, dpr };
+}
+
+// Helper: draw grid + axes
+function drawAxes(ctx, w, h, pad, xMax, yMax, xLabel, yLabel) {
+  const { l, b, t, r } = pad;
+  ctx.strokeStyle = 'rgba(0,229,255,0.07)';
+  ctx.lineWidth = 1;
+  const xSteps = 10; const ySteps = 5;
+  for (let i = 0; i <= xSteps; i++) {
+    const x = l + (i/xSteps) * (w - l - r);
+    ctx.beginPath(); ctx.moveTo(x, t); ctx.lineTo(x, h - b); ctx.stroke();
+  }
+  for (let i = 0; i <= ySteps; i++) {
+    const y = t + (i/ySteps) * (h - t - b);
+    ctx.beginPath(); ctx.moveTo(l, y); ctx.lineTo(w - r, y); ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(0,229,255,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(l, h-b); ctx.lineTo(w-r, h-b); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(l, t); ctx.lineTo(l, h-b); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(136,170,200,0.6)';
+  ctx.font = '11px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= xMax; i += 2) {
+    const x = l + (i/xMax) * (w - l - r);
+    ctx.fillText(i, x, h - b + 14);
+  }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= yMax; i += Math.ceil(yMax/5)) {
+    const y = h - b - (i/yMax) * (h - t - b);
+    ctx.fillText(i, l - 5, y + 4);
+  }
+  ctx.fillStyle = 'rgba(136,170,200,0.5)';
+  ctx.font = 'bold 11px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(xLabel, l + (w-l-r)/2, h - 2);
+  ctx.save(); ctx.translate(10, t + (h-t-b)/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText(yLabel, 0, 0); ctx.restore();
+}
+
+function toCanvas(gx, gy, w, h, pad, xMax, yMax) {
+  const { l, b, t, r } = pad;
+  return [
+    l + (gx/xMax) * (w - l - r),
+    h - b - (gy/yMax) * (h - t - b)
+  ];
+}
+
+// ── DRAW: UNIT RATE ───────────────────────
+function drawUR(sv) {
+  const { ctx, w, h } = setupCanvas('urCanvas');
+  const pad = { l:42, b:28, t:16, r:16 };
+  ctx.clearRect(0, 0, w, h);
+  drawAxes(ctx, w, h, pad, 10, 50, 'Speed (S)', 'Motor%');
+
+  // Draw line y=5x
+  const [x0, y0] = toCanvas(0, 0, w, h, pad, 10, 50);
+  const [x1, y1] = toCanvas(10, 50, w, h, pad, 10, 50);
+  ctx.strokeStyle = 'rgba(0,229,255,0.3)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw bars
+  for (let s = 1; s <= 10; s++) {
+    const barW = (w - pad.l - pad.r) / 12;
+    const [cx] = toCanvas(s, 0, w, h, pad, 10, 50);
+    const [, topY] = toCanvas(s, s*5, w, h, pad, 10, 50);
+    const botY = h - pad.b;
+    const alpha = s === sv ? 0.9 : 0.2;
+    ctx.fillStyle = `rgba(0,229,255,${alpha})`;
+    ctx.fillRect(cx - barW/2, topY, barW, botY - topY);
+  }
+
+  // Highlight dot
+  const [dx, dy] = toCanvas(sv, sv*5, w, h, pad, 10, 50);
+  ctx.beginPath(); ctx.arc(dx, dy, 6, 0, Math.PI*2);
+  ctx.fillStyle = '#00e5ff'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 12px DM Sans,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`(${sv}, ${sv*5}%)`, dx, dy - 12);
+}
+
+// ── DRAW: LINEAR FUNCTION ─────────────────
+function drawLF(sv) {
+  const { ctx, w, h } = setupCanvas('lfCanvas');
+  const pad = { l:42, b:28, t:16, r:16 };
+  ctx.clearRect(0, 0, w, h);
+  drawAxes(ctx, w, h, pad, 10, 50, 'Speed (S)', 'Motor%');
+
+  // Line y=5x
+  const [x0, y0] = toCanvas(0, 0, w, h, pad, 10, 50);
+  const [x1, y1] = toCanvas(10, 50, w, h, pad, 10, 50);
+  ctx.strokeStyle = '#00e676';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+
+  // Rise/run triangle from (sv-1,5*(sv-1)) to (sv,5*sv)
+  if (sv > 1) {
+    const [ax, ay] = toCanvas(sv-1, 5*(sv-1), w, h, pad, 10, 50);
+    const [bx, by] = toCanvas(sv, 5*sv, w, h, pad, 10, 50);
+    const [cx2] = toCanvas(sv, 5*(sv-1), w, h, pad, 10, 50);
+    ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(cx2, ay); ctx.stroke();
+    ctx.strokeStyle = '#ffd600'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx2, ay); ctx.lineTo(bx, by); ctx.stroke();
+    ctx.fillStyle = '#00e5ff'; ctx.font = '10px DM Sans,sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('run=1', (ax+cx2)/2, ay+12);
+    ctx.fillStyle = '#ffd600'; ctx.textAlign = 'left';
+    ctx.fillText('rise=5', bx+4, (ay+by)/2+4);
+  }
+
+  // Moving dot
+  const [dx, dy] = toCanvas(sv, sv*5, w, h, pad, 10, 50);
+  ctx.beginPath(); ctx.arc(dx, dy, 7, 0, Math.PI*2);
+  ctx.fillStyle = '#00e676'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 12px DM Sans,sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText(`(${sv}, ${sv*5})`, dx, dy - 13);
+}
+
+// ── DRAW: LINEAR DECAY ────────────────────
+function drawLD(ev) {
+  const { ctx, w, h } = setupCanvas('ldCanvas');
+  const pad = { l:42, b:28, t:16, r:16 };
+  ctx.clearRect(0, 0, w, h);
+  drawAxes(ctx, w, h, pad, 8, 100, 'Round (t)', 'Power%');
+
+  const dropRate = e => (20 - e) * 1.5;
+
+  // Draw 3 reference lines (low, mid, high E)
+  [[5, 'rgba(255,77,106,0.3)'], [10, 'rgba(79,195,247,0.25)'], [18, 'rgba(0,230,118,0.25)']].forEach(([e, color]) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    for (let t = 0; t <= 8; t++) {
+      const p = Math.max(0, 100 - dropRate(e) * t);
+      const [x, y] = toCanvas(t, p, w, h, pad, 8, 100);
+      t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Main line for current E
+  ctx.strokeStyle = '#4fc3f7'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let t = 0; t <= 8; t++) {
+    const p = Math.max(0, 100 - dropRate(ev) * t);
+    const [x, y] = toCanvas(t, p, w, h, pad, 8, 100);
+    t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Dot at t=3
+  const p3 = Math.max(0, 100 - dropRate(ev) * 3);
+  const [dx, dy] = toCanvas(3, p3, w, h, pad, 8, 100);
+  ctx.beginPath(); ctx.arc(dx, dy, 6, 0, Math.PI*2);
+  ctx.fillStyle = '#4fc3f7'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 11px DM Sans,sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText(`t=3: ${p3.toFixed(0)}%`, dx, dy - 12);
+
+  // Labels
+  ctx.font = '10px DM Sans,sans-serif'; ctx.fillStyle = 'rgba(136,170,200,0.5)';
+  ctx.textAlign = 'left';
+  ctx.fillText('E=18', w - pad.r - 32, toCanvas(8, Math.max(0, 100-dropRate(18)*8), w, h, pad, 8, 100)[1] - 4);
+  ctx.fillText('E=5', w - pad.r - 28, toCanvas(4, Math.max(0, 100-dropRate(5)*4), w, h, pad, 8, 100)[1] - 4);
+}
+
+// ── DRAW: NONLINEAR ───────────────────────
+function drawNL(sv) {
+  const { ctx, w, h } = setupCanvas('nlCanvas');
+  const pad = { l:48, b:28, t:16, r:16 };
+  ctx.clearRect(0, 0, w, h);
+  const yMax = 100;
+  drawAxes(ctx, w, h, pad, 10, yMax, 'Stat value', 'Output');
+
+  // Linear line S×5
+  ctx.strokeStyle = '#00e676'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let s = 0; s <= 10; s++) {
+    const [x, y] = toCanvas(s, Math.min(s*5, yMax), w, h, pad, 10, yMax);
+    s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Nonlinear curve P²
+  ctx.strokeStyle = '#ff9100'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let s = 0; s <= 10; s += 0.2) {
+    const [x, y] = toCanvas(s, Math.min(s*s, yMax), w, h, pad, 10, yMax);
+    s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Labels
+  ctx.font = 'bold 11px DM Sans,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#00e676'; ctx.fillText('S×5 (linear)', pad.l + 4, 28);
+  ctx.fillStyle = '#ff9100'; ctx.fillText('P² (nonlinear)', pad.l + 4, 42);
+
+  // Dots at current sv
+  const [lx, ly] = toCanvas(sv, Math.min(sv*5, yMax), w, h, pad, 10, yMax);
+  ctx.beginPath(); ctx.arc(lx, ly, 6, 0, Math.PI*2);
+  ctx.fillStyle = '#00e676'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  const [qx, qy] = toCanvas(sv, Math.min(sv*sv, yMax), w, h, pad, 10, yMax);
+  ctx.beginPath(); ctx.arc(qx, qy, 6, 0, Math.PI*2);
+  ctx.fillStyle = '#ff9100'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Vertical line at sv
+  const [vx] = toCanvas(sv, 0, w, h, pad, 10, yMax);
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(vx, pad.t); ctx.lineTo(vx, h-pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ── PROPORTIONAL SCALING UPDATE ───────────
+function updatePS(sv) {
+  document.getElementById('psLabel').textContent = sv;
+  const linearOut = sv * 5;
+  const nonlinOut = (sv * sv / 2).toFixed(1);
+  const linearPct = Math.min(linearOut, 100);
+  const nonlinPct = Math.min((sv*sv/2) / 50 * 100, 100);
+
+  document.getElementById('psCyanBar').style.width = linearPct + '%';
+  document.getElementById('psCyanBar').textContent = linearOut + '%';
+  document.getElementById('psCyanVal').textContent = linearOut + '%';
+  document.getElementById('psCyanS').textContent = sv;
+  document.getElementById('psCyanCalc').textContent = sv + '×5=' + linearOut + '%';
+
+  document.getElementById('psOrangeBar').style.width = nonlinPct + '%';
+  document.getElementById('psOrangeBar').textContent = nonlinOut;
+  document.getElementById('psOrangeVal').textContent = nonlinOut;
+  document.getElementById('psOrangeP').textContent = sv;
+  document.getElementById('psOrangeCalc').textContent = sv + '²÷2=' + nonlinOut;
+}
+
+// ── RATIO UPDATE ──────────────────────────
+function updateRatio() {
+  const s = +document.getElementById('rsS').value;
+  const e = +document.getElementById('rsE').value;
+  const t2 = +document.getElementById('rsT').value;
+  const p = +document.getElementById('rsP').value;
+
+  document.getElementById('rsSv').textContent = s;
+  document.getElementById('rsEv').textContent = e;
+  document.getElementById('rsTv').textContent = t2;
+  document.getElementById('rsPv').textContent = p;
+
+  const total = s + e + t2 + p;
+  const budgetEl = document.getElementById('rsBudget');
+  budgetEl.textContent = total + ' / 20';
+  budgetEl.style.color = total === 20 ? 'var(--green)' : total > 20 ? 'var(--red)' : 'var(--yellow)';
+
+  const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+  const gSE = gcd(s, e);
+  const gSP = gcd(s, p);
+  document.getElementById('ratioResult').textContent =
+    `S:E = ${s}:${e} = ${s/gSE}:${e/gSE}  |  S:P = ${s}:${p} = ${s/gSP}:${p/gSP}`;
+}
+
+// ── COPY ANSWERS TO CLIPBOARD ─────────────
+function copyAnswers() {
+  const name = document.getElementById('studentName').value.trim() || '[name]';
+  const p1   = document.getElementById('p1text').value.trim() || '(not answered)';
+  const p2   = document.getElementById('p2text').value.trim() || '(not answered)';
+  const p3   = document.getElementById('p3text').value.trim() || '(not answered)';
+
+  const text =
+    `Velocity Arena — Day 18 Reflection\nStudent: ${name}\n` +
+    `Date: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\n\n` +
+    `PROMPT 1 — The formula I used most:\n${p1}\n\n` +
+    `PROMPT 2 — The hardest moment:\n${p2}\n\n` +
+    `PROMPT 3 — My scouting formula:\n${p3}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  });
+}
+</script>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
