@@ -787,6 +787,7 @@
             <th>Date</th>
             <th>Match #</th>
             <th>Opponent</th>
+            <th class="ball-col">Ball</th>
             <th>Score</th>
             <th>Predicted</th>
             <th>Pred. Error</th>
@@ -821,6 +822,16 @@
       <div class="form-field">
         <label>Opponent</label>
         <input type="text" id="new-opponent" placeholder="Team name">
+      </div>
+      <div class="form-field ball-field" id="new-ball-field">
+        <label>Ball</label>
+        <select id="new-ball">
+          <option value="">--</option>
+          <option value="Standard">Standard</option>
+          <option value="Chaos">Chaos</option>
+          <option value="Heavy Touch">Heavy Touch</option>
+          <option value="Endurance">Endurance</option>
+        </select>
       </div>
       <div class="form-field">
         <label>Score</label>
@@ -1181,7 +1192,11 @@ function renderAll() {
 
 // ─── META INPUTS ───────────────────────────────────────────
 document.getElementById('meta-season').addEventListener('input', function() { currentTeam().season = this.value; });
-document.getElementById('meta-week').addEventListener('input', function() { currentTeam().week = parseInt(this.value)||1; });
+document.getElementById('meta-week').addEventListener('input', function() {
+  currentTeam().week = parseInt(this.value)||1;
+  // Show/hide the Ball column when the team advances into Season 2 (Wk 3+).
+  if (typeof applyBallVisibility === 'function') applyBallVisibility();
+});
 
 // ─── UNDERDOG BUDGET MECHANIC ──────────────────────────────
 // Season 2 (Days 11–15): the underdog from Season 1 gets a 22-point
@@ -1333,14 +1348,34 @@ function renderPredErrorSparkline() {
   label.textContent = 'Last ' + tail.length + ' matches · avg error ' + avg + ' goals. ' + msg;
 }
 
+// Ball type column appears in Weeks 3–4 (Seasons 2 & 3). Hidden until any
+// match has week >= 3 OR the team's current week is >= 3 — keeps the table
+// uncluttered during Season 1.
+function shouldShowBallCol() {
+  const team = currentTeam();
+  if (parseInt(team.week) >= 3) return true;
+  return (team.matchLog || []).some(m => parseInt(m.week) >= 3);
+}
+
+function applyBallVisibility() {
+  const show = shouldShowBallCol();
+  document.querySelectorAll('.ball-col').forEach(el => el.style.display = show ? '' : 'none');
+  const ballField = document.getElementById('new-ball-field');
+  if (ballField) ballField.style.display = show ? '' : 'none';
+}
+
 function renderMatchTable() {
   const tbody = document.getElementById('match-tbody');
   tbody.innerHTML = '';
   const rows = currentTeam().matchLog;
+  // Empty-state colspan covers the visible columns only; ball is hidden in Wk 1–2.
+  const showBall = shouldShowBallCol();
+  const emptyColspan = showBall ? 11 : 10;
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="10" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tr.innerHTML = '<td colspan="' + emptyColspan + '" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
     tbody.appendChild(tr);
+    applyBallVisibility();
     renderPredErrorSparkline();
     return;
   }
@@ -1358,6 +1393,13 @@ function renderMatchTable() {
       <td><input type="date" value="${r.date||''}" onchange="updateMatch(${i},'date',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="number" value="${r.match||''}" onchange="updateMatch(${i},'match',this.value)" min="1" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="text" value="${r.opponent||''}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td class="ball-col"><select onchange="updateMatch(${i},'ball',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color:var(--slate);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
+        <option value="" ${!r.ball?'selected':''}>--</option>
+        <option value="Standard"    ${r.ball==='Standard'?'selected':''}>Standard</option>
+        <option value="Chaos"       ${r.ball==='Chaos'?'selected':''}>Chaos</option>
+        <option value="Heavy Touch" ${r.ball==='Heavy Touch'?'selected':''}>Heavy Touch</option>
+        <option value="Endurance"   ${r.ball==='Endurance'?'selected':''}>Endurance</option>
+      </select></td>
       <td><input type="text" value="${r.score||''}" onchange="updateMatch(${i},'score',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:60px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td><input type="number" value="${r.predictedGoals||''}" onchange="updateMatch(${i},'predictedGoals',this.value)" min="0" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color:var(--slate);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
       <td style="text-align:center;font-size:11px;color:var(--steel);">${(() => { const predicted = parseFloat(r.predictedGoals); const actual = parseInt((r.score||'').split('-')[0]); if (isNaN(predicted) || isNaN(actual)) return '—'; return Math.abs(predicted - actual); })()}</td>
@@ -1372,6 +1414,7 @@ function renderMatchTable() {
     `;
     tbody.appendChild(tr);
   });
+  applyBallVisibility();
   renderPredErrorSparkline();
 }
 
@@ -1415,6 +1458,7 @@ function addMatchRow() {
     date: document.getElementById('new-date').value,
     match: matchNum,
     opponent: document.getElementById('new-opponent').value,
+    ball: document.getElementById('new-ball').value,
     score: document.getElementById('new-score').value,
     predictedGoals: document.getElementById('new-predicted').value,
     wl: document.getElementById('new-wl').value,
@@ -1423,6 +1467,7 @@ function addMatchRow() {
   currentTeam().matchLog.push(row);
   ['new-date','new-opponent','new-score','new-predicted','new-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('new-wl').value = '';
+  document.getElementById('new-ball').value = '';
   // Auto-increment match # for next entry
   document.getElementById('new-match').value = getNextMatchNum(week);
   renderMatchTable();
@@ -1443,6 +1488,8 @@ function updateMatch(i, field, val) {
     }
   }
   if (field === 'predictedGoals') renderPredErrorSparkline();
+  // Editing a row's week inline can flip the Ball column on or off.
+  if (field === 'week') applyBallVisibility();
 }
 
 // Parse a score string like "2-1" and return 'W' | 'L' | 'D' | null.
