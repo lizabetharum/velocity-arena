@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Velocity Arena · Match Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0D0D1A; --navy2:#161A2E; --navy3:#1E2240;
+      --cyan:#00E5FF; --teal:#007A99; --slate:#8899AA;
+      --white:#FFFFFF; --card-border:#222840;
+      --green:#00C97A; --red:#FF4D6A; --yellow:#FFD166;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'DM Sans',sans-serif;
+      background:var(--navy); color:#E8EAF2;
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      padding:1.5rem;
+    }
+    .back-link{
+      position:absolute; top:1.25rem; left:1.5rem;
+      color:var(--slate); text-decoration:none;
+      font-size:.8125rem; font-weight:500; letter-spacing:.04em;
+    }
+    .back-link:hover{color:var(--cyan)}
+    .brand{
+      font-size:.6875rem; font-weight:700; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--cyan);
+      margin-bottom:.5rem;
+    }
+    .timer-container{
+      background:var(--navy2);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      box-shadow:0 6px 24px rgba(0,0,0,.35);
+      padding:2.25rem 2.5rem;
+      text-align:center;
+      min-width:320px;
+    }
+    .timer-container h1{
+      font-size:1.375rem; font-weight:800;
+      color:var(--white); letter-spacing:-.01em;
+      margin-bottom:1rem;
+    }
+    #time-input-container{
+      margin-bottom:1rem;
+      display:flex; gap:.5rem; justify-content:center; align-items:center;
+      color:var(--slate); font-size:.875rem;
+    }
+    #minutes-input,#seconds-input{
+      width:80px; padding:.4rem;
+      font-family:'DM Sans',sans-serif;
+      font-size:1rem; text-align:center;
+      border-radius:6px;
+      border:1px solid var(--card-border);
+      background:var(--navy3); color:var(--white);
+      outline:none; transition:border-color .15s;
+    }
+    #minutes-input:focus,#seconds-input:focus{border-color:var(--teal)}
+    #minutes-input:disabled,#seconds-input:disabled{opacity:.5}
+    #display{
+      font-size:4rem; font-weight:800;
+      color:var(--cyan);
+      margin:1rem 0 1.25rem;
+      letter-spacing:-.02em;
+      font-variant-numeric:tabular-nums;
+    }
+    .buttons-container{
+      display:flex; gap:.625rem;
+      justify-content:center; flex-wrap:wrap;
+    }
+    .control-btn{
+      padding:.625rem 1.125rem;
+      font-family:'DM Sans',sans-serif;
+      font-size:.9375rem; font-weight:700;
+      border:none; border-radius:7px;
+      cursor:pointer;
+      transition:opacity .15s, transform .1s, background .15s;
+      letter-spacing:.01em;
+    }
+    .control-btn:active{transform:scale(.97)}
+    .control-btn:hover{opacity:.88}
+    #start-btn{background:var(--cyan); color:var(--navy)}
+    #start-btn.stop{background:var(--red); color:#fff}
+    #reset-btn{
+      background:transparent; color:var(--slate);
+      border:1px solid var(--card-border);
+    }
+    #reset-btn:hover{color:var(--white); border-color:var(--slate); opacity:1}
+    #warning-btn{
+      background:transparent; color:var(--yellow);
+      border:1px solid rgba(255,209,102,.4);
+    }
+    #warning-btn.active{
+      background:var(--yellow); color:var(--navy);
+      border-color:var(--yellow);
+    }
+    .hint{
+      font-size:.75rem; color:var(--slate);
+      margin-top:1rem; line-height:1.5;
+    }
+  </style>
+</head>
+<body>
+  <a href="/index.html" class="back-link">← Today</a>
+  <div class="brand">Velocity Arena</div>
+  <div class="timer-container">
+    <h1>Match Timer</h1>
+    <div id="time-input-container">
+      <input type="number" id="minutes-input" placeholder="Minutes" value="3" min="1">
+      <label for="minutes-input">min</label>
+      <input type="number" id="seconds-input" placeholder="Seconds" value="00" min="0" max="59">
+      <label for="seconds-input">sec</label>
+    </div>
+    <div id="display">3:00</div>
+    <div class="buttons-container">
+      <button id="start-btn"   class="control-btn">Start</button>
+      <button id="reset-btn"   class="control-btn">Reset</button>
+      <button id="warning-btn" class="control-btn" aria-pressed="false">30-Second Warning: Off</button>
+    </div>
+    <div class="hint">Tip: click any button once to “unlock” sound on mobile.</div>
+  </div>
+
+  <script>
+    // --- DOM
+    const display       = document.getElementById('display');
+    const startBtn      = document.getElementById('start-btn');
+    const resetBtn      = document.getElementById('reset-btn');
+    const warningBtn    = document.getElementById('warning-btn');
+    const minutesInput  = document.getElementById('minutes-input');
+    const secondsInput  = document.getElementById('seconds-input');
+
+    // --- Timer state
+    let timerInterval = null;
+    let isRunning = false;
+    let totalSeconds;
+
+    // --- Warning toggle state
+    let warningEnabled = false;  // controlled by toggle button
+    let warningPlayed  = false;  // set true once we play the 30-second beep
+
+    // --- Audio (Web Audio API)
+    let audioCtx;
+    function ensureAudioUnlocked() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx.state === 'suspended') {
+        return audioCtx.resume();
+      }
+      return Promise.resolve();
+    }
+
+    // Short single beep (for 30-second warning)
+    function playWarningBeep() {
+     
+      if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+ function tone(freq, start, dur = 0.4, type = 'sine', peak = 0.25) {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, start);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(peak, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+        osc.start(start);
+        osc.stop(start + dur);
+  }
+
+  // C5 → D5 → E5
+  /*tone(523.25, now + 0.0);  // C5
+  tone(587.33, now + 0.6);  // D5
+  tone(659.25, now + 1.2);  // E5*/
+  
+   tone(523.25, now + 0.00, 0.35, 'sine', 0.28);     // C5
+      tone(587.33, now + 0.35, 0.35, 'sine', 0.28);     // D5
+      tone(659.25, now + 0.65, 0.45, 'sine', 0.30);     // E5
+       tone(783.99, now + 1.05, 0.45, 'sine', 0.30);     // G5
+       tone(523.25, now + 1.50, 0.35, 'sine', 0.28);     // C5
+       tone(587.33, now + 0.85, 0.35, 'sine', 0.28);     // D5
+   
+/*  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+  function tone(freq, start, dur = 0.6) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";  // softer bell-like
+    osc.frequency.setValueAtTime(freq, start);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.12, start + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+    osc.start(start);
+    osc.stop(start + dur);
+  }
+
+  // G5 → E5 → C5
+  tone(783.99, now + 0.0);   // G5
+  tone(659.25, now + 0.7);   // E5
+  tone(523.25, now + 1.4);   // C5*/
+    
+    }
+
+    
+
+    // Three-tone melody (for time's up)
+    function playMelody() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      function tone(freq, start, dur = 0.4, type = 'sine', peak = 0.25) {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, start);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(peak, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+        osc.start(start);
+        osc.stop(start + dur);
+      }
+
+      // C5 → E5 → G5 (nice little arpeggio)
+      tone(523.25, now + 0.00, 0.35, 'sine', 0.28);     // C5
+      tone(659.25, now + 0.45, 0.35, 'sine', 0.28);     // E5
+      tone(783.99, now + 0.90, 0.45, 'sine', 0.30);     // G5
+      tone(659.25, now + 1.20, 0.35, 'sine', 0.28);     // E5
+    tone(523.25, now + 1.60, 0.35, 'sine', 0.28);     // C5
+    tone(523.25, now + 2.00, 0.35, 'sine', 0.28);     // C5
+      tone(659.25, now + 2.45, 0.35, 'sine', 0.28);     // E5
+      tone(783.99, now + 2.90, 0.45, 'sine', 0.30);     // G5
+      tone(659.25, now + 3.20, 0.35, 'sine', 0.28);     // E5
+    tone(523.25, now + 3.60, 0.35, 'sine', 0.28);
+   
+     
+     
+    }
+
+    // --- Helpers
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
+    function updateDisplayFromInputs() {
+      const m = Math.max(0, parseInt(minutesInput.value || '0', 10));
+      const s = Math.max(0, Math.min(59, parseInt(secondsInput.value || '0', 10)));
+      display.textContent = formatTime(m * 60 + s);
+    }
+
+    function setWarningUI(on) {
+      warningEnabled = on;
+      warningBtn.classList.toggle('active', on);
+      warningBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      warningBtn.textContent = on ? '30-Second Warning: On' : '30-Second Warning: Off';
+    }
+
+    function startTimer() {
+      if (timerInterval) return; // no double intervals
+      ensureAudioUnlocked().catch(()=>{});
+
+      if (totalSeconds === undefined) {
+        const minutes = parseInt(minutesInput.value, 10) || 0;
+        const seconds = parseInt(secondsInput.value, 10) || 0;
+        totalSeconds = (minutes * 60) + seconds;
+      }
+      if (totalSeconds <= 0) return;
+
+      timerInterval = setInterval(updateTimer, 1000);
+      startBtn.textContent = 'Pause';
+      startBtn.classList.add('stop');
+      isRunning = true;
+      minutesInput.disabled = true;
+      secondsInput.disabled = true;
+
+      // Reset 30-second flag when starting fresh
+      warningPlayed = false;
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      startBtn.textContent = 'Resume';
+      startBtn.classList.remove('stop');
+      isRunning = false;
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      totalSeconds = undefined;
+      isRunning = false;
+
+      minutesInput.disabled = false;
+      secondsInput.disabled = false;
+      minutesInput.value = '3';
+      secondsInput.value = '0';
+      display.textContent = '3:00';
+
+      startBtn.textContent = 'Start';
+      startBtn.classList.remove('stop');
+
+      // Reset warning state & UI
+      warningPlayed = false;
+      setWarningUI(false);
+    }
+
+    function endOfTimerUIReset() {
+      // Put UI back to defaults when timer finishes
+      startBtn.textContent = 'Start';
+      startBtn.classList.remove('stop');
+      isRunning = false;
+      minutesInput.disabled = false;
+      secondsInput.disabled = false;
+
+      // Turn off the 30-second warning toggle
+      setWarningUI(false);
+      warningPlayed = false;
+    }
+
+    function updateTimer() {
+      totalSeconds--;
+      display.textContent = formatTime(totalSeconds);
+
+      // 30-second warning (play only once, if enabled, and only if we reach 30s)
+      if (!warningPlayed && warningEnabled && totalSeconds === 30) {
+        ensureAudioUnlocked().then(() => playWarningBeep());
+        warningPlayed = true;
+      }
+
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        display.textContent = '00:00';
+
+        // Play melody BEFORE alert (alert can block audio on some browsers)
+        ensureAudioUnlocked().then(() => playMelody());
+
+        // Alert after scheduling sound
+        //setTimeout(() => alert('Time is up!'), 100);
+
+        endOfTimerUIReset();
+      }
+    }
+
+    // --- Events
+    startBtn.addEventListener('click', () => {
+      if (isRunning) pauseTimer();
+      else startTimer();
+    });
+
+    resetBtn.addEventListener('click', resetTimer);
+
+    warningBtn.addEventListener('click', () => {
+      // Toggle the 30-second warning state
+      ensureAudioUnlocked().catch(()=>{});
+      setWarningUI(!warningEnabled);
+    });
+
+    minutesInput.addEventListener('input', updateDisplayFromInputs);
+    secondsInput.addEventListener('input', updateDisplayFromInputs);
+  </script>
+</body>
+</html>
