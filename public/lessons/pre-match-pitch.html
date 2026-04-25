@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 17 — Pre-Match Pitch + Teach the Math</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:17px}
+:root{
+  --bg:#0b1220;--surface:#101c2e;--card:#162032;--border:#1e3352;
+  --cyan:#00e5ff;--yellow:#ffd600;--green:#00e676;--red:#ff4d6a;
+  --orange:#ff9100;--purple:#b388ff;--teal:#00bfa5;
+  --text:#e4edf8;--muted:#5a85a8;--soft:#8ab4d4;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;line-height:1.55}
+
+/* ── TECH ICONS ─────────── */
+.ticon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;flex-shrink:0;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--cyan)}
+.ticon.sm{width:30px;height:30px;border-radius:8px}
+.ticon.lg{width:52px;height:52px;border-radius:12px}
+.ticon.y{background:rgba(255,214,0,.1);border-color:rgba(255,214,0,.2);color:var(--yellow)}
+.ticon.g{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.2);color:var(--green)}
+.ticon.o{background:rgba(255,145,0,.1);border-color:rgba(255,145,0,.2);color:var(--orange)}
+.ticon.p{background:rgba(179,136,255,.1);border-color:rgba(179,136,255,.2);color:var(--purple)}
+.ticon.t{background:rgba(0,191,165,.1);border-color:rgba(0,191,165,.2);color:var(--teal)}
+.ticon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ticon.sm svg{width:15px;height:15px}
+.ticon.lg svg{width:28px;height:28px}
+
+/* ── HEADER ─────────────── */
+.hdr{background:var(--surface);border-bottom:3px solid var(--cyan);padding:14px 20px;position:sticky;top:0;z-index:100}
+.hdr-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.day-chip{background:var(--cyan);color:#0b1220;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:5px 13px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.hdr-titles{flex:1}
+.hdr-title{font-size:16px;font-weight:800;line-height:1.2}
+.hdr-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.hdr-robot{flex-shrink:0}
+
+/* ── PROGRESS BAR ───────── */
+.prog-wrap{background:var(--surface);border-bottom:1px solid var(--border)}
+.prog-bar{height:4px;background:var(--cyan);transition:width .4s ease}
+.prog-tabs{display:flex;max-width:720px;margin:0 auto}
+.ptab{flex:1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 4px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .2s;border-bottom:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;justify-content:center;gap:3px}
+.ptab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.ptab.done{color:var(--green);border-bottom-color:var(--green)}
+.ptab svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── LAYOUT ─────────────── */
+.main{max-width:720px;margin:0 auto;padding:24px 16px}
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── SECTION HEADER ─────── */
+.sec-eyebrow{font-size:11px;fontXP-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sec-title{font-size:28px;font-weight:900;color:var(--text);line-height:1.15;margin-bottom:10px}
+.sec-desc{font-size:17px;color:var(--soft);line-height:1.65;margin-bottom:24px;max-width:52ch}
+
+/* ── CARDS ──────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.card-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-label.yellow{color:var(--yellow)}
+.card-label.green{color:var(--green)}
+.card-label.orange{color:var(--orange)}
+.card-label.purple{color:var(--purple)}
+.card-label.teal{color:var(--teal)}
+.card-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── INFO BOX ───────────── */
+.info-box{border-left:4px solid var(--cyan);background:rgba(0,229,255,.06);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:16px;font-size:15px;color:var(--soft);line-height:1.65}
+.info-box strong{color:var(--text)}
+.info-box.yellow{border-left-color:var(--yellow);background:rgba(255,214,0,.06)}
+.info-box.green{border-left-color:var(--green);background:rgba(0,230,118,.06)}
+.info-box.orange{border-left-color:var(--orange);background:rgba(255,145,0,.06)}
+.info-box.purple{border-left-color:var(--purple);background:rgba(179,136,255,.06)}
+
+/* ── MISSION CARDS ─────── */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.mission-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.mc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.mc-icon.c{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);color:var(--cyan)}
+.mc-icon.y{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.25);color:var(--yellow)}
+.mc-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mc-num{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.mc-title{font-size:17px;font-weight:800;color:var(--text)}
+.mc-time{font-size:22px;font-weight:900;color:var(--cyan)}
+.mc-time.y{color:var(--yellow)}
+.mc-desc{font-size:14px;color:var(--soft);line-height:1.55}
+
+/* ── VISUAL STEPS ───────── */
+.vsteps{display:flex;flex-direction:column;gap:12px}
+.vstep{display:flex;gap:14px;align-items:flex-start;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:14px}
+.vstep-body{flex:1}
+.vstep-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.vstep-desc{font-size:14px;color:var(--soft);line-height:1.55}
+.vstep-desc strong{color:var(--yellow)}
+.vstep-desc .ok{color:var(--green);font-weight:800}
+.vstep-desc .no{color:var(--red);font-weight:800}
+
+/* ── WHAT IT MEANS BOX ─── */
+.meaning-box{background:rgba(0,229,255,.04);border:1px dashed rgba(0,229,255,.25);border-radius:10px;padding:14px 16px;margin:10px 0;display:flex;gap:12px;align-items:flex-start}
+.meaning-text{font-size:14px;color:var(--soft);line-height:1.6}
+.meaning-text strong{color:var(--text)}
+
+/* ── INPUTS ─────────────── */
+.field-label{font-size:15px;font-weight:700;color:var(--soft);margin-bottom:6px;display:block}
+.field-hint{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5;display:flex;align-items:flex-start;gap:6px}
+.field-hint svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px;opacity:.7}
+.field-group{margin-bottom:20px}
+input[type=text],input[type=number],textarea,select{
+  width:100%;background:#0b1220;border:2px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:17px;
+  padding:13px 15px;transition:border-color .2s;-webkit-appearance:none;appearance:none
+}
+input[type=text]:focus,input[type=number]:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
+input[type=number]{-moz-appearance:textfield;width:100px;text-align:center;font-size:22px;font-weight:800;height:58px;color:var(--cyan)}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+textarea{min-height:88px;resize:vertical;font-size:15px;line-height:1.65}
+select{cursor:pointer;height:54px;font-size:16px}
+::placeholder{color:rgba(139,180,212,.35)}
+
+/* ── PITCH CLAIM ROWS ─────── */
+.claim-row{background:#0b1220;border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;transition:border-color .3s}
+.claim-row:focus-within{border-color:var(--cyan)}
+.claim-row.filled{border-color:rgba(0,230,118,.5)}
+.claim-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.claim-stat-chip{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;border-radius:20px;flex-shrink:0;display:inline-flex;align-items:center;gap:5px}
+.claim-stat-chip.spd{background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3)}
+.claim-stat-chip.end{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.claim-stat-chip.pwr{background:rgba(255,145,0,.15);color:var(--orange);border:1px solid rgba(255,145,0,.3)}
+.claim-stat-chip.trn{background:rgba(0,191,165,.15);color:var(--teal);border:1px solid rgba(0,191,165,.3)}
+.claim-stat-chip.opp{background:rgba(179,136,255,.15);color:var(--purple);border:1px solid rgba(179,136,255,.3)}
+.claim-stat-chip svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+.claim-desc{font-size:13px;color:var(--soft);line-height:1.5;flex:1}
+.req-badge{font-size:11px;font-weight:700;color:var(--red);background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);border-radius:4px;padding:3px 8px;flex-shrink:0;margin-left:auto;display:inline-flex;align-items:center;gap:4px}
+.req-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+.claim-fields{display:grid;grid-template-columns:1fr 118px;gap:12px;align-items:start}
+.claim-num-box{display:flex;flex-direction:column;align-items:center;gap:6px}
+.claim-num-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center}
+
+/* ── PITCH PREVIEW ──────── */
+.pitch-preview{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.25);border-radius:14px;padding:22px;margin-top:18px}
+.pp-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.pp-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+.pp-line{font-size:15px;color:var(--text);line-height:1.75;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pp-line:last-child{border-bottom:none}
+.pp-tag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:4px;flex-shrink:0;display:inline-flex;align-items:center;gap:3px}
+.pp-tag svg,.s-icon{width:10px;height:10px;display:inline-block;vertical-align:middle;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.pp-tag.spd{background:rgba(0,229,255,.15);color:var(--cyan)}
+.pp-tag.end{background:rgba(0,230,118,.15);color:var(--green)}
+.pp-tag.pwr{background:rgba(255,145,0,.15);color:var(--orange)}
+.pp-tag.trn{background:rgba(0,191,165,.15);color:var(--teal)}
+.pp-tag.opp{background:rgba(179,136,255,.15);color:var(--purple)}
+.pp-num{font-weight:900;color:var(--yellow);font-size:17px}
+.pp-placeholder{color:var(--muted);font-style:italic;font-size:14px}
+
+/* ── TIMER ──────────────── */
+.timer-box{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:28px 20px;text-align:center;margin-bottom:22px}
+.timer-ring-wrap{position:relative;width:240px;height:240px;margin:0 auto 22px}
+.timer-ring-wrap svg{position:absolute;top:0;left:0}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:10}
+.ring-fill{fill:none;stroke:var(--cyan);stroke-width:10;stroke-linecap:round;stroke-dasharray:628.3;stroke-dashoffset:0;transition:stroke-dashoffset .5s linear,stroke .3s}
+.timer-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.timer-display{font-size:58px;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--cyan);letter-spacing:.04em;line-height:1;transition:color .3s}
+.timer-display.warn{color:var(--yellow)}
+.timer-display.danger{color:var(--red)}
+.timer-sublabel{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.timer-btn-row{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.timer-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;padding:14px 28px;cursor:pointer;transition:opacity .2s}
+.timer-btn:hover{opacity:.85}
+.timer-btn.primary{background:var(--cyan);color:#0b1220}
+.timer-btn.ghost{background:transparent;color:var(--muted);border:2px solid var(--border)}
+.timer-btn.ghost:hover{color:var(--text);border-color:var(--soft)}
+.timer-status{font-size:15px;color:var(--soft);min-height:24px;line-height:1.5}
+
+/* ── PITCH READ-BACK ─────── */
+.pitch-card{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:22px;margin-bottom:22px}
+.pitch-card-eyebrow{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.pitch-card-eyebrow svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+.pitch-card-line{font-size:16px;color:var(--text);line-height:1.8;padding:4px 0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pitch-card-num{font-weight:900;color:var(--yellow);font-size:18px}
+
+/* ── CALC SELECTOR ──────── */
+.calc-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.calc-option{background:#0b1220;border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:14px}
+.calc-option:hover{border-color:var(--cyan);background:rgba(0,229,255,.03)}
+.calc-option.selected{border-color:var(--cyan);background:rgba(0,229,255,.05)}
+.calc-check{width:24px;height:24px;min-width:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-top:3px}
+.calc-option.selected .calc-check{background:var(--cyan);border-color:var(--cyan)}
+.calc-check-dot{width:9px;height:9px;background:#0b1220;border-radius:50%;opacity:0;transition:opacity .2s}
+.calc-option.selected .calc-check-dot{opacity:1}
+.calc-info{}
+.calc-name{font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px}
+.calc-formula{font-size:13px;color:var(--cyan);font-family:'JetBrains Mono',monospace;margin-bottom:4px;line-height:1.5}
+.calc-desc{font-size:13px;color:var(--soft);line-height:1.5}
+
+/* ── MATH STEPS ─────────── */
+.math-steps{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.mstep{background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+.mstep-body{}
+.mstep-title{font-size:14px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.mstep-content{font-size:16px;color:var(--text);line-height:1.6}
+.mstep-content .hl{color:var(--cyan);font-weight:700;font-family:'JetBrains Mono',monospace}
+.mstep-content .val{color:var(--yellow);font-weight:800;font-size:18px}
+.mstep-content .ans{color:var(--green);font-weight:900;font-size:20px}
+
+/* ── FORMULA VIS ─────────── */
+.formula-vis{background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(0,229,255,.03));border:1px solid rgba(0,229,255,.25);border-radius:12px;padding:20px;text-align:center;margin:14px 0}
+.fv-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.fv-eq{font-size:20px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;margin-bottom:6px;line-height:1.4}
+.fv-eq .fc{color:var(--cyan)}
+.fv-eq .fy{color:var(--yellow)}
+.fv-note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:6px}
+
+/* ── RESULT BOX ─────────── */
+.result-wrap{display:flex;align-items:center;gap:14px;background:rgba(0,230,118,.07);border:2px solid rgba(0,230,118,.3);border-radius:10px;padding:14px 18px;margin:10px 0}
+.result-text{}
+.result-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:2px}
+.result-val{font-size:28px;font-weight:900;color:var(--green);font-family:'JetBrains Mono',monospace;line-height:1}
+
+/* ── SENTENCE STARTERS ──── */
+.starter-card{background:rgba(179,136,255,.06);border:1px solid rgba(179,136,255,.2);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.starter-card:hover{border-color:var(--purple);background:rgba(179,136,255,.1)}
+.starter-label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.starter-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+.starter-text{font-size:15px;color:var(--soft);line-height:1.65}
+.starter-blank{border-bottom:2px solid rgba(179,136,255,.4);color:var(--purple);font-weight:700;padding:0 4px;min-width:50px;display:inline-block}
+
+/* ── CHECKLIST ───────────── */
+.checklist{display:flex;flex-direction:column;gap:12px}
+.check-item{display:flex;align-items:flex-start;gap:14px;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;user-select:none}
+.check-item.checked{border-color:rgba(0,230,118,.5);background:rgba(0,230,118,.04)}
+.check-box{width:28px;height:28px;min-width:28px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green)}
+.check-text{font-size:16px;color:var(--text);line-height:1.5;flex:1;font-weight:600}
+.check-item.checked .check-text{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(90,133,168,.4)}
+.check-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45;font-weight:400;text-decoration:none}
+
+/* ── BUTTONS ─────────────── */
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;padding:14px 24px;cursor:pointer;transition:opacity .2s;text-decoration:none;line-height:1}
+.btn:hover{opacity:.86}
+.btn-primary{background:var(--cyan);color:#0b1220}
+.btn-ghost{background:transparent;color:var(--muted);border:2px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--soft)}
+.btn-green{background:var(--green);color:#0b1220}
+.btn-yellow{background:var(--yellow);color:#0b1220}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+
+/* ── WARN / ERR ─────────── */
+.warn-box{background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.3);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:15px;color:var(--soft);line-height:1.65;display:flex;align-items:flex-start;gap:10px}
+.warn-box-body{flex:1}
+.warn-box strong{color:var(--yellow)}
+.err-box{background:rgba(255,77,106,.06);border:2px solid rgba(255,77,106,.3);border-radius:10px;padding:14px 16px;margin:12px 0;font-size:15px;color:#ffaaaa;line-height:1.5;display:none}
+
+/* ── RULE BOX ────────────── */
+.rule-box{background:var(--card);border-left:4px solid var(--yellow);border-radius:0 12px 12px 0;padding:16px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:flex-start}
+.rule-body{}
+.rule-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--yellow);margin-bottom:5px}
+.rule-text{font-size:15px;color:var(--soft);line-height:1.65}
+.rule-text strong{color:var(--text)}
+
+/* ── COMPLETE ────────────── */
+.complete-box{text-align:center;padding:40px 20px}
+.complete-icon{width:80px;height:80px;border-radius:20px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.complete-icon svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.complete-title{font-size:28px;font-weight:900;color:var(--green);margin-bottom:10px}
+.complete-desc{font-size:16px;color:var(--soft);line-height:1.7;max-width:42ch;margin:0 auto}
+
+/* ── RESPONSIVE ─────────── */
+@media(max-width:520px){
+  .mission-grid{grid-template-columns:1fr}
+  .claim-fields{grid-template-columns:1fr}
+  .claim-num-box{flex-direction:row;align-items:center;gap:10px;justify-content:flex-start}
+  .timer-ring-wrap{width:200px;height:200px}
+  .timer-display{font-size:48px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="day-chip">Day 17</div>
+    <div class="hdr-titles">
+      <div class="hdr-title">Pre-Match Pitch + Teach the Math</div>
+      <div class="hdr-sub">Championship Block · 45 min</div>
+    </div>
+    <div class="hdr-robot">
+      <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="42" height="42" rx="10" fill="rgba(0,229,255,0.1)" stroke="rgba(0,229,255,0.3)" stroke-width="1"/>
+        <line x1="21" y1="5" x2="21" y2="10" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="21" cy="4.5" r="2.2" fill="#00e5ff"/>
+        <rect x="11" y="10" width="20" height="14" rx="3.5" fill="#162032" stroke="#00e5ff" stroke-width="1.5"/>
+        <rect x="14" y="14" width="5" height="5" rx="1.2" fill="#00e5ff"/>
+        <rect x="23" y="14" width="5" height="5" rx="1.2" fill="#ffd600"/>
+        <rect x="13" y="26" width="16" height="11" rx="3" fill="#162032" stroke="#00e5ff" stroke-width="1.5"/>
+        <circle cx="21" cy="31.5" r="2.2" fill="#00e5ff" opacity="0.75"/>
+        <rect x="8" y="27" width="4.5" height="8" rx="2.2" fill="#162032" stroke="#00e5ff" stroke-width="1.3"/>
+        <rect x="29.5" y="27" width="4.5" height="8" rx="2.2" fill="#162032" stroke="#00e5ff" stroke-width="1.3"/>
+        <line x1="17" y1="29.5" x2="19.2" y2="29.5" stroke="#00e5ff" stroke-width="1" opacity="0.55"/>
+        <line x1="22.8" y1="29.5" x2="25" y2="29.5" stroke="#00e5ff" stroke-width="1" opacity="0.55"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-bar" id="progBar" style="width:20%"></div>
+  <div class="prog-tabs">
+    <button class="ptab active" onclick="goPanel(0)" id="tab0"><i data-lucide="target"></i> Mission</button>
+    <button class="ptab" onclick="goPanel(1)" id="tab1"><i data-lucide="mic"></i> Pitch</button>
+    <button class="ptab" onclick="goPanel(2)" id="tab2"><i data-lucide="clock"></i> Practice</button>
+    <button class="ptab" onclick="goPanel(3)" id="tab3"><i data-lucide="calculator"></i> Math</button>
+    <button class="ptab" onclick="goPanel(4)" id="tab4"><i data-lucide="check-circle"></i> Ready</button>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ════════════════════════════════════════
+     PANEL 0 · MISSION
+════════════════════════════════════════ -->
+<div class="panel active" id="panel0">
+  <div class="sec-eyebrow">Day 17 · Championship Prep</div>
+  <h1 class="sec-title">Two Jobs. One Block.</h1>
+  <p class="sec-desc">Tomorrow is Championship. Today you prove — out loud — that you know your numbers.</p>
+
+  <div class="mission-grid">
+    <div class="mission-card">
+      <div class="mc-icon c"><i data-lucide="mic"></i></div>
+      <div class="mc-num">Job 1</div>
+      <div class="mc-time">21 min</div>
+      <div class="mc-title">Pitch Rehearsal</div>
+      <div class="mc-desc">Every claim needs a <strong style="color:var(--yellow)">specific number</strong>. You get 2 minutes. Timer cuts at 2:00.</div>
+    </div>
+    <div class="mission-card">
+      <div class="mc-icon y"><i data-lucide="calculator"></i></div>
+      <div class="mc-num">Job 2</div>
+      <div class="mc-time y">24 min</div>
+      <div class="mc-title">Teach the Math</div>
+      <div class="mc-desc">Pick one calculation. Explain it like you're talking to a friend who has <strong style="color:var(--yellow)">never seen a robot</strong> — use everyday words only.</div>
+    </div>
+  </div>
+
+  <!-- Pitch Rules -->
+  <div class="card">
+    <div class="card-label">
+      <i data-lucide="mic"></i> Rules for the Pitch
+    </div>
+    <div class="vsteps">
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="clock"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">2 minutes maximum</div>
+          <div class="vstep-desc">The timer starts when you start talking. You will be <strong>cut off at 2:00</strong> — no exceptions.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="hash"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Every claim needs a number</div>
+          <div class="vstep-desc"><span class="no">&#10008; "Our speed is good"</span><br><span class="ok">&#10004; "Our motor power is 50%"</span></div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="cpu"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Predict your opponent</div>
+          <div class="vstep-desc">Your pitch must say what you think the <strong>other team's bot will do</strong> — and include their number.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="users"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Teams give one answer only</div>
+          <div class="vstep-desc">After each pitch, every other team says: <span class="ok">YES</span> (every claim had a number) or <span class="no">NO</span> (a claim was missing a number). Nothing else.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teach the Math Rules -->
+  <div class="card">
+    <div class="card-label yellow"><i data-lucide="calculator"></i> Rules for Teach the Math</div>
+    <div class="vsteps">
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="clipboard"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Pick one calculation from your scouting report</div>
+          <div class="vstep-desc">Section 1, 2, 3, or 4 — any formula that appears in your report. Not from memory.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="message-square"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Use everyday words — no robot words</div>
+          <div class="vstep-desc">Pretend the person you're talking to <strong>has never seen a robot</strong>. Don't say "loadout" or "Speed stat" — say what it means in plain words instead.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon y"><i data-lucide="help-circle"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">The room will ask one question</div>
+          <div class="vstep-desc"><strong>"How did you get that specific number?"</strong><br>You must show the full calculation — formula, values, answer. Board if needed.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon o"><i data-lucide="alert-triangle"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Can't answer? Go to the board.</div>
+          <div class="vstep-desc">Any team that gets <strong>PARTIAL</strong> or <strong>NO</strong> must complete the calculation on the board before the block ends. Not optional.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goPanel(1)">
+      Start: Build Your Pitch
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 1 · PITCH BUILDER
+════════════════════════════════════════ -->
+<div class="panel" id="panel1">
+  <div class="sec-eyebrow">Job 1 · Pitch Builder</div>
+  <h1 class="sec-title">Build Your Pitch</h1>
+  <p class="sec-desc">Fill in each claim. Every number must come from your scouting report — Sections 1–4. No estimates.</p>
+
+  <div class="warn-box">
+    <div class="ticon sm"><i data-lucide="clipboard"></i></div>
+    <div class="warn-box-body"><strong>Keep your scouting report open.</strong> Every number you enter here must come directly from your report. If you don't have the number, find it before you continue.</div>
+  </div>
+
+  <!-- Team Info -->
+  <div class="card">
+    <div class="card-label"><i data-lucide="users"></i> Team Info</div>
+    <div class="field-group">
+      <label class="field-label">Your Team Name</label>
+      <input type="text" id="teamName" placeholder="e.g. Team Omega" oninput="updatePreview()" maxlength="40">
+    </div>
+    <div class="field-group" style="margin-bottom:0">
+      <label class="field-label">Opponent Team Name</label>
+      <input type="text" id="oppName" placeholder="e.g. Team Titan" oninput="updatePreview()" maxlength="40">
+    </div>
+  </div>
+
+  <!-- SPEED CLAIM -->
+  <div class="claim-row" id="claimSpd">
+    <div class="claim-header">
+      <span class="claim-stat-chip spd"><i data-lucide="zap"></i> Speed</span>
+      <span class="req-badge"><i data-lucide="hash"></i> NUMBER REQUIRED</span>
+    </div>
+    <div class="meaning-box" style="margin-bottom:12px">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text">Speed controls <strong>how fast your bot moves</strong> across the arena. Higher speed = reaches the ball and scoring zone first.<br><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan)">motorPower% = (S × 100) ÷ 20</span></div>
+    </div>
+    <div class="claim-fields">
+      <div>
+        <label class="field-label">What will you say about your Speed?</label>
+        <div class="field-hint"><i data-lucide="book-open"></i><span>Example: "Our motor power is 50%, which means we cross the arena in fewer steps than a bot running at 25%."</span></div>
+        <textarea id="spdText" placeholder="Write your speed claim here..." oninput="updatePreview();checkFilled(this,'claimSpd')" rows="3"></textarea>
+      </div>
+      <div class="claim-num-box">
+        <span class="claim-num-lbl">motorPower<br>%</span>
+        <input type="number" id="spdNum" placeholder="0" step="1" min="0" max="100" oninput="updatePreview()">
+        <span style="font-size:11px;color:var(--muted);text-align:center">from report</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENDURANCE CLAIM -->
+  <div class="claim-row" id="claimEnd">
+    <div class="claim-header">
+      <span class="claim-stat-chip end"><i data-lucide="battery"></i> Endurance</span>
+      <span class="req-badge"><i data-lucide="hash"></i> NUMBER REQUIRED</span>
+    </div>
+    <div class="meaning-box" style="margin-bottom:12px">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text">Endurance controls <strong>how long your bot stays strong</strong>. Low endurance = bot slows down faster. High endurance = stays at full power longer.<br><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan)">P(t) = 100 − (20−E) × 1.5 × t</span></div>
+    </div>
+    <div class="claim-fields">
+      <div>
+        <label class="field-label">What will you say about your Endurance?</label>
+        <div class="field-hint"><i data-lucide="book-open"></i><span>Example: "Our endurance stat is 14. At minute 3 our bot still has 82% power. A bot with endurance 5 only has 47.5% left."</span></div>
+        <textarea id="endText" placeholder="Write your endurance claim here..." oninput="updatePreview();checkFilled(this,'claimEnd')" rows="3"></textarea>
+      </div>
+      <div class="claim-num-box">
+        <span class="claim-num-lbl">E Stat</span>
+        <input type="number" id="endNum" placeholder="0" step="1" min="0" max="20" oninput="updatePreview()">
+        <span style="font-size:11px;color:var(--muted);text-align:center">from report</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TURNING CLAIM -->
+  <div class="claim-row" id="claimTrn">
+    <div class="claim-header">
+      <span class="claim-stat-chip trn"><i data-lucide="refresh-cw"></i> Turning</span>
+      <span class="req-badge"><i data-lucide="hash"></i> NUMBER REQUIRED</span>
+    </div>
+    <div class="meaning-box" style="margin-bottom:12px">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text"><strong>High Turning</strong> = tight sharp turns → your bot stays concentrated in a small area (good for guarding).<br><strong>Low Turning</strong> = wide sweeping arcs → your bot covers more ground (good for hunting).<br><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--teal)">arcSegments = T &nbsp;·&nbsp; turnRatio = 0.2 + (T × 0.02)</span></div>
+    </div>
+    <div class="claim-fields">
+      <div>
+        <label class="field-label">What will you say about your Turning?</label>
+        <div class="field-hint"><i data-lucide="book-open"></i><span>Example: "Our turning stat is 8. That gives us 8 arc segments and a turn ratio of 0.36 — meaning we sweep wide to cover more ground."</span></div>
+        <textarea id="trnText" placeholder="Write your turning claim here..." oninput="updatePreview();checkFilled(this,'claimTrn')" rows="3"></textarea>
+      </div>
+      <div class="claim-num-box">
+        <span class="claim-num-lbl">T Stat</span>
+        <input type="number" id="trnNum" placeholder="0" step="1" min="0" max="20" oninput="updatePreview()">
+        <span style="font-size:11px;color:var(--muted);text-align:center">from report</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POWER CLAIM -->
+  <div class="claim-row" id="claimPwr">
+    <div class="claim-header">
+      <span class="claim-stat-chip pwr"><i data-lucide="activity"></i> Power</span>
+      <span class="req-badge"><i data-lucide="hash"></i> NUMBER REQUIRED</span>
+    </div>
+    <div class="meaning-box" style="margin-bottom:12px">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text">Power controls <strong>how hard your bot charges and pushes</strong>. It's squared — so doubling your power stat quadruples your charge.<br><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--orange)">charge = P² &nbsp;·&nbsp; followThrough = P × 200 ms</span></div>
+    </div>
+    <div class="claim-fields">
+      <div>
+        <label class="field-label">What will you say about your Power?</label>
+        <div class="field-hint"><i data-lucide="book-open"></i><span>Example: "Our power stat is 6. That means charge = 36 and follow-through lasts 1200ms — compared to a bot with power 3 whose charge is only 9."</span></div>
+        <textarea id="pwrText" placeholder="Write your power claim here..." oninput="updatePreview();checkFilled(this,'claimPwr')" rows="3"></textarea>
+      </div>
+      <div class="claim-num-box">
+        <span class="claim-num-lbl">P Stat</span>
+        <input type="number" id="pwrNum" placeholder="0" step="1" min="0" max="20" oninput="updatePreview()">
+        <span style="font-size:11px;color:var(--muted);text-align:center">from report</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPPONENT PREDICTION -->
+  <div class="claim-row" id="claimOpp">
+    <div class="claim-header">
+      <span class="claim-stat-chip opp"><i data-lucide="crosshair"></i> Opponent Prediction</span>
+      <span class="req-badge"><i data-lucide="hash"></i> NUMBER REQUIRED</span>
+    </div>
+    <div class="meaning-box" style="margin-bottom:12px">
+      <div class="ticon sm y"><i data-lucide="lightbulb"></i></div>
+      <div class="meaning-text">You must <strong>predict what the other team's bot will do</strong> — and prove it with one of their numbers from your scouting report.</div>
+    </div>
+    <div class="claim-fields">
+      <div>
+        <label class="field-label">What do you predict your opponent will do?</label>
+        <div class="field-hint"><i data-lucide="book-open"></i><span>Example: "We predict they will charge early. Their power stat is 8, so charge = 64. But their endurance is only 4 — by minute 3 they're at 52% power and we outlast them."</span></div>
+        <textarea id="oppText" placeholder="Write your opponent prediction here..." oninput="updatePreview();checkFilled(this,'claimOpp')" rows="3"></textarea>
+      </div>
+      <div class="claim-num-box">
+        <span class="claim-num-lbl">Their Stat #</span>
+        <input type="number" id="oppNum" placeholder="0" step="0.1" min="0" max="9999" oninput="updatePreview()">
+        <span style="font-size:11px;color:var(--muted);text-align:center">their number</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE PREVIEW -->
+  <div class="pitch-preview">
+    <div class="pp-label">
+      <i data-lucide="eye"></i> Live Pitch Preview — updates as you type
+    </div>
+    <div id="previewLines">
+      <div style="color:var(--muted);font-style:italic;font-size:15px">Fill in the fields above to see your pitch build here...</div>
+    </div>
+  </div>
+
+  <div class="err-box" id="pitchErr">You are missing some numbers. Every claim needs a number from your scouting report before you can move on. Scroll up and fill in the missing boxes.</div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(0)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="checkPitchAndNext()">
+      Pitch ready — Practice Run
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 2 · PRACTICE RUN
+════════════════════════════════════════ -->
+<div class="panel" id="panel2">
+  <div class="sec-eyebrow">Job 1 · Practice Run</div>
+  <h1 class="sec-title">2-Minute Practice Run</h1>
+  <p class="sec-desc">Read your pitch out loud. Hit START when you begin talking. It stops at 2:00 — just like tomorrow.</p>
+
+  <!-- Pitch read-back -->
+  <div class="pitch-card">
+    <div class="pitch-card-eyebrow"><i data-lucide="mic"></i> Read this out loud — your pitch</div>
+    <div id="readbackContent" style="font-size:16px;color:var(--text);line-height:1.85">
+      Complete the Pitch Builder first to see your pitch here.
+    </div>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer-box">
+    <div class="timer-ring-wrap">
+      <svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
+        <circle class="ring-bg" cx="120" cy="120" r="100"/>
+        <circle class="ring-fill" cx="120" cy="120" r="100" id="timerRing"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-display" id="timerDisplay">2:00</div>
+        <div class="timer-sublabel" id="timerLabel">READY</div>
+      </div>
+    </div>
+    <div class="timer-btn-row">
+      <button class="timer-btn primary" id="timerBtn" onclick="toggleTimer()">
+        <span id="timerBtnIcon">&#9654;</span>
+        <span id="timerBtnText">Start Pitch</span>
+      </button>
+      <button class="timer-btn ghost" onclick="resetTimer()">&#8635; Reset</button>
+    </div>
+    <div class="timer-status" id="timerStatus"></div>
+  </div>
+
+  <!-- Self-check -->
+  <div class="card">
+    <div class="card-label"><i data-lucide="check-circle"></i> Self-Check After Your Run</div>
+    <div class="vsteps">
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="clock"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Did you finish under 2:00?</div>
+          <div class="vstep-desc">If not — what claim can you shorten? Go back and edit, then run again.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="hash"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Did you say all 5 numbers?</div>
+          <div class="vstep-desc">Speed %, Endurance stat, Turning stat, Power stat, and one opponent number. All five — out loud.</div>
+        </div>
+      </div>
+      <div class="vstep">
+        <div class="ticon"><i data-lucide="crosshair"></i></div>
+        <div class="vstep-body">
+          <div class="vstep-title">Did you predict the opponent?</div>
+          <div class="vstep-desc">You must say what you think their bot will do — and give their specific number from your scouting report.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(1)">&#8592; Edit Pitch</button>
+    <button class="btn btn-primary" onclick="goPanel(3)">
+      Next: Teach the Math
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 3 · TEACH THE MATH
+════════════════════════════════════════ -->
+<div class="panel" id="panel3">
+  <div class="sec-eyebrow">Job 2 · Teach the Math</div>
+  <h1 class="sec-title">Teach the Math</h1>
+  <p class="sec-desc">Pick one formula, enter your numbers, then practice explaining it in plain everyday words — no robot words allowed.</p>
+
+  <div class="rule-box">
+    <div class="ticon lg y"><i data-lucide="help-circle"></i></div>
+    <div class="rule-body">
+      <div class="rule-label">The Follow-Up Question</div>
+      <div class="rule-text">After you explain, the room asks: <strong>"How did you get that specific number?"</strong><br>You must show the full calculation — formula, values, and final answer. If you can't — you go to the board.</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Pick calculation -->
+  <div class="card">
+    <div class="card-label"><i data-lucide="list"></i> Step 1 — Pick Your Calculation</div>
+    <p style="font-size:15px;color:var(--soft);margin-bottom:16px;line-height:1.65">Choose one from the list below. It must come from your scouting report. No duplicate with another team.</p>
+
+    <div class="calc-grid" id="calcGrid">
+
+      <div class="calc-option" onclick="selectCalc('speed',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon"><i data-lucide="zap"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Speed Formula</div>
+          <div class="calc-formula">motorPower% = (S × 100) ÷ 20</div>
+          <div class="calc-desc">How fast your bot moves. Higher speed stat = higher motor power = reaches the ball first.</div>
+        </div>
+      </div>
+
+      <div class="calc-option" onclick="selectCalc('endurance',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon g"><i data-lucide="battery"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Endurance — Power Over Time</div>
+          <div class="calc-formula">P(t) = 100 − (20−E) × 1.5 × t</div>
+          <div class="calc-desc">How much power your bot has left at minute t. Low endurance = drops faster.</div>
+        </div>
+      </div>
+
+      <div class="calc-option" onclick="selectCalc('turning',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon t"><i data-lucide="refresh-cw"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Turning — Arc &amp; Ratio</div>
+          <div class="calc-formula">arcSegments = T &nbsp;·&nbsp; turnRatio = 0.2 + (T × 0.02)</div>
+          <div class="calc-desc">How your bot curves. High T = sharp tight turns. Low T = wide sweeping arcs.</div>
+        </div>
+      </div>
+
+      <div class="calc-option" onclick="selectCalc('power',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon o"><i data-lucide="activity"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Power — Charge &amp; Follow-Through</div>
+          <div class="calc-formula">charge = P² &nbsp;·&nbsp; followThrough = P × 200 ms</div>
+          <div class="calc-desc">Doubling your power stat quadruples your charge. The follow-through is how long the push lasts.</div>
+        </div>
+      </div>
+
+      <div class="calc-option" onclick="selectCalc('budget',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon y"><i data-lucide="briefcase"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Budget Constraint</div>
+          <div class="calc-formula">S + E + T + P = 20</div>
+          <div class="calc-desc">All four stats must add up to exactly 20. No more, no less. Prove your loadout is legal.</div>
+        </div>
+      </div>
+
+      <div class="calc-option" onclick="selectCalc('percent',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon p"><i data-lucide="trending-up"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Percent Change</div>
+          <div class="calc-formula">% Change = (New − Old) ÷ Old × 100</div>
+          <div class="calc-desc">How much a stat improved from Season 1 to Season 2. Shows your upgrade decision.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="err-box" id="noCalcErr" style="display:none">Select a calculation above first.</div>
+  </div>
+
+  <!-- Step 2: Enter numbers -->
+  <div class="card" id="mathInputCard" style="display:none">
+    <div class="card-label yellow"><i data-lucide="hash"></i> Step 2 — Enter Your Numbers from the Scouting Report</div>
+    <div id="mathInputArea"></div>
+    <button class="btn btn-yellow" onclick="calculateResult()">
+      <i data-lucide="calculator"></i> Calculate My Answer
+    </button>
+    <div id="calcResultArea" style="margin-top:16px"></div>
+  </div>
+
+  <!-- Step 3: Walkthrough -->
+  <div class="card" id="mathWalkthroughCard" style="display:none">
+    <div class="card-label green"><i data-lucide="book-open"></i> Step 3 — Walk Through It Out Loud</div>
+    <p style="font-size:15px;color:var(--soft);margin-bottom:16px;line-height:1.65">Read each step below. This is exactly what you say when the room asks: <strong style="color:var(--text)">"How did you get that number?"</strong></p>
+    <div id="walkthroughSteps" class="math-steps"></div>
+  </div>
+
+  <!-- Step 4: Plain language -->
+  <div class="card" id="plainLangCard" style="display:none">
+    <div class="card-label purple"><i data-lucide="message-square"></i> Step 4 — Explain It in Plain Language</div>
+    <p style="font-size:15px;color:var(--soft);margin-bottom:16px;line-height:1.65">Imagine the person you're explaining to <strong style="color:var(--text)">has never seen a robot</strong>. Use these sentence starters — tap one to use it.</p>
+    <div id="starterCards"></div>
+    <div style="margin-top:16px">
+      <label class="field-label">Write your full plain-language explanation:</label>
+      <div class="field-hint"><i data-lucide="message-square"></i><span>Use simple words. No jargon. Say what the formula does in real life — what does this number actually mean for your bot?</span></div>
+      <textarea id="plainExplain" placeholder="Tap a sentence starter above, then finish the explanation in your own words..." rows="6"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="checkPlainLang()" style="margin-top:14px">
+      <i data-lucide="check-circle"></i> Check My Explanation
+    </button>
+    <div id="plainFeedback" style="margin-top:12px"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(2)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goPanel(4)">
+      Final: Ready Check
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PANEL 4 · READY CHECK
+════════════════════════════════════════ -->
+<div class="panel" id="panel4">
+  <div class="sec-eyebrow">Final Check</div>
+  <h1 class="sec-title">Block Readiness Check</h1>
+  <p class="sec-desc">Everything on this list must be done before 10:10. Tap each item when it's complete.</p>
+
+  <div class="card">
+    <div class="card-label"><i data-lucide="mic"></i> Pitch Rehearsal</div>
+    <div class="checklist">
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm"><i data-lucide="mic"></i></div>
+        <div class="check-text">My team completed our pitch rehearsal
+          <div class="check-sub">We presented in front of the room — under 2 minutes</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm"><i data-lucide="hash"></i></div>
+        <div class="check-text">Every claim in our pitch included a specific number
+          <div class="check-sub">Speed %, Endurance, Turning, Power, and opponent stat — all said out loud</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm g"><i data-lucide="check-circle"></i></div>
+        <div class="check-text">We got YES — or we corrected any NO before Teach the Math started
+          <div class="check-sub">If we got a NO, we said the correct number before the next team went</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label yellow"><i data-lucide="calculator"></i> Teach the Math</div>
+    <div class="checklist">
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm"><i data-lucide="clipboard"></i></div>
+        <div class="check-text">We announced our calculation — it's on the board, no duplicate
+          <div class="check-sub">Choice came from scouting report Sections 1–4</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm"><i data-lucide="message-square"></i></div>
+        <div class="check-text">We explained our calculation in plain language — no jargon
+          <div class="check-sub">We used everyday words — no "loadout" or "Speed stat" without explaining what it means</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm y"><i data-lucide="help-circle"></i></div>
+        <div class="check-text">We answered "How did you get that specific number?"
+          <div class="check-sub">We showed the full calculation — formula, values, and final answer. Marked YES.</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="ticon sm"><i data-lucide="bar-chart-2"></i></div>
+        <div class="check-text">Any PARTIAL or NO was completed on the board before 10:10
+          <div class="check-sub">Used scouting report — not another team's work</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="readyResult" style="display:none"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goPanel(3)">&#8592; Teach the Math</button>
+    <button class="btn btn-green" onclick="checkReady()">
+      <i data-lucide="check-circle"></i> Submit Ready Check
+    </button>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── INLINE STAT ICONS (used in frequently-updating preview) ─────────
+const STAT_ICONS = {
+  spd: `<svg class="s-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  end: `<svg class="s-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>`,
+  trn: `<svg class="s-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`,
+  pwr: `<svg class="s-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+  opp: `<svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`
+};
+
+// ── PANEL NAV ──────────────────────────
+let currentPanel = 0;
+function goPanel(n) {
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===n));
+  document.querySelectorAll('.ptab').forEach((t,i) => {
+    t.classList.remove('active');
+    if (i < n) t.classList.add('done'); else t.classList.remove('done');
+  });
+  document.querySelectorAll('.ptab')[n].classList.add('active');
+  document.getElementById('progBar').style.width = ((n+1)/5*100)+'%';
+  currentPanel = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (n===2) buildReadback();
+}
+
+// ── PITCH PREVIEW ───────────────────────
+function updatePreview() {
+  const spdT = document.getElementById('spdText').value.trim();
+  const spdN = document.getElementById('spdNum').value;
+  const endT = document.getElementById('endText').value.trim();
+  const endN = document.getElementById('endNum').value;
+  const trnT = document.getElementById('trnText').value.trim();
+  const trnN = document.getElementById('trnNum').value;
+  const pwrT = document.getElementById('pwrText').value.trim();
+  const pwrN = document.getElementById('pwrNum').value;
+  const oppT = document.getElementById('oppText').value.trim();
+  const oppN = document.getElementById('oppNum').value;
+
+  const lines = [
+    makeLine('spd','Speed', spdT, spdN),
+    makeLine('end','Endurance', endT, endN),
+    makeLine('trn','Turning', trnT, trnN),
+    makeLine('pwr','Power', pwrT, pwrN),
+    makeLine('opp','Opponent', oppT, oppN),
+  ];
+  document.getElementById('previewLines').innerHTML = lines.join('');
+}
+
+function makeLine(tag, label, text, num) {
+  const icon = STAT_ICONS[tag] || '';
+  if (!text && (num===''||num===undefined||num===null)) {
+    return `<div class="pp-line"><span class="pp-tag ${tag}">${icon}${label}</span><span class="pp-placeholder">— fill in this claim above</span></div>`;
+  }
+  const numPart = (num!==''&&num!==null&&num!==undefined)
+    ? `<span class="pp-num">[${num}]</span>`
+    : `<span style="color:var(--red);font-weight:800">[NUMBER MISSING]</span>`;
+  return `<div class="pp-line"><span class="pp-tag ${tag}">${icon}${label}</span>${text || '<em style="color:var(--muted)">add text above</em>'}${text?' ':''}${numPart}</div>`;
+}
+
+function checkFilled(ta, rowId) {
+  document.getElementById(rowId).classList.toggle('filled', ta.value.trim().length > 4);
+}
+
+function checkPitchAndNext() {
+  const nums = ['spdNum','endNum','trnNum','pwrNum','oppNum'];
+  const missing = nums.filter(id => {
+    const v = document.getElementById(id).value;
+    return v===''||v===null||v===undefined;
+  });
+  const err = document.getElementById('pitchErr');
+  if (missing.length > 0) {
+    err.style.display = 'block';
+    err.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  err.style.display = 'none';
+  goPanel(2);
+}
+
+// ── READ-BACK ───────────────────────────
+function buildReadback() {
+  const team = document.getElementById('teamName').value.trim() || 'Our Team';
+  const opp  = document.getElementById('oppName').value.trim() || 'Opponent';
+  const spdT = document.getElementById('spdText').value.trim() || '[Speed claim not filled in]';
+  const spdN = document.getElementById('spdNum').value || '?';
+  const endT = document.getElementById('endText').value.trim() || '[Endurance claim not filled in]';
+  const endN = document.getElementById('endNum').value || '?';
+  const trnT = document.getElementById('trnText').value.trim() || '[Turning claim not filled in]';
+  const trnN = document.getElementById('trnNum').value || '?';
+  const pwrT = document.getElementById('pwrText').value.trim() || '[Power claim not filled in]';
+  const pwrN = document.getElementById('pwrNum').value || '?';
+  const oppT = document.getElementById('oppText').value.trim() || '[Opponent prediction not filled in]';
+  const oppN = document.getElementById('oppNum').value || '?';
+
+  document.getElementById('readbackContent').innerHTML = `
+    <div class="pitch-card-line" style="font-size:18px;font-weight:800;color:var(--cyan);margin-bottom:8px">${team} — Championship Pitch</div>
+    <div class="pitch-card-line"><span class="pp-tag spd" style="font-size:11px">${STAT_ICONS.spd} Speed</span>${spdT} — <span class="pitch-card-num">${spdN}%</span></div>
+    <div class="pitch-card-line"><span class="pp-tag end" style="font-size:11px">${STAT_ICONS.end} Endurance</span>${endT} — stat <span class="pitch-card-num">${endN}</span></div>
+    <div class="pitch-card-line"><span class="pp-tag trn" style="font-size:11px">${STAT_ICONS.trn} Turning</span>${trnT} — stat <span class="pitch-card-num">${trnN}</span></div>
+    <div class="pitch-card-line"><span class="pp-tag pwr" style="font-size:11px">${STAT_ICONS.pwr} Power</span>${pwrT} — stat <span class="pitch-card-num">${pwrN}</span></div>
+    <div class="pitch-card-line"><span class="pp-tag opp" style="font-size:11px">${STAT_ICONS.opp} ${opp}</span>${oppT} — <span class="pitch-card-num">${oppN}</span></div>
+  `;
+}
+
+// ── TIMER ────────────────────────────────
+const TOTAL_SECS = 120;
+const CIRCUMFERENCE = 2 * Math.PI * 100; // r=100 → 628.3
+let timerSecs = TOTAL_SECS;
+let timerRunning = false;
+let timerInterval = null;
+
+function toggleTimer() {
+  if (timerSecs <= 0) return;
+  timerRunning ? pauseTimer() : startTimer();
+}
+
+function startTimer() {
+  timerRunning = true;
+  document.getElementById('timerBtnIcon').textContent = '⏸';
+  document.getElementById('timerBtnText').textContent = 'Pause';
+  document.getElementById('timerLabel').textContent = 'PITCHING';
+  document.getElementById('timerStatus').textContent = 'Say every claim — say every number.';
+  timerInterval = setInterval(tick, 1000);
+}
+
+function pauseTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerBtnIcon').textContent = '▶';
+  document.getElementById('timerBtnText').textContent = 'Resume';
+  document.getElementById('timerLabel').textContent = 'PAUSED';
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSecs = TOTAL_SECS;
+  const d = document.getElementById('timerDisplay');
+  d.textContent = '2:00';
+  d.className = 'timer-display';
+  document.getElementById('timerRing').style.strokeDashoffset = '0';
+  document.getElementById('timerRing').style.stroke = 'var(--cyan)';
+  document.getElementById('timerLabel').textContent = 'READY';
+  document.getElementById('timerBtnIcon').textContent = '▶';
+  document.getElementById('timerBtnText').textContent = 'Start Pitch';
+  document.getElementById('timerStatus').textContent = '';
+  const btn = document.getElementById('timerBtn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+
+function tick() {
+  timerSecs--;
+  const m = Math.floor(timerSecs / 60);
+  const s = timerSecs % 60;
+  const d = document.getElementById('timerDisplay');
+  d.textContent = m + ':' + String(s).padStart(2,'0');
+
+  const pct = timerSecs / TOTAL_SECS;
+  document.getElementById('timerRing').style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+
+  if (timerSecs <= 10 && timerSecs > 0) {
+    d.className = 'timer-display danger';
+    document.getElementById('timerRing').style.stroke = 'var(--red)';
+    document.getElementById('timerStatus').textContent = 'Almost done — finish your sentence!';
+  } else if (timerSecs <= 30) {
+    d.className = 'timer-display warn';
+    document.getElementById('timerRing').style.stroke = 'var(--yellow)';
+    document.getElementById('timerStatus').textContent = '30 seconds left — finish your opponent prediction.';
+  }
+
+  if (timerSecs <= 0) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    d.textContent = '0:00';
+    d.className = 'timer-display danger';
+    document.getElementById('timerLabel').textContent = 'TIME!';
+    document.getElementById('timerBtn').disabled = true;
+    document.getElementById('timerBtn').style.opacity = '.4';
+    document.getElementById('timerStatus').innerHTML = 'Time called. <strong style="color:var(--green)">Did you finish all 5 claims?</strong>';
+  }
+}
+
+// ── CALC SELECTOR ────────────────────────
+let selectedCalc = null;
+
+const calcData = {
+  speed: {
+    formula: 'motorPower% = (S × 100) ÷ 20',
+    inputs: [
+      {id:'spd_s', label:'Speed Stat (S)', hint:'Find your Speed stat in scouting report Section 1', unit:''}
+    ],
+    compute: vals => (vals[0] * 100 / 20),
+    resultLabel: 'Motor Power %',
+    resultSuffix: '%',
+    steps: (vals, r) => [
+      {lucide:'file-text',color:'',title:'Write the formula',body:`The formula is: <span class="hl">motorPower% = (S × 100) ÷ 20</span>`},
+      {lucide:'hash',color:'',title:'Plug in your Speed stat',body:`Speed stat S = <span class="val">${vals[0]}</span>`},
+      {lucide:'x',color:'',title:'Multiply: S × 100',body:`<span class="val">${vals[0]}</span> × 100 = <span class="val">${vals[0]*100}</span>`},
+      {lucide:'divide',color:'',title:'Divide by 20',body:`<span class="val">${vals[0]*100}</span> ÷ 20 = <span class="ans">${r.toFixed(1)}%</span>`},
+      {lucide:'lightbulb',color:'y',title:'What this means',body:`Your bot runs at <span class="ans">${r.toFixed(1)}%</span> motor power. A bot with Speed 5 runs at only 25%. At ${r.toFixed(1)}%, you reach the ball faster.`}
+    ],
+    starters: [
+      'Think of Speed like how fast a car drives. The higher the number, the faster it goes. Our robot\'s speed stat is ___. We multiply that by 100 and divide by 20, which gives us ___%. That means our motor runs at ___% power.',
+      'Imagine two runners. One jogs, one sprints. Our motor runs at ___% power. The other team\'s motor runs at ___%. We get to the ball first because our percentage is higher.',
+      'Speed = engine power percentage. Our stat is ___. We do ___ × 100 ÷ 20 = ___%. That number controls how fast our robot moves across the arena.'
+    ]
+  },
+  endurance: {
+    formula: 'P(t) = 100 − (20−E) × 1.5 × t',
+    inputs: [
+      {id:'end_e', label:'Endurance Stat (E)', hint:'Find your Endurance stat in scouting report Section 2', unit:''},
+      {id:'end_t', label:'Round Number (t)', hint:'Which round do you want to check? Try round 3 or 4.', unit:''}
+    ],
+    compute: vals => 100 - (20 - vals[0]) * 1.5 * vals[1],
+    resultLabel: 'Power % at that round',
+    resultSuffix: '%',
+    steps: (vals, r) => [
+      {lucide:'file-text',color:'',title:'Write the formula',body:`<span class="hl">P(t) = 100 − (20−E) × 1.5 × t</span>`},
+      {lucide:'hash',color:'',title:'Plug in your values',body:`E = <span class="val">${vals[0]}</span> &nbsp;·&nbsp; t (round) = <span class="val">${vals[1]}</span>`},
+      {lucide:'trending-down',color:'g',title:'Find the decay rate',body:`20 − E = 20 − <span class="val">${vals[0]}</span> = <span class="val">${20-vals[0]}</span> &nbsp;·&nbsp; × 1.5 = <span class="val">${(20-vals[0])*1.5}</span>`},
+      {lucide:'x',color:'',title:'Multiply by the round',body:`<span class="val">${(20-vals[0])*1.5}</span> × <span class="val">${vals[1]}</span> = <span class="val">${(20-vals[0])*1.5*vals[1]}</span>`},
+      {lucide:'minus',color:'',title:'Subtract from 100',body:`100 − <span class="val">${(20-vals[0])*1.5*vals[1]}</span> = <span class="ans">${Math.max(r,0).toFixed(1)}%</span>`},
+      {lucide:'lightbulb',color:'y',title:'What this means',body:`At round ${vals[1]}, your bot is at <span class="ans">${Math.max(r,0).toFixed(1)}%</span> power. A bot with Endurance 4 at round ${vals[1]} is at only <span class="val">${Math.max(100-(20-4)*1.5*vals[1],0).toFixed(1)}%</span>. You outlast them.`}
+    ],
+    starters: [
+      'Imagine a phone battery. High endurance = it charges slower. Our endurance stat is ___. At round ___, our bot still has ___% power. A bot with endurance 4 only has ___% left by that same round.',
+      'Think of endurance like staying awake in class. The lower your endurance, the faster you slow down. Our bot has ___% power left at round ___. The other bot has already dropped to ___% by then.',
+      'Endurance controls how fast your bot loses power. At round ___, we calculated: 100 − (___ × 1.5 × ___) = ___%. That means we\'re still strong when others are slowing down.'
+    ]
+  },
+  turning: {
+    formula: 'arcSegments = T · turnRatio = 0.2 + (T × 0.02)',
+    inputs: [
+      {id:'trn_t', label:'Turning Stat (T)', hint:'Find your Turning stat in scouting report Section 1', unit:''}
+    ],
+    compute: vals => vals[0],
+    resultLabel: 'Arc Segments = T',
+    resultSuffix: '',
+    steps: (vals, r) => {
+      const ratio = (0.2 + vals[0] * 0.02).toFixed(3);
+      return [
+        {lucide:'file-text',color:'',title:'Write the two formulas',body:`<span class="hl">arcSegments = T</span><br><span class="hl">turnRatio = 0.2 + (T × 0.02)</span>`},
+        {lucide:'hash',color:'',title:'Plug in your Turning stat',body:`T = <span class="val">${vals[0]}</span>`},
+        {lucide:'refresh-cw',color:'t',title:'Calculate arc segments',body:`arcSegments = <span class="val">${vals[0]}</span> &nbsp;→&nbsp; your bot makes <span class="ans">${vals[0]}</span> arc sections in a full sweep`},
+        {lucide:'sliders',color:'t',title:'Calculate turn ratio',body:`0.2 + (<span class="val">${vals[0]}</span> × 0.02) = 0.2 + <span class="val">${(vals[0]*0.02).toFixed(3)}</span> = <span class="ans">${ratio}</span>`},
+        {lucide:'lightbulb',color:'y',title:'What this means',body:`With T = <span class="val">${vals[0]}</span>: your bot curves in <span class="ans">${vals[0]}</span> shorter arcs with ratio <span class="ans">${ratio}</span>. ${parseFloat(vals[0]) >= 10 ? 'High turning → tight turns → stays in a small zone.' : 'Low turning → wide arcs → sweeps more ground.'}`}
+      ];
+    },
+    starters: [
+      'Think of turning like how a car steers. Our turning stat is ___. That means our robot splits its path into ___ sections. The sharpness of each turn is 0.2 + (___ × 0.02) = ___. Higher number = tighter turns, smaller area.',
+      'Imagine drawing circles. A high turning stat means you draw small tight circles — your robot stays in one spot. A low stat means big wide circles — it covers more ground. Our stat is ___, so our robot makes ___ arc sections.',
+      'Turning controls how sharp the curves are. Our stat is ___. Arc segments = ___. Turn ratio = ___. That means we [stay concentrated / cover wide ground] depending on whether ___ is high or low.'
+    ]
+  },
+  power: {
+    formula: 'charge = P² · followThrough = P × 200 ms',
+    inputs: [
+      {id:'pwr_p', label:'Power Stat (P)', hint:'Find your Power stat in scouting report Section 1 or 3', unit:''}
+    ],
+    compute: vals => vals[0] * vals[0],
+    resultLabel: 'Charge (P²)',
+    resultSuffix: '',
+    steps: (vals, r) => [
+      {lucide:'file-text',color:'',title:'Write the two formulas',body:`<span class="hl">charge = P × P</span><br><span class="hl">followThrough = P × 200 ms</span>`},
+      {lucide:'hash',color:'',title:'Plug in your Power stat',body:`P = <span class="val">${vals[0]}</span>`},
+      {lucide:'x',color:'',title:'Calculate charge (P²)',body:`<span class="val">${vals[0]}</span> × <span class="val">${vals[0]}</span> = <span class="ans">${r}</span>`},
+      {lucide:'clock',color:'o',title:'Calculate follow-through duration',body:`<span class="val">${vals[0]}</span> × 200 = <span class="ans">${vals[0]*200} ms</span> of sustained push`},
+      {lucide:'lightbulb',color:'y',title:'Why squaring matters',body:`A bot with Power 3 has charge = 9. Your charge is <span class="ans">${r}</span>. That is <span class="ans">${r-9}</span> more force — even though the stat only looks ${vals[0]-3} higher. Quadratic means small stat gains = big impact gains.`}
+    ],
+    starters: [
+      'Power is like how hard you can push. Our power stat is ___. We multiply it by itself: ___ × ___ = ___. That\'s our charge strength. We also hold the push for ___ milliseconds — that\'s the follow-through.',
+      'Think of power like a spring. The tighter the spring, the harder it launches. Our spring strength is ___ × ___ = ___. Another bot with power 3 only gets 9. Ours is ___, so we hit much harder.',
+      'Power squared means: double the stat, quadruple the charge. Our power is ___. Charge = ___ × ___ = ___. Follow-through = ___ × 200 = ___ milliseconds. That means our push is stronger AND lasts longer.'
+    ]
+  },
+  budget: {
+    formula: 'S + E + T + P = 20',
+    inputs: [
+      {id:'bud_s', label:'Speed Stat (S)', hint:'From scouting report', unit:''},
+      {id:'bud_e', label:'Endurance Stat (E)', hint:'From scouting report', unit:''},
+      {id:'bud_t', label:'Turning Stat (T)', hint:'From scouting report', unit:''},
+      {id:'bud_p', label:'Power Stat (P)', hint:'From scouting report', unit:''}
+    ],
+    compute: vals => vals[0]+vals[1]+vals[2]+vals[3],
+    resultLabel: 'Total Stat Points',
+    resultSuffix: '/ 20',
+    steps: (vals, r) => [
+      {lucide:'file-text',color:'',title:'Write the formula',body:`<span class="hl">S + E + T + P = 20</span> — all four stats must add up to exactly 20`},
+      {lucide:'hash',color:'',title:'List your four stats',body:`S = <span class="val">${vals[0]}</span> &nbsp;·&nbsp; E = <span class="val">${vals[1]}</span> &nbsp;·&nbsp; T = <span class="val">${vals[2]}</span> &nbsp;·&nbsp; P = <span class="val">${vals[3]}</span>`},
+      {lucide:'plus',color:'',title:'Add them up',body:`<span class="val">${vals[0]}</span> + <span class="val">${vals[1]}</span> + <span class="val">${vals[2]}</span> + <span class="val">${vals[3]}</span> = <span class="${r===20?'ans':'val'}">${r}</span>`},
+      {lucide:r===20?'check-circle':'alert-triangle',color:r===20?'g':'y',title:r===20?'Budget is legal!':'Budget is NOT legal',body:r===20?`Total = <span class="ans">20</span>. Your loadout follows the rules. Every stat point is allocated — none wasted.`:`Total = <span style="color:var(--red);font-weight:800">${r}</span>. Must equal 20. You are ${r>20?r-20+' over':'20-'+r+' under'} the budget.`}
+    ],
+    starters: [
+      'Imagine you have exactly 20 coins to spend on 4 things. We spent ___ on Speed, ___ on Endurance, ___ on Turning, and ___ on Power. ___ + ___ + ___ + ___ = 20. Every coin is used — none left over, none missing.',
+      'Budget constraint means you can\'t go over the limit. Our total is: ___ + ___ + ___ + ___ = ___. Since that equals 20, our design is legal.',
+      'We have 20 stat points total. We chose to put more into [Speed/Power/etc.] because of our strategy. The numbers: S=___, E=___, T=___, P=___. They add up to 20 exactly.'
+    ]
+  },
+  percent: {
+    formula: '% Change = (New − Old) ÷ Old × 100',
+    inputs: [
+      {id:'pct_new', label:'New Stat (Season 2)', hint:'Your current stat from the scouting report', unit:''},
+      {id:'pct_old', label:'Old Stat (Season 1)', hint:'Your Season 1 stat — from the comparison section', unit:''}
+    ],
+    compute: vals => ((vals[0]-vals[1])/vals[1])*100,
+    resultLabel: '% Change',
+    resultSuffix: '%',
+    steps: (vals, r) => [
+      {lucide:'file-text',color:'',title:'Write the formula',body:`<span class="hl">% Change = (New − Old) ÷ Old × 100</span>`},
+      {lucide:'hash',color:'',title:'Plug in your values',body:`New = <span class="val">${vals[0]}</span> &nbsp;·&nbsp; Old = <span class="val">${vals[1]}</span>`},
+      {lucide:'minus',color:'',title:'Step 1: Subtract',body:`New − Old = <span class="val">${vals[0]}</span> − <span class="val">${vals[1]}</span> = <span class="val">${(vals[0]-vals[1]).toFixed(2)}</span>`},
+      {lucide:'divide',color:'',title:'Step 2: Divide by the old number',body:`<span class="val">${(vals[0]-vals[1]).toFixed(2)}</span> ÷ <span class="val">${vals[1]}</span> = <span class="val">${((vals[0]-vals[1])/vals[1]).toFixed(4)}</span>`},
+      {lucide:'x',color:'',title:'Step 3: Multiply by 100',body:`<span class="val">${((vals[0]-vals[1])/vals[1]).toFixed(4)}</span> × 100 = <span class="ans">${r > 0 ? '+' : ''}${r.toFixed(1)}%</span>`},
+      {lucide:'lightbulb',color:'y',title:'What this means',body:`The stat changed from <span class="val">${vals[1]}</span> to <span class="val">${vals[0]}</span> — a <span class="ans">${r>0?'+':''}${r.toFixed(1)}%</span> change. This shows our Season 2 strategy was to ${r>0?'increase':'decrease'} this stat.`}
+    ],
+    starters: [
+      'Percent change tells you how much something grew or shrank. Our stat went from ___ to ___. The difference is ___. We divide ___ by the original number ___ and multiply by 100 — that gives us ___%. That means we changed this stat by ___% between seasons.',
+      'Imagine your grade went from 60 to 78. That\'s a 30% improvement. Same idea here. Our stat went from ___ to ___. Step 1: subtract — ___ − ___ = ___. Step 2: divide — ___ ÷ ___ = ___. Step 3: × 100 = ___% change.',
+      'We changed this stat from ___ to ___ between Season 1 and Season 2. (___ − ___) ÷ ___ × 100 = ___%. That means we [improved / reduced] this stat by ___% to support our strategy.'
+    ]
+  }
+};
+
+function selectCalc(key, el) {
+  selectedCalc = key;
+  document.querySelectorAll('.calc-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  buildMathInput(key);
+}
+
+function buildMathInput(key) {
+  const data = calcData[key];
+  const card = document.getElementById('mathInputCard');
+  card.style.display = 'block';
+
+  const fv = `<div class="formula-vis"><div class="fv-label">Formula</div><div class="fv-eq">${data.formula}</div></div>`;
+  const inputs = data.inputs.map(inp => `
+    <div class="field-group">
+      <label class="field-label">${inp.label}</label>
+      <div class="field-hint"><span>${inp.hint}</span></div>
+      <input type="number" id="${inp.id}" step="0.01" placeholder="Enter number from your report" style="width:100%;height:58px;font-size:22px" oninput="clearCalcResult()">
+    </div>
+  `).join('');
+
+  document.getElementById('mathInputArea').innerHTML = fv + inputs;
+  document.getElementById('calcResultArea').innerHTML = '';
+  document.getElementById('mathWalkthroughCard').style.display = 'none';
+  document.getElementById('plainLangCard').style.display = 'none';
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function clearCalcResult() {
+  document.getElementById('calcResultArea').innerHTML = '';
+}
+
+function calculateResult() {
+  if (!selectedCalc) {
+    document.getElementById('noCalcErr').style.display = 'block';
+    return;
+  }
+  const data = calcData[selectedCalc];
+  const vals = data.inputs.map(inp => parseFloat(document.getElementById(inp.id).value));
+  if (vals.some(isNaN)) {
+    document.getElementById('calcResultArea').innerHTML = '<div class="err-box" style="display:block">Enter all numbers above before calculating. Each field needs a value from your scouting report.</div>';
+    return;
+  }
+  if (selectedCalc !== 'budget' && selectedCalc !== 'percent' && vals.slice(1).some(v => v===0)) {
+    document.getElementById('calcResultArea').innerHTML = '<div class="err-box" style="display:block">You cannot divide by zero. Check your numbers — the bottom number cannot be 0.</div>';
+    return;
+  }
+
+  const r = data.compute(vals);
+  const display = (selectedCalc==='percent') ? (r>0?'+':'')+r.toFixed(1)+'%'
+                : (selectedCalc==='power') ? r.toString()
+                : (selectedCalc==='turning') ? r.toString()
+                : (selectedCalc==='budget') ? r.toString()+' / 20'
+                : r.toFixed(1)+data.resultSuffix;
+
+  const isOk = selectedCalc==='budget' ? r===20 : true;
+  document.getElementById('calcResultArea').innerHTML = `
+    <div class="result-wrap">
+      <div class="ticon lg ${isOk?'g':'y'}"><i data-lucide="${isOk?'check-circle':'alert-triangle'}"></i></div>
+      <div class="result-text">
+        <div class="result-label">${data.resultLabel}</div>
+        <div class="result-val">${display}</div>
+      </div>
+    </div>
+    <div class="info-box green" style="margin-top:12px">Write this number down. This is the number you say when the room asks <strong>"How did you get that?"</strong></div>
+  `;
+
+  // Build walkthrough
+  const steps = data.steps(vals, r);
+  const wCard = document.getElementById('mathWalkthroughCard');
+  wCard.style.display = 'block';
+  document.getElementById('walkthroughSteps').innerHTML = steps.map(s => `
+    <div class="mstep">
+      <div class="ticon${s.color?' '+s.color:''}"><i data-lucide="${s.lucide}"></i></div>
+      <div class="mstep-body">
+        <div class="mstep-title">${s.title}</div>
+        <div class="mstep-content">${s.body}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Build starters
+  const plCard = document.getElementById('plainLangCard');
+  plCard.style.display = 'block';
+  document.getElementById('starterCards').innerHTML = data.starters.map((s,i) => `
+    <div class="starter-card" onclick="useStarter(${i})">
+      <div class="starter-label"><i data-lucide="message-circle"></i> Sentence Starter ${i+1} — Tap to use</div>
+      <div class="starter-text">${s.replace(/_+/g,'<span class="starter-blank">____</span>')}</div>
+    </div>
+  `).join('');
+
+  lucide.createIcons();
+  wCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function useStarter(i) {
+  if (!selectedCalc) return;
+  document.getElementById('plainExplain').value = calcData[selectedCalc].starters[i].replace(/_+/g,'____') + '\n\n';
+  document.getElementById('plainExplain').focus();
+}
+
+function checkPlainLang() {
+  const text = document.getElementById('plainExplain').value.trim();
+  const fb = document.getElementById('plainFeedback');
+  if (text.length < 40) {
+    fb.innerHTML = '<div class="err-box" style="display:block">Your explanation is too short. Expand it — explain what the formula does, what numbers you used, and what the answer means in real life.</div>';
+    return;
+  }
+  const jargon = ['loadout','scouting report','stat chip','speed motor','endurance chip','power module'];
+  const found = jargon.filter(j => text.toLowerCase().includes(j));
+  if (found.length > 0) {
+    fb.innerHTML = `<div class="warn-box"><div class="ticon sm y"><i data-lucide="alert-triangle"></i></div><div class="warn-box-body"><strong>Watch your word choices!</strong><br>You used: <strong>${found.join(', ')}</strong>.<br>The listener doesn't know those words. Replace them with everyday words — like "battery level" instead of "endurance chip."</div></div>`;
+    lucide.createIcons();
+    return;
+  }
+  fb.innerHTML = `<div class="info-box green" style="margin-top:0"><strong>Your explanation sounds clear.</strong> Read it out loud one more time — if a stranger could understand it without any help, you're ready.</div>`;
+}
+
+// ── CHECKLIST ────────────────────────────
+function toggleCheck(item) { item.classList.toggle('checked'); }
+
+function checkReady() {
+  const all  = document.querySelectorAll('#panel4 .check-item');
+  const done = document.querySelectorAll('#panel4 .check-item.checked');
+  const result = document.getElementById('readyResult');
+  result.style.display = 'block';
+
+  if (done.length === all.length) {
+    result.innerHTML = `
+      <div class="complete-box">
+        <div class="complete-icon"><i data-lucide="trophy"></i></div>
+        <div class="complete-title">Block Complete!</div>
+        <div class="complete-desc">Your pitch is locked. Your math is proved. Tomorrow is Championship.<br><strong style="color:var(--green)">Nothing changes after 10:10 today — except your focus.</strong></div>
+      </div>`;
+    lucide.createIcons();
+  } else {
+    const left = all.length - done.length;
+    result.innerHTML = `<div class="warn-box"><div class="ticon sm y"><i data-lucide="alert-triangle"></i></div><div class="warn-box-body"><strong>${left} item${left>1?'s':''} still not done.</strong><br>Complete everything before 10:10. Tap each item as you finish it.</div></div>`;
+    lucide.createIcons();
+  }
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
