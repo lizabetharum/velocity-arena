@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scouting Report Helper — Sections 3 &amp; 4</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0d1b2a;color:#e8f4fd;min-height:100vh;padding-bottom:80px}
+
+/* HEADER */
+.hdr{background:#132033;border-bottom:3px solid #00e5ff;padding:18px 28px}
+.hdr-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:#00e5ff;text-transform:uppercase;margin-bottom:6px}
+.hdr h1{font-size:20px;font-weight:900;color:#fff;line-height:1.2}
+
+/* PROGRESS */
+.prog-wrap{background:#132033;padding:14px 28px;border-bottom:1px solid #1e3a5f}
+.prog-track{height:6px;background:#1e3a5f;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#00e5ff,#0099ff);border-radius:3px;transition:width 0.4s}
+.prog-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#5a85a8}
+.prog-dots{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pdot{width:30px;height:30px;border-radius:50%;background:#1e3a5f;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#5a85a8;cursor:pointer;transition:all 0.2s;user-select:none;flex-shrink:0}
+.pdot.active{background:#00e5ff;color:#0d1b2a;border-color:#00e5ff}
+.pdot.done{background:#0a4a3a;color:#00c99a;border-color:#00c99a}
+
+/* MAIN */
+.main{max-width:740px;margin:0 auto;padding:28px 20px}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+
+/* SECTION BADGE */
+.sbadge{display:inline-block;background:#00e5ff18;border:1px solid #00e5ff44;color:#00e5ff;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.sbadge.s4{background:#a855f718;border-color:#a855f744;color:#a855f7}
+.sbadge.fin{background:#00c99a18;border-color:#00c99a44;color:#00c99a}
+
+/* STEP HEADER */
+.step-num{font-size:12px;color:#5a85a8;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.step-title{font-size:26px;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2}
+.step-sub{font-size:16px;color:#8ab4d4;margin-bottom:24px;line-height:1.5}
+
+/* CARDS */
+.card{background:#132033;border:1px solid #1e3a5f;border-radius:12px;padding:22px;margin-bottom:18px}
+.card-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#00e5ff;margin-bottom:14px}
+.card-title.s4{color:#a855f7}
+
+/* INPUTS */
+.lbl{display:block;font-size:15px;font-weight:700;color:#c8dfef;margin-bottom:6px}
+.hint{font-size:13px;color:#5a85a8;margin-bottom:8px;line-height:1.5}
+input[type=number],input[type=text]{width:100%;background:#0d1b2a;border:2px solid #1e3a5f;border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;padding:12px 16px;height:58px;transition:border-color 0.2s;-webkit-appearance:none;appearance:none}
+input:focus{outline:none;border-color:#00e5ff}
+select{width:100%;background:#0d1b2a;border:2px solid #1e3a5f;border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:20px;padding:12px 16px;height:58px;transition:border-color 0.2s;cursor:pointer}
+select:focus{outline:none;border-color:#a855f7}
+textarea{width:100%;background:#0d1b2a;border:2px solid #1e3a5f;border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:17px;padding:14px 16px;min-height:130px;resize:vertical;transition:border-color 0.2s;line-height:1.6}
+textarea:focus{outline:none;border-color:#a855f7}
+.input-g{margin-bottom:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* FORMULA BOX */
+.fbox{background:#0a2540;border:2px solid #00e5ff33;border-radius:10px;padding:18px 22px;margin:14px 0;text-align:center}
+.fbox .formula{font-size:22px;font-weight:700;color:#00e5ff;font-family:'Courier New',monospace;line-height:1.8}
+.fbox .flabel{font-size:13px;color:#5a85a8;margin-top:6px}
+
+/* MATH STEPS */
+.msteps{margin:14px 0}
+.mstep{background:#0d1b2a;border:1px solid #1e3a5f;border-radius:10px;padding:14px 18px;margin:8px 0;display:flex;align-items:flex-start;gap:14px}
+.mstep-n{width:28px;height:28px;min-width:28px;background:#00e5ff;color:#0d1b2a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;margin-top:2px}
+.mstep-c{flex:1}
+.mstep-lbl{font-size:14px;color:#8ab4d4;margin-bottom:4px}
+.mstep-val{font-size:21px;font-weight:700;color:#00c99a;font-family:'Courier New',monospace;word-break:break-all}
+
+/* RESULT */
+.res{background:#0a4a3a;border:2px solid #00c99a;border-radius:10px;padding:14px 20px;margin:12px 0;display:flex;align-items:center;gap:12px}
+.res-lbl{font-size:15px;color:#8ab4d4;flex:1;line-height:1.4}
+.res-val{font-size:30px;font-weight:900;color:#00c99a;min-width:80px;text-align:right;word-break:break-all}
+
+/* ALERTS */
+.err{background:#4a0a0a;border:2px solid #ff4444;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:15px;color:#ffaaaa;line-height:1.5}
+.warn{background:#3a2a00;border:2px solid #f5a623;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:14px;color:#f5d080;line-height:1.5}
+.info{background:#0a2540;border-left:4px solid #00e5ff;padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px;color:#b8d8f0;line-height:1.6}
+
+/* INTRO LIST */
+.feature-list{list-style:none;padding:0;margin:16px 0}
+.feature-list li{padding:12px 16px;background:#0d1b2a;border:1px solid #1e3a5f;border-radius:8px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;font-size:15px;color:#c8dfef;line-height:1.5}
+.feature-list li .ico{font-size:20px;min-width:28px;margin-top:1px}
+
+/* STAT FORMULA LIST */
+.stat-list{list-style:none;padding:0;margin:8px 0}
+.stat-list li{padding:10px 14px;background:#0d1b2a;border-radius:8px;margin-bottom:6px;display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;font-size:14px}
+.stat-list li .stat-letter{font-size:18px;font-weight:900;color:#a855f7;font-family:'Courier New',monospace}
+.stat-list li .stat-detail{color:#c8dfef;line-height:1.4}
+.stat-list li .stat-formula{color:#8ab4d4;font-size:13px;font-family:'Courier New',monospace;margin-top:2px}
+
+/* LOADOUT BUILDER */
+.lo-card{background:#0d1b2a;border:2px solid #1e3a5f;border-radius:12px;padding:18px;margin-bottom:16px;transition:border-color 0.3s}
+.lo-card.valid-lo{border-color:#00c99a}
+.lo-card.invalid-lo{border-color:#ff6b35}
+.lo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.lo-name{font-size:17px;font-weight:700;color:#fff}
+.lo-badge{padding:3px 12px;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.3s}
+.lo-badge.valid{background:#0a4a3a;color:#00c99a;border:1px solid #00c99a}
+.lo-badge.invalid{background:#4a1a0a;color:#ff6b35;border:1px solid #ff6b35}
+.lo-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.lo-stat{background:#132033;border-radius:8px;padding:12px 8px;text-align:center}
+.lo-stat-name{font-size:13px;font-weight:700;letter-spacing:1px;color:#a855f7;margin-bottom:8px;text-transform:uppercase}
+.lo-input{width:100%;background:#0d1b2a;border:2px solid #1e3a5f;border-radius:6px;color:#fff;font-family:'DM Sans',sans-serif;font-size:26px;font-weight:700;text-align:center;padding:8px 4px;height:54px;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+.lo-input:focus{outline:none;border-color:#a855f7}
+.lo-sum{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:18px;font-weight:700;text-align:center;transition:all 0.3s}
+.lo-sum.ok{background:#0a4a3a;border:2px solid #00c99a;color:#00c99a}
+.lo-sum.bad{background:#4a1a0a;border:2px solid #ff6b35;color:#ff6b35}
+.fo-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.fo-item{background:#132033;border-radius:8px;padding:10px 12px}
+.fo-lbl{font-size:11px;color:#5a85a8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.fo-val{font-size:17px;font-weight:700;color:#c8dfef}
+
+/* VERIFY ITEMS */
+.verify-item{border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.verify-item.ok{background:#0a4a3a;border:2px solid #00c99a}
+.verify-item.bad{background:#4a0a0a;border:2px solid #ff4444}
+.verify-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.verify-detail{font-size:14px;color:#8ab4d4;line-height:1.5}
+
+/* NAVIGATION */
+.nav{display:flex;gap:12px;margin-top:30px;align-items:center}
+.btn{padding:15px 28px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.btn-back{background:#1e3a5f;color:#8ab4d4;min-width:100px}
+.btn-back:hover{background:#2a4a70}
+.btn-next{background:#00e5ff;color:#0d1b2a;flex:1}
+.btn-next:hover{background:#33eeff;transform:translateY(-2px)}
+.btn-finish{background:#00c99a;color:#0d1b2a;flex:1}
+.btn-finish:hover{background:#33ddbb;transform:translateY(-2px)}
+
+/* EQUATION DISPLAY */
+.eq-display{background:#0a2540;border:2px solid #00e5ff44;border-radius:10px;padding:20px;text-align:center;font-size:24px;font-weight:700;color:#00e5ff;font-family:'Courier New',monospace;margin:16px 0;word-break:break-all;line-height:1.6}
+
+/* SUMMARY */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.sum-item{background:#0d1b2a;border:1px solid #1e3a5f;border-radius:10px;padding:14px 16px}
+.sum-key{font-size:11px;color:#5a85a8;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.sum-val{font-size:19px;font-weight:700;color:#00e5ff;word-break:break-word;line-height:1.3}
+.sum-lo{background:#0d1b2a;border:1px solid #1e3a5f;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.sum-lo-title{font-size:13px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.sum-lo-stats{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;font-family:'Courier New',monospace}
+.sum-lo-formulas{font-size:13px;color:#8ab4d4;line-height:1.6}
+
+/* DIVIDER */
+.divider{height:1px;background:#1e3a5f;margin:24px 0}
+
+/* LUCIDE ICONS */
+[data-lucide]{display:inline-block;vertical-align:middle;stroke-width:1.5}
+.feature-list .ico{display:flex;align-items:flex-start;padding-top:2px;min-width:28px}
+.feature-list .ico [data-lucide]{width:22px;height:22px;color:#00e5ff;flex-shrink:0}
+.lo-name [data-lucide]{width:18px;height:18px;margin-right:4px;vertical-align:-3px;color:#a855f7}
+.hdr-icon{display:inline-flex;align-items:center;gap:10px}
+.hdr-icon [data-lucide]{width:24px;height:24px;color:#00e5ff;flex-shrink:0}
+.info-icon{display:inline-flex;gap:8px;align-items:flex-start}
+.info-icon [data-lucide]{width:16px;height:16px;margin-top:2px;flex-shrink:0;color:#00e5ff}
+.warn-icon{display:inline-flex;gap:8px;align-items:flex-start}
+.warn-icon [data-lucide]{width:16px;height:16px;margin-top:2px;flex-shrink:0;color:#f5a623}
+
+/* REFERENCE CARD GRID (Section 4 Step 1) */
+.ref-grid{display:flex;flex-direction:column;gap:10px}
+.ref-row{display:grid;grid-template-columns:110px 1fr;gap:12px;background:#0d1b2a;border:1px solid #1e3a5f;border-radius:10px;padding:14px 16px;align-items:flex-start}
+.ref-stat-col{display:flex;align-items:center;gap:7px}
+.ref-stat-icon{width:28px;height:28px;background:#a855f718;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#a855f7}
+.ref-stat-name{font-size:14px;font-weight:700;color:#a855f7}
+.ref-detail-col{}
+.ref-formula-text{font-family:'Courier New',monospace;font-size:13px;color:#00e5ff;font-weight:700;margin-bottom:5px;line-height:1.5;word-break:break-word}
+.ref-desc-text{font-size:12px;color:#8ab4d4;line-height:1.5}
+.concept-tag{display:inline-block;background:#132033;border:1px solid #1e3a5f;border-radius:4px;padding:1px 7px;font-size:11px;color:#c8dfef;margin-left:4px;font-family:'DM Sans',sans-serif;font-weight:700}
+
+/* STRATEGY TYPES */
+.strategy-types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.strat-card{background:#0d1b2a;border-radius:10px;padding:14px;text-align:center}
+.strat-card.agg{border:2px solid #ff6b3566}
+.strat-card.def{border:2px solid #3b82f666}
+.strat-card.bal{border:2px solid #00c99a66}
+.strat-icon{font-size:22px;margin-bottom:6px}
+.strat-label{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px}
+.strat-desc{font-size:12px;color:#8ab4d4;line-height:1.5}
+.strat-example{font-size:11px;font-family:'Courier New',monospace;color:#5a85a8;margin-top:6px}
+
+/* STEP ICON BANNER */
+.step-icon-banner{display:flex;align-items:center;gap:14px;background:#132033;border:1px solid #1e3a5f;border-radius:12px;padding:16px 20px;margin-bottom:22px}
+.step-icon-banner.s4-banner{border-color:#a855f730;background:#1a1232}
+.step-icon-circle{width:52px;height:52px;min-width:52px;border-radius:12px;background:#00e5ff18;border:1.5px solid #00e5ff44;display:flex;align-items:center;justify-content:center}
+.step-icon-circle.s4{background:#a855f718;border-color:#a855f744}
+.step-icon-circle [data-lucide]{width:26px;height:26px;color:#00e5ff}
+.step-icon-circle.s4 [data-lucide]{color:#a855f7}
+.step-icon-text{}
+.step-icon-label{font-size:11px;color:#5a85a8;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.step-icon-title{font-size:17px;font-weight:700;color:#fff}
+
+/* RESULT ICON */
+.res-icon{width:36px;height:36px;min-width:36px;background:#00c99a22;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.res-icon [data-lucide]{width:20px;height:20px;color:#00c99a}
+
+/* FORMULA BOX ICON */
+.fbox-inner{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.fbox-icon{width:40px;height:40px;min-width:40px;background:#00e5ff18;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.fbox-icon [data-lucide]{width:22px;height:22px;color:#00e5ff}
+.fbox-icon.s4{background:#a855f718}
+.fbox-icon.s4 [data-lucide]{color:#a855f7}
+
+/* CARD ICON TITLE */
+.card-title-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.card-title-row [data-lucide]{width:16px;height:16px;color:#00e5ff;flex-shrink:0}
+.card-title-row.s4 [data-lucide]{color:#a855f7}
+.card-title-row .card-title{margin-bottom:0}
+
+@media(max-width:600px){
+  .two-col{grid-template-columns:1fr 1fr}
+  .lo-stats{grid-template-columns:repeat(4,1fr)}
+  .fo-row{grid-template-columns:1fr 1fr}
+  .sum-grid{grid-template-columns:1fr}
+  .step-title{font-size:22px}
+  .hdr h1{font-size:18px}
+  .ref-row{grid-template-columns:1fr}
+  .strategy-types{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-eyebrow">Velocity Arena &mdash; Day 16</div>
+  <h1 class="hdr-icon"><i data-lucide="scan-search"></i>Scouting Report Helper &mdash; Sections 3 &amp; 4</h1>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="prog-meta">
+    <span id="prog-label">Step 1 of 11</span>
+    <span id="prog-section">Getting Started</span>
+  </div>
+  <div class="prog-dots" id="prog-dots"></div>
+</div>
+
+<div class="main">
+
+  <!-- ====================================================== -->
+  <!-- STEP 0: INTRO                                           -->
+  <!-- ====================================================== -->
+  <div class="panel active" id="panel-0">
+    <div class="sbadge">Scouting Report</div>
+    <div class="step-title">Let&rsquo;s Build Your Scouting Report</div>
+    <div class="step-sub">This tool walks you through Sections 3 and 4 step by step. Type in your data &mdash; it does the math for you.</div>
+
+    <div class="card">
+      <div class="card-title">What You&rsquo;ll Do</div>
+      <ul class="feature-list">
+        <li><span class="ico"><i data-lucide="arrow-up-right"></i></span><span><strong>Section 3 &mdash; Trend Line:</strong> Use your opponent&rsquo;s past stats to write a math equation that predicts how many goals they&rsquo;ll score in the Championship.</span></li>
+        <li><span class="ico"><i data-lucide="cpu"></i></span><span><strong>Section 4 &mdash; Loadout Strategy:</strong> Build 3 different stat combinations for your bot and write a recommendation backed by your prediction.</span></li>
+        <li><span class="ico"><i data-lucide="clipboard-list"></i></span><span><strong>Summary:</strong> Copy everything to your paper scouting report at the end.</span></li>
+      </ul>
+    </div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="clipboard"></i><span>Have your paper scouting report nearby. You&rsquo;ll need your opponent&rsquo;s match data from the stats table on your report.</span></span></div>
+
+    <div class="input-g" style="margin-top:24px">
+      <label class="lbl" for="my-team">Your Team Name</label>
+      <input type="text" id="my-team" placeholder="e.g. Team Hydra" oninput="st.myTeam=this.value">
+    </div>
+    <div class="input-g">
+      <label class="lbl" for="opp-team">Team You&rsquo;re Scouting (your opponent)</label>
+      <input type="text" id="opp-team" placeholder="e.g. Team Apex" oninput="st.oppTeam=this.value;syncOppName()">
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-next" onclick="goTo(1)"><i data-lucide="arrow-up-right" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i>Start Section 3</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 1: DATA POINTS                                     -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-1">
+    <div class="sbadge">Section 3 &bull; Step 1 of 5</div>
+    <div class="step-title">Find Two Data Points</div>
+    <div class="step-sub">Look at your opponent&rsquo;s stats table on your paper report. Find two matches where their Speed and Goals are written down.</div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="table-2"></i><span>Use Match Day 1 and Match Day 2. Speed = their S stat. Goals = how many they scored.</span></span></div>
+
+    <div class="card">
+      <div class="card-title">Data Point 1 &mdash; First Match</div>
+      <div class="two-col">
+        <div class="input-g">
+          <label class="lbl">Speed (S&#x2081;)</label>
+          <div class="hint">Their Speed stat from that match</div>
+          <input type="number" id="m1-speed" min="0" max="20" placeholder="e.g. 8" oninput="st.m1.speed=toNum(this.value);calcAll()">
+        </div>
+        <div class="input-g">
+          <label class="lbl">Goals (G&#x2081;)</label>
+          <div class="hint">Goals they scored that match</div>
+          <input type="number" id="m1-goals" min="0" max="50" placeholder="e.g. 5" oninput="st.m1.goals=toNum(this.value);calcAll()">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Data Point 2 &mdash; Second Match</div>
+      <div class="two-col">
+        <div class="input-g">
+          <label class="lbl">Speed (S&#x2082;)</label>
+          <div class="hint">Their Speed stat from that match</div>
+          <input type="number" id="m2-speed" min="0" max="20" placeholder="e.g. 12" oninput="st.m2.speed=toNum(this.value);calcAll()">
+        </div>
+        <div class="input-g">
+          <label class="lbl">Goals (G&#x2082;)</label>
+          <div class="hint">Goals they scored that match</div>
+          <input type="number" id="m2-goals" min="0" max="50" placeholder="e.g. 8" oninput="st.m2.goals=toNum(this.value);calcAll()">
+        </div>
+      </div>
+    </div>
+
+    <div id="s1-warning"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(0)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(2)">Calculate Slope &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 2: SLOPE                                           -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-2">
+    <div class="sbadge">Section 3 &bull; Step 2 of 5</div>
+    <div class="step-icon-banner">
+      <div class="step-icon-circle"><i data-lucide="arrow-up-right"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 3 &mdash; Trend Line</div>
+        <div class="step-icon-title">Calculate the Slope (m)</div>
+      </div>
+    </div>
+    <div class="step-sub">The slope tells you how many extra goals your opponent scores for every 1 point increase in Speed.</div>
+
+    <div class="fbox">
+      <div class="fbox-inner">
+        <div class="fbox-icon"><i data-lucide="arrow-up-right"></i></div>
+        <div class="formula">m = (G&#x2082; &minus; G&#x2081;) &divide; (S&#x2082; &minus; S&#x2081;)</div>
+      </div>
+      <div class="flabel">Slope Formula &mdash; Rise over Run</div>
+    </div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="info"></i><span>The slope (m) tells you the <strong>rate of change</strong> — how much the Goals number goes up or down for every 1 point increase in Speed. A slope of 0.75 means: every time Speed goes up by 1, they score 0.75 more goals on average.</span></span></div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="calculator"></i><span class="card-title">Your Calculation</span></div>
+      <div class="hint" style="margin-bottom:12px">The calculator fills in automatically once you enter data on Step 1. Check each arithmetic step — they match what you would write on paper.</div>
+      <div id="slope-steps"><div class="info">Enter your match data on Step 1 first.</div></div>
+    </div>
+
+    <div id="slope-result"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(1)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(3)">Find Y-Intercept &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 3: Y-INTERCEPT                                     -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-3">
+    <div class="sbadge">Section 3 &bull; Step 3 of 5</div>
+    <div class="step-icon-banner">
+      <div class="step-icon-circle"><i data-lucide="milestone"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 3 &mdash; Trend Line</div>
+        <div class="step-icon-title">Find the Y-Intercept (b)</div>
+      </div>
+    </div>
+    <div class="step-sub">b is the predicted Goals when Speed equals zero &mdash; the point where your trend line crosses the y-axis. Think of it as the &ldquo;baseline&rdquo; score before Speed adds anything.</div>
+
+    <div class="fbox">
+      <div class="fbox-inner">
+        <div class="fbox-icon"><i data-lucide="milestone"></i></div>
+        <div class="formula">b = G&#x2081; &minus; m &times; S&#x2081;</div>
+      </div>
+      <div class="flabel">Y-Intercept Formula &mdash; use your slope m and Match 1 values</div>
+    </div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="info"></i><span>You already know m from Step 2 and your Match 1 data from Step 1. Plug those numbers in and the calculator shows every step. A negative b just means the line starts below zero &mdash; that&rsquo;s fine.</span></span></div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="calculator"></i><span class="card-title">Your Calculation</span></div>
+      <div class="hint" style="margin-bottom:12px">Steps appear automatically. Read through each one so you understand what&rsquo;s happening before you copy to paper.</div>
+      <div id="intercept-steps"><div class="info">Complete Step 2 first.</div></div>
+    </div>
+
+    <div id="intercept-result"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(2)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(4)">Write the Equation &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 4: EQUATION + INTERPRET                            -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-4">
+    <div class="sbadge">Section 3 &bull; Step 4 of 5</div>
+    <div class="step-icon-banner">
+      <div class="step-icon-circle"><i data-lucide="pencil-ruler"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 3 &mdash; Trend Line</div>
+        <div class="step-icon-title">Your Trend Line Equation</div>
+      </div>
+    </div>
+    <div class="step-sub">You now have m (slope) and b (y-intercept). Drop them into the slope-intercept form below. This equation describes your opponent&rsquo;s scoring pattern across every match &mdash; you can use it to predict any Speed value, not just the Championship.</div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="pencil-ruler"></i><span class="card-title">Your Equation</span></div>
+      <div class="eq-display" id="eq-display">Goals = ? &times; Speed + ?</div>
+      <div class="hint" style="text-align:center;margin-top:8px">&#8593; This updates automatically. Copy it onto Section 3 of your paper report exactly as shown.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="message-square"></i><span class="card-title">What Does the Slope Mean?</span></div>
+      <div class="hint">Explain it in plain language. Example: &ldquo;For every 1 point increase in Speed, they score 0.75 more goals.&rdquo;</div>
+      <textarea id="slope-meaning" placeholder="Write what the slope means here..." oninput="st.slopeMeaning=this.value"></textarea>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(3)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(5)">Make the Prediction &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 5: CHAMPIONSHIP PREDICTION                         -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-5">
+    <div class="sbadge">Section 3 &bull; Step 5 of 5</div>
+    <div class="step-icon-banner">
+      <div class="step-icon-circle"><i data-lucide="target"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 3 &mdash; Trend Line</div>
+        <div class="step-icon-title">Championship Prediction</div>
+      </div>
+    </div>
+    <div class="step-sub">Your trend line equation can predict goals at any Speed. Now use it to forecast how many goals your opponent will score in the Championship match &mdash; giving you a number to plan your loadout against.</div>
+
+    <div class="fbox">
+      <div class="fbox-inner">
+        <div class="fbox-icon"><i data-lucide="target"></i></div>
+        <div class="formula" id="pred-formula-display">Goals = m &times; Speed + b</div>
+      </div>
+      <div class="flabel">Your equation &mdash; plug in their Championship Speed to get Goals</div>
+    </div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="info"></i><span><strong>How to choose the Speed:</strong> Look at your opponent&rsquo;s most recent match Speed. That&rsquo;s your best estimate for what they&rsquo;ll run in the Championship. You can also check the <strong>dashboard</strong> for their Season 2 stat history.</span></span></div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="crosshair"></i><span class="card-title">Enter Their Championship Speed</span></div>
+      <div class="hint" style="margin-bottom:12px">Type a number between 0 and 20. The calculator runs your equation and shows every step of the arithmetic.</div>
+      <div class="input-g">
+        <label class="lbl">Championship Speed</label>
+        <input type="number" id="champ-speed" min="0" max="20" placeholder="e.g. 10" oninput="st.champSpeed=toNum(this.value);calcChampPrediction()">
+      </div>
+    </div>
+
+    <div id="champ-result"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(4)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(6)"><i data-lucide="cpu" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i>Start Section 4</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 6: CONSTRAINTS + THREAT                            -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-6">
+    <div class="sbadge s4">Section 4 &bull; Step 1 of 4</div>
+    <div class="step-icon-banner s4-banner">
+      <div class="step-icon-circle s4"><i data-lucide="sliders-horizontal"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 4 &mdash; Loadout Strategy</div>
+        <div class="step-icon-title">Your Constraint &amp; the Threat</div>
+      </div>
+    </div>
+    <div class="step-sub">Every bot loadout has one rule that can never be broken. You also need to name what makes your opponent dangerous.</div>
+
+    <div class="fbox" style="border-color:#a855f733">
+      <div class="fbox-inner">
+        <div class="fbox-icon s4"><i data-lucide="lock"></i></div>
+        <div class="formula" style="color:#a855f7">S + E + T + P = 20</div>
+      </div>
+      <div class="flabel">The constraint &mdash; your four stats must always sum to exactly 20</div>
+    </div>
+
+    <div class="card" style="border-color:#a855f722">
+      <div class="card-title-row s4"><i data-lucide="bot"></i><span class="card-title s4">The Four Stats &amp; Bot Formulas</span></div>
+      <div class="hint" style="margin-bottom:14px">These are the same formulas on your team reference card. They tell you exactly what each stat does to your bot.</div>
+      <div class="ref-grid">
+
+        <div class="ref-row">
+          <div class="ref-stat-col">
+            <span class="ref-stat-icon"><i data-lucide="gauge" style="width:16px;height:16px"></i></span>
+            <span class="ref-stat-name">Speed</span>
+          </div>
+          <div class="ref-detail-col">
+            <div class="ref-formula-text">motorPower% = (S &times; 100) &divide; 20</div>
+            <div class="ref-desc-text">Every point of Speed adds the same amount of motor power. <span class="concept-tag">Unit rate</span></div>
+          </div>
+        </div>
+
+        <div class="ref-row">
+          <div class="ref-stat-col">
+            <span class="ref-stat-icon"><i data-lucide="battery-charging" style="width:16px;height:16px"></i></span>
+            <span class="ref-stat-name">Endurance</span>
+          </div>
+          <div class="ref-detail-col">
+            <div class="ref-formula-text">P(t) = 100 &minus; (20&minus;E) &times; 1.5 &times; t</div>
+            <div class="ref-desc-text">Power drops over time. At 3 min: P(3) = 100 &minus; (20&minus;E) &times; 4.5 <span class="concept-tag">Linear decay</span></div>
+          </div>
+        </div>
+
+        <div class="ref-row">
+          <div class="ref-stat-col">
+            <span class="ref-stat-icon"><i data-lucide="rotate-cw" style="width:16px;height:16px"></i></span>
+            <span class="ref-stat-name">Turning</span>
+          </div>
+          <div class="ref-detail-col">
+            <div class="ref-formula-text">arcSegments = T &nbsp;&nbsp; turnRatio = 0.2 + (T &times; 0.02)</div>
+            <div class="ref-desc-text">How sharp can you turn? Higher T = tighter arc. <span class="concept-tag">Linear</span></div>
+          </div>
+        </div>
+
+        <div class="ref-row">
+          <div class="ref-stat-col">
+            <span class="ref-stat-icon"><i data-lucide="zap" style="width:16px;height:16px"></i></span>
+            <span class="ref-stat-name">Power</span>
+          </div>
+          <div class="ref-detail-col">
+            <div class="ref-formula-text">charge = P&sup2; &nbsp;&nbsp; followThrough = P &times; 200ms</div>
+            <div class="ref-desc-text">Double the stat &rarr; quadruple the charge. <span class="concept-tag">Quadratic</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#a855f722">
+      <div class="card-title-row s4"><i data-lucide="crosshair"></i><span class="card-title s4">Name the Threat</span></div>
+      <div class="hint">Look at your opponent&rsquo;s stats. What is their highest stat? What does that mean for how they play? What do you need to counter?</div>
+      <textarea id="threat-input" placeholder="Example: Their Speed is 12 out of 20, which gives them Motor Power of 60%. They move fast and score early. I need more Turning to block their drives." oninput="st.threat=this.value"></textarea>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(5)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(7)">Build Loadout Options &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 7: 3 LOADOUT OPTIONS                               -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-7">
+    <div class="sbadge s4">Section 4 &bull; Step 2 of 4</div>
+    <div class="step-icon-banner s4-banner">
+      <div class="step-icon-circle s4"><i data-lucide="layers"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 4 &mdash; Loadout Strategy</div>
+        <div class="step-icon-title">Build Three Loadout Options</div>
+      </div>
+    </div>
+    <div class="step-sub">Create 3 different stat combinations for your bot. Each one must add up to exactly 20. Try different strategies &mdash; aggressive, defensive, balanced.</div>
+
+    <div class="card" style="border-color:#1e3a5f">
+      <div class="card-title-row s4"><i data-lucide="layout-grid"></i><span class="card-title s4">What Do These Strategies Mean?</span></div>
+      <div class="strategy-types">
+        <div class="strat-card agg">
+          <div class="strat-label" style="color:#ff6b35"><i data-lucide="zap" style="width:16px;height:16px;vertical-align:-2px"></i> Aggressive</div>
+          <div class="strat-desc">High Speed and Power. Attack fast, charge hard. Wins if you can score before they do. Weak in endurance.</div>
+        </div>
+        <div class="strat-card def">
+          <div class="strat-label" style="color:#60a5fa"><i data-lucide="shield" style="width:16px;height:16px;vertical-align:-2px"></i> Defensive</div>
+          <div class="strat-desc">High Endurance and Turning. Block drives, outlast the opponent, stay in position late in the match.</div>
+        </div>
+        <div class="strat-card bal">
+          <div class="strat-label" style="color:#00c99a"><i data-lucide="activity" style="width:16px;height:16px;vertical-align:-2px"></i> Balanced</div>
+          <div class="strat-desc">No single weak stat. Adaptable across all situations. Trades peak performance for consistency.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn"><span class="warn-icon"><i data-lucide="alert-triangle"></i><span>Each option must sum to exactly 20. The badge next to each name will turn green when you&rsquo;re good.</span></span></div>
+
+    <!-- OPTION A -->
+    <div class="lo-card" id="lo-card-a">
+      <div class="lo-head">
+        <div class="lo-name"><i data-lucide="zap"></i> Option A</div>
+        <div class="lo-badge invalid" id="badge-a">?/20</div>
+      </div>
+      <div class="lo-stats">
+        <div class="lo-stat">
+          <div class="lo-stat-name">S</div>
+          <input class="lo-input" type="number" id="la-s" min="0" max="20" value="5" oninput="calcLoadout('a')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">E</div>
+          <input class="lo-input" type="number" id="la-e" min="0" max="20" value="5" oninput="calcLoadout('a')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">T</div>
+          <input class="lo-input" type="number" id="la-t" min="0" max="20" value="5" oninput="calcLoadout('a')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">P</div>
+          <input class="lo-input" type="number" id="la-p" min="0" max="20" value="5" oninput="calcLoadout('a')">
+        </div>
+      </div>
+      <div class="lo-sum" id="sum-a">Total: 20</div>
+      <div class="fo-row" id="fo-a"></div>
+    </div>
+
+    <!-- OPTION B -->
+    <div class="lo-card" id="lo-card-b">
+      <div class="lo-head">
+        <div class="lo-name"><i data-lucide="shield"></i> Option B</div>
+        <div class="lo-badge invalid" id="badge-b">?/20</div>
+      </div>
+      <div class="lo-stats">
+        <div class="lo-stat">
+          <div class="lo-stat-name">S</div>
+          <input class="lo-input" type="number" id="lb-s" min="0" max="20" value="5" oninput="calcLoadout('b')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">E</div>
+          <input class="lo-input" type="number" id="lb-e" min="0" max="20" value="5" oninput="calcLoadout('b')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">T</div>
+          <input class="lo-input" type="number" id="lb-t" min="0" max="20" value="5" oninput="calcLoadout('b')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">P</div>
+          <input class="lo-input" type="number" id="lb-p" min="0" max="20" value="5" oninput="calcLoadout('b')">
+        </div>
+      </div>
+      <div class="lo-sum" id="sum-b">Total: 20</div>
+      <div class="fo-row" id="fo-b"></div>
+    </div>
+
+    <!-- OPTION C -->
+    <div class="lo-card" id="lo-card-c">
+      <div class="lo-head">
+        <div class="lo-name"><i data-lucide="activity"></i> Option C</div>
+        <div class="lo-badge invalid" id="badge-c">?/20</div>
+      </div>
+      <div class="lo-stats">
+        <div class="lo-stat">
+          <div class="lo-stat-name">S</div>
+          <input class="lo-input" type="number" id="lc-s" min="0" max="20" value="5" oninput="calcLoadout('c')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">E</div>
+          <input class="lo-input" type="number" id="lc-e" min="0" max="20" value="5" oninput="calcLoadout('c')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">T</div>
+          <input class="lo-input" type="number" id="lc-t" min="0" max="20" value="5" oninput="calcLoadout('c')">
+        </div>
+        <div class="lo-stat">
+          <div class="lo-stat-name">P</div>
+          <input class="lo-input" type="number" id="lc-p" min="0" max="20" value="5" oninput="calcLoadout('c')">
+        </div>
+      </div>
+      <div class="lo-sum" id="sum-c">Total: 20</div>
+      <div class="fo-row" id="fo-c"></div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(6)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(8)">Verify Loadouts &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 8: VERIFY                                          -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-8">
+    <div class="sbadge s4">Section 4 &bull; Step 3 of 4</div>
+    <div class="step-icon-banner s4-banner">
+      <div class="step-icon-circle s4"><i data-lucide="check-circle-2"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 4 &mdash; Loadout Strategy</div>
+        <div class="step-icon-title">Verify Your Loadouts</div>
+      </div>
+    </div>
+    <div class="step-sub">Check that every option satisfies S + E + T + P = 20. Any that fail need to be fixed before you can move on.</div>
+
+    <div id="verify-panel"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(7)">&larr; Back</button>
+      <button class="btn btn-next" onclick="goTo(9)">Write Recommendation &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 9: RECOMMENDATION                                  -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-9">
+    <div class="sbadge s4">Section 4 &bull; Step 4 of 4</div>
+    <div class="step-icon-banner s4-banner">
+      <div class="step-icon-circle s4"><i data-lucide="pen-line"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label">Section 4 &mdash; Loadout Strategy</div>
+        <div class="step-icon-title">Your Strategy Recommendation</div>
+      </div>
+    </div>
+    <div class="step-sub">Pick the best loadout for the Championship and back it up with your Section 3 prediction as evidence.</div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="arrow-up-right"></i><span class="card-title">Your Section 3 Prediction</span></div>
+      <div class="res" style="margin-bottom:0">
+        <div class="res-lbl" id="rec-s3-label">Predicted Championship Goals</div>
+        <div class="res-val" id="rec-s3-val">&mdash;</div>
+      </div>
+      <div class="eq-display" id="rec-eq" style="font-size:18px;margin-top:12px;margin-bottom:0">Complete Section 3 first</div>
+    </div>
+
+    <div class="card" style="border-color:#a855f722">
+      <div class="card-title-row s4"><i data-lucide="layers"></i><span class="card-title s4">Choose Your Loadout</span></div>
+      <div class="input-g">
+        <label class="lbl">Which option do you recommend?</label>
+        <select id="rec-choice" onchange="st.recChoice=this.value">
+          <option value="">&#8212; Select one &#8212;</option>
+          <option value="A">Option A</option>
+          <option value="B">Option B</option>
+          <option value="C">Option C</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#a855f722">
+      <div class="card-title-row s4"><i data-lucide="pen-line"></i><span class="card-title s4">Write Your Recommendation</span></div>
+      <div class="hint">Include: which option you chose, why it counters the threat, and use your goal prediction from Section 3 as evidence.</div>
+      <textarea id="rec-text" placeholder="Example: I recommend Option B because our opponent is predicted to score 8 goals at Championship Speed. Their high Speed (Motor Power 60%) means they attack early. Option B gives us Turn Ratio 0.36, which lets us block their fast runs and control the field." oninput="st.recText=this.value" style="min-height:170px"></textarea>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(8)">&larr; Back</button>
+      <button class="btn btn-finish" onclick="goTo(10)"><i data-lucide="clipboard-check" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"></i>See Full Summary</button>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- STEP 10: SUMMARY                                        -->
+  <!-- ====================================================== -->
+  <div class="panel" id="panel-10">
+    <div class="sbadge fin">Done!</div>
+    <div class="step-icon-banner" style="border-color:#00c99a33;background:#0a4a3a22">
+      <div class="step-icon-circle" style="background:#00c99a18;border-color:#00c99a44"><i data-lucide="clipboard-check" style="color:#00c99a"></i></div>
+      <div class="step-icon-text">
+        <div class="step-icon-label" style="color:#00c99a">Complete</div>
+        <div class="step-icon-title">Copy These to Your Paper Report</div>
+      </div>
+    </div>
+    <div class="step-sub">Write every value below onto your scouting report. Everything is saved here until you close the tab.</div>
+
+    <div class="card">
+      <div class="card-title-row"><i data-lucide="arrow-up-right"></i><span class="card-title">Section 3 &mdash; Trend Line Analysis</span></div>
+      <div class="sum-grid" id="s3-summary"></div>
+      <div style="margin-top:8px">
+        <div class="hint">Your equation (write this on the line in Section 3):</div>
+        <div class="eq-display" id="s3-eq-summary">Goals = ? &times; Speed + ?</div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="hint">Slope interpretation (your own words):</div>
+        <div class="info" id="s3-meaning-summary" style="margin-top:6px">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row s4"><i data-lucide="layers"></i><span class="card-title s4">Section 4 &mdash; Loadout Options</span></div>
+      <div id="s4-lo-summary"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row s4"><i data-lucide="pen-line"></i><span class="card-title s4">Section 4 &mdash; Recommendation</span></div>
+      <div class="sum-grid" style="grid-template-columns:1fr">
+        <div class="sum-item">
+          <div class="sum-key">Recommended Option</div>
+          <div class="sum-val" id="sum-rec-choice">&mdash;</div>
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="hint">Your written recommendation:</div>
+        <div class="info" id="sum-rec-text" style="margin-top:6px">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="info"><span class="info-icon"><i data-lucide="check-circle-2"></i><span>All done! Write these onto your paper scouting report.</span></span></div>
+
+    <div class="nav">
+      <button class="btn btn-back" onclick="goTo(9)">&larr; Back</button>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+var st = {
+  myTeam: '', oppTeam: '',
+  m1: { speed: 0, goals: 0 },
+  m2: { speed: 0, goals: 0 },
+  slope: 0, intercept: 0, slopeValid: false,
+  champSpeed: 0, champGoals: null,
+  slopeMeaning: '', threat: '',
+  loadouts: {
+    a: { s:5, e:5, t:5, p:5 },
+    b: { s:5, e:5, t:5, p:5 },
+    c: { s:5, e:5, t:5, p:5 }
+  },
+  recChoice: '', recText: ''
+};
+
+var cur = 0;
+var STEPS = 11;
+var stepTitles = ['Intro','Data Points','Slope','Y-Intercept','Equation','Prediction','Constraints','Loadouts','Verify','Recommend','Summary'];
+var stepSecs   = ['Getting Started','S3: Trend Line','S3: Trend Line','S3: Trend Line','S3: Trend Line','S3: Trend Line','S4: Loadout','S4: Loadout','S4: Loadout','S4: Loadout','Done!'];
+
+function toNum(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function r2(n) { return Math.round(n * 100) / 100; }
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(n) {
+  if (n < 0 || n >= STEPS) return;
+  document.getElementById('panel-' + cur).classList.remove('active');
+  cur = n;
+  document.getElementById('panel-' + cur).classList.add('active');
+  updateProgress();
+  renderStep();
+  if (window.lucide) lucide.createIcons();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  var pct = (cur / (STEPS - 1)) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = 'Step ' + (cur + 1) + ' of ' + STEPS;
+  document.getElementById('prog-section').textContent = stepSecs[cur];
+  document.querySelectorAll('.pdot').forEach(function(d, i) {
+    d.classList.remove('active', 'done');
+    if (i === cur) d.classList.add('active');
+    else if (i < cur) d.classList.add('done');
+  });
+}
+
+// Build dots on load
+(function() {
+  var c = document.getElementById('prog-dots');
+  for (var i = 0; i < STEPS; i++) {
+    var d = document.createElement('div');
+    d.className = 'pdot';
+    d.textContent = i + 1;
+    d.title = stepTitles[i];
+    (function(idx) { d.addEventListener('click', function() { goTo(idx); }); })(i);
+    c.appendChild(d);
+  }
+  document.querySelectorAll('.pdot')[0].classList.add('active');
+})();
+
+// ============================================================
+// RENDER — called every time a panel becomes active
+// ============================================================
+function renderStep() {
+  if (cur === 2) renderSlope();
+  if (cur === 3) renderIntercept();
+  if (cur === 4) renderEquation();
+  if (cur === 5) {
+    renderEquation();
+    var el = document.getElementById('champ-speed');
+    if (el && st.champSpeed) el.value = st.champSpeed;
+    calcChampPrediction();
+  }
+  if (cur === 8) renderVerify();
+  if (cur === 9) renderRecommendPanel();
+  if (cur === 10) renderSummary();
+}
+
+// ============================================================
+// SECTION 3 CALCULATIONS
+// ============================================================
+function calcAll() {
+  renderSlope();
+  renderIntercept();
+  renderEquation();
+  calcChampPrediction();
+  renderVerify();
+}
+
+function renderSlope() {
+  var el = document.getElementById('slope-steps');
+  var res = document.getElementById('slope-result');
+  if (!el) return;
+
+  var s1 = st.m1.speed, g1 = st.m1.goals;
+  var s2 = st.m2.speed, g2 = st.m2.goals;
+
+  // Nothing entered yet
+  if (s1 === 0 && g1 === 0 && s2 === 0 && g2 === 0) {
+    el.innerHTML = '<div class="info">&#8592; Enter your match data on Step 1, then come back here.</div>';
+    if (res) res.innerHTML = '';
+    st.slopeValid = false;
+    return;
+  }
+
+  if (s1 === s2) {
+    st.slopeValid = false;
+    el.innerHTML = '<div class="warn">&#9888;&#65039; Both Speed values are the same (' + s1 + '). The slope formula needs different Speed values. Go back to Step 1 and pick a different match.</div>';
+    if (res) res.innerHTML = '';
+    return;
+  }
+
+  var num = g2 - g1;
+  var den = s2 - s1;
+  var m   = r2(num / den);
+  st.slope = m;
+  st.slopeValid = true;
+
+  el.innerHTML =
+    mstep(1, 'Subtract the Goals: G&#x2082; &minus; G&#x2081;', g2 + ' &minus; ' + g1 + ' = ' + num) +
+    mstep(2, 'Subtract the Speeds: S&#x2082; &minus; S&#x2081;', s2 + ' &minus; ' + s1 + ' = ' + den) +
+    mstep(3, 'Divide: ' + num + ' &divide; ' + den, 'm = ' + m);
+
+  if (res) res.innerHTML = resBox('Slope (m) &mdash; goals gained per 1 point of Speed', m);
+}
+
+function renderIntercept() {
+  var el = document.getElementById('intercept-steps');
+  var res = document.getElementById('intercept-result');
+  if (!el) return;
+
+  if (!st.slopeValid) {
+    el.innerHTML = '<div class="warn">Fix the slope calculation on Step 2 first.</div>';
+    if (res) res.innerHTML = '';
+    return;
+  }
+
+  var s1 = st.m1.speed, g1 = st.m1.goals;
+  var ms = r2(st.slope * s1);
+  var b  = r2(g1 - ms);
+  st.intercept = b;
+
+  el.innerHTML =
+    mstep(1, 'Multiply: m &times; S&#x2081; = ' + st.slope + ' &times; ' + s1, '= ' + ms) +
+    mstep(2, 'Subtract: G&#x2081; &minus; (m &times; S&#x2081;) = ' + g1 + ' &minus; ' + ms, 'b = ' + b);
+
+  if (res) res.innerHTML = resBox('Y-Intercept (b) &mdash; predicted Goals when Speed = 0', b);
+}
+
+function renderEquation() {
+  var el = document.getElementById('eq-display');
+  var pf = document.getElementById('pred-formula-display');
+  if (!el) return;
+  if (!st.slopeValid) {
+    el.textContent = 'Goals = ? \u00d7 Speed + ?';
+    if (pf) pf.innerHTML = 'Goals = m &times; Speed + b';
+    return;
+  }
+  var bSign = st.intercept >= 0 ? '+ ' : '\u2212 ';
+  var bAbs  = Math.abs(st.intercept);
+  var eq    = 'Goals = ' + st.slope + ' \u00d7 Speed ' + bSign + bAbs;
+  el.textContent = eq;
+  if (pf) pf.innerHTML = 'Goals = ' + st.slope + ' &times; Speed ' + (st.intercept >= 0 ? '+ ' : '&minus; ') + bAbs;
+}
+
+function calcChampPrediction() {
+  var el = document.getElementById('champ-result');
+  if (!el) return;
+
+  if (!st.slopeValid) {
+    el.innerHTML = '<div class="warn">Complete Section 3 Steps 1&ndash;3 first, then come back here.</div>';
+    return;
+  }
+
+  var spd = st.champSpeed;
+  if (spd === 0) {
+    el.innerHTML = '<div class="info">Enter a Championship Speed above to see the prediction.</div>';
+    st.champGoals = null;
+    return;
+  }
+
+  var product = r2(st.slope * spd);
+  var goals   = r2(product + st.intercept);
+  st.champGoals = goals;
+
+  var oppName = st.oppTeam || 'your opponent';
+  el.innerHTML =
+    '<div class="card"><div class="card-title">Step-by-Step Calculation</div><div class="msteps">' +
+    mstep(1, 'Plug in Championship Speed', 'Goals = ' + st.slope + ' &times; ' + spd + ' + (' + st.intercept + ')') +
+    mstep(2, 'Multiply: ' + st.slope + ' &times; ' + spd, '= ' + product) +
+    mstep(3, 'Add the y-intercept: ' + product + ' + (' + st.intercept + ')', 'Predicted Goals = ' + goals) +
+    '</div></div>' +
+    resBox('Predicted Championship Goals for ' + oppName, goals);
+}
+
+function syncOppName() {
+  var el = document.getElementById('rec-s3-label');
+  if (el) el.textContent = (st.oppTeam || 'Opponent') + '\'s predicted goals';
+}
+
+// ============================================================
+// SECTION 4 — LOADOUTS
+// ============================================================
+function calcLoadout(ltr) {
+  var s = toNum(document.getElementById('l' + ltr + '-s').value);
+  var e = toNum(document.getElementById('l' + ltr + '-e').value);
+  var t = toNum(document.getElementById('l' + ltr + '-t').value);
+  var p = toNum(document.getElementById('l' + ltr + '-p').value);
+  st.loadouts[ltr] = { s:s, e:e, t:t, p:p };
+
+  var total = s + e + t + p;
+  var valid = total === 20;
+  var key = ltr.toUpperCase();
+
+  var badge = document.getElementById('badge-' + ltr);
+  var sumEl = document.getElementById('sum-' + ltr);
+  var card  = document.getElementById('lo-card-' + ltr);
+
+  if (valid) {
+    badge.className = 'lo-badge valid'; badge.textContent = '20/20 \u2713';
+    sumEl.className = 'lo-sum ok'; sumEl.textContent = 'Total: 20 \u2713 Valid!';
+    if (card) { card.classList.add('valid-lo'); card.classList.remove('invalid-lo'); }
+  } else {
+    badge.className = 'lo-badge invalid'; badge.textContent = total + '/20';
+    sumEl.className = 'lo-sum bad'; sumEl.textContent = 'Total: ' + total + ' \u2190 Must equal 20';
+    if (card) { card.classList.add('invalid-lo'); card.classList.remove('valid-lo'); }
+  }
+
+  var mp = r2((s * 100) / 20);
+  var ep = r2(100 - (20 - e) * 4.5);
+  var tr = r2(0.2 + t * 0.02);
+  var cs = p * p;
+
+  var ft = lo.p * 200;
+  document.getElementById('fo-' + ltr).innerHTML =
+    foItem('Motor Power', mp + '%') +
+    foItem('Power @ 3min', ep) +
+    foItem('Turn Ratio', tr) +
+    foItem('Charge', cs + '%') +
+    foItem('Follow-Through', ft + 'ms') +
+    foItem('Arc Segments', lo.t);
+
+  renderVerify();
+}
+
+function renderVerify() {
+  var el = document.getElementById('verify-panel');
+  if (!el) return;
+  var html = '';
+  ['a','b','c'].forEach(function(ltr) {
+    var lo = st.loadouts[ltr];
+    var total = lo.s + lo.e + lo.t + lo.p;
+    var valid = total === 20;
+    var label = ltr === 'a' ? 'Option A' : ltr === 'b' ? 'Option B' : 'Option C';
+    var mp = r2((lo.s * 100) / 20);
+    var ep = r2(100 - (20 - lo.e) * 4.5);
+    var tr = r2(0.2 + lo.t * 0.02);
+    var cs = lo.p * lo.p;
+    html += '<div class="verify-item ' + (valid ? 'ok' : 'bad') + '">';
+    html += '<div class="verify-title" style="color:' + (valid ? '#00c99a' : '#ff4444') + '">' + (valid ? '\u2713' : '\u2717') + ' ' + label + ' &mdash; Total: ' + total + '/20' + (valid ? ' (Valid)' : ' (Fix this!)') + '</div>';
+    if (valid) {
+      var ft = lo.p * 200;
+      html += '<div class="verify-detail">S=' + lo.s + ' &nbsp; E=' + lo.e + ' &nbsp; T=' + lo.t + ' &nbsp; P=' + lo.p + '</div>';
+      html += '<div class="verify-detail" style="margin-top:6px">Motor: <strong>' + mp + '%</strong> &nbsp; Power@3min: <strong>' + ep + '</strong> &nbsp; Turn: <strong>' + tr + '</strong> &nbsp; Charge: <strong>' + cs + '%</strong> &nbsp; Follow-Through: <strong>' + ft + 'ms</strong></div>';
+    } else {
+      html += '<div class="verify-detail">Go back to Step 7 and adjust ' + label + ' so it equals exactly 20.</div>';
+    }
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderRecommendPanel() {
+  var bSign = st.slopeValid ? (st.intercept >= 0 ? '+ ' : '\u2212 ') : '';
+  var bAbs  = st.slopeValid ? Math.abs(st.intercept) : '';
+  var eqText = st.slopeValid ? 'Goals = ' + st.slope + ' \u00d7 Speed ' + bSign + bAbs : 'Complete Section 3 first';
+  var goalVal = (st.champGoals !== null && st.slopeValid) ? st.champGoals : '\u2014';
+
+  var eqEl  = document.getElementById('rec-eq');
+  var valEl = document.getElementById('rec-s3-val');
+  var lblEl = document.getElementById('rec-s3-label');
+  if (eqEl)  eqEl.textContent = eqText;
+  if (valEl) valEl.textContent = goalVal;
+  if (lblEl) lblEl.textContent = (st.oppTeam || 'Opponent') + "'s predicted Championship goals";
+
+  var rc = document.getElementById('rec-choice');
+  var rt = document.getElementById('rec-text');
+  if (rc && st.recChoice) rc.value = st.recChoice;
+  if (rt && st.recText) rt.value = st.recText;
+}
+
+// ============================================================
+// SUMMARY
+// ============================================================
+function renderSummary() {
+  // Section 3 summary grid
+  var bSign = st.slopeValid ? (st.intercept >= 0 ? '+ ' : '\u2212 ') : '';
+  var bAbs  = st.slopeValid ? Math.abs(st.intercept) : '';
+  var eqStr = st.slopeValid ? 'Goals = ' + st.slope + ' \u00d7 Speed ' + bSign + bAbs : '\u2014';
+
+  var s3el = document.getElementById('s3-summary');
+  if (s3el) s3el.innerHTML =
+    sItem('Your Team', st.myTeam || '\u2014') +
+    sItem('Scouted Opponent', st.oppTeam || '\u2014') +
+    sItem('Data Point 1', 'Speed=' + st.m1.speed + ', Goals=' + st.m1.goals) +
+    sItem('Data Point 2', 'Speed=' + st.m2.speed + ', Goals=' + st.m2.goals) +
+    sItem('Slope (m)', st.slopeValid ? st.slope : '\u2014') +
+    sItem('Y-Intercept (b)', st.slopeValid ? st.intercept : '\u2014') +
+    sItem('Championship Speed Used', st.champSpeed || '\u2014') +
+    sItem('Predicted Goals', st.champGoals !== null && st.slopeValid ? '<span style="color:#00c99a">' + st.champGoals + '</span>' : '\u2014');
+
+  var eqSumEl = document.getElementById('s3-eq-summary');
+  if (eqSumEl) eqSumEl.textContent = eqStr;
+
+  var meanEl = document.getElementById('s3-meaning-summary');
+  if (meanEl) meanEl.textContent = st.slopeMeaning || '\u2014';
+
+  // Section 4 loadouts
+  var loEl = document.getElementById('s4-lo-summary');
+  if (loEl) {
+    var html = '';
+    ['a','b','c'].forEach(function(ltr) {
+      var lo = st.loadouts[ltr];
+      var total = lo.s + lo.e + lo.t + lo.p;
+      var valid = total === 20;
+      var label = ltr === 'a' ? 'Option A' : ltr === 'b' ? 'Option B' : 'Option C';
+      var mp = r2((lo.s * 100) / 20);
+      var ep = r2(100 - (20 - lo.e) * 4.5);
+      var tr = r2(0.2 + lo.t * 0.02);
+      var cs = lo.p * lo.p;
+      html += '<div class="sum-lo">';
+      html += '<div class="sum-lo-title">' + label + (valid ? ' \u2713' : ' \u2717 (invalid)') + '</div>';
+      html += '<div class="sum-lo-stats">S=' + lo.s + ' &nbsp; E=' + lo.e + ' &nbsp; T=' + lo.t + ' &nbsp; P=' + lo.p + ' &nbsp; (Sum: ' + total + ')</div>';
+      if (valid) {
+        var ft2 = lo.p * 200;
+        html += '<div class="sum-lo-formulas">Motor: ' + mp + '% &bull; Power@3min: ' + ep + ' &bull; Turn: ' + tr + ' &bull; Charge: ' + cs + '% &bull; Follow-Through: ' + ft2 + 'ms</div>';
+      }
+      html += '</div>';
+    });
+    loEl.innerHTML = html;
+  }
+
+  var rcEl = document.getElementById('sum-rec-choice');
+  var rtEl = document.getElementById('sum-rec-text');
+  if (rcEl) rcEl.textContent = st.recChoice ? 'Option ' + st.recChoice : '\u2014';
+  if (rtEl) rtEl.textContent = st.recText || '\u2014';
+}
+
+// ============================================================
+// HELPERS — HTML snippets
+// ============================================================
+function mstep(n, lbl, val) {
+  return '<div class="mstep"><div class="mstep-n">' + n + '</div><div class="mstep-c"><div class="mstep-lbl">' + lbl + '</div><div class="mstep-val">' + val + '</div></div></div>';
+}
+function resBox(lbl, val) {
+  return '<div class="res"><div class="res-lbl">' + lbl + '</div><div class="res-val">' + val + '</div></div>';
+}
+function foItem(lbl, val) {
+  return '<div class="fo-item"><div class="fo-lbl">' + lbl + '</div><div class="fo-val">' + val + '</div></div>';
+}
+function sItem(key, val) {
+  return '<div class="sum-item"><div class="sum-key">' + key + '</div><div class="sum-val">' + val + '</div></div>';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+['a','b','c'].forEach(function(ltr) { calcLoadout(ltr); });
+updateProgress();
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
