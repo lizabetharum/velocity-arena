@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What-If? Analysis · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0D0D1A;
+      --navy2:      #161A2E;
+      --navy3:      #1E2240;
+      --cyan:       #00E5FF;
+      --teal:       #007A99;
+      --slate:      #8899AA;
+      --card-border:#222840;
+      --card-bg:    #161A2E;
+      --green:      #00C97A;
+      --red:        #FF4D6A;
+      --yellow:     #FFD166;
+      --purple:     #9B8AFF;
+      --orange:     #FF9F43;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+      font-size: 1.0625rem;
+      line-height: 1.6;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 4px; background: var(--cyan);
+      transition: width .5s ease; z-index: 200;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .875rem; font-weight: 500;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header h1 { font-size: 1rem; font-weight: 700; }
+    .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .7em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    /* ── Phase layout ── */
+    .phase { display: none; max-width: 720px; margin: 2rem auto 0; padding: 0 1.25rem; animation: fadeUp .3s ease both; }
+    .phase.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .phase-label {
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .625rem;
+    }
+    .phase-label span { color: var(--cyan); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .875rem;
+    }
+
+    /* ── Headings ── */
+    .h1 { font-size: 1.5rem; font-weight: 800; line-height: 1.2; margin-bottom: .5rem; }
+    .h2 { font-size: 1.1875rem; font-weight: 800; line-height: 1.3; margin-bottom: .5rem; }
+    .h3 { font-size: 1rem; font-weight: 800; margin-bottom: .375rem; }
+    .muted { color: var(--slate); font-size: .9375rem; line-height: 1.6; }
+    .body-text { font-size: 1.0625rem; color: #D0D4E0; line-height: 1.65; }
+
+    /* ── Formula board ── */
+    .formula-board {
+      background: var(--navy3);
+      border: 2px solid var(--cyan);
+      border-radius: 10px; padding: 1.5rem 1.75rem;
+      text-align: center; margin: 1.25rem 0;
+    }
+    .formula-main { font-size: 1.4375rem; font-weight: 800; color: var(--cyan); letter-spacing: .01em; }
+    .formula-note { font-size: .875rem; color: var(--slate); margin-top: .5rem; }
+
+    /* ── Rule announcement card ── */
+    .rule-card {
+      background: rgba(255,77,106,.07);
+      border: 2px solid var(--red);
+      border-radius: 12px; padding: 1.75rem;
+      margin: 1.25rem 0;
+    }
+    .rule-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--red); color: #fff;
+      font-size: .75rem; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; border-radius: 4px; padding: .3em .75em;
+      margin-bottom: 1rem;
+    }
+    .rule-text {
+      font-size: 1.25rem; font-weight: 700; color: #E8EAF2; line-height: 1.4;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      padding: .825rem 1.625rem; border-radius: 8px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--cyan); color: var(--navy); }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+    .btn-ghost { background: transparent; color: var(--slate); border: 1px solid var(--card-border); }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+    .btn-hint { background: rgba(255,209,102,.1); color: var(--yellow); border: 1px solid rgba(255,209,102,.3); font-size: .875rem; padding: .5rem 1rem; border-radius: 6px; }
+    .btn-hint:hover { background: rgba(255,209,102,.18); }
+
+    /* ── League grid ── */
+    .league-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0; }
+    @media (max-width: 520px) { .league-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .team-card {
+      background: var(--navy3); border: 2px solid var(--card-border);
+      border-radius: 10px; padding: 1.125rem 1rem;
+      cursor: pointer; transition: border-color .2s, background .2s;
+      position: relative; user-select: none;
+    }
+    .team-card:hover { border-color: var(--slate); }
+    .team-card.selected-violation { border-color: var(--red); background: rgba(255,77,106,.08); }
+    .team-card.selected-ok { border-color: var(--green); background: rgba(0,201,122,.08); }
+    .team-card.revealed-violation { border-color: var(--red); background: rgba(255,77,106,.08); }
+    .team-card.revealed-ok { border-color: var(--green); background: rgba(0,201,122,.08); }
+    .team-card.wrong-guess { animation: shake .3s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+    .team-name { font-size: 1rem; font-weight: 800; margin-bottom: .625rem; }
+    .team-stats { display: flex; flex-direction: column; gap: .3rem; }
+    .stat-row-sm {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .9375rem;
+    }
+    .stat-label-sm { color: var(--slate); font-weight: 700; width: 24px; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
+    .stat-val-sm { font-weight: 800; color: #E8EAF2; }
+    .stat-val-sm.over { color: var(--red); }
+    .stat-val-sm.ok-val { color: var(--green); }
+    .team-badge {
+      position: absolute; top: .625rem; right: .625rem;
+      font-size: .625rem; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; border-radius: 3px; padding: .15em .5em;
+    }
+    .badge-you { background: rgba(0,229,255,.15); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .badge-tap { background: rgba(136,153,170,.1); color: var(--slate); border: 1px solid var(--card-border); }
+
+    /* ── Step blocks ── */
+    .step-block {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem 1.375rem;
+      margin-bottom: 1rem; transition: border-color .2s;
+    }
+    .step-block.active-step { border-color: var(--teal); }
+    .step-block.done-step { border-color: var(--green); }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--navy2); border: 2px solid var(--card-border);
+      font-size: .75rem; font-weight: 800; color: var(--slate);
+      margin-bottom: .625rem; flex-shrink: 0;
+    }
+    .step-num.active { background: rgba(0,229,255,.1); border-color: var(--cyan); color: var(--cyan); }
+    .step-num.done { background: rgba(0,201,122,.1); border-color: var(--green); color: var(--green); }
+    .step-header { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; }
+    .step-title { font-size: 1rem; font-weight: 700; }
+
+    /* ── Input styles ── */
+    .num-input {
+      background: var(--navy2); border: 2px solid var(--card-border);
+      border-radius: 7px; padding: .625rem .875rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1.25rem;
+      font-weight: 800; color: #E8EAF2; width: 90px;
+      text-align: center; outline: none; transition: border-color .15s;
+    }
+    .num-input:focus { border-color: var(--teal); }
+    .num-input.correct { border-color: var(--green); background: rgba(0,201,122,.08); color: var(--green); }
+    .num-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    .input-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin: .875rem 0; }
+    .input-label { font-size: .9375rem; color: #C8CDD8; font-weight: 500; }
+    .input-unit { font-size: .9375rem; color: var(--slate); font-weight: 600; }
+
+    /* ── Feedback / hint ── */
+    .feedback {
+      border-radius: 7px; padding: .75rem 1rem;
+      font-size: .9375rem; line-height: 1.5;
+      margin-top: .625rem; display: none;
+    }
+    .feedback.visible { display: block; }
+    .feedback-correct { background: rgba(0,201,122,.1); border: 1px solid rgba(0,201,122,.3); color: var(--green); }
+    .feedback-error { background: rgba(255,77,106,.08); border: 1px solid rgba(255,77,106,.25); color: #FF8099; }
+    .feedback-hint { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25); color: var(--yellow); }
+    .feedback-info { background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.2); color: #A8F0FF; }
+
+    /* ── Before/After compare ── */
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: .875rem;
+      margin: 1rem 0;
+    }
+    .compare-col {
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem;
+    }
+    .compare-col.after { border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.04); }
+    .compare-col-label { font-size: .6875rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .75rem; color: var(--slate); }
+    .compare-col.after .compare-col-label { color: var(--cyan); }
+    .compare-item { margin-bottom: .5rem; }
+    .compare-item-name { font-size: .8125rem; color: var(--slate); font-weight: 600; }
+    .compare-item-val { font-size: 1.1875rem; font-weight: 800; }
+
+    /* ── Progress steps ── */
+    .team-progress {
+      display: flex; gap: .5rem; margin: 1rem 0; flex-wrap: wrap;
+    }
+    .tp-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--card-border); transition: background .3s;
+    }
+    .tp-dot.done { background: var(--green); }
+    .tp-dot.active { background: var(--cyan); }
+
+    /* ── Answer textarea ── */
+    .verdict-textarea {
+      width: 100%; background: var(--navy3);
+      border: 2px solid var(--card-border); border-radius: 8px;
+      padding: 1rem 1.125rem;
+      font-family: 'DM Sans', sans-serif; font-size: 1.0625rem;
+      color: #E8EAF2; resize: vertical; min-height: 110px;
+      outline: none; transition: border-color .15s; line-height: 1.6;
+    }
+    .verdict-textarea:focus { border-color: var(--teal); }
+    .char-count { font-size: .8125rem; color: var(--slate); text-align: right; margin-top: .375rem; }
+    .char-count.ready { color: var(--green); }
+
+    /* ── Icon styles ── */
+    .icon-wrap { display: flex; align-items: center; gap: .875rem; margin-bottom: 1.25rem; }
+    .icon-circle {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(0,229,255,.1); border: 1.5px solid rgba(0,229,255,.3);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .icon-circle.red { background: rgba(255,77,106,.1); border-color: rgba(255,77,106,.3); }
+    .icon-circle.green { background: rgba(0,201,122,.1); border-color: rgba(0,201,122,.3); }
+    .icon-circle.yellow { background: rgba(255,209,102,.1); border-color: rgba(255,209,102,.3); }
+
+    /* ── Divider ── */
+    hr.va-divider { border: none; border-top: 1px solid var(--card-border); margin: 1.25rem 0; }
+
+    /* ── Team tabs ── */
+    .team-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--card-border); margin-bottom: 1.25rem; overflow-x: auto; }
+    .team-tab {
+      flex-shrink: 0; padding: .625rem 1.125rem;
+      font-size: .875rem; font-weight: 700; color: var(--slate);
+      background: transparent; border: none; border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s; font-family: 'DM Sans', sans-serif;
+    }
+    .team-tab:hover { color: #E8EAF2; }
+    .team-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .team-tab.done-tab { color: var(--green); }
+
+    /* ── Equation box ── */
+    .equation-box {
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin: .875rem 0;
+      font-size: 1.0625rem; font-weight: 700; color: #E8EAF2;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .eq-var { color: var(--cyan); }
+    .eq-result { color: var(--green); font-weight: 800; }
+    .eq-old { color: var(--red); text-decoration: line-through; opacity: .7; }
+
+    /* ── Sticky formula reference ── */
+    .formula-sticky {
+      position: sticky; top: 6px; z-index: 50;
+      background: var(--navy3); border: 1px solid rgba(0,229,255,.3);
+      border-radius: 8px; padding: .75rem 1.125rem;
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .formula-sticky-label { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--slate); flex-shrink: 0; }
+    .formula-sticky-eq { font-size: .9375rem; font-weight: 800; color: var(--cyan); }
+
+    /* ── Final reveal ── */
+    .verdict-reveal {
+      background: rgba(0,201,122,.07); border: 2px solid rgba(0,201,122,.3);
+      border-radius: 12px; padding: 1.5rem; margin-top: 1rem; display: none;
+    }
+    .verdict-reveal.visible { display: block; animation: fadeUp .35s ease both; }
+    .verdict-title { font-size: 1.25rem; font-weight: 800; color: var(--green); margin-bottom: .75rem; }
+
+    /* ── Misc ── */
+    .mt-1 { margin-top: .5rem; } .mt-2 { margin-top: 1rem; } .mt-3 { margin-top: 1.5rem; }
+    .flex-end { display: flex; justify-content: flex-end; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-sm { gap: .5rem; } .gap-md { gap: 1rem; }
+
+    .highlight-box {
+      background: var(--navy3); border-left: 3px solid var(--cyan);
+      border-radius: 0 8px 8px 0; padding: .875rem 1.125rem; margin: .875rem 0;
+    }
+    .highlight-box.red { border-left-color: var(--red); }
+    .highlight-box.green { border-left-color: var(--green); }
+    .highlight-box.yellow { border-left-color: var(--yellow); }
+
+    .cap-badge {
+      display: inline-flex; align-items: center; gap: .3rem;
+      background: rgba(255,159,67,.12); color: var(--orange);
+      border: 1px solid rgba(255,159,67,.3); border-radius: 4px;
+      font-size: .75rem; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase; padding: .2em .6em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<header class="page-header">
+  <a href="/index.html" class="back-link">← Today</a>
+  <span style="color:var(--card-border)">|</span>
+  <h1>What-If? Analysis</h1>
+  <span class="day-tag">Day 17</span>
+</header>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 1 · Commissioner's Rule
+══════════════════════════════════════════ -->
+<section class="phase active" id="phase-1">
+  <p class="phase-label">Step <span>1 of 5</span> · The Rule</p>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <!-- Robot SVG icon -->
+      <div class="icon-circle red">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="10" width="14" height="11" rx="2.5" stroke="#FF4D6A" stroke-width="1.8"/>
+          <rect x="9" y="3" width="8" height="5.5" rx="2" stroke="#FF4D6A" stroke-width="1.8"/>
+          <line x1="13" y1="8.5" x2="13" y2="10" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="10" cy="14.5" r="1.5" fill="#FF4D6A"/>
+          <circle cx="16" cy="14.5" r="1.5" fill="#FF4D6A"/>
+          <line x1="10" y1="18.5" x2="16" y2="18.5" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="2" y1="13.5" x2="5" y2="13.5" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="21" y1="13.5" x2="24" y2="13.5" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="h2">Breaking News from the Commissioner</div>
+        <div class="muted">A new rule just dropped before the Championship.</div>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-badge">
+        <!-- Alert icon -->
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12.5 11H1.5L7 1.5Z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><line x1="7" y1="6" x2="7" y2="8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="7" cy="10" r=".6" fill="white"/></svg>
+        Official Rule Change
+      </div>
+      <div class="rule-text">"Endurance is capped at <strong style="color:var(--red)">4 points</strong> for the Championship. Any team with Endurance above 4 must reallocate those extra points to Speed — immediately."</div>
+      <div class="muted mt-2" style="font-size:.9375rem;">— The Commissioner</div>
+    </div>
+
+    <p class="body-text">This means teams who spent a lot on Endurance just got a forced trade: more Speed, but weaker staying power. Your job is to figure out <strong>exactly what that math looks like</strong> — for every team in the league.</p>
+
+    <hr class="va-divider" />
+
+    <div class="h3 mt-2">Before you start: two formulas to keep handy</div>
+
+    <div class="formula-board">
+      <div class="formula-main">Decay Rate = (20 − E) × 1.5</div>
+      <div class="formula-note">E = Endurance points &nbsp;·&nbsp; Result = % power lost per minute &nbsp;·&nbsp; Higher E = slower decay = bot lasts longer</div>
+    </div>
+
+    <div class="formula-board" style="margin-top:.75rem;">
+      <div class="formula-main">Speed Motor Power = Speed × 5</div>
+      <div class="formula-note">Speed points × 5 = motor power as a percentage</div>
+    </div>
+
+    <div class="highlight-box mt-2">
+      <strong>Quick example:</strong> If E = 6, decay rate = (20 − 6) × 1.5 = 14 × 1.5 = <strong style="color:var(--cyan)">21% per minute</strong>. That means the bot loses 21% power every minute it runs.
+    </div>
+
+    <div class="mt-3 flex-end">
+      <button class="btn btn-primary" onclick="goPhase(2)">
+        Got it — show me the league →
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 2 · League Scan
+══════════════════════════════════════════ -->
+<section class="phase" id="phase-2">
+  <p class="phase-label">Step <span>2 of 5</span> · Scan the League</p>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <div class="icon-circle">
+        <!-- Scanner / search icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <circle cx="11" cy="11" r="6.5" stroke="#00E5FF" stroke-width="1.8"/>
+          <line x1="16" y1="16" x2="22" y2="22" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="8" y1="11" x2="14" y2="11" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="11" y1="8" x2="11" y2="14" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="h2">Who Breaks the New Rule?</div>
+        <div class="muted">Tap every team whose Endurance is <strong style="color:var(--red)">greater than 4</strong>.</div>
+      </div>
+    </div>
+
+    <div class="highlight-box yellow">
+      <strong style="color:var(--yellow)">The cap is 4.</strong> Any team with Endurance <strong style="color:var(--yellow)">> 4</strong> violates the rule. Tap those teams. Leave the others alone.
+    </div>
+
+    <div class="league-grid" id="league-grid" style="margin-top:1.25rem;">
+      <!-- injected by JS -->
+    </div>
+
+    <div id="scan-feedback" class="feedback" style="margin-top:.5rem;"></div>
+
+    <div id="scan-hint-area" style="margin-top:.75rem; display:none;">
+      <button class="btn btn-hint" onclick="showScanHint()">
+        <!-- Lightbulb icon -->
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C4.8 1.5 3 3.3 3 5.5c0 1.3.6 2.4 1.5 3.1V10h5V8.6C10.4 7.9 11 6.8 11 5.5c0-2.2-1.8-4-4-4Z" stroke="#FFD166" stroke-width="1.5"/><line x1="5" y1="11.5" x2="9" y2="11.5" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round"/><line x1="5.5" y1="13" x2="8.5" y2="13" stroke="#FFD166" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Need a hint?
+      </button>
+    </div>
+
+    <div id="scan-hint-box" class="feedback feedback-hint" style="display:none; margin-top:.5rem;">
+      The cap is 4. Look at the E (Endurance) number for each team. If E = 5, 6, 7, or 8 — that team is over the limit. If E is 4 or less, they're fine.
+    </div>
+
+    <div class="mt-3 flex-end">
+      <button class="btn btn-primary" id="scan-next-btn" disabled onclick="goPhase(3)">
+        See the violations →
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 3 · Calculate the Changes
+══════════════════════════════════════════ -->
+<section class="phase" id="phase-3">
+  <p class="phase-label">Step <span>3 of 5</span> · Run the Math</p>
+
+  <!-- Sticky formula reference -->
+  <div class="formula-sticky">
+    <span class="formula-sticky-label">Formulas</span>
+    <span class="formula-sticky-eq">Decay = (20 − E) × 1.5</span>
+    <span style="color:var(--slate)">·</span>
+    <span class="formula-sticky-eq">Speed Power = S × 5</span>
+  </div>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <div class="icon-circle yellow">
+        <!-- Calculator icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="4" y="4" width="18" height="18" rx="3" stroke="#FFD166" stroke-width="1.8"/>
+          <rect x="7" y="7" width="12" height="4" rx="1.5" fill="rgba(255,209,102,.2)" stroke="#FFD166" stroke-width="1.3"/>
+          <circle cx="8.5" cy="15" r="1.2" fill="#FFD166"/>
+          <circle cx="13" cy="15" r="1.2" fill="#FFD166"/>
+          <circle cx="17.5" cy="15" r="1.2" fill="#FFD166"/>
+          <circle cx="8.5" cy="19" r="1.2" fill="#FFD166"/>
+          <circle cx="13" cy="19" r="1.2" fill="#FFD166"/>
+          <circle cx="17.5" cy="19" r="1.2" fill="#FFD166"/>
+        </svg>
+      </div>
+      <div>
+        <div class="h2">Recalculate the Violating Teams</div>
+        <div class="muted">Three teams break the new rule. Work through each one.</div>
+      </div>
+    </div>
+
+    <!-- Team progress dots -->
+    <div class="team-progress">
+      <div class="tp-dot active" id="tp0"></div>
+      <div class="tp-dot" id="tp1"></div>
+      <div class="tp-dot" id="tp2"></div>
+    </div>
+
+    <!-- Team tabs -->
+    <div class="team-tabs">
+      <button class="team-tab active" id="tab-0" onclick="switchTeamTab(0)">Bold 6</button>
+      <button class="team-tab" id="tab-1" onclick="switchTeamTab(1)">Iron 8</button>
+      <button class="team-tab" id="tab-2" onclick="switchTeamTab(2)">Sharp 5</button>
+    </div>
+
+    <!-- Team panels (injected by JS) -->
+    <div id="team-panel-0"></div>
+    <div id="team-panel-1" style="display:none;"></div>
+    <div id="team-panel-2" style="display:none;"></div>
+
+    <div class="mt-3 flex-end">
+      <button class="btn btn-primary" id="phase3-next" disabled onclick="goPhase(4)">
+        My team's turn →
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 4 · Your Team
+══════════════════════════════════════════ -->
+<section class="phase" id="phase-4">
+  <p class="phase-label">Step <span>4 of 5</span> · Your Team</p>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <div class="icon-circle green">
+        <!-- Bot with checkmark icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="6" y="10" width="14" height="11" rx="2.5" stroke="#00C97A" stroke-width="1.8"/>
+          <rect x="9" y="3" width="8" height="5.5" rx="2" stroke="#00C97A" stroke-width="1.8"/>
+          <line x1="13" y1="8.5" x2="13" y2="10" stroke="#00C97A" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="10" cy="14.5" r="1.5" fill="#00C97A"/>
+          <circle cx="16" cy="14.5" r="1.5" fill="#00C97A"/>
+          <path d="M10 18.5 Q13 20.5 16 18.5" stroke="#00C97A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="h2">Your Team: Solid 4</div>
+        <div class="muted">Now check: does this rule help or hurt you? Show the math.</div>
+      </div>
+    </div>
+
+    <!-- Echo's current stats card -->
+    <div class="highlight-box" style="margin-bottom:1rem;">
+      <div style="font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">Your Current Loadout</div>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <span><strong style="color:var(--cyan)">Speed = 5</strong> → 25% motor power</span>
+        <span><strong style="color:var(--cyan)">Endurance = 4</strong> → decay = ?%/min</span>
+        <span style="color:var(--slate)">Turning = 5 · Power = 6</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Are you compliant? -->
+    <div class="step-block active-step" id="e-step-1">
+      <div class="step-header">
+        <div class="step-num active" id="es1-num">1</div>
+        <div class="step-title">Does Team Echo violate the cap?</div>
+      </div>
+      <p class="body-text">Your Endurance is <strong style="color:var(--cyan)">4</strong>. The cap is <strong style="color:var(--red)">4</strong>. What does that mean?</p>
+      <div style="display:flex;gap:.875rem;margin-top:1rem;flex-wrap:wrap;">
+        <button class="btn btn-ghost" id="e-choice-yes" onclick="echoCompliant(false)">Yes — we're over the cap</button>
+        <button class="btn btn-primary" id="e-choice-no" onclick="echoCompliant(true)">No — we're exactly at the cap</button>
+      </div>
+      <div class="feedback" id="e-step1-feedback"></div>
+    </div>
+
+    <!-- Step 2: Your decay rate (locked until step 1 done) -->
+    <div class="step-block" id="e-step-2" style="opacity:.4;pointer-events:none;">
+      <div class="step-header">
+        <div class="step-num" id="es2-num">2</div>
+        <div class="step-title">Calculate your current decay rate</div>
+      </div>
+      <p class="body-text">Use the formula: <strong style="color:var(--cyan)">Decay = (20 − E) × 1.5</strong></p>
+      <p class="muted mt-1">Your E = 4. Plug it in.</p>
+      <div class="equation-box mt-2">
+        Decay = (20 − <span class="eq-var">4</span>) × 1.5 = <span class="eq-var">16</span> × 1.5 = <span class="eq-var">?</span>
+      </div>
+      <div class="input-row">
+        <span class="input-label">Decay rate =</span>
+        <input type="number" class="num-input" id="echo-decay" placeholder="?" min="0" max="100" oninput="checkEchoDecay()" />
+        <span class="input-unit">% / min</span>
+      </div>
+      <div class="feedback" id="e-step2-feedback"></div>
+      <button class="btn btn-hint mt-2" id="e-hint2-btn" onclick="showEchoHint(2)" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C4.8 1.5 3 3.3 3 5.5c0 1.3.6 2.4 1.5 3.1V10h5V8.6C10.4 7.9 11 6.8 11 5.5c0-2.2-1.8-4-4-4Z" stroke="#FFD166" stroke-width="1.5"/><line x1="5" y1="11.5" x2="9" y2="11.5" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Show me how
+      </button>
+    </div>
+
+    <!-- Step 3: Compare to violating teams -->
+    <div class="step-block" id="e-step-3" style="opacity:.4;pointer-events:none;">
+      <div class="step-header">
+        <div class="step-num" id="es3-num">3</div>
+        <div class="step-title">Compare your decay to the forced changes</div>
+      </div>
+      <p class="body-text">After the cap, every violating team has E = 4. That means their new decay rate is the <strong>same as yours</strong>: <strong style="color:var(--cyan)">24%/min</strong>.</p>
+      <p class="muted mt-1">But before the cap, they had <em>lower</em> decay rates because their E was higher. What changed for them?</p>
+
+      <div style="overflow-x:auto;margin-top:1rem;">
+        <table style="width:100%;border-collapse:collapse;min-width:420px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--card-border);">
+              <th style="text-align:left;padding:.5rem .75rem;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);">Team</th>
+              <th style="text-align:center;padding:.5rem .75rem;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);">Old Decay</th>
+              <th style="text-align:center;padding:.5rem .75rem;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);">New Decay</th>
+              <th style="text-align:center;padding:.5rem .75rem;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);">Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(34,40,64,.5);">
+              <td style="padding:.625rem .75rem;font-weight:700;">Bold 6</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--green);font-weight:800;">21%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);font-weight:800;">24%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);">↑ +3%/min</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(34,40,64,.5);">
+              <td style="padding:.625rem .75rem;font-weight:700;">Iron 8</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--green);font-weight:800;">18%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);font-weight:800;">24%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);">↑ +6%/min</td>
+            </tr>
+            <tr>
+              <td style="padding:.625rem .75rem;font-weight:700;">Sharp 5</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--green);font-weight:800;">22.5%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);font-weight:800;">24%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--red);">↑ +1.5%/min</td>
+            </tr>
+            <tr style="background:rgba(0,229,255,.04);border-top:2px solid rgba(0,229,255,.2);">
+              <td style="padding:.625rem .75rem;font-weight:800;color:var(--cyan);">Solid 4 (YOU)</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--cyan);font-weight:800;">24%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--cyan);font-weight:800;">24%/min</td>
+              <td style="text-align:center;padding:.625rem .75rem;color:var(--green);">— No change</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-3 flex-end">
+        <button class="btn btn-primary" onclick="unlockEchoStep4()">See what the Speed change means →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Speed threat -->
+    <div class="step-block" id="e-step-4" style="opacity:.4;pointer-events:none;">
+      <div class="step-header">
+        <div class="step-num" id="es4-num">4</div>
+        <div class="step-title">But wait — those teams got faster too</div>
+      </div>
+      <p class="body-text">When Endurance goes down, those points move to Speed. Iron 8 went from <span style="color:var(--slate)">Speed 4</span> to <span style="color:var(--cyan)">Speed 8</span>. That's a big jump.</p>
+
+      <div class="equation-box mt-2">
+        Iron 8 new Speed Power = <span class="eq-var">8</span> × 5 = <span class="eq-result">40%</span>
+        &nbsp;&nbsp;<span style="color:var(--slate);font-size:.875rem;">(was 20%)</span>
+      </div>
+
+      <p class="body-text mt-2">Your Speed is still 5. Iron 8 is now faster than you.</p>
+      <p class="muted mt-1">Is that a problem? It depends on the match length. A fast bot that decays quickly loses power fast. Your bot holds power longer by comparison — even though your decay rate is the same number now.</p>
+
+      <div class="highlight-box green mt-2">
+        <strong style="color:var(--green)">Key insight:</strong> Iron 8's new decay rate is 24%/min — same as yours. But before the rule change, Iron 8 decayed at only 18%/min. That means your Endurance strategy just got leveled. The gap closed in your favor.
+      </div>
+
+      <div class="mt-3 flex-end">
+        <button class="btn btn-primary" onclick="unlockEchoStep5()">Now make your verdict →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PHASE 5 · Verdict
+══════════════════════════════════════════ -->
+<section class="phase" id="phase-5">
+  <p class="phase-label">Step <span>5 of 5</span> · Your Verdict</p>
+
+  <div class="card">
+    <div class="icon-wrap">
+      <div class="icon-circle">
+        <!-- Trophy / verdict icon -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M9 4h8v8a4 4 0 0 1-8 0V4Z" stroke="#00E5FF" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M5 5.5H9v3.5" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M21 5.5H17v3.5" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="13" y1="16" x2="13" y2="19" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="9" y1="22" x2="17" y2="22" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="13" y1="19" x2="9" y2="22" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="13" y1="19" x2="17" y2="22" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="h2">Write Your Verdict</div>
+        <div class="muted">Does the Endurance cap help or hurt Solid 4? Explain using the numbers you calculated.</div>
+      </div>
+    </div>
+
+    <!-- Answer the three questions -->
+    <div class="highlight-box mb-1" style="margin-bottom:1rem;">
+      <p class="body-text"><strong>Your answer must include:</strong></p>
+      <div class="mt-1" style="display:flex;flex-direction:column;gap:.5rem;">
+        <div style="display:flex;gap:.625rem;align-items:flex-start;">
+          <span style="color:var(--cyan);font-weight:800;flex-shrink:0;">1.</span>
+          <span class="body-text">Which teams broke the rule? Name them.</span>
+        </div>
+        <div style="display:flex;gap:.625rem;align-items:flex-start;">
+          <span style="color:var(--cyan);font-weight:800;flex-shrink:0;">2.</span>
+          <span class="body-text">What is the new decay rate for violating teams? Show the calculation.</span>
+        </div>
+        <div style="display:flex;gap:.625rem;align-items:flex-start;">
+          <span style="color:var(--cyan);font-weight:800;flex-shrink:0;">3.</span>
+          <span class="body-text">Does this help or hurt Team Echo? Why?</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick reference -->
+    <details style="margin-bottom:1rem;">
+      <summary style="cursor:pointer;font-size:.875rem;font-weight:700;color:var(--slate);padding:.5rem 0;">
+        📋 Show my calculations
+      </summary>
+      <div style="margin-top:.75rem;display:flex;flex-direction:column;gap:.5rem;">
+        <div class="equation-box" style="font-size:.875rem;padding:.75rem 1rem;">
+          Team Volt: E 6→4, decay 21→24%/min, Speed 6→8 (30%→40% power)
+        </div>
+        <div class="equation-box" style="font-size:.875rem;padding:.75rem 1rem;">
+          Team Blaze: E 8→4, decay 18→24%/min, Speed 4→8 (20%→40% power)
+        </div>
+        <div class="equation-box" style="font-size:.875rem;padding:.75rem 1rem;">
+          Team Nova: E 5→4, decay 22.5→24%/min, Speed 5→6 (25%→30% power)
+        </div>
+        <div class="equation-box" style="font-size:.875rem;padding:.75rem 1rem;border-color:rgba(0,229,255,.3);">
+          Team Echo: E stays at 4. Decay stays at 24%/min. No change.
+        </div>
+      </div>
+    </details>
+
+    <textarea class="verdict-textarea" id="verdict-input"
+      placeholder="Write your answer here. Use the numbers: name the teams, show the decay calculation, and explain if the rule helps or hurts Team Echo…"
+      oninput="onVerdictInput()"></textarea>
+    <div class="char-count" id="verdict-count">0 / 30 characters needed</div>
+
+    <div class="mt-3">
+      <button class="btn btn-primary" id="verdict-btn" disabled onclick="revealVerdict()">
+        See the answer →
+      </button>
+    </div>
+
+    <!-- Verdict reveal -->
+    <div class="verdict-reveal" id="verdict-reveal">
+      <div class="verdict-title">✓ Here's the full picture</div>
+
+      <p class="body-text"><strong style="color:var(--red)">Three teams violate the cap:</strong> Team Volt (E=6), Team Blaze (E=8), and Team Nova (E=5). All must reduce Endurance to 4, moving excess points to Speed.</p>
+
+      <p class="body-text mt-2"><strong>New decay rate for all violators:</strong></p>
+      <div class="equation-box mt-1">
+        Decay = (20 − 4) × 1.5 = 16 × 1.5 = <span class="eq-result">24%/min</span>
+      </div>
+
+      <p class="body-text mt-2"><strong>New Speed motor power:</strong></p>
+      <div style="display:flex;flex-direction:column;gap:.375rem;margin-top:.625rem;">
+        <div class="equation-box" style="font-size:.9375rem;padding:.625rem 1rem;">Team Volt: Speed 8 × 5 = <span class="eq-result">40%</span></div>
+        <div class="equation-box" style="font-size:.9375rem;padding:.625rem 1rem;">Team Blaze: Speed 8 × 5 = <span class="eq-result">40%</span></div>
+        <div class="equation-box" style="font-size:.9375rem;padding:.625rem 1rem;">Team Nova: Speed 6 × 5 = <span class="eq-result">30%</span></div>
+      </div>
+
+      <p class="body-text mt-2"><strong style="color:var(--green)">Does this help or hurt Team Echo?</strong></p>
+      <div class="highlight-box green mt-1">
+        <strong style="color:var(--green)">It helps.</strong> Team Echo's Endurance is already 4 — no changes needed. The three violating teams all get worse Endurance (higher decay). Their bots will now run out of power at the same rate as Echo's — but before the rule, some of them lasted longer. The rule leveled the field. Echo didn't lose anything. Three opponents did.
+      </div>
+
+      <div class="highlight-box yellow mt-2">
+        <strong style="color:var(--yellow)">One trade-off to watch:</strong> Blaze and Volt both gained Speed. Blaze went from 20% to 40% motor power — that's a fast bot. Echo will need to leverage superior staying power if the match goes long.
+      </div>
+
+      <hr class="va-divider" />
+      <p class="body-text" style="font-size:.9375rem;color:var(--slate);">You just ran a what-if analysis. You changed one variable (Endurance cap), ran the formulas, and compared outputs. That's the whole move.</p>
+    </div>
+  </div>
+</section>
+
+
+<script>
+// ══ League data ══════════════════════════════════════════════
+const TEAMS = [
+  { name: 'Bold 6',   s: 6, e: 6, t: 4, p: 4, you: false },
+  { name: 'Iron 8',   s: 4, e: 8, t: 5, p: 3, you: false },
+  { name: 'Turbo 2',  s: 8, e: 2, t: 6, p: 4, you: false },
+  { name: 'Sharp 5',  s: 5, e: 5, t: 5, p: 5, you: false },
+  { name: 'Quick 3',  s: 7, e: 3, t: 4, p: 6, you: false },
+  { name: 'Solid 4',  s: 5, e: 4, t: 5, p: 6, you: true  },
+];
+
+// Violating teams (e > 4) — indices into TEAMS
+const VIOLATORS = [0, 1, 3]; // Bold 6, Iron 8, Sharp 5
+const VIOLATOR_DATA = [
+  { // Bold 6
+    name: 'Bold 6', oldS: 6, oldE: 6, newE: 4, excess: 2, newS: 8,
+    oldDecay: 21, newDecay: 24, oldSpeedPow: 30, newSpeedPow: 40,
+  },
+  { // Iron 8
+    name: 'Iron 8', oldS: 4, oldE: 8, newE: 4, excess: 4, newS: 8,
+    oldDecay: 18, newDecay: 24, oldSpeedPow: 20, newSpeedPow: 40,
+  },
+  { // Sharp 5
+    name: 'Sharp 5', oldS: 5, oldE: 5, newE: 4, excess: 1, newS: 6,
+    oldDecay: 22.5, newDecay: 24, oldSpeedPow: 25, newSpeedPow: 30,
+  },
+];
+
+// ══ Phase navigation ══════════════════════════════════════
+const PHASE_PCT = { 1: 10, 2: 30, 3: 55, 4: 78, 5: 100 };
+
+function goPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById(`phase-${n}`).classList.add('active');
+  document.getElementById('progress-bar').style.width = PHASE_PCT[n] + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 3) buildTeamPanels();
+}
+
+// ══ Phase 2 — League scan ════════════════════════════════
+let selectedTeams = new Set();
+let scanCorrect = false;
+let scanHintShown = false;
+let wrongAttempts = 0;
+
+function buildLeagueGrid() {
+  const grid = document.getElementById('league-grid');
+  TEAMS.forEach((team, idx) => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.id = `tc-${idx}`;
+    card.onclick = () => toggleTeam(idx);
+
+    let enduranceClass = team.e > 4 ? '' : '';
+
+    card.innerHTML = `
+      ${team.you ? '<div class="team-badge badge-you">YOU</div>' : '<div class="team-badge badge-tap">Tap to select</div>'}
+      <div class="team-name">${team.name}</div>
+      <div class="team-stats">
+        <div class="stat-row-sm"><span class="stat-label-sm">S</span><span class="stat-val-sm">${team.s}</span></div>
+        <div class="stat-row-sm"><span class="stat-label-sm">E</span><span class="stat-val-sm" id="esm-${idx}">${team.e}</span></div>
+        <div class="stat-row-sm"><span class="stat-label-sm">T</span><span class="stat-val-sm">${team.t}</span></div>
+        <div class="stat-row-sm"><span class="stat-label-sm">P</span><span class="stat-val-sm">${team.p}</span></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toggleTeam(idx) {
+  if (scanCorrect) return;
+  const card = document.getElementById(`tc-${idx}`);
+  if (selectedTeams.has(idx)) {
+    selectedTeams.delete(idx);
+    card.className = 'team-card';
+  } else {
+    selectedTeams.add(idx);
+    card.className = 'team-card selected-violation';
+  }
+  validateScan();
+}
+
+function validateScan() {
+  const correct = new Set(VIOLATORS);
+  const selected = selectedTeams;
+
+  // Check if selected matches violators exactly
+  const isCorrect = [...correct].every(v => selected.has(v)) && [...selected].every(v => correct.has(v));
+
+  if (isCorrect) {
+    scanCorrect = true;
+    // Reveal all with correct styling
+    TEAMS.forEach((t, i) => {
+      const card = document.getElementById(`tc-${i}`);
+      const eEl = document.getElementById(`esm-${i}`);
+      if (t.e > 4) {
+        card.className = 'team-card revealed-violation';
+        eEl.classList.add('over');
+      } else {
+        card.className = 'team-card revealed-ok';
+        eEl.classList.add('ok-val');
+      }
+    });
+    const fb = document.getElementById('scan-feedback');
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = '<strong>✓ Exactly right.</strong> Bold 6 (E=6), Iron 8 (E=8), and Sharp 5 (E=5) are all over the cap. Turbo 2, Quick 3, and Solid 4 are compliant.';
+    document.getElementById('scan-next-btn').disabled = false;
+    document.getElementById('scan-hint-area').style.display = 'none';
+  } else {
+    wrongAttempts++;
+    if (wrongAttempts >= 2) {
+      document.getElementById('scan-hint-area').style.display = 'block';
+    }
+  }
+}
+
+function showScanHint() {
+  document.getElementById('scan-hint-box').style.display = 'block';
+}
+
+// ══ Phase 3 — Team calculations ══════════════════════════
+const teamDone = [false, false, false];
+let currentTab = 0;
+
+function buildTeamPanels() {
+  VIOLATOR_DATA.forEach((td, i) => {
+    if (document.getElementById(`team-panel-${i}`).innerHTML !== '') return;
+    document.getElementById(`team-panel-${i}`).innerHTML = buildTeamPanel(td, i);
+  });
+}
+
+function buildTeamPanel(td, i) {
+  const prefix = `t${i}`;
+  return `
+    <!-- Before / After visual -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title">Current Loadout → After Cap</div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-col-label">Before (Current)</div>
+          <div class="compare-item"><div class="compare-item-name">Endurance</div><div class="compare-item-val" style="color:var(--red)">${td.oldE}</div></div>
+          <div class="compare-item"><div class="compare-item-name">Speed</div><div class="compare-item-val">${td.oldS}</div></div>
+          <div class="compare-item"><div class="compare-item-name">Decay Rate</div><div class="compare-item-val" style="color:var(--green)">${td.oldDecay}%/min</div></div>
+          <div class="compare-item"><div class="compare-item-name">Speed Power</div><div class="compare-item-val">${td.oldSpeedPow}%</div></div>
+        </div>
+        <div class="compare-col after">
+          <div class="compare-col-label">After (Cap Applied)</div>
+          <div class="compare-item"><div class="compare-item-name">Endurance</div><div class="compare-item-val" style="color:var(--cyan)">${td.newE} <span class="cap-badge">Capped</span></div></div>
+          <div class="compare-item"><div class="compare-item-name">Speed</div><div class="compare-item-val" style="color:var(--cyan)">${td.newS} (+${td.excess})</div></div>
+          <div class="compare-item"><div class="compare-item-name">Decay Rate</div><div class="compare-item-val" style="color:var(--cyan)">?%/min</div></div>
+          <div class="compare-item"><div class="compare-item-name">Speed Power</div><div class="compare-item-val" style="color:var(--cyan)">?%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step A: excess points -->
+    <div class="step-block active-step">
+      <div class="step-header">
+        <div class="step-num active">A</div>
+        <div class="step-title">How many points are being moved?</div>
+      </div>
+      <p class="body-text">${td.name} currently has Endurance = <strong style="color:var(--red)">${td.oldE}</strong>. The cap is <strong>4</strong>.</p>
+      <p class="muted mt-1">Excess = Current Endurance − 4</p>
+      <div class="input-row">
+        <span class="input-label">Excess =</span>
+        <span class="input-label" style="color:#E8EAF2;font-weight:800;">${td.oldE} − 4 =</span>
+        <input type="number" class="num-input" id="${prefix}-excess" placeholder="?" min="0" max="20" oninput="checkExcess('${prefix}', ${td.excess}, ${i})" />
+        <span class="input-unit">points</span>
+      </div>
+      <div class="feedback" id="${prefix}-excess-fb"></div>
+    </div>
+
+    <!-- Step B: new decay -->
+    <div class="step-block" id="${prefix}-step-b" style="opacity:.4;pointer-events:none;">
+      <div class="step-header">
+        <div class="step-num" id="${prefix}-bn">B</div>
+        <div class="step-title">Calculate the new decay rate</div>
+      </div>
+      <p class="body-text">With Endurance forced to <strong style="color:var(--cyan)">4</strong>, use the formula:</p>
+      <div class="equation-box mt-2">
+        Decay = (20 − <span class="eq-var">4</span>) × 1.5 = 16 × 1.5 = <span class="eq-var">?</span>
+      </div>
+      <div class="input-row">
+        <span class="input-label">New decay =</span>
+        <input type="number" class="num-input" id="${prefix}-decay" placeholder="?" min="0" max="100" step="0.5" oninput="checkDecay('${prefix}', ${td.newDecay}, ${i})" />
+        <span class="input-unit">% / min</span>
+      </div>
+      <div class="feedback" id="${prefix}-decay-fb"></div>
+      <button class="btn btn-hint mt-2" id="${prefix}-decay-hint" onclick="showDecayHint('${prefix}')" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C4.8 1.5 3 3.3 3 5.5c0 1.3.6 2.4 1.5 3.1V10h5V8.6C10.4 7.9 11 6.8 11 5.5c0-2.2-1.8-4-4-4Z" stroke="#FFD166" stroke-width="1.5"/><line x1="5" y1="11.5" x2="9" y2="11.5" stroke="#FFD166" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Show me the steps
+      </button>
+      <div class="feedback feedback-hint" id="${prefix}-decay-hint-box" style="display:none;">
+        Step 1: 20 − 4 = 16 &nbsp;·&nbsp; Step 2: 16 × 1.5 = 24
+      </div>
+    </div>
+
+    <!-- Step C: new Speed power -->
+    <div class="step-block" id="${prefix}-step-c" style="opacity:.4;pointer-events:none;">
+      <div class="step-header">
+        <div class="step-num" id="${prefix}-cn">C</div>
+        <div class="step-title">Calculate the new Speed motor power</div>
+      </div>
+      <p class="body-text">${td.name}'s new Speed = <strong style="color:var(--cyan)">${td.newS}</strong> (was ${td.oldS}, gained ${td.excess}).</p>
+      <p class="muted mt-1">Speed Motor Power = Speed × 5</p>
+      <div class="equation-box mt-2">
+        Speed Power = <span class="eq-var">${td.newS}</span> × 5 = <span class="eq-var">?</span>
+      </div>
+      <div class="input-row">
+        <span class="input-label">Speed Power =</span>
+        <input type="number" class="num-input" id="${prefix}-speed" placeholder="?" min="0" max="100" oninput="checkSpeedPow('${prefix}', ${td.newSpeedPow}, ${i})" />
+        <span class="input-unit">%</span>
+      </div>
+      <div class="feedback" id="${prefix}-speed-fb"></div>
+    </div>
+
+    <!-- Done banner (hidden until complete) -->
+    <div class="feedback feedback-correct" id="${prefix}-done" style="display:none;margin-top:1rem;">
+      <strong>✓ ${td.name} done.</strong> New decay: ${td.newDecay}%/min. New Speed Power: ${td.newSpeedPow}%.
+      ${i < 2 ? '<br>Move to the next team using the tabs above.' : ''}
+    </div>
+  `;
+}
+
+function checkExcess(prefix, correct, teamIdx) {
+  const inp = document.getElementById(`${prefix}-excess`);
+  const fb = document.getElementById(`${prefix}-excess-fb`);
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) { inp.className = 'num-input'; fb.className = 'feedback'; return; }
+  if (Math.abs(val - correct) < 0.1) {
+    inp.className = 'num-input correct';
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = `<strong>✓ Correct!</strong> ${correct} points must move from Endurance to Speed.`;
+    // Unlock step B
+    const stepB = document.getElementById(`${prefix}-step-b`);
+    stepB.style.opacity = '1'; stepB.style.pointerEvents = 'auto';
+    document.getElementById(`${prefix}-bn`).className = 'step-num active';
+    document.getElementById(`${prefix}-decay-hint`).style.display = 'inline-flex';
+  } else {
+    inp.className = 'num-input error';
+    fb.className = 'feedback feedback-error visible';
+    fb.innerHTML = `Try again. The formula is: Current Endurance (${correct + 4}) − 4 = ?`;
+  }
+}
+
+function showDecayHint(prefix) {
+  document.getElementById(`${prefix}-decay-hint-box`).style.display = 'block';
+}
+
+function checkDecay(prefix, correct, teamIdx) {
+  const inp = document.getElementById(`${prefix}-decay`);
+  const fb = document.getElementById(`${prefix}-decay-fb`);
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) { inp.className = 'num-input'; fb.className = 'feedback'; return; }
+  if (Math.abs(val - correct) < 0.1) {
+    inp.className = 'num-input correct';
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = `<strong>✓ Correct!</strong> Decay rate = 24%/min. This team now loses power 24% per minute.`;
+    // Unlock step C
+    const stepC = document.getElementById(`${prefix}-step-c`);
+    stepC.style.opacity = '1'; stepC.style.pointerEvents = 'auto';
+    document.getElementById(`${prefix}-cn`).className = 'step-num active';
+  } else {
+    inp.className = 'num-input error';
+    fb.className = 'feedback feedback-error visible';
+    fb.innerHTML = `Check your steps. (20 − 4) = 16, then 16 × 1.5 = ?`;
+    document.getElementById(`${prefix}-decay-hint`).style.display = 'inline-flex';
+  }
+}
+
+function checkSpeedPow(prefix, correct, teamIdx) {
+  const inp = document.getElementById(`${prefix}-speed`);
+  const fb = document.getElementById(`${prefix}-speed-fb`);
+  const val = parseFloat(inp.value);
+  const td = VIOLATOR_DATA[teamIdx];
+  if (isNaN(val)) { inp.className = 'num-input'; fb.className = 'feedback'; return; }
+  if (Math.abs(val - correct) < 0.1) {
+    inp.className = 'num-input correct';
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = `<strong>✓ Correct!</strong> ${td.name}'s Speed motor power jumped from ${td.oldSpeedPow}% to ${td.newSpeedPow}%.`;
+    // Mark team done
+    markTeamDone(prefix, teamIdx);
+  } else {
+    inp.className = 'num-input error';
+    fb.className = 'feedback feedback-error visible';
+    fb.innerHTML = `The new Speed is ${td.newS}. Try: ${td.newS} × 5 = ?`;
+  }
+}
+
+function markTeamDone(prefix, teamIdx) {
+  teamDone[teamIdx] = true;
+  document.getElementById(`${prefix}-done`).style.display = 'block';
+  // Progress dots
+  document.getElementById(`tp${teamIdx}`).className = 'tp-dot done';
+  const tab = document.getElementById(`tab-${teamIdx}`);
+  tab.classList.add('done-tab'); tab.classList.remove('active');
+  // If there's a next tab, activate it
+  const nextIdx = teamIdx + 1;
+  if (nextIdx < VIOLATOR_DATA.length) {
+    setTimeout(() => switchTeamTab(nextIdx), 600);
+  }
+  // Check if all done
+  if (teamDone.every(Boolean)) {
+    document.getElementById('phase3-next').disabled = false;
+  }
+}
+
+function switchTeamTab(idx) {
+  currentTab = idx;
+  VIOLATOR_DATA.forEach((_, i) => {
+    const panel = document.getElementById(`team-panel-${i}`);
+    const tab = document.getElementById(`tab-${i}`);
+    panel.style.display = i === idx ? 'block' : 'none';
+    tab.classList.remove('active');
+  });
+  document.getElementById(`tab-${idx}`).classList.add('active');
+  if (!teamDone[idx]) {
+    document.getElementById(`tp${idx}`).className = 'tp-dot active';
+  }
+}
+
+// ══ Phase 4 — Echo steps ═════════════════════════════════
+let echoStep = 1;
+
+function echoCompliant(isCorrect) {
+  const fb = document.getElementById('e-step1-feedback');
+  if (isCorrect) {
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = '<strong>✓ Right.</strong> E = 4 is exactly the limit. Not above it. Team Echo does NOT need to make any changes.';
+    document.getElementById('e-choice-yes').disabled = true;
+    document.getElementById('e-choice-no').disabled = true;
+    document.getElementById('es1-num').className = 'step-num done';
+    // Unlock step 2
+    setTimeout(() => {
+      const s2 = document.getElementById('e-step-2');
+      s2.style.opacity = '1'; s2.style.pointerEvents = 'auto';
+      document.getElementById('es2-num').className = 'step-num active';
+      document.getElementById('e-hint2-btn').style.display = 'inline-flex';
+    }, 400);
+  } else {
+    fb.className = 'feedback feedback-error visible';
+    fb.innerHTML = 'Check again. The cap is 4. Echo\'s Endurance is 4. Is 4 greater than 4?';
+  }
+}
+
+let echoDecayAttempts = 0;
+function checkEchoDecay() {
+  const inp = document.getElementById('echo-decay');
+  const fb = document.getElementById('e-step2-feedback');
+  const val = parseFloat(inp.value);
+  if (isNaN(val)) { inp.className = 'num-input'; fb.className = 'feedback'; return; }
+  if (Math.abs(val - 24) < 0.1) {
+    inp.className = 'num-input correct';
+    fb.className = 'feedback feedback-correct visible';
+    fb.innerHTML = '<strong>✓ Correct!</strong> (20 − 4) × 1.5 = 16 × 1.5 = 24%/min. That\'s how fast Echo loses power every minute.';
+    document.getElementById('es2-num').className = 'step-num done';
+    setTimeout(() => {
+      const s3 = document.getElementById('e-step-3');
+      s3.style.opacity = '1'; s3.style.pointerEvents = 'auto';
+      document.getElementById('es3-num').className = 'step-num active';
+    }, 400);
+  } else {
+    echoDecayAttempts++;
+    inp.className = 'num-input error';
+    fb.className = 'feedback feedback-error visible';
+    if (echoDecayAttempts >= 2) {
+      fb.innerHTML = 'Step through it: 20 − 4 = 16. Then 16 × 1.5 = ? <br><em>Hint: 16 × 1 = 16, and 16 × 0.5 = 8. Add them.</em>';
+    } else {
+      fb.innerHTML = 'Try again. Use: Decay = (20 − E) × 1.5, with E = 4.';
+    }
+  }
+}
+
+function showEchoHint(step) {
+  if (step === 2) {
+    const fb = document.getElementById('e-step2-feedback');
+    fb.className = 'feedback feedback-hint visible';
+    fb.innerHTML = 'Step 1: 20 − 4 = 16 &nbsp;·&nbsp; Step 2: 16 × 1.5 = 24';
+  }
+}
+
+function unlockEchoStep4() {
+  document.getElementById('es3-num').className = 'step-num done';
+  const s4 = document.getElementById('e-step-4');
+  s4.style.opacity = '1'; s4.style.pointerEvents = 'auto';
+  document.getElementById('es4-num').className = 'step-num active';
+  s4.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function unlockEchoStep5() {
+  document.getElementById('es4-num').className = 'step-num done';
+  setTimeout(() => goPhase(5), 200);
+}
+
+// ══ Phase 5 — Verdict ════════════════════════════════════
+function onVerdictInput() {
+  const val = document.getElementById('verdict-input').value.trim();
+  const len = val.length;
+  const countEl = document.getElementById('verdict-count');
+  const btn = document.getElementById('verdict-btn');
+  if (len >= 30) {
+    countEl.textContent = `${len} characters ✓ — ready`;
+    countEl.className = 'char-count ready';
+    btn.disabled = false;
+  } else {
+    countEl.textContent = `${len} / 30 characters needed`;
+    countEl.className = 'char-count';
+    btn.disabled = true;
+  }
+}
+
+function revealVerdict() {
+  const reveal = document.getElementById('verdict-reveal');
+  reveal.classList.add('visible');
+  document.getElementById('verdict-btn').textContent = '✓ Answer revealed';
+  document.getElementById('verdict-btn').disabled = true;
+  reveal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+// ══ Init ═════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildLeagueGrid();
+});
+</script>
+</body>
+</html>
