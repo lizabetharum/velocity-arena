@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — Build Your Bot's Equation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1b2a;--surface:#132033;--card:#1a2d45;--border:#2a4060;
+  --cyan:#00e5ff;--yellow:#ffd600;--green:#00e676;--red:#ff5252;
+  --orange:#ff9100;--purple:#ce93d8;--text:#e8f0fe;--muted:#7a9cc0;
+}
+html{font-size:16px;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65;}
+
+/* ── HEADER ───────────────────────────────────── */
+.hdr{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:2px solid var(--border);}
+.hdr-top{display:flex;align-items:center;gap:10px;padding:12px 18px 10px;}
+.day-badge{background:var(--yellow);color:#0d1b2a;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;border-radius:20px;white-space:nowrap;}
+.hdr-words{flex:1;}
+.hdr-title{font-size:15px;font-weight:800;}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.prog-bar{height:5px;background:var(--border);}
+.prog-fill{height:5px;background:var(--yellow);transition:width .4s;width:0%;}
+.step-tabs{display:flex;overflow-x:auto;}
+.stab{flex:1;min-width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'Montserrat',sans-serif;transition:color .15s;}
+.stab.active{color:var(--yellow);}
+.stab.done{color:var(--green);}
+.stab-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;background:var(--border);color:var(--muted);transition:all .2s;}
+.stab.active .stab-num{background:var(--yellow);color:#0d1b2a;}
+.stab.done .stab-num{background:var(--green);color:#0d1b2a;}
+
+/* ── SECTIONS ─────────────────────────────────── */
+.sec{display:none;padding:18px 16px 40px;max-width:620px;margin:0 auto;}
+.sec.on{display:block;}
+
+/* ── SECTION HEADER ───────────────────────────── */
+.sec-hd{margin-bottom:22px;}
+.sec-step-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+.sec-title{font-size:24px;font-weight:900;line-height:1.2;}
+.sec-desc{font-size:15px;color:var(--muted);margin-top:8px;line-height:1.6;}
+
+/* ── CARDS ────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
+.card-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+.clbl-c{color:var(--cyan);}
+.clbl-y{color:var(--yellow);}
+.clbl-g{color:var(--green);}
+.clbl-o{color:var(--orange);}
+.clbl-p{color:var(--purple);}
+.clbl-m{color:var(--muted);}
+
+/* ── CONCEPT BOX ──────────────────────────────── */
+.concept{background:rgba(0,229,255,.05);border-left:4px solid var(--cyan);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:18px;}
+.concept.yc{background:rgba(255,214,0,.05);border-left-color:var(--yellow);}
+.concept.gc{background:rgba(0,230,118,.05);border-left-color:var(--green);}
+.concept.oc{background:rgba(255,145,0,.05);border-left-color:var(--orange);}
+.concept-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--cyan);margin-bottom:8px;}
+.concept-title.yt{color:var(--yellow);}
+.concept-title.gt{color:var(--green);}
+.concept-title.ot{color:var(--orange);}
+.concept-body{font-size:14px;color:var(--text);line-height:1.7;}
+.concept-body strong{font-weight:800;}
+
+/* ── STAT BUTTONS ─────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.stat-btn{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .2s;font-family:'Montserrat',sans-serif;}
+.stat-btn:hover{border-color:var(--yellow);}
+.stat-btn.sel-speed{border-color:var(--cyan);background:rgba(0,229,255,.08);}
+.stat-btn.sel-endurance{border-color:var(--yellow);background:rgba(255,214,0,.08);}
+.stat-btn.sel-turning{border-color:var(--orange);background:rgba(255,145,0,.08);}
+.stat-btn.sel-power{border-color:var(--purple);background:rgba(206,147,216,.08);}
+.sb-icon{font-size:30px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;}
+.sb-name{font-size:15px;font-weight:800;}
+.sn-speed{color:var(--cyan);}
+.sn-endurance{color:var(--yellow);}
+.sn-turning{color:var(--orange);}
+.sn-power{color:var(--purple);}
+.sb-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ── DATA ENTRY PAIRS ─────────────────────────── */
+.dp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.dp-title{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.dp-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;}
+.dpn1{background:rgba(0,229,255,.2);color:var(--cyan);}
+.dpn2{background:rgba(255,214,0,.2);color:var(--yellow);}
+.dp-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fld{margin-bottom:2px;}
+.fld-lbl{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+.fld-inp{width:100%;padding:10px 12px;background:var(--card);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;}
+.fld-inp:focus{outline:none;border-color:var(--yellow);}
+.dp-coord{font-size:12px;color:var(--muted);font-weight:700;margin-top:10px;}
+
+/* ── GRAPH ────────────────────────────────────── */
+.graph-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;}
+.graph-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;}
+.graph-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);font-weight:600;}
+.leg-dot{width:10px;height:10px;border-radius:50%;}
+.liveGraph{width:100%;height:300px;display:block;overflow:visible;}
+
+/* ── MATH STEP ────────────────────────────────── */
+.math-step{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:10px;padding:14px;margin:12px 0;}
+.math-step.ys{background:rgba(255,214,0,.04);border-color:rgba(255,214,0,.18);}
+.math-step.gs{background:rgba(0,230,118,.04);border-color:rgba(0,230,118,.18);}
+.math-step.os{background:rgba(255,145,0,.04);border-color:rgba(255,145,0,.18);}
+.ms-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;}
+.math-row{font-size:15px;font-weight:700;line-height:2;display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
+.mr-val{font-size:18px;font-weight:900;}
+.mrc{color:var(--cyan);}
+.mry{color:var(--yellow);}
+.mrg{color:var(--green);}
+.mro{color:var(--orange);}
+.fraction{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;}
+.fn{font-size:14px;font-weight:800;border-bottom:2px solid var(--muted);padding:0 6px 3px;text-align:center;}
+.fd{font-size:14px;font-weight:800;padding:3px 6px 0;text-align:center;}
+
+/* ── ANSWER INPUT ─────────────────────────────── */
+.ans-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.ans-lbl{font-size:15px;font-weight:700;}
+.ans-input{width:100px;padding:10px;background:var(--surface);border:2px solid var(--border);border-radius:8px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:22px;font-weight:900;text-align:center;-moz-appearance:textfield;}
+.ans-input::-webkit-inner-spin-button,.ans-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.ans-input:focus{outline:none;border-color:var(--yellow);}
+.ans-fb{font-size:14px;font-weight:800;min-height:22px;margin-top:6px;}
+.fb-ok{color:var(--green);}
+.fb-err{color:var(--red);}
+.hint-try{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+/* ── LOCKED ───────────────────────────────────── */
+.locked{opacity:.3;pointer-events:none;}
+.locked.open{opacity:1;pointer-events:auto;}
+
+/* ── EQUATION DISPLAY ─────────────────────────── */
+.eq-display{background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(255,214,0,.04));border:2px solid rgba(0,229,255,.25);border-radius:14px;padding:20px;margin:16px 0;text-align:center;}
+.eq-display-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;}
+.eq-big{font-size:28px;font-weight:900;font-family:monospace;}
+.eq-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;}
+.eq-part{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:800;}
+.ep-wins{background:rgba(0,230,118,.12);color:var(--green);}
+.ep-m{background:rgba(255,214,0,.12);color:var(--yellow);}
+.ep-stat{background:rgba(0,229,255,.12);color:var(--cyan);}
+.ep-b{background:rgba(206,147,216,.12);color:var(--purple);}
+
+/* ── SENTENCE FRAME ───────────────────────────── */
+.sentence-frame{background:rgba(42,64,96,.35);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:15px;line-height:2;}
+.sf-fill{color:var(--yellow);font-weight:900;display:inline-block;border-bottom:2px solid var(--yellow);padding:0 4px;min-width:40px;text-align:center;}
+
+/* ── RESIDUAL ROWS ────────────────────────────── */
+.res-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.res-row:last-child{border-bottom:none;}
+.rr-lbl{color:var(--muted);font-weight:600;}
+.rr-val{font-weight:900;font-size:17px;font-family:monospace;}
+.res-interp{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6;font-style:italic;}
+
+/* ── UNIT RATE ────────────────────────────────── */
+.ur-box{background:rgba(255,145,0,.07);border:2px solid rgba(255,145,0,.25);border-radius:12px;padding:16px;text-align:center;margin-top:14px;}
+.ur-num{font-size:34px;font-weight:900;color:var(--orange);}
+.ur-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+
+/* ── REPORT ───────────────────────────────────── */
+.rep-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.ri-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;}
+.ri-val{font-size:19px;font-weight:900;font-family:monospace;}
+.ri-note{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+/* ── BUTTONS ──────────────────────────────────── */
+.btn-main{width:100%;background:var(--yellow);color:#0d1b2a;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;padding:16px;border-radius:12px;border:none;cursor:pointer;margin-top:18px;transition:opacity .15s,transform .1s;}
+.btn-main:hover{opacity:.9;transform:translateY(-1px);}
+.btn-back{width:100%;background:transparent;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;padding:12px;border-radius:12px;border:1px solid var(--border);cursor:pointer;margin-top:8px;transition:all .15s;}
+.btn-back:hover{color:var(--text);border-color:var(--muted);}
+.err-box{display:none;background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.25);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--red);font-weight:700;margin-top:10px;}
+
+hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
+
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.si-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.si-c{background:rgba(0,229,255,.15);color:var(--cyan);}
+.si-y{background:rgba(255,214,0,.15);color:var(--yellow);}
+.si-g{background:rgba(0,230,118,.15);color:var(--green);}
+.si-o{background:rgba(255,145,0,.15);color:var(--orange);}
+.si-text{font-size:15px;font-weight:800;}
+
+/* DISCUSSION PROMPT */
+.discuss-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);line-height:1.5;}
+.discuss-item:last-child{border-bottom:none;}
+.di-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+
+/* VERIFY BLOCK */
+.verify-block{background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:10px;padding:14px;margin-top:12px;}
+.vb-result{font-size:13px;font-weight:700;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ STICKY HEADER ═══════════════════════════════ -->
+<header class="hdr">
+  <div class="hdr-top">
+    <span class="day-badge">Day 13</span>
+    <div class="hdr-words">
+      <div class="hdr-title">Build Your Bot's Equation</div>
+      <div class="hdr-sub">Your data &rarr; your formula &rarr; your predictions</div>
+    </div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  <div class="step-tabs">
+    <button class="stab active" id="stab1" onclick="goSection(1)">
+      <div class="stab-num">1</div><span>Data</span>
+    </button>
+    <button class="stab" id="stab2" onclick="goSection(2)">
+      <div class="stab-num">2</div><span>Rate</span>
+    </button>
+    <button class="stab" id="stab3" onclick="goSection(3)">
+      <div class="stab-num">3</div><span>Equation</span>
+    </button>
+    <button class="stab" id="stab4" onclick="goSection(4)">
+      <div class="stab-num">4</div><span>Test It</span>
+    </button>
+    <button class="stab" id="stab5" onclick="goSection(5)">
+      <div class="stab-num">5</div><span>Report</span>
+    </button>
+  </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1 — CHOOSE STAT + DATA POINTS
+═══════════════════════════════════════════════════ -->
+<section class="sec on" id="sec1">
+  <div class="sec-hd">
+    <div class="sec-step-lbl">Step 1 of 5</div>
+    <div class="sec-title">Pick a stat. Add two match results.</div>
+    <div class="sec-desc">You're going to build a prediction formula for YOUR bot. It uses YOUR real match data. No two teams will get the same equation.</div>
+  </div>
+
+  <!-- PICK STAT -->
+  <div class="card">
+    <div class="step-indicator">
+      <div class="si-num si-c">1</div>
+      <div class="si-text">Which stat do you want to track?</div>
+    </div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Pick the stat you think affects your win % the most.</p>
+    <div class="stat-grid">
+      <div class="stat-btn" id="sbtn-speed" onclick="pickStat('speed')">
+        <div class="sb-icon"><svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+        <rect x="14" y="3" width="12" height="7" rx="2.5" fill="rgba(0,229,255,0.18)" stroke="#00e5ff" stroke-width="1.5"/>
+        <rect x="4" y="9" width="32" height="26" rx="5" fill="rgba(0,229,255,0.08)" stroke="#00e5ff" stroke-width="1.5"/>
+        <line x1="10" y1="22" x2="27" y2="22" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+        <path d="M22 17 L28 22 L22 27" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="10" y1="17" x2="16" y2="17" stroke="#00e5ff" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+        <line x1="10" y1="27" x2="16" y2="27" stroke="#00e5ff" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+      </svg></div>
+        <div class="sb-name sn-speed">Speed</div>
+        <div class="sb-desc">How fast your bot moves</div>
+      </div>
+      <div class="stat-btn" id="sbtn-endurance" onclick="pickStat('endurance')">
+        <div class="sb-icon"><svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+        <rect x="14" y="3" width="12" height="7" rx="2.5" fill="rgba(255,214,0,0.18)" stroke="#ffd600" stroke-width="1.5"/>
+        <rect x="4" y="9" width="32" height="26" rx="5" fill="rgba(255,214,0,0.08)" stroke="#ffd600" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="8" stroke="#ffd600" stroke-width="1.5" stroke-opacity="0.25" fill="none"/>
+        <path d="M20 14 A8 8 0 1 1 12.3 26" stroke="#ffd600" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <circle cx="20" cy="22" r="2.2" fill="#ffd600" opacity="0.85"/>
+      </svg></div>
+        <div class="sb-name sn-endurance">Endurance</div>
+        <div class="sb-desc">How long your bot lasts</div>
+      </div>
+      <div class="stat-btn" id="sbtn-turning" onclick="pickStat('turning')">
+        <div class="sb-icon"><svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+        <rect x="14" y="3" width="12" height="7" rx="2.5" fill="rgba(255,145,0,0.18)" stroke="#ff9100" stroke-width="1.5"/>
+        <rect x="4" y="9" width="32" height="26" rx="5" fill="rgba(255,145,0,0.08)" stroke="#ff9100" stroke-width="1.5"/>
+        <path d="M24 14.5 Q31 22 24 29.5" stroke="#ff9100" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M16 29.5 Q9 22 16 14.5" stroke="#ff9100" stroke-width="1.8" stroke-linecap="round"/>
+        <polygon points="24,14.5 20,14.5 22,11 26,14.5" fill="#ff9100"/>
+        <polygon points="16,29.5 20,29.5 18,33 14,29.5" fill="#ff9100"/>
+        <circle cx="20" cy="22" r="2.5" fill="rgba(255,145,0,0.2)" stroke="#ff9100" stroke-width="1.3"/>
+      </svg></div>
+        <div class="sb-name sn-turning">Turning</div>
+        <div class="sb-desc">How well your bot steers</div>
+      </div>
+      <div class="stat-btn" id="sbtn-power" onclick="pickStat('power')">
+        <div class="sb-icon"><svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+        <rect x="14" y="3" width="12" height="7" rx="2.5" fill="rgba(206,147,216,0.18)" stroke="#ce93d8" stroke-width="1.5"/>
+        <rect x="4" y="9" width="32" height="26" rx="5" fill="rgba(206,147,216,0.08)" stroke="#ce93d8" stroke-width="1.5"/>
+        <path d="M22 12 L16 22 L20.5 22 L18 32 L24 20 L19.5 20 Z" fill="#ce93d8" opacity="0.9"/>
+      </svg></div>
+        <div class="sb-name sn-power">Power</div>
+        <div class="sb-desc">How strong your bot is</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT: WHAT IS A DATA POINT -->
+  <div class="concept locked" id="concept-dp">
+    <div class="concept-title">&#128161; What is a data point?</div>
+    <!-- Illustrated SVG -->
+    <svg viewBox="0 0 240 130" style="display:block;width:100%;max-width:240px;margin:10px auto 12px;">
+      <!-- Grid lines -->
+      <line x1="44" y1="20" x2="44" y2="100" stroke="#2a4060" stroke-width="1"/>
+      <line x1="44" y1="100" x2="210" y2="100" stroke="#2a4060" stroke-width="1"/>
+      <!-- Light grid -->
+      <line x1="44" y1="60" x2="210" y2="60" stroke="#1a2d45" stroke-width="1"/>
+      <line x1="127" y1="20" x2="127" y2="100" stroke="#1a2d45" stroke-width="1"/>
+      <!-- Axis labels -->
+      <text x="127" y="116" text-anchor="middle" fill="#7a9cc0" font-size="10" font-family="Montserrat,sans-serif" font-weight="700">Stat</text>
+      <text x="10" y="64" text-anchor="middle" fill="#7a9cc0" font-size="12" font-family="Montserrat,sans-serif" font-weight="700" transform="rotate(-90 10 64)">Wins</text>
+      <!-- Tick values -->
+      <text x="44" y="112" text-anchor="middle" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">0</text>
+      <text x="127" y="112" text-anchor="middle" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">8</text>
+      <text x="210" y="112" text-anchor="middle" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">16</text>
+      <text x="40" y="103" text-anchor="end" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">0</text>
+      <text x="40" y="63" text-anchor="end" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">5</text>
+      <text x="40" y="23" text-anchor="end" fill="#7a9cc0" font-size="9" font-family="Montserrat,sans-serif">10</text>
+      <!-- Dashed reference lines to dot -->
+      <line x1="127" y1="62" x2="127" y2="100" stroke="#00e5ff" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+      <line x1="44" y1="62" x2="127" y2="62" stroke="#00e5ff" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+      <!-- The data point dot -->
+      <circle cx="127" cy="62" r="7" fill="#00e5ff" opacity="0.9"/>
+      <!-- Label -->
+      <rect x="132" y="44" width="72" height="22" rx="4" fill="#1a2d45" stroke="#2a4060" stroke-width="1"/>
+      <text x="168" y="59" text-anchor="middle" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">(8, 5)</text>
+      <!-- Axis indicator labels -->
+      <text x="127" y="125" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">Stat = 8</text>
+      <text x="20" y="62" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">Wins</text>
+      <text x="20" y="73" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">= 5</text>
+    </svg>
+    <div class="concept-body">
+      A <strong>data point</strong> = one match result. It has two numbers: your <strong>stat</strong> and your <strong>win %</strong>.<br><br>
+      Example: your team had <strong>8 Speed points</strong> and a <strong>60% win rate</strong>.<br>
+      That data point is written as <strong>(8, 60)</strong>.<br>
+      The stat goes first. Win % goes second.
+    </div>
+  </div>
+
+  <!-- DATA POINT 1 -->
+  <div class="dp-card locked" id="dpCard1">
+    <div class="dp-title">
+      <div class="dp-num dpn1">1</div>
+      Point 1 &mdash; <span id="dp1-season-lbl">Season 1</span>
+    </div>
+    <div class="dp-fields">
+      <div class="fld">
+        <div class="fld-lbl" id="dp1-stat-lbl">Stat value</div>
+        <input class="fld-inp" id="dp1x" type="number" min="1" max="18" placeholder="?" oninput="updateGraph()">
+      </div>
+      <div class="fld">
+        <div class="fld-lbl">Win % (0–90)</div>
+        <input class="fld-inp" id="dp1y" type="number" min="0" max="100" placeholder="?" oninput="updateGraph()">
+      </div>
+    </div>
+    <div class="dp-coord" id="dp1-coord">Your Point 1: ( &mdash; , &mdash; )</div>
+  </div>
+
+  <!-- DATA POINT 2 -->
+  <div class="dp-card locked" id="dpCard2">
+    <div class="dp-title">
+      <div class="dp-num dpn2">2</div>
+      Point 2 &mdash; <span id="dp2-season-lbl">Season 2</span>
+    </div>
+    <div class="dp-fields">
+      <div class="fld">
+        <div class="fld-lbl" id="dp2-stat-lbl">Stat value</div>
+        <input class="fld-inp" id="dp2x" type="number" min="1" max="18" placeholder="?" oninput="updateGraph()">
+      </div>
+      <div class="fld">
+        <div class="fld-lbl">Win % (0–90)</div>
+        <input class="fld-inp" id="dp2y" type="number" min="0" max="100" placeholder="?" oninput="updateGraph()">
+      </div>
+    </div>
+    <div class="dp-coord" id="dp2-coord">Your Point 2: ( &mdash; , &mdash; )</div>
+  </div>
+
+  <!-- LIVE GRAPH (shows after both points entered) -->
+  <div class="graph-wrap locked" id="graphWrap1">
+    <div class="graph-lbl">&#128202; Your two results on a graph</div>
+    <svg class="liveGraph" id="graph1" viewBox="0 0 500 300"></svg>
+    <div class="graph-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div>Point 1 (Season 1)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Point 2 (Season 2)</div>
+    </div>
+  </div>
+
+  <div id="same-x-err" class="err-box">&#9888; Your two stat values are the same. You need two <em>different</em> values to build a line. Change one of them.</div>
+  <div id="sec1-err" class="err-box">Fill in all four numbers first.</div>
+  <button class="btn-main" onclick="goToRate()">Next: Find the Rate of Change &rarr;</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2 — RATE OF CHANGE + Y-INTERCEPT
+═══════════════════════════════════════════════════ -->
+<section class="sec" id="sec2">
+  <div class="sec-hd">
+    <div class="sec-step-lbl">Step 2 of 5</div>
+    <div class="sec-title">How much do wins go up?</div>
+    <div class="sec-desc">For every 1 point of <strong id="stat-name-s2">stat</strong> you add, how much does your win % go up? That number is the <strong style="color:var(--yellow)">rate of change</strong>.</div>
+  </div>
+
+  <!-- LIVE GRAPH with two points -->
+  <div class="graph-wrap">
+    <div class="graph-lbl">&#128202; Your match data</div>
+    <svg class="liveGraph" id="graph2" viewBox="0 0 500 300"></svg>
+    <div class="graph-legend" id="graph2-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div>Point 1</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Point 2</div>
+    </div>
+  </div>
+
+  <!-- CONCEPT: RATE OF CHANGE -->
+  <div class="concept">
+    <div class="concept-title">&#128200; What is rate of change?</div>
+    <!-- Static SVG illustration -->
+    <svg viewBox="0 0 260 150" style="display:block;width:100%;max-width:260px;margin:10px auto 12px;">
+      <!-- Grid lines -->
+      <line x1="44" y1="20" x2="44" y2="115" stroke="#2a4060" stroke-width="1.2"/>
+      <line x1="44" y1="115" x2="225" y2="115" stroke="#2a4060" stroke-width="1.2"/>
+      <line x1="44" y1="67" x2="225" y2="67" stroke="#1a2d45" stroke-width="1"/>
+      <line x1="134" y1="20" x2="134" y2="115" stroke="#1a2d45" stroke-width="1"/>
+      <!-- Axis labels -->
+      <text x="134" y="132" text-anchor="middle" fill="#7a9cc0" font-size="10" font-family="Montserrat,sans-serif" font-weight="700">Stat</text>
+      <text x="12" y="72" fill="#7a9cc0" font-size="12" font-family="Montserrat,sans-serif" font-weight="700" transform="rotate(-90 12 72)">Wins</text>
+      <!-- P1 at stat=4, wins=3 → SVG (98, 91)  ; P2 at stat=9, wins=8 → SVG (198, 43) -->
+      <!-- Line through P1 P2 extended -->
+      <line x1="50" y1="105" x2="240" y2="19" stroke="#00e5ff" stroke-width="1.5" stroke-opacity="0.35" stroke-dasharray="4 3"/>
+      <!-- Rise/run triangle -->
+      <!-- Horizontal leg: (98,91) to (198,91) = run -->
+      <line x1="98" y1="91" x2="198" y2="91" stroke="#ffd600" stroke-width="2" stroke-dasharray="5 3"/>
+      <!-- Vertical leg: (198,91) to (198,43) = rise -->
+      <line x1="198" y1="91" x2="198" y2="43" stroke="#00e676" stroke-width="2.5"/>
+      <!-- Arrow tip for rise -->
+      <polygon points="198,43 194,55 202,55" fill="#00e676"/>
+      <!-- Arrow tip for run -->
+      <polygon points="198,91 186,87 186,95" fill="#ffd600"/>
+      <!-- Point 1 -->
+      <circle cx="98" cy="91" r="6" fill="#00e5ff"/>
+      <text x="82" y="88" fill="#00e5ff" font-size="10" font-family="Montserrat,sans-serif" font-weight="800">P1</text>
+      <!-- Point 2 -->
+      <circle cx="198" cy="43" r="6" fill="#ffd600"/>
+      <text x="204" y="40" fill="#ffd600" font-size="10" font-family="Montserrat,sans-serif" font-weight="800">P2</text>
+      <!-- Labels for rise and run -->
+      <text x="148" y="108" text-anchor="middle" fill="#ffd600" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">stat change (run)</text>
+      <text x="222" y="72" fill="#00e676" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">wins</text>
+      <text x="222" y="84" fill="#00e676" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">change</text>
+      <text x="222" y="96" fill="#00e676" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">(rise)</text>
+    </svg>
+    <div class="concept-body">
+      <strong style="color:var(--yellow)">Rate of change</strong> = how much your win % goes up for each stat point you add.<br><br>
+      Formula: <strong>rate of change = win % change &divide; stat change</strong><br><br>
+      Math calls this the <strong style="color:var(--yellow)">slope</strong>. We use the letter <strong style="color:var(--yellow)">m</strong>.
+    </div>
+  </div>
+
+  <!-- STEP: CALCULATE SLOPE -->
+  <div class="card">
+    <div class="step-indicator">
+      <div class="si-num si-y">1</div>
+      <div class="si-text">Calculate the rate of change</div>
+    </div>
+
+    <div class="math-step">
+      <div class="ms-lbl">Step A &mdash; Find the win % change</div>
+      <div class="math-row">
+        Win % changed from <span class="mr-val mrg" id="roc-y1">?</span> to <span class="mr-val mrg" id="roc-y2">?</span>
+      </div>
+      <div class="math-row" style="margin-top:6px;">
+        Change = <span class="mr-val mrg" id="roc-y2b">?</span> &minus; <span class="mr-val mrg" id="roc-y1b">?</span> = <strong class="mr-val" style="color:var(--green);font-size:20px;" id="roc-dy">?</strong>
+      </div>
+    </div>
+
+    <div class="math-step ys">
+      <div class="ms-lbl">Step B &mdash; Find the stat change</div>
+      <div class="math-row">
+        Stat changed from <span class="mr-val mry" id="roc-x1">?</span> to <span class="mr-val mry" id="roc-x2">?</span>
+      </div>
+      <div class="math-row" style="margin-top:6px;">
+        Change = <span class="mr-val mry" id="roc-x2b">?</span> &minus; <span class="mr-val mry" id="roc-x1b">?</span> = <strong class="mr-val" style="color:var(--yellow);font-size:20px;" id="roc-dx">?</strong>
+      </div>
+    </div>
+
+    <div class="math-step">
+      <div class="ms-lbl">Step C &mdash; Divide: win % change &divide; stat change</div>
+      <div class="math-row">
+        Rate of change (m) =
+        <span class="fraction">
+          <span class="fn" id="frac-top">?</span>
+          <span class="fd" id="frac-bot">?</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="ans-group">
+      <span class="ans-lbl">m =</span>
+      <input class="ans-input" id="slope-in" type="number" step="0.01" placeholder="?" oninput="checkSlope()">
+    </div>
+    <div class="ans-fb" id="slope-fb"></div>
+    <div class="hint-try" id="slope-hint"></div>
+  </div>
+
+  <!-- Y-INTERCEPT — LOCKED until slope confirmed -->
+  <div class="locked" id="yint-section">
+
+    <!-- CONCEPT: Y-INTERCEPT -->
+    <div class="concept yc">
+      <div class="concept-title yt">&#128250; What is the y-intercept (b)?</div>
+      <!-- Static SVG illustration -->
+      <svg viewBox="0 0 230 130" style="display:block;width:100%;max-width:230px;margin:10px auto 12px;">
+        <!-- Grid -->
+        <line x1="44" y1="20" x2="44" y2="105" stroke="#2a4060" stroke-width="1.2"/>
+        <line x1="44" y1="105" x2="200" y2="105" stroke="#2a4060" stroke-width="1.2"/>
+        <!-- Line: goes through y-axis -->
+        <line x1="44" y1="58" x2="200" y2="30" stroke="#00e5ff" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="5 3"/>
+        <!-- Y-intercept dot (on y-axis) -->
+        <circle cx="44" cy="58" r="8" fill="none" stroke="#ffd600" stroke-width="3"/>
+        <circle cx="44" cy="58" r="4" fill="#ffd600"/>
+        <!-- Arrow pointing to it -->
+        <line x1="80" y1="85" x2="52" y2="62" stroke="#ffd600" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Label -->
+        <text x="82" y="83" fill="#ffd600" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">b = y-intercept</text>
+        <text x="82" y="96" fill="#7a9cc0" font-size="10" font-family="Montserrat,sans-serif">line position (b)</text>
+        <!-- Axis labels -->
+        <text x="122" y="120" text-anchor="middle" fill="#7a9cc0" font-size="10" font-family="Montserrat,sans-serif" font-weight="700">Stat</text>
+        <text x="12" y="65" fill="#7a9cc0" font-size="12" font-family="Montserrat,sans-serif" font-weight="700" transform="rotate(-90 12 65)">Wins</text>
+        <!-- Stat = 0 label -->
+        <text x="44" y="118" text-anchor="middle" fill="#ffd600" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">stat here = 0</text>
+      </svg>
+      <div class="concept-body">
+        The <strong style="color:var(--yellow)">y-intercept (b)</strong> is a number that positions your line on the graph.<br><br>
+        No bot ever has Speed = 0 in a real match, so <strong>b doesn't describe a real game situation</strong>. It's just the math working behind the scenes.<br><br>
+        We calculate it with: <strong>b = y &minus; m &times; x</strong><br>
+        Use your <strong>Point 1 numbers</strong>.
+      </div>
+    </div>
+
+    <!-- STEP: CALCULATE Y-INTERCEPT -->
+    <div class="card">
+      <div class="step-indicator">
+        <div class="si-num si-y">2</div>
+        <div class="si-text">Calculate the y-intercept (b)</div>
+      </div>
+
+      <div class="math-step ys">
+        <div class="ms-lbl">Plug Point 1 into the formula: b = y &minus; (m &times; x)</div>
+        <div class="math-row" id="yint-formula-display" style="flex-wrap:wrap;gap:6px;font-size:14px;">
+          b = <span class="mr-val mrg" id="yi-y1">?</span>
+          &minus; ( <span class="mr-val mry" id="yi-m">?</span>
+          &times; <span class="mr-val mrc" id="yi-x1">?</span> )
+          = <span class="mr-val mry" id="yi-y1b">?</span>
+          &minus; <span class="mr-val mro" id="yi-mx1">?</span>
+        </div>
+      </div>
+
+      <div class="ans-group">
+        <span class="ans-lbl">b =</span>
+        <input class="ans-input" id="yint-in" type="number" step="0.01" placeholder="?" oninput="checkYint()">
+      </div>
+      <div class="ans-fb" id="yint-fb"></div>
+    </div>
+  </div>
+
+  <div id="sec2-err" class="err-box">Confirm both answers before moving on.</div>
+  <button class="btn-main" onclick="goToEquation()">Next: See Your Equation &rarr;</button>
+  <button class="btn-back" onclick="goSection(1)">&larr; Back</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3 — EQUATION
+═══════════════════════════════════════════════════ -->
+<section class="sec" id="sec3">
+  <div class="sec-hd">
+    <div class="sec-step-lbl">Step 3 of 5</div>
+    <div class="sec-title">This is your bot's formula.</div>
+    <div class="sec-desc">It uses your real match data. No other team has this equation.</div>
+  </div>
+
+  <!-- LIVE GRAPH with line -->
+  <div class="graph-wrap">
+    <div class="graph-lbl">&#128202; Your equation as a line</div>
+    <svg class="liveGraph" id="graph3" viewBox="0 0 500 300"></svg>
+    <div class="graph-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div>Point 1</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Point 2</div>
+      <div class="leg"><div style="width:20px;height:2px;background:var(--cyan);opacity:.5;margin-top:4px;border-top:2px dashed var(--cyan)"></div>Your equation line</div>
+    </div>
+  </div>
+
+  <!-- EQUATION DISPLAY -->
+  <div class="eq-display">
+    <div class="eq-display-lbl">Your Team's Equation</div>
+    <div class="eq-big" id="eq-big-text">y = &mdash;x + &mdash;</div>
+    <div class="eq-legend">
+      <div class="eq-part ep-wins">y = Win %</div>
+      <div class="eq-part ep-m" id="eq-part-m">m = &mdash;</div>
+      <div class="eq-part ep-stat" id="eq-part-stat">x = Stat</div>
+      <div class="eq-part ep-b" id="eq-part-b">b = anchor</div>
+    </div>
+  </div>
+
+  <!-- WHAT EACH PART MEANS -->
+  <div class="card">
+    <div class="card-lbl clbl-m">What each piece means</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div class="eq-part ep-wins" style="flex-shrink:0">y</div>
+        <div style="font-size:14px;line-height:1.6;color:var(--text)"><strong style="color:var(--green)">Win %</strong> &mdash; the percentage you want to predict.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div class="eq-part ep-m" style="flex-shrink:0">m</div>
+        <div style="font-size:14px;line-height:1.6;color:var(--text)"><strong style="color:var(--yellow)">Rate of change</strong> &mdash; how much win % changes per 1 stat point. Your value: <strong id="m-explain" style="color:var(--yellow)">—</strong></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div class="eq-part ep-stat" style="flex-shrink:0">x</div>
+        <div style="font-size:14px;line-height:1.6;color:var(--text)"><strong style="color:var(--cyan)" id="stat-name-x">Stat</strong> &mdash; the number you plug in to make a prediction.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div class="eq-part ep-b" style="flex-shrink:0">b</div>
+        <div style="font-size:14px;line-height:1.6;color:var(--text)"><strong style="color:var(--purple)">y-intercept (b)</strong> &mdash; positions the line on the graph. Your bot never has stat = 0, so this number doesn't describe a real match. It's the math anchor. Your value: <strong id="b-explain" style="color:var(--purple)">—</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT YOUR SLOPE MEANS (sentence frame) -->
+  <div class="card">
+    <div class="card-lbl clbl-y">What your rate of change means</div>
+    <div class="sentence-frame">
+      "For every <strong style="color:var(--cyan)">1 point</strong> I add to
+      <span class="sf-fill" id="interp-stat">stat</span>,
+      my predicted win % changes by
+      <span class="sf-fill" id="interp-slope">m</span> wins."
+    </div>
+    <div id="slope-direction" style="margin-top:12px;font-size:14px;font-weight:700;"></div>
+  </div>
+
+  <!-- VERIFY WITH POINT 1 -->
+  <div class="card">
+    <div class="card-lbl clbl-g">&#10003; Quick check: plug in your Point 1</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:10px;line-height:1.5;">If the equation is right, it should predict win % close to your Point 1 wins.</p>
+    <div class="verify-block">
+      <div class="math-row" id="verify-formula" style="font-size:14px;">y = &mdash;</div>
+      <div class="vb-result" id="verify-result"></div>
+    </div>
+  </div>
+
+  <button class="btn-main" onclick="goSection(4)">Next: Test Your Equation &rarr;</button>
+  <button class="btn-back" onclick="goSection(2)">&larr; Back</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4 — TEST IT
+═══════════════════════════════════════════════════ -->
+<section class="sec" id="sec4">
+  <div class="sec-hd">
+    <div class="sec-step-lbl">Step 4 of 5</div>
+    <div class="sec-title">How accurate is your equation?</div>
+    <div class="sec-desc">Use a match you haven't used yet. Compare what your equation predicted vs what actually happened.</div>
+  </div>
+
+  <!-- CONCEPT: RESIDUAL -->
+  <div class="concept oc">
+    <div class="concept-title ot"><svg viewBox="0 0 40 40" fill="none" width="22" height="22" style="display:inline-block;vertical-align:middle;margin-right:6px;">
+        <rect x="14" y="3" width="12" height="7" rx="2.5" fill="rgba(255,145,0,0.18)" stroke="#ff9100" stroke-width="1.5"/>
+        <rect x="4" y="9" width="32" height="26" rx="5" fill="rgba(255,145,0,0.08)" stroke="#ff9100" stroke-width="1.5"/>
+        <line x1="12" y1="15" x2="28" y2="15" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="12" y1="29" x2="28" y2="29" stroke="#ff9100" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="20" y1="17" x2="20" y2="27" stroke="#ff9100" stroke-width="1.6" stroke-dasharray="2 2"/>
+        <polygon points="20,15 17.5,20 22.5,20" fill="#ff9100"/>
+        <polygon points="20,29 17.5,24 22.5,24" fill="#ff9100"/>
+      </svg>What is a residual?</div>
+    <svg viewBox="0 0 420 210" style="display:block;width:100%;margin:12px auto 14px;">
+      <!-- Background -->
+      <rect x="0" y="0" width="420" height="210" rx="8" fill="#132033"/>
+      <!-- Grid lines -->
+      <line x1="60" y1="20" x2="60" y2="160" stroke="#2a4060" stroke-width="1.3"/>
+      <line x1="60" y1="160" x2="390" y2="160" stroke="#2a4060" stroke-width="1.3"/>
+      <line x1="60" y1="90" x2="390" y2="90" stroke="#1a2d45" stroke-width="1"/>
+      <line x1="225" y1="20" x2="225" y2="160" stroke="#1a2d45" stroke-width="1"/>
+      <!-- Equation line (predicted) -->
+      <line x1="70" y1="150" x2="380" y2="40" stroke="#00e5ff" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="8 4"/>
+      <!-- Predicted point on line at x=225 → y≈95 -->
+      <circle cx="225" cy="95" r="8" fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-dasharray="4 2" opacity="0.85"/>
+      <!-- Actual point ABOVE the line -->
+      <circle cx="225" cy="52" r="10" fill="#ff9100"/>
+      <!-- Residual dashed line from actual down to predicted -->
+      <line x1="225" y1="62" x2="225" y2="87" stroke="#ff9100" stroke-width="2.5" stroke-dasharray="5 3"/>
+      <!-- Arrowhead pointing to predicted -->
+      <polygon points="225,95 220,82 230,82" fill="#ff9100" opacity="0.75"/>
+      <!-- Label: Actual -->
+      <rect x="242" y="40" width="120" height="24" rx="4" fill="#1a2d45" stroke="#ff9100" stroke-width="1.2"/>
+      <text x="302" y="56" text-anchor="middle" fill="#ff9100" font-size="13" font-family="Montserrat,sans-serif" font-weight="800">Actual: 8 win %</text>
+      <!-- Label: Predicted -->
+      <rect x="242" y="84" width="132" height="24" rx="4" fill="#1a2d45" stroke="#00e5ff" stroke-width="1.2"/>
+      <text x="308" y="100" text-anchor="middle" fill="#00e5ff" font-size="13" font-family="Montserrat,sans-serif" font-weight="700">Predicted: 6 win %</text>
+      <!-- Residual callout box -->
+      <rect x="74" y="62" width="126" height="28" rx="5" fill="#1a2d45" stroke="#ff9100" stroke-width="1.5"/>
+      <text x="137" y="81" text-anchor="middle" fill="#ff9100" font-size="14" font-family="Montserrat,sans-serif" font-weight="900">residual = 2</text>
+      <!-- Leader line from callout to gap -->
+      <line x1="200" y1="76" x2="222" y2="76" stroke="#ff9100" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+      <!-- Axis labels -->
+      <text x="225" y="195" text-anchor="middle" fill="#7a9cc0" font-size="13" font-family="Montserrat,sans-serif" font-weight="700">Stat</text>
+      <text x="18" y="93" text-anchor="middle" fill="#7a9cc0" font-size="13" font-family="Montserrat,sans-serif" font-weight="700" transform="rotate(-90 18 93)">Win %</text>
+    </svg>
+    <div class="concept-body">
+      <strong style="color:var(--orange)">Residual = predicted win % &minus; actual win %</strong><br><br>
+      &bull; Residual = 0: your equation was <strong>perfect</strong>!<br>
+      &bull; Positive residual: your equation <strong>over-predicted</strong> (your win % was lower than expected).<br>
+      &bull; Negative residual: your equation <strong>under-predicted</strong> (you did better than expected!)
+    </div>
+  </div>
+
+  <!-- EQUATION REMINDER -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;">Your equation</div>
+    <div style="font-size:20px;font-weight:900;font-family:monospace;color:var(--cyan);" id="eq-reminder">y = &mdash;</div>
+  </div>
+
+  <!-- TEST MATCH INPUT -->
+  <div class="card">
+    <div class="step-indicator">
+      <div class="si-num si-o">1</div>
+      <div class="si-text">Pick one test match. Enter those numbers.</div>
+    </div>
+    <div class="dp-fields">
+      <div class="fld">
+        <div class="fld-lbl" id="test-stat-lbl">Stat value</div>
+        <input class="fld-inp" id="test-x" type="number" min="1" max="18" placeholder="?" oninput="updateResidual()">
+      </div>
+      <div class="fld">
+        <div class="fld-lbl">Actual win % (0–100)</div>
+        <input class="fld-inp" id="test-y" type="number" min="0" max="100" placeholder="?" oninput="updateResidual()">
+      </div>
+    </div>
+
+    <div class="res-block" id="residualBlock" style="display:none;">
+      <div class="res-row">
+        <span class="rr-lbl">Predicted win % (your equation)</span>
+        <span class="rr-val" id="rb-predicted" style="color:var(--cyan);">—</span>
+      </div>
+      <div class="res-row">
+        <span class="rr-lbl">Actual win %</span>
+        <span class="rr-val" id="rb-actual">—</span>
+      </div>
+      <div class="res-row" style="border-top:2px solid var(--border);padding-top:10px;">
+        <span class="rr-lbl" style="font-weight:800;color:var(--text);">Residual (predicted &minus; actual)</span>
+        <span class="rr-val" id="rb-residual" style="color:var(--orange);font-size:22px;">—</span>
+      </div>
+      <div class="res-interp" id="rb-interp"></div>
+    </div>
+  </div>
+
+  <!-- LIVE GRAPH with residual -->
+  <div class="graph-wrap" id="graphWrap4" style="display:none;">
+    <div class="graph-lbl">&#128202; Your equation line + test result</div>
+    <svg class="liveGraph" id="graph4" viewBox="0 0 500 300"></svg>
+    <div class="graph-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div>Data points</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--orange)"></div>Test match (actual)</div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <!-- UNIT RATE -->
+  <div class="card">
+    <div class="step-indicator">
+      <div class="si-num si-o">2</div>
+      <div class="si-text">Win % per Speed point &mdash; unit rate</div>
+    </div>
+    <div class="concept oc" style="margin-bottom:14px;">
+      <div class="concept-title ot">&#128270; What is a unit rate?</div>
+      <div class="concept-body">
+        A <strong style="color:var(--orange)">unit rate</strong> tells you what you get for <strong>exactly 1</strong> of something.<br><br>
+        Here: how much win % did you get for <strong>each Speed point</strong> in Season 1?<br>
+        Formula: <strong>Win % &divide; Speed stat = win % per Speed point</strong>
+      </div>
+    </div>
+    <div class="dp-fields">
+      <div class="fld">
+        <div class="fld-lbl">Season 1 win %</div>
+        <input class="fld-inp" id="s1-wins" type="number" min="0" max="100" placeholder="?" oninput="updateUnitRate()">
+      </div>
+      <div class="fld">
+        <div class="fld-lbl">Season 1 Speed stat</div>
+        <input class="fld-inp" id="s1-speed" type="number" min="1" max="18" placeholder="?" oninput="updateUnitRate()">
+      </div>
+    </div>
+    <div class="ur-box" id="urBox" style="display:none;">
+      <div class="ur-num" id="ur-num">—</div>
+      <div class="ur-lbl" id="ur-lbl">win % per Speed point</div>
+    </div>
+    <div id="ur-interp" style="display:none;font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6;"></div>
+  </div>
+
+  <div id="sec4-err" class="err-box">Fill in the test match and unit rate before continuing.</div>
+  <button class="btn-main" onclick="goToReport()">Next: Class Report &rarr;</button>
+  <button class="btn-back" onclick="goSection(3)">&larr; Back</button>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 5 — REPORT
+═══════════════════════════════════════════════════ -->
+<section class="sec" id="sec5">
+  <div class="sec-hd">
+    <div class="sec-step-lbl">Step 5 of 5</div>
+    <div class="sec-title">Share with the class.</div>
+    <div class="sec-desc">Read your report card out loud. Every team will have different numbers.</div>
+  </div>
+
+  <!-- REPORT CARD -->
+  <div style="background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(255,214,0,.03));border:2px solid rgba(0,229,255,.2);border-radius:14px;padding:18px;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:14px;">&#127942; Your Team's Report Card</div>
+    <div class="rep-item">
+      <div class="ri-lbl">Your Equation</div>
+      <div class="ri-val" id="rep-eq">—</div>
+      <div class="ri-note" id="rep-eq-words">—</div>
+    </div>
+    <div class="rep-item">
+      <div class="ri-lbl">Rate of Change (Slope)</div>
+      <div class="ri-val" id="rep-slope" style="color:var(--yellow)">—</div>
+      <div class="ri-note" id="rep-slope-note">—</div>
+    </div>
+    <div class="rep-item">
+      <div class="ri-lbl">y-Intercept</div>
+      <div class="ri-val" id="rep-b" style="color:var(--purple)">—</div>
+      <div class="ri-note" id="rep-b-note">—</div>
+    </div>
+    <div class="rep-item">
+      <div class="ri-lbl">Test Residual</div>
+      <div class="ri-val" id="rep-residual" style="color:var(--orange)">—</div>
+      <div class="ri-note" id="rep-residual-note">—</div>
+    </div>
+    <div class="rep-item" style="border:none;margin-bottom:0;">
+      <div class="ri-lbl">Win % Per Speed Point (Unit Rate)</div>
+      <div class="ri-val" id="rep-ur" style="color:var(--orange)">—</div>
+      <div class="ri-note" id="rep-ur-note">—</div>
+    </div>
+  </div>
+
+  <!-- CLASS DISCUSSION PROMPTS -->
+  <div class="card">
+    <div class="card-lbl clbl-m">Listen for these things when other teams share</div>
+    <div style="display:flex;flex-direction:column;">
+      <div class="discuss-item">
+        <div class="di-dot" style="background:var(--cyan)"></div>
+        <span>Which team has the <strong style="color:var(--cyan)">steepest slope</strong>? Their stat has the biggest effect on wins.</span>
+      </div>
+      <div class="discuss-item">
+        <div class="di-dot" style="background:var(--yellow)"></div>
+        <span>Which team has the <strong style="color:var(--yellow)">smallest residual</strong>? Their equation is the most accurate.</span>
+      </div>
+      <div class="discuss-item">
+        <div class="di-dot" style="background:var(--orange)"></div>
+        <span><strong style="color:var(--orange)">Compare unit rates.</strong> If two teams had the same Speed, who got a higher win %? Why might that be?</span>
+      </div>
+      <div class="discuss-item">
+        <div class="di-dot" style="background:var(--green)"></div>
+        <span>Did two teams use the <strong style="color:var(--green)">same stat</strong> but get <strong style="color:var(--green)">different slopes</strong>? What does that tell you?</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-back" onclick="goSection(4)" style="margin-top:4px;">&larr; Back</button>
+</section>
+
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────
+let selectedStat = null;
+let slope = null;
+let yInt = null;
+let slopeOK = false;
+let yintOK = false;
+let testResidual = null;
+let unitRate = null;
+
+const STAT_LABELS = {speed:'Speed', endurance:'Endurance', turning:'Turning', power:'Power'};
+const STAT_COLORS = {speed:'#00e5ff', endurance:'#ffd600', turning:'#ff9100', power:'#ce93d8'};
+
+function r2(n){ return Math.round(n*100)/100; }
+function gv(id){ return parseFloat(document.getElementById(id).value); }
+
+// ── NAVIGATION ───────────────────────────────────────────────────────
+function goSection(n){
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.getElementById('sec'+n).classList.add('on');
+  document.querySelectorAll('.stab').forEach((t,i) => {
+    t.classList.remove('active','done');
+    if(i+1===n) t.classList.add('active');
+    if(i+1<n) t.classList.add('done');
+  });
+  document.getElementById('progFill').style.width = [0,25,50,75,100][n-1]+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── STAT SELECTION ───────────────────────────────────────────────────
+function pickStat(stat){
+  selectedStat = stat;
+  document.querySelectorAll('.stat-btn').forEach(b => b.className = 'stat-btn');
+  document.getElementById('sbtn-'+stat).classList.add('sel-'+stat);
+
+  // Unlock concept + data entry
+  document.getElementById('concept-dp').classList.remove('locked');
+  document.getElementById('dpCard1').classList.remove('locked');
+  document.getElementById('dpCard2').classList.remove('locked');
+
+  // Update labels
+  const lbl = STAT_LABELS[stat];
+  document.getElementById('dp1-stat-lbl').textContent = lbl+' value (Season 1)';
+  document.getElementById('dp2-stat-lbl').textContent = lbl+' value (Season 2)';
+  document.getElementById('stat-name-s2').textContent = lbl;
+  document.getElementById('stat-name-x').textContent = lbl;
+  document.getElementById('test-stat-lbl').textContent = lbl+' value';
+
+  updateGraph();
+}
+
+// ── UPDATE COORDINATES + GRAPH ───────────────────────────────────────
+function updateGraph(){
+  const x1=gv('dp1x'), y1=gv('dp1y'), x2=gv('dp2x'), y2=gv('dp2y');
+  const lbl = selectedStat ? STAT_LABELS[selectedStat] : 'Stat';
+
+  document.getElementById('dp1-coord').innerHTML =
+    (!isNaN(x1)&&!isNaN(y1)) ? '<strong style="color:var(--cyan)">Your Point 1: ('+x1+', '+y1+')</strong>' : 'Your Point 1: ( &mdash; , &mdash; )';
+  document.getElementById('dp2-coord').innerHTML =
+    (!isNaN(x2)&&!isNaN(y2)) ? '<strong style="color:var(--yellow)">Your Point 2: ('+x2+', '+y2+')</strong>' : 'Your Point 2: ( &mdash; , &mdash; )';
+
+  const sameX = !isNaN(x1)&&!isNaN(x2)&&x1===x2;
+  document.getElementById('same-x-err').style.display = sameX ? 'block' : 'none';
+
+  const bothReady = !isNaN(x1)&&!isNaN(y1)&&!isNaN(x2)&&!isNaN(y2)&&!sameX;
+  const gw = document.getElementById('graphWrap1');
+  if(bothReady){
+    gw.classList.remove('locked');
+    renderGraph('graph1', {p1:{x:x1,y:y1}, p2:{x:x2,y:y2}, statName:STAT_LABELS[selectedStat]||'Stat'});
+  } else {
+    gw.classList.add('locked');
+  }
+}
+
+// ── GRAPH RENDERER ───────────────────────────────────────────────────
+function renderGraph(svgId, opts){
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  const {p1=null, p2=null, showLine=false, m=null, b=null,
+    testPt=null, showRiseRun=false, statName='Stat'} = opts;
+
+  // Collect all points for auto-scale
+  const allX=[0], allY=[0];
+  if(p1){allX.push(p1.x);allY.push(p1.y);}
+  if(p2){allX.push(p2.x);allY.push(p2.y);}
+  if(testPt){allX.push(testPt.x);allY.push(testPt.y);}
+  if(showLine && m!==null && b!==null){
+    // include predicted y values
+    allX.forEach(x => allY.push(r2(m*x+b)));
+  }
+
+  const xMax = Math.max(...allX)*1.35 + 3;
+  const yMax = Math.max(...allY.filter(v=>v>=0))*1.35 + 2;
+  const xMin=0, yMin=0;
+
+  // Layout
+  const ML=54,MR=20,MT=20,MB=48;
+  const PW=500-ML-MR, PH=300-MT-MB;
+
+  function sx(x){ return ML + (x-xMin)/(xMax-xMin)*PW; }
+  function sy(y){ return MT + PH - Math.max(0,(y-yMin)/(yMax-yMin)*PH); }
+
+  // Nice ticks helper
+  function niceTicks(min,max,n){
+    const range=max-min, step=Math.pow(10,Math.floor(Math.log10(range/n)));
+    const nSteps=[1,2,5].map(s=>s*step);
+    const s=nSteps.find(s=>range/s<=n)||nSteps[nSteps.length-1];
+    const ticks=[];
+    for(let v=Math.ceil(min/s)*s; v<=max; v=r2(v+s)) ticks.push(r2(v));
+    return ticks;
+  }
+
+  let html='';
+
+  // Background
+  html+=`<rect x="0" y="0" width="500" height="300" fill="#132033" rx="8"/>`;
+
+  // Light grid
+  const xTicks=niceTicks(xMin,xMax,5);
+  const yTicks=niceTicks(yMin,yMax,5);
+  xTicks.forEach(t=>{
+    const x=sx(t);
+    html+=`<line x1="${x}" y1="${MT}" x2="${x}" y2="${MT+PH}" stroke="#1a2d45" stroke-width="1"/>`;
+    html+=`<text x="${x}" y="${MT+PH+14}" text-anchor="middle" fill="#5a7a9a" font-size="11" font-family="Montserrat,sans-serif">${t}</text>`;
+  });
+  yTicks.forEach(t=>{
+    const y=sy(t);
+    html+=`<line x1="${ML}" y1="${y}" x2="${ML+PW}" y2="${y}" stroke="#1a2d45" stroke-width="1"/>`;
+    html+=`<text x="${ML-5}" y="${y+3}" text-anchor="end" fill="#5a7a9a" font-size="11" font-family="Montserrat,sans-serif">${t}</text>`;
+  });
+
+  // Axes
+  html+=`<line x1="${ML}" y1="${MT}" x2="${ML}" y2="${MT+PH}" stroke="#2a4060" stroke-width="1.8"/>`;
+  html+=`<line x1="${ML}" y1="${MT+PH}" x2="${ML+PW}" y2="${MT+PH}" stroke="#2a4060" stroke-width="1.8"/>`;
+
+  // Axis labels
+  html+=`<text x="${ML+PW/2}" y="${300-10}" text-anchor="middle" fill="#7a9cc0" font-size="12" font-family="Montserrat,sans-serif" font-weight="700">${statName}</text>`;
+  html+=`<text x="10" y="${MT+PH/2}" text-anchor="middle" fill="#7a9cc0" font-size="12" font-family="Montserrat,sans-serif" font-weight="700" transform="rotate(-90 10 ${MT+PH/2})">Win %</text>`;
+
+  // Equation line (if showLine)
+  if(showLine && m!==null && b!==null){
+    const lx1=xMin, ly1=r2(m*lx1+b);
+    const lx2=xMax, ly2=r2(m*lx2+b);
+    const sly1=Math.max(MT, Math.min(MT+PH, sy(ly1)));
+    const sly2=Math.max(MT, Math.min(MT+PH, sy(ly2)));
+    html+=`<line x1="${sx(lx1)}" y1="${sly1}" x2="${sx(lx2)}" y2="${sly2}" stroke="#00e5ff" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="6 3"/>`;
+  }
+
+  // Rise/run triangle
+  if(showRiseRun && p1 && p2){
+    const cx=sx(p1.x), cy=sy(p1.y);
+    const dx=sx(p2.x), dy=sy(p1.y); // corner
+    const ex=sx(p2.x), ey=sy(p2.y);
+    html+=`<line x1="${cx}" y1="${cy}" x2="${dx}" y2="${dy}" stroke="#ffd600" stroke-width="1.8" stroke-dasharray="4 2"/>`;
+    html+=`<line x1="${dx}" y1="${dy}" x2="${ex}" y2="${ey}" stroke="#00e676" stroke-width="2.5"/>`;
+    // Labels
+    const midRunX=(cx+dx)/2, midRunY=dy+14;
+    const midRiseX=dx+18, midRiseY=(dy+ey)/2;
+    const dy2=p2.y-p1.y, dx2=p2.x-p1.x;
+    html+=`<text x="${midRunX}" y="${midRunY}" text-anchor="middle" fill="#ffd600" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">run:${dx2}</text>`;
+    html+=`<text x="${midRiseX}" y="${midRiseY}" fill="#00e676" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">rise:${dy2}</text>`;
+  }
+
+  // Test point + residual
+  if(testPt && m!==null && b!==null){
+    const predicted=r2(m*testPt.x+b);
+    const tsx=sx(testPt.x);
+    const tsy_actual=sy(testPt.y);
+    const tsy_pred=Math.max(MT, Math.min(MT+PH, sy(predicted)));
+    // Residual line
+    html+=`<line x1="${tsx}" y1="${tsy_actual}" x2="${tsx}" y2="${tsy_pred}" stroke="#ff9100" stroke-width="2.5" stroke-dasharray="4 2"/>`;
+    // Predicted (on line, ghost dot)
+    html+=`<circle cx="${tsx}" cy="${tsy_pred}" r="8" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="3 2" opacity="0.7"/>`;
+    // Actual dot
+    html+=`<circle cx="${tsx}" cy="${tsy_actual}" r="9" fill="#ff9100" opacity="0.9"/>`;
+    html+=`<text x="${tsx+9}" y="${tsy_actual+4}" fill="#ff9100" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">Actual</text>`;
+  }
+
+  // Data points
+  if(p1){
+    html+=`<circle cx="${sx(p1.x)}" cy="${sy(p1.y)}" r="9" fill="#00e5ff" opacity="0.9"/>`;
+    html+=`<text x="${sx(p1.x)+9}" y="${sy(p1.y)-5}" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">P1(${p1.x},${p1.y})</text>`;
+  }
+  if(p2){
+    html+=`<circle cx="${sx(p2.x)}" cy="${sy(p2.y)}" r="9" fill="#ffd600" opacity="0.9"/>`;
+    html+=`<text x="${sx(p2.x)+9}" y="${sy(p2.y)-5}" fill="#ffd600" font-size="11" font-family="Montserrat,sans-serif" font-weight="800">P2(${p2.x},${p2.y})</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+// ── SECTION 1 → 2 ───────────────────────────────────────────────────
+function goToRate(){
+  const x1=gv('dp1x'), y1=gv('dp1y'), x2=gv('dp2x'), y2=gv('dp2y');
+  document.getElementById('sec1-err').style.display='none';
+  document.getElementById('same-x-err').style.display='none';
+  if(!selectedStat||isNaN(x1)||isNaN(y1)||isNaN(x2)||isNaN(y2)){
+    document.getElementById('sec1-err').style.display='block'; return;
+  }
+  if(x1===x2){
+    document.getElementById('same-x-err').style.display='block'; return;
+  }
+
+  const dy=y2-y1, dx=x2-x1;
+  slope = r2(dy/dx);
+  slopeOK=false; yintOK=false;
+
+  // Fill in rate of change steps
+  document.getElementById('roc-y1').textContent=y1;
+  document.getElementById('roc-y2').textContent=y2;
+  document.getElementById('roc-y1b').textContent=y1;
+  document.getElementById('roc-y2b').textContent=y2;
+  document.getElementById('roc-dy').textContent=dy;
+  document.getElementById('roc-x1').textContent=x1;
+  document.getElementById('roc-x2').textContent=x2;
+  document.getElementById('roc-x1b').textContent=x1;
+  document.getElementById('roc-x2b').textContent=x2;
+  document.getElementById('roc-dx').textContent=dx;
+  document.getElementById('frac-top').textContent=dy;
+  document.getElementById('frac-bot').textContent=dx;
+
+  document.getElementById('slope-in').value='';
+  document.getElementById('slope-fb').textContent='';
+  document.getElementById('slope-hint').textContent='Hint: '+dy+' ÷ '+dx+' = ?';
+  document.getElementById('yint-section').className='locked';
+
+  // Graph 2: show points
+  renderGraph('graph2', {p1:{x:x1,y:y1},p2:{x:x2,y:y2}, statName:STAT_LABELS[selectedStat]||'Stat'});
+
+  goSection(2);
+}
+
+// ── CHECK SLOPE ──────────────────────────────────────────────────────
+function checkSlope(){
+  const entered=parseFloat(document.getElementById('slope-in').value);
+  const fb=document.getElementById('slope-fb');
+  if(isNaN(entered)){fb.textContent='';return;}
+  if(Math.abs(entered-slope)<0.06){
+    fb.innerHTML='<span class="fb-ok">&#10003; Correct! Rate of change = '+slope+'</span>';
+    slopeOK=true;
+    // Unlock y-intercept section
+    document.getElementById('yint-section').className='locked open';
+    // Pre-fill y-intercept formula
+    const x1=gv('dp1x'), y1=gv('dp1y');
+    const mx1=r2(slope*x1);
+    yInt=r2(y1-slope*x1);
+    document.getElementById('yi-y1').textContent=y1;
+    document.getElementById('yi-m').textContent=slope;
+    document.getElementById('yi-x1').textContent=x1;
+    document.getElementById('yi-y1b').textContent=y1;
+    document.getElementById('yi-mx1').textContent=mx1;
+    document.getElementById('yint-in').value='';
+    document.getElementById('yint-fb').textContent='';
+    // Show rise/run on graph
+    renderGraph('graph2',{
+      p1:{x:gv('dp1x'),y:gv('dp1y')},
+      p2:{x:gv('dp2x'),y:gv('dp2y')},
+      showRiseRun:true,
+      statName:STAT_LABELS[selectedStat]||'Stat'
+    });
+    // Update legend
+    document.getElementById('graph2-legend').innerHTML=
+      '<div class="leg"><div class="leg-dot" style="background:var(--cyan)"></div>Point 1</div>'+
+      '<div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Point 2</div>'+
+      '<div class="leg"><div style="width:18px;height:2px;border-top:2px solid var(--yellow);display:inline-block;margin-top:4px"></div>&nbsp;<span style="color:var(--yellow);font-size:11px">stat change</span></div>'+
+      '<div class="leg"><div style="width:4px;height:12px;background:var(--green);display:inline-block"></div>&nbsp;<span style="color:var(--green);font-size:11px">win % change</span></div>';
+  } else {
+    fb.innerHTML='<span class="fb-err">&#10007; Not quite. Divide '+
+      (gv('dp2y')-gv('dp1y'))+' &divide; '+(gv('dp2x')-gv('dp1x'))+'</span>';
+    slopeOK=false;
+  }
+}
+
+// ── CHECK Y-INTERCEPT ────────────────────────────────────────────────
+function checkYint(){
+  if(!slopeOK) return;
+  const x1=gv('dp1x'), y1=gv('dp1y');
+  yInt=r2(y1-slope*x1);
+  const entered=parseFloat(document.getElementById('yint-in').value);
+  const fb=document.getElementById('yint-fb');
+  if(isNaN(entered)){fb.textContent='';return;}
+  if(Math.abs(entered-yInt)<0.12){
+    fb.innerHTML='<span class="fb-ok">&#10003; Correct! b = '+yInt+'</span>';
+    yintOK=true;
+  } else {
+    fb.innerHTML='<span class="fb-err">&#10007; Check the subtraction. b = '+y1+' &minus; ('+slope+' &times; '+x1+') = '+y1+' &minus; '+r2(slope*x1)+' = '+yInt+'</span>';
+    yintOK=false;
+  }
+}
+
+// ── SECTION 2 → 3 ───────────────────────────────────────────────────
+function goToEquation(){
+  if(!slopeOK||!yintOK){
+    document.getElementById('sec2-err').style.display='block'; return;
+  }
+  document.getElementById('sec2-err').style.display='none';
+
+  const m=slope, b=yInt;
+  const lbl=STAT_LABELS[selectedStat]||'stat';
+  const bSign = b>=0 ? '+ '+b : '&minus; '+Math.abs(b);
+  const bSignPlain = b>=0 ? '+ '+b : '- '+Math.abs(b);
+
+  // Equation display
+  document.getElementById('eq-big-text').innerHTML='y = '+m+'x '+bSign;
+  document.getElementById('eq-part-m').textContent='m = '+m;
+  document.getElementById('eq-part-stat').textContent='x = '+lbl;
+  document.getElementById('eq-part-b').textContent='b = '+b;
+  document.getElementById('m-explain').textContent=m;
+  document.getElementById('b-explain').textContent=b;
+
+  // Interpretation sentence
+  document.getElementById('interp-stat').textContent=lbl;
+  document.getElementById('interp-slope').textContent=m;
+  const dir=document.getElementById('slope-direction');
+  if(m>0.05) dir.innerHTML='<span style="color:var(--green)">&#8593; More '+lbl+' &rarr; higher win %. Positive relationship.</span>';
+  else if(m<-0.05) dir.innerHTML='<span style="color:var(--red)">&#8595; More '+lbl+' &rarr; lower win %. Negative relationship.</span>';
+  else dir.innerHTML='<span style="color:var(--muted)">&#8594; '+lbl+' does not strongly affect win % for your bot.</span>';
+
+  // Verify with point 1
+  const x1=gv('dp1x'), y1=gv('dp1y');
+  const pred=r2(m*x1+b);
+  document.getElementById('verify-formula').innerHTML=
+    'y = '+m+' &times; '+x1+' '+bSign+' = <strong style="color:var(--green)">'+pred+'</strong>';
+  const vr=document.getElementById('verify-result');
+  const diff=Math.abs(pred-y1);
+  if(diff<0.3) vr.innerHTML='<span style="color:var(--green)">&#10003; Predicted '+pred+' &asymp; Actual '+y1+' &mdash; your equation checks out!</span>';
+  else vr.innerHTML='<span style="color:var(--orange)">Predicted: '+pred+', Actual: '+y1+'. Gap of '+r2(diff)+'. Check your rounding if this seems too large.</span>';
+
+  // Equation reminder for section 4
+  document.getElementById('eq-reminder').innerHTML='y = '+m+'x '+bSign;
+
+  // Graph 3: with line
+  renderGraph('graph3',{
+    p1:{x:gv('dp1x'),y:gv('dp1y')},
+    p2:{x:gv('dp2x'),y:gv('dp2y')},
+    showLine:true, m:m, b:b,
+    statName:lbl
+  });
+
+  goSection(3);
+}
+
+// ── SECTION 4: RESIDUAL ──────────────────────────────────────────────
+function updateResidual(){
+  const m=slope, b=yInt;
+  if(m===null||b===null) return;
+  const x=gv('test-x'), actual=gv('test-y');
+  if(isNaN(x)||isNaN(actual)){
+    document.getElementById('residualBlock').style.display='none';
+    document.getElementById('graphWrap4').style.display='none';
+    return;
+  }
+  const predicted=r2(m*x+b);
+  const residual=r2(predicted-actual);
+  testResidual=residual;
+
+  document.getElementById('residualBlock').style.display='block';
+  document.getElementById('rb-predicted').textContent=predicted;
+  document.getElementById('rb-actual').textContent=actual;
+  const resEl=document.getElementById('rb-residual');
+  resEl.textContent=residual>=0?'+'+residual:String(residual);
+  resEl.style.color=residual===0?'var(--green)':residual>0?'var(--orange)':'var(--cyan)';
+
+  let interp='';
+  if(residual===0) interp='Perfect! Your equation predicted exactly right.';
+  else if(residual>0) interp='Your equation over-predicted by '+residual+' win % points. Your team performed below the model.';
+  else interp='Your equation under-predicted by '+Math.abs(residual)+' win % points. Your team out-performed the model!';
+  document.getElementById('rb-interp').textContent=interp;
+
+  // Graph 4: with line + test point
+  document.getElementById('graphWrap4').style.display='block';
+  renderGraph('graph4',{
+    p1:{x:gv('dp1x'),y:gv('dp1y')},
+    p2:{x:gv('dp2x'),y:gv('dp2y')},
+    showLine:true, m:m, b:b,
+    testPt:{x:x,y:actual},
+    statName:STAT_LABELS[selectedStat]||'Stat'
+  });
+}
+
+// ── UNIT RATE ────────────────────────────────────────────────────────
+function updateUnitRate(){
+  const wins=gv('s1-wins'), spd=gv('s1-speed');
+  if(isNaN(wins)||isNaN(spd)||spd===0){
+    document.getElementById('urBox').style.display='none';
+    document.getElementById('ur-interp').style.display='none';
+    return;
+  }
+  unitRate=r2(wins/spd);
+  document.getElementById('urBox').style.display='block';
+  document.getElementById('ur-num').textContent=unitRate;
+  document.getElementById('ur-lbl').textContent='win % per Speed point  ('+wins+' \u00f7 '+spd+')';
+  const ip=document.getElementById('ur-interp');
+  ip.style.display='block';
+  ip.textContent='In Season 1, each Speed point was worth '+unitRate+' wins. '+
+    (unitRate>0.5?'Speed had a big effect on your win %.':
+     unitRate>0.2?'Speed had a moderate effect on your win %.':
+     'Speed had a small effect on your win %. Other stats may matter more for your bot.');
+}
+
+// ── SECTION 4 → 5 ───────────────────────────────────────────────────
+function goToReport(){
+  const tx=gv('test-x'), ty=gv('test-y');
+  const sw=gv('s1-wins'), ss=gv('s1-speed');
+  if(isNaN(tx)||isNaN(ty)||isNaN(sw)||isNaN(ss)){
+    document.getElementById('sec4-err').style.display='block'; return;
+  }
+  document.getElementById('sec4-err').style.display='none';
+
+  const m=slope, b=yInt;
+  const lbl=STAT_LABELS[selectedStat]||'stat';
+  const bSign = b>=0?'+ '+b:'- '+Math.abs(b);
+
+  document.getElementById('rep-eq').textContent='y = '+m+'x '+bSign;
+  document.getElementById('rep-eq-words').textContent='Predicted Wins = '+m+' \u00d7 '+lbl+' '+bSign;
+  document.getElementById('rep-slope').textContent='m = '+m;
+  document.getElementById('rep-slope-note').textContent='For every +1 '+lbl+', predicted wins change by '+m+'.';
+  document.getElementById('rep-b').textContent='b = '+b;
+  document.getElementById('rep-b-note').textContent='b = '+b+'. Positions the line. No real game meaning — no bot has '+lbl+' = 0.';
+  document.getElementById('rep-residual').textContent=testResidual>=0?'+'+testResidual:String(testResidual);
+  document.getElementById('rep-residual-note').textContent=
+    testResidual===0?'Perfect prediction.':
+    testResidual>0?'Over-predicted by '+testResidual+'. Team performed below model.':
+    'Under-predicted by '+Math.abs(testResidual)+'. Team out-performed the model.';
+  document.getElementById('rep-ur').textContent=unitRate+' win % per Speed point';
+  document.getElementById('rep-ur-note').textContent='Season 1: '+sw+' win % \u00f7 Speed '+ss+' = '+unitRate+' win % per Speed point.';
+
+  goSection(5);
+}
+</script>
+</body>
+</html>

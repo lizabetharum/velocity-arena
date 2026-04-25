@@ -27,6 +27,9 @@ const ACTIVITY_LESSONS = {
     { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
   ],
   'Final Proposal Verification': '/lessons/proposal-verification.html',
+  'Building and Solving Linear Equations': '/lessons/day13-linear-equations.html',
+  'Stat Auction + Prediction Check': '/lessons/stat-auction.html',
+  'Percent Change: Season 1 to Season 2 Configurations': '/lessons/percent-change.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
