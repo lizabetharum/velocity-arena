@@ -945,7 +945,10 @@ const DAYS = [
         "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected.",
         "facilitatorDescription": "Phase 1 (20 min): teams calculate what happens when a stat is scaled by 50%. Speed is proportional (50% more Speed gives 50% more motor power). Power is not (charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed -- quadratic). Phase 2 (25 min): teams draft a rule change proposal using those scaling calculations as evidence, backed by at least two dashboard numbers and addressing how the current last-place team is affected. This sets up tomorrow's formal Commissioner's Meeting.",
         "script": "https://docs.google.com/document/d/1s9wUXxuyLnXP-TNXoZV22tcXRDgv5g6wBUYuzYEQjk8/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1_VhsD2hZb2VBH7-lwdKmMHGJAq5x8VJqHUwdI6GsdZg/edit?usp=drive_link"
+        "worksheet": "https://docs.google.com/document/d/1_VhsD2hZb2VBH7-lwdKmMHGJAq5x8VJqHUwdI6GsdZg/edit?usp=drive_link",
+        "webpage" :["https://velocity-arena-gold.vercel.app/lessons/proportional-scaling.html",
+          "https://velocity-arena-gold.vercel.app/lessons/day11-commissioner-proposal.html"
+        ]
       },
       {
         "name": "Break",
@@ -968,7 +971,9 @@ const DAYS = [
         "description": "The facilitator announces publicly: the team in last place gets one free stat reallocation before Season 2, no Commissioner approval required. If that is your team, you rework your allocation sheet now. Every team begins thinking about Season 2 loadouts under the rules that will pass tomorrow.",
         "facilitatorDescription": "Announce publicly: the current last-place team gets one free stat reallocation before Season 2, no Commissioner approval required. Public announcement is essential -- it creates the comeback narrative and keeps the last-place team mathematically engaged. The underdog team reworks their allocation sheet now. All teams begin planning Season 2 loadouts under the rules that will pass tomorrow.",
         "script": "https://docs.google.com/document/d/1uub9UpMbQF4he0B55d5SCFc8Jg7RbYljg-A5i_nHo9E/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1uUZX29Zj8tEQ64mf7fKm0PYlzEpkn-2LqDcZBG8Vg4k/edit?usp=sharing"
+        "worksheet": "https://docs.google.com/document/d/1uUZX29Zj8tEQ64mf7fKm0PYlzEpkn-2LqDcZBG8Vg4k/edit?usp=sharing",
+        "webpage": "hhttps://velocity-arena-gold.vercel.app/lessons/day11-season2-reallocation.html"
+    
       },
       {
         "name": "Break",
