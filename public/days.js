@@ -1116,7 +1116,8 @@ const DAYS = [
         "block": "Ice Breaker",
         "description": "Each team writes their Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Post it publicly. Everyone can see every team's prediction. You will revisit these on Friday.",
         "facilitatorDescription": "Each team writes a Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Cards post publicly; every team's prediction is visible. Revisit on Day 15. Creates public stakes for the whole week and makes prediction accuracy socially real.",
-        "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link"
+        "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link",
+        "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html"
       },
       {
         "name": "Break",
@@ -1369,12 +1370,12 @@ const DAYS = [
     "vocabulary": "INEQUALITY. A statement that one quantity is less than, greater than, or not equal to another. Used to describe loadout constraints like 'Speed > 5' or 'Endurance ≤ 4.'",
     "activities": [
       {
-        "name": "Memory Probe: Scout Your Opponent Cold",
+        "name": "Know Your Opponent",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "No posted reports. No dashboards. No notes. You have 5 minutes to write from memory: your Championship opponent's top two stat allocations, their Endurance decay rate (the r value), their Season 1 average goals per match, and their Endurance decay output at t = 3. Then reports go up -- verify every number and score yourself.",
-        "facilitatorDescription": "No posted reports, no dashboards, no notes. Campers have 5 minutes to write from memory: their Championship opponent's top two stat allocations, Endurance decay rate (r value), Season 1 average goals per match, and Endurance decay output at t = 3. After 5 minutes, reports go up and campers verify every number and self-score. Retrieval practice before the final scouting push.",
-        "script": "https://docs.google.com/document/d/13EAWLvzOpJzSWD48ie6-Ti6RsVMJySXtF03AYYh9Nz0/edit?usp=drive_link"
+        "description": "Your Championship opponent's stat card is face down on the table. Flip it. Read the numbers. Stand up for the one stat you fear most — your body is your vote. Then sketch a four-bar chart of their build and circle the biggest threat. One word on the board. That stat determines your ball mode and your Skills Arena target this afternoon.",
+      "facilitatorDescription": "Championship opponent stat cards are waiting face down when campers arrive. They flip, read, and vote physically — standing for the one stat they fear most. Then a quick bar chart sketch of the opponent's build, one circled threat. Six threat words go on the board, one per team, and campers receive a direct promise: that stat determines their ball mode and Skills Arena focus in the afternoon session. No writing beyond one word and four bar labels. The physical vote replaces discussion and moves the room fast.",
+      "script": "https://docs.google.com/document/d/13EAWLvzOpJzSWD48ie6-Ti6RsVMJySXtF03AYYh9Nz0/edit?usp=drive_link"
       },
       {
         "name": "Break",
@@ -1405,7 +1406,9 @@ const DAYS = [
         "block": "Match-Build-Make",
         "description": "Teams present final Championship rule proposals. Same format: 3 minutes, two data points, address the last-place team. League votes. New rules on the wall. Adjust your loadout for Championship -- fix any math errors before leaving.",
         "facilitatorDescription": "Teams present final Championship rule proposals. Same format as Day 12: 3 minutes, two data points cited, address the last-place team. League votes. Passing rules go on the wall. After voting, teams adjust their Championship loadout under the new constraints -- fix any math errors before leaving. Final rule-setting meeting of the program.",
-        "script": "https://docs.google.com/document/d/1uw_04mJk0wg6xibN7EcWCWRgKNHZP_-h60m6ucufcsI/edit?usp=drive_link"
+        "script": "https://docs.google.com/document/d/1uw_04mJk0wg6xibN7EcWCWRgKNHZP_-h60m6ucufcsI/edit?usp=drive_link",
+        "webpage":"https://velocity-arena-gold.vercel.app/lessons/day16-commissioner-proposal.html",
+        "worksheet":"https://docs.google.com/document/d/1bOi-qqmVXnb-Uhr6HAw-ezLjD1jYr0-e_-Ui-nJpeAw/edit?usp=sharing"
       },
       {
         "name": "Break",
