@@ -102,6 +102,12 @@
 .tact-name{font-size:0.9375rem;font-weight:700;color:var(--white);}
 .tact-block{font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:0.125rem;color:var(--slate);}
 .tact-desc{font-size:0.8125rem;color:var(--slate);line-height:1.55;margin-top:0.375rem;}
+.tact-links{display:flex;gap:0.375rem;flex-wrap:wrap;margin-top:0.5rem;}
+.tact-link{font-size:0.6875rem;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:99px;background:var(--navy3);color:var(--cyan);text-decoration:none;border:1px solid rgba(0,229,255,0.3);display:inline-flex;align-items:center;gap:3px;transition:opacity .12s;}
+.tact-link:hover{opacity:.85;}
+.tact-link.worksheet{color:#44CC88;border-color:rgba(68,204,136,0.3);}
+.tact-link.webpage{color:#FFCA28;border-color:rgba(255,202,40,0.3);}
+.tact-link.template{color:#A08EE0;border-color:rgba(160,142,224,0.3);}
 
 .tends-box{background:var(--navy2);border:1px solid var(--card-border);border-left:4px solid var(--cyan);border-radius:0.625rem;padding:1rem 1.25rem;margin-top:1.25rem;}
 .tends-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.375rem;}
@@ -286,16 +292,24 @@ function renderDay(dayNum) {
       <div class="idea-text">${d.vocabulary}</div>
     </div>` : '';
 
-  const actRows = (d.activities || []).map(a =>
-    `<div class="tact-row">
+  // URL fields (script/worksheet/webpage/template) live directly on each
+  // activity in days.js — that file is the single source of truth.
+  const actRows = (d.activities || []).map(a => {
+    const linkPills = [];
+    if (a.script)    linkPills.push(`<a class="tact-link"           href="${a.script}"    target="_blank" rel="noopener">📄 Script</a>`);
+    if (a.worksheet) linkPills.push(`<a class="tact-link worksheet" href="${a.worksheet}" target="_blank" rel="noopener">📋 Worksheet</a>`);
+    if (a.webpage)   linkPills.push(`<a class="tact-link webpage"   href="${a.webpage}"   target="_blank" rel="noopener">🔗 Page</a>`);
+    if (a.template)  linkPills.push(`<a class="tact-link template"  href="${a.template}"  target="_blank" rel="noopener">📐 Template</a>`);
+    return `<div class="tact-row">
       <div class="tact-mins">${a.mins}m</div>
       <div class="tact-body">
         <div class="tact-name">${a.name}</div>
         <div class="tact-block">${(a.block || '').replace(/\\/g, '')}</div>
         ${(a.facilitatorDescription || a.description) ? `<div class="tact-desc">${a.facilitatorDescription || a.description}</div>` : ''}
+        ${linkPills.length ? `<div class="tact-links">${linkPills.join('')}</div>` : ''}
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 
   const endsHtml = d.ends ? `
     <div class="tends-box">
