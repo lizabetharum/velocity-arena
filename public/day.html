@@ -42,6 +42,14 @@
 .hero-meta{font-size:13px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
 .hero-theme{font-size:24px;font-weight:800;color:var(--white);line-height:1.25;}
 .hero-week{font-size:15px;color:var(--slate);margin-top:6px;}
+
+.produce-list{display:flex;flex-direction:column;gap:6px;}
+.produce-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px dashed var(--card-border);}
+.produce-item:last-child{border-bottom:none;}
+.produce-item input{margin-top:4px;width:16px;height:16px;accent-color:var(--cyan);cursor:pointer;flex-shrink:0;}
+.produce-item label{font-size:14px;color:var(--white);line-height:1.5;cursor:pointer;flex:1;}
+.produce-item.done label{color:var(--text-muted);text-decoration:line-through;}
+.produce-empty{font-size:14px;color:var(--text-muted);padding:6px 0;}
 </style>
 </head>
 <body>
@@ -168,6 +176,20 @@ if (!day) {
     <div><strong style="color:var(--teal);min-width:70px;display:inline-block;">${fmtTime(r.time)}</strong> ${r.label}${r.mins ? ` <span style="color:var(--text-muted);">(${r.mins} min)</span>` : ''}</div>
   `).join('');
 
+  // What you produce — checklist persisted per day in localStorage
+  const produceKey = `va_produce_d${day.day}`;
+  let produceDone = [];
+  try { produceDone = JSON.parse(localStorage.getItem(produceKey) || '[]'); } catch(e){}
+  const produceHtml = (day.produce && day.produce.length)
+    ? `<div class="produce-list">${day.produce.map((p,i) => {
+        const checked = produceDone.includes(i);
+        return `<div class="produce-item${checked ? ' done' : ''}" id="pi-${i}">
+          <input type="checkbox" id="pc-${i}"${checked ? ' checked' : ''} onchange="toggleProduce(${i},this)">
+          <label for="pc-${i}">${p}</label>
+        </div>`;
+      }).join('')}</div>`
+    : `<div class="produce-empty">Deliverables list coming soon for this day.</div>`;
+
   document.getElementById('main-content').innerHTML = `
 
     <div style="margin-bottom:20px;">
@@ -198,6 +220,11 @@ if (!day) {
             ${dailyScheduleHtml}
           </div>
         </div>
+
+        <div class="section-label" style="margin-top:24px;">What you produce</div>
+        <div class="card" style="margin-top:0;">
+          ${produceHtml}
+        </div>
       </div>
 
     </div>
@@ -212,6 +239,19 @@ if (!day) {
       </a>
     </div>
   `;
+}
+
+// Persist produce-checklist state per day in localStorage
+function toggleProduce(idx, el) {
+  if (!day) return;
+  const key = `va_produce_d${day.day}`;
+  let done = [];
+  try { done = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){}
+  if (el.checked && !done.includes(idx)) done.push(idx);
+  if (!el.checked) done = done.filter(i => i !== idx);
+  try { localStorage.setItem(key, JSON.stringify(done)); } catch(e){}
+  const item = document.getElementById('pi-' + idx);
+  if (item) item.classList.toggle('done', el.checked);
 }
 </script>
 </body>

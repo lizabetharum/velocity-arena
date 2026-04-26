@@ -85,6 +85,13 @@ const DAYS = [
       }
     ],
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall. You have 3 minutes. |",
+    "produce": [
+      "Prior knowledge diagnostic — 8 math questions answered individually",
+      "Stat card — Speed row filled in",
+      "Speed Stat Challenge worksheet — motor power percentages for Speed values 1, 3, 5, 6, and 8",
+      "Data dashboard — two distance entries (Speed = 3 and Speed = 6)",
+      "Written sentence — predicted vs. actual distance compared with calculation"
+    ],
     "funElement": "None today. Bot novelty and the two improv activities create psychological safety before any math is introduced. Let students touch the robots before anything else. The first time a bot moves, something shifts in the room.",
     "los": "LO 1.1 (stat-to-formula matching on reference card); LO 3.1 (coordinate grid navigation, first attempt, informal)",
     "facilitatorRisk": {
