@@ -182,6 +182,15 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1c1eqg0S2J3XcXiKMmNwJ3UTzanJ9fqgavb8SrAyMrxo/edit?usp=drivesdk"
       }
     ],
+    "produce": [
+      "Endurance decay worksheet — scaffolded table for E \= 4; independent table for E \= 2", 
+      "Paper graph — P(t) plotted across five t-values for team's Endurance allocation", 
+      "Endurance bot code — motor power decay programmed in MakeCode", 
+      "Data dashboard — two distance entries (first 30 sec vs. last 30 sec of 2-min run)", 
+      "Written sentence — formula prediction vs. bot result, gap identified",  
+      "Role assignment record — Coder, Fabricator, Analyst roles documented for Week 2",  
+      "Wall display — bot name and one-sentence mission statement"
+    ],
     "ends": "Name one math concept you used today. Write the full calculation. Share it with a teammate and explain what it means about your bot, not in formula terms, but in behavior terms. You have 4 minutes. |",
     "funElement": "Bot naming ceremony activates today at end of session. Bot names and origin stories are posted on the wall for the full four weeks. First permanent artifact of the program.",
     "los": "LO 2.1 (slope meaning described from bot decay graph); LO 2.2 (Endurance decay equation written in slope-intercept form)",
@@ -247,6 +256,12 @@ const DAYS = [
       }
     ],
     "endBufferMins": 2,
+    "produce": [
+      " Distance-time graph — Run A and Run B plotted from data card",  
+      "Written estimate — straight-line distance between two coordinates",  
+      "Distance formula calculations — d \= √((x₂−x₁)² \+ (y₂−y₁)²) verified for three coordinate pairs",  
+      "Launch Sequence — written plan and MakeCode arc navigation code"
+    ],
     "ends": "Each person on your team silently rates today's collaboration: 1 = rough, 2 = okay, 3 = solid. Hold up your number at the same time so everyone sees at once. If anyone holds up a 1, talk for 2 minutes about what specifically happened. You have 5 minutes total. |",
     "funElement": "None today. Discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
     "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance formula introduced on life-sized grid, verified against two coordinate pairs; deepened on Day 10 with match data)",
@@ -317,6 +332,13 @@ const DAYS = [
         "description": "Refine your scoop design and your Power speed value in MakeCode. Try one scoop redesign and one speed change. Record which had a bigger effect on kick distance.",
         "facilitatorDescription": "Teams refine scoop design and Power speed value in MakeCode. Require one scoop redesign and one speed change per team; teams record which had the bigger effect on kick distance. This is where teams start to internalize the physical-vs-code trade-off."
       }
+    ],
+    "produce": [
+      "Power Stat Challenge worksheet — charge speed (P²) and follow-through (P × 200\) for P \= 1, 2, 4, 8; ratios; two ball travel distances",  
+      "Cardboard scoop — built and attached to Cutebot",  
+      "Scoop testing worksheet — kick distances at three Power settings, 3 shots each",  
+      "Written sentence — whether quadrupling charge speed quadrupled kick distance, with reasoning",  
+      "Data log entry — which change (scoop or Power value) had bigger effect on kick distance"
     ],
     "endBufferMins": 7,
     "ends": "Write this sentence and complete it: \"The skill I used today was \\[name it specifically, not just 'math'\\] and I will use it tomorrow by \\[name the exact moment and action\\].\" You have 3 minutes. |",
@@ -403,6 +425,14 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1b-dHky2JBEv8cZp-h9htJNm8CnTfeaA9Tz9ENb_GP1Y/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      "Two-formula warm-up — Speed and Endurance outputs calculated for one allocation",  
+      "Three stat loadouts — each summing to 20 points; all four formula outputs calculated; recorded in dashboard ", 
+      "Written answer — tradeoff shown if Speed \= 8, with all calculations",  
+      "Cold Recall Check — five individual math problems on paper (no grade)",  
+      "Launch sequence code — JavaScript uploaded to bot",  
+      "Data dashboard — simulation match observations logged (prediction vs. bot behavior)"
+    ],
     "endBufferMins": 2,
     "ends": "What is one thing you are good at that most people do not know about? Be specific. Name the thing. Give a real example from your own life. You have 5 minutes. |",
     "funElement": "Misconception correction: Equals sign as balance (activates today. Day 5 is the first day the full budget equation is introduced, making this the natural placement for the correction).",
@@ -487,6 +517,17 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1tfwcohDC_tUJ700pCwIWLIa4j31qdFJoUgcJdhvyd1A/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      " Interleaved problem set — 12 problems across six formula types; concept-tag column completed",  
+      "Season 1 allocation sheet — four stats locked; sum verified at 20",  
+      "Coordinate grid — starting position, tip-off (4,2), and goal (8,2) plotted; approach path drawn",  
+      "Data dashboard — straight-line distance to ball and travel time prediction calculated",  
+      "Written sentence — approach angle justified with distance or stat value",  
+      "Launch sequence — programmed in MakeCode; two test run times logged",  
+      "Written sentence — where Speed model broke down (if predicted ≠ actual)",  
+      "Run order — final launch sequence committed to and locked for Season 1",  
+      "Dashboard observation — one data-cited claim about each other team's showcase run"
+    ],
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall next to your bot's name. You have 3 minutes. |",
     "funElement": "Season 1 begins tomorrow. Anticipation of real matches creates investment in getting the allocation right today.",
     "los": "LO 1.2 (all four stat calculations on allocation sheet, 100% accuracy); LO 2.2 (Endurance decay equation derived from allocation); LO 6.1 (MakeCode motor command verified against proportional calculation)",
@@ -567,6 +608,13 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1a5KUPWHp_fCxAtXL7_0lfCgMAREfU6jWhYTGg3pyfQo/edit?tab=t.0",
         "webpage": "https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html"
       }
+    ],
+    "produce": [
+      "Endurance decay equation — P(t) \= 100 − rt written in slope-intercept form; r calculated",  
+      "X-intercept — minute bot power reaches zero, calculated and logged",  
+      "Match prediction — projected goals for first match, written in data log",  
+      "Match data log — actual goals and win/loss recorded after each of three matches",  
+      "Data dashboard — updated with Day 1 match results and leaderboard standing"
     ],
     "endBufferMins": 5,
     "ends": "Name one math concept you used today. Write the full calculation. Share it with your teammate and explain what it means for your bot's behavior. Not formula terms. Bot terms. You have 4 minutes. |",
@@ -668,6 +716,15 @@ const DAYS = [
         "facilitatorDescription": "Two tracks. Track A (Data Dive): teams review the scatter plot equation against today's match results -- does the line fit the new points, and what variable is the equation missing? Track B (Bot Lab): teams adjust one MakeCode setting and run the bot for 90 seconds, observing what changes. Open Lab is only 25 minutes today -- keep it tight."
       }
     ],
+    "produce": [
+      "Scavenger Hunt answer sheet — calculations completed at each posted problem card",  
+      "Class scatter plot — team's data point added (Speed allocation vs. Goals Scored)",  
+      "Card sort — verbal situations, data tables, and graphs matched",  
+      "Linear equation — slope and y-intercept calculated from two scatter plot points; written in slope-intercept form",  
+      "Match data log — equation-based prediction before each match; actual result after (two matches)",  
+      "Rivalry card — one trash-talk claim citing a specific stat or dashboard number, posted on wall",  
+      "Dashboard note — one variable the scatter plot equation isn't capturing (Track A)"
+    ],
     "endBufferMins": 10,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for exactly 2 minutes about what happened. You have 5 minutes total. |",
     "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
@@ -746,6 +803,15 @@ const DAYS = [
         "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at their three match results, spot patterns, and write one hypothesis entry in the dashboard -- 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): teams experiment freely with the bot. Any useful finding goes in the dashboard before they leave.",
         "script": "https://docs.google.com/document/d/15gZrKNFwogagCQQUGQOWAwVur95G9jX9lQ1tpNBYhuc/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Sticky note — rival's card annotated with accuracy check; corrected calculation written if wrong",  
+      "Formula Relay written work — 20 problem cards solved and stamped; error count per formula type",  
+      "Pre-match prediction — calculation from weakest formula type logged before match",  
+      "Match data log — prediction and actual for each of three matches",  
+      "Written sentence — variable the model missed (for any match \>20% off prediction)",  
+      "Data dashboard — complete, no blanks",  
+      "Dashboard hypothesis entry — stat change, expected outcome, and data justification (Track A)"
     ],
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action\\].\" You have 3 minutes. |",
     "funElement": "Rivalry cards drive ongoing engagement. Teams verify each other's data claims before match day.",
@@ -832,6 +898,15 @@ const DAYS = [
         "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at Season 1 data and name one stat allocation change for Season 2 as a hypothesis with data justification. Track B (Bot Lab): teams test the loadout change physically before committing, then write the hypothesis entry. Physical testing before committing is legitimate analytical work, not avoidance -- name that for Track B teams.",
         "script": "https://docs.google.com/document/d/1GkIgRVtmJvsugSYWpLDG2Xzz8zalIqUKgm22L55SkRs/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Index card — best Season 1 match: stat config and result, posted for gallery walk",  
+      "Dot-sticker vote — placed on one other team's card",  
+      "Distance formula worksheet — three distances calculated on 8×4 field; summary table completed",  
+      "Written reflections — charge efficiency, charges-per-goal estimate, formula limits, one stat to adjust with tradeoff",  
+      "Cold Recall Check — five individual math problems on paper (no grade)",  
+      "Data dashboard — final Season 1 entries: goals per minute, possession time, win/loss by stat matchup",  
+      "Season 2 hypothesis entry — one stat change with data justification"
     ],
     "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
     "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
@@ -927,6 +1002,13 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1lfFv6i-y2nMuwujLECd2zdS1AszyAJWGnU2m4p2deOc/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      "Proportional scaling calculations — 50% stat increase applied to Speed (linear) and Power (quadratic); results compared",  
+      "Commissioner proposal draft — one rule change; two dashboard numbers cited; last-place team addressed ", 
+      "Season 2 allocation sheet — reworked with 2 extra points (last-place team); preliminary loadout notes (all teams)",  
+      "Dashboard hypothesis entries — adjusted loadout observations labeled \"hypothesis\"",
+      "Commissioner proposal — numbers verified against dashboard; corrections noted"
+    ],
     "endBufferMins": 5,
     "ends": "Write one personal goal and one team goal for this week. The personal goal must name a specific math skill, not \"get better at math.\" You have 3 minutes. |",
     "funElement": "Underdog mechanic announced today. Public announcement is essential. Creates comeback narrative and keeps the last-place team mathematically engaged.",
@@ -999,6 +1081,13 @@ const DAYS = [
         "facilitatorDescription": "Teams verify Season 2 allocation calculations, program the new loadout into MakeCode, and run one test drive to confirm code matches math. Last chance to catch a mis-coded stat before Season 2 matches begin tomorrow.",
         "script": "https://docs.google.com/document/d/1rQO_FefyE0XsqYJGit2EcfBexmNWm_vQEcS0WyKXOuA/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Commissioner proposal — finalized after lobbying; all numbers dashboard-verified; one concept type named ", 
+      "3-minute presentation — rule proposal delivered with two data points cited",  
+      "Season 2 allocation sheet — revised under new league rules; complete before leaving",  
+      "MakeCode code — new Season 2 loadout programmed",  
+      "Test drive result — one run recorded to confirm code matches math"
     ],
     "endBufferMins": 20,
     "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
@@ -1086,6 +1175,15 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1U0cbB9ixVtfxtBcDY4yKjn54nQCvgR497j4teWAtD2A/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      "Prediction Market index card — \"We will win [X] of [Y] matches,\" posted publicly",
+      "Win-probability equation — slope and y-intercept from two past data points; written in slope-intercept form ", 
+      "Two residuals — predicted minus actual for two past matches",  
+      "Unit rate — Season 1 wins ÷ Speed stat calculated",  
+      "Match data log — prediction and ball mode before each match; actual result and residual after",  
+      "Dashboard entry — Season 2 residuals compared to Season 1",  
+      "Skills Card — prediction-actual sentence logged; Skill Badge earned"
+    ],
     "endBufferMins": 5,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
     "funElement": "Prediction market creates public stakes. Season 2 under new rules gives the whole room a fresh start.",
@@ -1157,6 +1255,15 @@ const DAYS = [
         "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at residuals from the last two match days; if model error has increased, identify one variable to add. Track B (Bot Lab): teams test new stat points from the Stat Auction under match conditions and check whether performance matches formula predictions.",
         "script": "https://docs.google.com/document/d/1Ttdu2hNLgwJswRGZozjztwdZhaKL-zq2AJQyROfKOSg/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Prediction Market index card — justification added if win total adjusted; one dashboard number cited",  
+      "Percent change worksheet — (new − old) / old × 100 calculated for all four stats",  
+      "Written sentence — which ball mode team expects to perform best in, citing stat percent change",  
+      "Match data log — prediction before each of three matches; actual result after ", 
+      "Written sentence — missing variable identified for any match \>20% off ", 
+      "Data dashboard — fully updated",  
+      "Dashboard hypothesis — revised equation with new variable (Track A); or Skills Card prediction-actual logged (Track B)"
     ],
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action in tomorrow's schedule\\].\" You have 3 minutes. |",
     "funElement": "Prediction market still active. Teams track Season 2 record against public prediction.",
@@ -1230,6 +1337,16 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1j_P-vq1s85VIWRo6doy1GCI_v1yYw0vUu_vgG1CgGoM/edit?usp=sharing"
       }
     ],
+    "produce": [
+      "Bot lore update — one new sentence added to origin story based on Season 1–2 results",  
+      "Scouting Report Section 1 — opponent's four stats as percentages of 20-point budget; work shown",  
+      "Scouting Report Section 2 — opponent's Endurance decay equation in slope-intercept form; work shown",  
+      "One-line scouting note — strongest/weakest ball mode identified with cited number",  
+      "Match data log — prediction and ball mode before each of three matches; actual result after",  
+      "Prediction Market resolution — final Season 2 record compared to public prediction card",  
+      "Season 2 retrospective — Season 2 vs. Season 1 residuals compared; proportional stat changes identified",  
+      "Scouting Report Section 3 (begun) — opponent Speed vs. Goals trend line (Track A); or Skills Card kick-distance data (Track B)"
+    ],
     "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
     "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
     "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
@@ -1300,6 +1417,14 @@ const DAYS = [
         "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
         "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Bar chart — opponent's four stats drawn; biggest threat circled",  
+      "Scouting Report Section 3 — trend line equation from two opponent data points; one Championship match prediction",  
+      "Scouting Report Section 4 — one strategy recommendation; three valid loadout combinations under Championship constraints",  
+      "Championship rule proposal — presented verbally (3 min, two data points, last-place team addressed)",  
+      "Championship loadout sheet — adjusted and math-corrected ", 
+      "MakeCode code — Championship loadout programmed; test drive verified against formula outputs"
     ],
     "ends": "Write one personal goal and one team goal for this final week. The personal goal must name something mathematical you want to be able to explain clearly to a visitor on Thursday. You have 3 minutes. |",
     "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
@@ -1372,6 +1497,13 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      "Cold retrieval paper — five numbers written from memory (opponent's motor power, decay rate r, best goal count; own decay at t=3, own motor power)",  
+      "Sticky note annotations — one \"Correct\" and one corrected calculation on opponent's scouting report",
+      "Pre-match pitch — 2-minute verbal rehearsal with specific equation results; peer feedback applied",  
+      "What-If? analysis — league teams violating \"Endurance ≤ 4\" identified; new decay rates and motor power outputs calculated; effect on own team assessed",  
+      "Pitch notes — every claim annotated with a specific number"
+    ],
     "endsMins": 10,
     "ends": "Name one mathematical claim from today's pre-match pitch rehearsals, from any team, not just yours. Write the calculation. Explain to a teammate why citing that specific number makes the argument stronger than a general claim. You have 4 minutes. |",
     "funElement": "Championship bracket reveal creates maximum anticipation.",
@@ -1442,6 +1574,11 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1lvW3OtIjKUPp7oxeYng28ghkXNTotYAh6RL108wr7CU/edit?usp=drive_link"
       }
     ],
+    "produce": [
+      "Pre-match pitch — 2-minute verbal delivery to judges before each Championship match",  
+      "Loss-recovery documentation — completed for every losing team", 
+      "Championship Configuration — winning team's loadout and scouting report posted on wall (champion only)"
+    ],
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
     "funElement": "Pre-match pitch to judges activates today, scored on mathematical specificity. This is the moment all four weeks of math work is tested in a live, high-stakes public setting.",
     "los": "LO 7.1 (pre-match prediction logged before every Championship match); LO 7.2 (post-match revision if \\>20% off); LO 8.1 (pre-match pitch scored by judges on rubric for evidence quality and math content)",
@@ -1511,6 +1648,11 @@ const DAYS = [
         "facilitatorDescription": "Short debrief and prep window. Teams review data, reflect on the program, and get ready for Day 20. Last Open Lab of the program.",
         "script": "https://docs.google.com/document/d/13h94Qu4vn9Sxch1Nbo8oWIbjWgXtYDoJh7j1byr1laA/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      " Station display — scouting report, bot, coordinate grid, and data dashboard arranged for visitors",  
+      "Teaching goal — one sentence written: what the team wants every visitor to understand",  
+      "Visitor mini-challenge facilitation — each visitor guided through unit rate calculation, coordinate distance calculation, and proportional scaling explanation"
     ],
     "ends": "Write: \"The skill I used today to teach a visitor was \\[name it\\] and I know it worked when \\[describe the specific moment you saw them understand it\\].\" You have 3 minutes. |",
     "funElement": "Best Teacher vote collected by visitors today. Winner announced at tomorrow's ceremony. Creates anticipation and social recognition for mathematical communication, not just winning. Scouting Report Verbal Check runs concurrently with vote count in the afternoon.",
@@ -1588,6 +1730,9 @@ const DAYS = [
         "facilitatorDescription": "Unstructured time. Campers drive bots, revisit the coordinate grid, teach each other anything they want. No task, no output. This is the last time the program exists in this form -- let the room shape the close.",
         "script": "https://docs.google.com/document/d/1mzg9cMe7l6ev_kSYjNDtCmGjqRorba91zmQoJvQg0CY/edit?usp=drive_link"
       }
+    ],
+    "produce": [
+      "Final journal entry — individual reflection on what changed from Day 1 allocation to Championship loadout and why"
     ],
     "endBufferMins": 15,
     "endsMins": 20,
