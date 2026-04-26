@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance Calculator — Velocity Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0D0D1A;--navy2:#161A2E;--navy3:#1E2240;
+  --cyan:#00E5FF;--teal:#007A99;--slate:#8899AA;
+  --white:#FFFFFF;--card-border:#222840;--card-bg:#161A2E;
+  --orange:#FF9100;--green:#00C97A;--purple:#9B8AFF;--blue:#4FC3F7;--yellow:#FFD166;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;line-height:1.55;font-size:15px;}
+
+.topbar{background:var(--navy);border-bottom:1px solid var(--card-border);padding:10px 20px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;}
+.topbar a{color:var(--slate);text-decoration:none;}
+.topbar a:hover{color:var(--cyan);}
+
+.container{max-width:980px;margin:0 auto;padding:28px 22px 60px;}
+
+.title{font-size:30px;font-weight:800;color:var(--white);letter-spacing:-.01em;margin-bottom:6px;}
+.title span{color:var(--cyan);}
+.subtitle{font-size:15px;color:var(--slate);margin-bottom:24px;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media (max-width:760px){ .grid-2{grid-template-columns:1fr;} }
+
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:20px 22px;}
+.card h2{font-size:13px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+
+/* INPUTS */
+.point-row{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;}
+.point-row .lbl{font-size:13px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;min-width:60px;}
+.point-row.p1 .lbl{color:var(--orange);}
+.point-row.p2 .lbl{color:var(--green);}
+.coord-input{background:var(--navy);border:1.5px solid var(--card-border);border-radius:8px;padding:10px 12px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;text-align:center;outline:none;transition:border-color .15s;}
+.coord-input:focus{border-color:var(--cyan);}
+.coord-input::-webkit-inner-spin-button{opacity:.5;}
+
+/* GRID */
+.gridbox{background:var(--navy);border:1px solid var(--card-border);border-radius:10px;padding:10px;}
+svg.grid{width:100%;height:auto;display:block;}
+.grid-cell{fill:none;stroke:var(--card-border);stroke-width:.5;}
+.grid-axis{stroke:#3a4060;stroke-width:1;}
+.grid-line{stroke:var(--cyan);stroke-width:2.5;stroke-linecap:round;}
+.grid-leg{stroke:var(--slate);stroke-width:1.5;stroke-dasharray:4 3;}
+.grid-pt{stroke:var(--white);stroke-width:1.5;}
+.grid-pt.p1{fill:var(--orange);}
+.grid-pt.p2{fill:var(--green);}
+.grid-label{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;fill:var(--slate);}
+.grid-label.p1{fill:var(--orange);}
+.grid-label.p2{fill:var(--green);}
+
+/* WORKED STEPS */
+.step{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px dashed var(--card-border);font-size:14px;}
+.step:last-child{border-bottom:none;}
+.step-formula{color:var(--slate);font-family:'DM Sans',sans-serif;}
+.step-formula b{color:var(--white);font-weight:700;}
+.step-result{color:var(--cyan);font-weight:800;font-size:16px;}
+.step.final .step-result{color:var(--cyan);font-size:22px;}
+.step.final .step-formula{color:var(--white);font-weight:700;}
+
+/* BOT PANEL */
+.power-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;margin-bottom:12px;}
+.power-label{font-size:13px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;}
+.power-value{font-size:30px;font-weight:800;color:var(--purple);min-width:60px;text-align:right;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;background:transparent;}
+input[type=range]::-webkit-slider-runnable-track{height:6px;background:var(--card-border);border-radius:3px;}
+input[type=range]::-moz-range-track{height:6px;background:var(--card-border);border-radius:3px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;background:var(--purple);border-radius:50%;border:2px solid var(--white);cursor:pointer;margin-top:-7px;}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;background:var(--purple);border-radius:50%;border:2px solid var(--white);cursor:pointer;}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.stat-box{background:var(--navy);border:1px solid var(--card-border);border-radius:8px;padding:12px;}
+.stat-box .lbl{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.stat-box .val{font-size:22px;font-weight:800;color:var(--purple);}
+.stat-box .formula{font-size:11px;color:var(--slate);margin-top:2px;}
+
+.verdict{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--navy3);border-left:4px solid var(--cyan);font-size:14px;line-height:1.65;}
+.verdict b{color:var(--cyan);}
+.verdict .yes{color:var(--green);font-weight:800;}
+.verdict .no{color:var(--orange);font-weight:800;}
+
+.formula-banner{background:var(--navy3);border:1px solid var(--card-border);border-radius:10px;padding:14px 18px;margin-bottom:18px;text-align:center;font-size:18px;font-weight:700;color:var(--white);letter-spacing:.01em;}
+.formula-banner span{color:var(--cyan);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/index.html">Today</a>
+  <a href="/schedule.html">Schedule</a>
+  <a href="/teachers.html">Teacher resources</a>
+  <a href="/tools.html">Tools</a>
+  <a href="/activities/math/index.html">Math concepts</a>
+</div>
+
+<div class="container">
+
+  <div class="title">Distance <span>Calculator</span></div>
+  <div class="subtitle">Two points on the grid. One straight line. The distance formula does the rest.</div>
+
+  <div class="formula-banner">
+    d = √((x₂ − x₁)² + (y₂ − y₁)²)
+  </div>
+
+  <div class="grid-2">
+
+    <!-- LEFT: Inputs + worked steps -->
+    <div class="card">
+      <h2>Your two points</h2>
+      <div class="point-row p1">
+        <div class="lbl">Point 1</div>
+        <input type="number" class="coord-input" id="x1" value="2" step="any" aria-label="x1">
+        <input type="number" class="coord-input" id="y1" value="1" step="any" aria-label="y1">
+      </div>
+      <div class="point-row p2">
+        <div class="lbl">Point 2</div>
+        <input type="number" class="coord-input" id="x2" value="6" step="any" aria-label="x2">
+        <input type="number" class="coord-input" id="y2" value="4" step="any" aria-label="y2">
+      </div>
+
+      <h2 style="margin-top:22px;">Worked steps</h2>
+      <div class="step">
+        <span class="step-formula">x₂ − x₁ = <b id="dx-formula">6 − 2</b></span>
+        <span class="step-result" id="dx-result">4</span>
+      </div>
+      <div class="step">
+        <span class="step-formula">y₂ − y₁ = <b id="dy-formula">4 − 1</b></span>
+        <span class="step-result" id="dy-result">3</span>
+      </div>
+      <div class="step">
+        <span class="step-formula">(x₂ − x₁)² = <b id="dx2-formula">4²</b></span>
+        <span class="step-result" id="dx2-result">16</span>
+      </div>
+      <div class="step">
+        <span class="step-formula">(y₂ − y₁)² = <b id="dy2-formula">3²</b></span>
+        <span class="step-result" id="dy2-result">9</span>
+      </div>
+      <div class="step">
+        <span class="step-formula">sum = <b id="sum-formula">16 + 9</b></span>
+        <span class="step-result" id="sum-result">25</span>
+      </div>
+      <div class="step final">
+        <span class="step-formula">d = √sum</span>
+        <span class="step-result" id="d-result">5</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Visualization -->
+    <div class="card">
+      <h2>Picture it</h2>
+      <div class="gridbox">
+        <svg id="gridsvg" class="grid" viewBox="0 0 320 320" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div style="font-size:12px;color:var(--slate);margin-top:8px;">
+        <span style="color:var(--orange);font-weight:700;">●</span> Point 1
+        <span style="margin:0 12px;">·</span>
+        <span style="color:var(--green);font-weight:700;">●</span> Point 2
+        <span style="margin:0 12px;">·</span>
+        <span style="color:var(--cyan);font-weight:700;">━</span> straight-line distance
+        <span style="margin:0 12px;">·</span>
+        <span style="color:var(--slate);">- - -</span> legs
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOT STAT BRIDGE -->
+  <div class="card" style="margin-top:18px;">
+    <h2>Bridge to your bot — Power stat</h2>
+    <div style="font-size:14px;color:var(--slate);margin-bottom:14px;">
+      Your charge isn't free. The Power stat decides how fast and how far your bot moves on a single charge.
+    </div>
+
+    <div class="power-row">
+      <div>
+        <div class="power-label">Power stat (1–10)</div>
+        <input type="range" id="power" min="1" max="10" step="1" value="4">
+      </div>
+      <div class="power-value" id="power-value">4</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="lbl">Charge speed</div>
+        <div class="val"><span id="charge-speed">8</span> cm/s</div>
+        <div class="formula">Power² / 2</div>
+      </div>
+      <div class="stat-box">
+        <div class="lbl">Follow-through</div>
+        <div class="val"><span id="followthrough">800</span> cm</div>
+        <div class="formula">Power × 200</div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const inputs = ['x1','y1','x2','y2'].map($);
+const power = $('power');
+
+function compute() {
+  const x1 = parseFloat($('x1').value) || 0;
+  const y1 = parseFloat($('y1').value) || 0;
+  const x2 = parseFloat($('x2').value) || 0;
+  const y2 = parseFloat($('y2').value) || 0;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dx2 = dx * dx;
+  const dy2 = dy * dy;
+  const sum = dx2 + dy2;
+  const d = Math.sqrt(sum);
+
+  const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(2);
+
+  $('dx-formula').textContent = `${fmt(x2)} − ${fmt(x1)}`;
+  $('dy-formula').textContent = `${fmt(y2)} − ${fmt(y1)}`;
+  $('dx-result').textContent = fmt(dx);
+  $('dy-result').textContent = fmt(dy);
+  $('dx2-formula').textContent = `${fmt(dx)}²`;
+  $('dy2-formula').textContent = `${fmt(dy)}²`;
+  $('dx2-result').textContent = fmt(dx2);
+  $('dy2-result').textContent = fmt(dy2);
+  $('sum-formula').textContent = `${fmt(dx2)} + ${fmt(dy2)}`;
+  $('sum-result').textContent = fmt(sum);
+  $('d-result').textContent = fmt(d);
+
+  drawGrid(x1, y1, x2, y2);
+
+  // Power-stat bridge
+  const p = parseInt(power.value, 10);
+  const chargeSpeed = (p * p) / 2;          // cm/s
+  const followThrough = p * 200;            // cm
+  $('power-value').textContent = p;
+  $('charge-speed').textContent = fmt(chargeSpeed);
+  $('followthrough').textContent = fmt(followThrough);
+
+  // Verdict — assume 1 grid unit ≈ 10 cm. Tune if curriculum says otherwise.
+  const cmPerUnit = 10;
+  const distanceCm = d * cmPerUnit;
+  const verdictEl = $('verdict');
+  if (d === 0) {
+    verdictEl.innerHTML = `<b>Pick two different points.</b> A bot doesn't need to charge to a spot it's already at.`;
+  } else {
+    const makesIt = followThrough >= distanceCm;
+    const verdictWord = makesIt
+      ? `<span class="yes">Yes — your charge has enough follow-through.</span>`
+      : `<span class="no">Not quite — your follow-through falls short.</span>`;
+    verdictEl.innerHTML = `
+      Distance to close: <b>${fmt(d)}</b> grid units ≈ <b>${fmt(distanceCm)} cm</b>
+      (assuming 1 grid unit = 10 cm).<br>
+      At Power ${p}: charge speed <b>${fmt(chargeSpeed)} cm/s</b>,
+      follow-through <b>${fmt(followThrough)} cm</b>.<br>
+      ${verdictWord}
+    `;
+  }
+}
+
+function drawGrid(x1, y1, x2, y2) {
+  const svg = $('gridsvg');
+  const W = 320, H = 320, pad = 24;
+  // Auto-bound the grid: include origin + both points, with breathing room
+  const xs = [0, x1, x2];
+  const ys = [0, y1, y2];
+  let minX = Math.min(...xs), maxX = Math.max(...xs);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  // Pad bounds by at least 1, ensure non-zero range
+  if (maxX - minX < 4) { minX -= 2; maxX += 2; }
+  if (maxY - minY < 4) { minY -= 2; maxY += 2; }
+  minX = Math.floor(minX - 1); maxX = Math.ceil(maxX + 1);
+  minY = Math.floor(minY - 1); maxY = Math.ceil(maxY + 1);
+
+  const px = x => pad + ((x - minX) / (maxX - minX)) * (W - 2*pad);
+  const py = y => H - pad - ((y - minY) / (maxY - minY)) * (H - 2*pad);
+
+  let html = '';
+  // Grid lines (integer x and y)
+  for (let xi = Math.ceil(minX); xi <= Math.floor(maxX); xi++) {
+    html += `<line class="grid-cell" x1="${px(xi)}" y1="${py(minY)}" x2="${px(xi)}" y2="${py(maxY)}" />`;
+  }
+  for (let yi = Math.ceil(minY); yi <= Math.floor(maxY); yi++) {
+    html += `<line class="grid-cell" x1="${px(minX)}" y1="${py(yi)}" x2="${px(maxX)}" y2="${py(yi)}" />`;
+  }
+  // Axes (x=0 and y=0 if in view)
+  if (minX <= 0 && maxX >= 0) {
+    html += `<line class="grid-axis" x1="${px(0)}" y1="${py(minY)}" x2="${px(0)}" y2="${py(maxY)}" />`;
+  }
+  if (minY <= 0 && maxY >= 0) {
+    html += `<line class="grid-axis" x1="${px(minX)}" y1="${py(0)}" x2="${px(maxX)}" y2="${py(0)}" />`;
+  }
+  // Right-triangle legs (dashed)
+  html += `<line class="grid-leg" x1="${px(x1)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y1)}" />`;
+  html += `<line class="grid-leg" x1="${px(x2)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y2)}" />`;
+  // Hypotenuse
+  html += `<line class="grid-line" x1="${px(x1)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y2)}" />`;
+  // Points
+  html += `<circle class="grid-pt p1" cx="${px(x1)}" cy="${py(y1)}" r="6" />`;
+  html += `<circle class="grid-pt p2" cx="${px(x2)}" cy="${py(y2)}" r="6" />`;
+  html += `<text class="grid-label p1" x="${px(x1) + 10}" y="${py(y1) - 8}">(${x1}, ${y1})</text>`;
+  html += `<text class="grid-label p2" x="${px(x2) + 10}" y="${py(y2) - 8}">(${x2}, ${y2})</text>`;
+
+  svg.innerHTML = html;
+}
+
+inputs.forEach(el => el.addEventListener('input', compute));
+power.addEventListener('input', compute);
+compute();
+</script>
+</body>
+</html>
