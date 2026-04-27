@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<title>Season 2 Planning</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+*{box-sizing:border-box;margin:0;padding:0;}
+section{padding:4px 8px;border-bottom:1px solid #e0e0e0;}
+section:last-child{border-bottom:none;}
+h2{font-size:7pt;font-weight:700;margin-bottom:3px;}
+p,li{font-size:7pt;line-height:1.3;}
+ul,ol{padding-left:13px;}
+li{margin-bottom:2px;}
+.t-time{font-size:6.5pt;font-weight:700;white-space:nowrap;width:0.48in;}
+.t-action{font-size:7pt;font-weight:600;width:0.9in;}
+.t-focus{font-size:6.5pt;color:#444;font-style:italic;line-height:1.25;}
+.prob-table{width:100%;border-collapse:collapse;}
+.prob-table th{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  padding:2px 5px;border-bottom:1.5px solid #000;text-align:left;}
+.prob-table td{font-size:7pt;padding:3px 5px;border-bottom:1px solid #e0e0e0;
+  vertical-align:top;line-height:1.3;}
+.prob-table tr:last-child td{border-bottom:none;}
+.footer-left{font-size:6.5pt;font-weight:700;color:#555;}
+.footer-right{font-size:6.5pt;color:#555;text-align:right;}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 5px 10px; }
+.section-label { margin-bottom: 4px; }
+.checklist { gap: 4px; }
+.checklist li { font-size: 8pt; }
+.timing-table td { padding: 4px 6px 4px 0; }
+.timing-table td.t-action { font-size: 8pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 7.5pt; line-height: 1.3; }
+.say-list { gap: 5px; }
+.say-item { font-size: 8pt; line-height: 1.4; }
+.say-quote { font-size: 8pt; line-height: 1.35; }
+.watch-grid { gap: 5px 12px; }
+.watch-item { font-size: 7.5pt; line-height: 1.3; }
+.produces li { font-size: 7pt; }
+.pattern-note { font-size: 7pt; margin-top: 5px; padding-top: 4px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Season 2 Planning</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+      <span class="progress-label">5 of 5</span>
+    </div>
+    <div class="header-meta">40 min &nbsp;|&nbsp; Open Lab<br>Day 10 &nbsp;|&nbsp; 1:30–2:10 PM</div>
+  </div>
+  <div class="math-bar">MATH: <span>Hypothesis: "If I change [stat] from [X] to [Y], then [outcome] because [dashboard number]." One variable at a time.</span></div>
+  <div class="card-body">
+    <div class="col">
+<section>
+  <div class="section-label">Before Block Opens</div>
+  <ul class="checklist">
+    <li>Season 1 leaderboard still visible — do not clear it</li>
+    <li>Dashboards open on all devices</li>
+    <li>MakeCode accessible for Track B. Bots powered.</li>
+    <li>Hypothesis format on board (leave up full 40 min): <strong>"If I change [stat] from [X] to [Y], then [outcome] because [number from dashboard]."</strong></li>
+    <li>Closing Ritual prompt staged: "Describe a mistake your team made this week that led to something better. Name it, describe what happened, say exactly what you changed."</li>
+  </ul>
+</section>
+<section>
+  <div class="section-label">Track Distinction</div>
+  <p><strong>Track A (Data):</strong> read Season 1 dashboard → identify one stat to change → write hypothesis with data citation.</p>
+  <p style="margin-top:4px;"><strong>Track B (Bot Lab):</strong> write hypothesis FIRST, then test. Running the bot and then writing a hypothesis to match what you saw is post-hoc rationalization — not Season 2 planning. One variable at a time.</p>
+  <p style="margin-top:4px;">Both tracks end with a written hypothesis. Season 2 reallocation is permanent.</p>
+</section>
+<section>
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>One written Season 2 hypothesis citing specific Season 1 data</li>
+    <li>Track B: hypothesis written before test run + test result added as confirming or contradicting evidence</li>
+    <li>Pair-share: adjacent team identifies stat change + data citation from your hypothesis</li>
+  </ul>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Timing</div>
+  <table class="timing-table">
+    <tr><th class="t-time">Time</th><th class="t-action">Action</th><th class="t-focus">Watch For</th></tr>
+    <tr><td class="t-time">0:00–0:03</td><td class="t-action">Launch: name both tracks and the one Track B rule. Point to hypothesis format. Under 3 min.</td><td class="t-focus">Track B: hypothesis must precede the test run</td></tr>
+    <tr><td class="t-time">0:03–0:33</td><td class="t-action">Track work. Two checks: Track A citing data (not feelings), Track B writing hypothesis before running.</td><td class="t-focus">Track B team running bot for 10 min with no written words: "Bot goes down until you write the hypothesis."</td></tr>
+    <tr><td class="t-time">0:30</td><td class="t-action">10-min warning. "Hypothesis should be at least partially written. Track B: bots down at 0:33."</td><td class="t-focus">Partially written beats blank</td></tr>
+    <tr><td class="t-time">0:33–0:38</td><td class="t-action">Pair-share: read hypothesis to adjacent team. They name: (1) stat changing, (2) data citation. 2 min each, switch.</td><td class="t-focus">Adjacent team can't find both → hypothesis needs one more line</td></tr>
+    <tr><td class="t-time">0:38–0:40</td><td class="t-action">Close: devices down. Launch Closing Ritual prompt.</td><td class="t-focus">Teams without a data citation — note for Monday's Season 2 planning session</td></tr>
+    <tr class="hard-row"><td class="t-time">0:40</td><td class="t-action">End of Day 10. Season 1 complete.</td><td class="t-focus">Season 2 starts Monday</td></tr>
+  </table>
+</section>
+<section>
+  <div class="section-label">Strong vs. Weak Hypothesis</div>
+  <p style="font-size:6.5pt;"><strong>Strong:</strong> "If I increase Speed from 6 to 9, my goals/min will increase because in rounds against Speed ≤5 I won 3 of 3, but against Speed ≥9 I lost 4 of 4."</p>
+  <p style="margin-top:4px;font-size:6.5pt;"><strong>Weak:</strong> "If I increase Speed, I'll win more because I felt slow." (Feeling may be correct — hypothesis is not usable without data.)</p>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Launch Script</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Say</span> "Two options. Track A is data: look at your Season 1 dashboard, pick one stat you want to change, and write a hypothesis. Your hypothesis has to include a real number from your dashboard — not a feeling about how your matches went."</div>
+    <div class="say-item"><span class="say-tag">Say</span> "Track B is bot testing: you try out the change before you write your hypothesis. But Track B only counts as thinking if you write the hypothesis first. If you run the bot, see what happens, and then write a hypothesis to match it — that's not a plan. That's working backwards. Write the hypothesis first, then test it."</div>
+    <div class="say-item"><span class="say-tag">Say</span> "Both tracks finish with a written hypothesis. Season 2 reallocation is permanent. This is your last chance to experiment without it counting. Go."</div>
+  </div>
+</section>
+<section>
+  <div class="section-label">Watch For</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Track A: hypothesis changes two stats simultaneously.</span> <span class="watch-redirect">"Pick the one stat your data most directly supports. You can plan the second change after you see how the first performs."</span></div>
+    <div class="watch-item"><span class="watch-trigger">Track A: hypothesis cites win % without specifying opponent stats.</span> <span class="watch-redirect">"Of the 3 matches you lost, what was your opponent's dominant stat? What does that tell you about which of your stats needs to change?" W/L by stat matchup column has the answer.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Track B: hypothesis contradicted by test — team wants to rewrite hypothesis.</span> <span class="watch-redirect">"Hypothesis stays as written. Add the test result as contradicting evidence. A disproven hypothesis with recorded data is more analytically useful than a convenient hypothesis that was never tested."</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team asks: "Should we increase Speed or Endurance?"</span> <span class="watch-redirect">"What does your W/L by stat matchup column show?" Point to the dashboard. Do not answer the question.</span></div>
+  </div>
+</section>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">0:40 — End of Day 10. Season 1 complete. Every team has a written Season 2 hypothesis.</span></div>
+  <div class="card-footer">
+    <span class="footer-left">Velocity Arena &middot; Facilitator Activity Card &middot; Day 10 of 20</span>
+    <span class="footer-right">40 min &nbsp;|&nbsp; Open Lab</span>
+  </div>
+</div></div>
+</body></html>

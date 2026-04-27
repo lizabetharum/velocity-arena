@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+      *{box-sizing:border-box;margin:0;padding:0}
+.prob-table{width:calc(100% - 20px);border-collapse:collapse;font-size:7pt;margin:4px 10px}
+.prob-table th{font-weight:700;padding:2px 5px;border-bottom:1px solid #000;text-align:left;font-size:7pt}
+.prob-table td{padding:2px 5px;border-bottom:.5px solid #ccc;font-size:7pt;line-height:1.3}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 2px 6px; }
+.section-label { margin-bottom: 2px; padding-bottom: 2px; }
+.checklist { gap: 2px; }
+.checklist li { font-size: 7pt; }
+.timing-table td { padding: 1px 4px 1px 0; }
+.timing-table td.t-action { font-size: 7pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 6.5pt; line-height: 1.15; }
+.say-list { gap: 2px; }
+.say-item { font-size: 7pt; line-height: 1.2; }
+.say-quote { font-size: 7pt; line-height: 1.15; }
+.watch-grid { gap: 2px 8px; }
+.watch-item { font-size: 6.5pt; line-height: 1.15; }
+.produces li { font-size: 6.5pt; }
+.pattern-note { font-size: 6.5pt; margin-top: 2px; padding-top: 2px; }
+.col-inner { font-size: 7pt; line-height: 1.25; }
+</style><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Percent Change: Season 1 to Season 2 Configurations</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:50%;"></div></div>
+      <span class="progress-label">2 of 4</span>
+    </div>
+    <div class="header-meta">50 MIN · CHALLENGE<br>Day 14 · 10:00–10:50 AM</div>
+  </div>
+  <div class="math-bar">% Change = ((New − Old) ÷ Old) × 100 &nbsp;·&nbsp; Speed proportional · Power² not proportional · Zero-value = undefined</div>
+  <div class="card-body">
+    <div class="col">
+<div class="section">
+  <div class="section-label">Before</div>
+  <ul class="checklist">
+    <li>Pull every team's S1 allocation — fill in Stat Summary Reference before session</li>
+    <li>Auction Board from Day 14 still visible — teams read S2 config from it</li>
+    <li>Percent Change worksheet distributed — one per camper (not per team)</li>
+    <li>Calculators available — hand them over without comment</li>
+  </ul>
+</div>
+<div class="section">
+  <div class="section-label">Formula</div>
+  <div class="col-inner">
+    <strong>% Change = ((New − Old) ÷ Old) × 100</strong><br>
+    Work through board example before teams start.<br>
+    <strong>Key teaching:</strong> Is percent change proportional?<br>
+    Speed: +50% stat → +50% motor power (proportional ✓)<br>
+    Power: +50% Power → +125% charge speed (NOT proportional ✗)<br><br>
+    <strong>Zero-value warning:</strong> If S1 stat = 0, percent change is undefined — cannot divide by zero. Use absolute change instead and note it on the worksheet.
+  </div>
+</div>
+<div class="section">
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>Worksheet: percent change for all 4 stats, S1→S2</li>
+    <li>Biggest-change stat named with direction</li>
+    <li>Written answer: is their biggest change proportional? Why?</li>
+  </ul>
+</div></div><div class="col"><div class="section">
+<div class="section-label">Timing</div>
+<table class="timing-table">
+<thead><tr><th>Time</th><th>Action</th><th>Watch For</th></tr></thead>
+<tbody>
+<tr><td class="t-time">10:00</td><td class="t-action">Launch: connect to auction, no recap. One sentence, open worksheet. Under 30 sec.</td><td class="t-focus">Teams reaching for phones → "Everything you need is on your worksheet and the board."</td></tr>
+<tr><td class="t-time">10:03</td><td class="t-action">Introduce formula on board. Work through one example. Display formula — stays visible all block.</td><td class="t-focus">Team says they already know it → "Good — do the first calculation and check your answer against mine."</td></tr>
+<tr><td class="t-time">10:08</td><td class="t-action">Teams work independently. Circulate. Do not answer calculation questions — redirect to formula.</td><td class="t-focus">Stat with S1 value of zero → "Percent change is undefined when old = 0. Calculate absolute change. Note it."</td></tr>
+<tr><td class="t-time">10:25</td><td class="t-action">Call time. Pairs verify each other's work — 3 minutes.</td><td class="t-focus">Team that hasn't finished → let them continue, pull one answer at share-out.</td></tr>
+<tr><td class="t-time">10:28</td><td class="t-action">Share-out: each team names their biggest-change stat. Record on Team Comparison Table on board.</td><td class="t-focus">Team can't agree on biggest change → "Which has the largest absolute percent change number?"</td></tr>
+<tr><td class="t-time">10:36</td><td class="t-action">Proportionality discussion — "Is percent change proportional?" Speed vs. Power comparison.</td><td class="t-focus">Team says "yes, always" → ask about Power formula (Power²). "Run the numbers."</td></tr>
+<tr><td class="t-time">10:44</td><td class="t-action">Connect to Prediction Market: team that raised Speed by 50% — does their prediction card reflect that?</td><td class="t-focus"></td></tr>
+<tr class="hard-row"><td class="t-time">10:50</td><td colspan="2">Transition to PM / lunch</td></tr>
+</tbody></table>
+</div></div><div class="col"><div class="section">
+<div class="section-label">Say Script</div>
+<div class="say-list">
+  <div class="say-item"><span class="say-tag">Launch</span>
+    <span class="say-quote">The auction just locked your Season 2 configuration. Percent change is the tool that turns that decision into data. You can now calculate exactly how much each of your four stats shifted from Season 1 to Season 2.</span></div>
+  <div class="say-item"><span class="say-tag">Formula Intro</span>
+    <span class="say-quote">Percent change equals new minus old, divided by old, times 100. That's it. Let's do one together on the board.</span></div>
+  <div class="say-item"><span class="say-tag">Zero Value</span>
+    <span class="say-quote">If your Season 1 value is zero, you cannot calculate percent change — you'd be dividing by zero. Write "undefined" and calculate the absolute change instead: new minus old, with no division.</span></div>
+  <div class="say-item"><span class="say-tag">Proportionality Q</span>
+    <span class="say-quote">Here is a question for the whole room: if a team increased Speed by 50%, should their wins increase by 50%? Does it depend on which stat changed?</span> Then: <span class="say-quote">The answer depends on whether the relationship is proportional. Speed is — Power is not. That is why we calculate both.</span></div>
+  <div class="say-item"><span class="say-tag">Prediction Link</span>
+    <span class="say-quote">Look at your Prediction Market card. If you raised Speed by 50% and your prediction calls for more wins — can you explain the link? If you can, your prediction is evidence-based. If you can't, it's still a guess.</span></div>
+</div>
+</div></div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">10:50 — Every team has completed percent change for all 4 stats. Team Comparison Table filled on board. Proportionality question discussed. Link to Prediction Market explicit.</span></div>
+  <div class="card-footer"><span>Velocity Arena · Day 14</span><span>Challenge · LO 6.1, 6.2</span></div>
+</div></div></body></html>

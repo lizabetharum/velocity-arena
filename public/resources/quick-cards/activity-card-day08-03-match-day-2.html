@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<title>Match Day 2</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+*{box-sizing:border-box;margin:0;padding:0;}
+section{padding:2px 6px;border-bottom:1px solid #e0e0e0;}
+section:last-child{border-bottom:none;}
+h2{font-size:7pt;font-weight:700;margin-bottom:3px;}
+p,li{font-size:6.5pt;line-height:1.2;}
+ul,ol{padding-left:13px;}
+li{margin-bottom:2px;}
+.t-time{font-size:6.5pt;font-weight:700;white-space:nowrap;width:0.48in;}
+.t-action{font-size:7pt;font-weight:600;width:0.9in;}
+.t-focus{font-size:6.5pt;color:#444;font-style:italic;line-height:1.25;}
+.prob-table{width:100%;border-collapse:collapse;}
+.prob-table th{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  padding:2px 5px;border-bottom:1.5px solid #000;text-align:left;}
+.prob-table td{font-size:7pt;padding:3px 5px;border-bottom:1px solid #e0e0e0;
+  vertical-align:top;}
+.prob-table tr:last-child td{border-bottom:none;}
+.footer-left{font-size:6.5pt;font-weight:700;color:#555;}
+.footer-right{font-size:6.5pt;color:#555;text-align:right;}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 3px 8px; }
+.section-label { margin-bottom: 3px; padding-bottom: 3px; }
+.checklist { gap: 3px; }
+.checklist li { font-size: 7.5pt; }
+.timing-table td { padding: 2px 5px 2px 0; }
+.timing-table td.t-action { font-size: 7.5pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 7pt; line-height: 1.2; }
+.say-list { gap: 3px; }
+.say-item { font-size: 7.5pt; line-height: 1.3; }
+.say-quote { font-size: 7.5pt; line-height: 1.25; }
+.watch-grid { gap: 3px 10px; }
+.watch-item { font-size: 7pt; line-height: 1.2; }
+.produces li { font-size: 7pt; }
+.pattern-note { font-size: 7pt; margin-top: 3px; padding-top: 3px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Match Day 2</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
+      <span class="progress-label">3 of 4</span>
+    </div>
+    <div class="header-meta">70 min &nbsp;|&nbsp; Match Block<br>Day 8 &nbsp;|&nbsp; 12:00–1:10 PM</div>
+  </div>
+  <div class="math-bar">MATH: <span>Prediction source = scatter plot equation: Goals = mS + b. Plug in Speed allocation. LO 5.2, 7.1</span></div>
+  <div class="card-body">
+    <div class="col">
+<section>
+  <div class="section-label">Before Matches Begin</div>
+  <ul class="checklist">
+    <li>Day 8 bracket posted — 2 rounds only, both matchups visible from every seat</li>
+    <li>Day 7 leaderboard stays on wall — add Day 8 results to same board</li>
+    <li>Match field ready before activity ends (not during transition)</li>
+    <li>Data logs on tables — scatter plot equation section filled from this morning. Blank equation → fill before Round 1 starts.</li>
+    <li>Dashboard visible from every seat</li>
+    <li>Rivalry Cards materials staged and ready at 1:10 — transition is direct, no buffer</li>
+  </ul>
+</section>
+<section>
+  <div class="section-label">New Today: Prediction Source</div>
+  <p>Day 8 uses the scatter plot equation: Goals = mS + b. Plug in Speed allocation → read off prediction. The prediction gap is the data every remaining lesson builds on.</p>
+</section>
+<section>
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>2 data log rows: goals for, goals against, W/L</li>
+    <li>Dashboard updated with both match results</li>
+    <li>Equation-based prediction before each round (written, not in head)</li>
+    <li>Loss-recovery hypothesis: one variable to change + why</li>
+  </ul>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Timing (LO 5.2, 7.1)</div>
+  <table class="timing-table">
+    <tr><th class="t-time">Time</th><th class="t-action">Action</th><th class="t-focus">Watch For</th></tr>
+    <tr><td class="t-time">12:00</td><td class="t-action">Opening: one new thing — prediction source is now the scatter plot equation. Under 2 min.</td><td class="t-focus">Cycle is familiar — only the prediction source changed</td></tr>
+    <tr><td class="t-time">12:02</td><td class="t-action">Rnd 1 pre-match: each team reads scatter plot prediction aloud</td><td class="t-focus">No written equation → stop here until on paper</td></tr>
+    <tr><td class="t-time">12:06</td><td class="t-action">Rnd 1 play — start simultaneously, call 3-min mark. 12:12 — announce result, record immediately.</td><td class="t-focus">Stay neutral. Go to losing team first.</td></tr>
+    <tr><td class="t-time">12:14</td><td class="t-action">Loss recovery Rnd 1 — same 4 steps. Step 2 today: Speed allocation, not endurance.</td><td class="t-focus">No team starts Rnd 2 until all finish recovery.</td></tr>
+    <tr><td class="t-time">12:28</td><td class="t-action">Rnd 2 pre-match — new pairings, predictions aloud. 12:32 — Rnd 2 play.</td><td class="t-focus">Revised equation after Rnd 1? Correct — acknowledge it.</td></tr>
+    <tr><td class="t-time">12:38</td><td class="t-action">Rnd 2 post + loss recovery — last loss today, don't abbreviate Step 1.</td><td class="t-focus">3 consecutive losses (Days 7+8) → see facilitator notes.</td></tr>
+    <tr><td class="t-time">12:53</td><td class="t-action">Dashboard update — walk room, no blanks. 1:03 — Leaderboard. Name Best Prediction leader (equation accuracy).</td><td class="t-focus">Blank = gap in scatter plot that can't be reconstructed.</td></tr>
+    <tr class="hard-row"><td class="t-time">1:10</td><td class="t-action">Transition → Rivalry Cards (direct, no buffer)</td><td class="t-focus">"Leaderboard up. Tell each other what you think."</td></tr>
+  </table>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Day 8 Loss Recovery — Step 2 Difference</div>
+  <p>Same 4-step script as Day 7. Step 2 changes today:</p>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Step 2</span> <span class="say-quote">"Your equation predicted X goals. You scored Y. That gap is your data. Let's find the one variable your model got wrong."</span> Open dashboard. Look at Speed allocation only. Did they change it since Day 7? If yes — that's the variable. If no — model needs more data points. Open Lab conversation.</div>
+  </div>
+</section>
+<section>
+  <div class="section-label">Day 8-Specific Watch For</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Team can't produce a number from their equation.</span> <span class="watch-redirect">"What is your Speed allocation? Plug that in." No equation → write an estimate and note it's not equation-based.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team revises equation mid-match-day.</span> <span class="watch-redirect">Revising the prediction after a loss: correct. Revising slope/intercept happens in Open Lab, not between rounds.</span></div>
+    <div class="watch-item"><span class="watch-trigger">3 consecutive losses (Days 7 + 8 Round 1).</span> <span class="watch-redirect">"You have more data than any winning team right now. Three losses = three chances to test a model." Name it explicitly.</span></div>
+  </div>
+</section>
+<section>
+  <div class="section-label">Opening Script</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Say</span> "Two matches today. Same cycle as Day 7. One change: prediction source. Use your scatter plot equation from this morning — plug in your Speed, read off the prediction. Log it before the match. Written, not in your head."</div>
+  </div>
+</section>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">1:10 — Leaderboard updated. Transition directly to Rivalry Cards — no buffer.</span></div>
+  <div class="card-footer">
+    <span class="footer-left">Velocity Arena &middot; Facilitator Activity Card &middot; Day 8 of 20</span>
+    <span class="footer-right">70 min &nbsp;|&nbsp; Match Block</span>
+  </div>
+</div></div>
+</body></html>

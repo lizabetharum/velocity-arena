@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end -->
+<meta charset="UTF-8">
+<title>Velocity Arena — Speed Stat Challenge</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 5px 10px; }
+.section-label { margin-bottom: 4px; }
+.checklist { gap: 4px; }
+.checklist li { font-size: 8pt; }
+.timing-table td { padding: 4px 6px 4px 0; }
+.timing-table td.t-action { font-size: 8pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 7.5pt; line-height: 1.3; }
+.say-list { gap: 5px; }
+.say-item { font-size: 8pt; line-height: 1.4; }
+.say-quote { font-size: 8pt; line-height: 1.35; }
+.watch-grid { gap: 5px 12px; }
+.watch-item { font-size: 7.5pt; line-height: 1.3; }
+.produces li { font-size: 7pt; }
+.pattern-note { font-size: 7pt; margin-top: 5px; padding-top: 4px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+
+<div class="page">
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <div class="activity-name">Speed Stat Challenge</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:67%;"></div></div>
+      <span class="progress-label">6 of 9</span>
+    </div>
+    <div class="header-meta">Day 1 · Challenge Block · 40 min<br>Follows Pre-Task Diagnostic</div>
+  </div>
+
+  <!-- MATH BAR -->
+  <div class="math-bar">
+    MATH: <span>Motor Power = (Speed × 100) ÷ 20 &nbsp;·&nbsp; Each stat point = 5% motor power &nbsp;·&nbsp; Speed × 5 = Power %</span>
+  </div>
+
+  <!-- THREE-COLUMN BODY -->
+  <div class="card-body">
+
+    <!-- ── COL 1: Before You Start ────────────────────── -->
+    <div class="col">
+      <div class="section">
+        <div class="section-label">Before You Start</div>
+        <ul class="checklist">
+          <li>Formula written on board <strong>before</strong> anyone sits down</li>
+          <li>Speed Challenge worksheets printed — 1 per team</li>
+          <li>Stat cards at every seat, face up</li>
+          <li>Comparison team pairings decided and written down</li>
+          <li>Timer set to 40 min — you'll call 0:05, 0:20, 0:30, 0:37</li>
+          <li>Your answer key in hand — not projected</li>
+          <li class="note">Do not confirm or deny any answers during team calculation or peer comparison. Redirect to the work.<br />
+          <br /></li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Students Produce</div>
+    <ul class="produces">
+    <li>Completed Speed Stat Challenge worksheet — motor power calculations for each Speed value</li>
+    <li>Speed value written on stat card (binding from the moment it is written)</li>
+    <li>Class claim sentence: doubling Speed does / does not double motor power — written on board</li>
+    </ul>
+  </div>
+      <div class="section grow">
+        <div class="section-label">Answer Key</div>
+        <div class="answer-grid">
+          <div class="ah">Pts</div><div class="ah">Power %</div><div class="ah">Shortcut</div>
+          <div class="ar bold">1</div><div class="ar bold">5%</div><div class="ar">1 × 5</div>
+          <div class="ar bold">3</div><div class="ar bold">15%</div><div class="ar">3 × 5</div>
+          <div class="ar bold">5</div><div class="ar bold">25%</div><div class="ar">5 × 5</div>
+          <div class="ar bold">6</div><div class="ar bold">30%</div><div class="ar">6 × 5</div>
+          <div class="ar bold last">8</div><div class="ar bold last">40%</div><div class="ar last">8 × 5</div>
+        </div>
+        <div class="pattern-note">Speed = 20 → 100% (max). Speed = 4 → 20% (good extension value — not on worksheet).</div>
+      </div>
+    </div>
+
+    <!-- ── COL 2: Timing ──────────────────────────────── -->
+    <div class="col">
+      <div class="section grow">
+        <div class="section-label">Timing</div>
+        <table class="timing-table">
+          <tr>
+            <td class="t-time">0:00</td>
+            <td class="t-action">Formula on board</td>
+            <td class="t-focus">One sentence only — point to the board and step back. Hard cap at 5 minutes. If you're still talking at 0:05, stop mid-sentence: "Worksheet time starts now."</td>
+          </tr>
+          <tr>
+            <td class="t-time">0:05</td>
+            <td class="t-action">Team calculation</td>
+            <td class="t-focus">Circulate slowly. Scan for teams that haven't started and values that are clearly wrong. Do not confirm or deny anything. Redirect to the formula.</td>
+          </tr>
+          <tr>
+            <td class="t-time">0:20</td>
+            <td class="t-action">Peer comparison</td>
+            <td class="t-focus">Announce pairings, then move to the edge of the room. Teams compare value by value starting at Speed = 1. You do not arbitrate. Silent pairs need a prompt — walk to them.</td>
+          </tr>
+          <tr>
+            <td class="t-time">0:30</td>
+            <td class="t-action">Whole-room confirm</td>
+            <td class="t-focus">State all five values. Then ask: "What pattern do you see?" Wait. Do not fill the silence. Accept any correct observation — you don't need formal mathematical language here.</td>
+          </tr>
+          <tr>
+            <td class="t-time">0:37</td>
+            <td class="t-action">Stat card entry</td>
+            <td class="t-focus">Teams choose their Speed allocation. Circulate while they decide. Check that they filled in both the points AND the percentage. Stay near teams that look uncertain.</td>
+          </tr>
+          <tr class="hard-row">
+            <td class="t-time">0:40</td>
+            <td class="t-action">Hard stop</td>
+            <td class="t-focus">Every team must have a Speed value on their stat card before leaving. Stay at the table until they write it. The entry is binding from the moment it's written.</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── COL 3: Say This + Watch For ───────────────── -->
+    <div class="col">
+
+      <div class="section">
+        <div class="section-label">Say This</div>
+        <div class="say-list">
+          <div class="say-item">
+            <span class="say-tag">Launch</span>
+            <div class="say-quote">"One formula. Motor power equals Speed points times 100 divided by 20. Your worksheet has five Speed values: 1, 3, 5, 6, and 8. Go."</div>
+          </div>
+          <div class="say-item">
+            <span class="say-tag">Compare</span>
+            <div class="say-quote">"Stop. Turn to your comparison team. Compare your Speed = 1 answer. If you match, move to Speed = 3. Go through all five."</div>
+          </div>
+          <div class="say-item">
+            <span class="say-tag">Pattern</span>
+            <div class="say-quote">"Look at your table. What pattern do you see?" &nbsp;[wait — do not answer it]</div>
+          </div>
+          <div class="say-item">
+            <span class="say-tag">Allocate</span>
+            <div class="say-quote">"You have seen the formula and calculated five values. Now choose your Speed allocation and write it on your stat card."</div>
+          </div>
+          <div class="say-item">
+            <span class="say-tag dont">Not this</span>
+            <div class="say-quote plain">Don't say "linear relationship" — save for Day 4. Don't say "good job" or "perfect" when confirming values — confirm and move on.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section grow">
+        <div class="section-label">Watch For → Redirect</div>
+        <div class="watch-grid">
+          <div class="watch-item">
+            <span class="watch-trigger">Teams disagree — can't find the split</span>
+            <span class="watch-redirect">"Write your work for Speed = [X] side by side. Find the step where they diverge." Walk away. Return in 2 min.</span>
+          </div>
+          <div class="watch-item">
+            <span class="watch-trigger">Team writes decimals (0.05 not 5%)</span>
+            <span class="watch-redirect">"What does the ×100 do to that number?" Walk away without staying for the answer.</span>
+          </div>
+          <div class="watch-item">
+            <span class="watch-trigger">Team inverted the fraction (2000% for Spd = 1)</span>
+            <span class="watch-redirect">"For Speed = 1 your answer is 2000%. Can a motor run at 2000%?" That's enough. Don't show them the error.</span>
+          </div>
+          <div class="watch-item">
+            <span class="watch-trigger">Team not working — chatting, cards out</span>
+            <span class="watch-redirect">"Speed = 1. What does the formula give you?" Point to worksheet. One prompt only — walk away.</span>
+          </div>
+          <div class="watch-item">
+            <span class="watch-trigger">Both teams agree on a wrong answer</span>
+            <span class="watch-redirect">"You both got [X] for Speed = 1. Walk me through the first step of the calculation." Don't point to the error.</span>
+          </div>
+          <div class="watch-item">
+            <span class="watch-trigger">Team finishes all 5 in &lt; 4 min</span>
+            <span class="watch-redirect">Extension: "Calculate Speed = 2, 10, and 20. What does Speed = 20 tell you about the formula?"</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /card-body -->
+
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">Every team must write a Speed value on their stat card before leaving the room. Stay at the table until they do. The stat card entry is binding from the moment it's written — do not soften this.</span>
+  </div>
+
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · Day 1 of 20</span>
+    <span>Speed Stat Challenge · Summer Sparks 2026</span>
+  </div>
+
+</div><!-- /card -->
+</div><!-- /page -->
+
+</body>
+</html>

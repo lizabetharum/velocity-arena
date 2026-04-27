@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<title>Match Day 3</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+*{box-sizing:border-box;margin:0;padding:0;}
+section{padding:1px 3px;border-bottom:1px solid #e0e0e0;}
+section:last-child{border-bottom:none;}
+h2{font-size:6pt;font-weight:700;margin-bottom:1px;}
+p,li{font-size:6pt;line-height:1.15;}
+ul,ol{padding-left:13px;}
+li{margin-bottom:2px;}
+.t-time{font-size:6pt;font-weight:700;white-space:nowrap;width:0.42in;}
+.t-action{font-size:6.5pt;font-weight:600;width:0.82in;}
+.t-focus{font-size:6pt;color:#444;font-style:italic;line-height:1.2;}
+.prob-table{width:100%;border-collapse:collapse;}
+.prob-table th{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  padding:2px 5px;border-bottom:1.5px solid #000;text-align:left;}
+.prob-table td{font-size:6pt;padding:1px 4px;border-bottom:1px solid #e0e0e0;
+  vertical-align:top;line-height:1.2;}
+.prob-table tr:last-child td{border-bottom:none;}
+.footer-left{font-size:6.5pt;font-weight:700;color:#555;}
+.footer-right{font-size:6.5pt;color:#555;text-align:right;}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 2px 6px; }
+.section-label { margin-bottom: 2px; padding-bottom: 2px; }
+.checklist { gap: 2px; }
+.checklist li { font-size: 7pt; }
+.timing-table td { padding: 1px 4px 1px 0; }
+.timing-table td.t-action { font-size: 7pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 6.5pt; line-height: 1.15; }
+.say-list { gap: 2px; }
+.say-item { font-size: 7pt; line-height: 1.2; }
+.say-quote { font-size: 7pt; line-height: 1.15; }
+.watch-grid { gap: 2px 8px; }
+.watch-item { font-size: 6.5pt; line-height: 1.15; }
+.produces li { font-size: 6.5pt; }
+.pattern-note { font-size: 6.5pt; margin-top: 2px; padding-top: 2px; }
+.col-inner { font-size: 7pt; line-height: 1.25; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Match Day 3</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
+      <span class="progress-label">3 of 4</span>
+    </div>
+    <div class="header-meta">90 min &nbsp;|&nbsp; Match Block<br>Day 9 &nbsp;|&nbsp; 12:00–1:30 PM</div>
+  </div>
+  <div class="math-bar">MATH: <span>20% gap rule: |pred−actual|÷pred×100. Gap &gt;20% → write sentence. Prediction uses Formula Relay target type. LO 4.1, 7.2</span></div>
+  <div class="card-body">
+    <div class="col">
+<section>
+  <div class="section-label">Before Matches Begin</div>
+  <ul class="checklist">
+    <li>Formula Relay target board still up and visible — used during loss recovery Step 2</li>
+    <li>3-round bracket posted, all matchups visible from every seat</li>
+    <li>Data logs on tables — Day 3 prediction (from Formula Relay) already written in Prediction column. Verify before Round 1.</li>
+    <li>Dashboard accessible from every seat</li>
+    <li>Open Lab materials staged — Track A/B directions ready for 1:30 transition (direct, no buffer)</li>
+  </ul>
+</section>
+<section>
+  <div class="section-label">New Today: 20% Gap Rule</div>
+  <p><strong>Formula:</strong> |prediction − actual| ÷ prediction × 100</p>
+  <p>If gap &gt; 20%: team writes one sentence in data log Notes column: <em>"The variable my model missed was _____ because _____."</em></p>
+  <table class="prob-table" style="margin-top:4px;">
+    <tr><th>Pred</th><th>Actual</th><th>Gap %</th><th>Write?</th></tr>
+    <tr><td>5</td><td>3</td><td>40%</td><td>Yes</td></tr>
+    <tr><td>4</td><td>3</td><td>25%</td><td>Yes</td></tr>
+    <tr><td>4</td><td>4</td><td>0%</td><td>No</td></tr>
+    <tr><td>0</td><td>&gt;0</td><td>N/A</td><td>Yes (auto)</td></tr>
+  </table>
+</section>
+<section>
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>3 data log rows: goals for/against, W/L, prediction</li>
+    <li>20% gap sentence for any match exceeding threshold</li>
+    <li>Dashboard updated, leaderboard updated</li>
+  </ul>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Timing (LO 4.1, 7.2)</div>
+  <table class="timing-table">
+    <tr><th class="t-time">Time</th><th class="t-action">Action</th><th class="t-focus">Watch For</th></tr>
+    <tr><td class="t-time">0:00</td><td class="t-action">Opening: name the 20% gap rule. Confirm predictions. Under 3 min.</td><td class="t-focus">Blank prediction: "Formula, substitution, number. 90 seconds."</td></tr>
+    <tr><td class="t-time">0:03</td><td class="t-action">Rnd 1 pre-match: predictions aloud — must use Formula Relay target type.</td><td class="t-focus">Round number, no calculation → "Which formula did you use?"</td></tr>
+    <tr><td class="t-time">0:07</td><td class="t-action">Rnd 1 play — start simultaneously, call 3-min mark</td><td class="t-focus">Stay neutral. Your goal count is final.</td></tr>
+    <tr><td class="t-time">0:13</td><td class="t-action">Rnd 1 post + recovery: record immediately, flag &gt;20% gap teams, gap entries + recovery before Rnd 2. Step 2 refs Formula Relay board.</td><td class="t-focus">No team starts Rnd 2 until all finish recovery.</td></tr>
+    <tr><td class="t-time">0:28</td><td class="t-action">Rnd 2 pre-match. Target type still applies.</td><td class="t-focus">Revised formula after Rnd 1? Correct move — acknowledge it.</td></tr>
+    <tr><td class="t-time">0:32</td><td class="t-action">Rnd 2 play. 0:38 — post + loss recovery + gap entries.</td><td class="t-focus">Step 2: push for one specific input variable.</td></tr>
+    <tr><td class="t-time">0:53</td><td class="t-action">Rnd 3 pre-match — final match of Season 1.</td><td class="t-focus">Two-loss teams may go quiet — check prediction rows</td></tr>
+    <tr><td class="t-time">0:57</td><td class="t-action">Rnd 3 play. 1:03 — post + loss recovery. Do not abbreviate Step 1 (3rd loss).</td><td class="t-focus">All gap entries filled before proceeding.</td></tr>
+    <tr><td class="t-time">1:13</td><td class="t-action">Check all &gt;20% gap rows have sentences. 1:22 — Dashboard + leaderboard. Name Season 1 Best Prediction leader.</td><td class="t-focus">"I don't know" is not a complete entry.</td></tr>
+    <tr class="hard-row"><td class="t-time">1:30</td><td class="t-action">Transition → Open Lab (direct)</td><td class="t-focus">Season 1 complete</td></tr>
+  </table>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Loss Recovery — Step 2 (Day 9 Version)</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Step 1</span> <span class="say-quote">"That result was frustrating. That's a real feeling and it makes sense."</span> <em>Wait 30 seconds. Add nothing.</em></div>
+    <div class="say-item"><span class="say-tag">Step 2</span> <span class="say-quote">"Your prediction used [Formula Relay target type]. Your model said X goals. You scored Y. Look at one input: did the number you plugged into the formula match what you actually ran with today?"</span> Ref the Formula Relay board. One variable — did the input match?</div>
+    <div class="say-item"><span class="say-tag">Step 3</span> <span class="say-quote">"You have N matches left. The gap entry you write now is the one sentence your next prediction builds on. What one variable would you change?"</span></div>
+  </div>
+</section>
+<section>
+  <div class="section-label">Watch For</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Team wants to switch formula type from relay target.</span> <span class="watch-redirect">Not until they've used the target type at least once. They can switch for Round 3 only after that.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Gap entry blank: "I don't know."</span> <span class="watch-redirect">"Look at your prediction formula. Which input number was approximate? That's your starting point." Don't accept incomplete entries.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Small prediction (1 or 2 goals) — any miss triggers &gt;20%.</span> <span class="watch-redirect">Rule still applies. Small predictions are fragile models. The sentence should name what the model didn't account for at low goal counts.</span></div>
+  </div>
+</section>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">1:30 — All gap entries filled. Dashboard + leaderboard updated. Transition → Open Lab.</span></div>
+  <div class="card-footer">
+    <span class="footer-left">Velocity Arena &middot; Facilitator Activity Card &middot; Day 9 of 20</span>
+    <span class="footer-right">90 min &nbsp;|&nbsp; Match Block</span>
+  </div>
+</div></div>
+</body></html>

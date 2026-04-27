@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+      *{box-sizing:border-box;margin:0;padding:0}
+.prob-table{width:calc(100% - 20px);border-collapse:collapse;font-size:6.5pt;margin:4px 10px}
+.prob-table th{font-weight:700;padding:2px 5px;border-bottom:1px solid #000;text-align:left;font-size:6.5pt}
+.prob-table td{padding:2px 5px;border-bottom:.5px solid #ccc;font-size:6.5pt;line-height:1.2}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 2px 6px; }
+.section-label { margin-bottom: 2px; padding-bottom: 2px; }
+.checklist { gap: 2px; }
+.checklist li { font-size: 7pt; }
+.timing-table td { padding: 1px 4px 1px 0; }
+.timing-table td.t-action { font-size: 7pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 6.5pt; line-height: 1.15; }
+.say-list { gap: 2px; }
+.say-item { font-size: 7pt; line-height: 1.2; }
+.say-quote { font-size: 7pt; line-height: 1.15; }
+.watch-grid { gap: 2px 8px; }
+.watch-item { font-size: 6.5pt; line-height: 1.15; }
+.produces li { font-size: 6.5pt; }
+.pattern-note { font-size: 6.5pt; margin-top: 2px; padding-top: 2px; }
+.col-inner { font-size: 7pt; line-height: 1.25; }
+</style><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Season 2 Match Day 2</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
+      <span class="progress-label">3 of 4</span>
+    </div>
+    <div class="header-meta">90 MIN · MATCH<br>Day 14 · PM</div>
+  </div>
+  <div class="math-bar">Configs locked after auction · equation prediction before every match · MD2 residual = data for Open Lab track assignment</div>
+  <div class="card-body">
+    <div class="col"><div class="section"><div class="section-label">Before</div>
+<ul class="checklist">
+  <li>Pull Day 14 Stat Auction notes — know which teams won and what they changed</li>
+  <li>Fill in Post-Auction Config Verification table (team, stat, S1→S2 values)</li>
+  <li>Fill in Prediction Market Progress table (names, cards, MD1 results)</li>
+  <li>Commissioner rules copied from Day 12 vote record</li>
+  <li>Linear equation and percent change worksheets accessible</li>
+  <li>Do NOT start Match 1 until every auction winner confirms MakeCode reflects new allocation</li>
+</ul>
+</div>
+<div class="section"><div class="section-label">What Makes MD2 Different</div>
+<div class="col-inner" style="font-size:6.5pt;line-height:1.3;">
+  1. <strong>Locked configs</strong> — auction is closed. No changes between matches.<br>
+  2. <strong>Percent change calculated</strong> — teams know exactly how much shifted. Match is a live test of whether that change mattered.<br>
+  3. <strong>Prediction Market cards locked</strong> — every result moves teams toward or away from their public number.<br><br>
+  <em>Do NOT let teams skip the equation prediction ritual — it is more important now than on MD1.</em>
+</div>
+</div>
+<div class="section"><div class="section-label">Students Produce</div>
+<ul class="produces">
+  <li>Equation prediction written before every match</li>
+  <li>Result recorded immediately after each match</li>
+  <li>Residual calculated per match</li>
+  <li>Prediction Market Progress updated after all matches</li>
+</ul></div>
+</div><div class="col"><div class="section"><div class="section-label">Timing</div>
+<table class="timing-table">
+<thead><tr><th>Time</th><th>Action</th><th>Watch For</th></tr></thead>
+<tbody>
+<tr><td class="t-time">0:00</td><td class="t-action">Config verification: every auction winner reads MakeCode values aloud. "Think it's right" is not enough — open and read the values.</td><td class="t-focus">Team that "thinks" it's right → open MakeCode and read values.</td></tr>
+<tr><td class="t-time">0:07</td><td class="t-action">Commissioner rules reminder: read aloud once, exactly as passed, no commentary.</td><td class="t-focus">Team re-litigating a rule → "Rules are locked. No changes today."</td></tr>
+<tr><td class="t-time">0:15</td><td class="t-action">Match 1 — equation prediction ritual (Step 4 new: check MD1 residual before predicting).</td><td class="t-focus">Team skipping prediction ritual → hold them. Both written predictions required.</td></tr>
+<tr><td class="t-time">0:30</td><td class="t-action">Match 2. Repeat ritual. Run loss recovery for MD1 losers before match.</td><td class="t-focus">Visible frustration from prior loss → run loss recovery before they compete.</td></tr>
+<tr><td class="t-time">0:45</td><td class="t-action">Match 3. Check allocation compliance after each win.</td><td class="t-focus">Team asking to change allocation between matches → not permitted after auction.</td></tr>
+<tr><td class="t-time">0:60</td><td class="t-action">Match 4 if schedule allows. Maintain prediction ritual.</td><td class="t-focus">Teams rushing ritual as time pressure builds → slow it down.</td></tr>
+<tr class="hard-row"><td class="t-time">1:20</td><td class="t-action" colspan="2">Close matches. Update leaderboard. Update Prediction Market Progress table.</td></tr>
+</tbody></table></div>
+</div><div class="col"><div class="section"><div class="section-label">Say Script</div>
+<div class="say-list">
+  <div class="say-item"><span class="say-tag">Opening</span>
+    <span class="say-quote">Season 2 Match Day 2. Configs locked, auction closed. Every change from this morning is final. Auction winners: open MakeCode and read me your four stat values.</span></div>
+  <div class="say-item"><span class="say-tag">Before Each Match</span>
+    <span class="say-quote">Write your equation prediction before you take the field. Plug in your current stat value for x. What does y equal? Write that number. Both teams, before the match starts.</span></div>
+  <div class="say-item"><span class="say-tag">Loss Recovery S2 (3 Steps)</span>
+    Step 1: <span class="say-quote">Which commissioner rule most affected that match?</span><br>
+    Step 2: <span class="say-quote">What did your equation predict? What happened? What's the residual?</span><br>
+    Step 3: <span class="say-quote">One thing to change before next round — stat or equation parameter?</span> Under 5 min.</div>
+  <div class="say-item"><span class="say-tag">Prediction Market Wrap</span>
+    After all matches: read each team's card and current record aloud. <span class="say-quote">[Team] predicted X wins. After today they have Y wins with Z matches remaining. On track or off track?</span></div>
+</div></div>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">End of MD2 — Prediction Market Progress table filled before Open Lab. Every team has residuals from both MD1 and MD2. Facilitator ready with track assignments for Open Lab.</span></div>
+  <div class="card-footer"><span>Velocity Arena · Day 14</span><span>Match · LO 3.1, 5.1, 7.2, 9.1</span></div>
+</div></div></body></html>

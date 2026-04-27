@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<title>Match Day 1</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+*{box-sizing:border-box;margin:0;padding:0;}
+section{padding:3px 7px;border-bottom:1px solid #e0e0e0;}
+section:last-child{border-bottom:none;}
+h2{font-size:6.5pt;font-weight:700;margin-bottom:3px;}
+p,li{font-size:6.5pt;line-height:1.2;}
+ul,ol{padding-left:13px;}
+li{margin-bottom:2px;}
+.t-time{font-size:6pt;font-weight:700;white-space:nowrap;width:0.42in;}
+.t-action{font-size:6.5pt;font-weight:600;width:0.82in;}
+.t-focus{font-size:6pt;color:#444;font-style:italic;line-height:1.2;}
+.prob-table{width:100%;border-collapse:collapse;}
+.prob-table th{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
+  padding:2px 5px;border-bottom:1.5px solid #000;text-align:left;}
+.prob-table td{font-size:6.5pt;padding:3px 5px;border-bottom:1px solid #e0e0e0;
+  vertical-align:top;}
+.prob-table tr:last-child td{border-bottom:none;}
+.footer-left{font-size:6.5pt;font-weight:700;color:#555;}
+.footer-right{font-size:6.5pt;color:#555;text-align:right;}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 3px 8px; }
+.section-label { margin-bottom: 3px; padding-bottom: 3px; }
+.checklist { gap: 3px; }
+.checklist li { font-size: 7.5pt; }
+.timing-table td { padding: 2px 5px 2px 0; }
+.timing-table td.t-action { font-size: 7.5pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 7pt; line-height: 1.2; }
+.say-list { gap: 3px; }
+.say-item { font-size: 7.5pt; line-height: 1.3; }
+.say-quote { font-size: 7.5pt; line-height: 1.25; }
+.watch-grid { gap: 3px 10px; }
+.watch-item { font-size: 7pt; line-height: 1.2; }
+.produces li { font-size: 7pt; }
+.pattern-note { font-size: 7pt; margin-top: 3px; padding-top: 3px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Match Day 1</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:80%;"></div></div>
+      <span class="progress-label">4 of 5</span>
+    </div>
+    <div class="header-meta">90 min &nbsp;|&nbsp; Match Block<br>Day 7 &nbsp;|&nbsp; 12:00–1:30 PM</div>
+  </div>
+  <div class="math-bar">MATH: <span>Leaderboard: Wins · Goals Scored · Best Prediction = |predicted−actual| &nbsp;&nbsp; LO 5.1, 7.1</span></div>
+  <div class="card-body">
+    <div class="col">
+<section>
+  <div class="section-label">Before Matches Begin</div>
+  <ul class="checklist">
+    <li>Round-robin bracket posted — every team can see from seat</li>
+    <li>Leaderboard blank on wall: Wins | Goals Scored | Best Prediction</li>
+    <li>Match field ready (grid, goals, start positions) — verify before lunch</li>
+    <li>Match data logs on tables — Endurance eq + x-intercept already filled from AM</li>
+    <li>Bots charged + programmed. Any team still coding at 12:00 plays with what they have.</li>
+    <li>Loss-recovery script memorized — you will need it fast</li>
+  </ul>
+</section>
+<section>
+  <div class="section-label">Pre-Match Ritual (Every Round)</div>
+  <ul class="checklist">
+    <li>Call both teams for the matchup</li>
+    <li>Each team states prediction number out loud — both teams hear both numbers</li>
+    <li>Confirm predictions are written in data log before match starts — wait if blank</li>
+    <li>Start all matches simultaneously on your signal</li>
+  </ul>
+</section>
+<section>
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>3 data log rows: goals for, goals against, W/L — one per round</li>
+    <li>Dashboard updated with all round results</li>
+    <li>Loss-recovery: one hypothesis (what to change + why) per loss</li>
+  </ul>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Timing (LO 5.1, 7.1)</div>
+  <table class="timing-table">
+    <tr><th class="t-time">Time</th><th class="t-action">Action</th><th class="t-focus">Watch For</th></tr>
+    <tr><td class="t-time">12:00</td><td class="t-action">Opening: Season 1 starts. Walk the match cycle once. Name the leaderboard.</td><td class="t-focus">Under 3 min — don't talk down the energy</td></tr>
+    <tr><td class="t-time">12:03</td><td class="t-action">Rnd 1 pre-match: predictions read aloud from data log</td><td class="t-focus">Any team without written prediction stops here</td></tr>
+    <tr><td class="t-time">12:07</td><td class="t-action">Rnd 1 play: start simultaneously, call 3-min mark</td><td class="t-focus">Stay neutral. Watch bots off field.</td></tr>
+    <tr><td class="t-time">12:13</td><td class="t-action">Rnd 1 post: announce result. Teams record immediately.</td><td class="t-focus">Go to losing team first — don't wait</td></tr>
+    <tr><td class="t-time">12:15</td><td class="t-action">Loss recovery Rnd 1 — 4 steps, under 5 min</td><td class="t-focus">No team starts Rnd 2 until all finish recovery.</td></tr>
+    <tr><td class="t-time">12:28</td><td class="t-action">Rnd 2 pre-match: new pairings, predictions stated</td><td class="t-focus">Watch for prediction written after hearing opponent's number</td></tr>
+    <tr><td class="t-time">12:32</td><td class="t-action">Rnd 2 play</td><td class="t-focus">Same calls as Rnd 1</td></tr>
+    <tr><td class="t-time">12:38</td><td class="t-action">Rnd 2 post + loss recovery — push for specificity (one stat)</td><td class="t-focus">Second recovery is faster</td></tr>
+    <tr><td class="t-time">12:53</td><td class="t-action">Rnd 3 pre-match — stakes highest</td><td class="t-focus">Two-loss teams may go quiet — check prediction rows</td></tr>
+    <tr><td class="t-time">12:57</td><td class="t-action">Rnd 3 play</td><td class="t-focus"></td></tr>
+    <tr><td class="t-time">1:03</td><td class="t-action">Rnd 3 post + loss recovery — do not abbreviate Step 1.</td><td class="t-focus">Last loss carries most emotional weight</td></tr>
+    <tr><td class="t-time">1:13</td><td class="t-action">Data check: 3 rows filled in every log. Dashboards updated.</td><td class="t-focus">No blank rows — blanks cannot be reconstructed</td></tr>
+    <tr class="hard-row"><td class="t-time">1:20</td><td class="t-action">Transition → Leaderboard Reveal</td><td class="t-focus">"Leaderboard goes up now."</td></tr>
+  </table>
+</section>
+</div>
+    <div class="col">
+<section>
+  <div class="section-label">Loss Recovery — Word for Word, in Order</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Step 1</span> <span class="say-quote">"That result was frustrating. That's a real feeling and it makes sense."</span> <em>Wait 30 seconds. Add nothing.</em></div>
+    <div class="say-item"><span class="say-tag">Step 2</span> <span class="say-quote">"Your model predicted X goals. You scored Y. That gap is the most interesting thing that happened today. Let's find the one decision that created it."</span> Open dashboard. One stat only.</div>
+    <div class="say-item"><span class="say-tag">Step 3</span> <span class="say-quote">"You have N matches left. You now have data you didn't have before. What's one thing you'd change?"</span> Write their answer. That is their next hypothesis. Do not evaluate it.</div>
+    <div class="say-item"><span class="say-tag">Step 4</span> <span class="say-quote">"Walk to one other team. Tell them: 'We're changing _____ because _____.' One sentence. Then come back."</span></div>
+  </div>
+</section>
+<section>
+  <div class="section-label">When Recovery Script Breaks Down</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Camper in tears / shut down.</span> <span class="watch-redirect">Sit with them 30–60 sec. "We'll look at the dashboard in 5 minutes." Don't skip Step 2.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team lost 4–5 consecutive matches.</span> <span class="watch-redirect">"Show me one match where your prediction was close. What was different?" Open Lab: one stat only.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Watch for: prediction inflation.</span> <span class="watch-redirect">"Your prediction goes in before you hear theirs. Write what your equation gave you."</span></div>
+  </div>
+</section>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">1:20 — Data check complete. All logs filled. Transition to Leaderboard Reveal.</span></div>
+  <div class="card-footer">
+    <span class="footer-left">Velocity Arena &middot; Facilitator Activity Card &middot; Day 7 of 20</span>
+    <span class="footer-right">90 min &nbsp;|&nbsp; Match Block</span>
+  </div>
+</div></div>
+</body></html>

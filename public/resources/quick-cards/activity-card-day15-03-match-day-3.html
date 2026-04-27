@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="en"><head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (sessionStorage.getItem(KEY) === '1') return;
+  // Hide content while we verify or redirect
+  document.documentElement.style.visibility = 'hidden';
+  function showLockedAndExit() {
+    location.href = '/teachers.html';
+  }
+  // Async-load config to get the current teacher password, then prompt
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view quick cards:');
+    if (ans !== null && ans === pw) {
+      sessionStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      showLockedAndExit();
+    }
+  };
+  s.onerror = showLockedAndExit;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
+.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
+.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
+.answer-grid { display: grid; grid-template-columns: auto auto auto; }
+.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
+.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
+.answer-grid .ar.last { border-bottom: none; }
+.answer-grid .bold { font-weight: 700; }
+.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
+.say-list { display: flex; flex-direction: column; gap: 7px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
+.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+/* card-specific */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+      *{box-sizing:border-box;margin:0;padding:0}
+.prob-table{width:calc(100% - 20px);border-collapse:collapse;font-size:6.5pt;margin:4px 10px}
+.prob-table th{font-weight:700;padding:2px 5px;border-bottom:1px solid #000;text-align:left;font-size:6.5pt}
+.prob-table td{padding:2px 5px;border-bottom:.5px solid #ccc;font-size:6.5pt;line-height:1.2}
+
+/* card-specific — tighter layout to fit print */
+.section { padding: 2px 6px; }
+.section-label { margin-bottom: 2px; padding-bottom: 2px; }
+.checklist { gap: 2px; }
+.checklist li { font-size: 7pt; }
+.timing-table td { padding: 1px 4px 1px 0; }
+.timing-table td.t-action { font-size: 7pt; font-weight: 600; }
+.timing-table td.t-focus { font-size: 6.5pt; line-height: 1.15; }
+.say-list { gap: 2px; }
+.say-item { font-size: 7pt; line-height: 1.2; }
+.say-quote { font-size: 7pt; line-height: 1.15; }
+.watch-grid { gap: 2px 8px; }
+.watch-item { font-size: 6.5pt; line-height: 1.15; }
+.produces li { font-size: 6.5pt; }
+.pattern-note { font-size: 6.5pt; margin-top: 2px; padding-top: 2px; }
+.col-inner { font-size: 7pt; line-height: 1.25; }
+</style><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+</head><body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page"><div class="card">
+  <div class="card-header">
+    <div class="activity-name">Match Day 3 — Season 2 Final</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;"></div></div>
+      <span class="progress-label">3 of 4</span>
+    </div>
+    <div class="header-meta">90 MIN · MATCH<br>Day 15 · PM</div>
+  </div>
+  <div class="math-bar">Prediction Market closes today · equation prediction ritual mandatory every round · Season 2 retrospective at 1:53 (non-negotiable)</div>
+  <div class="card-body">
+    <div class="col"><div class="section"><div class="section-label">Before</div>
+<ul class="checklist">
+  <li>Commissioner rules from Day 12 vote record — copy into Commissioner Rules box</li>
+  <li>Fill Prediction Market Resolution table: names, cards, MD1 + MD2 results (leave MD3 and Hit? blank)</li>
+  <li>Every team: Linear equation worksheet with equation box filled. Missing = reconstruct from dashboard before play.</li>
+  <li>All bots reflect S2 allocation. Auction is closed. No changes.</li>
+  <li>Round-robin bracket posted.</li>
+  <li>Loss recovery for MD3: Step 2 references equation residual AND percent change from Day 14.</li>
+</ul>
+</div>
+<div class="section"><div class="section-label">What Makes MD3 Different</div>
+<div class="col-inner" style="font-size:6.5pt;line-height:1.3;">
+  1. <strong>Prediction Market closes today</strong> — final verdict on the hypothesis posted Day 13.<br>
+  2. <strong>Last equation test before Week 4</strong> — residual becomes scouting foundation data.<br>
+  3. <strong>Season 2 retrospective at 1:53</strong> — two questions to whole room. Bridge to Day 16 scouting. Do not skip.
+</div>
+</div>
+<div class="section"><div class="section-label">Students Produce</div>
+<ul class="produces">
+  <li>Equation prediction + result + residual per match</li>
+  <li>Final Season 2 record</li>
+  <li>Prediction Market verdict: hit or miss, specific number off by</li>
+</ul></div>
+</div><div class="col"><div class="section"><div class="section-label">Timing</div>
+<table class="timing-table">
+<thead><tr><th>Time</th><th>Action</th><th>Watch For</th></tr></thead>
+<tbody>
+<tr><td class="t-time">0:00</td><td class="t-action">Opening — 3 sentences: Prediction Market closes today, equation prediction ritual is non-negotiable, every residual feeds scouting.</td><td class="t-focus"></td></tr>
+<tr><td class="t-time">0:03</td><td class="t-action">Rounds 1–3: run same equation prediction ritual as MD1/MD2. Both teams write prediction before each match.</td><td class="t-focus">Team skipping ritual → "Hold. This is more important today than Day 1. Write the number."</td></tr>
+<tr><td class="t-time">~0:14</td><td class="t-action">After each round: results announced, data recorded, loss recovery for losers (Step 2: residual + percent change).</td><td class="t-focus">Final-round loss carries most emotional weight — hold Step 1 of loss recovery longer than usual.</td></tr>
+<tr class="hard-row"><td class="t-time">1:47</td><td class="t-action" colspan="2">Matches close. Fill MD3 result and Hit? column in Prediction Market table.</td></tr>
+<tr><td class="t-time">1:50</td><td class="t-action">Read each team's card aloud: prediction vs. actual, specific number off by. Teams who hit: say it clearly. Teams who missed: name the gap.</td><td class="t-focus"></td></tr>
+<tr><td class="t-time">1:53</td><td class="t-action">Season 2 retrospective: Q1 — "What did your equation get right?" Q2 — "What did your equation miss?" Two minutes, whole room.</td><td class="t-focus">Do not skip this — it is the bridge to Day 16 scouting work.</td></tr>
+<tr><td class="t-time">2:00</td><td class="t-action" colspan="2">Transition to Open Lab: Scouting Continuation or Identity Refinement</td></tr>
+</tbody></table></div>
+</div><div class="col"><div class="section"><div class="section-label">Say Script</div>
+<div class="say-list">
+  <div class="say-item"><span class="say-tag">Opening</span>
+    <span class="say-quote">Three things close today: the commissioner rules come down after this match day, the Prediction Market cards get their verdict, and your equation gets its final test before scouting. Every round: write your equation prediction before you play. Every round: record the residual after.</span></div>
+  <div class="say-item"><span class="say-tag">Prediction Market Close 1:50</span>
+    Read each card aloud. <span class="say-quote">[Team] predicted [X] wins. They finished with [Y]. [Hit / missed by Z].</span> For a hit: <span class="say-quote">Your gut and your data agreed. That is a finding, not luck.</span> For a miss: <span class="say-quote">You were off by [Z]. Was that over or under? What would your equation have predicted?</span></div>
+  <div class="say-item"><span class="say-tag">Retrospective 1:53</span>
+    <span class="say-quote">Two questions. Answer internally. Q1: what did your equation get right this season? Q2: what did it miss? Write one answer to each in your data log before Monday.</span></div>
+  <div class="say-item"><span class="say-tag">Loss Recovery MD3 Step 2</span>
+    <span class="say-quote">What did your equation predict? What happened? What's the residual? Now look at your percent change worksheet — did your biggest stat change contribute to this loss or not?</span></div>
+</div></div>
+</div>
+  </div>
+  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">1:53 — Season 2 retrospective runs before Open Lab. Two questions, whole room, 2 minutes. Do not skip. Prediction Market Resolution table complete with Hit? column filled before Open Lab.</span></div>
+  <div class="card-footer"><span>Velocity Arena · Day 15</span><span>Match · LO 5.1, 7.1, 9.1</span></div>
+</div></div></body></html>
