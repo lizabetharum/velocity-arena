@@ -44,6 +44,16 @@
 .hero-week{font-size:15px;color:var(--slate);margin-top:6px;}
 
 .produce-pill{display:inline-block;background:rgba(0,201,122,.14);color:var(--green);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:6px 14px;border-radius:999px;margin-bottom:14px;}
+.do-pill{display:inline-block;background:rgba(79,195,247,.14);color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:6px 14px;border-radius:999px;margin-bottom:6px;}
+.do-sub{font-size:14px;font-weight:700;color:var(--white);margin-bottom:14px;}
+.act-pills{display:flex;flex-direction:column;gap:14px;}
+.act-pill{display:grid;grid-template-columns:8rem 1fr;gap:18px;align-items:start;font-size:14px;line-height:1.6;}
+.act-pill-block{font-size:15px;font-weight:800;}
+.act-pill-block.bk-hook{color:var(--orange);}
+.act-pill-block.bk-challenge{color:var(--green);}
+.act-pill-block.bk-match{color:var(--purple);}
+.act-pill-block.bk-openlab{color:var(--blue);}
+.act-pill-desc{color:var(--slate);}
 .produce-list{display:flex;flex-direction:column;gap:10px;}
 .produce-item{display:flex;align-items:center;gap:14px;background:var(--navy3);border:1px solid var(--card-border);border-radius:10px;padding:14px 18px;}
 .produce-item input{appearance:none;-webkit-appearance:none;width:22px;height:22px;border:2px solid var(--slate);border-radius:5px;background:transparent;cursor:pointer;flex-shrink:0;position:relative;transition:border-color .15s,background .15s;}
@@ -116,6 +126,30 @@ if (!day) {
   // The legacy `a.link` field (set directly on activities in days.js) takes
   // precedence as a single link; otherwise we fall back to the shared map,
   // which may return multiple links per activity.
+  // Stacked block summary — one row per block type, in order, de-duped.
+  const blockLong = b => {
+    const s = (b || '').toLowerCase();
+    if (s.includes('hook') || s.includes('ice breaker')) return { label: 'Ice Breaker', cls: 'bk-hook' };
+    if (s.includes('challenge')) return { label: 'Challenge Block', cls: 'bk-challenge' };
+    if (s.includes('match')) return { label: 'Match-Build-Make', cls: 'bk-match' };
+    if (s.includes('open lab') || s.includes('open-lab')) return { label: 'Open Lab', cls: 'bk-openlab' };
+    return null;
+  };
+  const blockSeen = new Set();
+  const actPills = (day.activities || [])
+    .filter(a => {
+      const lb = blockLong(a.block);
+      if (!lb || blockSeen.has(lb.label)) return false;
+      blockSeen.add(lb.label);
+      return true;
+    })
+    .map(a => {
+      const lb = blockLong(a.block);
+      const desc = (a.description || '').split('.')[0] + '.';
+      return `<div class="act-pill"><span class="act-pill-block ${lb.cls}">${lb.label}</span><span class="act-pill-desc">${desc}</span></div>`;
+    })
+    .join('');
+
   const actRows = (day.activities || []).map(a => {
     const links = a.link
       ? [{ url: a.link, label: 'Open Activity' }]
@@ -209,6 +243,13 @@ if (!day) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
 
       <div>
+        ${actPills ? `
+        <span class="do-pill">What you'll do</span>
+        <div class="do-sub">Today's activities</div>
+        <div class="card" style="margin-bottom:24px;">
+          <div class="act-pills">${actPills}</div>
+        </div>` : ''}
+
         <div class="section-label">Today's activities</div>
         <div class="card" style="padding:6px 22px;">
           ${actRows || '<p style="padding:14px 0;color:var(--text-muted);font-size:15px;">No activities extracted for this day.</p>'}
