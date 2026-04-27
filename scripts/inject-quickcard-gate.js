@@ -19,26 +19,24 @@ const GATE_BLOCK = `${MARK_START}
 <script>
 (function(){
   var KEY = 'va_teacher_auth';
-  if (sessionStorage.getItem(KEY) === '1') return;
-  // Hide content while we verify or redirect
+  // localStorage so auth persists across tabs and reloads (sessionStorage is per-tab).
+  if (localStorage.getItem(KEY) === '1') return;
   document.documentElement.style.visibility = 'hidden';
-  function showLockedAndExit() {
-    location.href = '/teachers.html';
-  }
-  // Async-load config to get the current teacher password, then prompt
+  function bounce() { location.href = '/teachers.html'; }
   var s = document.createElement('script');
   s.src = '/config.js';
   s.onload = function() {
-    var pw = (window.CONFIG && window.CONFIG.teacherPassword) || '';
+    // CONFIG is a top-level const — accessible globally as CONFIG, NOT as window.CONFIG.
+    var pw = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) || '';
     var ans = prompt('Teacher password required to view quick cards:');
-    if (ans !== null && ans === pw) {
-      sessionStorage.setItem(KEY, '1');
+    if (ans !== null && ans.trim() === String(pw).trim()) {
+      localStorage.setItem(KEY, '1');
       document.documentElement.style.visibility = '';
     } else {
-      showLockedAndExit();
+      bounce();
     }
   };
-  s.onerror = showLockedAndExit;
+  s.onerror = bounce;
   document.head.appendChild(s);
 })();
 </script>
