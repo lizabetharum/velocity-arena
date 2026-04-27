@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; }
+
+@media print {
+  html, body { background: white; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; }
+  .screen-note { display: none; }
+}
+
+.screen-note {
+  text-align: center; padding: 8px; font-size: 8pt; color: #555;
+  background: #ddd; font-family: 'Montserrat', sans-serif;
+}
+
+.page {
+  width: 11in; height: 8.5in;
+  padding: 0.28in 0.32in 0.22in;
+  background: white;
+  display: flex; flex-direction: column; gap: 0;
+  margin: 0 auto;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding-bottom: 7px;
+  border-bottom: 3px solid #E8A020;
+  flex-shrink: 0;
+}
+.header-left { display: flex; flex-direction: column; gap: 1px; }
+.prog-name {
+  font-size: 18pt; font-weight: 900; color: #1A1A2E;
+  letter-spacing: 0.04em; line-height: 1;
+}
+.prog-sub {
+  font-size: 7.5pt; font-weight: 600; color: #666;
+  letter-spacing: 0.10em; text-transform: uppercase;
+}
+.header-right {
+  font-size: 7pt; font-weight: 600; color: #888;
+  text-align: right; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ── LEGEND ─────────────────────────────────────────────── */
+.legend {
+  display: flex; align-items: stretch; gap: 0;
+  padding: 5px 0 6px;
+  flex-shrink: 0;
+}
+.legend-label {
+  font-size: 6pt; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #fff;
+  background: #1A1A2E; padding: 4px 8px;
+  display: flex; align-items: center;
+  border-radius: 3px 0 0 3px; margin-right: 0; flex-shrink: 0;
+}
+.legend-inner {
+  display: flex; align-items: center; gap: 0;
+  border: 1.5px solid #1A1A2E; border-left: none;
+  border-radius: 0 3px 3px 0; overflow: hidden;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 0;
+  font-size: 6.5pt; font-weight: 700; color: #fff;
+  border-right: 1px solid rgba(255,255,255,0.25);
+}
+.legend-item:last-child { border-right: none; }
+.legend-swatch {
+  width: 22px; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 8pt; font-weight: 900; color: white; flex-shrink: 0;
+  padding: 4px 6px;
+}
+.legend-text { padding: 4px 9px 4px 4px; white-space: nowrap; color: #1A1A2E; font-size: 6.5pt; }
+.dot-challenge { background: #2A5298; }
+.dot-match     { background: #B22222; }
+.dot-build     { background: #1B7A48; }
+.dot-open      { background: #E8A020; }
+.dot-review    { background: #7B2D8B; }
+.dot-special   { background: #1A1A2E; }
+.legend-sep { width: 1px; background: #ccc; margin: 0; align-self: stretch; }
+
+/* ── WEEK GRID ───────────────────────────────────────────── */
+.weeks { flex: 1; display: flex; flex-direction: column; gap: 5px; min-height: 0; }
+
+.week-row {
+  flex: 1; display: flex; gap: 5px; min-height: 0;
+}
+
+.week-label {
+  width: 0.58in; flex-shrink: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  border-radius: 3px;
+  padding: 4px 6px;
+}
+.week-label.w1 { background: #1A1A2E; }
+.week-label.w2 { background: #2A5298; }
+.week-label.w3 { background: #1B7A48; }
+.week-label.w4 { background: #B22222; }
+
+.wk-num {
+  font-size: 16pt; font-weight: 900; color: #E8A020; line-height: 1;
+}
+.wk-name {
+  font-size: 5pt; font-weight: 700; color: rgba(255,255,255,0.85);
+  text-transform: uppercase; letter-spacing: 0.10em; text-align: center;
+  margin-top: 2px;
+}
+.wk-days {
+  font-size: 6pt; font-weight: 600; color: rgba(255,255,255,0.6);
+  margin-top: 3px;
+}
+
+/* ── DAYS ────────────────────────────────────────────────── */
+.days { flex: 1; display: flex; gap: 4px; min-width: 0; }
+
+.day {
+  flex: 1; border: 1px solid #ddd; border-radius: 3px;
+  display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0;
+}
+
+.day-num {
+  font-size: 6pt; font-weight: 900; color: white;
+  padding: 2px 5px 2px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.day-num.challenge { background: #2A5298; }
+.day-num.match     { background: #B22222; }
+.day-num.build     { background: #1B7A48; }
+.day-num.open      { background: #E8A020; color: #1A1A2E; }
+.day-num.review    { background: #7B2D8B; }
+.day-num.special   { background: #1A1A2E; }
+
+.day-body {
+  flex: 1; padding: 3px 5px; display: flex; flex-direction: column; gap: 2px;
+  min-height: 0;
+}
+.day-title {
+  font-size: 6.5pt; font-weight: 800; color: #1A1A2E;
+  line-height: 1.25; flex-shrink: 0;
+}
+.day-math {
+  font-size: 5.5pt; font-weight: 600; color: #444;
+  line-height: 1.25; flex: 1;
+}
+.day-math em {
+  font-style: normal; color: #E8A020; font-weight: 700;
+}
+.day-flag {
+  font-size: 5pt; font-weight: 700; color: white;
+  background: #E8A020; color: #1A1A2E;
+  padding: 1px 4px; border-radius: 2px;
+  align-self: flex-start; flex-shrink: 0;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ── WEEK META COLUMN ────────────────────────────────────── */
+.week-meta {
+  width: 1.05in; flex-shrink: 0;
+  border: 1px solid #ddd; border-radius: 3px;
+  padding: 5px 7px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.meta-head {
+  font-size: 5.5pt; font-weight: 800; letter-spacing: 0.10em;
+  text-transform: uppercase; color: #888;
+  border-bottom: 1px solid #eee; padding-bottom: 2px; margin-bottom: 1px;
+}
+.meta-item {
+  font-size: 5.5pt; font-weight: 600; color: #333; line-height: 1.3;
+}
+.meta-milestone {
+  font-size: 5.5pt; font-weight: 700; color: #1A1A2E;
+  background: #F4F4F4; border-left: 2px solid #E8A020;
+  padding: 2px 4px; line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.footer {
+  flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+  padding-top: 5px; border-top: 1px solid #ddd;
+  font-size: 6pt; font-weight: 600; color: #999;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.footer-eq {
+  font-weight: 800; color: #1A1A2E; letter-spacing: 0.08em;
+  font-size: 6.5pt;
+}
+</style>
+</head>
+<body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="prog-name">VELOCITY ARENA</div>
+      <div class="prog-sub">4-Week Facilitator Roadmap · 20 Days · Rising 9th Grade</div>
+    </div>
+    <div class="header-right">
+      Summer 2026 Pilot<br>velocityarena.io
+    </div>
+  </div>
+
+  <!-- LEGEND / KEY -->
+  <div class="legend">
+    <span class="legend-label">Key</span>
+    <div class="legend-inner">
+      <div class="legend-item">
+        <span class="legend-swatch dot-challenge">■</span>
+        <span class="legend-text">Challenge / Instruction</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch dot-match">■</span>
+        <span class="legend-text">Match Day</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch dot-build">■</span>
+        <span class="legend-text">Build / Lab</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch dot-open">■</span>
+        <span class="legend-text">Open Lab</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch dot-review">■</span>
+        <span class="legend-text">Review / Proposal</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-swatch dot-special">■</span>
+        <span class="legend-text">Special</span>
+      </div>
+      <div class="legend-sep"></div>
+      <div class="legend-item">
+        <span class="legend-swatch" style="background:#F4F4F4;color:#E8A020;">★</span>
+        <span class="legend-text">Milestone</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKS -->
+  <div class="weeks">
+
+    <!-- WEEK 1 -->
+    <div class="week-row">
+      <div class="week-label w1">
+        <div class="wk-num">1</div>
+        <div class="wk-name">Play Lab</div>
+        <div class="wk-days">Days 1–5</div>
+      </div>
+      <div class="days">
+
+        <div class="day">
+          <div class="day-num challenge">Day 1</div>
+          <div class="day-body">
+            <div class="day-title">Speed Stat + First Drive</div>
+            <div class="day-math">Motor% = (S × 100) / 20<br><em>Proportional reasoning</em><br>Budget intro: S+E+T+P=20</div>
+            <div class="day-flag">★ First drive</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 2</div>
+          <div class="day-body">
+            <div class="day-title">Endurance Stat</div>
+            <div class="day-math">P(t) = 100 − (20−E)×1.5×t<br><em>Linear decay · slope</em><br>Rate of change intro</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 3</div>
+          <div class="day-body">
+            <div class="day-title">Turning Stat</div>
+            <div class="day-math">Arc Segs = T<br>Ratio = 0.2 + (T×0.02)<br><em>Coordinate geometry</em></div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 4</div>
+          <div class="day-body">
+            <div class="day-title">Power Stat</div>
+            <div class="day-math">Charge = P²<br>Follow = P×200ms<br><em>Quadratic relationship</em></div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num build">Day 5</div>
+          <div class="day-body">
+            <div class="day-title">All Stats + Practice Matches</div>
+            <div class="day-math">Full 20-point allocation<br><em>Budget constraint algebra</em><br>Dashboard setup</div>
+            <div class="day-flag">★ Season 1 alloc.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="week-meta">
+        <div class="meta-head">Week 1 Focus</div>
+        <div class="meta-item">One stat per day. Low cognitive load. Let chaos happen.</div>
+        <div class="meta-head" style="margin-top:4px;">Energy</div>
+        <div class="meta-item">Curious, exploratory, safe. No leaderboard yet.</div>
+        <div class="meta-milestone">Milestone: all 4 stats allocated. Bot drives.</div>
+      </div>
+    </div>
+
+    <!-- WEEK 2 -->
+    <div class="week-row">
+      <div class="week-label w2">
+        <div class="wk-num">2</div>
+        <div class="wk-name">Season 1</div>
+        <div class="wk-days">Days 6–10</div>
+      </div>
+      <div class="days">
+
+        <div class="day">
+          <div class="day-num challenge">Day 6</div>
+          <div class="day-body">
+            <div class="day-title">Lock In: Allocation, Geometry, and Launch Sequence</div>
+            <div class="day-math">Interleaved problem set · concept tags<br><em>Coordinate geometry · distance</em><br>Launch sequence locks at showcase</div>
+            <div class="day-flag">★ Alloc. locked</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num match">Day 7</div>
+          <div class="day-body">
+            <div class="day-title">Season 1 Match Day 1</div>
+            <div class="day-math">Scatter plot — stat vs. result<br><em>Linear equations from data</em><br>Loss recovery: Step 2</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 8</div>
+          <div class="day-body">
+            <div class="day-title">Rivalry Cards</div>
+            <div class="day-math">Every claim = a number<br><em>Slope-intercept form</em><br>Prediction vs. actual</div>
+            <div class="day-flag">★ Cards posted</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num match">Day 9</div>
+          <div class="day-body">
+            <div class="day-title">Season 1 Match Day 2</div>
+            <div class="day-math">Residuals intro<br><em>Distance formula</em><br>Dashboard analysis</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num special">Day 10</div>
+          <div class="day-body">
+            <div class="day-title">Season 1 Final + Season 2 Hypothesis</div>
+            <div class="day-math">Season 1 data review<br><em>Data-backed prediction</em><br>Season 2 reallocation plan</div>
+            <div class="day-flag">★ S1 complete</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="week-meta">
+        <div class="meta-head">Week 2 Focus</div>
+        <div class="meta-item">Leaderboard goes live. Loss recovery is load-bearing.</div>
+        <div class="meta-head" style="margin-top:4px;">Energy</div>
+        <div class="meta-item">Competitive, data-hungry, iterative.</div>
+        <div class="meta-milestone">Milestone: Rivalry cards posted. S1 ends with data-backed S2 hypothesis.</div>
+      </div>
+    </div>
+
+    <!-- WEEK 3 -->
+    <div class="week-row">
+      <div class="week-label w3">
+        <div class="wk-num">3</div>
+        <div class="wk-name">Commissioner</div>
+        <div class="wk-days">Days 11–15</div>
+      </div>
+      <div class="days">
+
+        <div class="day">
+          <div class="day-num challenge">Day 11</div>
+          <div class="day-body">
+            <div class="day-title">Systems of Inequalities + Realloc.</div>
+            <div class="day-math">Constraints: S≥4, E≥3, T≥2, P≥1<br><em>Systems of inequalities</em><br>Season 2 allocation</div>
+            <div class="day-flag">★ S2 alloc.</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num review">Day 12</div>
+          <div class="day-body">
+            <div class="day-title">Commissioner Proposals + Vote</div>
+            <div class="day-math">Proposal math: percent change<br><em>% change = (new−old)/old</em><br>Real rule vote</div>
+            <div class="day-flag">★ Rules passed</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 13</div>
+          <div class="day-body">
+            <div class="day-title">Linear Equations + S2 Match 1</div>
+            <div class="day-math">y = mx + b prediction<br><em>Slope from stat data</em><br>Residual = actual − predicted</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num match">Day 14</div>
+          <div class="day-body">
+            <div class="day-title">Season 2 Match Day 2</div>
+            <div class="day-math">Residual tracking<br><em>Prediction market</em><br>Commissioner rules binding</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num challenge">Day 15</div>
+          <div class="day-body">
+            <div class="day-title">Scouting Reports</div>
+            <div class="day-math">Opponent stat analysis<br><em>Linear eq. for scouting</em><br>What-if inequality modeling</div>
+            <div class="day-flag">★ Scout reports</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="week-meta">
+        <div class="meta-head">Week 3 Focus</div>
+        <div class="meta-item">Don't over-scaffold proposals. Send verification back to the room.</div>
+        <div class="meta-head" style="margin-top:4px;">Energy</div>
+        <div class="meta-item">Empowered, analytical, creative.</div>
+        <div class="meta-milestone">Milestone: Teams propose + vote real rules. S2 under passed rules.</div>
+      </div>
+    </div>
+
+    <!-- WEEK 4 -->
+    <div class="week-row">
+      <div class="week-label w4">
+        <div class="wk-num">4</div>
+        <div class="wk-name">Championship</div>
+        <div class="wk-days">Days 16–20</div>
+      </div>
+      <div class="days">
+
+        <div class="day">
+          <div class="day-num challenge">Day 16</div>
+          <div class="day-body">
+            <div class="day-title">Bot Identity + What-If Analysis</div>
+            <div class="day-math">All 4 formulas under pressure<br><em>Inequality constraints</em><br>Pre-match math pitch prep</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num special">Day 17</div>
+          <div class="day-body">
+            <div class="day-title">Championship Bracket Reveal + Pitch</div>
+            <div class="day-math">Data-backed argument<br><em>% change as growth</em><br>Judges briefed</div>
+            <div class="day-flag">★ Bracket set</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num match">Day 18</div>
+          <div class="day-body">
+            <div class="day-title">Championship Matches</div>
+            <div class="day-math">Pitch to judges before each match<br><em>All formulas live</em><br>Double elimination</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num special">Day 19</div>
+          <div class="day-body">
+            <div class="day-title">Community Exhibition</div>
+            <div class="day-math">Students teach their math<br><em>Full program arc</em><br>Awards ceremony</div>
+            <div class="day-flag">★ Exhibition</div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="day-num review">Day 20</div>
+          <div class="day-body">
+            <div class="day-title">Post-Diagnostic + Reflection</div>
+            <div class="day-math">Pre/post diagnostic<br><em>Growth measurement</em><br>Program close</div>
+            <div class="day-flag">★ Final</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="week-meta">
+        <div class="meta-head">Week 4 Focus</div>
+        <div class="meta-item">Pitches before every championship match. Data-backed argument required.</div>
+        <div class="meta-head" style="margin-top:4px;">Energy</div>
+        <div class="meta-item">Strategic, performative, reflective.</div>
+        <div class="meta-milestone">Milestone: Championship. Exhibition. Post-diagnostic.</div>
+      </div>
+    </div>
+
+  </div><!-- /weeks -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Velocity Arena · Summer 2026 Pilot · 4 Sites</span>
+    <span class="footer-eq">S + E + T + P = 20</span>
+    <span>Facilitator Reference · Do Not Distribute to Students</span>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
