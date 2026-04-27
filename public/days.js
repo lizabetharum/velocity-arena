@@ -291,7 +291,7 @@ const DAYS = [
     "week": 1,
     "weekName": "Play Lab + Boot Camp",
     "theme": "Power: Ratio, Motor Speed, and the Scoop",
-    "bigMathIdea": "Ratios and non-proportional scaling. charge speed = Power² / 2 and follow through = Power × 200. Double the Power, quadruple the charge speed.",
+    "bigMathIdea": "Ratios and non-proportional scaling. charge speed = Power²  and follow through = Power × 200. Double the Power, quadruple the charge speed.",
     "vocabulary": "PROPORTIONAL SCALING. If Power = 2 gives charge = 2 and Power = 4 gives charge = 8, the output scales with Power². The output grows faster than the input — that's non-proportional.",
     "activities": [
       {
@@ -301,7 +301,7 @@ const DAYS = [
         "description": "Face a partner. On a count of three, both of you show any number of fingers (0-5). Race to say the sum first. Correct answer earns a point. Rotate partners every 90 seconds. The math is easy -- the speed is the challenge.",
         "facilitatorDescription": "Pairs face each other. On a count of three, both show any number of fingers (0-5). First to say the correct sum earns a point. Rotate partners every 90 seconds. The math is trivial -- speed is the challenge. Creates low-stakes math play before the harder Power block.",
         "script": "https://docs.google.com/document/d/1JNyyLnY61I0ZFGAbaiF8hfYKNHLkampIQiTAsIgHMC4/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-01-finger-speed-sums.html"
+        "quickCard": "/resources/quick-cards/activity-card-day04-01-finger-speed-sums.html"
       },
       {
         "name": "Power Allocation: Stat Card Fill-In",
@@ -315,11 +315,11 @@ const DAYS = [
         "name": "Power Stat Challenge: Ratio and Motor Speed",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Two rules go on the board: charge speed = Power² / 2, and follow through = POWER x 200. Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you.",
-        "facilitatorDescription": "Two rules on the board: charge speed = Power² / 2, follow through = POWER x 200. Teams calculate charge speed for Power = 1, 2, 4, 8 (0.5, 2, 8, 32) and the ratios between them. Side-by-side with Day 1's Speed formula: Speed is proportional (double the stat, double the output); Power is not (double the stat, quadruple the output). That contrast is the mathematical core of today. Test physically: teams program Power 4 (charge speed 8), place the bot exactly 40 cm from the ball, kick, measure. Repeat with Power 8 (charge speed 32). Both results should surprise them.",
+        "description": "Two rules go on the board: charge speed = Power², and follow through = POWER x 200. Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you.",
+        "facilitatorDescription": "Two rules on the board: charge speed = Power², follow through = POWER x 200. Teams calculate charge speed for Power = 1, 2, 4, 8 (0.5, 2, 8, 32) and the ratios between them. Side-by-side with Day 1's Speed formula: Speed is proportional (double the stat, double the output); Power is not (double the stat, quadruple the output). That contrast is the mathematical core of today. Test physically: teams program Power 4 (charge speed 8), place the bot exactly 40 cm from the ball, kick, measure. Repeat with Power 8 (charge speed 32). Both results should surprise them.",
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1hibUDAxPyYtzHXAbZb7Z2A0tmaMKNz8BX0fSDL6hzc0/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
+        "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -332,11 +332,12 @@ const DAYS = [
         "name": "Scoop Build + Ratio Testing",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings (charge speed = Power² / 2), run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'",
-        "facilitatorDescription": "Teams build a cardboard front scoop for the Cutebot. One rule: it must make clean contact with the ball. Teams test at three Power settings (charge speed = Power² / 2), run 3 shots at each from the 40 cm start line, and record kick distances in the dashboard. Each team writes: 'Quadrupling charge speed did / did not quadruple kick distance, because...' Keep the build loose -- iteration is the point, not a perfect first scoop.",
+        "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'",
+        "facilitatorDescription": "Teams build a cardboard front scoop for the Cutebot. One rule: it must make clean contact with the ball. Teams test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in the dashboard. Each team writes: 'Quadrupling charge speed did / did not quadruple kick distance, because...' Keep the build loose -- iteration is the point, not a perfect first scoop.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1VqQrWMrNWUKKHIVaulGEyOchsYJ4Xs4D5TC2WWuRhDM/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
+        "makecode":"https://makecode.microbit.org/S48965-41345-37286-67819",
+        "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
         "name": "Break",
@@ -399,8 +400,8 @@ const DAYS = [
         "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power² / 2, follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
-        "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power² / 2, follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
+        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power², follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
+        "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power², follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
         "script": "https://docs.google.com/document/d/1qtE-c80NIwHmAZBYp-aFF3alFVtrdfwHuow5CL9zKFg/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1phpZXVdhlbUXIrBv_lv1Q4njeCX116chos0deJRs360/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-03-budget-constraint.html"
@@ -804,8 +805,8 @@ const DAYS = [
         "name": "Formula Relay: All Five Types in One Race",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² / 2 charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions.",
-        "facilitatorDescription": "Twenty problem cards face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² / 2 charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards). Teams flip one, solve as a team, bring to you for stamping. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. Post-race, teams sort into six piles and count errors per type -- their weakest type becomes the focus for today's pre-match prediction. Prediction logged before the match, no exceptions.",
+        "description": "Twenty problem cards, face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards -- determine whether scaling one or both scoop dimensions is proportional). Flip one, solve it as a team, bring it to the facilitator. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. After the race, sort your cards into six piles and count errors per type. Your weakest type is today's focus -- use it for today's pre-match prediction. Prediction logged before the match. No exceptions.",
+        "facilitatorDescription": "Twenty problem cards face down, shuffled across six formula types: Speed proportionality, Endurance decay, Turn Ratio / Arc Segments (2 cards), Power² charge speed, follow through (Power x 200), budget constraint, and Proportional Scaling (2 scoop-scaling cards). Teams flip one, solve as a team, bring to you for stamping. Correct work gets a stamp. First team to finish all 20 with fewer than 3 errors wins. Post-race, teams sort into six piles and count errors per type -- their weakest type becomes the focus for today's pre-match prediction. Prediction logged before the match, no exceptions.",
         "script": "https://docs.google.com/document/d/1Ec2G293mPaGajilq-H2jMTSDgBCMNziSXGasL7Bd5wE/edit?usp=drive_link",
         "webpage": "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-02-formula-relay.html"
@@ -994,8 +995,8 @@ const DAYS = [
         "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
         "mins": 45,
         "block": "Challenge Block",
-        "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected.",
-        "facilitatorDescription": "Phase 1 (20 min): teams calculate what happens when a stat is scaled by 50%. Speed is proportional (50% more Speed gives 50% more motor power). Power is not (charge speed = Power² / 2, so 50% more Power gives more than 50% more charge speed -- quadratic). Phase 2 (25 min): teams draft a rule change proposal using those scaling calculations as evidence, backed by at least two dashboard numbers and addressing how the current last-place team is affected. This sets up tomorrow's formal Commissioner's Meeting.",
+        "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power², so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected.",
+        "facilitatorDescription": "Phase 1 (20 min): teams calculate what happens when a stat is scaled by 50%. Speed is proportional (50% more Speed gives 50% more motor power). Power is not (charge speed = Power², so 50% more Power gives more than 50% more charge speed -- quadratic). Phase 2 (25 min): teams draft a rule change proposal using those scaling calculations as evidence, backed by at least two dashboard numbers and addressing how the current last-place team is affected. This sets up tomorrow's formal Commissioner's Meeting.",
         "script": "https://docs.google.com/document/d/1s9wUXxuyLnXP-TNXoZV22tcXRDgv5g6wBUYuzYEQjk8/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1_VhsD2hZb2VBH7-lwdKmMHGJAq5x8VJqHUwdI6GsdZg/edit?usp=drive_link",
         "webpage" :["https://velocity-arena-gold.vercel.app/lessons/proportional-scaling.html",
