@@ -11,6 +11,15 @@ const DAYS_PATH = path.join(__dirname, '..', 'public', 'days.js');
 
 // Card URLs the user provided
 const CARDS = `
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-01-circle-pass.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-02-mirror-pairs.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-driving-question.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-05-pre-task-diagnostic.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-08-data-dashboard-setup.html
+https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-09-open-lab.html
 https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-03-endurance-allocation.html
 https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html
 https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html
@@ -171,6 +180,8 @@ for (const url of CARDS) {
     matches.push({
       url, day: dayNum, idxHint, slug,
       activityName: acts[i].name, activityIdx: i, scoreVal: 999, alreadyHas: !!acts[i].quickCard,
+      existingUrl: acts[i].quickCard || null,
+      needsUpdate: !!acts[i].quickCard && acts[i].quickCard !== url,
     });
     continue;
   }
@@ -195,6 +206,8 @@ for (const url of CARDS) {
     activityIdx: best.i,
     scoreVal: best.s,
     alreadyHas: !!best.a.quickCard,
+    existingUrl: best.a.quickCard || null,
+    needsUpdate: !!best.a.quickCard && best.a.quickCard !== url,
   });
 }
 
@@ -267,7 +280,22 @@ const sortedMatches = matches.slice().sort((a, b) =>
 );
 
 for (const m of sortedMatches) {
-  if (m.alreadyHas) continue;
+  // Already has the exact URL we want — skip
+  if (m.alreadyHas && !m.needsUpdate) continue;
+
+  // Already has a quickCard but with a different URL — replace inline
+  if (m.alreadyHas && m.needsUpdate) {
+    const findStr = `"quickCard": ${JSON.stringify(m.existingUrl)}`;
+    const replaceStr = `"quickCard": ${JSON.stringify(m.url)}`;
+    const at = text.indexOf(findStr);
+    if (at === -1) {
+      console.warn(`  could not find existing quickCard line for "${m.activityName}" — skipping`);
+      continue;
+    }
+    text = text.slice(0, at) + replaceStr + text.slice(at + findStr.length);
+    applied++;
+    continue;
+  }
 
   // Scope the name search to the right day's section. Anchor on `"day": N,`
   // which is unique per day, then bound the search by the next `"day": N+1,`.

@@ -14,7 +14,7 @@ const DAYS = [
         "description": "Stand in a circle with your whole group. One person makes any sound and movement -- anything goes -- then passes it to the next person. That person copies it and immediately adds their own twist. Keep it moving around the circle. When your facilitator calls 'reverse,' flip directions. You can not do this wrong.",
         "facilitatorDescription": "Whole group stands in a circle. One camper creates a sound-and-movement combination and passes it clockwise. Each person copies exactly, then adds their own variation before passing. Call 'reverse' to flip directions. Model over-the-top variation yourself first -- campers who go tiny are shrinking. No right answer; name this explicitly before starting.",
         "script": "https://docs.google.com/document/d/1hXPfNWhq7z9Az6lpR94Lj78uSAZg7WH3HX83gIe4lp4/edit?usp=drivesdk",
-        "quickCard": "/resources/quick-cards/activity-card-day01-01-circle-pass.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-01-circle-pass.html"
       },
       {
         "name": "Mirror: Pairs",
@@ -23,7 +23,7 @@ const DAYS = [
         "description": "Face a partner. One person leads slow, deliberate movements while the other mirrors exactly. No talking. After two minutes, swap. No winner, no evaluator -- just two people paying attention to each other.",
         "facilitatorDescription": "Pairs face each other. One camper leads slow, deliberate movements; the partner mirrors exactly in silence. Swap leaders after two minutes. No winners, no evaluators -- the goal is sustained mutual attention. Watch for speed creep; gently remind the lead to slow down if the follower cannot keep up.",
         "script": "https://docs.google.com/document/d/1qAd3bp7JVVt--7k_DVi9iq9a9A1bjuYESbz7GYqyU1sY/edit?usp=drivesdk",
-        "quickCard": "/resources/quick-cards/activity-card-day01-02-mirror-pairs.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-02-mirror-pairs.html"
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",
@@ -33,7 +33,8 @@ const DAYS = [
         "facilitatorDescription": "Campers receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each camper's starting point by math topic so the program meets campers where they are. Frame it before distributing: this is a measure of what campers already know about the eight math topics, not about Velocity Arena.",
         "link": "/activities/diagnostic/index.html",
         "script": "https://docs.google.com/document/d/1ki4h4daYwPkqDaJ9BnYlwBNBxTpMsEi5MukBDviqwfI/edit?usp=drivesdk",
-        "webpage": "https://velocity-arena-922bfwmu7-liz-arums-projects.vercel.app/activities/diagnostic/index.html"
+        "webpage": "https://velocity-arena-922bfwmu7-liz-arums-projects.vercel.app/activities/diagnostic/index.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-05-pre-task-diagnostic.html"
       },
       {
         "name": "Driving Question Reveal + Team Formation",
@@ -41,7 +42,8 @@ const DAYS = [
         "block": "LX Setup",
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet.",
         "facilitatorDescription": "Unveil the driving-question poster that will anchor the whole four weeks. Announce three-person teams and have campers sit together at their team tables. No math content yet -- this activity is pure set-up and social orientation.",
-        "script": "https://docs.google.com/document/d/1whCYZecdM3gyaziLFXggw8qiABDZVBvgxwAGWxMc3UQ/edit?usp=drivesdk"
+        "script": "https://docs.google.com/document/d/1whCYZecdM3gyaziLFXggw8qiABDZVBvgxwAGWxMc3UQ/edit?usp=drivesdk",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-driving-question.html"
       },
       {
         "name": "Stat Card Distribution",
@@ -50,7 +52,8 @@ const DAYS = [
         "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
         "facilitatorDescription": "Hand each camper a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the camper for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
         "script": "https://docs.google.com/document/d/1K0kG2dMqj8hDzy1uFp6OpIj4PZrtm1eb9zCeg_wqSx0/edit?usp=sharing",
-        "template": "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link"
+        "template": "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html"
       },
       {
         "name": "Speed Stat Challenge: What Does Motor Power Actually Mean?",
@@ -59,7 +62,8 @@ const DAYS = [
         "description": "One formula goes on the board: Speed % = (Speed points / 20) x 100. Your team calculates motor power for Speed values of 1, 3, 5, 6, and 8. Then compare answers with the team next to you. If you disagree, figure out where the split is -- without asking the facilitator first.",
         "facilitatorDescription": "Put one formula on the board: Speed % = (Speed points / 20) x 100. Teams calculate motor power for Speed values of 1, 3, 5, 6, and 8. Then teams compare answers with the team next to them and reconcile any disagreements before asking for help. Do not resolve disagreements yourself -- the productive work happens in the between-team conversation.",
         "script": "https://docs.google.com/document/d/12wViKxrKPix59HkDOGzY5YdpanDO5o_j6hbpYZlg3MM/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/14AtbbAZ9NygFtvebCek_SXmQKuzPbJxZKpGsp0DiFc8/edit?usp=drive_link"
+        "worksheet": "https://docs.google.com/document/d/14AtbbAZ9NygFtvebCek_SXmQKuzPbJxZKpGsp0DiFc8/edit?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -75,7 +79,8 @@ const DAYS = [
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?",
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware.",
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/1LLHU2AGux0_DxKIzkUDRcMvzSoxAIOkhigtIn6HFcJ0/edit?usp=sharing"
+        "worksheet": "https://docs.google.com/document/d/1LLHU2AGux0_DxKIzkUDRcMvzSoxAIOkhigtIn6HFcJ0/edit?usp=sharing",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -83,7 +88,8 @@ const DAYS = [
         "block": "Open Lab",
         "description": "Unstructured time with your bot. Drive it, experiment with MakeCode, or talk strategy with your team. No task to complete -- just time to explore.",
         "facilitatorDescription": "Unstructured bot time for teams. Driving, experimenting in MakeCode, strategy talk -- all fine. No required output. First Open Lab of the program; resist the urge to assign a task. Novelty with the hardware is the point.",
-        "script": "https://docs.google.com/document/d/1x7RnctRVwDj3nuC77ApKWc6Xquo7mQXYhYhLJT4bfjk/edit?usp=drivesdk"
+        "script": "https://docs.google.com/document/d/1x7RnctRVwDj3nuC77ApKWc6Xquo7mQXYhYhLJT4bfjk/edit?usp=drivesdk",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-09-open-lab.html"
       }
     ],
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall. You have 3 minutes. |",
