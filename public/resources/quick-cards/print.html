@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Print Quick Cards — Velocity Arena</title>
+<link rel="icon" href="/images/first.ico">
+<style>
+@page { size: 11in 8.5in landscape; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'DM Sans', system-ui, sans-serif; background: #0D0D1A; color: #fff; }
+
+@media screen {
+  body { padding: 28px 22px 60px; }
+  .topbar { background: #0D0D1A; border-bottom: 1px solid #222840; padding: 10px 20px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: flex; gap: 18px; align-items: center; margin: -28px -22px 28px; }
+  .topbar a { color: #8899AA; text-decoration: none; }
+  .topbar a:hover { color: #00E5FF; }
+
+  .container { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -.01em; margin-bottom: 6px; }
+  h1 span { color: #00E5FF; }
+  .lede { font-size: 15px; color: #8899AA; margin-bottom: 22px; line-height: 1.55; }
+
+  .actions { position: sticky; top: 0; background: #0D0D1A; padding: 14px 0; border-bottom: 1px solid #222840; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; z-index: 5; margin-bottom: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; background: #00E5FF; color: #0D0D1A; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: opacity .15s; }
+  .btn:hover { opacity: .88; }
+  .btn-ghost { background: transparent; color: #8899AA; border: 1.5px solid #222840; }
+  .btn-ghost:hover { color: #fff; border-color: #00E5FF; }
+  .count-badge { background: #1E2240; color: #00E5FF; font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 999px; margin-left: auto; }
+
+  .week-section { background: #161A2E; border: 1px solid #222840; border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; }
+  .week-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .week-title { font-size: 13px; font-weight: 800; color: #00E5FF; text-transform: uppercase; letter-spacing: .08em; }
+  .week-actions { display: flex; gap: 8px; }
+  .week-actions button { background: transparent; color: #8899AA; border: 1px solid #222840; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+  .week-actions button:hover { color: #00E5FF; border-color: #00E5FF; }
+
+  .card-list { display: flex; flex-direction: column; gap: 4px; }
+  .card-row { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 6px; transition: background .15s; cursor: pointer; }
+  .card-row:hover { background: #1E2240; }
+  .card-row input { width: 18px; height: 18px; accent-color: #00E5FF; cursor: pointer; flex-shrink: 0; }
+  .card-row .day { font-size: 11px; font-weight: 800; color: #8899AA; min-width: 56px; }
+  .card-row .name { font-size: 14px; color: #fff; flex: 1; }
+  .card-row .preview-link { font-size: 11px; font-weight: 700; color: #00E5FF; text-decoration: none; text-transform: uppercase; letter-spacing: .05em; opacity: .6; }
+  .card-row .preview-link:hover { opacity: 1; }
+  .empty { color: #8899AA; font-size: 14px; padding: 12px 4px; font-style: italic; }
+
+  /* Hide the print frames on screen */
+  #print-frames { display: none; }
+}
+
+@media print {
+  body { background: white; color: #000; margin: 0; padding: 0; }
+  .topbar, .container, .actions { display: none !important; }
+  #print-frames { display: block; }
+  #print-frames iframe { display: block; width: 11in; height: 8.5in; border: 0; page-break-after: always; page-break-inside: avoid; }
+  #print-frames iframe.skip { display: none; }
+  #print-frames iframe:last-of-type:not(.skip) { page-break-after: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/index.html">Today</a>
+  <a href="/schedule.html">Schedule</a>
+  <a href="/teachers.html">Teacher resources</a>
+  <a href="/tools.html">Tools</a>
+</div>
+
+<div class="container">
+  <h1>Print <span>Quick Cards</span></h1>
+  <p class="lede">Pick the cards you want and print them all in one go. Each card prints to a single landscape page (11&times;8.5).</p>
+
+  <div class="actions">
+    <button class="btn" onclick="printSelected()">Print selected →</button>
+    <button class="btn-ghost" onclick="selectAll(true)">Select all</button>
+    <button class="btn-ghost" onclick="selectAll(false)">Clear all</button>
+    <span class="count-badge" id="count-badge">0 selected</span>
+  </div>
+
+  <div id="weeks">
+    <p class="empty">Loading quick cards from days.js&hellip;</p>
+  </div>
+</div>
+
+<div id="print-frames"></div>
+
+<script src="/config.js"></script>
+<script src="/days.js"></script>
+<script>
+const WEEK_TITLES = {
+  1: 'Week 1 · Play Lab + Boot Camp',
+  2: 'Week 2 · Season 1',
+  3: 'Week 3 · Season 2 + Commissioner',
+  4: 'Week 4 · Championship'
+};
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Collect all (day, activity) pairs that have a quickCard URL
+function collectCards() {
+  const out = [];
+  for (const day of (typeof DAYS !== 'undefined' ? DAYS : [])) {
+    for (const a of (day.activities || [])) {
+      if (a.quickCard) {
+        out.push({ day: day.day, week: day.week, name: a.name, url: a.quickCard });
+      }
+    }
+  }
+  return out;
+}
+
+function render() {
+  const root = document.getElementById('weeks');
+  const cards = collectCards();
+  if (cards.length === 0) {
+    root.innerHTML = '<p class="empty">No quick cards yet — add a <code>quickCard</code> URL to any activity in <code>days.js</code> and it will appear here.</p>';
+    return;
+  }
+
+  // Group by week
+  const byWeek = {};
+  cards.forEach(c => { (byWeek[c.week] = byWeek[c.week] || []).push(c); });
+
+  let html = '';
+  Object.keys(byWeek).map(Number).sort((a,b) => a - b).forEach(week => {
+    html += `<div class="week-section" data-week="${week}">
+      <div class="week-head">
+        <div class="week-title">${escapeHtml(WEEK_TITLES[week] || ('Week ' + week))}</div>
+        <div class="week-actions">
+          <button onclick="selectWeek(${week}, true)">Select week</button>
+          <button onclick="selectWeek(${week}, false)">Clear week</button>
+        </div>
+      </div>
+      <div class="card-list">`;
+    byWeek[week].forEach((c, i) => {
+      const id = `chk-${c.day}-${i}`;
+      html += `<label class="card-row">
+        <input type="checkbox" id="${id}" data-week="${week}" data-url="${escapeHtml(c.url)}" onchange="updateCount()">
+        <span class="day">Day ${c.day}</span>
+        <span class="name">${escapeHtml(c.name)}</span>
+        <a class="preview-link" href="${escapeHtml(c.url)}" target="_blank" onclick="event.stopPropagation()">Preview ↗</a>
+      </label>`;
+    });
+    html += `</div></div>`;
+  });
+  root.innerHTML = html;
+  updateCount();
+}
+
+function updateCount() {
+  const n = document.querySelectorAll('.card-row input:checked').length;
+  document.getElementById('count-badge').textContent = `${n} selected`;
+}
+
+function selectAll(state) {
+  document.querySelectorAll('.card-row input').forEach(b => { b.checked = state; });
+  updateCount();
+}
+
+function selectWeek(week, state) {
+  document.querySelectorAll(`.card-row input[data-week="${week}"]`).forEach(b => { b.checked = state; });
+  updateCount();
+}
+
+function printSelected() {
+  const selected = Array.from(document.querySelectorAll('.card-row input:checked')).map(b => b.dataset.url);
+  if (selected.length === 0) {
+    alert('Pick at least one card before printing.');
+    return;
+  }
+
+  const root = document.getElementById('print-frames');
+  root.innerHTML = '';
+
+  let loaded = 0;
+  selected.forEach(url => {
+    const f = document.createElement('iframe');
+    f.src = url;
+    f.onload = () => {
+      loaded++;
+      if (loaded === selected.length) {
+        // Give layout a tick, then print
+        setTimeout(() => window.print(), 250);
+      }
+    };
+    root.appendChild(f);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', render);
+} else {
+  render();
+}
+</script>
+</body>
+</html>

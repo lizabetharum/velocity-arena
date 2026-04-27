@@ -13,7 +13,8 @@ const DAYS = [
         "block": "Ice Breaker",
         "description": "Stand in a circle with your whole group. One person makes any sound and movement -- anything goes -- then passes it to the next person. That person copies it and immediately adds their own twist. Keep it moving around the circle. When your facilitator calls 'reverse,' flip directions. You can not do this wrong.",
         "facilitatorDescription": "Whole group stands in a circle. One camper creates a sound-and-movement combination and passes it clockwise. Each person copies exactly, then adds their own variation before passing. Call 'reverse' to flip directions. Model over-the-top variation yourself first -- campers who go tiny are shrinking. No right answer; name this explicitly before starting.",
-        "script": "https://docs.google.com/document/d/1hXPfNWhq7z9Az6lpR94Lj78uSAZg7WH3HX83gIe4lp4/edit?usp=drivesdk"
+        "script": "https://docs.google.com/document/d/1hXPfNWhq7z9Az6lpR94Lj78uSAZg7WH3HX83gIe4lp4/edit?usp=drivesdk",
+        "quickCard": "/resources/quick-cards/activity-card-day01-01-circle-pass.html"
       },
       {
         "name": "Mirror: Pairs",
@@ -21,7 +22,8 @@ const DAYS = [
         "block": "Ice Breaker",
         "description": "Face a partner. One person leads slow, deliberate movements while the other mirrors exactly. No talking. After two minutes, swap. No winner, no evaluator -- just two people paying attention to each other.",
         "facilitatorDescription": "Pairs face each other. One camper leads slow, deliberate movements; the partner mirrors exactly in silence. Swap leaders after two minutes. No winners, no evaluators -- the goal is sustained mutual attention. Watch for speed creep; gently remind the lead to slow down if the follower cannot keep up.",
-        "script": "https://docs.google.com/document/d/1qAd3bp7JVVt--7k_DVi9iq9a9A1bjuYESbz7GYqyU1sY/edit?usp=drivesdk"
+        "script": "https://docs.google.com/document/d/1qAd3bp7JVVt--7k_DVi9iq9a9A1bjuYESbz7GYqyU1sY/edit?usp=drivesdk",
+        "quickCard": "/resources/quick-cards/activity-card-day01-02-mirror-pairs.html"
       },
       {
         "name": "Pre-Task Diagnostic: Prior Knowledge Assessment",

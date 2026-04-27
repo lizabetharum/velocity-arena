@@ -75,6 +75,14 @@
         <!-- populated by renderFacilitatorScripts() from days.js -->
       </div>
 
+      <div class="section-label" style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <span>Quick cards by day</span>
+        <a href="/resources/quick-cards/print.html" target="_blank" style="font-size:0.6875rem;font-weight:700;color:var(--cyan);text-decoration:none;text-transform:uppercase;letter-spacing:.06em;">Print all / by week &rarr;</a>
+      </div>
+      <div class="resource-grid" id="quickcard-grid" style="grid-template-columns:1fr;margin-bottom:1.5rem;max-height:36rem;overflow-y:auto;padding-right:0.5rem;">
+        <!-- populated by renderQuickCards() from days.js -->
+      </div>
+
       </div>
 
       <div class="section-label">Dashboard</div>
@@ -208,11 +216,40 @@ function renderFacilitatorScripts() {
   grid.dataset.rendered = '1';
 }
 
+function renderQuickCards() {
+  const grid = document.getElementById('quickcard-grid');
+  if (!grid || typeof DAYS === 'undefined') return;
+  if (grid.dataset.rendered === '1') return;
+
+  let html = '';
+  let lastWeek = -1;
+  for (const day of DAYS) {
+    const acts = (day.activities || []).filter(a => a.quickCard);
+    if (acts.length === 0) continue;
+    if (day.week !== lastWeek) {
+      lastWeek = day.week;
+      html += '<div style="font-size:0.6875rem;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;margin:0.5rem 0 0.25rem;">' + escapeHtml(WEEK_HEADINGS[day.week] || ('Week ' + day.week)) + '</div>';
+    }
+    html += '<div class="resource-card">';
+    html += '<div class="resource-title">Day ' + day.day + ' &mdash; ' + escapeHtml(day.theme || '') + '</div>';
+    for (const a of acts) {
+      html += '<a class="resource-link" href="' + a.quickCard + '" target="_blank">' + escapeHtml(a.name) + ' &rarr;</a>';
+    }
+    html += '</div>';
+  }
+  if (!html) {
+    html = '<div style="font-size:0.8125rem;color:var(--slate);font-style:italic;padding:0.5rem 0;">No quick cards attached yet. Add a <code>quickCard</code> URL to any activity in <code>days.js</code>.</div>';
+  }
+  grid.innerHTML = html;
+  grid.dataset.rendered = '1';
+}
+
 function unlock() {
   if (sessionStorage.getItem(SESSION_KEY) === '1') {
     gate.style.display = 'none';
     content.classList.add('unlocked');
     renderFacilitatorScripts();
+    renderQuickCards();
     return;
   }
   if (input.value === PASSWORD) {
@@ -220,6 +257,7 @@ function unlock() {
     gate.style.display = 'none';
     content.classList.add('unlocked');
     renderFacilitatorScripts();
+    renderQuickCards();
   } else {
     error.textContent = 'Incorrect password.';
     input.value = '';
