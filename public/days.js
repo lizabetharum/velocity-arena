@@ -12,7 +12,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Stand in a circle with your whole group. One person makes any sound and movement -- anything goes -- then passes it to the next person. That person copies it and immediately adds their own twist. Keep it moving around the circle. When your facilitator calls 'reverse,' flip directions. You can not do this wrong.",
-        "facilitatorDescription": "Whole group stands in a circle. One camper creates a sound-and-movement combination and passes it clockwise. Each person copies exactly, then adds their own variation before passing. Call 'reverse' to flip directions. Model over-the-top variation yourself first -- campers who go tiny are shrinking. No right answer; name this explicitly before starting.",
+        "facilitatorDescription": "Whole group stands in a circle. One student creates a sound-and-movement combination and passes it clockwise. Each person copies exactly, then adds their own variation before passing. Call 'reverse' to flip directions. Model over-the-top variation yourself first -- students who go tiny are shrinking. No right answer; name this explicitly before starting.",
         "script": "https://docs.google.com/document/d/1hXPfNWhq7z9Az6lpR94Lj78uSAZg7WH3HX83gIe4lp4/edit?usp=drivesdk",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-01-circle-pass.html"
       },
@@ -21,7 +21,7 @@ const DAYS = [
         "mins": 15,
         "block": "Ice Breaker",
         "description": "Face a partner. One person leads slow, deliberate movements while the other mirrors exactly. No talking. After two minutes, swap. No winner, no evaluator -- just two people paying attention to each other.",
-        "facilitatorDescription": "Pairs face each other. One camper leads slow, deliberate movements; the partner mirrors exactly in silence. Swap leaders after two minutes. No winners, no evaluators -- the goal is sustained mutual attention. Watch for speed creep; gently remind the lead to slow down if the follower cannot keep up.",
+        "facilitatorDescription": "Pairs face each other. One student leads slow, deliberate movements; the partner mirrors exactly in silence. Swap leaders after two minutes. No winners, no evaluators -- the goal is sustained mutual attention. Watch for speed creep; gently remind the lead to slow down if the follower cannot keep up.",
         "script": "https://docs.google.com/document/d/1qAd3bp7JVVt--7k_DVi9iq9a9A1bjuYESbz7GYqyU1sY/edit?usp=drivesdk",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-02-mirror-pairs.html"
       },
@@ -30,7 +30,7 @@ const DAYS = [
         "mins": 15,
         "block": "Challenge Block",
         "description": "You answer 8 questions about general math (speed, distance, graphs) in 12 minutes. There is no grade. This just helps your facilitator know what you already know so the program can meet you where you are.",
-        "facilitatorDescription": "Campers receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each camper's starting point by math topic so the program meets campers where they are. Frame it before distributing: this is a measure of what campers already know about the eight math topics, not about Velocity Arena.",
+        "facilitatorDescription": "Students receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each student's starting point by math topic so the program meets students where they are. Frame it before distributing: this is a measure of what students already know about the eight math topics, not about Velocity Arena.",
         "link": "/activities/diagnostic/index.html",
         "script": "https://docs.google.com/document/d/1ki4h4daYwPkqDaJ9BnYlwBNBxTpMsEi5MukBDviqwfI/edit?usp=drivesdk",
         "webpage": "https://velocity-arena-922bfwmu7-liz-arums-projects.vercel.app/activities/diagnostic/index.html",
@@ -41,7 +41,7 @@ const DAYS = [
         "mins": 10,
         "block": "LX Setup",
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet.",
-        "facilitatorDescription": "Unveil the driving-question poster that will anchor the whole four weeks. Announce three-person teams and have campers sit together at their team tables. No math content yet -- this activity is pure set-up and social orientation.",
+        "facilitatorDescription": "Unveil the driving-question poster that will anchor the whole four weeks. Announce three-person teams and have students sit together at their team tables. No math content yet -- this activity is pure set-up and social orientation.",
         "script": "https://docs.google.com/document/d/1whCYZecdM3gyaziLFXggw8qiABDZVBvgxwAGWxMc3UQ/edit?usp=drivesdk",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-driving-question.html"
       },
@@ -50,7 +50,7 @@ const DAYS = [
         "mins": 5,
         "block": "LX Setup",
         "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
-        "facilitatorDescription": "Hand each camper a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the camper for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
+        "facilitatorDescription": "Hand each student a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the student for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
         "script": "https://docs.google.com/document/d/1K0kG2dMqj8hDzy1uFp6OpIj4PZrtm1eb9zCeg_wqSx0/edit?usp=sharing",
         "template": "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html"
@@ -120,7 +120,7 @@ const DAYS = [
         "mins": 15,
         "block": "Ice Breaker",
         "description": "One at a time, each person makes a deliberate, over-the-top mistake -- drop something, say something wrong, trip on purpose -- then takes a deep, exaggerated bow while the whole group cheers as loud as possible. The bigger the mistake, the louder the cheer.",
-        "facilitatorDescription": "One at a time, each camper makes a deliberate over-the-top mistake -- drop something, say something wrong, trip on purpose -- then takes a theatrical bow while the whole group cheers as loud as possible. The bigger the mistake, the louder the cheer. Model it first yourself to set the scale. Frame the rule: campers are trying to out-embarrass each other on purpose. Risk: can feel humiliating to campers with math shame, so the over-the-top theatrical framing is essential.",
+        "facilitatorDescription": "One at a time, each student makes a deliberate over-the-top mistake -- drop something, say something wrong, trip on purpose -- then takes a theatrical bow while the whole group cheers as loud as possible. The bigger the mistake, the louder the cheer. Model it first yourself to set the scale. Frame the rule: students are trying to out-embarrass each other on purpose. Risk: can feel humiliating to students with math shame, so the over-the-top theatrical framing is essential.",
         "script": "https://docs.google.com/document/d/1P1yi8TbpERF1pztb-VTR4v4gpO4dDz0_3fNkEslJDBk/edit?usp=drivesdk"
       },
       {
@@ -128,7 +128,7 @@ const DAYS = [
         "mins": 15,
         "block": "Ice Breaker",
         "description": "Your whole team does jumping jacks at full speed for 30 seconds. Then you slow down -- one fewer rep each cycle -- until you are doing one jumping jack every 10 seconds. You feel the drop in your body. Your facilitator asks: 'What would we call it if your bot did this?' The answer is Endurance.",
-        "facilitatorDescription": "Teams do jumping jacks at full speed for 30 seconds, then cycle down -- one fewer rep each cycle -- until they are doing one jumping jack every 10 seconds. Campers feel the drop physically. Then ask the hinge question: 'What would we call it if your bot did this?' The answer is Endurance. Physical embodiment before the formula gets introduced in the Challenge Block.",
+        "facilitatorDescription": "Teams do jumping jacks at full speed for 30 seconds, then cycle down -- one fewer rep each cycle -- until they are doing one jumping jack every 10 seconds. Students feel the drop physically. Then ask the hinge question: 'What would we call it if your bot did this?' The answer is Endurance. Physical embodiment before the formula gets introduced in the Challenge Block.",
         "script": "https://docs.google.com/document/d/1mGn9MzXHu0cghazkY0RGQDzLq4lr0fpRFz8et-B1MMo/edit?usp=drivesdk"
       },
       {
@@ -170,7 +170,7 @@ const DAYS = [
         "mins": 10,
         "block": "Match-Build-Make",
         "description": "Your facilitator explains the three team roles -- Coder, Fabricator, Analyst -- that rotate weekly. Your team decides who starts in each role next week.",
-        "facilitatorDescription": "Explain the three team roles -- Coder, Fabricator, Analyst -- that rotate weekly. Teams decide internally who starts in each role. Emphasize rotation: no camper specializes in one role for the whole program.",
+        "facilitatorDescription": "Explain the three team roles -- Coder, Fabricator, Analyst -- that rotate weekly. Teams decide internally who starts in each role. Emphasize rotation: no student specializes in one role for the whole program.",
         "script": "https://docs.google.com/document/d/1PiKGa7FdUtdhcvAF49XXecY_2bKQXI3KeV03aEmA-ZE/edit?usp=drivesdk",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-06-role-rotation.html"
       },
@@ -225,7 +225,7 @@ const DAYS = [
         "mins": 25,
         "block": "Ice Breaker",
         "description": "One person on your team is the 'robot.' The other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two spots. The robot follows instructions exactly -- even if they lead somewhere wrong. No touching allowed.",
-        "facilitatorDescription": "One camper per team plays 'robot' while the other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two points. The robot follows instructions literally -- even when they lead somewhere wrong. No touching. Sets up the Turning stat and the idea that precise instructions produce precise movement.",
+        "facilitatorDescription": "One student per team plays 'robot' while the other two give step-by-step verbal instructions (forward 2, turn left 90 degrees, forward 1) to navigate between two points. The robot follows instructions literally -- even when they lead somewhere wrong. No touching. Sets up the Turning stat and the idea that precise instructions produce precise movement.",
         "script": "https://docs.google.com/document/d/1KCi2wIXFxhKpFjJtnzjW_-DEDTpZ-ODI2dinMXD6Gcs/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-01-human-robot.html"
       },
@@ -234,7 +234,7 @@ const DAYS = [
         "mins": 65,
         "block": "Challenge Block",
         "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formulas on the board -- Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02). Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate.",
-        "facilitatorDescription": "Part 1 (20 min): teams plot two bot runs on the same graph from a data card -- one line slopes down, the other stays flat. Teams figure out why before flipping the card for the stat allocations. Arc Approximation (10 min): draw one smooth curved turn on the board with three straight chord segments overlaid. Ask: are the segments together longer or shorter than the arc, and what happens with more, shorter segments? The point is the physical intuition that a curve can be broken into straight measurable pieces -- prerequisite for the distance formula. Walk the Plane (15 min): campers walk to called coordinates on a life-sized taped grid, then estimate the distance from (1,1) to (4,5). Write d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time, calculate, and verify against two more pairs -- the formula gets verified by standing on the grid. Part 2 (20 min): Turning formulas go on the board (Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02)). Teams fill stat cards, then program the bot to navigate from (0,0) to a called coordinate.",
+        "facilitatorDescription": "Part 1 (20 min): teams plot two bot runs on the same graph from a data card -- one line slopes down, the other stays flat. Teams figure out why before flipping the card for the stat allocations. Arc Approximation (10 min): draw one smooth curved turn on the board with three straight chord segments overlaid. Ask: are the segments together longer or shorter than the arc, and what happens with more, shorter segments? The point is the physical intuition that a curve can be broken into straight measurable pieces -- prerequisite for the distance formula. Walk the Plane (15 min): students walk to called coordinates on a life-sized taped grid, then estimate the distance from (1,1) to (4,5). Write d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time, calculate, and verify against two more pairs -- the formula gets verified by standing on the grid. Part 2 (20 min): Turning formulas go on the board (Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02)). Teams fill stat cards, then program the bot to navigate from (0,0) to a called coordinate.",
         "script": "https://docs.google.com/document/d/1Rha6U3CayswkxkooVnwXukkJv7dDJnZALeHko60_kyg/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
@@ -282,7 +282,7 @@ const DAYS = [
     "funElement": "None today. Discovery and first coordinate navigation challenge create engagement through genuine uncertainty and physical movement.",
     "los": "LO 2.1 (slope meaning with two specific bot examples from graph); LO 3.1 (coordinate navigation attempts logged with error distance); LO 3.2 (distance formula introduced on life-sized grid, verified against two coordinate pairs; deepened on Day 10 with match data)",
     "facilitatorRisk": {
-      "risk": "The worksheet becomes anexercise where campers just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
+      "risk": "The worksheet becomes anexercise where students just plot points without ever discussing what the graph shape means, and the Turning stat introduction gets buried under the graphing task.",
       "say": "\"Before Part 2: stop everyone. Say \"Look at your graph and the team next to yours. Your lines are different shapes. I want one sentence from each team, not what the formula says, but what your bot physically did differently to create that shape. Start there.\" Then, when you transition to the coordinate navigation: \"This grid is your new stat. Turning controls how your bot moves through this space. Let's see what it actually does.\"\" |"
     }
   },
@@ -308,7 +308,7 @@ const DAYS = [
         "mins": 3,
         "block": "Ice Breaker",
         "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
-        "facilitatorDescription": "Campers fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
+        "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
       },
       {
@@ -343,7 +343,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -365,7 +365,7 @@ const DAYS = [
     "funElement": "None today. The scoop build and the \"doubling motor speed does not double kick distance\" discovery create genuine productive surprise. The scoop iteration loop (build, test, adjust) generates its own momentum.",
     "los": "LO 1.2 (proportional vs non-proportional contrast: Speed output scales linearly -- double the stat, double the output; Power output scales as P²/2 -- double the stat, quadruple the output; both named explicitly with side-by-side examples); LO 3.2 (distance calculations verified against bot kick test data)",
     "facilitatorRisk": {
-      "risk": "Campers assume more Power always wins and stop thinking about trade-offs in the 20-point budget. Cognitive overload from trying to optimize all four stats simultaneously.",
+      "risk": "Students assume more Power always wins and stop thinking about trade-offs in the 20-point budget. Cognitive overload from trying to optimize all four stats simultaneously.",
       "say": "\"Before anyone changes that speed value: what happens to your Endurance if you give 3 more points to Power? Calculate it. Your total is still 20. Where does that Power come from? Your equation has four variables. Show me the trade-off on paper before you touch the code.\" |"
     }
   },
@@ -382,7 +382,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' You have to check the math on your stat card before you act. Only do the action if the condition is actually true for your numbers.",
-        "facilitatorDescription": "Call commands like 'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' Campers check their stat card before acting and only perform the action if the condition is true for their numbers. Warm-up for conditional logic and the full-system equation coming in the Challenge Block.",
+        "facilitatorDescription": "Call commands like 'Simon Says: IF the sum of Speed + Endurance equals 10, THEN clap 4 times.' Students check their stat card before acting and only perform the action if the condition is true for their numbers. Warm-up for conditional logic and the full-system equation coming in the Challenge Block.",
         "script": "https://docs.google.com/document/d/1h8HEuGVEsHCbIc_LeWVK2cioguPdtOpbBl6Bd27Lywg/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-01-simon-says.html"
       },
@@ -463,9 +463,9 @@ const DAYS = [
     "endBufferMins": 2,
     "ends": "What is one thing you are good at that most people do not know about? Be specific. Name the thing. Give a real example from your own life. You have 5 minutes. |",
     "funElement": "Misconception correction: Equals sign as balance (activates today. Day 5 is the first day the full budget equation is introduced, making this the natural placement for the correction).",
-    "los": "LO 1.1 (all four stat-to-formula pairs applied); LO 1.2 (all four formula calculations correct across three loadout options); LO 5.1 (data dashboard with first simulation entries); LO 9.1 (Week 1 journal: one personal strength named with a specific example) # WEEK 2: THE BUILD + FIRST SEASON *Energy register: Competitive, invested, occasionally frustrated. The leaderboard is up. The data dashboard is live. Frustration is productive here. It means campers care.* +-----------------------------------------------------------------------+ | **OPEN LAB PROTOCOL: WEEKS 2 AND 3** Starting Week 2, Open Lab runs two parallel tracks. Campers choose which one to join at the start of each Open Lab. Both tracks are legitimate uses of the time. **Track A: Data Dive** Review the data dashboard. Revise predictions. Analyze residuals. Run formula calculations for next match prep. This track has a specific prompt in each day's Open Lab description. **Track B: Bot Lab** Experiment with MakeCode. Test a new scoop angle. Try a weird loadout you would never use in a real match. Drive backwards at full speed and observe Turning behavior. No required output. Just bot time. Track choice is self-selected and publicly visible. A team that chooses Bot Lab after a loss is avoiding their data. That tells you something. Do not redirect them immediately. Watch for one full Open Lab. If they choose Bot Lab after two consecutive losses without any dashboard revision, ask one question: \"What would your data tell you if you looked right now?\" Then step back and let them decide. The self-selection is diagnostic, not a problem to fix. Teams that consistently choose Track A are doing the analytical work the program is designed to produce. Teams that consistently choose Track B may be more engaged with the physical system than the mathematical one. Both are valid paths through the program. Only one of them produces a competitive advantage in Season 2. Let them figure that out. +=======================================================================+ +-----------------------------------------------------------------------+",
+    "los": "LO 1.1 (all four stat-to-formula pairs applied); LO 1.2 (all four formula calculations correct across three loadout options); LO 5.1 (data dashboard with first simulation entries); LO 9.1 (Week 1 journal: one personal strength named with a specific example) # WEEK 2: THE BUILD + FIRST SEASON *Energy register: Competitive, invested, occasionally frustrated. The leaderboard is up. The data dashboard is live. Frustration is productive here. It means students care.* +-----------------------------------------------------------------------+ | **OPEN LAB PROTOCOL: WEEKS 2 AND 3** Starting Week 2, Open Lab runs two parallel tracks. Students choose which one to join at the start of each Open Lab. Both tracks are legitimate uses of the time. **Track A: Data Dive** Review the data dashboard. Revise predictions. Analyze residuals. Run formula calculations for next match prep. This track has a specific prompt in each day's Open Lab description. **Track B: Bot Lab** Experiment with MakeCode. Test a new scoop angle. Try a weird loadout you would never use in a real match. Drive backwards at full speed and observe Turning behavior. No required output. Just bot time. Track choice is self-selected and publicly visible. A team that chooses Bot Lab after a loss is avoiding their data. That tells you something. Do not redirect them immediately. Watch for one full Open Lab. If they choose Bot Lab after two consecutive losses without any dashboard revision, ask one question: \"What would your data tell you if you looked right now?\" Then step back and let them decide. The self-selection is diagnostic, not a problem to fix. Teams that consistently choose Track A are doing the analytical work the program is designed to produce. Teams that consistently choose Track B may be more engaged with the physical system than the mathematical one. Both are valid paths through the program. Only one of them produces a competitive advantage in Season 2. Let them figure that out. +=======================================================================+ +-----------------------------------------------------------------------+",
     "facilitatorRisk": {
-      "risk": "Campers treat the budget constraint as a puzzle with one optimal answer, stopping creative exploration of trade-offs after the first \"good\" loadout. Facilitator talking too long about the constraint concept reinforces this.",
+      "risk": "Students treat the budget constraint as a puzzle with one optimal answer, stopping creative exploration of trade-offs after the first \"good\" loadout. Facilitator talking too long about the constraint concept reinforces this.",
       "say": "\"Launch in under 5 minutes and say nothing else until the grapple is over. The only words after you put the equation on the board are: \"Design three different loadouts. Show all four formula calculations for each. You have 20 minutes.\" Then stop talking and walk to the back of the room.\" |"
     }
   },
@@ -481,7 +481,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Your team lines up. The first person solves step 1 of a multi-step equation on the whiteboard, tags the next person for step 2, and so on. First team to the correct final answer wins.",
-        "facilitatorDescription": "Teams line up at the whiteboard. First camper solves step 1 of a multi-step equation, tags the next camper for step 2, and so on. First team to the correct final answer wins. Primes procedural fluency before the interleaved problem set.",
+        "facilitatorDescription": "Teams line up at the whiteboard. First student solves step 1 of a multi-step equation, tags the next student for step 2, and so on. First team to the correct final answer wins. Primes procedural fluency before the interleaved problem set.",
         "script": "https://docs.google.com/document/d/1TM8X1tlASaOyRy5xgQauO_l05p1tAPgbD0FkGdACu1Q/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/17el70myq_C81c16ErdoBQ_KKBS8x-fb0Xug2SEA_-Fg/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-01-equation-relay-race.html"
@@ -491,7 +491,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Official Stat Allocation: Interleaved Problem Set",
@@ -538,7 +538,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Free Code or Final Verification",
@@ -591,7 +591,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Endurance Decay Equations in Slope-Intercept Form",
@@ -625,7 +625,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Season 1 Round-Robin Matches, Day 1",
@@ -676,7 +676,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Problem cards are posted around the room, each showing a real stat value from yesterday's leaderboard ('Team A: Speed = 5, scored 3 goals'). Walk to each card, answer the question on the back (calculate a percentage, write a ratio), and find the matching answer on the next card. It is a self-correcting chain loop.",
-        "facilitatorDescription": "Post problem cards around the room, each referencing a real stat from yesterday's leaderboard ('Team A: Speed = 5, scored 3 goals'). Campers walk to each card, answer the question on the back (calculate a percentage, write a ratio), and find the matching answer on the next card. Self-correcting chain loop -- if campers cannot find the next card, their previous answer is wrong.",
+        "facilitatorDescription": "Post problem cards around the room, each referencing a real stat from yesterday's leaderboard ('Team A: Speed = 5, scored 3 goals'). Students walk to each card, answer the question on the back (calculate a percentage, write a ratio), and find the matching answer on the next card. Self-correcting chain loop -- if students cannot find the next card, their previous answer is wrong.",
         "script": "https://docs.google.com/document/d/1LsBHj1fZelZGJysKmNXpW42IlD4GokWiVK0D9KvpBYQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-01-scavenger-hunt.html"
       },
@@ -685,7 +685,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Energy Reset",
@@ -699,7 +699,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Matching Situations, Graphs, and Linear Equations",
@@ -732,7 +732,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Rivalry Cards",
@@ -748,7 +748,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab",
@@ -772,7 +772,7 @@ const DAYS = [
     "funElement": "Rivalry cards activate today. Leaderboard updated after matches.",
     "los": "LO 2.3 (scatter plot of Speed vs. Goals Scored with equation from two data points); LO 5.2 (scatter plot built from dashboard data, labeled); LO 7.1 (equation-based prediction logged before match)",
     "facilitatorRisk": {
-      "risk": "Part 1 \"matching\" activity feels like a worksheet and campers rush through the matching to get to the graph, losing the representational translation work that is the core of the session.",
+      "risk": "Part 1 \"matching\" activity feels like a worksheet and students rush through the matching to get to the graph, losing the representational translation work that is the core of the session.",
       "say": "\"Before you distribute the cards: \"You have three representations of the same thing: a situation in words, a data table, and a graph. They all describe the same relationship. Your job is to find which three belong together and be ready to explain why the graph looks the way it does given the numbers in the table. Do not match by elimination. Match by reasoning.\"\" |"
     }
   },
@@ -798,7 +798,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Formula Relay: All Five Types in One Race",
@@ -815,7 +815,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Lunch / Snack Break",
@@ -838,7 +838,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Post-Match Debrief and Free Code",
@@ -879,7 +879,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. You walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding, not who won the most, but who learned the most from one match result.",
-        "facilitatorDescription": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Campers walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding -- not who won the most, but who learned the most from one match result. Emphasize that the vote is about learning, not record.",
+        "facilitatorDescription": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Students walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding -- not who won the most, but who learned the most from one match result. Emphasize that the vote is about learning, not record.",
         "script": "https://docs.google.com/document/d/1xMUVjmU2S0wIzAEcFF8N4Gx7ol96ItPGM5AMiu8rI-g/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-01-best-match-gallery-walk.html"
       },
@@ -888,14 +888,14 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Distance Formula: How Far Did the Ball Travel",
         "mins": 50,
         "block": "Challenge Block",
         "description": "Week 2 continuation of the coordinate geometry introduced on Day 3. On Day 3 you walked the grid physically and computed straight-line distance with your bodies. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what was observed during the match? If not, name the source of the discrepancy -- measurement error, bot drift, or formula misapplication. This session closes the coordinate geometry arc started on Day 3.",
-        "facilitatorDescription": "Reconnect to Day 3 explicitly: campers used this formula on the floor grid, walking to coordinates and estimating diagonals. Today applies it to real Season 1 match data. Teams use three coordinate pairs from their data log and calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Every calculation recorded. Then teams answer: does the computed distance match what was observed during the match? If not, name the discrepancy source -- measurement error, bot drift, or formula misapplication. Closes the coordinate geometry arc started on Day 3. Do not let teams treat this as a new formula.",
+        "facilitatorDescription": "Reconnect to Day 3 explicitly: students used this formula on the floor grid, walking to coordinates and estimating diagonals. Today applies it to real Season 1 match data. Teams use three coordinate pairs from their data log and calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Every calculation recorded. Then teams answer: does the computed distance match what was observed during the match? If not, name the discrepancy source -- measurement error, bot drift, or formula misapplication. Closes the coordinate geometry arc started on Day 3. Do not let teams treat this as a new formula.",
         "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
         "worksheet": "https://docs.google.com/document/d/1rlvuktLelGSmNZhlcX6xbDgxutA3qaG4DMdsaJxRdmw/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html"
@@ -905,7 +905,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Lunch / Snack Break",
@@ -929,7 +929,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Season 1 Final Round",
@@ -963,7 +963,7 @@ const DAYS = [
     "funElement": "Season 1 closes. Final leaderboard update creates stakes and sets up the Week 3 Commissioner's Week power shift.",
     "los": "LO 3.2 (distance formula deepened: applied to three match-data coordinate pairs, discrepancy sourced); LO 5.1 (complete dashboard, no blanks); LO 7.2 (post-match revision entries with data justification); LO 9.1 (Week 2 journal: a specific mistake named, consequence described, change recorded)",
     "facilitatorRisk": {
-      "risk": "Campers treat this as a new formula they have never seen, bypassing the Day 3 embodied experience. The formula is not new -- they used it on the life-sized grid on Day 3. Reconnect explicitly before calculating.",
+      "risk": "Students treat this as a new formula they have never seen, bypassing the Day 3 embodied experience. The formula is not new -- they used it on the life-sized grid on Day 3. Reconnect explicitly before calculating.",
       "say": "\"You have used this formula before -- Day 3, on the floor grid. You walked to the coordinates. You estimated the diagonal. Then you calculated. Today is the same formula on real match data. Before you plug in numbers: which two coordinates are you starting with? Find them in your data log. Now you can calculate.\""
     }
   },
@@ -979,7 +979,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "A tape line runs across the room labeled 'least important' to 'most important' for winning Season 1 matches. You stand at the position that matches your belief about which stat matters most. No data allowed yet, pure instinct. After everyone has placed themselves: look at the spread. Then the facilitator asks: 'Now open your dashboard. Does the data support where you're standing?'",
-        "facilitatorDescription": "Lay a tape line across the room, labeled 'least important' to 'most important' for winning Season 1 matches. Campers stand at the position matching their belief about which stat matters most. No data yet -- pure instinct. Then ask: 'Now open your dashboard. Does the data support where you're standing?' Let the spread reveal disagreement, then require dashboard evidence.",
+        "facilitatorDescription": "Lay a tape line across the room, labeled 'least important' to 'most important' for winning Season 1 matches. Students stand at the position matching their belief about which stat matters most. No data yet -- pure instinct. Then ask: 'Now open your dashboard. Does the data support where you're standing?' Let the spread reveal disagreement, then require dashboard evidence.",
         "script": "https://docs.google.com/document/d/1d7vhhtcpL9ZhEbacI4QChLFig33nDHQgb2pGtZjzpg8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-01-human-number-line.html"
       },
@@ -988,7 +988,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
@@ -1008,7 +1008,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Lunch / Snack Break",
@@ -1034,7 +1034,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Practice Matches: Test New Loadout Hypotheses",
@@ -1051,7 +1051,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Commissioner Proposal Refinement",
@@ -1101,14 +1101,14 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Final Proposal Verification",
         "mins": 35,
         "block": "Challenge Block",
-        "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed. Your facilitator also checks Criterion 6: at least one of the following concept types must be named in the proposal -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay. Your facilitator asks one camper per team: 'How did you calculate this number? What kind of math is that?' before the meeting starts.",
-        "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one camper per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
+        "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed. Your facilitator also checks Criterion 6: at least one of the following concept types must be named in the proposal -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay. Your facilitator asks one student per team: 'How did you calculate this number? What kind of math is that?' before the meeting starts.",
+        "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one student per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
         "script": "https://docs.google.com/document/d/1rZES5FM1sbJcv16FcgLuV0mhrjpyPj2OaPZU_F1rJng/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1Gk98vJySwPowrqkMj1LTYlvm8b5U3g5o/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
@@ -1135,7 +1135,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Season 2 Allocation Verification",
@@ -1156,7 +1156,7 @@ const DAYS = [
     ],
     "endBufferMins": 20,
     "ends": "Name one math concept from today's meeting that was in someone else's proposal, not yours. Write the calculation they used. Explain to a teammate why citing that specific number made the argument stronger. You have 4 minutes. |",
-    "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Campers author the rules of their own game using data they collected.",
+    "funElement": "Commissioner's Meeting is the highest-agency moment of the program. Students author the rules of their own game using data they collected.",
     "los": "LO 4.3 (Season 2 loadout adjusted under new rule constraints); LO 5.3 (data-backed argument scored on rubric); LO 8.1 (3-minute presentation scored on evidence quality and math content)",
     "facilitatorRisk": {
       "risk": "One team's proposal dominates the meeting and other teams disengage from verifying the math in their own proposals. Anxiety contagion when a confident team presents first.",
@@ -1185,7 +1185,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Energy Reset",
@@ -1198,8 +1198,8 @@ const DAYS = [
         "name": "Building and Solving Linear Equations",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is camper-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point.",
-        "facilitatorDescription": "Part 1: using Season 1 and early Season 2 data, teams write the equation that predicts their win probability. Two past data points, slope calculated, y-intercept solved, equation in slope-intercept form. Camper-generated, not formula-imposed. Part 2: teams test the equation against two past matches and calculate residuals (predicted minus actual). Teams also calculate wins per Speed point (Season 1 wins / Speed stat) as a unit rate. Each team reports two residuals and the unit rate to the class. Every team's equation is different -- that is the point. Before releasing to afternoon: each team's equation must be on the whiteboard with slope, y-intercept, and source data points labeled.",
+        "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is student-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point.",
+        "facilitatorDescription": "Part 1: using Season 1 and early Season 2 data, teams write the equation that predicts their win probability. Two past data points, slope calculated, y-intercept solved, equation in slope-intercept form. Student-generated, not formula-imposed. Part 2: teams test the equation against two past matches and calculate residuals (predicted minus actual). Teams also calculate wins per Speed point (Season 1 wins / Speed stat) as a unit rate. Each team reports two residuals and the unit rate to the class. Every team's equation is different -- that is the point. Before releasing to afternoon: each team's equation must be on the whiteboard with slope, y-intercept, and source data points labeled.",
         "script": "https://docs.google.com/document/d/1F-g0L6Z_d2klUamK6SFWQSTv7J6Zg4SPUqTAzzHDibc/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1nix-JvEGlUqGEOWzDaELTovsFCR5zP5P92qYIHK2NFU/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-02-linear-equations.html"
@@ -1209,7 +1209,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Lunch / Snack Break",
@@ -1233,7 +1233,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Residual Analysis or Bot Calibration",
@@ -1285,7 +1285,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Percent Change: Season 1 to Season 2 Configurations",
@@ -1318,7 +1318,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Equation Revision or Loadout Experiments",
@@ -1343,7 +1343,7 @@ const DAYS = [
     "funElement": "Prediction market still active. Teams track Season 2 record against public prediction.",
     "los": "LO 1.3 (percent change vs. percentage point difference, three consecutive correct dashboard entries); LO 4.2 (pre-match prediction logged and compared each match); LO 7.2 (revision entry with data-cited justification when \\>20% off)",
     "facilitatorRisk": {
-      "risk": "Campers confuse percent change and percentage point difference and treat the two numbers as interchangeable in their Commissioner proposals and scouting reports, a misconception that compounds from here forward.",
+      "risk": "Students confuse percent change and percentage point difference and treat the two numbers as interchangeable in their Commissioner proposals and scouting reports, a misconception that compounds from here forward.",
       "say": "\"Stop and put both numbers side by side on the board using one team's actual data. Say: \"This team changed Speed from 4 to 7 points. That is 3 percentage points different. The percent change is (7 - 4) / 4 x 100 = 75%. Their bot is 75% faster, not 3% faster. Which number tells you more about the actual change in bot behavior? Why?\" Make teams answer in one sentence before moving on.\" |"
     }
   },
@@ -1359,7 +1359,7 @@ const DAYS = [
         "mins": 25,
         "block": "Ice Breaker",
         "description": "You walk the room and re-read every bot origin story from Day 2. Then you ask: has your bot's story changed? What happened in Seasons 1 and 2 that belongs in its lore now? You write one new sentence to add, something that only makes sense because you played the matches.",
-        "facilitatorDescription": "Campers walk the room and re-read every Day 2 bot origin story. Each team asks: has our bot's story changed? What from Seasons 1 and 2 belongs in its lore now? Teams write one new sentence to add to their bot's lore -- something that only makes sense because they played the matches. Creative layer on top of the stat system, not a replacement for it.",
+        "facilitatorDescription": "Students walk the room and re-read every Day 2 bot origin story. Each team asks: has our bot's story changed? What from Seasons 1 and 2 belongs in its lore now? Teams write one new sentence to add to their bot's lore -- something that only makes sense because they played the matches. Creative layer on top of the stat system, not a replacement for it.",
         "script": "https://docs.google.com/document/d/1a7VLmihhAGvqVlVV43-5ZNT9fgtdltZcUdYa1JFT18g/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1YiobKPGJCQGe9n7Usf7SN1dZnsYxBsj2vaOnsAMhdl4/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-01-bot-lore-gallery-walk.html"
@@ -1369,7 +1369,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Scouting Report: Mathematical Foundation",
@@ -1403,7 +1403,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Scouting Continuation or Identity Refinement",
@@ -1427,9 +1427,9 @@ const DAYS = [
     ],
     "ends": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes. |",
     "funElement": "Creative expression reinforces team ownership and bot identity. Scouting reports begin the intellectual preparation for Championship.",
-    "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Campers teach others. They present to judges. The arc ends with them as the authority.*",
+    "los": "LO 7.3 (scouting report sections 1 and 2: opponent stats as percentages and Endurance decay equation); LO 2.4 (Endurance decay x-intercept predicted from equation); LO 6.3 (error trace from bot behavior back to calculation, begun in scouting analysis); LO 9.1 (Week 3 journal: a specific number or calculation named as the thing that changed their thinking) # WEEK 4: CHAMPIONSHIP + EXHIBITION *Energy register: Proud, expert, generous. Students teach others. They present to judges. The arc ends with them as the authority.*",
     "facilitatorRisk": {
-      "risk": "Creative expression becomes pure decoration with no mathematical connection. Campers spend 90 minutes on visual design with no reference to their stat system.",
+      "risk": "Creative expression becomes pure decoration with no mathematical connection. Students spend 90 minutes on visual design with no reference to their stat system.",
       "say": "\"Before the creative block starts, read your slogan to me out loud. It must reference a stat, equation, or data point. \"Team Velocity\" is a team name. \"Speed = 7: 35% Power and Still Climbing\" is a slogan with math. You have 2 minutes to revise if yours does not include a number. The creativity is real. It just has to connect to what your bot actually does.\" |"
     }
   },
@@ -1446,7 +1446,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Your Championship opponent's stat card is face down on the table. Flip it. Read the numbers. Stand up for the one stat you fear most — your body is your vote. Then sketch a four-bar chart of their build and circle the biggest threat. One word on the board. That stat determines your ball mode and your Skills Arena target this afternoon.",
-      "facilitatorDescription": "Championship opponent stat cards are waiting face down when campers arrive. They flip, read, and vote physically — standing for the one stat they fear most. Then a quick bar chart sketch of the opponent's build, one circled threat. Six threat words go on the board, one per team, and campers receive a direct promise: that stat determines their ball mode and Skills Arena focus in the afternoon session. No writing beyond one word and four bar labels. The physical vote replaces discussion and moves the room fast.",
+      "facilitatorDescription": "Championship opponent stat cards are waiting face down when students arrive. They flip, read, and vote physically — standing for the one stat they fear most. Then a quick bar chart sketch of the opponent's build, one circled threat. Six threat words go on the board, one per team, and students receive a direct promise: that stat determines their ball mode and Skills Arena focus in the afternoon session. No writing beyond one word and four bar labels. The physical vote replaces discussion and moves the room fast.",
       "script": "https://docs.google.com/document/d/13EAWLvzOpJzSWD48ie6-Ti6RsVMJySXtF03AYYh9Nz0/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-01-know-your-opponent.html"
       },
@@ -1455,7 +1455,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Scouting Report Completion: Sections 3 and 4",
@@ -1490,7 +1490,7 @@ const DAYS = [
         "mins": 10,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "10-minute break. Campers stand, move, get water. Longer break lets energy fully reset before the next heavy block."
+        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Championship Loadout Verification",
@@ -1514,7 +1514,7 @@ const DAYS = [
     "funElement": "Championship bracket is forming. Scouting reports give every team tactical agency going into the tournament.",
     "los": "LO 7.3 (scouting report sections 3 and 4: trend line equation with prediction and inequality strategy); LO 4.3 (valid Championship loadouts under new constraints); LO 8.1 (Commissioner presentation with numerical evidence)",
     "facilitatorRisk": {
-      "risk": "Scouting report verbal check-ins become interrogations that make campers feel tested rather than expert, which re-triggers math shame in the final week.",
+      "risk": "Scouting report verbal check-ins become interrogations that make students feel tested rather than expert, which re-triggers math shame in the final week.",
       "say": "\"Frame it as preparation, not evaluation. Say: \"I am going to ask you to walk me through one calculation from your scouting report. Pretend I am a visitor at the Exhibition who has never seen this before. Explain it so I understand what it means about your opponent.\" Expert framing, not quiz framing. If they stumble, say: \"Take 2 minutes to review it. I will come back.\"\" |"
     }
   },
@@ -1530,7 +1530,7 @@ const DAYS = [
         "mins": 25,
         "block": "Ice Breaker",
         "description": "Part 1 (8 min): From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their Season 1 best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2 (17 min): All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes.",
-        "facilitatorDescription": "Part 1 (8 min): from memory, campers write five numbers -- opponent's Speed motor power, Endurance decay rate, Season 1 best single-match goal count, own Endurance output at t = 3, and own Speed motor power. Part 2 (17 min): post all scouting reports. Teams read the opponent's report about them, find one calculation the opponent got right and one they got wrong, and annotate with sticky notes.",
+        "facilitatorDescription": "Part 1 (8 min): from memory, students write five numbers -- opponent's Speed motor power, Endurance decay rate, Season 1 best single-match goal count, own Endurance output at t = 3, and own Speed motor power. Part 2 (17 min): post all scouting reports. Teams read the opponent's report about them, find one calculation the opponent got right and one they got wrong, and annotate with sticky notes.",
         "script": "https://docs.google.com/document/d/1CqRMPNEMrwuD__AO8xXUpXKYu7z0FRbgVkU47bvCDv0/edit?usp=drive_link",
         "template": "https://docs.google.com/document/d/1LELkBNge6avite1E60qRi_rU829oVV_M7FIyFNHyayg/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-cold-retrieval-scouting-annotation.html"
@@ -1565,7 +1565,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "What-If? Analysis",
@@ -1581,7 +1581,7 @@ const DAYS = [
         "mins": 15,
         "block": "Open Lab",
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow.",
-        "facilitatorDescription": "Teams rehearse the pitch one more time and add specific numbers to any vague claim. Every claim must have a number next to it before campers leave for the day. Short 15-minute window -- keep it focused on number-for-claim matching.",
+        "facilitatorDescription": "Teams rehearse the pitch one more time and add specific numbers to any vague claim. Every claim must have a number next to it before students leave for the day. Short 15-minute window -- keep it focused on number-for-claim matching.",
         "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-05-open-lab-pitch-bot-prep.html"
       }
@@ -1598,7 +1598,7 @@ const DAYS = [
     "funElement": "Championship bracket reveal creates maximum anticipation.",
     "los": "LO 7.3 (scouting report complete, all four sections verified); LO 8.1 (pre-match pitch rehearsed with peer feedback on specificity); LO 8.2 (first rehearsal of expert-level explanation of proportional reasoning)",
     "facilitatorRisk": {
-      "risk": "Pre-match pitch rehearsal focuses on delivery polish rather than mathematical specificity. Campers practice sounding confident rather than citing accurate numbers.",
+      "risk": "Pre-match pitch rehearsal focuses on delivery polish rather than mathematical specificity. Students practice sounding confident rather than citing accurate numbers.",
       "say": "\"The judges tomorrow are scoring on one thing: mathematical specificity. Every claim needs a number. \"Our bot is fast\" scores zero. \"Our Speed = 7 gives us 35% motor power, which is 10 percentage points above the league average Speed of 5\" scores full points. Before you leave today, every claim in your pitch has a number next to it on paper.\" |"
     }
   },
@@ -1613,8 +1613,8 @@ const DAYS = [
         "name": "Pre-Championship Ritual",
         "mins": 20,
         "block": "Ice Breaker",
-        "description": "The whole camp does one physical warm-up together, energetic and brief, led by any camper who wants to lead it. Then each team has 3 minutes for their own ritual: a chant, a handshake, anything they invented. This is earned. Four weeks of work made this moment exist.",
-        "facilitatorDescription": "Whole camp does one physical warm-up together, energetic and brief, led by any camper who volunteers. Then each team has 3 minutes for their own ritual -- chant, handshake, whatever they invented. This is earned. Do not rush it; four weeks of work made this moment exist.",
+        "description": "The whole camp does one physical warm-up together, energetic and brief, led by any student who wants to lead it. Then each team has 3 minutes for their own ritual: a chant, a handshake, anything they invented. This is earned. Four weeks of work made this moment exist.",
+        "facilitatorDescription": "Whole camp does one physical warm-up together, energetic and brief, led by any student who volunteers. Then each team has 3 minutes for their own ritual -- chant, handshake, whatever they invented. This is earned. Do not rush it; four weeks of work made this moment exist.",
         "script": "https://docs.google.com/document/d/1ghkcMGT4HXJNR4lpWKilIdLigMZX1g5dJ-da9jdZMfY/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day18-01-pre-championship-ritual.html"
       },
@@ -1623,7 +1623,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Championship Rounds 1 and 2",
@@ -1655,7 +1655,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Open Lab: Reflection Time",
@@ -1701,14 +1701,14 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Community Exhibition: Teaching Begins",
         "mins": 90,
         "block": "Match-Build-Make",
         "description": "Visitors arrive. Teach each visitor to complete three mini-challenges: (1) calculate a unit rate from your scouting data -- Season 1 wins divided by your Speed stat, stated as wins per 1 Speed point; (2) plot two match coordinates on the arena grid and calculate the distance between them; (3) explain in their own words why your Speed stat and motor power scale proportionally. Your goal is for each visitor to complete all three independently, without prompting after your initial explanation. That is the assessment.",
-        "facilitatorDescription": "Visitors arrive. Campers teach each visitor to complete three mini-challenges: (1) calculate a unit rate from scouting data -- Season 1 wins divided by Speed stat, stated as wins per 1 Speed point; (2) plot two match coordinates on the arena grid and calculate the distance between them; (3) explain in their own words why Speed and motor power scale proportionally. Goal: each visitor completes all three independently after initial explanation. Visitor completion is the assessment, not camper delivery.",
+        "facilitatorDescription": "Visitors arrive. Students teach each visitor to complete three mini-challenges: (1) calculate a unit rate from scouting data -- Season 1 wins divided by Speed stat, stated as wins per 1 Speed point; (2) plot two match coordinates on the arena grid and calculate the distance between them; (3) explain in their own words why Speed and motor power scale proportionally. Goal: each visitor completes all three independently after initial explanation. Visitor completion is the assessment, not student delivery.",
         "script": "https://docs.google.com/document/d/1kPsmjmLJf6hZYdt6SSDuvMpwZoMSVShJtEGvzI37eJM/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-02-community-exhibition-teaching.html"
       },
@@ -1723,8 +1723,8 @@ const DAYS = [
         "name": "Extended Exhibition + Best Teacher Voting",
         "mins": 60,
         "block": "Match-Build-Make",
-        "description": "Keep teaching. Visitors get one ballot: 'Which camper explained the math most clearly?' Exhibition matches can run while visitors watch.",
-        "facilitatorDescription": "Exhibition continues. Hand each visitor one ballot: 'Which camper explained the math most clearly?' Exhibition matches run concurrently while visitors watch. Best Teacher vote collects here for tomorrow's ceremony announcement.",
+        "description": "Keep teaching. Visitors get one ballot: 'Which student explained the math most clearly?' Exhibition matches can run while visitors watch.",
+        "facilitatorDescription": "Exhibition continues. Hand each visitor one ballot: 'Which student explained the math most clearly?' Exhibition matches run concurrently while visitors watch. Best Teacher vote collects here for tomorrow's ceremony announcement.",
         "script": "https://docs.google.com/document/d/1Lr34NgMylBQ2F7ceLzvivkvrPu1zCW06pXgCg3NdSKQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-03-extended-exhibition-voting.html"
       },
@@ -1733,7 +1733,7 @@ const DAYS = [
         "mins": 40,
         "block": "Match-Build-Make",
         "description": "Present one calculation from your completed scouting report to your facilitator -- 2 minutes, your choice of calculation. Explain what it is, how you calculated it, and what it tells you about your opponent's bot.",
-        "facilitatorDescription": "Each camper presents one calculation from their completed scouting report -- 2 minutes, camper's choice. They explain what it is, how it was calculated, and what it reveals about the opponent's bot. Runs concurrently with Best Teacher vote count. Expert framing, not quiz framing.",
+        "facilitatorDescription": "Each student presents one calculation from their completed scouting report -- 2 minutes, student's choice. They explain what it is, how it was calculated, and what it reveals about the opponent's bot. Runs concurrently with Best Teacher vote count. Expert framing, not quiz framing.",
         "script": "https://docs.google.com/document/d/1oB-r6Wuz-b7gVrWASsG_Ycl-c5zJ-bjW960gzglQuuA/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-04-scouting-verbal-check-vote.html"
       },
@@ -1756,7 +1756,7 @@ const DAYS = [
     "funElement": "Best Teacher vote collected by visitors today. Winner announced at tomorrow's ceremony. Creates anticipation and social recognition for mathematical communication, not just winning. Scouting Report Verbal Check runs concurrently with vote count in the afternoon.",
     "los": "LO 8.2 (visitor completes coordinate plotting, navigation, and proportional reasoning explanation independently); LO 3.1 (coordinate plotting reviewed and taught to visitors); LO 1.2 (proportional reasoning explanation verified by visitor completion); LO 7.3 (scouting report verbal check: one calculation explained, method described, bot behavior implication named)",
     "facilitatorRisk": {
-      "risk": "Campers feel embarrassed or exposed teaching visitors who are parents, adults, or people they know, which re-triggers math shame in a social context with high personal stakes.",
+      "risk": "Students feel embarrassed or exposed teaching visitors who are parents, adults, or people they know, which re-triggers math shame in a social context with high personal stakes.",
       "say": "\"This conversation happens before visitors arrive. Say: \"In 20 minutes, someone is going to walk through that door and not know how any of this works. You know more about this than they do. That is not arrogance. That is four weeks of work. Your job is not to impress them. Your job is to help them understand one thing. Just one. That is it.\"\" |"
     }
   },
@@ -1772,7 +1772,7 @@ const DAYS = [
         "mins": 20,
         "block": "Ice Breaker",
         "description": "Final gallery walk of every artifact: bot origin stories, rivalry cards, leaderboard history, Commissioner rule changes, scouting reports, and the Day 1 goals posted in Week 1. You walk quietly. You are looking at what four weeks of work looks like.",
-        "facilitatorDescription": "Campers walk quietly past every artifact: bot origin stories, rivalry cards, leaderboard history, Commissioner rule changes, scouting reports, and the Day 1 goals posted in Week 1. Quiet. Let the room do the work -- no narration. This is looking at four weeks of visible progress.",
+        "facilitatorDescription": "Students walk quietly past every artifact: bot origin stories, rivalry cards, leaderboard history, Commissioner rule changes, scouting reports, and the Day 1 goals posted in Week 1. Quiet. Let the room do the work -- no narration. This is looking at four weeks of visible progress.",
         "script": "https://docs.google.com/document/d/1XDCeJ8J2U_zF0_vdgpfAYD6L4EFX8oRX8ZoRXOLapJ8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-01-walk-the-wall-final-gallery.html"
       },
@@ -1781,14 +1781,14 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
         "mins": 15,
         "block": "Challenge Block",
         "description": "12 minutes, individual. 8 questions parallel to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay -- using the same age-appropriate non-bot contexts. This measures growth by math topic, not a camp assessment. Your facilitator compares your results to Day 1 per concept. This is the only formal assessment on Day 20. Protect the afternoon.",
-        "facilitatorDescription": "12 minutes, individual. 8 questions parallel to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, linear decay -- using the same age-appropriate non-bot contexts. Measures growth by math topic per camper, not a camp-wide assessment. Compare results to Day 1 concept-by-concept. Only formal assessment on Day 20. Frame explicitly: 'I am comparing you to yourself from four weeks ago.' Protect the afternoon -- no other assessment work.",
+        "facilitatorDescription": "12 minutes, individual. 8 questions parallel to the updated Day 1 pre-task -- aligned to the Summer Sparks concept set: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, linear decay -- using the same age-appropriate non-bot contexts. Measures growth by math topic per student, not a camp-wide assessment. Compare results to Day 1 concept-by-concept. Only formal assessment on Day 20. Frame explicitly: 'I am comparing you to yourself from four weeks ago.' Protect the afternoon -- no other assessment work.",
         "script": "https://docs.google.com/document/d/1KYGrQCGgyWRPsgwlafFgnID0cetHfHpnEK8oQ3o7kr8/edit?usp=drive_link",
         "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic-post/index.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
@@ -1798,14 +1798,14 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Awards Ceremony",
         "mins": 60,
         "block": "Match-Build-Make",
-        "description": "Championship winner celebrated. Best Teacher award announced. The facilitator names one specific mathematical moment for each team: a particular calculation, a dashboard decision, a Commissioner argument, not generic praise. Hello Insight post-survey verbal reflection: each camper names one personal growth area and one specific camp moment that demonstrates that growth.",
-        "facilitatorDescription": "Celebrate the Championship winner. Announce Best Teacher award. Name one specific mathematical moment for each team -- a particular calculation, a dashboard decision, a Commissioner argument. Not generic praise. Hello Insight post-survey verbal reflection: each camper names one personal growth area and one specific camp moment that demonstrates that growth.",
+        "description": "Championship winner celebrated. Best Teacher award announced. The facilitator names one specific mathematical moment for each team: a particular calculation, a dashboard decision, a Commissioner argument, not generic praise. Hello Insight post-survey verbal reflection: each student names one personal growth area and one specific camp moment that demonstrates that growth.",
+        "facilitatorDescription": "Celebrate the Championship winner. Announce Best Teacher award. Name one specific mathematical moment for each team -- a particular calculation, a dashboard decision, a Commissioner argument. Not generic praise. Hello Insight post-survey verbal reflection: each student names one personal growth area and one specific camp moment that demonstrates that growth.",
         "script": "https://docs.google.com/document/d/1FPkaluCh58L3kfr2E7mx8GKXUJpYzD9391KWC2kBKlQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-03-awards-ceremony.html"
       },
@@ -1814,7 +1814,7 @@ const DAYS = [
         "mins": 5,
         "block": "Break",
         "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let campers stand, move, get water."
+        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
         "name": "Lunch / Snack Break",
@@ -1828,7 +1828,7 @@ const DAYS = [
         "mins": 90,
         "block": "Open Lab",
         "description": "Unstructured time. Drive the bots. Revisit the coordinate grid. Teach each other anything you want. This is the last time the program exists in this form.",
-        "facilitatorDescription": "Unstructured time. Campers drive bots, revisit the coordinate grid, teach each other anything they want. No task, no output. This is the last time the program exists in this form -- let the room shape the close.",
+        "facilitatorDescription": "Unstructured time. Students drive bots, revisit the coordinate grid, teach each other anything they want. No task, no output. This is the last time the program exists in this form -- let the room shape the close.",
         "script": "https://docs.google.com/document/d/1mzg9cMe7l6ev_kSYjNDtCmGjqRorba91zmQoJvQg0CY/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-04-final-free-time-closing.html"
       }
@@ -1839,10 +1839,10 @@ const DAYS = [
     "endBufferMins": 15,
     "endsMins": 20,
     "ends": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes. |",
-    "funElement": "Best Teacher award announced. Social recognition for mathematical communication, not winning. Awards ceremony closes the program with campers as the experts. The verbal check ran on Day 19. Day 20 is the celebration.",
+    "funElement": "Best Teacher award announced. Social recognition for mathematical communication, not winning. Awards ceremony closes the program with students as the experts. The verbal check ran on Day 19. Day 20 is the celebration.",
     "los": "LO 7.1 (post-task diagnostic reflects Season 1 and 2 prediction practice); LO 8.2 (Best Teacher award outcome reflects visitor-assessed teaching quality); Note: LO 9.2 verbal reflection runs at the awards ceremony (Hello Insight post-survey) and is assessed there, not in the daily LO field. Scouting Report Verbal Check (LO 7.3) completed on Day 19 afternoon. # SCOPE AND SEQUENCE SUMMARY",
     "facilitatorRisk": {
-      "risk": "Post-task diagnostic triggers end-of-program anxiety and campers disengage from it, treating it as a formality. Cognitive overload after four weeks.",
+      "risk": "Post-task diagnostic triggers end-of-program anxiety and students disengage from it, treating it as a formality. Cognitive overload after four weeks.",
       "say": "\"Say this before distributing the diagnostic: \"On Day 1, you filled out something like this and most of you did not know most of the answers. Today you do. I am not grading you against anyone else. I am comparing you to yourself from four weeks ago. Every answer you know today that you did not know on Day 1 is evidence of what happened in this room. Fill it out completely.\"\" |"
     }
   }
