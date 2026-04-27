@@ -1455,7 +1455,13 @@
         <div class="sc-val" id="sc-speed">?%</div>
       </div>
     </div>
+    <div style="margin-top:1rem;">
+      <div class="sc-label" style="text-align:center;font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.375rem;">Your name</div>
+      <input type="text" id="sc-name" placeholder="First name + last initial" autocomplete="off"
+        style="width:100%;max-width:18rem;display:block;margin:0 auto;background:var(--navy3);border:2px solid rgba(255,159,67,.4);border-radius:6px;padding:.5rem .75rem;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;color:#E8EAF2;text-align:center;outline:none;">
+    </div>
     <p style="font-size:.8125rem;color:var(--slate);margin-top:.875rem;">Record this on your individual stat card before you leave the table.</p>
+    <div id="lock-notice" style="display:none;margin-top:.875rem;padding:.75rem 1rem;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);border-radius:6px;font-size:.8125rem;color:#E8EAF2;line-height:1.5;text-align:left;"></div>
   </div>
 
   <!-- Done banner -->
@@ -1474,6 +1480,11 @@
 </section>
 
 <script>
+// ── Storage endpoint (Google Apps Script web app) ─────────────────────────────
+// Same endpoint used by speed-stat / power lessons. Empty string disables
+// remote save (falls back to localStorage only).
+const SAVE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzV0_UPT5vyy-PNRS9Vw4jvPT0Bcx22k0hHV62-fLFj7nKmp3Mem2Z1szmv_dJy4OJk/exec';
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const POWER_VALS = { 1:1, 2:4, 4:16, 8:64 };
 
@@ -1711,11 +1722,76 @@ function updateStatCard() {
   }
 }
 
-function finishLesson() {
+async function finishLesson() {
+  const pts = parseInt(document.getElementById('sc-power').value);
+  const nameEl = document.getElementById('sc-name');
+  const name = (nameEl ? nameEl.value : '').trim();
+
+  if (isNaN(pts) || pts < 1 || pts > 8) {
+    alert('Pick your Power points (1–8) on the stat card before finishing.');
+    document.getElementById('sc-power').focus();
+    return;
+  }
+  if (!name) {
+    alert('Type your name on the stat card before finishing.');
+    nameEl && nameEl.focus();
+    return;
+  }
+
+  let lockedPts = pts;
+
+  // No Content-Type → simple CORS request (Apps Script can't respond to OPTIONS).
+  if (SAVE_ENDPOINT) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          site: localStorage.getItem('va_selected_site') || '',
+          stat: 'power',
+          points: pts,
+          charge: pts * pts,
+          followThrough: pts * 200,
+          lesson: 'power-stat-challenge',
+          ts: new Date().toISOString(),
+        }),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.ok === false && result.error === 'already_locked') {
+        const existing = Number(result.existing);
+        if (!isNaN(existing)) {
+          lockedPts = existing;
+          const notice = document.getElementById('lock-notice');
+          if (notice) {
+            notice.innerHTML = '<strong style="color:#FFD166;">Already locked:</strong> ' +
+              name + ' previously locked Power = ' + existing +
+              ' (charge ' + (existing * existing) + ', follow-through ' + (existing * 200) + 'ms). Using that value.';
+            notice.style.display = 'block';
+          }
+        }
+      }
+    } catch (_e) {
+      // Network failure — proceed; facilitator reconciles offline.
+    }
+  }
+
+  localStorage.setItem('va_student_name', name);
+  localStorage.setItem('va_power_locked', lockedPts);
+
   document.getElementById('done-banner').classList.add('visible');
   document.getElementById('done-btn-wrap').style.display = 'none';
   window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
 }
+
+// Pre-fill the name input from a previous session if available.
+(function preFillName() {
+  const saved = localStorage.getItem('va_student_name');
+  if (!saved) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('sc-name');
+    if (el && !el.value) el.value = saved;
+  });
+})();
 
 // ── Sentence starter chips ────────────────────────────────────────────────────
 function insertStarter(textareaId, text, chipEl) {
