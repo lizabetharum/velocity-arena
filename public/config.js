@@ -12,7 +12,7 @@ const CONFIG = {
   // Can be any weekday — weekends are skipped automatically.
   // Used as the default for any code that doesn't specify a site
   // (e.g. the current "Today" view on the homepage).
-  startDate: "2026-04-15",
+  startDate: "2026-04-18",
 
   // Per-site start dates. Each pilot site may begin camp on a different
   // day of the week. Keys are the internal site codes:
@@ -23,9 +23,9 @@ const CONFIG = {
   // (last day of camp) by counting 20 weekdays forward from the start,
   // skipping weekends and any holidays listed below.
   siteStartDates: {
-    NY1: "2026-04-15",   // New York 1
-    NY2: "2026-04-15",   // New York 2
-    TN:  "2026-04-15",   // Tennessee
+    NY1: "2026-04-18",   // New York 1
+    NY2: "2026-04-18",   // New York 2
+    TN:  "2026-04-18",   // Tennessee
   },
 
   // Your timezone — affects what "today" means.
