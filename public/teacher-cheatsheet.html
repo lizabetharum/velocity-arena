@@ -33,6 +33,11 @@
   max-width: 72rem;
   margin: 0 auto;
   padding: 1rem 1.75rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 .back-bar a {
   font-size: 0.8125rem;
@@ -41,6 +46,26 @@
   text-decoration: none;
 }
 .back-bar a:hover { text-decoration: underline; }
+.print-btn {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: var(--cyan);
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: opacity .15s;
+}
+.print-btn:hover { opacity: .85; }
+.print-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.print-btn svg { width: 14px; height: 14px; }
 
 .lesson-flow {
   border: 1px solid var(--border);
@@ -152,24 +177,74 @@
 }
 
 @media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-size: 11pt;
+  @page { margin: 0.5in; }
+
+  /* Force black-on-white everywhere; let the browser keep us in B/W */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 10.5pt;
+    line-height: 1.4;
   }
-  #site-header, .back-bar { display: none !important; }
-  .page-shell { padding: 0; margin: 0; }
+  body * { color: #000 !important; }
+
+  /* Hide chrome */
+  #site-header, .back-bar, .print-btn { display: none !important; }
+
+  .page-shell { padding: 0 !important; margin: 0 !important; max-width: none !important; background: #fff !important; border: 0 !important; box-shadow: none !important; }
+
+  /* Container blocks: white bg, hairline black border */
   .lesson-flow, .decision-tree, .tree-branch {
-    background: #ffffff !important;
+    background: #fff !important;
     box-shadow: none !important;
-    border-color: #00000033 !important;
-  }
-  .lesson-flow, .decision-tree {
+    border: 1px solid #000 !important;
     break-inside: avoid;
     page-break-inside: avoid;
-    margin-bottom: 1rem;
   }
-  .tree-branch { break-inside: avoid; page-break-inside: avoid; }
+  .lesson-flow, .decision-tree { margin-bottom: 0.5rem; padding: 0.5rem 0.6rem 0.6rem; }
+  .tree-branch { padding: 0.45rem 0.55rem; }
+
+  /* Headings: black, slightly heavier weight stands in for color */
+  .section-title { color: #000 !important; font-weight: 800 !important; }
+  .section-sub   { color: #000 !important; font-style: italic; }
+
+  /* Flow steps: time column black + bold (was cyan) */
+  .flow-time { color: #000 !important; font-weight: 700; }
+  .flow-body, .flow-note, .tree-symptoms, .tree-steps, .tree-footer { color: #000 !important; }
+  .flow-note { border-top: 1px solid #000 !important; }
+
+  /* ELL+ branch: replace cyan emphasis with a thicker double border + bold heading */
+  .tree-branch--ell {
+    border: 2.5px double #000 !important;
+    grid-column: 1 / -1;
+  }
+  .tree-branch--ell .tree-title {
+    color: #000 !important;
+    font-weight: 800 !important;
+    text-decoration: underline;
+  }
+
+  /* Strong/em: keep semantic emphasis without color */
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+
+  /* Layout: keep 2-up tree, single-column flow */
+  .tree-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .flow-steps { gap: 0.4rem; }
+  .flow-steps li { font-size: 9.5pt; }
+  .tree-title { font-size: 10pt; }
+  .tree-symptoms, .tree-steps, .tree-footer, .flow-note { font-size: 9pt; }
+  .flow-time { font-size: 9pt; }
+
+  /* Browser-managed: do NOT print background colors */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: economy !important;
+    print-color-adjust: economy !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure long links don't trail unhelpful URLs */
+  a, a:visited { text-decoration: none; }
 }
 </style>
 </head>
@@ -178,6 +253,14 @@
 
 <div class="back-bar">
   <a href="/teachers.html">&larr; Back to Teacher Resources</a>
+  <button type="button" class="print-btn" onclick="window.print()" aria-label="Print this cheatsheet">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8" rx="1"/>
+    </svg>
+    Print
+  </button>
 </div>
 
 <main class="page-shell card">
