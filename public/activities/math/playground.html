@@ -90,6 +90,69 @@
     .nav-brand span { display: none; }
   }
 
+  /* ── SECONDARY NAV (concept switcher, only when a concept is open) ── */
+  .concept-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #0f1024;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .concept-nav::-webkit-scrollbar { display: none; }
+  .concept-nav.hidden { display: none; }
+  .concept-pills {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+  .concept-pill {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .concept-pill:hover { color: var(--text); border-color: var(--muted); }
+  .concept-pill.active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: rgba(0, 229, 255, 0.12);
+  }
+  .concept-step {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all .15s;
+  }
+  .concept-step:hover { border-color: var(--cyan); color: var(--cyan); }
+  @media (max-width: 600px) {
+    .concept-pills { justify-content: flex-start; }
+  }
+
   /* Internal "back to hub" button when a concept is open */
   .concept-back-btn {
     background: none;
@@ -370,6 +433,13 @@
   <button class="concept-back-btn hidden" id="backBtn" onclick="showHub()">← All Concepts</button>
 </nav>
 
+<!-- ── SECONDARY NAV (visible only when a concept is open) ── -->
+<nav class="concept-nav hidden" id="conceptNav" aria-label="Switch concept">
+  <button type="button" class="concept-step" id="prevConceptBtn" onclick="prevConcept()" aria-label="Previous concept">‹</button>
+  <div class="concept-pills" id="conceptPills"></div>
+  <button type="button" class="concept-step" id="nextConceptBtn" onclick="nextConcept()" aria-label="Next concept">›</button>
+</nav>
+
 <!-- ══════════════════════════════════════
      HUB
 ══════════════════════════════════════ -->
@@ -505,12 +575,45 @@ let current = -1;
 // ══════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════
+// Named labels for the concept-switcher pills (full names help students who struggle with language)
+const CONCEPT_LABELS = [
+  'Proportional Reasoning',
+  'Unit Rates',
+  'Ratio',
+  'Proportional Scaling',
+  'Coordinate Geometry',
+  'Arc Approximation',
+  'Linear Decay',
+  'Slope'
+];
+
+function buildConceptNav() {
+  const wrap = document.getElementById('conceptPills');
+  if (!wrap) return;
+  wrap.innerHTML = CONCEPTS.map((c, i) =>
+    `<button type="button" class="concept-pill" data-idx="${i}" onclick="openConcept(${i})">`
+    + (CONCEPT_LABELS[i] || c.title)
+    + `</button>`
+  ).join('');
+}
+
+function setActivePill(idx) {
+  document.querySelectorAll('.concept-pill').forEach(p => {
+    p.classList.toggle('active', +p.dataset.idx === idx);
+  });
+}
+
+function nextConcept() { if (current >= 0) openConcept((current + 1) % CONCEPTS.length); }
+function prevConcept() { if (current >= 0) openConcept((current - 1 + CONCEPTS.length) % CONCEPTS.length); }
+
 function openConcept(idx) {
   current = idx;
   const c = CONCEPTS[idx];
   document.getElementById('hub').style.display = 'none';
   document.getElementById('module').style.display = 'block';
   document.getElementById('backBtn').classList.remove('hidden');
+  document.getElementById('conceptNav').classList.remove('hidden');
+  setActivePill(idx);
 
   // Build left panel
   const panel = document.getElementById('ctrlPanel');
@@ -548,8 +651,12 @@ function showHub() {
   document.getElementById('hub').style.display = 'block';
   document.getElementById('module').style.display = 'none';
   document.getElementById('backBtn').classList.add('hidden');
+  document.getElementById('conceptNav').classList.add('hidden');
   current = -1;
 }
+
+// Build the concept-switcher pills once CONCEPTS is in scope
+buildConceptNav();
 
 window.addEventListener('resize', () => { if(current >= 0) drawCanvas(); });
 
