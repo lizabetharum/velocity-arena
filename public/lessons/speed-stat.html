@@ -717,6 +717,38 @@
       border-top: 1px solid var(--card-border);
       margin: 1.25rem 0;
     }
+
+    /* ── Friction gate elements (pedagogical friction fixes) ── */
+    .pred-gate {
+      background: var(--navy3);
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .pred-gate .gate-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .pause-block {
+      background: rgba(255,209,102,.05);
+      border: 1px solid rgba(255,209,102,.2);
+      border-radius: 7px;
+      padding: 1rem 1.25rem;
+      margin: .5rem 0;
+    }
+    .mistake-radio-group { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; }
+    .mistake-radio-group label { display: flex; align-items: flex-start; gap: .5rem; font-size: .875rem; color: #C8CDD8; cursor: pointer; line-height: 1.4; }
+    .mistake-radio-group input[type=radio] { margin-top: .2rem; flex-shrink: 0; }
+    .phase5-gate {
+      background: var(--navy3);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+    }
+    .phase5-gate-label { font-size: .6875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .5rem; display: block; }
+    .yn-row { display: flex; gap: 1.5rem; margin-top: .75rem; flex-wrap: wrap; }
+    .yn-row label { display: flex; align-items: center; gap: .375rem; font-size: .875rem; cursor: pointer; color: #C8CDD8; }
   </style>
 </head>
 <body>
@@ -759,6 +791,18 @@
       <div class="formula-sub">Motor power as a percentage of your 20-point budget</div>
     </div>
 
+    <!-- Fix 1: Prediction gate — must answer correctly before Go unlocks -->
+    <div class="pred-gate" style="margin:1rem 0;" id="p1-pred-wrap">
+      <div class="gate-label">Before you start</div>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.75rem;">Apply the formula once. If Speed = 10, what is motor power?</p>
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <input type="number" class="answer-input" id="p1-pred" placeholder="?" min="0" max="200" oninput="checkPhase1Pred()" />
+        <span class="pct-suffix">%</span>
+        <span id="p1-pred-icon" style="font-size:1rem;margin-left:.25rem;"></span>
+      </div>
+      <div class="hint-box" id="p1-pred-hint" style="margin-top:.5rem;"></div>
+    </div>
+
     <p class="muted">You have five Speed values to calculate: <strong style="color:#E8EAF2">1, 3, 5, 6, and 8.</strong> Fill in your work and your answer for each row.</p>
 
     <div class="timer-row mt-2">
@@ -769,7 +813,7 @@
         </svg>
         <div class="num" id="timer-num">5</div>
       </div>
-      <span class="timer-label" id="timer-label">Read the formula — Go activates in 5 seconds</span>
+      <span class="timer-label" id="timer-label">Read the formula and answer the question below. Go unlocks when both are done.</span>
     </div>
 
     <button class="btn btn-primary locked" id="go-btn" onclick="startPhase2()">
@@ -804,7 +848,7 @@
       </tbody>
     </table>
 
-    <p class="muted">Fill in all five rows, then submit. No feedback until you submit — find your own errors first.</p>
+    <p class="muted">Fill in rows 1–2, then answer the pause question to unlock rows 3–5. Submit when all five are done — no feedback until you submit.</p>
 
     <div class="mt-2 flex-end">
       <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">
@@ -846,6 +890,16 @@
       oninput="onPatternInput()"></textarea>
     <div class="char-count" id="char-count">0 / 10 characters needed</div>
 
+    <!-- Fix 3: Prediction before reveal -->
+    <div class="pred-gate" style="margin-top:1rem;" id="p4-pred-wrap">
+      <div class="gate-label">Your prediction</div>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.75rem;">Before seeing the pattern: if Speed = 12, what do you predict motor power will be?</p>
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <input type="number" class="answer-input" id="p4-pred" placeholder="?" min="0" max="200" oninput="onP4PredInput()" />
+        <span class="pct-suffix">%</span>
+      </div>
+    </div>
+
     <div class="mt-2 flex-end">
       <button class="btn btn-primary" id="pattern-btn" disabled onclick="revealPattern()">
         See the pattern →
@@ -856,40 +910,71 @@
   <div class="card" id="pattern-reveal-card" style="display:none;">
     <div class="pattern-reveal">
       <div class="reveal-label">The pattern</div>
-      <p>Every Speed point adds exactly <span class="formula-highlight">5% motor power</span>.<br>
-      The shortcut: <span class="formula-highlight">Speed × 5 = motor power %</span>.</p>
+      <p>Every Speed point adds exactly <span class="formula-highlight">5% motor power</span>.</p>
     </div>
 
-    <hr class="va-divider" />
+    <!-- Fix 4: Earn the shortcut -->
+    <div class="pred-gate" style="margin-top:1rem;" id="shortcut-gate-wrap">
+      <div class="gate-label">Earn the shortcut</div>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.75rem;">How much does motor power change when Speed increases by 1 point?</p>
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <input type="number" class="answer-input" id="shortcut-gate" placeholder="?" min="0" max="100" oninput="checkShortcutGate()" />
+        <span class="pct-suffix">%</span>
+        <span id="shortcut-gate-icon" style="font-size:1rem;margin-left:.25rem;"></span>
+      </div>
+    </div>
 
-    <div class="section-heading" style="font-size:.9375rem;">Two quick checks</div>
-    <p class="muted mt-1" style="margin-bottom:1rem;">These values weren't in your table. Apply the formula.</p>
+    <div id="shortcut-reveal" style="display:none;">
+      <div class="pattern-reveal" style="margin-top:.75rem;">
+        <div class="reveal-label">The shortcut</div>
+        <p>The shortcut: <span class="formula-highlight">Speed × 5 = motor power %</span>.</p>
+      </div>
 
-    <div class="ext-inputs">
-      <div class="ext-item">
-        <label>Speed = 20</label>
+      <hr class="va-divider" />
+
+      <!-- Fix 9: Extreme check — required to proceed -->
+      <div class="section-heading" style="font-size:.9375rem;">Extreme check</div>
+      <p class="muted mt-1" style="margin-bottom:.75rem;">What happens at the maximum? Apply the shortcut.</p>
+
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.875rem;color:#C8CDD8;">If Speed = 20, motor power =</span>
         <div style="display:flex;align-items:center;gap:.25rem;">
           <input type="number" class="answer-input" id="check-20" placeholder="?" min="0" max="200"
                  oninput="checkQuick(this, 100)" />
           <span class="pct-suffix">%</span>
+          <span id="check-20-icon" style="font-size:1rem;margin-left:.25rem;"></span>
         </div>
-        <div class="hint-box" id="hint-20"></div>
       </div>
-      <div class="ext-item">
-        <label>Speed = 4</label>
-        <div style="display:flex;align-items:center;gap:.25rem;">
-          <input type="number" class="answer-input" id="check-4" placeholder="?" min="0" max="200"
-                 oninput="checkQuick(this, 20)" />
-          <span class="pct-suffix">%</span>
-        </div>
-        <div class="hint-box" id="hint-4"></div>
-      </div>
-    </div>
+      <div class="hint-box" id="hint-20"></div>
 
-    <div class="mt-3 flex-end">
-      <button class="btn btn-primary" id="to-phase5-btn" onclick="goPhase5()">
-        Choose your Speed allocation →
-      </button>
+      <div id="extreme-reflect-wrap" style="display:none;margin-top:.75rem;">
+        <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.375rem;">What does Speed = 20 tell you about the system?</p>
+        <input type="text" class="work-input" id="extreme-reflect"
+               placeholder="e.g. Using all 20 Speed points takes 100% of the budget — nothing left for other stats…"
+               oninput="checkExtremeReflect()" />
+        <div class="char-count" id="extreme-reflect-count">0 / 5 characters needed</div>
+      </div>
+
+      <hr class="va-divider" />
+
+      <p class="muted" style="font-size:.8125rem;margin-bottom:.75rem;">Bonus check (not required to proceed)</p>
+      <div class="ext-inputs">
+        <div class="ext-item">
+          <label>Speed = 4</label>
+          <div style="display:flex;align-items:center;gap:.25rem;">
+            <input type="number" class="answer-input" id="check-4" placeholder="?" min="0" max="200"
+                   oninput="checkQuick(this, 20)" />
+            <span class="pct-suffix">%</span>
+          </div>
+          <div class="hint-box" id="hint-4"></div>
+        </div>
+      </div>
+
+      <div class="mt-3 flex-end">
+        <button class="btn btn-primary" id="to-phase5-btn" disabled onclick="goPhase5()">
+          Choose your Speed allocation →
+        </button>
+      </div>
     </div>
   </div>
 </section>
@@ -955,6 +1040,35 @@
         <div class="budget-bar-fill" id="budget-fill" style="width:40%"></div>
       </div>
       <div class="budget-note ok" id="budget-note">12 points remain for Endurance, Turning, and Power (Days 2–4)</div>
+    </div>
+
+    <!-- Fix 6: Remaining points YES/NO -->
+    <div class="phase5-gate" id="remaining-gate">
+      <span class="phase5-gate-label">Before you lock</span>
+      <p style="font-size:.875rem;color:#C8CDD8;">You chose <strong id="rc-pts">8</strong> Speed points. That leaves <strong id="rc-rem">12</strong> points for Endurance, Turning, and Power. Is that enough for all 3 stats?</p>
+      <div class="yn-row">
+        <label><input type="radio" name="remaining-yn" value="yes" onchange="checkLockEligible()"> Yes — each stat gets at least 1 point</label>
+        <label><input type="radio" name="remaining-yn" value="no" onchange="checkLockEligible()"> No — I'd need to reconsider</label>
+      </div>
+    </div>
+
+    <!-- Fix 7: Sacrifice reflection -->
+    <div class="phase5-gate" id="sacrifice-gate">
+      <span class="phase5-gate-label">Trade-off</span>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.5rem;">Increasing Speed reduces what you can spend on other stats. What are you giving up?</p>
+      <textarea class="pattern-textarea" id="sacrifice-text"
+        placeholder="e.g. I'm giving up points in Endurance and Power to prioritize motor speed…"
+        oninput="checkLockEligible()" style="min-height:80px;"></textarea>
+      <div class="char-count" id="sacrifice-count">0 / 10 characters needed</div>
+    </div>
+
+    <!-- Fix 8: Why this Speed -->
+    <div class="phase5-gate" id="why-gate">
+      <span class="phase5-gate-label">Your reasoning</span>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.5rem;">Why are you choosing this Speed value? One sentence — no reason, no lock.</p>
+      <input type="text" class="work-input" id="why-speed"
+             placeholder="I'm choosing Speed X because…" oninput="checkLockEligible()" />
+      <div class="char-count" id="why-speed-count">0 / 10 characters needed</div>
     </div>
 
     <!-- Name + Lock -->
@@ -1065,31 +1179,69 @@ function getHint(speed, rawAnswer) {
   return `Step through it: first multiply ${speed} × 100, then divide that result by 20. What do you get?`;
 }
 
-// ══ Phase 1 — Timer ══════════════════════════════════════════════
+// ══ Phase 1 — Timer + Prediction gate ════════════════════════════
 let timerStart = 0;
-function startTimer() {
-  const num = document.getElementById('timer-num');
-  const label = document.getElementById('timer-label');
-  const arc = document.getElementById('timer-arc');
-  timerStart = Date.now();
+window._timerReady = false;
+window._predReady  = false;
 
-  function unlock() {
-    const btn = document.getElementById('go-btn');
-    btn.classList.remove('locked');
-    btn.removeAttribute('disabled');
-    label.textContent = 'Ready — press Go when you are.';
-    num.textContent = '✓';
-    num.style.color = 'var(--green)';
-    arc.style.stroke = 'var(--green)';
+function tryUnlockGo() {
+  if (window._timerReady && window._predReady) {
+    document.getElementById('go-btn').classList.remove('locked');
+    document.getElementById('timer-label').textContent = 'Ready — press Go when you are.';
+  }
+}
+
+function checkPhase1Pred() {
+  const input = document.getElementById('p1-pred');
+  const icon  = document.getElementById('p1-pred-icon');
+  const hint  = document.getElementById('p1-pred-hint');
+  const ans   = parseFloat(input.value);
+  if (isNaN(ans)) {
+    input.className = 'answer-input'; icon.textContent = ''; hint.className = 'hint-box'; return;
+  }
+  if (Math.abs(ans - 50) < 0.5) {
+    input.className   = 'answer-input correct';
+    icon.textContent  = '✅';
+    hint.className    = 'hint-box';
+    window._predReady = true;
+    tryUnlockGo();
+  } else {
+    input.className   = 'answer-input error';
+    icon.textContent  = '';
+    window._predReady = false;
+    let hintText = '';
+    if (Math.abs(ans - 200) < 1)   hintText = 'That\'s more than 100% — which number goes on top? Apply Speed × 100 first, then ÷ 20.';
+    else if (Math.abs(ans - 0.5) < 0.05) hintText = 'You got 0.5 — the formula asks for a <em>percentage</em>. What does × 100 do to that number?';
+    else if (Math.abs(ans - 5) < 0.5)    hintText = 'Try (10 × 100) first, then ÷ 20. What is 1000 ÷ 20?';
+    else hintText = 'Apply the formula step by step: (10 × 100) ÷ 20 = ?';
+    hint.innerHTML  = hintText;
+    hint.className  = 'hint-box visible';
+  }
+}
+
+function startTimer() {
+  const num   = document.getElementById('timer-num');
+  const label = document.getElementById('timer-label');
+  const arc   = document.getElementById('timer-arc');
+  timerStart  = Date.now();
+
+  function onTimerDone() {
+    window._timerReady = true;
+    num.textContent    = '✓';
+    num.style.color    = 'var(--green)';
+    arc.style.stroke   = 'var(--green)';
+    if (!window._predReady) {
+      label.textContent = 'Timer done — answer the question above to unlock Go.';
+    }
+    tryUnlockGo();
   }
 
   // Primary: setTimeout
-  setTimeout(unlock, 5000);
+  setTimeout(onTimerDone, 5000);
 
-  // Fallback: if the button is clicked while still locked,
-  // check real elapsed time and unlock anyway if ≥5s have passed
+  // Fallback: clicked before timer fires
   document.getElementById('go-btn').addEventListener('click', function() {
-    if (Date.now() - timerStart >= 5000) unlock();
+    if (Date.now() - timerStart >= 5000 && !window._timerReady) onTimerDone();
   });
 }
 window.addEventListener('DOMContentLoaded', () => {
@@ -1101,33 +1253,118 @@ window.addEventListener('DOMContentLoaded', () => {
   startTimer();
 });
 
-function onNameInput() {
-  const name = document.getElementById('student-name').value.trim();
-  document.getElementById('lock-btn').disabled = name.length < 1;
+function onNameInput() { checkLockEligible(); }
+
+function checkLockEligible() {
+  const nameEl      = document.getElementById('student-name');
+  const sacrificeEl = document.getElementById('sacrifice-text');
+  const whyEl       = document.getElementById('why-speed');
+  const name        = nameEl ? nameEl.value.trim() : '';
+  const sacrifice   = sacrificeEl ? sacrificeEl.value.trim() : '';
+  const why         = whyEl ? whyEl.value.trim() : '';
+  const remainYN    = document.querySelector('input[name="remaining-yn"]:checked');
+
+  // Update char counts
+  const sacCount = document.getElementById('sacrifice-count');
+  if (sacCount) {
+    sacCount.textContent = sacrifice.length >= 10 ? `${sacrifice.length} characters ✓` : `${sacrifice.length} / 10 characters needed`;
+    sacCount.className   = sacrifice.length >= 10 ? 'char-count ready' : 'char-count';
+  }
+  const whyCount = document.getElementById('why-speed-count');
+  if (whyCount) {
+    whyCount.textContent = why.length >= 10 ? `${why.length} characters ✓` : `${why.length} / 10 characters needed`;
+    whyCount.className   = why.length >= 10 ? 'char-count ready' : 'char-count';
+  }
+
+  const eligible = name.length >= 1
+    && remainYN !== null
+    && sacrifice.length >= 10
+    && why.length >= 10;
+
+  const lockBtn = document.getElementById('lock-btn');
+  if (lockBtn) lockBtn.disabled = !eligible;
 }
 
 // ══ Phase 2 — Build table ════════════════════════════════════════
 function buildCalcTable() {
-  const tbody = document.getElementById('calc-tbody');
-  SPEED_VALUES.forEach(spd => {
+  const tbody      = document.getElementById('calc-tbody');
+  const PAUSE_AFTER = 2; // pause after rows 1–2 (Speed 1 and 3)
+
+  SPEED_VALUES.forEach((spd, idx) => {
+    const locked = idx >= PAUSE_AFTER;
     const tr = document.createElement('tr');
+    tr.id = `row-${spd}`;
+    if (locked) tr.style.opacity = '.4';
     tr.innerHTML = `
       <td><span class="speed-val">${spd}</span></td>
       <td>
         <input type="text" class="work-input" id="work-${spd}"
-               placeholder="e.g. (${spd} × 100) ÷ 20" autocomplete="off" />
+               placeholder="e.g. (${spd} × 100) ÷ 20" autocomplete="off"${locked ? ' disabled' : ''} />
       </td>
       <td>
         <div style="display:flex;align-items:center;gap:.25rem;">
           <input type="number" class="answer-input" id="ans-${spd}"
-                 placeholder="?" min="0" max="200" autocomplete="off" />
+                 placeholder="?" min="0" max="200" autocomplete="off"
+                 ${locked ? 'disabled' : 'oninput="checkPauseReady()"'} />
           <span class="pct-suffix">%</span>
         </div>
       </td>
       <td><span class="row-icon" id="icon-${spd}"></span></td>
     `;
     tbody.appendChild(tr);
+
+    // Insert pause row after second data row
+    if (idx === PAUSE_AFTER - 1) {
+      const pauseTr = document.createElement('tr');
+      pauseTr.id = 'pause-tr';
+      pauseTr.style.display = 'none';
+      pauseTr.innerHTML = `
+        <td colspan="4" style="padding:.625rem 0;">
+          <div class="pause-block">
+            <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem;">Pause</div>
+            <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.625rem;">Two rows done. What do you notice so far about how motor power changes?</p>
+            <textarea class="pattern-textarea" id="pause-ta"
+              placeholder="e.g. Every time Speed goes up, motor power also increases…"
+              oninput="onPauseInput()" style="min-height:72px;font-size:.875rem;"></textarea>
+            <div class="char-count" id="pause-count">0 / 10 characters to unlock rows 3–5</div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(pauseTr);
+    }
   });
+}
+
+function checkPauseReady() {
+  const v1 = document.getElementById('ans-' + SPEED_VALUES[0]).value.trim();
+  const v2 = document.getElementById('ans-' + SPEED_VALUES[1]).value.trim();
+  if (v1 !== '' && v2 !== '') {
+    const pauseTr = document.getElementById('pause-tr');
+    if (pauseTr && pauseTr.style.display === 'none') {
+      pauseTr.style.display = '';
+      pauseTr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+}
+
+function onPauseInput() {
+  const ta      = document.getElementById('pause-ta');
+  const countEl = document.getElementById('pause-count');
+  const len     = ta.value.trim().length;
+  if (len >= 10) {
+    countEl.textContent = `${len} characters ✓ — rows 3–5 unlocked`;
+    countEl.className   = 'char-count ready';
+    SPEED_VALUES.slice(2).forEach(spd => {
+      const row = document.getElementById(`row-${spd}`);
+      if (row) {
+        row.style.opacity = '';
+        row.querySelectorAll('input').forEach(inp => inp.removeAttribute('disabled'));
+      }
+    });
+  } else {
+    countEl.textContent = `${len} / 10 characters to unlock rows 3–5`;
+    countEl.className   = 'char-count';
+  }
 }
 
 function allFilled() {
@@ -1246,11 +1483,21 @@ function buildPhase3(results) {
       </button>
     </div>`;
   } else {
-    html += `<div class="mt-2 flex-end">
-      <button class="btn btn-primary" id="phase3-next" disabled onclick="goPhase4WithFixed()">
-        See the pattern →
-      </button>
-    </div>`;
+    // Fix 5: Mistake identification — must select before proceeding
+    html += `
+      <hr style="border:none;border-top:1px solid var(--card-border);margin:1.25rem 0;" />
+      <div style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Which mistake did you make?</div>
+      <div class="mistake-radio-group" id="mistake-radio-group">
+        <label><input type="radio" name="mistake" value="divided" onchange="checkAllFixed()"> I divided first — used 20 ÷ Speed instead of Speed × 100 first</label>
+        <label><input type="radio" name="mistake" value="no100" onchange="checkAllFixed()"> I forgot to multiply by 100</label>
+        <label><input type="radio" name="mistake" value="mixed" onchange="checkAllFixed()"> I mixed up the numbers or order of steps</label>
+        <label><input type="radio" name="mistake" value="other" onchange="checkAllFixed()"> Other mistake</label>
+      </div>
+      <div class="mt-2 flex-end">
+        <button class="btn btn-primary" id="phase3-next" disabled onclick="goPhase4WithFixed()">
+          See the pattern →
+        </button>
+      </div>`;
   }
 
   card.innerHTML = html;
@@ -1279,8 +1526,9 @@ function checkFix(input, spd) {
 function checkAllFixed() {
   const btn = document.getElementById('phase3-next');
   if (!btn) return;
-  const allFixed = window._phase3Results.every(r => r.ok || r.fixed !== undefined);
-  btn.disabled = !allFixed;
+  const allFixed      = window._phase3Results.every(r => r.ok || r.fixed !== undefined);
+  const mistakeChosen = !!document.querySelector('input[name="mistake"]:checked');
+  btn.disabled = !(allFixed && mistakeChosen);
 }
 
 function goPhase4WithFixed() {
@@ -1307,20 +1555,18 @@ function goPhase4(resolved) {
 
 // ══ Phase 4 — Pattern ════════════════════════════════════════════
 function onPatternInput() {
-  const val = document.getElementById('pattern-input').value.trim();
-  const len = val.length;
+  const val     = document.getElementById('pattern-input').value.trim();
+  const pred    = (document.getElementById('p4-pred') || {}).value || '';
+  const len     = val.length;
   const countEl = document.getElementById('char-count');
-  const btn = document.getElementById('pattern-btn');
-  if (len >= 10) {
-    countEl.textContent = `${len} characters ✓`;
-    countEl.className = 'char-count ready';
-    btn.disabled = false;
-  } else {
-    countEl.textContent = `${len} / 10 characters needed`;
-    countEl.className = 'char-count';
-    btn.disabled = true;
-  }
+  const btn     = document.getElementById('pattern-btn');
+  const ready   = len >= 10 && pred.trim() !== '';
+  countEl.textContent = len >= 10 ? `${len} characters ✓` : `${len} / 10 characters needed`;
+  countEl.className   = len >= 10 ? 'char-count ready' : 'char-count';
+  btn.disabled        = !ready;
 }
+
+function onP4PredInput() { onPatternInput(); }
 
 function revealPattern() {
   document.getElementById('pattern-reveal-card').style.display = 'block';
@@ -1328,27 +1574,76 @@ function revealPattern() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
+// Fix 4: Shortcut gate — must know "+5 per point" before seeing shortcut formula
+function checkShortcutGate() {
+  const input = document.getElementById('shortcut-gate');
+  const icon  = document.getElementById('shortcut-gate-icon');
+  const ans   = parseFloat(input.value);
+  if (isNaN(ans)) { input.className = 'answer-input'; icon.textContent = ''; return; }
+  if (Math.abs(ans - 5) < 0.5) {
+    input.className  = 'answer-input correct';
+    icon.textContent = '✅';
+    const reveal = document.getElementById('shortcut-reveal');
+    if (reveal) reveal.style.display = 'block';
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  } else {
+    input.className  = 'answer-input error';
+    icon.textContent = '';
+  }
+}
+
 function checkQuick(input, correct) {
-  const ans = parseFloat(input.value);
-  const id = input.id;
-  const hintEl = document.getElementById('hint-' + id.split('-')[1]);
-  if (isNaN(ans)) { input.className = 'answer-input'; hintEl.className = 'hint-box'; return; }
+  const ans    = parseFloat(input.value);
+  const id     = input.id;
+  const suffix = id.replace('check-', '');
+  const hintEl = document.getElementById('hint-' + suffix);
+  if (isNaN(ans)) {
+    input.className = 'answer-input';
+    if (hintEl) hintEl.className = 'hint-box';
+    return;
+  }
   if (Math.abs(ans - correct) < 0.5) {
     input.className = 'answer-input correct';
-    hintEl.className = 'hint-box';
-    // Enable proceed if both done or just one
+    if (hintEl) hintEl.className = 'hint-box';
+    if (id === 'check-20') {
+      // Fix 9: Show extreme reflection prompt
+      const icon = document.getElementById('check-20-icon');
+      if (icon) icon.textContent = '✅';
+      const reflWrap = document.getElementById('extreme-reflect-wrap');
+      if (reflWrap) reflWrap.style.display = 'block';
+    }
     checkQuickBothDone();
   } else {
     input.className = 'answer-input error';
     const spd = id === 'check-20' ? 20 : 4;
-    hintEl.innerHTML = `Try the shortcut: Speed × 5 = motor power %. What is ${spd} × 5?`;
-    hintEl.className = 'hint-box visible';
+    if (hintEl) {
+      hintEl.innerHTML = `Try the shortcut: Speed × 5 = motor power %. What is ${spd} × 5?`;
+      hintEl.className = 'hint-box visible';
+    }
   }
 }
 
+// Fix 9: Extreme check reflection gate
+function checkExtremeReflect() {
+  const el    = document.getElementById('extreme-reflect');
+  const count = document.getElementById('extreme-reflect-count');
+  if (!el) return;
+  const len = el.value.trim().length;
+  if (count) {
+    count.textContent = len >= 5 ? `${len} characters ✓` : `${len} / 5 characters needed`;
+    count.className   = len >= 5 ? 'char-count ready' : 'char-count';
+  }
+  checkQuickBothDone();
+}
+
 function checkQuickBothDone() {
-  // Allow proceed even if one is wrong — the questions are enrichment
-  document.getElementById('to-phase5-btn').style.opacity = '1';
+  const btn = document.getElementById('to-phase5-btn');
+  if (!btn) return;
+  const c20     = document.getElementById('check-20');
+  const reflect = document.getElementById('extreme-reflect');
+  const c20ok   = c20 && Math.abs(parseFloat(c20.value) - 100) < 0.5;
+  const reflOk  = reflect && reflect.value.trim().length >= 5;
+  btn.disabled  = !(c20ok && reflOk);
 }
 
 function goPhase5() { setPhase(5); }
@@ -1357,18 +1652,18 @@ function goPhase5() { setPhase(5); }
 function onSliderChange() {
   const pts = parseInt(document.getElementById('speed-slider').value);
   const pct = pts * 5;
-  document.getElementById('slider-val').textContent = pts;
-  document.getElementById('slider-pct').textContent = `= ${pct}%`;
-  document.getElementById('sc-speed-pts').textContent = pts;
-  document.getElementById('sc-speed-pct').textContent = `${pct}% motor power`;
+  document.getElementById('slider-val').textContent    = pts;
+  document.getElementById('slider-pct').textContent    = `= ${pct}%`;
+  document.getElementById('sc-speed-pts').textContent  = pts;
+  document.getElementById('sc-speed-pct').textContent  = `${pct}% motor power`;
 
-  const budgetFill = document.getElementById('budget-fill');
+  const budgetFill  = document.getElementById('budget-fill');
   const budgetLabel = document.getElementById('budget-label');
-  const budgetNote = document.getElementById('budget-note');
-  const remaining = 20 - pts;
+  const budgetNote  = document.getElementById('budget-note');
+  const remaining   = 20 - pts;
 
-  budgetFill.style.width = (pts / 20 * 100) + '%';
-  budgetLabel.textContent = `Using ${pts} of your 20-point budget`;
+  budgetFill.style.width    = (pts / 20 * 100) + '%';
+  budgetLabel.textContent   = `Using ${pts} of your 20-point budget`;
 
   if (remaining < 3) {
     budgetNote.textContent = `Only ${remaining} point${remaining !== 1 ? 's' : ''} left — you need at least 1 each for Endurance, Turning, and Power.`;
@@ -1377,6 +1672,14 @@ function onSliderChange() {
     budgetNote.textContent = `${remaining} points remain for Endurance, Turning, and Power (Days 2–4)`;
     budgetNote.className = 'budget-note ok';
   }
+
+  // Fix 6: Update remaining-gate display, reset radio (force re-engagement on each slider change)
+  const rcPts = document.getElementById('rc-pts');
+  const rcRem = document.getElementById('rc-rem');
+  if (rcPts) rcPts.textContent = pts;
+  if (rcRem) rcRem.textContent = remaining;
+  document.querySelectorAll('input[name="remaining-yn"]').forEach(r => r.checked = false);
+  checkLockEligible();
 }
 
 function openLockModal() {

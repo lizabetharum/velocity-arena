@@ -1,4 +1,7 @@
-const DAYS = [
+// Master 20-day schedule. Used by all sites by default (NY1, NY2, TN, ...).
+// Per-site overrides live in their own files (e.g. days-tn.js) and are
+// selected by the tiny dispatcher in days.js.
+const DAYS_DEFAULT = [
   {
     "day": 1,
     "week": 1,
@@ -62,7 +65,7 @@ const DAYS = [
         "description": "One formula goes on the board: Speed % = (Speed points / 20) x 100. Your team calculates motor power for Speed values of 1, 3, 5, 6, and 8. Then compare answers with the team next to you. If you disagree, figure out where the split is -- without asking the facilitator first.",
         "facilitatorDescription": "Put one formula on the board: Speed % = (Speed points / 20) x 100. Teams calculate motor power for Speed values of 1, 3, 5, 6, and 8. Then teams compare answers with the team next to them and reconcile any disagreements before asking for help. Do not resolve disagreements yourself -- the productive work happens in the between-team conversation.",
         "script": "https://docs.google.com/document/d/12wViKxrKPix59HkDOGzY5YdpanDO5o_j6hbpYZlg3MM/edit?usp=drivesdk",
-        "worksheet": "https://drive.google.com/file/d/1K51qc8WHn95uEqbp0sOxFxXN9cgcjm7W/view?usp=drive_link",
+        "worksheet": "https://docs.google.com/document/d/14AtbbAZ9NygFtvebCek_SXmQKuzPbJxZKpGsp0DiFc8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html"
       },
       {
@@ -138,7 +141,8 @@ const DAYS = [
         "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example and names the rate of change out loud -- this number is the slope of the decay line, how fast your bot loses power per minute. Then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you.",
         "facilitatorDescription": "Formula on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Step 1 (5 min): work one full example on the board -- Endurance = 6, decay rate = 21% per minute, P(1) = 79%, P(2) = 58%, P(3) = 37%, P(4) = 16%, P(5) capped at 0%. Every number shown, no steps skipped. Name the rate of change explicitly as the slope. Step 2 (10 min): teams calculate for Endurance = 4 using a scaffolded worksheet. Step 3 (10 min): teams calculate for Endurance = 2 with no scaffolding. Step 4 (10 min): teams plot their own Endurance allocation over five t-values. Step 5 (5 min): two teams with different allocations read their t=3 values aloud -- that comparison is where the formula becomes strategic.",
         "script": "https://docs.google.com/document/d/1sYI4n2zRgr-a98835xcq0P6UdhhoHvJjBZjFPbl2fbg/edit?usp=drivesdk",
-       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html"
+        "worksheet": "https://docs.google.com/document/d/10AvFGU5Dss1FNtHiuFk1ZGqquCrM2KYKX0_UK3gf4zo/edit?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -154,7 +158,7 @@ const DAYS = [
         "description": "Open MakeCode and write code that reduces your bot's motor power over time based on your Endurance allocation. Test it by running the bot for 2 minutes. Record distance in the first 30 seconds vs. the last 30 seconds, and write one sentence about the gap between what the formula predicted and what actually happened.",
         "facilitatorDescription": "Teams open MakeCode and write code that reduces the bot's motor power over time based on their Endurance allocation. They test by running the bot for 2 minutes, recording distance in the first 30 seconds vs. the last 30 seconds. Each team writes one sentence about the gap between what the formula predicted and what actually happened -- that gap is the productive noticing.",
         "script": "https://docs.google.com/document/d/1DC_OoLC1Cz_QbwkvVGKaorM9pTOcouWny7Sw4qrqLaw/edit?usp=drivesdk",
-        "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
+        "worksheet": "https://docs.google.com/document/d/1H-sRKYvSqgAfmtK2Jo3f5cTc1706qA3OmmZUYd8Exro/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html"
       },
       {
@@ -335,7 +339,7 @@ const DAYS = [
         "facilitatorDescription": "Teams build a cardboard front scoop for the Cutebot. One rule: it must make clean contact with the ball. Teams test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in the dashboard. Each team writes: 'Quadrupling charge speed did / did not quadruple kick distance, because...' Keep the build loose -- iteration is the point, not a perfect first scoop.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1VqQrWMrNWUKKHIVaulGEyOchsYJ4Xs4D5TC2WWuRhDM/edit?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S50384-96547-11729-75922",
+        "makecode":"https://makecode.microbit.org/S48965-41345-37286-67819",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
@@ -449,8 +453,7 @@ const DAYS = [
         "description": "Experiment with the loadouts you designed this morning. Try each one. Which one produces the behavior your formulas predicted?",
         "facilitatorDescription": "Teams experiment with the three loadouts they designed in the morning. Each gets tested. The question: which one produces the behavior their formulas predicted? This is the hinge where teams notice formula-vs-reality gaps heading into Season 1.",
         "script": "https://docs.google.com/document/d/1b-dHky2JBEv8cZp-h9htJNm8CnTfeaA9Tz9ENb_GP1Y/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-open-lab-closing.html",
-        "worksheet":"https://docs.google.com/document/d/1qAIWuumIOSJ18bQEGq2PDC8lpjbU0ChAsQtj-ks77jY/edit?usp=sharing"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-open-lab-closing.html"
       }
     ],
     "produce": [
