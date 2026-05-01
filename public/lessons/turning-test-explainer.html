@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turning Test Program · Code Explainer · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:    #0D0D1A;
+      --navy2:   #161A2E;
+      --navy3:   #1E2240;
+      --cyan:    #00E5FF;
+      --teal:    #007A99;
+      --slate:   #8899AA;
+      --border:  #222840;
+      --card:    #161A2E;
+      --green:   #00C97A;
+      --red:     #FF4D6A;
+      --yellow:  #FFD166;
+      --orange:  #FF8C42;
+      --purple:  #BD7AFF;
+      --text:    #E8EAF2;
+      --muted:   #9AA3B2;
+      --mono:    'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    /* ── Nav ── */
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      display: flex;
+      gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    /* ── Layout ── */
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ── Page header ── */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub { font-size: .9375rem; color: var(--muted); line-height: 1.6; max-width: 620px; }
+
+    /* ── Section ── */
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .section-title {
+      font-size: 1.0625rem; font-weight: 800; color: var(--text);
+      margin-bottom: .5rem; letter-spacing: -.01em;
+    }
+    .section-body { font-size: .9rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .875rem; }
+
+    /* ── Button grid ── */
+    .button-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .875rem; }
+    @media (max-width: 620px) { .button-grid { grid-template-columns: 1fr; } }
+
+    .btn-card {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem;
+    }
+    .btn-card.btn-a  { border-color: rgba(0,229,255,.3); }
+    .btn-card.btn-b  { border-color: rgba(255,209,102,.3); }
+    .btn-card.btn-ab { border-color: rgba(255,77,106,.3); }
+
+    .btn-chip {
+      display: inline-block; font-size: .6875rem; font-weight: 800;
+      letter-spacing: .1em; text-transform: uppercase;
+      border-radius: 5px; padding: .25em .65em; margin-bottom: .75rem;
+    }
+    .btn-a  .btn-chip { background: rgba(0,229,255,.12); color: var(--cyan); }
+    .btn-b  .btn-chip { background: rgba(255,209,102,.12); color: var(--yellow); }
+    .btn-ab .btn-chip { background: rgba(255,77,106,.12); color: var(--red); }
+
+    .btn-label { font-size: .9375rem; font-weight: 700; margin-bottom: .375rem; }
+    .btn-desc  { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Formula display ── */
+    .formula-row {
+      display: flex; flex-wrap: wrap; gap: .75rem; margin: .875rem 0;
+    }
+    .formula-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem 1.125rem; flex: 1; min-width: 180px;
+    }
+    .formula-box .f-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .formula-box .f-eq {
+      font-family: var(--mono); font-size: .9375rem; color: var(--text);
+      font-weight: 700; line-height: 1.5;
+    }
+    .formula-box .f-note {
+      font-size: .75rem; color: var(--muted); margin-top: .375rem; line-height: 1.5;
+    }
+
+    /* ── Interactive calculator ── */
+    .calc-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
+
+    .stat-input-group { margin-bottom: .875rem; }
+    .stat-input-label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: .375rem;
+    }
+    .stat-input-label .s-name {
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .stat-input-label .s-val {
+      font-size: 1.125rem; font-weight: 800;
+    }
+    .stat-input-label .s-val.speed-color { color: var(--cyan); }
+    .stat-input-label .s-val.endurance-color { color: var(--green); }
+    .stat-input-label .s-val.turning-color { color: var(--purple); }
+    .stat-input-label .s-pct { font-size: .75rem; color: var(--slate); margin-left: .25rem; }
+
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; background: var(--navy3);
+      border-radius: 3px; outline: none; margin: .25rem 0;
+    }
+    input[type=range].speed-range::-webkit-slider-thumb     { background: var(--cyan); }
+    input[type=range].endurance-range::-webkit-slider-thumb { background: var(--green); }
+    input[type=range].turning-range::-webkit-slider-thumb   { background: var(--purple); }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 20px; height: 20px; border-radius: 50%;
+      cursor: pointer; box-shadow: 0 0 0 3px rgba(255,255,255,.1);
+    }
+
+    .budget-bar-track {
+      height: 8px; background: var(--navy3); border-radius: 4px; overflow: hidden; margin: .5rem 0 .25rem;
+    }
+    .budget-bar-fill {
+      height: 100%; border-radius: 4px; transition: width .2s ease;
+      background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 60%, var(--red) 100%);
+    }
+    .budget-note { font-size: .75rem; text-align: right; font-weight: 700; }
+    .budget-note.ok      { color: var(--green); }
+    .budget-note.over    { color: var(--red); }
+    .budget-note.warning { color: var(--yellow); }
+
+    .output-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: .625rem;
+    }
+    @media (max-width: 480px) { .output-grid { grid-template-columns: 1fr; } }
+    .output-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .75rem 1rem;
+    }
+    .output-box .o-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .25rem;
+    }
+    .output-box .o-val {
+      font-family: var(--mono); font-size: 1.25rem; font-weight: 700; color: var(--text);
+    }
+    .output-box .o-note { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    .endurance-table {
+      width: 100%; border-collapse: collapse; margin-top: .75rem; font-size: .8125rem;
+    }
+    .endurance-table th {
+      font-size: .625rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--slate); text-align: left; padding: .4rem .75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .endurance-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.4); }
+    .endurance-table tr:last-child td { border-bottom: none; }
+    .endurance-table .t-time { color: var(--yellow); font-weight: 700; font-family: var(--mono); }
+    .endurance-table .t-pct  { font-family: var(--mono); font-weight: 700; }
+    .endurance-table .t-pwr  { font-family: var(--mono); font-weight: 700; }
+    .endurance-table .t-pwr.low { color: var(--red); }
+    .endurance-table .t-pwr.mid { color: var(--yellow); }
+    .endurance-table .t-pwr.ok  { color: var(--green); }
+
+    /* ── Arc canvas ── */
+    .arc-wrap {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem;
+      display: flex; flex-direction: column; align-items: center; gap: .75rem;
+    }
+    .arc-label {
+      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); text-align: center;
+    }
+    canvas#arc-canvas {
+      border-radius: 6px; display: block;
+    }
+
+    /* ── Border flow ── */
+    .flow-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .625rem;
+      text-align: center;
+    }
+    @media (max-width: 600px) { .flow-grid { grid-template-columns: 1fr; } }
+
+    .flow-step {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem .875rem;
+      position: relative;
+    }
+    .flow-step::after {
+      content: '→';
+      position: absolute; right: -1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--slate); font-size: .875rem;
+    }
+    .flow-step:last-child::after { display: none; }
+    @media (max-width: 600px) {
+      .flow-step::after { content: '↓'; right: auto; bottom: -.875rem; top: auto; left: 50%; transform: translateX(-50%); }
+    }
+
+    .flow-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,229,255,.12); border: 1px solid rgba(0,229,255,.3);
+      color: var(--cyan); font-size: .6875rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto .625rem;
+    }
+    .flow-text { font-size: .8125rem; color: var(--text); font-weight: 600; line-height: 1.4; }
+    .flow-sub  { font-size: .6875rem; color: var(--muted); margin-top: .25rem; line-height: 1.4; }
+
+    .sensor-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: .875rem 0;
+    }
+    .sensor-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 7px; padding: .75rem .5rem; text-align: center;
+    }
+    .sensor-num { font-size: .6875rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--slate); margin-bottom: .25rem; }
+    .sensor-pos { font-size: .8125rem; font-weight: 700; }
+    .sensor-pos.left   { color: var(--cyan); }
+    .sensor-pos.right  { color: var(--orange); }
+    .sensor-pos.center { color: var(--yellow); }
+    .sensor-trigger    { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* ── Code block ── */
+    .code-block {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+      font-family: var(--mono); font-size: .8125rem; color: var(--muted);
+      line-height: 1.8; overflow-x: auto;
+    }
+    .code-block .kw  { color: var(--purple); }
+    .code-block .num { color: var(--yellow); }
+    .code-block .fn  { color: var(--cyan); }
+    .code-block .cmt { color: #4a556a; font-style: italic; }
+    .code-block .var { color: var(--text); }
+
+    /* ── Inline chip ── */
+    .chip {
+      display: inline-block; font-family: var(--mono); font-size: .75rem; font-weight: 700;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 4px; padding: .1em .4em;
+    }
+    .chip.cyan   { color: var(--cyan);   border-color: rgba(0,229,255,.25);   background: rgba(0,229,255,.06); }
+    .chip.green  { color: var(--green);  border-color: rgba(0,201,122,.25);   background: rgba(0,201,122,.06); }
+    .chip.yellow { color: var(--yellow); border-color: rgba(255,209,102,.25); background: rgba(255,209,102,.06); }
+    .chip.purple { color: var(--purple); border-color: rgba(189,122,255,.25); background: rgba(189,122,255,.06); }
+    .chip.red    { color: var(--red);    border-color: rgba(255,77,106,.25);  background: rgba(255,77,106,.06); }
+
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem; margin: .875rem 0;
+      font-size: .875rem; line-height: 1.6;
+    }
+    .callout.info   { background: rgba(0,229,255,.05); border: 1px solid rgba(0,229,255,.2); color: var(--cyan); }
+    .callout.warn   { background: rgba(255,209,102,.05); border: 1px solid rgba(255,209,102,.2); color: var(--yellow); }
+    .callout.danger { background: rgba(255,77,106,.05); border: 1px solid rgba(255,77,106,.2); color: var(--red); }
+    .callout strong { font-weight: 700; }
+
+    /* ── Constants table ── */
+    .const-table { width: 100%; border-collapse: collapse; font-size: .8375rem; }
+    .const-table th {
+      font-size: .625rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--slate); text-align: left; padding: .5rem .875rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .const-table td { padding: .625rem .875rem; border-bottom: 1px solid rgba(34,40,64,.4); vertical-align: top; }
+    .const-table tr:last-child td { border-bottom: none; }
+    .const-table .c-name { font-family: var(--mono); color: var(--cyan); font-weight: 700; }
+    .const-table .c-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-table .c-desc { color: var(--muted); font-size: .8125rem; line-height: 1.5; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/index.html">Today</a>
+  <a href="/schedule.html">Schedule</a>
+  <a href="/teachers.html">Teacher resources</a>
+  <a href="/tools.html">Tools</a>
+  <a href="/activities/math/index.html">Math concepts</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">MakeCode · Code Explainer</div>
+    <div class="page-title">Turning Test Program</div>
+    <div class="page-sub">A 20-second test program for the BBC micro:bit + Cutebot Pro. Flash it, press A, and watch your stat allocations turn into real robot motion — arcs, border recoveries, and endurance decay — before committing to a match build.</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ── CONTROLS ── -->
+  <div class="section">
+    <div class="section-label">What each button does</div>
+    <div class="button-grid">
+
+      <div class="btn-card btn-a">
+        <div class="btn-chip">Button A</div>
+        <div class="btn-label">Run 20-second test</div>
+        <div class="btn-desc">Bot drives immediately using your current SPEED, ENDURANCE, and TURNING values. Runs until time expires, then stops and shows "DONE".</div>
+      </div>
+
+      <div class="btn-card btn-b">
+        <div class="btn-chip">Button B</div>
+        <div class="btn-label">Cycle simulated time</div>
+        <div class="btn-desc">Steps through 0 → 60 → 120 → 180 seconds of fake match time, so you can see how endurance decay changes motor power before the bot even moves.</div>
+      </div>
+
+      <div class="btn-card btn-ab">
+        <div class="btn-chip">A + B</div>
+        <div class="btn-label">Emergency stop</div>
+        <div class="btn-desc">Kills all motors immediately and shows an X on the display. Use this if the bot heads somewhere it shouldn't. Takes effect within one check cycle (~60 ms).</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STAT CALCULATOR ── -->
+  <div class="section">
+    <div class="section-label">Live stat calculator</div>
+    <p class="section-body" style="margin-bottom:1.25rem;">Change the sliders to match your allocation. The calculator shows exactly what the code computes before Button A runs — motor power, arc timing, turn ratio, and endurance at every match checkpoint. Stats must total 20 or fewer points.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <!-- Inputs -->
+      <div class="card">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:1rem;">Stat allocation</div>
+
+        <div class="stat-input-group">
+          <div class="stat-input-label">
+            <span class="s-name" style="color:var(--cyan);">Speed</span>
+            <span><span class="s-val speed-color" id="spd-val">4</span><span class="s-pct" id="spd-pct"> = 20% motor power</span></span>
+          </div>
+          <input type="range" class="speed-range" id="spd-slider" min="1" max="17" value="4" oninput="recalc()" />
+        </div>
+
+        <div class="stat-input-group">
+          <div class="stat-input-label">
+            <span class="s-name" style="color:var(--green);">Endurance</span>
+            <span><span class="s-val endurance-color" id="end-val">6</span></span>
+          </div>
+          <input type="range" class="endurance-range" id="end-slider" min="1" max="17" value="6" oninput="recalc()" />
+        </div>
+
+        <div class="stat-input-group">
+          <div class="stat-input-label">
+            <span class="s-name" style="color:var(--purple);">Turning</span>
+            <span><span class="s-val turning-color" id="trn-val">2</span></span>
+          </div>
+          <input type="range" class="turning-range" id="trn-slider" min="1" max="8" value="2" oninput="recalc()" />
+        </div>
+
+        <div style="margin-top:.75rem;">
+          <div class="budget-bar-track">
+            <div class="budget-bar-fill" id="budget-fill" style="width:50%"></div>
+          </div>
+          <div class="budget-note ok" id="budget-note">12 of 20 points used</div>
+        </div>
+      </div>
+
+      <!-- Computed outputs -->
+      <div class="card">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:1rem;">Computed at match start (t = 0)</div>
+        <div class="output-grid">
+          <div class="output-box">
+            <div class="o-label">Base power</div>
+            <div class="o-val" id="out-power">20%</div>
+            <div class="o-note">Speed × 5</div>
+          </div>
+          <div class="output-box">
+            <div class="o-label">Turn ratio</div>
+            <div class="o-val" id="out-ratio">0.24</div>
+            <div class="o-note">0.2 + Turning × 0.02</div>
+          </div>
+          <div class="output-box">
+            <div class="o-label">Segment duration</div>
+            <div class="o-val" id="out-seg">10 800 ms</div>
+            <div class="o-note">21 600 ÷ Turning</div>
+          </div>
+          <div class="output-box">
+            <div class="o-label">Arcs per cycle</div>
+            <div class="o-val" id="out-arcs">2</div>
+            <div class="o-note">= Turning value</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Endurance table -->
+    <div class="card" style="margin-top:.875rem;">
+      <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:.75rem;">Endurance decay across simulated match time</div>
+      <table class="endurance-table" id="end-table">
+        <thead>
+          <tr>
+            <th>Match time</th>
+            <th>Power remaining %</th>
+            <th>Applied motor power</th>
+            <th>What you'll see</th>
+          </tr>
+        </thead>
+        <tbody id="end-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ARC PATTERN ── -->
+  <div class="section">
+    <div class="section-label">How the arc pattern works</div>
+    <p class="section-body" style="margin-bottom:1.25rem;">The drive loop alternates direction each cycle. Each cycle has <strong style="color:var(--text);">Turning</strong> segments. Within a segment, one motor runs faster than the other by the <strong style="color:var(--text);">turn ratio</strong> — creating an arc. Higher Turning = more arcs per cycle = tighter curves.</p>
+
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:1rem;align-items:start;">
+      <div>
+        <div class="arc-wrap">
+          <div class="arc-label">Arc preview — adjust sliders above to update</div>
+          <canvas id="arc-canvas" width="320" height="260"></canvas>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:.875rem;">
+          <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:.75rem;">Motor assignment per segment</div>
+          <div class="code-block">
+<span class="cmt">// lastTurnWasLeft alternates each cycle</span>
+<span class="kw">if</span> (TURNING == <span class="num">1</span>) {
+  <span class="cmt">// straight — both same power</span>
+  L = R = currentPower
+} <span class="kw">else if</span> (lastTurnWasLeft) {
+  <span class="cmt">// arc right</span>
+  L = currentPower × (<span class="num">1</span> − turnRatio)
+  R = currentPower × (<span class="num">1</span> + turnRatio)
+} <span class="kw">else</span> {
+  <span class="cmt">// arc left</span>
+  L = currentPower × (<span class="num">1</span> + turnRatio)
+  R = currentPower × (<span class="num">1</span> − turnRatio)
+}</div>
+        </div>
+
+        <div class="callout info">
+          <strong>Turning = 1:</strong> Bot drives straight. Turn ratio is still computed but both motors get identical power.
+        </div>
+        <div class="callout warn" style="margin-top:.625rem;">
+          <strong>Turn ratio caps at 0.4.</strong> Turning values above 9 all produce the same ratio — the gap between motors is already at maximum.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BORDER DETECTION ── -->
+  <div class="section">
+    <div class="section-label">Border detection and recovery</div>
+    <p class="section-body" style="margin-bottom:1.25rem;">The bot checks sensors every 60 ms while driving. If any sensor reads above the threshold, it stops and runs a recovery sequence based on which side triggered.</p>
+
+    <!-- Sensor map -->
+    <div class="card" style="margin-bottom:.875rem;">
+      <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:.75rem;">Sensor positions on Cutebot Pro (front of bot)</div>
+      <div class="sensor-grid">
+        <div class="sensor-box">
+          <div class="sensor-num">Sensor 1</div>
+          <div class="sensor-pos left">Far left</div>
+          <div class="sensor-trigger">Returns 1</div>
+        </div>
+        <div class="sensor-box">
+          <div class="sensor-num">Sensor 2</div>
+          <div class="sensor-pos center">Center-left</div>
+          <div class="sensor-trigger">Returns 3</div>
+        </div>
+        <div class="sensor-box">
+          <div class="sensor-num">Sensor 3</div>
+          <div class="sensor-pos center">Center-right</div>
+          <div class="sensor-trigger">Returns 3</div>
+        </div>
+        <div class="sensor-box">
+          <div class="sensor-num">Sensor 4</div>
+          <div class="sensor-pos right">Far right</div>
+          <div class="sensor-trigger">Returns 2</div>
+        </div>
+      </div>
+      <div class="callout info" style="margin-top:.625rem;font-size:.8125rem;">
+        Sensors 2 and 3 both map to return value 3 — treated as a head-on or corner collision. The response is a longer backup plus a wider pivot, then a second border recheck.
+      </div>
+    </div>
+
+    <!-- Recovery flow -->
+    <div class="card">
+      <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:1rem;">Recovery sequence (left-border example, returns 1)</div>
+      <div class="flow-grid">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-text">Hard stop</div>
+          <div class="flow-sub">Both motors cut. 50 ms pause.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-text">Back up</div>
+          <div class="flow-sub">Both motors reverse at BORDER_PIVOT_POWER for 600 ms.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-text">Pivot away</div>
+          <div class="flow-sub">Left → pivot right. Right → pivot left. ±80 ms random jitter to avoid looping.</div>
+        </div>
+      </div>
+      <hr />
+      <p style="font-size:.8125rem;color:var(--muted);line-height:1.6;">After pivoting, the code runs <span class="chip cyan">checkBorder()</span> again. If the bot is still on the border, it backs up once more and pivots the opposite direction before resuming the drive loop.</p>
+    </div>
+  </div>
+
+  <!-- ── MATH ── -->
+  <div class="section">
+    <div class="section-label">The formulas</div>
+    <p class="section-body" style="margin-bottom:1.25rem;">Every calculation in <span class="chip cyan">computeStats()</span> maps directly to a stat from your allocation sheet. These are the same formulas used in the match engine — the test program shows you what they produce in real motion.</p>
+
+    <div class="formula-row">
+      <div class="formula-box">
+        <div class="f-label">Base motor power</div>
+        <div class="f-eq">Speed × 100 ÷ 20<br>= Speed × 5</div>
+        <div class="f-note">Same as the Speed stat lesson formula. Speed = 4 → 20% motor power.</div>
+      </div>
+      <div class="formula-box">
+        <div class="f-label">Turn ratio</div>
+        <div class="f-eq">0.2 + Turning × 0.02<br>max 0.4</div>
+        <div class="f-note">The percentage differential between left and right motors. Turning = 2 → ratio 0.24.</div>
+      </div>
+    </div>
+
+    <div class="formula-row">
+      <div class="formula-box">
+        <div class="f-label">Arc segment duration</div>
+        <div class="f-eq">21 600 ÷ Turning</div>
+        <div class="f-note">Total arc time (BASE_SEGMENT_MS × 12 = 21 600 ms) split evenly across arcs. Turning = 2 → 10 800 ms per arc.</div>
+      </div>
+      <div class="formula-box">
+        <div class="f-label">Endurance remaining %</div>
+        <div class="f-eq">100 − (20 − E) × t ÷ 40<br>floor: 20%</div>
+        <div class="f-note">Decay rate = 20 − Endurance. Multiplied by simulated time ÷ 40. Minimum 20% always.</div>
+      </div>
+    </div>
+
+    <div class="formula-row">
+      <div class="formula-box" style="flex: 2;">
+        <div class="f-label">Applied motor power (after decay)</div>
+        <div class="f-eq">round(basePower × enduranceFactor)<br>floor: 15%</div>
+        <div class="f-note">Applied power at full match length can be significantly lower. This is what the motors actually receive. The 15% floor prevents the bot from being completely immobile.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONSTANTS ── -->
+  <div class="section">
+    <div class="section-label">Constants</div>
+    <p class="section-body" style="margin-bottom:1rem;">These values are set at the top of the file. Changing them changes how aggressive the border recovery is and how often the bot checks for borders.</p>
+    <div class="card">
+      <table class="const-table">
+        <thead>
+          <tr>
+            <th>Constant</th>
+            <th>Default</th>
+            <th>What it controls</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="c-name">TEST_DURATION_MS</td>
+            <td class="c-val">20 000</td>
+            <td class="c-desc">How long the bot runs when you press A. 20 seconds by default. Increase for a longer test.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BASE_SEGMENT_MS</td>
+            <td class="c-val">1 800</td>
+            <td class="c-desc">Base unit for arc timing. Total arc time = BASE_SEGMENT_MS × 12. Raise this to make arcs longer.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BORDER_CHECK_MS</td>
+            <td class="c-val">60</td>
+            <td class="c-desc">How often sensors are polled while driving (every 60 ms). Lower = faster reaction; higher = fewer checks per second.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BORDER_THRESHOLD</td>
+            <td class="c-val">200</td>
+            <td class="c-desc">Grayscale reading above which a sensor counts as "on the border." Adjust if sensor readings don't match your mat.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BACKUP_MS</td>
+            <td class="c-val">600</td>
+            <td class="c-desc">How long the bot reverses during border recovery. Longer = more clearance from the edge.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BORDER_PIVOT_MS</td>
+            <td class="c-val">400</td>
+            <td class="c-desc">How long the pivot turn lasts after backing up. Longer = wider re-entry angle. Has ±80 ms random jitter.</td>
+          </tr>
+          <tr>
+            <td class="c-name">BORDER_PIVOT_POWER</td>
+            <td class="c-val">50</td>
+            <td class="c-desc">Fixed power used for all backup and pivot moves. Independent of Speed allocation.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── HOW TO USE ── -->
+  <div class="section">
+    <div class="section-label">How to use this program</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.875rem;">
+      <div class="card">
+        <div style="font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);margin-bottom:.75rem;">Step-by-step</div>
+        <ol style="padding-left:1.1rem;display:flex;flex-direction:column;gap:.625rem;">
+          <li style="font-size:.875rem;color:var(--muted);line-height:1.6;">Set <span class="chip cyan">SPEED</span>, <span class="chip green">ENDURANCE</span>, <span class="chip purple">TURNING</span> at the bottom of the file. Total must be ≤ 20.</li>
+          <li style="font-size:.875rem;color:var(--muted);line-height:1.6;">Flash to the micro:bit. Place bot in center of mat.</li>
+          <li style="font-size:.875rem;color:var(--muted);line-height:1.6;">Press <strong style="color:var(--text);">B</strong> to set a simulated match time if you want to see decay. Otherwise stay at 0s.</li>
+          <li style="font-size:.875rem;color:var(--muted);line-height:1.6;">Press <strong style="color:var(--text);">A</strong>. Bot drives for 20 seconds.</li>
+          <li style="font-size:.875rem;color:var(--muted);line-height:1.6;">Change Turning, reflash, and compare arc patterns side-by-side.</li>
+        </ol>
+      </div>
+      <div>
+        <div class="callout warn">
+          <strong>Changing Turning values:</strong> reflash the bot each time. The drive loop reads TURNING at runtime — no need to change any other code.
+        </div>
+        <div class="callout info" style="margin-top:.625rem;">
+          <strong>What to look for:</strong> does the arc fit inside the mat? Does the bot recover cleanly from corners? Does motor power drop visibly at 120 s vs 0 s?
+        </div>
+        <div class="callout danger" style="margin-top:.625rem;">
+          <strong>If the bot gets stuck in a corner loop:</strong> press A+B to emergency stop. Increase BORDER_PIVOT_MS or BACKUP_MS and reflash.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────
+  let S = 4, E = 6, T = 2;
+  const BASE_SEGMENT_MS = 1800;
+
+  // ── Recalculate and re-render ──────────────────────────────────────
+  function recalc() {
+    S = parseInt(document.getElementById('spd-slider').value);
+    E = parseInt(document.getElementById('end-slider').value);
+    T = parseInt(document.getElementById('trn-slider').value);
+
+    // Labels
+    document.getElementById('spd-val').textContent = S;
+    document.getElementById('end-val').textContent = E;
+    document.getElementById('trn-val').textContent = T;
+    document.getElementById('spd-pct').textContent = ` = ${S * 5}% motor power`;
+
+    // Budget
+    const total   = S + E + T;
+    const pct     = Math.min(total / 20 * 100, 100);
+    document.getElementById('budget-fill').style.width = pct + '%';
+    const noteEl = document.getElementById('budget-note');
+    noteEl.textContent = `${total} of 20 points used`;
+    noteEl.className   = total > 20 ? 'budget-note over' : total > 17 ? 'budget-note warning' : 'budget-note ok';
+
+    // Outputs
+    const basePower = S * 5;
+    const turnRatio = Math.min(0.2 + T * 0.02, 0.4);
+    const segMs     = Math.round((BASE_SEGMENT_MS * 12) / T);
+
+    document.getElementById('out-power').textContent = basePower + '%';
+    document.getElementById('out-ratio').textContent = turnRatio.toFixed(2);
+    document.getElementById('out-seg').textContent   = segMs.toLocaleString() + ' ms';
+    document.getElementById('out-arcs').textContent  = T;
+
+    // Endurance table
+    buildEnduranceTable(basePower);
+
+    // Arc canvas
+    drawArc();
+  }
+
+  function buildEnduranceTable(basePower) {
+    const tbody = document.getElementById('end-tbody');
+    const times  = [0, 60, 120, 180];
+    const decay  = 20 - E;
+    tbody.innerHTML = '';
+    times.forEach(t => {
+      let endPct = 100 - decay * t / 40;
+      endPct = Math.max(endPct, 20);
+      const factor    = endPct / 100;
+      let appliedPwr  = Math.round(basePower * factor);
+      appliedPwr      = Math.max(appliedPwr, 15);
+      const ratio     = Math.min(0.2 + (parseInt(document.getElementById('trn-slider').value)) * 0.02, 0.4);
+      const pClass    = appliedPwr <= 15 ? 'low' : appliedPwr <= 20 ? 'mid' : 'ok';
+      const desc      = appliedPwr <= 15 ? 'Floor — bot barely moving' : appliedPwr <= 20 ? 'Noticeably slower' : appliedPwr <= 30 ? 'Full speed' : 'Full speed';
+      const lPwr = T === 1 ? appliedPwr : appliedPwr * (1 + ratio);
+      const rPwr = T === 1 ? appliedPwr : appliedPwr * (1 - ratio);
+      const motorStr = T === 1
+        ? `L = R = ${appliedPwr}%`
+        : `L = ${lPwr.toFixed(0)}%  R = ${rPwr.toFixed(0)}%`;
+      tbody.innerHTML += `
+        <tr>
+          <td class="t-time">${t === 0 ? 'Start (0 s)' : t + ' s'}</td>
+          <td class="t-pct" style="color:${endPct <= 20 ? 'var(--red)' : endPct <= 50 ? 'var(--yellow)' : 'var(--green)'}">${endPct.toFixed(0)}%</td>
+          <td class="t-pwr ${pClass}">${motorStr}</td>
+          <td style="font-size:.75rem;color:var(--muted);">${desc}</td>
+        </tr>`;
+    });
+  }
+
+  // ── Arc canvas ─────────────────────────────────────────────────────
+  function drawArc() {
+    const canvas  = document.getElementById('arc-canvas');
+    const ctx     = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#1E2240';
+    ctx.beginPath();
+    ctx.roundRect(0, 0, W, H, 8);
+    ctx.fill();
+
+    // Mat border
+    ctx.strokeStyle = '#3A4060';
+    ctx.lineWidth = 2;
+    const pad = 16;
+    ctx.strokeRect(pad, pad, W - pad*2, H - pad*2);
+    ctx.fillStyle = '#2A2E48';
+    ctx.fillText = 'mat';
+
+    // Compute path
+    const ratio      = Math.min(0.2 + T * 0.02, 0.4);
+    const segCount   = Math.min(T * 2, 16);
+    const segMs      = (BASE_SEGMENT_MS * 12) / T;
+    const scale      = 0.012;
+    const baseSpeed  = S * 5;
+
+    let x = W / 2, y = H * 0.7;
+    let angle  = -Math.PI / 2; // start heading up
+    let left   = true;
+    const step = 8;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    for (let arc = 0; arc < segCount; arc++) {
+      left = (arc % 2 === 0);
+      const vL = left ? baseSpeed * (1 - ratio) : baseSpeed * (1 + ratio);
+      const vR = left ? baseSpeed * (1 + ratio) : baseSpeed * (1 - ratio);
+      const angularV = (vR - vL) * 0.0008;
+      const totalSteps = Math.round((segMs / 1000) * 6);
+
+      for (let s = 0; s < totalSteps; s++) {
+        angle += angularV;
+        const spd = ((vL + vR) / 2) * scale;
+        x += Math.cos(angle) * spd;
+        y += Math.sin(angle) * spd;
+
+        // Clamp to mat
+        x = Math.max(pad + 4, Math.min(W - pad - 4, x));
+        y = Math.max(pad + 4, Math.min(H - pad - 4, y));
+        ctx.lineTo(x, y);
+      }
+    }
+
+    // Gradient stroke
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0,   'rgba(0,229,255,0.9)');
+    grad.addColorStop(0.5, 'rgba(189,122,255,0.9)');
+    grad.addColorStop(1,   'rgba(0,229,255,0.5)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth   = 2;
+    ctx.lineJoin    = 'round';
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+
+    // Start dot
+    ctx.beginPath();
+    ctx.arc(W / 2, H * 0.7, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#00E5FF';
+    ctx.fill();
+
+    // Label
+    ctx.font = '600 10px Montserrat, sans-serif';
+    ctx.fillStyle = 'rgba(136,153,170,0.7)';
+    ctx.textAlign = 'center';
+    ctx.fillText('START', W / 2, H * 0.7 + 18);
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    recalc();
+  });
+</script>
+</body>
+</html>

@@ -471,36 +471,41 @@ strong.r { color: var(--red); }
   </div>
 
   <div class="card">
-    <div class="card-title">The Three Variables in Your Code</div>
+    <div class="card-title">The Variables in Your Code</div>
     <table class="var-table">
       <thead>
         <tr><th>Variable</th><th>What It Stores</th><th>Formula</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td><span class="var-name">motorPower</span><div class="var-eq">set once at start</div></td>
-          <td style="font-size:13px;">Your bot's top speed — how fast it goes at full power</td>
+          <td><span class="var-name">basePower</span><div class="var-eq">computed once per press</div></td>
+          <td style="font-size:13px;">Top wheel speed — how fast the bot goes at 100% power</td>
           <td style="font-size:13px;"><strong style="color:var(--cyan);">SPEED × 100 ÷ 20</strong></td>
         </tr>
         <tr>
-          <td><span class="var-name">DECAY_RATE</span><div class="var-eq">set once at start</div></td>
-          <td style="font-size:13px;">How fast power drains. Higher E = smaller decay rate = longer battery</td>
+          <td><span class="var-name">DECAY_RATE</span><div class="var-eq">computed once per press</div></td>
+          <td style="font-size:13px;">How fast power drains each minute. Higher E = smaller decay rate</td>
           <td style="font-size:13px;"><strong style="color:var(--red);">20 &minus; ENDURANCE</strong></td>
         </tr>
         <tr>
-          <td><span class="var-name">currentPower</span><div class="var-eq">recalculated every loop</div></td>
-          <td style="font-size:13px;">% of full power remaining right now. Starts at 100, counts down. Floored at 20%</td>
-          <td style="font-size:13px;"><strong style="color:var(--orange);">100 &minus; DECAY_RATE &times; t &divide; 40</strong></td>
+          <td><span class="var-name">simulatedMatchTime</span><div class="var-eq">set by Button B</div></td>
+          <td style="font-size:13px;">The match time being tested (in seconds). Cycles through 0 → 60 → 120 → 180</td>
+          <td style="font-size:13px;"><strong style="color:var(--purple);">0 / 60 / 120 / 180</strong></td>
         </tr>
         <tr>
-          <td><span class="var-name">wheelSpeed</span><div class="var-eq">recalculated every loop</div></td>
-          <td style="font-size:13px;">Actual wheel speed right now — scales top speed by remaining power</td>
-          <td style="font-size:13px;"><strong style="color:var(--green);">motorPower × currentPower ÷ 100</strong></td>
+          <td><span class="var-name">endurancePercent</span><div class="var-eq">computed once per press</div></td>
+          <td style="font-size:13px;">Power remaining at the simulated time. Floored at 20%</td>
+          <td style="font-size:13px;"><strong style="color:var(--orange);">100 &minus; DECAY_RATE × t ÷ 40</strong></td>
+        </tr>
+        <tr>
+          <td><span class="var-name">currentPower</span><div class="var-eq">computed once per press</div></td>
+          <td style="font-size:13px;">Actual wheel speed for this burst — top speed scaled by remaining power</td>
+          <td style="font-size:13px;"><strong style="color:var(--green);">basePower × endurancePercent ÷ 100</strong></td>
         </tr>
       </tbody>
     </table>
     <div class="notice-green" style="margin-top:14px; margin-bottom:0; padding:10px 14px;">
-      <strong style="color:var(--green);">Floor rule:</strong> If currentPower drops below 20, set it to 20. The bot never fully stops — it runs at minimum speed for the rest of the match.
+      <strong style="color:var(--green);">Floor rule:</strong> endurancePercent never drops below 20. The bot keeps moving even at the end of a long match.
     </div>
   </div>
 
@@ -566,27 +571,27 @@ strong.r { color: var(--red); }
         <span style="font-size:18px; color:var(--muted);">→</span>
         <span style="font-size:13px; color:var(--text);">2 min: <strong style="color:var(--red);">17%</strong></span>
       </div>
-      <div style="font-size:13px; color:var(--muted); flex:1; min-width:200px;">You'll see it slow down. The LEDs on the micro:bit show power remaining — watch them dim as the bot loses speed.</div>
+      <div style="font-size:13px; color:var(--muted); flex:1; min-width:200px;">Each burst starts from the same line at a different simulated power level. The gap between marks is what the formula predicts — and what your bot actually does.</div>
     </div>
   </div>
 
-  <!-- UPDATED: Section 1 worksheet callout — now reflects Part 1 (strategic decision) + Part 2 (detailed prediction table) -->
   <div class="ws-callout">
     <div class="ws-icon">📋</div>
     <div>
-      <div class="ws-label">Worksheet — Parts 1 &amp; 2: Before You Run</div>
+      <div class="ws-label">Worksheet — Before You Run</div>
       <div class="ws-text">
-        Fill in Parts 1 and 2 of your worksheet now — before you open MakeCode.<br><br>
-        <strong>Part 1 — Before You Calculate:</strong> Decide how your bot should behave — stay strong for the full run, or start strong and fade.<br><br>
-        <strong>Part 2 — Before You Run:</strong>
-        <ul style="margin-top:8px; padding-left:20px; display:flex; flex-direction:column; gap:6px;">
-          <li>Your Endurance allocation from your stat card</li>
-          <li>Decay rate: <code>20 &minus; E</code></li>
-          <li>Drop per minute: <code>(20 &minus; E) &times; 1.5</code></li>
-          <li>Total drop at 2 minutes: <code>(20 &minus; E) &times; 1.5 &times; 2</code></li>
-          <li>Motor % at minute 2: <code>100 &minus; (20 &minus; E) &times; 1.5 &times; 2</code></li>
-          <li>Expected last-30-second distance (use your first-distance measurement and power ratio)</li>
+        Fill in your predictions before you open MakeCode. You need four numbers — one for each burst.<br><br>
+        <strong>Step 1:</strong> Find your Endurance stat and calculate decay rate: <code>20 &minus; E</code><br><br>
+        <strong>Step 2:</strong> Plug each time into the formula to predict endurancePercent at t = 0, 60, 120, and 180 seconds:<br>
+        <code style="display:block; margin:8px 0 4px; font-size:12px;">endurancePercent = 100 &minus; DECAY_RATE &times; t &divide; 40</code>
+        <ul style="margin-top:4px; padding-left:20px; display:flex; flex-direction:column; gap:4px;">
+          <li>t = 0 s (start of match)</li>
+          <li>t = 60 s (1 minute in)</li>
+          <li>t = 120 s (2 minutes in)</li>
+          <li>t = 180 s (3 minutes in)</li>
         </ul>
+        <br><strong>Step 3:</strong> Convert to currentPower: <code>basePower &times; endurancePercent &divide; 100</code><br>
+        where basePower = <code>SPEED &times; 100 &divide; 20</code>
       </div>
     </div>
   </div>
@@ -627,246 +632,348 @@ strong.r { color: var(--red); }
 
   <div class="notice">
     <div class="notice-title">Read this before you start.</div>
-    Your bot will slow down during the test. The formula predicts one distance. The bot will probably do something slightly different. That gap is <strong>not a mistake</strong> — it's the whole point. You're comparing a math model to a real machine. Real machines have friction, battery differences, and floor variation. The gap is information.
+    The bot runs for exactly <strong>2 seconds</strong> each time you press A. Button B sets which moment in the match you're simulating. You'll run four 2-second bursts — at t = 0, 1 min, 2 min, and 3 min — and mark where the bot stops each time. The formula predicts the bot should slow down. You're here to see if it does.
   </div>
 
   <div class="card">
     <div class="card-title">The Code Structure</div>
-    <p style="font-size:14px; color:var(--muted); margin-bottom:14px;">Your program has three parts: <strong>on start</strong> sets variables, <strong>on button A</strong> runs the decay loop, and <strong>on button A+B</strong> is the emergency stop.</p>
-    <div class="pseudo-card">
-      <div><span class="pk">on start:</span></div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> SPEED <span class="pv">to</span> 0 &nbsp;&nbsp;&nbsp;<span class="pc">// ← change to your stat</span></div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> ENDURANCE <span class="pv">to</span> 0 &nbsp;&nbsp;&nbsp;<span class="pc">// ← change to your stat</span></div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> motorPower <span class="pv">to</span> SPEED &times; 100 &divide; 20</div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> DECAY_RATE <span class="pv">to</span> 0 &nbsp;&nbsp;&nbsp;<span class="pc">// ← you calculate: 20 − ENDURANCE</span></div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> FLOOR <span class="pv">to</span> 20</div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> DURATION <span class="pv">to</span> 0 &nbsp;&nbsp;&nbsp;<span class="pc">// ← change to 180</span></div>
-      <div style="margin-top:8px;"><span class="pk">on button A pressed:</span></div>
-      <div>&nbsp;&nbsp;<span class="pk">if</span> <span class="pf">not</span> matchRunning <span class="pk">then:</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> t <span class="pv">to</span> 0</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> matchStartTime <span class="pv">to</span> <span class="pm">running time (ms)</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> matchRunning <span class="pv">to</span> <span class="pf">true</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pf">show string</span> <span class="pv">"GO"</span> &nbsp;&rarr;&nbsp; <span class="pf">clear screen</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pk">while</span> matchRunning:</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> t <span class="pv">to</span> (<span class="pm">running time (ms)</span> &minus; matchStartTime) &divide; 1000</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pk">if</span> t &ge; DURATION <span class="pk">then:</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> matchRunning <span class="pv">to</span> <span class="pf">false</span> &nbsp;·&nbsp; <span class="pf">stop all wheels</span> &nbsp;·&nbsp; <span class="pk">break</span></div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> currentPower <span class="pv">to</span> 100 &minus; (DECAY_RATE &times; t &divide; 40)</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pv">set</span> currentPower <span class="pv">to</span> <span class="pm">max of</span> currentPower <span class="pm">and</span> FLOOR</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pf">set left/right wheel speed</span> motorPower &times; currentPower &divide; 100 %</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pf">plot bar graph</span> of currentPower up to 100</div>
-      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pf">pause</span> 200 ms</div>
-      <div style="margin-top:8px;"><span class="pk">on button A+B pressed:</span> &nbsp;<span class="pc">// emergency stop</span></div>
-      <div>&nbsp;&nbsp;<span class="pv">set</span> matchRunning <span class="pv">to</span> <span class="pf">false</span> &nbsp;·&nbsp; <span class="pf">stop all wheels</span> &nbsp;·&nbsp; <span class="pf">show leds</span> (✕)</div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">Three blocks work together. You set your stats in <strong>on start</strong>, use <strong>Button B</strong> to choose the match time you want to test, then press <strong>Button A</strong> to drive for 2 seconds at that power level.</p>
+
+    <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">on start — set your stats</div>
+    <div class="pseudo-card" style="margin-bottom:16px;">
+      <div><span class="pv">set</span> SPEED <span class="pv">to</span> 0 &nbsp;&nbsp;<span class="pc">// ← change to your stat card value</span></div>
+      <div><span class="pv">set</span> ENDURANCE <span class="pv">to</span> 0 &nbsp;&nbsp;<span class="pc">// ← change to your stat card value</span></div>
+      <div><span class="pv">set</span> TEST_DURATION_MS <span class="pv">to</span> <strong style="color:var(--cyan);">2000</strong> &nbsp;&nbsp;<span class="pc">// 2-second burst</span></div>
+      <div><span class="pv">set</span> simulatedMatchTime <span class="pv">to</span> 0 &nbsp;&nbsp;<span class="pc">// starts at beginning of match</span></div>
     </div>
-    <div class="notice-green" style="margin-bottom:0; padding:10px 14px;">
-      <strong style="color:var(--green);">The LED bar graph</strong> shows power draining in real time. The <code>max of currentPower and FLOOR</code> block replaces the if-statement — it's a cleaner way to enforce the 20% floor. <strong style="color:var(--green);">A+B</strong> is the emergency stop at any time.
+
+    <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">computeStats — formula runs here</div>
+    <div class="pseudo-card" style="margin-bottom:16px;">
+      <div><span class="pv">set</span> basePower <span class="pv">to</span> SPEED &times; 100 &divide; 20 &nbsp;&nbsp;<span class="pc">// top wheel speed</span></div>
+      <div><span class="pv">set</span> DECAY_RATE <span class="pv">to</span> 20 &minus; ENDURANCE</div>
+      <div><span class="pv">set</span> endurancePercent <span class="pv">to</span> 100 &minus; DECAY_RATE &times; simulatedMatchTime &divide; 40</div>
+      <div><span class="pv">set</span> endurancePercent <span class="pv">to</span> <span class="pm">max of</span> endurancePercent <span class="pm">and</span> 20 &nbsp;&nbsp;<span class="pc">// 20% floor</span></div>
+      <div><span class="pv">set</span> currentPower <span class="pv">to</span> <span class="pm">round</span>(basePower &times; endurancePercent &divide; 100)</div>
+    </div>
+
+    <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">on button A — run 2-second burst</div>
+    <div class="pseudo-card" style="margin-bottom:16px;">
+      <div><span class="pf">call</span> computeStats &nbsp;&nbsp;<span class="pc">// calculate power for current simulatedMatchTime</span></div>
+      <div><span class="pf">set left/right wheel speed</span> <span class="pv">to</span> currentPower %</div>
+      <div><span class="pk">while</span> running <span class="pk">and</span> elapsed &lt; TEST_DURATION_MS:</div>
+      <div>&nbsp;&nbsp;<span class="pc">// check border — handle if hit</span></div>
+      <div>&nbsp;&nbsp;<span class="pf">pause</span> BORDER_CHECK_MS</div>
+      <div><span class="pf">stop all wheels</span> &nbsp;→&nbsp; <span class="pf">show string</span> <span class="pv">"DONE"</span></div>
+    </div>
+
+    <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">on button B — cycle simulated match time</div>
+    <div class="pseudo-card" style="margin-bottom:0;">
+      <div><span class="pk">if</span> simulatedMatchTime = 0: &nbsp;<span class="pv">set to</span> 60 &nbsp;&nbsp;<span class="pc">// LED: 1 column</span></div>
+      <div><span class="pk">else if</span> simulatedMatchTime = 60: &nbsp;<span class="pv">set to</span> 120 &nbsp;&nbsp;<span class="pc">// LED: 2 columns</span></div>
+      <div><span class="pk">else if</span> simulatedMatchTime = 120: &nbsp;<span class="pv">set to</span> 180 &nbsp;&nbsp;<span class="pc">// LED: 3 columns</span></div>
+      <div><span class="pk">else</span>: &nbsp;<span class="pv">set to</span> 0 &nbsp;&nbsp;<span class="pc">// LED: center dot</span></div>
+    </div>
+
+    <div class="notice-green" style="margin-top:14px; margin-bottom:0; padding:10px 14px;">
+      <strong style="color:var(--green);">simulatedMatchTime</strong> is the key variable. It feeds into <code>computeStats</code>, which recalculates how much power the bot should have at that point in the match. You change it with B — not by waiting for time to pass.
     </div>
   </div>
 
   <div class="card">
+    <div class="card-title">📺 Read the LEDs — Know Your Time</div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">Before each run, check the LED grid. It shows which moment in the match you're about to simulate.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;">
+
+      <div style="background:#0d1b2a; border:2px solid rgba(0,229,255,.4); border-radius:12px; padding:14px; text-align:center;">
+        <div style="font-size:11px; font-weight:800; color:var(--cyan); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">t = 0 s · Start</div>
+        <svg viewBox="0 0 50 50" width="50" height="50" style="display:block; margin:0 auto 10px;">
+          <rect x="0" y="0" width="50" height="50" rx="4" fill="#0a1520"/>
+          <circle cx="25" cy="25" r="4" fill="#00e5ff" opacity="0.9"/>
+        </svg>
+        <div style="font-size:12px; color:var(--muted);">Center dot</div>
+        <div style="font-size:20px; font-weight:800; color:var(--cyan); margin-top:6px;">100%</div>
+        <div style="font-size:11px; color:var(--muted);">endurance %</div>
+      </div>
+
+      <div style="background:#0d1b2a; border:2px solid rgba(0,230,118,.4); border-radius:12px; padding:14px; text-align:center;">
+        <div style="font-size:11px; font-weight:800; color:var(--green); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">t = 60 s · 1 min</div>
+        <svg viewBox="0 0 50 50" width="50" height="50" style="display:block; margin:0 auto 10px;">
+          <rect x="0" y="0" width="50" height="50" rx="4" fill="#0a1520"/>
+          <circle cx="5" cy="5" r="3.5" fill="#00e676" opacity="0.9"/>
+          <circle cx="5" cy="15" r="3.5" fill="#00e676" opacity="0.9"/>
+          <circle cx="5" cy="25" r="3.5" fill="#00e676" opacity="0.9"/>
+          <circle cx="5" cy="35" r="3.5" fill="#00e676" opacity="0.9"/>
+          <circle cx="5" cy="45" r="3.5" fill="#00e676" opacity="0.9"/>
+        </svg>
+        <div style="font-size:12px; color:var(--muted);">1 column lit</div>
+        <div style="font-size:20px; font-weight:800; color:var(--green); margin-top:6px;">~85%</div>
+        <div style="font-size:11px; color:var(--muted);">at E = 10</div>
+      </div>
+
+      <div style="background:#0d1b2a; border:2px solid rgba(255,214,0,.4); border-radius:12px; padding:14px; text-align:center;">
+        <div style="font-size:11px; font-weight:800; color:var(--yellow); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">t = 120 s · 2 min</div>
+        <svg viewBox="0 0 50 50" width="50" height="50" style="display:block; margin:0 auto 10px;">
+          <rect x="0" y="0" width="50" height="50" rx="4" fill="#0a1520"/>
+          <circle cx="5" cy="5" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="5" cy="15" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="5" cy="25" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="5" cy="35" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="5" cy="45" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="15" cy="5" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="15" cy="15" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="15" cy="25" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="15" cy="35" r="3.5" fill="#ffd600" opacity="0.9"/>
+          <circle cx="15" cy="45" r="3.5" fill="#ffd600" opacity="0.9"/>
+        </svg>
+        <div style="font-size:12px; color:var(--muted);">2 columns lit</div>
+        <div style="font-size:20px; font-weight:800; color:var(--yellow); margin-top:6px;">~70%</div>
+        <div style="font-size:11px; color:var(--muted);">at E = 10</div>
+      </div>
+
+      <div style="background:#0d1b2a; border:2px solid rgba(255,82,82,.4); border-radius:12px; padding:14px; text-align:center;">
+        <div style="font-size:11px; font-weight:800; color:var(--red); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">t = 180 s · 3 min</div>
+        <svg viewBox="0 0 50 50" width="50" height="50" style="display:block; margin:0 auto 10px;">
+          <rect x="0" y="0" width="50" height="50" rx="4" fill="#0a1520"/>
+          <circle cx="5"  cy="5"  r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="5"  cy="15" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="5"  cy="25" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="5"  cy="35" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="5"  cy="45" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="15" cy="5"  r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="15" cy="15" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="15" cy="25" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="15" cy="35" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="15" cy="45" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="25" cy="5"  r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="25" cy="15" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="25" cy="25" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="25" cy="35" r="3.5" fill="#ff5252" opacity="0.9"/>
+          <circle cx="25" cy="45" r="3.5" fill="#ff5252" opacity="0.9"/>
+        </svg>
+        <div style="font-size:12px; color:var(--muted);">3 columns lit</div>
+        <div style="font-size:20px; font-weight:800; color:var(--red); margin-top:6px;">~55%</div>
+        <div style="font-size:11px; color:var(--muted);">at E = 10</div>
+      </div>
+
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-top:12px;">The endurance % shown above is for E = 10. Your actual values will differ based on your Endurance stat.</p>
+  </div>
+
+  <div class="card">
     <div class="card-title">Step-by-Step — Build Your Program</div>
+
     <div class="phase-block" style="background:rgba(0,229,255,.07); border:1px solid rgba(0,229,255,.25);">
       <div class="phase-title" style="color:var(--cyan);">Phase 1 — Open the Starter Program</div>
       <ol class="step-list" style="padding:0;">
         <li class="step-item">
           <div class="step-num" style="background:var(--cyan); font-size:11px;">1</div>
-          <div class="step-text">Open MakeCode and sign in. Then go to this link:<br>
+          <div class="step-text">Open MakeCode and sign in. Go to this link:<br>
             <a href="https://makecode.microbit.org/S64256-60132-71836-06952" target="_blank" style="color:var(--cyan); font-weight:700; word-break:break-all;">makecode.microbit.org/S64256-60132-71836-06952</a><br>
-            <span style="font-size:12px; color:var(--muted);">This opens the starter program with the loop structure already built.</span>
+            <span style="font-size:12px; color:var(--muted);">The starter already has the Button A loop, Button B cycle, and computeStats function built. You're entering your stats, not building from scratch.</span>
           </div>
         </li>
         <li class="step-item">
           <div class="step-num" style="background:var(--cyan); font-size:11px;">2</div>
-          <div class="step-text">Click <strong>Edit</strong> to open it in the editor. You'll see the <code>on start</code> and <code>on button B</code> blocks already there.</div>
+          <div class="step-text">Click <strong>Edit</strong> to open it. You should see five blocks: <code>on start</code>, <code>on button A</code>, <code>on button B</code>, <code>on button A+B</code>, and <code>function computeStats</code>.</div>
         </li>
       </ol>
     </div>
+
     <div class="phase-block" style="background:rgba(220,20,60,.08); border:1px solid rgba(220,20,60,.25);">
-      <div class="phase-title" style="color:#dc143c;">Phase 2 — Set Your Stats</div>
+      <div class="phase-title" style="color:#dc143c;">Phase 2 — Enter Your Stats</div>
       <ol class="step-list" style="padding:0;">
         <li class="step-item">
           <div class="step-num" style="background:#dc143c; font-size:11px;">3</div>
-          <div class="step-text">Inside <strong>on start</strong>, find <code>set SPEED to ___</code>. Click the number and type your Speed stat from your stat card.</div>
+          <div class="step-text">In <code>on start</code>, find <code>set SPEED to 0</code>. Click the <strong>0</strong> and type your Speed stat from your stat card.</div>
         </li>
         <li class="step-item">
           <div class="step-num" style="background:#dc143c; font-size:11px;">4</div>
-          <div class="step-text">Find <code>set ENDURANCE to ___</code>. Type your Endurance stat. This is the number that controls your decay rate.</div>
+          <div class="step-text">Find <code>set ENDURANCE to 0</code>. Click the <strong>0</strong> and type your Endurance stat. This controls how much power drops each minute.</div>
         </li>
         <li class="step-item">
           <div class="step-num" style="background:#dc143c; font-size:11px;">5</div>
-          <div class="step-text">Check: <code>motorPower = SPEED × 100 ÷ 20</code> should already be there. If not, add it from the <strong style="color:#dc143c;">Variables</strong> category. This sets your top speed.</div>
-        </li>
-        <li class="step-item">
-          <div class="step-num" style="background:#dc143c; font-size:11px;">6</div>
-          <div class="step-text">Make sure <code>DURATION = 180</code> is set. That's 3 minutes in seconds — the full match length.</div>
-        </li>
-        <li class="step-item">
-          <div class="step-num" style="background:#dc143c; font-size:11px;">7</div>
-          <div class="step-text">Find <code>set DECAY_RATE to 20 &minus; ENDURANCE</code>. Confirm the number matches what you calculated: DECAY_RATE = 20 &minus; your E value.</div>
+          <div class="step-text">Confirm <code>TEST_DURATION_MS = 2000</code>. That's a 2-second burst — short enough to mark safely, long enough to measure a clear distance.</div>
         </li>
       </ol>
     </div>
+
     <div class="phase-block" style="background:rgba(0,140,140,.08); border:1px solid rgba(0,140,140,.25);">
-      <div class="phase-title" style="color:#008c8c;">Phase 3 — Check the Decay Loop</div>
+      <div class="phase-title" style="color:#008c8c;">Phase 3 — Check computeStats</div>
       <ol class="step-list" style="padding:0;">
         <li class="step-item">
+          <div class="step-num" style="background:#008c8c; font-size:11px;">6</div>
+          <div class="step-text">Open the <code>computeStats</code> function. Find <code>set DECAY_RATE to 20 &minus; ENDURANCE</code>. This is the decay rate from the formula — it uses your live ENDURANCE variable, so you don't need to change it.</div>
+        </li>
+        <li class="step-item">
+          <div class="step-num" style="background:#008c8c; font-size:11px;">7</div>
+          <div class="step-text">Find <code>set endurancePercent to 100 &minus; DECAY_RATE &times; simulatedMatchTime &divide; 40</code>. This is your formula, adapted. The <strong>÷ 40</strong> converts seconds to minutes and folds in the 1.5 multiplier.</div>
+        </li>
+        <li class="step-item">
           <div class="step-num" style="background:#008c8c; font-size:11px;">8</div>
-          <div class="step-text">Inside the <strong>while loop</strong>, find <code>set t to (running time (ms) &minus; matchStartTime) &divide; 1000</code>. The <strong>÷ 1000</strong> converts milliseconds to seconds.</div>
+          <div class="step-text">Find the floor: <code>set endurancePercent to max of endurancePercent and 20</code>. Power never drops below 20%. The bot keeps moving.</div>
         </li>
         <li class="step-item">
           <div class="step-num" style="background:#008c8c; font-size:11px;">9</div>
-          <div class="step-text">Find <code>set currentPower to 100 &minus; (DECAY_RATE &times; t &divide; 40)</code>. The <strong>÷ 40</strong> is the combined fix for both problems.</div>
-        </li>
-        <li class="step-item">
-          <div class="step-num" style="background:#008c8c; font-size:11px;">10</div>
-          <div class="step-text">Find the floor check: <code>set currentPower to max of currentPower and FLOOR</code>. This prevents the bot from stopping — it holds at minimum speed.</div>
-        </li>
-        <li class="step-item">
-          <div class="step-num" style="background:#008c8c; font-size:11px;">11</div>
-          <div class="step-text">Find <code>set wheelSpeed to motorPower × currentPower ÷ 100</code>. This scales your top speed by remaining power.</div>
+          <div class="step-text">Find <code>set currentPower to round(basePower &times; endurancePercent &divide; 100)</code>. This is the actual wheel speed — your top speed scaled by how much power is left.</div>
         </li>
       </ol>
     </div>
+
     <div class="phase-block" style="background:rgba(114,72,184,.12); border:1px solid rgba(114,72,184,.4);">
       <div class="phase-title" style="color:#b48aff;">Phase 4 — Download</div>
       <ol class="step-list" style="padding:0;">
         <li class="step-item">
-          <div class="step-num" style="background:#7248b8; font-size:11px;">12</div>
+          <div class="step-num" style="background:#7248b8; font-size:11px;">10</div>
           <div class="step-text">Plug your micro:bit v2 into the computer with the USB cable.</div>
         </li>
         <li class="step-item">
-          <div class="step-num" style="background:#7248b8; font-size:11px;">13</div>
-          <div class="step-text">Click the <strong style="color:#b48aff;">⬇ Download</strong> button (top right, purple). Transfer the file to the micro:bit v2.</div>
+          <div class="step-num" style="background:#7248b8; font-size:11px;">11</div>
+          <div class="step-text">Click <strong style="color:#b48aff;">⬇ Download</strong> and transfer the file to the micro:bit.</div>
         </li>
         <li class="step-item">
-          <div class="step-num" style="background:#7248b8; font-size:11px;">14</div>
-          <div class="step-text">Click the <strong>···</strong> next to Download → select <strong>Disconnect</strong>. Then carefully unplug the USB cable.</div>
+          <div class="step-num" style="background:#7248b8; font-size:11px;">12</div>
+          <div class="step-text">Click <strong>···</strong> → <strong>Disconnect</strong>. Unplug the USB cable. The bot is ready.</div>
         </li>
       </ol>
     </div>
   </div>
 
-  <!-- UPDATED: "before you run" checklist now reflects Parts 1 & 2 -->
   <div class="ws-callout">
     <div class="ws-icon">✅</div>
     <div>
       <div class="ws-label">Before you run — check your worksheet</div>
-      <div class="ws-text">Parts 1 and 2 of your worksheet should be complete. You should have:<br><br>
-        ☐ &nbsp;Part 1: Strategic decision circled (stay strong or fade)<br>
-        ☐ &nbsp;Part 2: Endurance allocation written in<br>
-        ☐ &nbsp;Part 2: Decay rate calculated<br>
-        ☐ &nbsp;Part 2: Motor % at minute 2 calculated<br>
-        ☐ &nbsp;Part 2: Expected last-30-second distance estimated
+      <div class="ws-text">
+        Parts 1 and 2 of your worksheet should be complete before you press A.<br><br>
+        ☐ &nbsp;Your SPEED and ENDURANCE stats entered in the code<br>
+        ☐ &nbsp;Decay rate calculated: <code>20 &minus; E</code><br>
+        ☐ &nbsp;endurancePercent predicted for each time point (t = 0, 60, 120, 180)<br>
+        ☐ &nbsp;Expected currentPower predicted for each time point
       </div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">📏 How the Test Works</div>
-    <p style="font-size:14px; color:var(--text); line-height:1.6; margin-bottom:16px;">You don't need 2 meters of space. The bot only travels for 30 seconds at a time — you pick it up, return it to start, and let it run again. You are measuring how far the bot travels in the <strong>same 30-second window</strong> at three different moments in the match.</p>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:16px;">
+    <p style="font-size:14px; color:var(--text); line-height:1.6; margin-bottom:16px;">You run <strong>four 2-second bursts</strong> — one for each simulated match time. Each burst starts from the same line. Tape marks where the bot stops. You measure all four at the end.</p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:20px;">
       <div class="test-cell" style="border-color:rgba(0,229,255,.4);">
-        <div class="test-time" style="color:var(--cyan);">0:00 – 0:30</div>
-        <div class="test-action" style="margin-top:6px;">Run 1. Mark where the bot stops at 0:30. Pick it up.</div>
+        <div class="test-time" style="color:var(--cyan);">Burst 1</div>
+        <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin:4px 0;">t = 0 · Start</div>
+        <div class="test-action">Center dot LED. Bot at full power. Press A.</div>
+      </div>
+      <div class="test-cell" style="border-color:rgba(0,230,118,.4);">
+        <div class="test-time" style="color:var(--green);">Burst 2</div>
+        <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin:4px 0;">t = 60 s · 1 min</div>
+        <div class="test-action">1-column LED. Press B once, then A.</div>
       </div>
       <div class="test-cell" style="border-color:rgba(255,214,0,.4);">
-        <div class="test-time" style="color:var(--yellow);">1:30 – 2:00</div>
-        <div class="test-action" style="margin-top:6px;">Place bot at start at 1:30. Mark at 2:00. Pick it up.</div>
+        <div class="test-time" style="color:var(--yellow);">Burst 3</div>
+        <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin:4px 0;">t = 120 s · 2 min</div>
+        <div class="test-action">2-column LED. Press B again, then A.</div>
       </div>
-      <div class="test-cell" style="border-color:rgba(255,145,0,.4);">
-        <div class="test-time" style="color:var(--orange);">2:30 – 3:00</div>
-        <div class="test-action" style="margin-top:6px;">Place bot at start at 2:30. Mark at 3:00. Measure all three.</div>
+      <div class="test-cell" style="border-color:rgba(255,82,82,.4);">
+        <div class="test-time" style="color:var(--red);">Burst 4</div>
+        <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; margin:4px 0;">t = 180 s · 3 min</div>
+        <div class="test-action">3-column LED. Press B again, then A.</div>
       </div>
     </div>
+
     <div class="measure-card">
       <div class="measure-title">📏 How to Measure</div>
       <ol style="padding-left:20px; display:flex; flex-direction:column; gap:8px;">
-        <li style="font-size:14px; color:var(--text); line-height:1.6;">Put a piece of tape on the floor at the starting line.</li>
-        <li style="font-size:14px; color:var(--text); line-height:1.6;">After each 30-second run, mark where the front of the bot stopped.</li>
-        <li style="font-size:14px; color:var(--text); line-height:1.6;">Measure from the starting tape to each mark using a tape measure.</li>
-        <li style="font-size:14px; color:var(--text); line-height:1.6;">Record all distances in <strong>centimeters (cm)</strong>.</li>
+        <li style="font-size:14px; color:var(--text); line-height:1.6;">Put a piece of tape on the floor — this is the <strong>starting line</strong>. It stays there for all four runs.</li>
+        <li style="font-size:14px; color:var(--text); line-height:1.6;">After each 2-second run, place a piece of tape at the <strong>front of the bot</strong> to mark where it stopped.</li>
+        <li style="font-size:14px; color:var(--text); line-height:1.6;">Move the bot back to the starting line before each new run.</li>
+        <li style="font-size:14px; color:var(--text); line-height:1.6;">After all four runs, measure from the starting tape to each mark. Record in <strong>centimeters (cm)</strong>.</li>
       </ol>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">▶ Run the Test</div>
+    <div class="card-title">▶ Run the Test — Step by Step</div>
     <ol class="step-list" style="padding:0;">
-      <li class="step-item"><div class="step-num" style="font-size:11px;">15</div><div class="step-text">Place the bot at the starting tape. Press <strong>A</strong> to start. Watch the LED bar graph — that's your power draining in real time.</div></li>
-      <li class="step-item"><div class="step-num" style="font-size:11px;">16</div><div class="step-text">At <strong>0:30</strong> — mark the bot's position. Pick up the bot. The timer is still running.</div></li>
-      <li class="step-item"><div class="step-num" style="font-size:11px;">17</div><div class="step-text">Before <strong>1:30</strong> — have the bot back at the starting line. At 1:30, set it down. <strong>Do not press A or B again.</strong></div></li>
-      <li class="step-item"><div class="step-num" style="font-size:11px;">18</div><div class="step-text">At <strong>2:00</strong> — mark the bot's position. Pick it up and place it back at the start by <strong>2:30</strong>.</div></li>
-      <li class="step-item"><div class="step-num" style="font-size:11px;">19</div><div class="step-text">At <strong>2:30</strong> — set the bot down for the final 30 seconds.</div></li>
-      <li class="step-item"><div class="step-num" style="font-size:11px;">20</div><div class="step-text">At <strong>3:00</strong> — the bot stops on its own. Measure all three distances from the starting tape. Record in centimeters.</div></li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">1</div>
+        <div class="step-text">Put a strip of tape on the floor. This is the starting line for all four runs.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">2</div>
+        <div class="step-text">Place the bot at the starting line. Check the LED — it should show the <strong style="color:var(--cyan);">center dot</strong> (t = 0). If it shows columns, press B until you're back to the center dot.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">3</div>
+        <div class="step-text">Press <strong>A</strong>. The bot drives for 2 seconds and stops. Place a piece of tape at the front of the bot to mark where it stopped. This is your <strong style="color:var(--cyan);">Burst 1</strong> mark.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">4</div>
+        <div class="step-text">Move the bot back to the starting line.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">5</div>
+        <div class="step-text">Press <strong>B</strong>. The LED shows <strong style="color:var(--green);">1 column</strong> — the bot is now simulating t = 60 seconds (1 minute into the match).</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">6</div>
+        <div class="step-text">Press <strong>A</strong>. Mark where the bot stops. This is your <strong style="color:var(--green);">Burst 2</strong> mark.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">7</div>
+        <div class="step-text">Move the bot back to start. Press <strong>B</strong> → LED shows <strong style="color:var(--yellow);">2 columns</strong> (t = 120 s, 2 min). Press <strong>A</strong>. Mark where it stops — <strong style="color:var(--yellow);">Burst 3</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">8</div>
+        <div class="step-text">Move the bot back to start. Press <strong>B</strong> → LED shows <strong style="color:var(--red);">3 columns</strong> (t = 180 s, 3 min). Press <strong>A</strong>. Mark where it stops — <strong style="color:var(--red);">Burst 4</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num" style="font-size:11px;">9</div>
+        <div class="step-text">Measure from the starting tape to each of the four marks. Record all distances in centimeters.</div>
+      </li>
     </ol>
     <div class="notice" style="margin-top:16px; margin-bottom:0;">
-      <strong>If the bot doesn't visibly slow down:</strong> Run the full 3 minutes. A bot with high Endurance (E = 15+) has a small decay rate — the difference is real but subtle. The numbers will tell the story.
+      <strong>Emergency stop:</strong> Press <strong>A + B</strong> together at any time. The bot stops immediately and shows an X on the LED.
     </div>
   </div>
 
-  <!-- UPDATED: now reflects 3-row data table, 4 analysis questions, correct part number -->
   <div class="ws-callout">
     <div class="ws-icon">📋</div>
     <div>
-      <div class="ws-label">Worksheet — Part 3: Run &amp; Record</div>
+      <div class="ws-label">Worksheet — Record &amp; Analyze</div>
       <div class="ws-text">
-        After the test, fill in Part 3.<br><br>
-        <strong>Part 3 — Record Your Data:</strong> Fill in all three rows — Formula Predicts / Bot Actually Did / Gap:
-        <ul style="margin-top:8px; padding-left:20px; display:flex; flex-direction:column; gap:6px;">
-          <li>First 30 seconds (0:00–0:30)</li>
-          <li>Middle window (1:30–2:00)</li>
-          <li>Last 30 seconds (2:30–3:00)</li>
-        </ul>
-        <br>Then answer questions 1–4:
-        <ul style="margin-top:8px; padding-left:20px; display:flex; flex-direction:column; gap:6px;">
-          <li>Was your prediction too high, too low, or close?</li>
-          <li>Complete the gap sentence: <em>"The formula predicted ___ at minute 2:30. The bot did ___."</em></li>
-          <li>What did the formula NOT account for? (friction / battery drop / surface differences / other)</li>
-          <li>If you increased Endurance by 2 points, the gap would get smaller / get larger / stay the same</li>
-        </ul>
+        Fill in your data table — one row for each burst:<br><br>
+        ☐ &nbsp;<strong>Burst 1</strong> (t = 0): Formula prediction / Actual distance / Gap<br>
+        ☐ &nbsp;<strong>Burst 2</strong> (t = 60 s): Formula prediction / Actual distance / Gap<br>
+        ☐ &nbsp;<strong>Burst 3</strong> (t = 120 s): Formula prediction / Actual distance / Gap<br>
+        ☐ &nbsp;<strong>Burst 4</strong> (t = 180 s): Formula prediction / Actual distance / Gap<br><br>
+        Then answer the analysis questions: Was your prediction too high or too low? What caused the gap? What would you change in the formula to make it more accurate?
       </div>
     </div>
   </div>
 
   <div class="key-idea">
     <div class="key-idea-label">The Gap Sentence</div>
-    <div class="key-idea-text">A prediction + an observation + a gap = a complete scientific statement. A large gap isn't a failure — it's telling you something the formula doesn't account for. Name one real-world cause of your gap.</div>
-  </div>
-
-  <!-- UPDATED: reflect questions renumbered to 5 and 6 -->
-  <div class="ws-callout">
-    <div class="ws-icon">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14 22 C8 22 4 18 4 13 C4 9 7 6 10 6 C11 6 12 6.5 13 7 C13.5 5.5 15 4 17 4 C20 4 23 7 23 10 C25 10.5 26 12 26 14 C26 17 24 19 22 20 L14 22Z" stroke="var(--cyan)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-        <line x1="14" y1="7" x2="14" y2="22" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
-        <line x1="9" y1="11" x2="19" y2="11" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
-        <line x1="9" y1="15" x2="19" y2="15" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
-        <circle cx="14" cy="11" r="1.5" fill="var(--cyan)" opacity="0.9"/>
-        <circle cx="14" cy="15" r="1.5" fill="var(--cyan)" opacity="0.9"/>
-        <circle cx="9" cy="11" r="1" fill="var(--cyan)" opacity="0.6"/>
-        <circle cx="19" cy="11" r="1" fill="var(--cyan)" opacity="0.6"/>
-        <circle cx="9" cy="15" r="1" fill="var(--cyan)" opacity="0.6"/>
-        <circle cx="19" cy="15" r="1" fill="var(--cyan)" opacity="0.6"/>
-      </svg>
-    </div>
-    <div>
-      <div class="ws-label">Worksheet — Reflect</div>
-      <div class="ws-text">
-        Answer both Reflect questions on your worksheet.<br><br>
-        <strong>Question 5:</strong> What caused the gap? Name at least one real-world factor the formula didn't account for.<br><br>
-        <strong>Question 6:</strong> What would you change in the formula to make it more accurate? There is no wrong answer — this is how models improve.
-      </div>
-    </div>
+    <div class="key-idea-text">Prediction + observation + gap = a complete scientific statement. The formula predicts a perfect machine. Your bot is not a perfect machine. Name one real-world cause of your gap — that's how models improve.</div>
   </div>
 
   <div class="card" style="border-color:rgba(255,82,82,.3);">
     <div class="card-title" style="color:var(--red);">Watch Out — Common Errors</div>
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;"><strong style="color:var(--red);">Forgot ÷ 1000 on time</strong><br><span style="font-size:13px; color:var(--muted);">t is in milliseconds instead of seconds. Decay happens instantly and the bot dies in the first second.</span></div>
-      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;"><strong style="color:var(--red);">While loop set to 30000 instead of 180000</strong><br><span style="font-size:13px; color:var(--muted);">Bot only runs 30 seconds. Match length is 3 minutes = 180,000 ms.</span></div>
-      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;"><strong style="color:var(--red);">DECAY_RATE × (t ÷ 40) instead of DECAY_RATE × t ÷ 40</strong><br><span style="font-size:13px; color:var(--muted);">When t &lt; 40, dividing t first gives 0. Always multiply first, divide last.</span></div>
-      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;"><strong style="color:var(--red);">Missing floor check</strong><br><span style="font-size:13px; color:var(--muted);">Without <code>set currentPower to max of currentPower and FLOOR</code>, the bot may stop mid-run instead of running at minimum speed.</span></div>
+      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;">
+        <strong style="color:var(--red);">Pressed B too many times</strong><br>
+        <span style="font-size:13px; color:var(--muted);">B cycles 0 → 60 → 120 → 180 → 0. Check the LED pattern before pressing A. If you're on the wrong time, keep pressing B until you cycle back.</span>
+      </div>
+      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;">
+        <strong style="color:var(--red);">SPEED or ENDURANCE still set to 0</strong><br>
+        <span style="font-size:13px; color:var(--muted);">If the bot doesn't move, check on start. Both values default to 0 in the starter — you must type yours in.</span>
+      </div>
+      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;">
+        <strong style="color:var(--red);">Measuring before the bot fully stops</strong><br>
+        <span style="font-size:13px; color:var(--muted);">Wait for "DONE" to appear on the LED screen before placing your tape mark. The bot stops automatically at 2 seconds.</span>
+      </div>
+      <div style="background:rgba(255,82,82,.07); border-radius:8px; padding:10px 14px;">
+        <strong style="color:var(--red);">Bot hit the border and turned before stopping</strong><br>
+        <span style="font-size:13px; color:var(--muted);">The border detection code will turn the bot away from the edge. If this happens, the distance isn't straight-line. Re-run that burst with the bot positioned away from any border.</span>
+      </div>
     </div>
   </div>
 

@@ -471,9 +471,6 @@
  */
 
 
-// ── Variable declarations ─────────────────────────────────────────────
-
-
 // ── Launch sequence ───────────────────────────────────────────────────
 /**
  * ╔═══════════════════════════════════════════════════════════════════╗
@@ -493,10 +490,10 @@
  * ║    → spins left 90° in place                                      ║
  * ║  • CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)   ║
  * ║    → spins right 90° in place                                     ║
- * ║  • CutebotPro.pwmCruiseControl(motorPower, motorPower)             ║
+ * ║  • CutebotPro.pwmCruiseControl(currentPower, currentPower)        ║
  * ║    → drives forward at your bot's roam speed                      ║
  * ║  • CutebotPro.runBlockCnt(2)                                      ║
- * ║    → drives exactly 2 units (30 cm each), then stops             ║
+ * ║    → drives exactly 2 units (27 cm each), then stops             ║
  * ║  • CutebotPro.stopImmediately(CutebotProMotors.ALL)               ║
  * ║    → stops all motors                                             ║
  * ║  • basic.pause(500)                                               ║
@@ -522,17 +519,25 @@ function launchSequence() {
 // ── Start match ───────────────────────────────────────────────────────
 input.onButtonPressed(Button.A, function () {
     if (!(matchRunning)) {
+        if (SPEED + ENDURANCE + TURNING + POWER != 20) {
+            basic.showString("ERR")
+            basic.pause(1000)
+            basic.clearScreen()
+            return
+        }
         computeStats()
-        t = 0
+        matchTime = 0
         matchStartTime = input.runningTime()
         matchRunning = true
         ballDetected = false
+        consecutiveBorderHits = 0
         showPhase("\"GO\"")
         launchSequence()
         isRoaming = true
         matchLoop()
     }
 })
+
 
 // ── Endurance bar on LED ──────────────────────────────────────────────
 function showEnduranceBar(num: number) {
@@ -544,6 +549,7 @@ function showEnduranceBar(num: number) {
         }
     }
 }
+
 
 // ── Border detection ──────────────────────────────────────────────────
 function checkBorder() {
@@ -562,92 +568,96 @@ function checkBorder() {
     return 0
 }
 
-function borderOnlyWatch(ms: number) {
-    watchResult = 0
-    elapsed2 = 0
-    while (elapsed2 < ms) {
-        chunk = Math.min(BORDER_CHECK_MS, ms - elapsed2)
-        basic.pause(chunk)
-        elapsed2 += chunk
-        borderSide = checkBorder()
-        if (borderSide > 0) {
-            CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            watchResult = 1
-            return
-        }
-    }
-}
-
-// ── Charge + Follow-Through (border-aware throughout) ─────────────────
-function chargeAndFollowThrough() {
-    chargeHitBorder = false
-    CutebotPro.pwmCruiseControl(chargePower, chargePower)
-    followStart = input.runningTime()
-    while (input.runningTime() - followStart < CHARGE_DURATION_MS) {
-        borderSide = checkBorder()
-        if (borderSide > 0) {
-            CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            handleBorder()
-            chargeHitBorder = true
-            break
-        }
-        basic.pause(CHARGE_CHECK_MS)
-    }
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    if (!chargeHitBorder) {
-        CutebotPro.pwmCruiseControl(motorPower, motorPower)
-        followStart = input.runningTime()
-        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
-            borderSide = checkBorder()
-            if (borderSide > 0) {
-                CutebotPro.stopImmediately(CutebotProMotors.ALL)
-                handleBorder()
-                break
-            }
-            basic.pause(CHARGE_CHECK_MS)
-        }
-        CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    }
-}
 
 // ── Main match loop ───────────────────────────────────────────────────
 function matchLoop() {
     while (matchRunning) {
-        t = (input.runningTime() - matchStartTime) / 1000
-        if (t >= 180) {
+        matchTime = (input.runningTime() - matchStartTime) / 1000
+        if (matchTime >= 180) {
             endMatch()
             break;
+        }
+        // ── 30s warning flash ──
+        if (matchTime >= 150 && matchTime < 151) {
+            basic.showLeds(`
+                # # # # #
+                # . . . #
+                # . # . #
+                # . . . #
+                # # # # #
+                `)
+            basic.pause(400)
+            basic.clearScreen()
         }
         if (ballDetected) {
             isRoaming = false
             CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            basic.pause(500)
+            basic.pause(200)
+            if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+            } else {
+                CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+            }
+            basic.pause(150)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(300)
+            basic.showLeds(`
+                . . # . .
+                . # # # .
+                # # # # #
+                . # # # .
+                . . # . .
+                `)
             chargeAndFollowThrough()
             CutebotPro.stopImmediately(CutebotProMotors.ALL)
             basic.pause(500)
+            dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+            if (dist <= CONTACT_CM || dist > BALL_DETECT_CM) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+                basic.pause(200)
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            }
             ballDetected = false
+            consecutiveBorderHits = 0
             isRoaming = true
             continue;
         }
-        endurancePercent = 100 - DECAY_RATE * t / 40
+        motorPower = SPEED * 100 / 20
+        endurancePercent = 100 - DECAY_RATE * matchTime / 40
         endurancePercent = Math.max(endurancePercent, 20)
         enduranceFactor = endurancePercent / 100
-        effectiveDuration = Math.round(thisDuration * enduranceFactor)
+        currentPower = Math.round(motorPower * enduranceFactor)
+        let powerFloor = Math.max(Math.round(motorPower * 0.20), 10)
+        currentPower = Math.max(currentPower, powerFloor)
+        effectiveDuration = thisDuration
         lastTurnWasLeft = !(lastTurnWasLeft)
         for (let index = 0; index < TURNING; index++) {
-            if (lastTurnWasLeft) {
-                CutebotPro.pwmCruiseControl(motorPower * (1 - turnRatio), motorPower * (1 + turnRatio))
+            if (TURNING == 1) {
+                CutebotPro.pwmCruiseControl(currentPower, currentPower)
+            } else if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(currentPower * (1 - turnRatio), currentPower * (1 + turnRatio))
             } else {
-                CutebotPro.pwmCruiseControl(motorPower * (1 + turnRatio), motorPower * (1 - turnRatio))
+                CutebotPro.pwmCruiseControl(currentPower * (1 + turnRatio), currentPower * (1 - turnRatio))
             }
             driveAndWatch(effectiveDuration)
             CutebotPro.stopImmediately(CutebotProMotors.ALL)
             if (watchResult == 1) {
+                consecutiveBorderHits += 1
+                if (consecutiveBorderHits >= 2) {
+                    lastTurnWasLeft = !(lastTurnWasLeft)
+                    consecutiveBorderHits = 0
+                }
                 handleBorder()
                 break;
             }
             if (watchResult == 2) {
                 ballDetected = true
+                consecutiveBorderHits = 0
+                break;
+            }
+            if (watchResult == 3) {
+                consecutiveBorderHits = 0
+                handleStuck()
                 break;
             }
         }
@@ -657,10 +667,62 @@ function matchLoop() {
     }
 }
 
-// ── Polling helpers ───────────────────────────────────────────────────
+
+// ── Charge + Follow-Through ───────────────────────────────────────────
+function chargeAndFollowThrough() {
+    chargeHitBorder = false
+    let effectiveCharge = Math.round(chargePower * enduranceFactor)
+    effectiveCharge = Math.max(effectiveCharge, 15)
+    basic.showString("C")
+    CutebotPro.pwmCruiseControl(effectiveCharge, effectiveCharge)
+    let contactCount = 0
+    let contactMade = false
+    while (!(chargeHitBorder) && !(contactMade)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            chargeHitBorder = true
+            basic.showString("B")
+            break;
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist <= CONTACT_CM) {
+            contactCount += 1
+            if (contactCount >= 2) {
+                contactMade = true
+            }
+        } else {
+            contactCount = 0
+        }
+        basic.pause(CHARGE_CHECK_MS)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    if (!(chargeHitBorder)) {
+        basic.showString("F")
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        followStart = input.runningTime()
+        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
+            borderSide = checkBorder()
+            if (borderSide > 0) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                handleBorder()
+                break;
+            }
+            basic.pause(CHARGE_CHECK_MS)
+        }
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        CutebotPro.pwmCruiseControl(-1 * currentPower, -1 * currentPower)
+        basic.pause(300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    }
+}
+
+
+// ── Drive + watch for border, ball, and stuck ─────────────────────────
 function driveAndWatch(ms: number) {
     watchResult = 0
     elapsed = 0
+    stuckCount = 0
     while (elapsed < ms) {
         halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
         basic.pause(halfChunk)
@@ -684,13 +746,54 @@ function driveAndWatch(ms: number) {
             return
         }
         dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
-        if (dist > 0 && dist < BALL_DETECT_CM) {
+        if (dist > CONTACT_CM && dist < BALL_DETECT_CM) {
+            stuckCount = 0
             CutebotPro.stopImmediately(CutebotProMotors.ALL)
             watchResult = 2
             return
+        } else if (dist <= CONTACT_CM) {
+            stuckCount += 1
+            if (stuckCount >= STUCK_HITS) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                watchResult = 3
+                return
+            }
+        } else {
+            stuckCount = 0
         }
     }
 }
+
+
+// ── Stuck recovery ────────────────────────────────────────────────────
+function handleStuck() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (lastTurnWasLeft) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        lastTurnWasLeft = false
+    } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        lastTurnWasLeft = true
+    }
+    basic.pause(STUCK_PIVOT_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    isRoaming = true
+}
+
 
 // ── Emergency stop ────────────────────────────────────────────────────
 input.onButtonPressed(Button.AB, function () {
@@ -709,16 +812,19 @@ input.onButtonPressed(Button.AB, function () {
     basic.clearScreen()
 })
 
+
 // ── Compute stats from 20-point budget ───────────────────────────────
 function computeStats() {
-    motorPower = SPEED * 100 / 20
-    chargePower = POWER * POWER
+    currentPower = SPEED * 100 / 20
+    chargePower = Math.min(POWER * POWER, 100)
     FOLLOW_THROUGH_MS = POWER * 200
     totalArcTime = BASE_SEGMENT_MS * 12
     thisDuration = Math.round(totalArcTime / TURNING)
     turnRatio = 0.2 + TURNING * 0.02
+    turnRatio = Math.min(turnRatio, 0.4)
     DECAY_RATE = 20 - ENDURANCE
 }
+
 
 // ── Handle border ─────────────────────────────────────────────────────
 function handleBorder() {
@@ -731,13 +837,17 @@ function handleBorder() {
     basic.pause(100)
     if (borderSide == 1) {
         CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
         lastTurnWasLeft = false
     } else if (borderSide == 2) {
         CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
         lastTurnWasLeft = true
     } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS + 300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
         CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
         basic.pause(BORDER_PIVOT_MS * 2)
         lastTurnWasLeft = false
@@ -759,36 +869,43 @@ function handleBorder() {
     isRoaming = true
 }
 
+
+// ── Show phase label ──────────────────────────────────────────────────
 function showPhase(text: string) {
     basic.showString(text)
     basic.pause(300)
     basic.clearScreen()
 }
 
+
+// ── End match ─────────────────────────────────────────────────────────
 function endMatch() {
     matchRunning = false
     isRoaming = false
     CutebotPro.stopImmediately(CutebotProMotors.ALL)
 }
 
-// ── Variable initializations ──────────────────────────────────────────
+
+// ── Variable declarations ─────────────────────────────────────────────
 let recheck = 0
-let isCharging = false
 let totalArcTime = 0
-let chargePower = 0
 let dist = 0
 let remainChunk = 0
 let halfChunk = 0
 let elapsed = 0
+let FOLLOW_THROUGH_MS = 0
+let followStart = 0
+let chargePower = 0
+let chargeHitBorder = false
 let turnRatio = 0
 let lastTurnWasLeft = false
 let thisDuration = 0
 let effectiveDuration = 0
 let enduranceFactor = 0
 let endurancePercent = 0
+let motorPower = 0
+let currentPower = 0
 let borderSide = 0
-let chunk = 0
-let elapsed2 = 0
 let sensor4State = 0
 let sensor3State = 0
 let sensor2State = 0
@@ -796,49 +913,35 @@ let sensor1State = 0
 let rows = 0
 let ballDetected = false
 let matchStartTime = 0
-let t = 0
+let matchTime = 0
 let isRoaming = false
 let matchRunning = false
 let watchResult = 0
-let motorPower = 0
 let msPerUnit = 0
 let launchActive = false
 let DECAY_RATE = 0
+let stuckCount = 0
+let consecutiveBorderHits = 0
 let POWER = 0
 let TURNING = 0
 let ENDURANCE = 0
 let SPEED = 0
-let UNIT_CM = 0
-let CHARGE_DURATION_MS = 0
-let BORDER_THRESHOLD = 0
-let BASE_SEGMENT_MS = 0
-let BALL_DETECT_CM = 0
-let BACKUP_MS = 0
-let BORDER_PIVOT_POWER = 0
-let BORDER_PIVOT_MS = 0
-let BORDER_CHECK_MS = 0
-let pivotLeft = false
-let FOLLOW_THROUGH_MS = 0
-let followStart = 0
-let chargeHitBorder = false
-let CHARGE_CHECK_MS = 0
+
 
 // ── System constants (do not change) ─────────────────────────────────
-let DRIVE_CHUNK_MS = 150
-BORDER_CHECK_MS = 60
-CHARGE_CHECK_MS = 20
-let PIVOT_MS = 400
-BORDER_PIVOT_MS = 700
-BORDER_PIVOT_POWER = 40
-BACKUP_MS = 600
-BALL_DETECT_CM = 40
-BASE_SEGMENT_MS = 320
-BORDER_THRESHOLD = 200
-CHARGE_DURATION_MS = 800
-let MATCH_DURATION = 180000
-UNIT_CM = 30
+let BORDER_CHECK_MS = 60
+let CHARGE_CHECK_MS = 20
+let BORDER_PIVOT_MS = 400
+let BORDER_PIVOT_POWER = 50
+let BACKUP_MS = 600
+let BALL_DETECT_CM = 40
+let BASE_SEGMENT_MS = 1800
+let BORDER_THRESHOLD = 200
+let UNIT_CM = 27
 let LAUNCH_RIGHT_TURN = 85
-DECAY_RATE = 20 - ENDURANCE
+let CONTACT_CM = 5
+let STUCK_HITS = 3
+let STUCK_PIVOT_MS = 600
 
 
 /**
@@ -854,11 +957,15 @@ DECAY_RATE = 20 - ENDURANCE
  * ║  POWER     → how hard your bot charges when it sees the ball      ║
  * ╚═══════════════════════════════════════════════════════════════════╝
  */
-SPEED = 5        // ← YOUR VALUE HERE  (current total: 20)
-ENDURANCE = 5    // ← YOUR VALUE HERE
-TURNING = 5      // ← YOUR VALUE HERE
-POWER = 5        // ← YOUR VALUE HERE
+SPEED = 0        // ← YOUR VALUE HERE  (current total: 20)
+ENDURANCE = 0    // ← YOUR VALUE HERE
+TURNING = 0      // ← YOUR VALUE HERE
+POWER = 0        // ← YOUR VALUE HERE
 // ─────────────────────────────────────────────────────────────────────
+
+
+// ── Init ──────────────────────────────────────────────────────────────
+DECAY_RATE = 20 - ENDURANCE
 
 
 // ── Forever loop: safety-net border check during roaming ──────────────

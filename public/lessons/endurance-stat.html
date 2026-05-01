@@ -591,26 +591,85 @@
 <section class="section active" id="sec-0">
 
   <div class="section-badge">Section 1 · The Formula</div>
-  <h2 class="section-heading">Power Decay Over Time</h2>
-  <p class="section-sub">
-    Every bot loses power as the match wears on — unless your Endurance stat is high enough to slow the drain.
-    This formula shows exactly how much power your bot has at any minute of a match.
-  </p>
+  <h2 class="section-heading">What Does Endurance Do?</h2>
+  <p class="section-sub">Start with the data. This bot played a full 5-minute match. No formula yet — just watch what happened.</p>
+
+  <!-- Card 1: t=0–3 visible, t=4–5 hidden until prediction committed -->
+  <div class="card" id="s1-observe-card">
+    <div class="card-title">Match Data — Unknown Bot</div>
+    <table class="calc-table">
+      <thead><tr><th>t (min)</th><th>Power</th></tr></thead>
+      <tbody>
+        <tr><td class="t-val">0</td><td class="p-val">100%</td></tr>
+        <tr><td class="t-val">1</td><td class="p-val">79%</td></tr>
+        <tr><td class="t-val">2</td><td class="p-val">58%</td></tr>
+        <tr><td class="t-val">3</td><td class="p-val">37%</td></tr>
+        <tr id="s1-row4" style="display:none;background:rgba(255,209,102,.04);"><td class="t-val">4</td><td class="p-floor" id="s1-val4">20%</td></tr>
+        <tr id="s1-row5" style="display:none;background:rgba(255,209,102,.04);"><td class="t-val">5</td><td class="p-floor">20%</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">What do you notice about how power changes over time?</p>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">Write at least 2 observations. One must include a specific number.</p>
+      <textarea class="reflect-textarea" id="s1-obs-text" placeholder="Observation 1:&#10;Observation 2:" oninput="checkS1Obs()" style="min-height:90px;"></textarea>
+      <div class="char-count" id="s1-obs-count">0 / 40 min</div>
+    </div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Will the power ever reach 0%?</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+          <input type="radio" name="reach-zero" value="yes" onchange="checkS1Obs()"> Yes
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+          <input type="radio" name="reach-zero" value="no" onchange="checkS1Obs()"> No
+        </label>
+      </div>
+    </div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Based on this pattern, what will P(4) be?</p>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <input type="number" class="work-input" id="s1-pred-input" placeholder="?" oninput="checkS1Obs()">
+        <span style="font-size:.875rem;color:var(--slate);">%</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary locked" id="s1-reveal-btn" onclick="revealFloor()">See what actually happened at t=4 →</button>
+  </div>
+
+  <!-- Card 2: Floor mismatch + zero-trap reveal — hidden until prediction committed -->
+  <div id="s1-floor-card" style="display:none;" class="card">
+    <div class="card-title">What Actually Happened</div>
+
+    <!-- P(4) prediction echo -->
+    <p id="s1-prediction-echo" style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.875rem;line-height:1.5;"></p>
+
+    <!-- "Will it reach 0%?" reveal — no correct/incorrect label, just the fact -->
+    <div id="s1-zero-reveal" style="font-size:.875rem;line-height:1.6;padding:.75rem 1rem;border-radius:7px;margin-bottom:.875rem;background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);"></div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Two things just happened that you didn't predict. Explain both in one sentence each. Use math.</p>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">1) Why did power stop falling?&nbsp;&nbsp;2) Why can it never reach 0%?</p>
+      <textarea class="reflect-textarea" id="s1-floor-explain" placeholder="1) Power stopped because...&#10;2) It can't reach 0% because..." oninput="checkFloorExplain()" style="min-height:90px;"></textarea>
+      <div class="char-count" id="s1-floor-count">0 / 30 min</div>
+    </div>
+
+    <button class="btn btn-primary locked" id="s1-formula-btn" onclick="revealFormula()">See the formula →</button>
+  </div>
+
+  <!-- Formula section — revealed only after observations answered -->
+  <div id="formula-reveal" style="display:none;">
 
   <!-- Formula board -->
   <div class="formula-board">
     <div class="formula-text">P(t) = 100 − (20 − E) × 1.5 × t</div>
-    <div class="formula-sub">Power at time t = Base power minus decay</div>
+    <div class="formula-sub">Power at time t · floored at 20%</div>
   </div>
 
-  <!-- 20% floor callout -->
-  <div class="floor-callout">
-    <div class="fc-icon">⚡</div>
-    <div class="fc-body">
-      <strong>Power Floor: 20%</strong><br>
-      The game engine never lets power drop below <strong>20%</strong>. Once the formula would give a result below 20%, power stays locked at 20% for the rest of the match. Your bot never fully dies.
-    </div>
-  </div>
+  <!-- 20% floor note (no callout — they already found it) -->
+  <p style="font-size:.8125rem;color:var(--slate);margin:.5rem 0 1rem;line-height:1.5;">The game engine enforces the floor you found. Once the formula drops below it, power stays locked there for the rest of the match.</p>
 
   <!-- Variable table -->
   <div class="card">
@@ -646,66 +705,34 @@
         </tr>
       </tbody>
     </table>
-    <p style="font-size:.8125rem;color:var(--slate);margin-top:.5rem;">
-      ⚡ If the formula gives less than 20%, power is <strong style="color:var(--yellow)">capped at 20%</strong> — that's the power floor.
-    </p>
   </div>
 
-  <!-- Worked example -->
+  <!-- Full table — no starting values given -->
   <div class="card">
-    <div class="card-title">Worked Example · E = 6</div>
-    <p class="section-sub" style="margin-bottom:.75rem;">
-      With E = 6, the decay rate each minute is:<br>
-      <strong style="color:var(--cyan)">(20 − 6) × 1.5 = 14 × 1.5 = <span style="color:var(--yellow)">21% per minute</span></strong>
-    </p>
-    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:1rem;">
-      The 20% floor kicks in at: <strong style="color:var(--red)">t = 80 ÷ 21 ≈ 3.81 min</strong> — after that, power stays locked at 20%.
-    </p>
-    <table class="calc-table">
-      <thead>
-        <tr>
-          <th>t (min)</th>
-          <th>Calculation</th>
-          <th>P(t)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="t-val">0</span></td>
-          <td class="calc-expr">100 − 21 × 0 = 100 − 0</td>
-          <td><span class="p-val">100%</span></td>
-        </tr>
-        <tr>
-          <td><span class="t-val">1</span></td>
-          <td class="calc-expr">100 − 21 × 1 = 100 − 21</td>
-          <td><span class="p-val">79%</span></td>
-        </tr>
-        <tr>
-          <td><span class="t-val">2</span></td>
-          <td class="calc-expr">100 − 21 × 2 = 100 − 42</td>
-          <td><span class="p-val">58%</span></td>
-        </tr>
-        <tr>
-          <td><span class="t-val">3</span></td>
-          <td class="calc-expr">100 − 21 × 3 = 100 − 63</td>
-          <td><span class="p-val">37%</span></td>
-        </tr>
-        <tr style="background:rgba(255,209,102,.04);">
-          <td><span class="t-val">4</span></td>
-          <td class="calc-expr">100 − 21 × 4 = 16 → <strong style="color:var(--yellow)">⚡ floor</strong></td>
-          <td><span class="p-floor">20%</span></td>
-        </tr>
-        <tr style="background:rgba(255,209,102,.04);">
-          <td><span class="t-val">5</span></td>
-          <td class="calc-expr">100 − 21 × 5 = −5 → <strong style="color:var(--yellow)">⚡ floor</strong></td>
-          <td><span class="p-floor">20%</span></td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="font-size:.8125rem;color:var(--slate);margin-top:.5rem;">
-      Rows highlighted in yellow hit the 20% floor — the formula result was below 20%, so the game engine locked power at 20%.
-    </p>
+    <div class="card-title">Verify the Formula · E = 6</div>
+    <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">Fill in P(t) for E = 6, t = 0 through t = 3. Use the formula. No starting values given.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.625rem;margin-bottom:.75rem;">
+      <div style="text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 0</div>
+        <input type="number" class="work-input" id="verify-t0" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 1</div>
+        <input type="number" class="work-input" id="verify-t1" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 2</div>
+        <input type="number" class="work-input" id="verify-t2" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 3</div>
+        <input type="number" class="work-input" id="verify-t3" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+      </div>
+    </div>
+    <div id="verify-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;"></div>
   </div>
+
+  </div><!-- end #formula-reveal -->
 
   <div class="nav-row">
     <span></span>
@@ -717,62 +744,91 @@
 <section class="section" id="sec-1">
 
   <div class="section-badge">Section 2 · Calculate Your Decay</div>
-  <h2 class="section-heading">Practice Tables</h2>
-  <p class="section-sub">Fill in the missing values. Use the formula: <strong style="color:var(--cyan)">P(t) = 100 − (20 − E) × 1.5 × t</strong></p>
+  <h2 class="section-heading">One Shot, No Hints</h2>
+  <p class="section-sub">No scaffolding. No per-row feedback. You get one submit per table.</p>
 
-  <div class="floor-callout" style="margin-bottom:1.25rem;">
-    <div class="fc-icon">⚡</div>
-    <div class="fc-body">Remember: if your calculation gives less than <strong>20%</strong>, write <strong>20</strong> — that's the power floor.</div>
+  <!-- Deliberate misconception — must engage before Part A -->
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);margin-bottom:1rem;">
+    <div class="card-title" style="color:var(--purple);">Before You Calculate</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">If E doubles from 5 to 10, the time before the bot hits the 20% floor also doubles.</p>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Pick one. Don't calculate yet.</p>
+    <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:.875rem;">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="mc1" value="true" onchange="revealMC1(this)"> True
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="mc1" value="false" onchange="revealMC1(this)"> False
+      </label>
+    </div>
+    <div id="mc1-reveal" style="display:none;font-size:.875rem;line-height:1.6;padding:.75rem 1rem;border-radius:7px;"></div>
   </div>
 
-  <!-- PART A: Scaffolded E=4 -->
+  <!-- PART A: E=4 — no given decay rate -->
   <div class="card">
-    <div class="scaffold-badge">Scaffolded · E = 4</div>
-    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">
-      With E = 4, the decay rate is <strong style="color:var(--cyan)">(20 − 4) × 1.5 = 24% per minute</strong>.
-      Fill in the product (24 × t) and then P(t) for each row. <strong style="color:var(--yellow)">One check per row — no re-tries.</strong> Think before you click.
-    </p>
+    <div class="card-title">E = 4</div>
 
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">First: what is the decay rate when E = 4?</p>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <input type="number" class="work-input" id="a-decay-ans" placeholder="?">
+        <span style="font-size:.875rem;color:var(--slate);">% per minute</span>
+        <span id="a-decay-icon" style="font-size:1.1rem;"></span>
+      </div>
+      <div id="a-decay-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-top:.5rem;"></div>
+    </div>
+
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;">Now fill in P(t) for each minute. One submit.</p>
     <table class="calc-table" id="scaffolded-table">
       <thead>
-        <tr>
-          <th>t</th>
-          <th>24 × t = ?</th>
-          <th>P(t) = 100 − ?</th>
-          <th></th>
-        </tr>
+        <tr><th>t (min)</th><th>P(t)</th></tr>
       </thead>
-      <tbody id="scaffolded-body">
-        <!-- rows inserted by JS -->
-      </tbody>
+      <tbody id="scaffolded-body"></tbody>
     </table>
+    <div class="submit-row">
+      <button class="btn btn-primary" id="submit-a-btn" onclick="submitPartA()">Submit</button>
+      <span id="submit-a-status" style="font-size:.8125rem;color:var(--slate);"></span>
+    </div>
+    <div id="part-a-results" style="margin-top:1rem;display:none;"></div>
   </div>
 
   <div class="section-divider"></div>
 
-  <!-- PART B: Independent E=2 -->
-  <div class="card">
-    <div class="indep-badge">Independent · E = 2</div>
-    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">
-      Now on your own. With E = 2, calculate the full product (decay × t) and P(t) for each minute.
-      <em style="color:var(--slate)">Submit shows correct / incorrect only — no answer reveal.</em>
-    </p>
+  <!-- Trap question: floor misconception — must commit before Part B appears -->
+  <div class="card" id="s2-trap-card" style="background:rgba(255,77,106,.05);border-color:rgba(255,77,106,.25);">
+    <div class="card-title" style="color:var(--red);">Before Part B</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">With E = 2, can your bot's power ever reach 0%?</p>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Pick one and explain your reasoning. Commit before you see Part B.</p>
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:.875rem;">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="trap-q" value="yes" onchange="checkTrap()"> Yes
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="trap-q" value="no" onchange="checkTrap()"> No
+      </label>
+    </div>
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Explain your reasoning:</p>
+      <textarea class="reflect-textarea" id="trap-reason" placeholder="Because..." oninput="checkTrap()" style="min-height:60px;"></textarea>
+      <div class="char-count" id="trap-reason-count">0 / 5 min</div>
+    </div>
+    <button class="btn btn-primary locked" id="trap-commit-btn" onclick="commitTrap()">Commit →</button>
+    <div id="trap-reveal" style="display:none;margin-top:.875rem;"></div>
+  </div>
+
+  <!-- PART B: E=2 — full independence (hidden until trap committed) -->
+  <div class="card" id="s2-partb-card" style="display:none;">
+    <div class="card-title">E = 2</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">Same deal. Figure out the decay rate, then calculate P(t) for each minute.</p>
 
     <table class="calc-table" id="indep-table">
       <thead>
-        <tr>
-          <th>t</th>
-          <th>Full product</th>
-          <th>P(t)</th>
-        </tr>
+        <tr><th>t (min)</th><th>P(t)</th></tr>
       </thead>
-      <tbody id="indep-body">
-        <!-- rows inserted by JS -->
-      </tbody>
+      <tbody id="indep-body"></tbody>
     </table>
 
     <div class="submit-row">
-      <button class="btn btn-primary" id="submit-all-btn" onclick="submitIndep()">Submit All</button>
+      <button class="btn btn-primary" id="submit-all-btn" onclick="submitIndep()">Submit</button>
       <span id="submit-status" style="font-size:.8125rem;color:var(--slate);"></span>
     </div>
     <div id="indep-results" style="margin-top:1rem;display:none;"></div>
@@ -788,8 +844,58 @@
 <section class="section" id="sec-2">
 
   <div class="section-badge">Section 3 · Your Decay Graph</div>
-  <h2 class="section-heading">Visualize the Drop</h2>
-  <p class="section-sub">Drag the Endurance slider and watch the power curve update live. The <span style="color:var(--red);font-weight:700;">red dashed line</span> is the 20% floor. The <span style="color:var(--yellow);font-weight:700;">yellow dashed line</span> marks the 3-minute match end.</p>
+  <h2 class="section-heading">Predict, Then Verify</h2>
+  <p class="section-sub">Commit to two predictions before the slider unlocks. You can't change them after.</p>
+
+  <!-- Prediction gate — must commit before slider appears -->
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);">
+    <div class="card-title" style="color:var(--purple);">Make Your Predictions</div>
+
+    <div style="margin-bottom:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">You just calculated the E=2 table in Part B.</p>
+      <p style="font-size:.875rem;color:var(--slate);margin-bottom:.625rem;">Does your E=2 bot hit the 20% floor before the 3-minute mark?</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-slope" value="yes" onchange="checkPredictions()"> Yes
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-slope" value="no" onchange="checkPredictions()"> No
+        </label>
+      </div>
+    </div>
+
+    <div style="margin-bottom:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">If E increases, the bot hits the 20% floor:</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="sooner" onchange="checkPredictions()"> Sooner
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="later" onchange="checkPredictions()"> Later
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="same" onchange="checkPredictions()"> Same
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary locked" id="commit-predict-btn" onclick="commitPredictions()">Commit predictions →</button>
+    <div id="predict-result" style="display:none;margin-top:.875rem;font-size:.8125rem;padding:.75rem 1rem;border-radius:6px;line-height:1.55;"></div>
+
+    <!-- Explanation gate — appears after commit, unlocks slider -->
+    <div id="pred-explain-card" style="display:none;margin-top:.875rem;">
+      <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+        <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Were you correct? Explain why — for each prediction.</p>
+        <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">No hints. Use the formula. Show the calculation that proves your point.</p>
+        <textarea class="reflect-textarea" id="pred-explain-text" placeholder="Write your explanation here." oninput="checkPredExplain()" style="min-height:80px;"></textarea>
+        <div class="char-count" id="pred-explain-count">0 / 50 min</div>
+      </div>
+      <button class="btn btn-primary locked" id="unlock-slider-btn" onclick="unlockSliderGraph()">See the graph →</button>
+    </div>
+  </div>
+
+  <!-- Slider + graph — hidden until explanation submitted -->
+  <div id="slider-graph-section" style="display:none;">
 
   <!-- Slider -->
   <div class="card">
@@ -906,39 +1012,6 @@
     </div>
   </div>
 
-  <!-- Graph interpretation — forced step before compare -->
-  <div class="card" style="background:rgba(0,229,255,.04);border-color:rgba(0,229,255,.2);">
-    <div class="card-title" style="color:var(--cyan);">Read the Graph · Answer Before Moving On</div>
-    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:1rem;line-height:1.55;">Look at the curve above. Answer both questions.</p>
-
-    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.75rem;">
-      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">
-        Before the floor, does power decrease by the same amount each minute?
-      </p>
-      <div style="display:flex;gap:1.5rem;margin-bottom:.375rem;">
-        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
-          <input type="radio" name="graph-linear" value="yes" onchange="checkGraphQ1()"> YES
-        </label>
-        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
-          <input type="radio" name="graph-linear" value="no" onchange="checkGraphQ1()"> NO
-        </label>
-      </div>
-      <div id="graph-q1-feedback" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-top:.25rem;"></div>
-    </div>
-
-    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;">
-      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">
-        What is that amount? <span style="color:var(--slate);font-weight:500;">(use the decay rate shown above)</span>
-      </p>
-      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
-        <input type="number" class="work-input" id="graph-decay-ans" placeholder="?" style="width:80px;" oninput="checkGraphQ2()">
-        <span style="font-size:.875rem;color:var(--slate);">% per minute</span>
-        <span id="graph-q2-icon" style="font-size:1.1rem;"></span>
-      </div>
-      <div id="graph-q2-feedback" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-top:.5rem;"></div>
-    </div>
-  </div>
-
   <!-- Compare panel -->
   <div class="card">
     <div class="card-title">Compare Two Bots at t = 3 min</div>
@@ -982,6 +1055,17 @@
       </div>
       <div id="compare-faster-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;"></div>
     </div>
+  </div>
+
+  </div><!-- end #slider-graph-section -->
+
+  <!-- Post-prediction accountability — visible immediately (predictions already committed) -->
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);">
+    <div class="card-title" style="color:var(--purple);">Were You Correct?</div>
+    <p id="s3-pred-recall" style="font-size:.875rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Review your two predictions above.</p>
+    <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Explain what the graph shows and whether each prediction was right. Use numbers from the graph — not just "yes" or "no".</p>
+    <textarea class="reflect-textarea" id="s3-accountability" placeholder="My first prediction was... The graph shows... because...&#10;My second prediction was... The graph shows... because..." oninput="checkS3Accountability()" style="min-height:100px;"></textarea>
+    <div class="char-count" id="s3-acc-count">0 / 60 min</div>
   </div>
 
   <div class="nav-row">
@@ -1049,25 +1133,15 @@
   <div class="card">
     <div class="card-title">Question 1 of 3</div>
     <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
-      What shape does your graph make? Why does that shape matter for a match?
+      Write the rule for each phase using math notation.
     </p>
-    <p style="font-size:.8125rem;font-weight:700;color:var(--slate);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;">Circle first, then explain:</p>
-    <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:.875rem;">
-      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q1-shape" value="linear"> Straight line down, then flat
-      </label>
-      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q1-shape" value="curve"> A smooth curve
-      </label>
-      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q1-shape" value="steps"> A step shape
-      </label>
+    <div style="background:var(--navy3);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.875rem;font-size:.9375rem;color:var(--slate);line-height:2.4;letter-spacing:.01em;">
+      Phase 1 &nbsp;(t &le; ___): &nbsp;P(t) &nbsp;= &nbsp;___________________________<br>
+      Phase 2 &nbsp;(t &gt; ___): &nbsp;P(t) &nbsp;= &nbsp;___________________________
     </div>
-    <div class="sentence-frame">
-      <strong>Explain why:</strong> "The graph makes this shape because as time increases, power decreases at a ___ rate. During a match, this means..."
-    </div>
-    <textarea class="reflect-textarea" id="q1-text" placeholder="Type your answer here..." oninput="checkReflect('q1-text','q1-count',10)"></textarea>
-    <div class="char-count" id="q1-count">0 / 10 min</div>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Fill in the blanks with actual formulas and the exact transition time for your current E value. The transition time changes with E — check the reference graph above.</p>
+    <textarea class="reflect-textarea" id="q1-text" placeholder="Write the two rules here." oninput="checkReflect('q1-text','q1-count',40)"></textarea>
+    <div class="char-count" id="q1-count">0 / 40 min</div>
   </div>
 
   <!-- Q2 -->
@@ -1076,30 +1150,18 @@
     <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
       At what minute does your bot drop below 50% power? Show your work.
     </p>
-    <div class="sentence-frame">
-      <strong>Formula:</strong> Solve 100 − (20 − E) × 1.5 × t = 50, so t = 50 ÷ ((20 − E) × 1.5)
-    </div>
 
     <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem;">
       <label style="font-size:.875rem;font-weight:700;">Use E =</label>
-      <input type="number" class="num-input" id="q2-e" min="1" max="20" value="10" oninput="calcQ2()" style="width:70px;">
+      <input type="number" class="num-input" id="q2-e" min="1" max="20" value="10" oninput="checkQ2()" style="width:70px;">
       <span style="font-size:.875rem;color:var(--slate);">→ drops below 50% at t ≈</span>
       <input type="number" step="0.1" class="num-input" id="q2-answer" placeholder="?" oninput="checkQ2()">
       <span style="font-size:.875rem;color:var(--slate);">min</span>
       <span id="q2-icon" style="font-size:1rem;"></span>
     </div>
-    <div id="q2-auto" class="auto-hint" style="display:none;"></div>
-
-    <!-- Interpretation step — connect the math to meaning -->
-    <div style="display:flex;align-items:center;gap:.625rem;flex-wrap:wrap;margin-top:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
-      <span style="font-size:.875rem;font-weight:700;color:#E8EAF2;">This means my bot drops below 50% at minute</span>
-      <input type="number" step="0.1" class="num-input" id="q2-meaning" placeholder="?" style="width:80px;" oninput="checkQ2Meaning()">
-      <span id="q2-meaning-icon" style="font-size:1.1rem;"></span>
-    </div>
-    <div id="q2-meaning-feedback" style="display:none;font-size:.8125rem;margin-top:.375rem;padding:.5rem .75rem;border-radius:5px;"></div>
 
     <p style="font-size:.8125rem;color:var(--slate);margin:.75rem 0 .375rem;">Show your work:</p>
-    <textarea class="reflect-textarea" id="q2-work" placeholder="50 ÷ ((20 − E) × 1.5) = ..." style="min-height:70px;" oninput="checkReflect('q2-work','q2-work-count',5)"></textarea>
+    <textarea class="reflect-textarea" id="q2-work" placeholder="Solve 100 − (20 − E) × 1.5 × t = 50 ..." style="min-height:70px;" oninput="checkReflect('q2-work','q2-work-count',5)"></textarea>
     <div class="char-count" id="q2-work-count">0 / 5 min</div>
   </div>
 
@@ -1107,25 +1169,34 @@
   <div class="card">
     <div class="card-title">Question 3 of 3</div>
     <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
-      A teammate has E = 10. Will their bot hit the 20% floor faster or slower than yours? Why?
+      You have 20 total points. Your teammate is choosing between E = 8 and E = 14. Which should they pick?
     </p>
-    <p style="font-size:.8125rem;font-weight:700;color:var(--slate);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;">Circle first, then explain:</p>
+    <p style="font-size:.875rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Calculate what each option gives at t = 3. Show your work. Then make a recommendation and defend it — including what each choice costs in remaining points.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.875rem;">
+      <div style="background:var(--navy3);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">E = 8</div>
+        <div style="font-size:.875rem;color:#C8CDD8;margin-bottom:.25rem;">P(3) = ?</div>
+        <div style="font-size:.75rem;color:var(--slate);">12 points left</div>
+      </div>
+      <div style="background:var(--navy3);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">E = 14</div>
+        <div style="font-size:.875rem;color:#C8CDD8;margin-bottom:.25rem;">P(3) = ?</div>
+        <div style="font-size:.75rem;color:var(--slate);">6 points left</div>
+      </div>
+    </div>
+
+    <p style="font-size:.8125rem;font-weight:700;color:var(--slate);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;">Pick one, then argue your case:</p>
     <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:.875rem;">
       <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q3-speed"> Their bot hits the floor faster
+        <input type="radio" name="q3-choice" value="e8"> E = 8
       </label>
       <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q3-speed"> Their bot hits the floor slower
-      </label>
-      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
-        <input type="radio" name="q3-speed"> Same speed
+        <input type="radio" name="q3-choice" value="e14"> E = 14
       </label>
     </div>
-    <div class="sentence-frame">
-      <strong>Explain why:</strong> "With E = 10, their decay rate is ___, so they reach 20% at t ≈ ___. Compared to my E = ___, their bot is ___ because..."
-    </div>
-    <textarea class="reflect-textarea" id="q3-text" placeholder="Type your answer here..." oninput="checkReflect('q3-text','q3-count',10)"></textarea>
-    <div class="char-count" id="q3-count">0 / 10 min</div>
+    <textarea class="reflect-textarea" id="q3-text" placeholder="Show P(3) for both, then argue your case..." oninput="checkReflect('q3-text','q3-count',20)"></textarea>
+    <div class="char-count" id="q3-count">0 / 20 min</div>
   </div>
 
   <div id="done-btn-wrap" style="text-align:center;margin-top:1.25rem;display:none;">
@@ -1142,11 +1213,8 @@
 <section class="section" id="sec-4">
 
   <div class="section-badge">Section 5 · Lock In</div>
-  <h2 class="section-heading">Lock in your Endurance allocation.</h2>
-  <p class="section-sub">
-    You've seen how Endurance shapes your bot's power curve. Pick a number now — this is binding for Week 1.
-    You don't know Turning or Power costs yet, but you'll need to leave at least 2 points for them (1 each).
-  </p>
+  <h2 class="section-heading">Solve the constraints. Then lock in.</h2>
+  <p class="section-sub">Two requirements: your bot must stay above 50% power at t = 3, and you must keep at least 8 points for Turning and Power. Solve for the valid range of E — then pick within it.</p>
 
   <div class="card" id="sec4-main">
     <!-- Stat card visual -->
@@ -1201,21 +1269,32 @@
       <div class="budget-note ok" id="budget-note">10 points remain for Turning and Power (Days 3–4)</div>
     </div>
 
-    <!-- Pre-commitment step — force math → decision connection -->
-    <div style="background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:1rem 1.125rem;margin:1.25rem 0 1rem;">
-      <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:.5rem;">Before you lock in</div>
-      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.875rem;">
-        <span style="font-size:.875rem;font-weight:700;color:#E8EAF2;">At t = 3, my power will be:</span>
-        <span id="lock-p3-display" style="font-size:1.875rem;font-weight:800;color:var(--cyan);">55%</span>
+    <!-- Constraint math gate — must solve before lock button enables -->
+    <div style="background:rgba(155,138,255,.06);border:1px solid rgba(155,138,255,.3);border-radius:8px;padding:1rem 1.125rem;margin:1.25rem 0 1rem;">
+      <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.5rem;">Solve This First</div>
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Two constraints — both must hold:</p>
+      <div style="background:var(--navy3);border-radius:6px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.875rem;color:#C8CDD8;line-height:1.8;">
+        1. P(3) &gt; <strong style="color:var(--yellow);">60%</strong> — your bot must stay above 60% power at the 3-minute mark.<br>
+        2. Decay rate &lt; <strong style="color:var(--yellow);">13%/min</strong> — keep decay low to conserve power longer.
       </div>
-      <label style="display:flex;align-items:center;gap:.625rem;cursor:pointer;font-size:.875rem;color:#E8EAF2;font-weight:600;line-height:1.45;">
-        <input type="checkbox" id="precommit-check" onchange="onNameInput()" style="width:16px;height:16px;accent-color:var(--cyan);cursor:pointer;flex-shrink:0;">
-        I've checked this number and understand how long my bot stays competitive.
-      </label>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Set up both inequalities. Solve each for E. The minimum E that satisfies both is your answer — guessing fails when there are two constraints to cross.</p>
+
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.625rem;">
+        <span style="font-size:.875rem;font-weight:700;color:#E8EAF2;">Minimum E =</span>
+        <input type="number" id="constraint-ans" class="work-input" placeholder="?" min="1" max="20" oninput="checkConstraint()" style="width:80px;">
+        <span id="constraint-icon" style="font-size:1.1rem;"></span>
+      </div>
+
+      <div id="constraint-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-bottom:.625rem;line-height:1.55;"></div>
+      <!-- P(3) live display — synced with slider for reference -->
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.5rem;">
+        <span style="font-size:.8125rem;color:var(--slate);">At your current slider value, P(3) =</span>
+        <span id="lock-p3-display" style="font-size:1.25rem;font-weight:800;color:var(--cyan);">55%</span>
+      </div>
     </div>
 
-    <!-- Name input -->
-    <div style="margin-bottom:1rem;">
+    <!-- Name input — only shown after constraint is solved -->
+    <div id="name-input-wrap" style="margin-bottom:1rem;display:none;">
       <label for="student-name" style="display:block;font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Your name</label>
       <input type="text" id="student-name" class="name-input" placeholder="First name, last initial — e.g. Alex M." oninput="onNameInput()" autocomplete="off" />
     </div>
@@ -1291,102 +1370,180 @@ function goSection(idx) {
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-// ── Section 2: Scaffolded table (E=4) ────────────────────────────────────────
-// decay = (20-4)*1.5 = 24/min
-// tFloor = 80/24 ≈ 3.33 min → t=4 and t=5 hit the 20% floor
-const scaffData = [
-  { t:1, product:24,  pt:76 },
-  { t:2, product:48,  pt:52 },
-  { t:3, product:72,  pt:28 },
-  { t:4, product:96,  pt:20 },  // raw=4 → floored at 20%
-  { t:5, product:120, pt:20 },  // raw=-20 → floored at 20%
-];
+// ── Section 1: Prediction-first gate ─────────────────────────────────────────
+// Mystery bot had E=6: decay=21/min. Raw P(4)=16 — below the 20% floor.
 
-const scaffChecked = {};   // track 1-attempt limit per row
+function checkS1Obs() {
+  const text = document.getElementById('s1-obs-text').value.trim();
+  const pred = document.getElementById('s1-pred-input').value;
+  const reachZero = document.querySelector('input[name="reach-zero"]:checked');
+  const count = document.getElementById('s1-obs-count');
+  const btn = document.getElementById('s1-reveal-btn');
+  count.textContent = text.length + ' / 40 min';
+  count.classList.toggle('ready', text.length >= 40);
+  const ready = text.length >= 40 && pred !== '' && !isNaN(parseFloat(pred)) && reachZero !== null;
+  btn.classList.toggle('locked', !ready);
+}
+
+function revealFloor() {
+  const predVal = parseFloat(document.getElementById('s1-pred-input').value);
+  const reachZeroVal = document.querySelector('input[name="reach-zero"]:checked')?.value;
+
+  // Show the hidden rows
+  document.getElementById('s1-row4').style.display = '';
+  document.getElementById('s1-row5').style.display = '';
+
+  // Echo P(4) prediction vs actual
+  const echo = document.getElementById('s1-prediction-echo');
+  if (!isNaN(predVal)) {
+    if (predVal === 20) {
+      echo.innerHTML = 'You predicted P(4) = <strong style="color:var(--green)">' + predVal + '%</strong>. Actual: <strong style="color:var(--yellow)">20%</strong>. You got it — but look at t=5. It stayed at 20% again.';
+    } else {
+      echo.innerHTML = 'You predicted P(4) = <strong style="color:var(--cyan)">' + predVal + '%</strong>. Actual: <strong style="color:var(--yellow)">20%</strong>. The raw formula gives ' + predVal + '%, but the game stopped it at 20%.';
+    }
+  }
+
+  // "Will it reach 0%?" trap reveal — always shown, no validation, just fact
+  const zeroReveal = document.getElementById('s1-zero-reveal');
+  if (reachZeroVal === 'yes') {
+    zeroReveal.innerHTML = 'You said yes. Look at t=4 and t=5. Power stopped at 20% and <em>stayed there</em>. The game engine enforces a floor — power can never drop below 20%, no matter how many minutes pass. You were wrong. That gap between your prediction and reality is what this lesson is about.';
+  } else {
+    zeroReveal.innerHTML = 'You said no — correct. But can you explain why from the data? Power hit 20% and locked there. The game enforces a minimum. That floor is what changes everything about how Endurance works.';
+  }
+
+  // Lock the reveal button
+  const revealBtn = document.getElementById('s1-reveal-btn');
+  revealBtn.disabled = true; revealBtn.style.opacity = '.4';
+
+  // Show floor card
+  const floorCard = document.getElementById('s1-floor-card');
+  floorCard.style.display = 'block';
+  floorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function checkFloorExplain() {
+  const text = document.getElementById('s1-floor-explain').value.trim();
+  const count = document.getElementById('s1-floor-count');
+  const btn = document.getElementById('s1-formula-btn');
+  count.textContent = text.length + ' / 30 min';
+  count.classList.toggle('ready', text.length >= 30);
+  btn.classList.toggle('locked', text.length < 30);
+}
+
+function revealFormula() {
+  const el = document.getElementById('formula-reveal');
+  if (el) { el.style.display = 'block'; el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  const btn = document.getElementById('s1-formula-btn');
+  btn.disabled = true;
+  btn.style.opacity = '.4';
+}
+
+function checkVerify() {
+  const t0 = parseFloat(document.getElementById('verify-t0').value);
+  const t1 = parseFloat(document.getElementById('verify-t1').value);
+  const t2 = parseFloat(document.getElementById('verify-t2').value);
+  const t3 = parseFloat(document.getElementById('verify-t3').value);
+  const fb = document.getElementById('verify-fb');
+  const allFilled = !isNaN(t0) && !isNaN(t1) && !isNaN(t2) && !isNaN(t3);
+  if (!allFilled) { fb.style.display = 'none'; return; }
+  const ok0 = t0 === 100, ok1 = t1 === 79, ok2 = t2 === 58, ok3 = t3 === 37;
+  const setField = (id, ok) => {
+    document.getElementById(id).classList.toggle('correct', ok);
+    document.getElementById(id).classList.toggle('error', !ok);
+  };
+  setField('verify-t0', ok0); setField('verify-t1', ok1);
+  setField('verify-t2', ok2); setField('verify-t3', ok3);
+  fb.style.display = 'block';
+  if (ok0 && ok1 && ok2 && ok3) {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+    fb.textContent = '✓ All four correct. The formula reproduces the mystery data. Move to Section 2.';
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+    const hints = [];
+    if (!ok0) hints.push('P(0): plug t=0 into the formula');
+    if (!ok1) hints.push('P(1): 100 − (20 − 6) × 1.5 × 1 = ?');
+    if (!ok2) hints.push('P(2): 100 − 14 × 1.5 × 2 = ?');
+    if (!ok3) hints.push('P(3): 100 − 14 × 1.5 × 3 = ?');
+    fb.textContent = hints.join(' · ');
+  }
+}
+
+// ── Section 2: E=4 table (P(t) only, single submit) ──────────────────────────
+const scaffData = [
+  { t:1, pt:76 },
+  { t:2, pt:52 },
+  { t:3, pt:28 },
+  { t:4, pt:20 },
+  { t:5, pt:20 },
+];
 
 function buildScaffolded() {
   const tbody = document.getElementById('scaffolded-body');
   scaffData.forEach(row => {
-    const floorRow = row.pt === 20 && row.t >= 4;
-    // Hints guide without giving the answer
-    const hintText = floorRow
-      ? `Does 100 − (24 × ${row.t}) drop below 20%? If so, what does the floor rule say?`
-      : `The decay rate is 24%/min. Try: 24 × ${row.t} = ? Then subtract from 100.`;
     const tr = document.createElement('tr');
-    if (floorRow) tr.style.background = 'rgba(255,209,102,.03)';
-    tr.id = 'sr-' + row.t;
     tr.innerHTML = `
       <td class="t-val">${row.t}</td>
-      <td>
-        <input type="number" class="work-input" id="sp-${row.t}" placeholder="?" aria-label="24 × ${row.t}">
-      </td>
-      <td>
-        <input type="number" class="work-input" id="spt-${row.t}" placeholder="?" aria-label="P(${row.t})">
-      </td>
-      <td>
-        <button class="row-check-btn" onclick="checkScaffRow(${row.t})">Check</button>
-        <span id="si-${row.t}" style="margin-left:.375rem;font-size:1rem;"></span>
-        <div class="hint-box" id="sh-${row.t}">${hintText}</div>
-      </td>
+      <td><input type="number" class="work-input" id="spt-${row.t}" placeholder="?"></td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function checkScaffRow(t) {
-  if (scaffChecked[t]) return;   // already used this row's check
-  scaffChecked[t] = true;
-
-  const row = scaffData.find(r => r.t === t);
-  const prodEl = document.getElementById('sp-' + t);
-  const ptEl   = document.getElementById('spt-' + t);
-  const hint   = document.getElementById('sh-' + t);
-  const icon   = document.getElementById('si-' + t);
-
-  const prodVal = parseFloat(prodEl.value);
-  const ptVal   = parseFloat(ptEl.value);
-  let allOk = true;
-
-  if (prodVal === row.product) {
-    prodEl.classList.add('correct'); prodEl.classList.remove('error');
-  } else {
-    prodEl.classList.add('error'); prodEl.classList.remove('correct'); allOk = false;
+function checkADecay() {
+  const val = parseFloat(document.getElementById('a-decay-ans').value);
+  const icon = document.getElementById('a-decay-icon');
+  const fb = document.getElementById('a-decay-fb');
+  if (isNaN(val)) { icon.textContent = ''; fb.style.display = 'none'; return; }
+  const ok = val === 24;
+  icon.textContent = ok ? '✓' : '✗';
+  icon.style.color = ok ? 'var(--green)' : 'var(--red)';
+  fb.style.display = ok ? 'none' : 'block';
+  if (!ok) {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);margin-top:.5rem;';
+    fb.textContent = 'Use (20 − E) × 1.5 with E = 4.';
   }
-  if (ptVal === row.pt) {
-    ptEl.classList.add('correct'); ptEl.classList.remove('error');
-  } else {
-    ptEl.classList.add('error'); ptEl.classList.remove('correct'); allOk = false;
-  }
-
-  if (allOk) {
-    hint.classList.remove('visible');
-    icon.textContent = '✓';
-    icon.style.color = 'var(--green)';
-  } else {
-    hint.classList.add('visible');
-    icon.textContent = '✗';
-    icon.style.color = 'var(--red)';
-  }
-
-  // Disable the Check button — one attempt only
-  const btn = document.querySelector('#sr-' + t + ' .row-check-btn');
-  if (btn) { btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed'; }
-  // Freeze inputs so they can't silently change after checking
-  prodEl.readOnly = true; ptEl.readOnly = true;
 }
 
-// ── Section 2: Independent table (E=2) ───────────────────────────────────────
+function submitPartA() {
+  const btn = document.getElementById('submit-a-btn');
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
+  // Validate decay rate at submit time (not on input)
+  checkADecay();
+  let correct = 0;
+  let hitsBelowFloor = false;
+  // Raw formula values for E=4 (before floor): t1=76, t2=52, t3=28, t4=4, t5=-20
+  const rawUnfloored = { 1: 76, 2: 52, 3: 28, 4: 4, 5: -20 };
+  scaffData.forEach(row => {
+    const el = document.getElementById('spt-' + row.t);
+    const val = parseFloat(el.value);
+    const ok = val === row.pt;
+    if (ok) correct++;
+    el.classList.toggle('correct', ok);
+    el.classList.toggle('error', !ok);
+    el.readOnly = true;
+    // Detect if student computed the raw formula without applying the floor
+    if (!isNaN(val) && val < 20 && row.pt === 20) hitsBelowFloor = true;
+  });
+  const results = document.getElementById('part-a-results');
+  results.style.display = 'block';
+  const wrong = scaffData.length - correct;
+  if (hitsBelowFloor) {
+    results.innerHTML = `<div style="background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--red);font-weight:700;line-height:1.6;">Your math is right — but the game stops at 20%. Power can't drop below the floor. What does that tell you about the bot's performance in the final minutes?</div>`;
+  } else if (correct === scaffData.length) {
+    results.innerHTML = '<div style="background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--green);font-weight:700;">✓ All correct.</div>';
+  } else {
+    results.innerHTML = `<div style="background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1.125rem;color:var(--yellow);font-weight:700;">${correct} of ${scaffData.length} correct. ${wrong} marked red. Recalculate — no answers given.</div>`;
+  }
+}
+
+// ── Section 2: Independent table (E=2, P(t) only) ────────────────────────────
 // decay = (20-2)*1.5 = 27/min
-// tFloor = 80/27 ≈ 2.96 min → t=3, t=4, t=5 all hit the 20% floor
-// t=3: raw=100-81=19 → clamped to 20
-// t=4: raw=100-108=-8 → clamped to 20
-// t=5: raw=100-135=-35 → clamped to 20
 const indepData = [
-  { t:1, product:27,  pt:73 },
-  { t:2, product:54,  pt:46 },
-  { t:3, product:81,  pt:20 },  // raw=19 → floored at 20%
-  { t:4, product:108, pt:20 },  // raw=-8 → floored at 20%
-  { t:5, product:135, pt:20 },  // raw=-35 → floored at 20%
+  { t:1, pt:73 },
+  { t:2, pt:46 },
+  { t:3, pt:20 },
+  { t:4, pt:20 },
+  { t:5, pt:20 },
 ];
 
 function buildIndep() {
@@ -1395,7 +1552,6 @@ function buildIndep() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="t-val">${row.t}</td>
-      <td><input type="number" class="work-input" id="ip-${row.t}" placeholder="?"></td>
       <td><input type="number" class="work-input" id="ipt-${row.t}" placeholder="?"></td>
     `;
     tbody.appendChild(tr);
@@ -1409,31 +1565,138 @@ function submitIndep() {
   const total = indepData.length;
 
   indepData.forEach(row => {
-    const pv   = parseFloat(document.getElementById('ip-'  + row.t).value);
-    const ptv  = parseFloat(document.getElementById('ipt-' + row.t).value);
-    const pOk  = pv  === row.product;
+    const ptv = parseFloat(document.getElementById('ipt-' + row.t).value);
     const ptOk = ptv === row.pt;
-    if (pOk && ptOk) correct++;
-    const pipEl = document.getElementById('ip-'  + row.t);
+    if (ptOk) correct++;
     const iptEl = document.getElementById('ipt-' + row.t);
-    pipEl.classList.toggle('correct', pOk);  pipEl.classList.toggle('error', !pOk);
-    iptEl.classList.toggle('correct', ptOk); iptEl.classList.toggle('error', !ptOk);
-    // Freeze inputs after submit
-    pipEl.readOnly = true; iptEl.readOnly = true;
+    iptEl.classList.toggle('correct', ptOk);
+    iptEl.classList.toggle('error', !ptOk);
+    iptEl.readOnly = true;
   });
 
-  // Disable submit button — one attempt
   const btn = document.getElementById('submit-all-btn');
   btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
 
-  // Show correct / incorrect summary — no answers revealed
   if (correct === total) {
-    results.innerHTML = '<div style="background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--green);font-weight:700;">✓ All 5 correct — solid work.</div>';
+    results.innerHTML = '<div style="background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--green);font-weight:700;">✓ All correct.</div>';
   } else {
     const wrong = total - correct;
-    results.innerHTML = `<div style="background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1.125rem;color:var(--yellow);font-weight:700;">${correct} of ${total} correct. ${wrong} cell${wrong!==1?'s':''} marked red — check your decay rate and recalculate those rows.</div>`;
+    results.innerHTML = `<div style="background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1.125rem;color:var(--yellow);font-weight:700;">${correct} of ${total} correct. ${wrong} marked red. Recalculate — no answers given.</div>`;
   }
   document.getElementById('submit-status').textContent = '';
+}
+
+// ── Section 2: Trap question (floor misconception) ───────────────────────────
+function checkTrap() {
+  const picked = document.querySelector('input[name="trap-q"]:checked');
+  const reason = document.getElementById('trap-reason').value.trim();
+  const count = document.getElementById('trap-reason-count');
+  const btn = document.getElementById('trap-commit-btn');
+  count.textContent = reason.length + ' / 5 min';
+  count.classList.toggle('ready', reason.length >= 5);
+  btn.classList.toggle('locked', !picked || reason.length < 5);
+}
+
+function commitTrap() {
+  const val = document.querySelector('input[name="trap-q"]:checked')?.value;
+  const reason = document.getElementById('trap-reason').value.trim();
+  if (!val || reason.length < 5) return;
+
+  document.querySelectorAll('input[name="trap-q"]').forEach(r => r.disabled = true);
+  const commitBtn = document.getElementById('trap-commit-btn');
+  commitBtn.disabled = true;
+  commitBtn.style.opacity = '.4';
+
+  const reveal = document.getElementById('trap-reveal');
+  reveal.style.display = 'block';
+
+  if (val === 'no') {
+    reveal.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--green);line-height:1.6;';
+    reveal.innerHTML = '&#10003; Correct. The 20% floor applies to every bot at every E value. Power is clamped by the game engine — it can\'t drop below 20%. E=2 has brutal decay (27%/min), but the floor still holds. Now calculate the table.';
+  } else {
+    reveal.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--red);line-height:1.6;';
+    reveal.innerHTML = '&#10007; No — the 20% floor applies to every bot regardless of E. Look back at the mystery data: power hit 20% and stayed there, even though the raw formula would push it lower. The game engine enforces the floor. Keep that in mind when you fill this table.';
+  }
+
+  // Reveal Part B
+  const partB = document.getElementById('s2-partb-card');
+  partB.style.display = 'block';
+  setTimeout(() => partB.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+}
+
+// ── Section 3: Prediction gate ───────────────────────────────────────────────
+function checkPredictions() {
+  const slope = document.querySelector('input[name="pred-slope"]:checked');
+  const floor = document.querySelector('input[name="pred-floor-timing"]:checked');
+  const btn = document.getElementById('commit-predict-btn');
+  if (slope && floor) {
+    btn.classList.remove('locked');
+  }
+}
+
+function commitPredictions() {
+  const slopeVal = document.querySelector('input[name="pred-slope"]:checked')?.value;
+  const floorVal = document.querySelector('input[name="pred-floor-timing"]:checked')?.value;
+  if (!slopeVal || !floorVal) return;
+
+  // Lock radio inputs
+  document.querySelectorAll('input[name="pred-slope"], input[name="pred-floor-timing"]').forEach(r => r.disabled = true);
+  document.getElementById('commit-predict-btn').disabled = true;
+  document.getElementById('commit-predict-btn').style.opacity = '.4';
+
+  // E=2 hits floor at t = 80/((20-2)*1.5) = 80/27 ≈ 2.96 min → before 3 min → answer is "yes"
+  const slopeCorrect = slopeVal === 'yes';
+  const floorCorrect = floorVal === 'later';      // higher E → hits floor later
+
+  const resultEl = document.getElementById('predict-result');
+  resultEl.style.display = 'block';
+
+  let msg = '';
+  if (slopeCorrect && floorCorrect) {
+    resultEl.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:6px;padding:.75rem 1rem;font-size:.8125rem;color:var(--green);line-height:1.55;margin-top:.875rem;';
+    msg = '✓ Both correct. E=2 decays at 27%/min — hits the floor at t = 80/27 ≈ 2.96 min, just inside the 3-minute match. Now explain why using the formula.';
+  } else {
+    resultEl.style.cssText = 'display:block;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:6px;padding:.75rem 1rem;font-size:.8125rem;color:var(--yellow);line-height:1.55;margin-top:.875rem;';
+    const slopeNote = slopeCorrect ? '' : 'E=2: decay = (20−2)×1.5 = 27%/min. Floor hit at 80/27 = 2.96 min — just before 3 min. ';
+    const floorNote = floorCorrect ? '' : 'Higher E = slower decay = floor hit later. ';
+    msg = slopeNote + floorNote + 'Now explain what the formula tells you.';
+  }
+  resultEl.textContent = msg;
+
+  // Show explanation card — slider stays hidden until they explain
+  document.getElementById('pred-explain-card').style.display = 'block';
+
+  // Populate the post-graph accountability prompt with their committed answers
+  const slopeLbl = slopeVal === 'yes' ? '"Yes"' : '"No"';
+  const floorLbl = floorVal === 'later' ? '"Later"' : floorVal === 'sooner' ? '"Sooner"' : '"Same"';
+  const recall = document.getElementById('s3-pred-recall');
+  if (recall) recall.textContent = 'Your predictions: (1) E=2 hits floor before 3 min → ' + slopeLbl + ' · (2) Higher E hits floor → ' + floorLbl + '. Use the graph numbers to verify or contradict each one.';
+}
+
+// ── Section 3: Post-graph accountability ─────────────────────────────────────
+function checkS3Accountability() {
+  const text = document.getElementById('s3-accountability').value.trim();
+  const count = document.getElementById('s3-acc-count');
+  count.textContent = text.length + ' / 60 min';
+  count.classList.toggle('ready', text.length >= 60);
+}
+
+function checkPredExplain() {
+  const text = document.getElementById('pred-explain-text').value.trim();
+  const count = document.getElementById('pred-explain-count');
+  const btn = document.getElementById('unlock-slider-btn');
+  count.textContent = text.length + ' / 50 min';
+  count.classList.toggle('ready', text.length >= 50);
+  btn.classList.toggle('locked', text.length < 50);
+}
+
+function unlockSliderGraph() {
+  document.getElementById('slider-graph-section').style.display = 'block';
+  const btn = document.getElementById('unlock-slider-btn');
+  btn.disabled = true;
+  btn.style.opacity = '.4';
+  setTimeout(() => document.getElementById('slider-graph-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  updateGraph();
 }
 
 // ── Section 3: Graph ──────────────────────────────────────────────────────────
@@ -1450,16 +1713,7 @@ function updateGraph() {
   const E = parseInt(document.getElementById('e-slider').value);
   document.getElementById('e-display').textContent = E;
 
-  // Reset graph interpretation inputs whenever E changes
-  const gdAns = document.getElementById('graph-decay-ans');
-  const gdIcon = document.getElementById('graph-q2-icon');
-  const gdFb   = document.getElementById('graph-q2-feedback');
-  const gq1Fb  = document.getElementById('graph-q1-feedback');
-  if (gdAns)  { gdAns.value = ''; gdAns.classList.remove('correct','error'); }
-  if (gdIcon) gdIcon.textContent = '';
-  if (gdFb)   gdFb.style.display = 'none';
-  if (gq1Fb)  gq1Fb.style.display = 'none';
-  document.querySelectorAll('input[name="graph-linear"]').forEach(r => r.checked = false);
+  // (graph interpretation inputs removed — prediction gate used instead)
 
   const decayRate = (20 - E) * 1.5;
   const infiniteMatch = E >= 20;
@@ -1685,30 +1939,6 @@ function checkReflect(textId, countId, minLen) {
   checkAllReflect();
 }
 
-function calcQ2() {
-  const E = parseInt(document.getElementById('q2-e').value) || 10;
-  const eClamped = Math.min(20, Math.max(1, E));
-  const decayRate = (20 - eClamped) * 1.5;
-  const autoEl = document.getElementById('q2-auto');
-
-  if (eClamped >= 20) {
-    autoEl.style.display = 'flex';
-    autoEl.innerHTML = '<span class="ah-warn">⚠</span> E=20 means no decay — bot never drops below 50%.';
-    return;
-  }
-
-  const tExact = 50 / decayRate;
-  autoEl.style.display = 'flex';
-  autoEl.innerHTML = `<span class="ah-check">→</span> Auto-calc: t = 50 ÷ (${decayRate.toFixed(1)}) = <strong style="color:var(--cyan)">${tExact.toFixed(2)} min</strong>`;
-  // Reset interpretation step when E changes
-  const mEl = document.getElementById('q2-meaning');
-  const mIcon = document.getElementById('q2-meaning-icon');
-  const mFb = document.getElementById('q2-meaning-feedback');
-  if (mEl) { mEl.value = ''; mEl.classList.remove('correct','error'); }
-  if (mIcon) mIcon.textContent = '';
-  if (mFb) mFb.style.display = 'none';
-  checkQ2();
-}
 
 function checkQ2() {
   const E = parseInt(document.getElementById('q2-e').value) || 10;
@@ -1728,10 +1958,11 @@ function checkQ2() {
 }
 
 function checkAllReflect() {
-  const q1ok = document.getElementById('q1-text').value.trim().length >= 10;
+  const q1ok = document.getElementById('q1-text').value.trim().length >= 40;
   const q2ans = parseFloat(document.getElementById('q2-answer').value);
   const q2workOk = document.getElementById('q2-work').value.trim().length >= 5;
-  const q3ok = document.getElementById('q3-text').value.trim().length >= 10;
+  const q3ok = document.getElementById('q3-text').value.trim().length >= 20;
+  const q3picked = document.querySelector('input[name="q3-choice"]:checked');
 
   const E = parseInt(document.getElementById('q2-e').value) || 10;
   const eClamped = Math.min(20, Math.max(1, E));
@@ -1739,7 +1970,7 @@ function checkAllReflect() {
   const tExact = eClamped >= 20 ? null : 50 / decayRate;
   const q2numOk = tExact !== null ? (!isNaN(q2ans) && Math.abs(q2ans - tExact) < 0.15) : true;
 
-  const allDone = q1ok && q2numOk && q2workOk && q3ok;
+  const allDone = q1ok && q2numOk && q2workOk && q3ok && !!q3picked;
   const doneBtnWrap = document.getElementById('done-btn-wrap');
   doneBtnWrap.style.display = allDone ? 'block' : 'none';
 }
@@ -1797,13 +2028,10 @@ function onLockSliderChange() {
   document.getElementById('sc-endurance-pts').textContent = pts;
   document.getElementById('sc-endurance-sub').textContent = 'decay ' + decayRate.toFixed(1) + '%/min';
 
-  // Sync pre-commitment t=3 display
+  // Sync P(3) live display in the constraint gate
   const p3 = Math.round(calcP(pts, 3));
   const p3El = document.getElementById('lock-p3-display');
   if (p3El) { p3El.textContent = p3 + '%'; p3El.style.color = powerColor(p3); }
-  // Reset checkbox so they have to re-confirm after changing the slider
-  const precheck = document.getElementById('precommit-check');
-  if (precheck) { precheck.checked = false; }
   // Re-evaluate lock button state
   onNameInput();
 
@@ -1822,10 +2050,49 @@ function onLockSliderChange() {
   }
 }
 
+// ── Section 5: Constraint gate ────────────────────────────────────────────────
+// Constraint 1: P(3) > 50 → 100 − (20−E)×4.5 > 50 → (20−E) < 11.11 → E > 8.89 → min E = 9
+// Constraint 2: leave ≥8 pts → E ≤ 20 − (priorSpeed||0) − 8
+// Valid range (no prior speed): 9 ≤ E ≤ 12
+let constraintSolved = false;
+
+// Dual constraints: P(3) > 60 AND decay < 13%/min
+// P(3) > 60: 100 − (20−E)×4.5 > 60 → (20−E) < 8.89 → E > 11.11 → E ≥ 12
+// Decay < 13: (20−E)×1.5 < 13 → (20−E) < 8.67 → E > 11.33 → E ≥ 12
+// Both give the same boundary: minimum E = 12
+function checkConstraint() {
+  const ans = parseInt(document.getElementById('constraint-ans').value);
+  const icon = document.getElementById('constraint-icon');
+  const fb = document.getElementById('constraint-fb');
+  if (isNaN(ans) || ans < 1 || ans > 20) {
+    icon.textContent = ''; fb.style.display = 'none';
+    constraintSolved = false; onNameInput(); return;
+  }
+  const p3 = calcP(ans, 3);
+  const decay = (20 - ans) * 1.5;
+  icon.textContent = ans === 12 ? '✓' : '✗';
+  icon.style.color = ans === 12 ? 'var(--green)' : 'var(--red)';
+  fb.style.display = 'block';
+  if (ans === 12) {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);line-height:1.55;';
+    fb.innerHTML = '&#10003; Correct. Both constraints give E &gt; 11.33 → minimum integer is 12.<br>E = 12: P(3) = 100 &minus; 8&times;4.5 = 64% &gt; 60% &#10003; &nbsp;&nbsp;Decay = 8&times;1.5 = 12%/min &lt; 13% &#10003;<br>E = 11: P(3) = 59.5% ✗ &nbsp;E = 11 fails. Now choose your E with that floor in mind.';
+    constraintSolved = true;
+    document.getElementById('name-input-wrap').style.display = 'block';
+  } else if (ans < 12) {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);line-height:1.55;';
+    fb.innerHTML = '&#10007; E = ' + ans + ': P(3) = ' + p3 + '%, decay = ' + decay.toFixed(1) + '%/min. At least one constraint fails. Set up both inequalities: (1) 100&minus;(20&minus;E)&times;4.5 &gt; 60, (2) (20&minus;E)&times;1.5 &lt; 13. Solve for E.';
+    constraintSolved = false;
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--yellow);line-height:1.55;';
+    fb.innerHTML = '&#10007; E = ' + ans + ' satisfies both, but it\'s not the minimum. Solve the inequalities — find the exact boundary, then take the smallest integer above it.';
+    constraintSolved = false;
+  }
+  onNameInput();
+}
+
 function onNameInput() {
-  const name     = document.getElementById('student-name').value.trim();
-  const checked  = document.getElementById('precommit-check')?.checked ?? false;
-  document.getElementById('lock-btn').disabled = name.length < 1 || !checked;
+  const name = document.getElementById('student-name')?.value.trim() ?? '';
+  document.getElementById('lock-btn').disabled = name.length < 1 || !constraintSolved;
 }
 
 function openLockModal() {
@@ -2005,37 +2272,27 @@ function checkCompareFaster() {
   }
 }
 
-// ── Q2: interpretation step ───────────────────────────────────────────────────
-function checkQ2Meaning() {
-  const E = parseInt(document.getElementById('q2-e').value) || 10;
-  const eClamped = Math.min(20, Math.max(1, E));
-  const decayRate = (20 - eClamped) * 1.5;
-  if (eClamped >= 20) return;
-  const tExact = 50 / decayRate;
-  const ans  = parseFloat(document.getElementById('q2-meaning').value);
-  const icon = document.getElementById('q2-meaning-icon');
-  const fb   = document.getElementById('q2-meaning-feedback');
-  if (isNaN(ans)) { if (icon) icon.textContent = ''; if (fb) fb.style.display = 'none'; return; }
-  const ok = Math.abs(ans - tExact) < 0.15;
-  if (icon) { icon.textContent = ok ? '✓' : '✗'; icon.style.color = ok ? 'var(--green)' : 'var(--red)'; }
-  if (fb) {
-    fb.style.display = 'block';
-    if (ok) {
-      fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
-      fb.textContent = `✓ Correct. At t ≈ ${tExact.toFixed(2)} min, your bot's power hits exactly 50%.`;
-    } else {
-      fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
-      fb.textContent = `✗ That doesn't match. Go back to your calculation — what t value did you get?`;
-    }
+
+// ── Section 2: Misconception reveal ──────────────────────────────────────────
+function revealMC1(radioEl) {
+  document.querySelectorAll('input[name="mc1"]').forEach(r => r.disabled = true);
+  const reveal = document.getElementById('mc1-reveal');
+  reveal.style.display = 'block';
+  if (radioEl.value === 'false') {
+    // Correct
+    reveal.style.cssText = 'display:block;background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--green);line-height:1.6;';
+    reveal.innerHTML = '✓ Correct — but not for the reason you might expect. <br><br>E=5 decay: (20−5)×1.5 = 22.5/min → floor at t = 80/22.5 = <strong>3.6 min</strong>.<br>E=10 decay: (20−10)×1.5 = 15/min → floor at t = 80/15 = <strong>5.3 min</strong>.<br><br>5.3 ÷ 3.6 ≈ 1.47 — not 2. Doubling E does <strong>not</strong> double the time. The relationship is non-linear because E shifts the decay rate, which is already inside the formula. Verify it yourself when you calculate Part A.';
+  } else {
+    // Wrong
+    reveal.style.cssText = 'display:block;background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--red);line-height:1.6;';
+    reveal.innerHTML = '✗ Actually false — but the reason matters. <br><br>E=5 decay: (20−5)×1.5 = 22.5/min → floor at t = 80/22.5 = <strong>3.6 min</strong>.<br>E=10 decay: (20−10)×1.5 = 15/min → floor at t = 80/15 = <strong>5.3 min</strong>.<br><br>5.3 ÷ 3.6 ≈ 1.47 — not 2. Doubling E only roughly <em>halves the decay rate</em> if you started at E=0. Because E offsets (20−E), the multiplier depends on where you start. Now go calculate Part A and see where the floor actually appears.';
   }
-  checkAllReflect();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 buildScaffolded();
 buildIndep();
 updateGraph();
-calcQ2();
 initLockSection();
 // Set initial progress (section 0 of 5 = 20%)
 document.getElementById('progress-bar').style.width = '20%';

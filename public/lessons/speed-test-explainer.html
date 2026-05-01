@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speed Test Program · Code Explainer · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0D0D1A;
+      --navy2:  #161A2E;
+      --navy3:  #1E2240;
+      --cyan:   #00E5FF;
+      --teal:   #007A99;
+      --slate:  #8899AA;
+      --border: #222840;
+      --card:   #161A2E;
+      --green:  #00C97A;
+      --red:    #FF4D6A;
+      --yellow: #FFD166;
+      --orange: #FF8C42;
+      --purple: #BD7AFF;
+      --text:   #E8EAF2;
+      --muted:  #9AA3B2;
+      --mono:   'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      display: flex; gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub {
+      font-size: .9375rem; color: var(--muted);
+      line-height: 1.6; max-width: 600px;
+    }
+
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .75rem; }
+
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+    @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    /* Button cards */
+    .btn-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .btn-badge {
+      display: inline-block;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .btn-badge.a  { background: rgba(0,229,255,.15);  color: var(--cyan);   border: 1px solid rgba(0,229,255,.3); }
+    .btn-badge.b  { background: rgba(255,209,102,.12); color: var(--yellow); border: 1px solid rgba(255,209,102,.25); }
+    .btn-badge.ab { background: rgba(255,76,106,.12);  color: var(--red);    border: 1px solid rgba(255,76,106,.25); }
+    .btn-card h3  { font-size: .9375rem; font-weight: 700; margin-bottom: .4rem; }
+    .btn-card p   { font-size: .8125rem; color: var(--muted); line-height: 1.55; }
+
+    /* LED display */
+    .led-grid { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .led-item {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem 1rem;
+      display: flex; align-items: center; gap: .875rem;
+      min-width: 200px; flex: 1;
+    }
+    .led-visual {
+      flex-shrink: 0; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .led-number {
+      font-family: var(--mono); font-size: 1.625rem; font-weight: 700; color: var(--cyan);
+    }
+    .led-desc { font-size: .8125rem; color: var(--muted); line-height: 1.45; }
+    .led-desc strong { color: var(--text); }
+
+    /* LED dot grid for X pattern */
+    .led-dots {
+      display: grid; grid-template-columns: repeat(5, 7px); gap: 2px;
+    }
+    .ld { width: 7px; height: 7px; border-radius: 50%; }
+    .ld.on  { background: #FF4D6A; }
+    .ld.off { background: rgba(255,255,255,.08); }
+
+    /* Bar graph preview */
+    .bar-preview {
+      display: grid; grid-template-columns: repeat(5, 7px); gap: 2px;
+      align-items: end; height: 44px;
+    }
+    .bp-col { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+    .bp-dot { width: 7px; height: 7px; border-radius: 1px; }
+    .bp-dot.on  { background: var(--cyan); }
+    .bp-dot.off { background: rgba(255,255,255,.08); }
+
+    /* Formula box */
+    .formula-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: .625rem;
+    }
+    .formula-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .4rem;
+    }
+    .formula-eq { font-family: var(--mono); font-size: .9375rem; color: var(--cyan); margin-bottom: .375rem; }
+    .formula-note { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .formula-note strong { color: var(--yellow); }
+
+    /* Callouts */
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: .75rem; font-size: .8125rem; line-height: 1.55;
+    }
+    .callout.info   { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: #c0e8f0; }
+    .callout.warn   { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.2); color: #f0e0b0; }
+    .callout.danger { background: rgba(255,76,106,.07); border: 1px solid rgba(255,76,106,.2); color: #f0b8c0; }
+    .callout-icon   { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout strong { display: block; margin-bottom: .2rem; }
+
+    /* Sequence flow */
+    .flow { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: .5rem; }
+    .flow-step {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem .875rem;
+      min-width: 100px; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: .35rem;
+    }
+    .flow-icon { font-size: 1.25rem; }
+    .flow-name { font-size: .6375rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text); }
+    .flow-desc { font-size: .6125rem; color: var(--muted); line-height: 1.4; }
+    .flow-arrow { color: var(--slate); font-size: 1rem; padding: 0 .2rem; flex-shrink: 0; }
+
+    /* Speed × Power table */
+    .sp-table { width: 100%; border-collapse: collapse; }
+    .sp-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .sp-table td { padding: .45rem .75rem; border-bottom: 1px solid rgba(34,40,64,.5); font-size: .8125rem; }
+    .sp-table tr.highlight td { background: rgba(0,229,255,.05); }
+    .bar-wrap { display: flex; align-items: center; gap: .5rem; }
+    .bar-bg   { flex: 1; height: 7px; background: var(--navy3); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .bar-pct  { font-family: var(--mono); font-size: .75rem; font-weight: 700; min-width: 2.75rem; text-align: right; }
+
+    /* Interactive calculator */
+    .calc-wrap {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .calc-header {
+      background: var(--navy3); border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .calc-header-title { font-size: .9375rem; font-weight: 800; }
+    .calc-body { padding: 1.5rem; }
+
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-top {
+      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .4rem;
+    }
+    .slider-name { font-size: .8125rem; font-weight: 700; }
+    .slider-val  { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 3px; outline: none; cursor: pointer;
+      background: var(--navy3); accent-color: var(--cyan);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; border: 2px solid var(--navy2);
+      background: var(--cyan); cursor: pointer;
+    }
+    .slider-sub { font-size: .6875rem; color: var(--muted); margin-top: .25rem; }
+
+    .outputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1.25rem; }
+    @media (max-width: 520px) { .outputs-grid { grid-template-columns: 1fr 1fr; } }
+    .out-cell {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem 1rem; text-align: center;
+    }
+    .out-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .4rem; }
+    .out-val   { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+    .out-unit  { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* Power meter */
+    .power-meter {
+      margin-top: 1.5rem;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+    }
+    .pm-label {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .75rem;
+    }
+    .pm-track {
+      width: 100%; height: 18px; background: rgba(255,255,255,.06);
+      border-radius: 9px; overflow: hidden; position: relative;
+    }
+    .pm-fill {
+      height: 100%; border-radius: 9px;
+      background: linear-gradient(90deg, var(--teal), var(--cyan));
+      transition: width .25s;
+    }
+    .pm-markers {
+      display: flex; justify-content: space-between;
+      margin-top: .4rem; font-family: var(--mono);
+      font-size: .6375rem; color: var(--slate);
+    }
+    .pm-markers span:not(:first-child):not(:last-child) { color: rgba(136,153,170,.5); }
+
+    /* Constants table */
+    .const-table { width: 100%; border-collapse: collapse; }
+    .const-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .const-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .8125rem; }
+    .const-name { font-family: var(--mono); color: var(--cyan); }
+    .const-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-note { color: var(--muted); font-size: .775rem; }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/lessons">← Lessons</a>
+  <a href="/lessons/speed-test-explainer.html" style="color:var(--cyan)">Speed Test</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">Code Explainer · BBC micro:bit v2 + Cutebot Pro</div>
+    <h1 class="page-title">Speed Test Program</h1>
+    <p class="page-sub">This program drives the bot straight for 2 seconds at whatever SPEED you've set — so you can see how far it travels at different motorPower values. Press B to cycle through your stat SPEED without re-flashing.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- BUTTON CONTROLS -->
+  <div class="section">
+    <div class="section-label">Button Controls</div>
+    <div class="grid-3">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>Run the test</h3>
+        <p>Shows SPEED stat and power bar, then drives straight for 2 seconds and stops.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>Cycle SPEED</h3>
+        <p>Steps SPEED from 1 → 2 → … → 20 → back to 1 without re-flashing. Shows new value on LED.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge ab">A + B</div>
+        <h3>Emergency stop</h3>
+        <p>Immediately cuts both motors during a run. Shows X on LED and clears after 500 ms.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEQUENCE -->
+  <div class="section">
+    <div class="section-label">What happens when you press A</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">🔢</div>
+        <div class="flow-name">Show SPEED</div>
+        <div class="flow-desc">Scrolls SPEED value on LED — 800 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📊</div>
+        <div class="flow-name">Power bar</div>
+        <div class="flow-desc">Bar graph shows motor % — 800 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">⏱️</div>
+        <div class="flow-name">Pause</div>
+        <div class="flow-desc">Screen clears — 500 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,229,255,.35)">
+        <div class="flow-icon">🚗</div>
+        <div class="flow-name">Drive</div>
+        <div class="flow-desc">Both motors at currentPower for 2 000 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🛑</div>
+        <div class="flow-name">Stop</div>
+        <div class="flow-desc">Both motors cut immediately</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,201,122,.3)">
+        <div class="flow-icon" style="font-size:.875rem;line-height:1.3;">✕<br><span style="font-size:.55rem;color:var(--green)">LED</span></div>
+        <div class="flow-name">Done</div>
+        <div class="flow-desc">X pattern 500 ms then clear</div>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">ℹ️</span>
+      <div>The preview phase (SPEED scroll + power bar) takes about 2.1 seconds before the bot moves. The 2-second drive timer starts the moment wheels begin turning.</div>
+    </div>
+  </div>
+
+  <!-- LED DISPLAY -->
+  <div class="section">
+    <div class="section-label">LED Display Decoder</div>
+    <div class="led-grid">
+
+      <div class="led-item">
+        <div class="led-visual">
+          <div class="led-number">8</div>
+        </div>
+        <div class="led-desc"><strong>Scrolling number</strong><br>Current SPEED stat — shown for 800 ms before each run, and when cycling with Button B</div>
+      </div>
+
+      <div class="led-item">
+        <div class="led-visual" style="align-items:flex-end;">
+          <!-- bar graph preview: 5 columns, filling from bottom, ~50% -->
+          <div class="bar-preview" id="led-bar-preview">
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+          </div>
+        </div>
+        <div class="led-desc"><strong>Bar graph</strong><br>Height shows motor power (0–100%). Taller = more power. Shown for 800 ms after SPEED number</div>
+      </div>
+
+      <div class="led-item">
+        <div class="led-visual">
+          <div class="led-dots">
+            <div class="ld on"></div><div class="ld off"></div><div class="ld off"></div><div class="ld off"></div><div class="ld on"></div>
+            <div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div>
+            <div class="ld off"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld off"></div>
+            <div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div>
+            <div class="ld on"></div><div class="ld off"></div><div class="ld off"></div><div class="ld off"></div><div class="ld on"></div>
+          </div>
+        </div>
+        <div class="led-desc"><strong>X pattern</strong><br>Run complete or emergency stop triggered. Shown for 500 ms then clears</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FORMULA -->
+  <div class="section">
+    <div class="section-label">Formula</div>
+    <div class="formula-box">
+      <div class="formula-label">Motor Power</div>
+      <div class="formula-eq">currentPower = (SPEED × 100) / 20 (%)</div>
+      <div class="formula-note">
+        
+        Both left and right motors get the same value, so the bot drives straight.
+      </div>
+    </div>
+    
+  </div>
+
+
+  <!-- INTERACTIVE CALCULATOR -->
+  <div class="section">
+    <div class="section-label">Interactive Preview</div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <span class="calc-header-title">Try a SPEED value</span>
+        <span style="font-size:.75rem;color:var(--muted);">Mirrors what the bot computes on Button A</span>
+      </div>
+      <div class="calc-body">
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name">SPEED</span>
+            <span class="slider-val" id="c-speed-val">10</span>
+          </div>
+          <input type="range" id="c-speed" min="1" max="20" value="10" oninput="calcRecalc()" />
+          <div class="slider-sub">Press B on the micro:bit v2 to cycle this same range live without re-flashing</div>
+        </div>
+
+        <div class="outputs-grid">
+          <div class="out-cell">
+            <div class="out-label">Motor Power</div>
+            <div class="out-val" id="out-pwr" style="color:var(--cyan)">50%</div>
+            <div class="out-unit">both motors</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Drive Duration</div>
+            <div class="out-val" style="color:var(--yellow)">2.0</div>
+            <div class="out-unit">seconds</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Preview Time</div>
+            <div class="out-val" style="color:var(--slate)">~2.1</div>
+            <div class="out-unit">sec (scroll + bar)</div>
+          </div>
+        </div>
+
+        <div class="power-meter">
+          <div class="pm-label">Motor power — <span id="pm-label-pct">50%</span></div>
+          <div class="pm-track">
+            <div class="pm-fill" id="pm-fill" style="width:50%"></div>
+          </div>
+          <div class="pm-markers">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW BUTTON B WORKS -->
+  <div class="section">
+    <div class="section-label">How Button B Cycling Works</div>
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Button B changes SPEED in memory without touching the flashed program. Each press adds 1 to SPEED. When SPEED hits 20, the next press wraps it back to 1.</p>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--mono);font-size:.8rem;">
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">1</span>
+        <span style="color:var(--slate)">→</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">2</span>
+        <span style="color:var(--slate)">→ · · · →</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">20</span>
+        <span style="color:var(--slate)">→</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">1</span>
+        <span style="color:var(--slate)">→ · · ·</span>
+      </div>
+      <div class="callout info" style="margin-top:.875rem;">
+        <span class="callout-icon">ℹ️</span>
+        <div>The new SPEED only takes effect the next time you press A. Pressing B mid-run changes the value in memory but doesn't affect the current drive — <code style="font-family:var(--mono);font-size:.8rem;background:rgba(0,0,0,.3);padding:.1em .3em;border-radius:3px;">currentPower</code> was already computed when you pressed A.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTANTS -->
+  <div class="section">
+    <div class="section-label">Variables &amp; Constants</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="const-table">
+        <thead>
+          <tr><th>Name</th><th>Value</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="const-name">SPEED</td>
+            <td class="const-val">2 (start)</td>
+            <td class="const-note">Starting speed stat — change in code or cycle with Button B</td>
+          </tr>
+          <tr>
+            <td class="const-name">TEST_DURATION_MS</td>
+            <td class="const-val">2000</td>
+            <td class="const-note">How long the bot drives on each press of A (in milliseconds). Edit in code to taste</td>
+          </tr>
+          <tr>
+            <td class="const-name">currentPower</td>
+            <td class="const-note">computed</td>
+            <td class="const-note">(SPEED × 100)/20 — the actual PWM value sent to both motors</td>
+          </tr>
+          <tr>
+            <td class="const-name">running</td>
+            <td class="const-val">false</td>
+            <td class="const-note">Flag that the A+B emergency stop sets to false, causing the drive loop to exit</td>
+          </tr>
+          <tr>
+            <td class="const-name">testStart</td>
+            <td class="const-note">computed</td>
+            <td class="const-note">Timestamp (ms) when the drive loop begins — used to measure elapsed time</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="section">
+    <div class="section-label">How to Use This Program</div>
+    <div class="card">
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">1</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);"> Set SPEED. Then download the program.</strong></span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">2</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Set a SPEED with Button B.</strong> Each press adds 1. The scrolling number confirms the current value. Stop when you reach the stat you want to test.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">3</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Place the bot on a clear straight run.</strong> It drives for 2 seconds then stops. Mark where it starts and where ends up.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">4</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Press A to run.</strong> Watch the preview (number → bar graph), then it drives. Press A+B any time to stop early.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">5</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Compare speeds.</strong> Press B to bump SPEED up, reposition the bot at the same start line, press A again. Compare how far it travels.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="callout warn" style="margin-top:.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>The bot has no sensors active during this test.</strong> It drives blind for 2 seconds. Make sure the run path is clear — it will drive off a table or into a wall without stopping.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+  // ── Speed reference table ────────────────────────────────────────────
+  (function buildTable() {
+    const tbody = document.getElementById('sp-tbody');
+    for (let spd = 1; spd <= 20; spd++) {
+      const pwr = spd * 5;
+      const color = pwr >= 75 ? '#00C97A' : pwr >= 40 ? '#FFD166' : '#9AA3B2';
+      const tr = document.createElement('tr');
+      if (spd === 10) tr.className = 'highlight';
+      tr.innerHTML = `
+        <td style="font-family:var(--mono);font-weight:700;color:var(--cyan)">${spd}</td>
+        <td style="font-family:var(--mono);font-weight:700;color:${color}">${pwr}%</td>
+        <td>
+          <div class="bar-wrap">
+            <div class="bar-bg">
+              <div class="bar-fill" style="width:${pwr}%;background:${color};"></div>
+            </div>
+            <span class="bar-pct" style="color:${color}">${pwr}%</span>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    }
+  })();
+
+  // ── Interactive calculator ───────────────────────────────────────────
+  function calcRecalc() {
+    const spd = parseInt(document.getElementById('c-speed').value);
+    const pwr = spd * 5;
+    const color = pwr >= 75 ? '#00C97A' : pwr >= 40 ? '#FFD166' : '#9AA3B2';
+
+    document.getElementById('c-speed-val').textContent = spd;
+    document.getElementById('out-pwr').textContent = pwr + '%';
+    document.getElementById('out-pwr').style.color  = color;
+    document.getElementById('pm-fill').style.width   = pwr + '%';
+    document.getElementById('pm-fill').style.background = `linear-gradient(90deg, #007A99, ${color})`;
+    document.getElementById('pm-label-pct').textContent = pwr + '%';
+  }
+
+  calcRecalc();
+</script>
+
+</body>
+</html>
