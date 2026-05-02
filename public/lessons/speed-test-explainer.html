@@ -275,6 +275,18 @@
     .const-name { font-family: var(--mono); color: var(--cyan); }
     .const-val  { font-family: var(--mono); color: var(--yellow); }
     .const-note { color: var(--muted); font-size: .775rem; }
+
+    /* MakeCode blocks */
+    pre.blocks { display: none; }
+    .blocks-render-area { min-height: 80px; display: flex; align-items: flex-start; justify-content: flex-start; padding: .75rem 0; flex-wrap: wrap; gap: .75rem; }
+    .blocks-loading { display: flex; align-items: center; gap: .75rem; font-size: .8125rem; color: var(--muted); padding: .5rem 0; }
+    .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .block-entry { margin-bottom: 1.25rem; }
+    .block-entry-header { font-size: .6875rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .625rem; display: flex; align-items: center; gap: .5rem; }
+    .block-entry-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .block-entry-body { display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; align-items: start; }
+    .block-entry-explain { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -321,37 +333,37 @@
     <div class="section-label">What happens when you press A</div>
     <div class="flow">
       <div class="flow-step">
-        <div class="flow-icon">🔢</div>
+        <div class="flow-icon">💡</div>
         <div class="flow-name">Show SPEED</div>
         <div class="flow-desc">Scrolls SPEED value on LED — 800 ms</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">📊</div>
+        <div class="flow-icon">⚡</div>
         <div class="flow-name">Power bar</div>
         <div class="flow-desc">Bar graph shows motor % — 800 ms</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">⏱️</div>
+        <div class="flow-icon">⏸️</div>
         <div class="flow-name">Pause</div>
         <div class="flow-desc">Screen clears — 500 ms</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(0,229,255,.35)">
-        <div class="flow-icon">🚗</div>
+        <div class="flow-icon">🤖</div>
         <div class="flow-name">Drive</div>
         <div class="flow-desc">Both motors at currentPower for 2 000 ms</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
-        <div class="flow-icon">🛑</div>
+        <div class="flow-icon">✋</div>
         <div class="flow-name">Stop</div>
         <div class="flow-desc">Both motors cut immediately</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(0,201,122,.3)">
-        <div class="flow-icon" style="font-size:.875rem;line-height:1.3;">✕<br><span style="font-size:.55rem;color:var(--green)">LED</span></div>
+        <div class="flow-icon">🏁</div>
         <div class="flow-name">Done</div>
         <div class="flow-desc">X pattern 500 ms then clear</div>
       </div>
@@ -429,6 +441,161 @@
     
   </div>
 
+
+  <!-- BLOCK BY BLOCK -->
+  <div class="section">
+    <div class="section-label">Block by Block</div>
+
+    <!-- STARTING VALUES -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Starting Values
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let testStart = 0
+let running = false
+let currentPower = 0
+let SPEED = 1
+let TEST_DURATION_MS = 2000
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Set <code>TEST_DURATION_MS</code> to <strong>2000</strong> and <code>SPEED</code> to <strong>1</strong> before you download. Everything else starts at 0 and gets computed when you press A.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON A -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Button A — Run the test
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let currentPower = 0
+let SPEED = 0
+let running = false
+let testStart = 0
+let TEST_DURATION_MS = 0
+input.onButtonPressed(Button.A, function () {
+    currentPower = SPEED * 100 / 20
+    basic.showString("" + (SPEED))
+    basic.pause(800)
+    led.plotBarGraph(
+    currentPower,
+    100
+    )
+    basic.pause(800)
+    basic.clearScreen()
+    basic.pause(500)
+    running = true
+    testStart = input.runningTime()
+    CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    while (running && input.runningTime() - testStart < TEST_DURATION_MS) {
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    running = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Computes <code>currentPower</code> from your SPEED stat, shows the number then the power bar, then drives straight for <code>TEST_DURATION_MS</code> milliseconds. The <code>while</code> loop keeps checking elapsed time so an A+B press can exit early. X pattern on LED confirms the run is done.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON B -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Button B — Cycle SPEED
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let SPEED = 0
+input.onButtonPressed(Button.B, function () {
+    if (SPEED >= 20) {
+        SPEED = 1
+    } else {
+        SPEED += 1
+    }
+    basic.showString("" + (SPEED))
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Steps SPEED up by 1 each press — wraps back to 1 after 20. The scrolling number lets you confirm the value before pressing A. No re-flashing needed.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON A+B -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--red)"></div>
+        Button A+B — Emergency Stop
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let running = false
+input.onButtonPressed(Button.AB, function () {
+    running = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Sets <code>running = false</code> so the Button A loop exits on its next check, then cuts both motors immediately. Use this if the bot heads somewhere it shouldn't.
+        </div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- INTERACTIVE CALCULATOR -->
   <div class="section">
@@ -517,13 +684,13 @@
         <tbody>
           <tr>
             <td class="const-name">SPEED</td>
-            <td class="const-val">2 (start)</td>
-            <td class="const-note">Starting speed stat — change in code or cycle with Button B</td>
+            <td class="const-val">1</td>
+            <td class="const-note">Starting speed stat — set to 1 in code before downloading, then cycle with Button B</td>
           </tr>
           <tr>
             <td class="const-name">TEST_DURATION_MS</td>
             <td class="const-val">2000</td>
-            <td class="const-note">How long the bot drives on each press of A (in milliseconds). Edit in code to taste</td>
+            <td class="const-note">How long the bot drives on each press of A (milliseconds). Set this to 2000 in code before downloading</td>
           </tr>
           <tr>
             <td class="const-name">currentPower</td>
@@ -552,7 +719,7 @@
       <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">1</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);"> Set SPEED. Then download the program.</strong></span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Set TEST_DURATION_MS to 2000 and SPEED to 1 in the code. Then download the program.</strong></span>
         </li>
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">2</span>
@@ -619,6 +786,66 @@
   }
 
   calcRecalc();
+</script>
+
+<!-- ── MAKECODE BLOCKS RENDERER ───────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId = 0;
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
+    }, MAKECODE_URL);
+  }
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src = msg.uri; img.width = msg.width; img.height = msg.height;
+        img.alt = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        console.log("[MakeCode render error] id=" + msg.id + " error=" + msg.error);
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Blocks preview unavailable</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
 </script>
 
 </body>

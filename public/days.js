@@ -524,6 +524,7 @@ const DAYS = [
         "block": "Match-Build-Make",
         "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
         "facilitatorDescription": "Teams program the launch sequence as a routine separate from the stat loadout coded in the morning. Two test runs, both timed, both logged. The comparison to the Speed prediction is the math moment: a mismatch is not a failure, it is data. If a team's times are off, ask one question only: 'What did your formula predict, and what did you observe?' Then let them work. Some teams will have approach angles that add distance not captured in their straight-line calculation -- that is the right kind of confusion to carry into Season 1. Do not resolve it for them.",
+        "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"
       },
       {

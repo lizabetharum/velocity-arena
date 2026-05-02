@@ -474,6 +474,18 @@ let ENDURANCE = 0
         <div class="blocks-render-area" id="render-buttonA">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let TURNING = 0
+let TEST_DURATION_MS = 0
+let currentPower = 0
+let turnRatio = 0
+let thisDuration = 0
+let watchResult = 0
+let running = false
+let testStart = 0
+let lastTurnWasLeft = false
+function computeStats() {}
+function driveAndWatch(ms: number) {}
+function handleBorder() {}
 input.onButtonPressed(Button.A, function () {
     computeStats()
     basic.showString("" + (TURNING))
@@ -487,13 +499,14 @@ input.onButtonPressed(Button.A, function () {
                 break
             }
             if (TURNING == 1) {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(currentPower, currentPower)
             } else if (lastTurnWasLeft) {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(currentPower * (1 - turnRatio), currentPower * (1 + turnRatio))
             } else {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(currentPower * (1 + turnRatio), currentPower * (1 - turnRatio))
             }
             driveAndWatch(thisDuration)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
             if (watchResult == 1) {
                 handleBorder()
                 break
@@ -501,6 +514,7 @@ input.onButtonPressed(Button.A, function () {
             basic.pause(80)
         }
     }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
     running = false
     basic.showLeds(`
         # . . . #
@@ -556,6 +570,7 @@ input.onButtonPressed(Button.A, function () {
         <div class="blocks-render-area" id="render-buttonB">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let TURNING = 0
 input.onButtonPressed(Button.B, function () {
     if (TURNING == 2) {
         TURNING = 5
@@ -594,6 +609,7 @@ input.onButtonPressed(Button.B, function () {
         <div class="blocks-render-area" id="render-buttonAB">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let simulatedMatchTime = 0
 input.onButtonPressed(Button.AB, function () {
     if (simulatedMatchTime == 0) {
         simulatedMatchTime = 60
@@ -635,6 +651,18 @@ input.onButtonPressed(Button.AB, function () {
         <div class="blocks-render-area" id="render-computeStats">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let SPEED = 0
+let ENDURANCE = 0
+let TURNING = 0
+let BASE_SEGMENT_MS = 0
+let simulatedMatchTime = 0
+let currentPower = 0
+let totalArcTime = 0
+let thisDuration = 0
+let turnRatio = 0
+let DECAY_RATE = 0
+let endurancePercent = 0
+let enduranceFactor = 0
 function computeStats () {
     currentPower = SPEED * 100 / 20
     totalArcTime = BASE_SEGMENT_MS * 12
@@ -687,6 +715,13 @@ function computeStats () {
         <div class="blocks-render-area" id="render-driveAndWatch">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let watchResult = 0
+let elapsed = 0
+let BORDER_CHECK_MS = 0
+let halfChunk = 0
+let borderSide = 0
+let remainChunk = 0
+function checkBorder() { return 0 }
 function driveAndWatch (ms: number) {
     watchResult = 0
     elapsed = 0
@@ -756,7 +791,17 @@ function driveAndWatch (ms: number) {
         <div class="blocks-render-area" id="render-checkBorder">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let sensor1State = 0
+let sensor2State = 0
+let sensor3State = 0
+let sensor4State = 0
+let BORDER_THRESHOLD = 0
 function checkBorder () {
+    CutebotPro.trackbitStateValue()
+    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
     if (sensor1State > BORDER_THRESHOLD) {
         return 1
     } else if (sensor4State > BORDER_THRESHOLD) {
@@ -801,6 +846,13 @@ function checkBorder () {
         <div class="blocks-render-area" id="render-handleBorder">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
+let BORDER_PIVOT_POWER = 0
+let BACKUP_MS = 0
+let BORDER_PIVOT_MS = 0
+let borderSide = 0
+let lastTurnWasLeft = false
+let recheck = 0
+function checkBorder() { return 0 }
 function handleBorder () {
     CutebotPro.stopImmediately(CutebotProMotors.ALL)
     basic.pause(50)
@@ -1001,7 +1053,7 @@ function handleBorder () {
       type: "renderblocks",
       id: pre.id,
       code: pre.textContent.trim(),
-      options: { package: EXTENSION_PACKAGE }
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
     }, MAKECODE_URL);
   }
 
@@ -1032,6 +1084,7 @@ function handleBorder () {
         pre.remove();
         if (area) area.appendChild(img);
       } else {
+        console.log("[MakeCode render error] id=" + msg.id + " error=" + msg.error);
         if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Blocks preview unavailable — <a href='https://makecode.microbit.org/' target='_blank' style='color:#a78bfa;'>open in MakeCode</a> to view.</span>";
         pre.remove();
       }
