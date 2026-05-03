@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (localStorage.getItem(KEY) === '1') return;
+  document.documentElement.style.visibility = 'hidden';
+  function bounce() { location.href = '/teachers.html'; }
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view contact sheet:');
+    if (ans !== null && ans.trim() === String(pw).trim()) {
+      localStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      bounce();
+    }
+  };
+  s.onerror = bounce;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end -->
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Contact Sheet</title>
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { margin: 0; padding: 0; }
+body{
+  background:var(--bg-1);color:var(--fg-1);
+  font-family:var(--font-sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:var(--accent-ink);}
+
+.topnav{position:sticky;top:0;z-index:10;background:var(--bg-0);border-bottom:1px solid var(--line-strong);padding:14px 32px 0;}
+.topnav .row{display:flex;align-items:center;gap:28px;max-width:1400px;margin:0 auto;}
+.topnav .brand{font:800 13px/1 var(--font-sans);letter-spacing:.04em;color:var(--fg-0);display:flex;align-items:center;gap:8px;text-decoration:none;}
+.topnav .brand .mark{width:18px;height:18px;background:var(--accent);display:inline-block;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.topnav nav{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.topnav nav a{font:600 11.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);padding:14px;text-decoration:none;position:relative;white-space:nowrap;}
+.topnav nav a:hover{color:var(--fg-0);}
+.topnav nav a.active{color:var(--accent);}
+.topnav nav a.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--accent);}
+.topnav .util{font:600 11px/1 var(--font-mono);color:var(--fg-1);letter-spacing:.04em;padding-bottom:14px;}
+.topnav .accent-rule{height:1px;background:var(--line-cyan);margin:0 -32px;}
+@media (max-width:780px){.topnav nav{display:none;}}
+
+.page{max-width:1400px;margin:0 auto;padding:32px 24px 80px;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);text-decoration:none;margin-bottom:18px;}
+.back-link:hover{color:var(--accent-bright);}
+
+.page-head{margin-bottom:28px;}
+.page-head .eyebrow{font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);margin:0 0 12px;}
+.page-head .eyebrow b{color:var(--accent);margin-right:8px;font-weight:600;}
+.page-head h1{font:700 22px/1.18 var(--font-sans);letter-spacing:-.015em;color:var(--fg-0);margin:0 0 8px;text-wrap:balance;}
+.page-head h1 .em{color:var(--accent);}
+.page-head .lede{font:400 13px/1.5 var(--font-sans);color:var(--fg-1);margin:0;max-width:70ch;}
+.page-head .lede em{font-style:italic;color:var(--fg-0);}
+
+/* ─── DAY PICKER ─── */
+.day-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;}
+.day-pill{
+  font:600 10px/1 var(--font-mono);letter-spacing:.06em;
+  color:var(--fg-2);background:transparent;
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:6px 9px;text-decoration:none;cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:color var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out),background var(--dur-1) var(--ease-out);
+}
+.day-pill:hover{color:var(--fg-0);border-color:var(--line-strong);}
+.day-pill.current{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);}
+
+/* ─── CONTACT FRAME ─── */
+.contact-frame{
+  background:#1A1A1A;
+  border-radius:var(--r-md);
+  padding:28px 24px;
+  overflow-x:auto;
+}
+.contact-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;gap:16px;flex-wrap:wrap;
+}
+.contact-bar .lhs{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.contact-bar .lhs .pill{
+  font:700 9px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;
+  color:#1A1A1A;background:var(--accent);
+  padding:5px 9px;border-radius:var(--r-sm);
+  font-variant-numeric:tabular-nums;
+}
+.contact-bar .lhs .meta{font:500 11px/1 var(--font-mono);color:#B9C4D2;letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+.contact-bar .lhs .meta b{color:#fff;font-weight:700;}
+.contact-bar .rhs{display:flex;gap:8px;}
+.contact-bar .rhs button{
+  font:600 10px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;background:transparent;
+  border:1px solid rgba(255,255,255,0.25);
+  padding:7px 11px;border-radius:var(--r-sm);cursor:pointer;
+  transition:background var(--dur-1) var(--ease-out),color var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out);
+}
+.contact-bar .rhs button:hover{border-color:#fff;}
+.contact-bar .rhs button.primary{background:var(--accent);color:#1A1A1A;border-color:var(--accent);}
+.contact-bar .rhs button.primary:hover{background:var(--accent-bright);border-color:var(--accent-bright);}
+
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:60px 24px;
+  padding:28px 18px;
+  background:#fff;
+  border-radius:2px;
+  min-width:1180px;
+}
+@media (max-width:1100px){
+  .contact-grid{grid-template-columns:repeat(2, 1fr);min-width:680px;}
+}
+
+.ts-wrap{position:relative;}
+.ts-wrap .ts-num{
+  position:absolute;top:-22px;left:0;
+  font:700 9px/1 'DM Sans', system-ui, sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  color:#6E7E92;
+}
+.ts-wrap .ts-num b{color:#1A1A1A;}
+.ts-cap{
+  position:absolute;bottom:-22px;left:0;right:0;
+  display:flex;justify-content:space-between;
+  font:600 9px/1 'DM Sans', system-ui, sans-serif;letter-spacing:.04em;color:#6E7E92;
+}
+.ts-cap b{color:#1A1A1A;font-weight:700;}
+
+.tsheet{
+  aspect-ratio:11 / 8.5;
+  background:#fff;border:1px solid #000;color:#000;
+  font-family:'DM Sans', system-ui, sans-serif;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.tsheet .h{display:flex;align-items:center;padding:5px 6px;border-bottom:1px solid #000;gap:6px;}
+.tsheet .h .kg{
+  font:800 7pt 'DM Sans', system-ui, sans-serif;line-height:1;
+  width:14px;height:14px;display:grid;place-items:center;
+  border:1px solid #000;flex-shrink:0;
+}
+.tsheet .h .name{
+  font:900 7pt 'DM Sans', system-ui, sans-serif;text-transform:uppercase;letter-spacing:.04em;
+  flex:1;line-height:1.1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tsheet .h .kind{
+  font:800 5pt 'DM Sans', system-ui, sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  background:#000;color:#fff;padding:2px 5px;flex-shrink:0;
+}
+.tsheet .h .of{font:700 5.5pt 'DM Sans', system-ui, sans-serif;letter-spacing:.06em;color:#6E7E92;flex-shrink:0;font-variant-numeric:tabular-nums;}
+.tsheet .clock{
+  border-bottom:1px solid #000;padding:2px 6px;
+  display:flex;align-items:center;gap:6px;
+  font:700 5pt 'DM Sans', system-ui, sans-serif;letter-spacing:.06em;text-transform:uppercase;
+}
+.tsheet .clock .label{color:#6E7E92;flex-shrink:0;}
+.tsheet .clock .track{
+  flex:1;height:5px;background:#fff;border:1px solid #000;
+  position:relative;overflow:hidden;
+}
+.tsheet .clock .track::after{
+  content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to right,#000 0,#000 0.5px,transparent 0.5px,transparent 10%);
+  opacity:.55;
+}
+.tsheet .clock .fill{position:absolute;top:0;bottom:0;left:0;background:#000;z-index:1;}
+.tsheet .clock .now{font-variant-numeric:tabular-nums;color:#000;flex-shrink:0;}
+.tsheet .m{background:#efefef;border-bottom:1px solid #000;padding:2px 6px;font:700 5pt 'DM Sans', system-ui, sans-serif;line-height:1.3;}
+.tsheet .m em{font-style:normal;font-weight:500;}
+.tsheet .b{flex:1;display:grid;grid-template-columns:2.4fr 3fr 3.4fr;min-height:0;}
+.tsheet .b > div{padding:3px 4px;}
+.tsheet .b > div + div{border-left:1px solid #000;}
+.tsheet .b .lbl{
+  font:800 4pt 'DM Sans', system-ui, sans-serif;letter-spacing:.12em;text-transform:uppercase;
+  border-bottom:1px solid #000;padding-bottom:1px;margin-bottom:2px;
+}
+.tsheet .b .ln{display:block;height:2px;background:#ddd;margin-bottom:2px;border-radius:1px;}
+.tsheet .b .ln.s{width:70%;}
+.tsheet .b .ln.m{width:88%;}
+.tsheet .b .ln.l{width:100%;}
+.tsheet .b .ln.dark{background:#444;height:2.5px;}
+.tsheet .stop{
+  border-top:1px solid #000;padding:2px 6px;
+  font:700 5pt 'DM Sans', system-ui, sans-serif;
+  background:#fff;display:flex;gap:4px;align-items:center;
+}
+.tsheet .stop b{background:#000;color:#fff;padding:1px 3px;font-size:4pt;letter-spacing:.1em;}
+.tsheet .ft{
+  border-top:1px solid #ccc;background:#f5f5f5;
+  padding:1px 6px;
+  font:800 4pt 'DM Sans', system-ui, sans-serif;letter-spacing:.06em;text-transform:uppercase;
+  display:flex;justify-content:space-between;color:#6E7E92;
+}
+
+/* ─── ANNOTATIONS ─── */
+.annotations{
+  display:grid;grid-template-columns:repeat(3, 1fr);gap:18px;
+  margin-top:28px;
+}
+@media (max-width:880px){.annotations{grid-template-columns:1fr;}}
+.annotations .ann{
+  padding:14px 16px;
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--bg-2);
+}
+.annotations .ann .pin{
+  display:inline-block;
+  font:700 9px/1 var(--font-mono);letter-spacing:.1em;
+  color:var(--accent);margin-bottom:8px;
+}
+.annotations .ann h4{font:700 14px/1.3 var(--font-sans);color:var(--fg-0);margin:0 0 6px;}
+.annotations .ann p{font:400 12.5px/1.5 var(--font-sans);color:var(--fg-1);margin:0;}
+
+.empty-state{
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-radius:var(--r-md);padding:18px 22px;
+  color:var(--fg-1);font:400 14px/1.6 var(--font-sans);
+}
+.empty-state code{font-family:var(--font-mono);background:var(--bg-1);padding:1px 6px;border-radius:2px;font-size:13px;color:var(--fg-0);}
+
+/* ─── PRINT MODE — hide chrome, render iframes ─── */
+#print-frames{display:none;}
+@media print {
+  body{background:#fff;color:#000;}
+  .topnav, .page-head, .back-link, .day-picker, .contact-frame, .annotations { display:none !important; }
+  #print-frames{display:block;}
+  #print-frames iframe{display:block;width:11in;height:8.5in;border:0;page-break-after:always;page-break-inside:avoid;}
+  #print-frames iframe:last-of-type{page-break-after:auto;}
+  @page{size:11in 8.5in landscape;margin:0;}
+}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">FACILITATOR · CONTACT SHEET</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<main class="page">
+
+  <a class="back-link" href="/teacher-quickcards.html">← Back to Quick Cards</a>
+
+  <section class="page-head">
+    <p class="eyebrow"><b>B</b>Contact sheet</p>
+    <h1 id="cs-title">Day 01 contact sheet <span class="em">— print proof</span></h1>
+    <p class="lede" id="cs-lede">What you see before you commit a tree to the printer. Each card is a half-scale 11×8.5 landscape sheet, in run-order. <em>Prints in pure B&amp;W</em> on classroom toner; kind reads from the corner glyph (◐ ▣ ▲ ◇) and a black tag, and the bar under the header shows where this card lives in the day's run.</p>
+  </section>
+
+  <nav class="day-picker" id="day-picker" aria-label="Pick a day"></nav>
+
+  <div id="contact-shell">
+    <!-- populated by render() -->
+  </div>
+
+  <div class="annotations">
+    <div class="ann">
+      <span class="pin">ONE SHEET = ONE CARD</span>
+      <h4>Each card is a full 11×8.5 page</h4>
+      <p>No cutting, no trimming. Print, clip together by day, drop on the clipboard. The N-of-8 in each header is the only registration you need — a stray sheet finds its way home from sequence number alone.</p>
+    </div>
+    <div class="ann">
+      <span class="pin">B&amp;W BY DESIGN</span>
+      <h4>Glyph + tag, not color</h4>
+      <p>Cards print on classroom toner — no color budget. The kind reads from a typographic mark in the corner (◐ warm-up · ▣ discuss · ▲ build · ◇ reflect) plus a black inverted tag. Color stays in the week view, where screens live.</p>
+    </div>
+    <div class="ann">
+      <span class="pin">RUN-ORDER CLOCK</span>
+      <h4>Where am I in the day?</h4>
+      <p>Every sheet carries a black bar showing its slot in the day's total minutes. A teacher mid-lesson can glance down and know exactly how much runway is left — without recomputing from the agenda.</p>
+    </div>
+  </div>
+
+</main>
+
+<div id="print-frames"></div>
+
+<script src="/config.js"></script>
+<script src="/days-default.js"></script>
+<script src="/days-tn.js"></script>
+<script src="/days.js"></script>
+<script>
+const KIND_GLYPH = { warmup: '◐', discuss: '▣', build: '▲', reflect: '◇' };
+const KIND_LABEL = { warmup: 'Warm-up', discuss: 'Discuss', build: 'Build', reflect: 'Reflect' };
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function kindFor(block) {
+  const b = String(block || '').toLowerCase();
+  if (/(ice breaker|warm.?up|hook|opener)/.test(b)) return 'warmup';
+  if (/(build|match|make|lab|test|drive)/.test(b)) return 'build';
+  if (/(ends|reflect|wind|close|debrief|share)/.test(b)) return 'reflect';
+  return 'discuss';
+}
+
+function fmtMin(m) {
+  const h = Math.floor(m / 60), r = Math.floor(m % 60);
+  return h ? `${h}:${String(r).padStart(2, '0')}` : `0:${String(r).padStart(2, '0')}`;
+}
+
+function getQueryDay() {
+  const m = location.search.match(/[?&]day=(\d+)/);
+  return m ? Math.max(1, parseInt(m[1], 10)) : null;
+}
+
+// Decorative placeholder lines so the proof reads as a real card layout.
+function lineBlock(seed, slots) {
+  const widths = ['s', 'm', 'l'];
+  let out = '';
+  for (let i = 0; i < slots; i++) {
+    const w = widths[(seed + i) % widths.length];
+    const dark = ((seed + i) % 4) === 0 ? ' dark' : '';
+    out += `<span class="ln ${w}${dark}"></span>`;
+  }
+  return out;
+}
+
+function renderSheet(activity, idx, total, runStart, totalDayMins) {
+  const kind = kindFor(activity.block);
+  const seq = idx + 1;
+  const seqStr = String(seq).padStart(2, '0');
+  const mins = Number(activity.mins) || 0;
+  const fillPct = totalDayMins ? Math.min(100, ((runStart + mins) / totalDayMins) * 100) : 0;
+  const startTime = fmtMin(runStart);
+  const endTime = fmtMin(runStart + mins);
+  const glyph = KIND_GLYPH[kind];
+  const kindLabel = KIND_LABEL[kind];
+  const blockLabel = activity.block ? activity.block : kindLabel;
+
+  return `
+    <div class="ts-wrap">
+      <div class="ts-num"><b>${seqStr}</b> · ${escapeHtml(activity.name)} · ${mins} min</div>
+      <div class="tsheet ${kind}">
+        <div class="h">
+          <div class="kg">${glyph}</div>
+          <div class="name">${escapeHtml(activity.name)}</div>
+          <div class="kind">${escapeHtml(kindLabel)}</div>
+          <div class="of">${seq}/${total}</div>
+        </div>
+        <div class="clock">
+          <span class="label">Run</span>
+          <span class="track"><span class="fill" style="width:${fillPct.toFixed(1)}%"></span></span>
+          <span class="now">${startTime} → ${endTime}</span>
+        </div>
+        <div class="m">${escapeHtml(blockLabel.toUpperCase())}: <em>${escapeHtml(activity.name)}</em></div>
+        <div class="b">
+          <div><div class="lbl">Before</div>${lineBlock(idx, 3)}</div>
+          <div><div class="lbl">Run</div>${lineBlock(idx + 1, 4)}</div>
+          <div><div class="lbl">Watch</div>${lineBlock(idx + 2, 3)}</div>
+        </div>
+        <div class="stop"><b>STOP</b> See full card for hard-stop rule.</div>
+        <div class="ft"><span>VA · Day ${seq <= 9 ? '' : ''}${seq} of ${total}</span><span>${escapeHtml(activity.name)}</span></div>
+      </div>
+      <div class="ts-cap"><span>${escapeHtml(blockLabel)}</span><b>${mins} min</b></div>
+    </div>`;
+}
+
+function render() {
+  const shell = document.getElementById('contact-shell');
+  const picker = document.getElementById('day-picker');
+  if (!shell || typeof DAYS === 'undefined') return;
+
+  const eligibleDays = DAYS.filter(d => (d.activities || []).some(a => a.quickCard));
+  if (eligibleDays.length === 0) {
+    shell.innerHTML = '<div class="empty-state">No quick cards mapped yet — add a <code>quickCard</code> URL to any activity in <code>days.js</code>.</div>';
+    picker.innerHTML = '';
+    return;
+  }
+
+  // Day picker
+  const requested = getQueryDay();
+  const current = eligibleDays.find(d => d.day === requested) || eligibleDays[0];
+  picker.innerHTML = eligibleDays.map(d => {
+    const isCurrent = d.day === current.day;
+    return `<a class="day-pill ${isCurrent ? 'current' : ''}" href="?day=${d.day}">DAY ${String(d.day).padStart(2, '0')}</a>`;
+  }).join('');
+
+  const sheetActs = (current.activities || []).filter(a => a.quickCard);
+  const totalMins = sheetActs.reduce((s, a) => s + (Number(a.mins) || 0), 0);
+  const sheetCount = sheetActs.length;
+
+  // Title + lede
+  document.getElementById('cs-title').innerHTML =
+    `Day ${String(current.day).padStart(2, '0')} contact sheet <span class="em">— ${sheetCount} card${sheetCount === 1 ? '' : 's'}, ${totalMins} min total</span>`;
+
+  // Build sheets in run order
+  let running = 0;
+  const sheets = sheetActs.map((a, i) => {
+    const html = renderSheet(a, i, sheetCount, running, totalMins);
+    running += Number(a.mins) || 0;
+    return html;
+  }).join('');
+
+  shell.innerHTML = `
+    <div class="contact-frame">
+      <div class="contact-bar">
+        <div class="lhs">
+          <span class="pill">Proof · Day ${String(current.day).padStart(2, '0')}</span>
+          <span class="meta"><b>${sheetCount} sheets</b> · landscape · letter · ${totalMins} min total · ${escapeHtml(current.theme || '')}</span>
+        </div>
+        <div class="rhs">
+          <button type="button" id="btn-print" class="primary">Send to printer (${sheetCount} pages)</button>
+        </div>
+      </div>
+      <div class="contact-grid">${sheets}</div>
+    </div>`;
+
+  document.getElementById('btn-print').addEventListener('click', () => sendToPrinter(sheetActs));
+}
+
+function sendToPrinter(activities) {
+  const root = document.getElementById('print-frames');
+  root.innerHTML = '';
+  let loaded = 0;
+  activities.forEach(a => {
+    const f = document.createElement('iframe');
+    f.src = a.quickCard;
+    f.onload = () => {
+      loaded++;
+      if (loaded === activities.length) {
+        setTimeout(() => window.print(), 250);
+      }
+    };
+    root.appendChild(f);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', render);
+} else {
+  render();
+}
+</script>
+</body>
+</html>
