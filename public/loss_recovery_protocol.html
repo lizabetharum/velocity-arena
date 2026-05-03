@@ -1,346 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loss Recovery Protocol — Velocity Arena</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loss Recovery Protocol — Velocity Arena</title>
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { margin: 0; padding: 0; }
+body{
+  background:var(--bg-1);color:var(--fg-0);
+  font-family:var(--font-sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:var(--accent-ink);}
 
-    :root {
-      --black: #0f0f0f;
-      --white: #ffffff;
-      --gray-100: #f5f5f5;
-      --gray-300: #d1d1d1;
-      --gray-500: #737373;
-      --gray-700: #404040;
-      --accent: #e84040;
-      --accent-soft: #fdf2f2;
-      --step-bg: #ffffff;
-      --required-border: #e84040;
-      --optional-border: #d1d1d1;
-    }
+.topnav{position:sticky;top:0;z-index:10;background:var(--bg-0);border-bottom:1px solid var(--line-strong);padding:14px 32px 0;}
+.topnav .row{display:flex;align-items:center;gap:28px;max-width:1400px;margin:0 auto;}
+.topnav .brand{font:800 13px/1 var(--font-sans);letter-spacing:.04em;color:var(--fg-0);display:flex;align-items:center;gap:8px;text-decoration:none;}
+.topnav .brand .mark{width:18px;height:18px;background:var(--accent);display:inline-block;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.topnav nav{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.topnav nav a{font:600 11.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);padding:14px;text-decoration:none;position:relative;white-space:nowrap;}
+.topnav nav a:hover{color:var(--fg-0);}
+.topnav nav a.active{color:var(--accent);}
+.topnav nav a.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--accent);}
+.topnav .util{font:600 11px/1 var(--font-mono);color:var(--fg-1);letter-spacing:.04em;padding-bottom:14px;}
+.topnav .accent-rule{height:1px;background:var(--line-cyan);margin:0 -32px;}
+@media (max-width:780px){.topnav nav{display:none;}}
 
-    body {
-      font-family: var(--font-sans);
-      background: var(--gray-100);
-      color: var(--black);
-      min-height: 100vh;
-      padding: 24px 16px 48px;
-    }
+.page{max-width:720px;margin:0 auto;padding:32px 24px 80px;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);text-decoration:none;margin-bottom:24px;}
+.back-link:hover{color:var(--accent-bright);}
+.page-head{margin-bottom:24px;}
+.page-head .eyebrow{font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);margin:0 0 12px;}
+.page-head .eyebrow b{color:var(--accent);margin-right:8px;font-weight:600;}
+.page-head h1{font:800 32px/1.05 var(--font-sans);letter-spacing:-.02em;color:var(--fg-0);margin:0 0 10px;}
+.page-head .lede{font:400 14px/1.55 var(--font-sans);color:var(--fg-1);max-width:60ch;margin:0;}
 
-    .page {
-      max-width: 640px;
-      margin: 0 auto;
-    }
+.alert{
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-left:3px solid var(--error);
+  border-radius:var(--r-md);padding:14px 18px;
+  font:500 13px/1.55 var(--font-sans);color:var(--fg-1);
+  margin-bottom:32px;
+}
+.alert b{color:var(--error);font-weight:700;}
 
-    /* Header */
-    .header {
-      margin-bottom: 32px;
-    }
+.steps{display:flex;flex-direction:column;gap:14px;}
+.step{
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-radius:var(--r-md);overflow:hidden;
+  border-left:3px solid var(--accent);
+}
+.step.optional{border-left-color:var(--line-strong);opacity:.95;}
+.step-header{
+  padding:16px 20px 10px;
+  border-bottom:1px solid var(--line);
+}
+.step-number{font:600 10.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.step.optional .step-number{color:var(--fg-2);}
+.step-title{font:700 16px/1.3 var(--font-sans);letter-spacing:-.005em;color:var(--fg-0);}
+.step-body{padding:16px 20px 18px;}
 
-    .header-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gray-500);
-      margin-bottom: 6px;
-    }
+.say-block{
+  background:var(--bg-3);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px;
+  font:400 14px/1.65 var(--font-sans);color:var(--fg-0);font-style:italic;
+}
+.say-label{
+  display:block;
+  font:600 10.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);font-style:normal;margin-bottom:8px;
+}
+.say-block .divider{height:1px;background:var(--line);margin:12px 0;}
 
-    .header-title {
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1.15;
-      color: var(--black);
-      margin-bottom: 10px;
-    }
+.timing{
+  display:flex;align-items:flex-start;gap:8px;
+  font:500 12.5px/1.55 var(--font-mono);
+  color:var(--fg-2);
+  padding:8px 0;
+}
+.timing-icon{font-style:normal;}
 
-    .header-sub {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--gray-500);
-      line-height: 1.5;
-    }
+.note{
+  background:var(--bg-3);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:12px 14px;
+  font:400 12.5px/1.65 var(--font-sans);
+  color:var(--fg-1);
+  margin-top:10px;
+}
+.note strong{color:var(--fg-0);font-weight:700;}
 
-    /* Alert bar */
-    .alert {
-      background: var(--black);
-      color: var(--white);
-      border-radius: 8px;
-      padding: 14px 18px;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.5;
-      margin-bottom: 28px;
-      letter-spacing: 0.01em;
-    }
-
-    .alert span {
-      color: var(--accent);
-    }
-
-    /* Steps */
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .step {
-      background: var(--step-bg);
-      border-radius: 10px;
-      overflow: hidden;
-      border-left: 4px solid var(--required-border);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-
-    .step.optional {
-      border-left-color: var(--optional-border);
-    }
-
-    .step-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 18px 10px;
-    }
-
-    .step-number {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      white-space: nowrap;
-    }
-
-    .step.optional .step-number {
-      color: var(--gray-500);
-    }
-
-    .step-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--black);
-    }
-
-    .step-body {
-      padding: 0 18px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* SAY block */
-    .say-block {
-      background: var(--accent-soft);
-      border-radius: 6px;
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--black);
-      line-height: 1.65;
-    }
-
-    .say-block .say-label {
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .step.optional .say-block {
-      background: var(--gray-100);
-    }
-
-    .step.optional .say-block .say-label {
-      color: var(--gray-500);
-    }
-
-    .say-block em {
-      font-style: italic;
-      color: var(--gray-700);
-    }
-
-    /* Timing note */
-    .timing {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gray-700);
-      line-height: 1.5;
-    }
-
-    .timing-icon {
-      font-size: 13px;
-      margin-top: 0px;
-      flex-shrink: 0;
-    }
-
-    /* Facilitator note */
-    .note {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--gray-500);
-      line-height: 1.6;
-      padding-top: 2px;
-    }
-
-    .note strong {
-      color: var(--gray-700);
-      font-weight: 700;
-    }
-
-    /* Divider */
-    .divider {
-      height: 1px;
-      background: var(--gray-300);
-      margin: 4px 0 8px;
-    }
-
-    /* Footer rule */
-    .footer-rule {
-      background: var(--white);
-      border-radius: 10px;
-      padding: 16px 18px;
-      border-left: 4px solid var(--black);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-
-    .footer-rule-label {
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--black);
-      margin-bottom: 6px;
-    }
-
-    .footer-rule p {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--black);
-      line-height: 1.55;
-    }
-
-    .footer-rule p span {
-      color: var(--accent);
-    }
-  </style>
+.footer-rule{
+  margin-top:32px;padding:18px 20px;
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-left:3px solid var(--accent);border-radius:var(--r-md);
+}
+.footer-rule-label{font:600 10.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.footer-rule p{font:400 13.5px/1.65 var(--font-sans);color:var(--fg-1);margin:0;}
+.footer-rule p span{color:var(--fg-0);font-weight:600;}
+</style>
 </head>
 <body>
-  <div class="page">
 
-    <a href="/teachers.html" style="display:inline-flex;align-items:center;gap:6px;font-family: var(--font-sans);font-size:13px;font-weight:600;color:var(--gray-700);text-decoration:none;border:1px solid var(--gray-300);background:var(--white);padding:8px 14px;border-radius:6px;margin-bottom:20px;transition:border-color .15s,color .15s;">&larr; Back to Teacher Resources</a>
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">FACILITATOR PROTOCOL</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
 
-    <div class="header">
-      <div class="header-label">Velocity Arena · Facilitator Reference</div>
-      <div class="header-title">Loss Recovery Protocol</div>
-      <div class="header-sub">Run this immediately after a loss. Do not wait. Do not skip to the next match.</div>
+<main class="page">
+
+  <a class="back-link" href="/teachers.html">← Back to Teacher Resources</a>
+
+  <section class="page-head">
+    <p class="eyebrow"><b>00</b>Facilitator protocol</p>
+    <h1>Loss Recovery Protocol.</h1>
+    <p class="lede">Run this immediately after a loss. Do not wait. Do not skip to the next match.</p>
+  </section>
+
+  <div class="alert">
+    <b>Steps 1–3 are non-negotiable.</b> Say them in order, word for word. Step 4 is optional — use it when time and energy allow.
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">Step 01</div>
+        <div class="step-title">Acknowledge the emotion</div>
+      </div>
+      <div class="step-body">
+        <div class="say-block">
+          <span class="say-label">Say — word for word</span>
+          "That result was frustrating. That's a real feeling and it makes sense."
+        </div>
+        <div class="timing">
+          <span class="timing-icon">⏱</span>
+          Wait 30 seconds. Do not qualify it. Do not move on early.
+        </div>
+      </div>
     </div>
 
-    <div class="alert">
-      <span>Steps 1–3 are non-negotiable.</span> Say them in order, word for word. Step 4 is optional — use it when time and energy allow.
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">Step 02</div>
+        <div class="step-title">Locate the decision point</div>
+      </div>
+      <div class="step-body">
+        <div class="say-block">
+          <span class="say-label">Say — word for word</span>
+          "Your equation predicted X. The actual result was Y. Residual: X − Y."
+          <div class="divider"></div>
+          "Now look at this morning's percent change calculation. Your biggest stat change was Z% in [stat]. The result changed by [residual]. Is the change in your performance proportional to the change in your configuration?"
+        </div>
+        <div class="timing">
+          <span class="timing-icon">⏱</span>
+          Give them 60 seconds to look at both worksheets.
+        </div>
+        <div class="note">
+          <strong>Do not provide the interpretation — ask for theirs.</strong> If they changed a stat by 50% and the result barely moved, the model is missing something. If the result moved proportionally, the model is working. Either finding is useful.
+        </div>
+      </div>
     </div>
 
-    <div class="steps">
-
-      <!-- STEP 1 -->
-      <div class="step">
-        <div class="step-header">
-          <div class="step-number">Step 1</div>
-          <div class="step-title">Acknowledge the emotion</div>
+    <div class="step">
+      <div class="step-header">
+        <div class="step-number">Step 03</div>
+        <div class="step-title">Restore hypothesis-making</div>
+      </div>
+      <div class="step-body">
+        <div class="say-block">
+          <span class="say-label">Say — word for word</span>
+          "You have N matches left in Season 2. Your Prediction Market card calls for W wins. What is the one adjustment — configuration or strategy — most likely to close the gap?"
         </div>
-        <div class="step-body">
-          <div class="say-block">
-            <span class="say-label">Say — word for word</span>
-            "That result was frustrating. That's a real feeling and it makes sense."
-          </div>
-          <div class="timing">
-            <span class="timing-icon">⏱</span>
-            Wait 30 seconds. Do not qualify it. Do not move on early.
-          </div>
+        <div class="timing">
+          <span class="timing-icon">✏️</span>
+          Write their answer down. That is their hypothesis going into the next match.
+        </div>
+        <div class="note">
+          <strong>Do not evaluate the hypothesis now.</strong> Your job is to get them into planning mode, not to approve the plan.
         </div>
       </div>
-
-      <!-- STEP 2 -->
-      <div class="step">
-        <div class="step-header">
-          <div class="step-number">Step 2</div>
-          <div class="step-title">Locate the decision point</div>
-        </div>
-        <div class="step-body">
-          <div class="say-block">
-            <span class="say-label">Say — word for word</span>
-            "Your equation predicted X. The actual result was Y. Residual: X − Y."
-            <div class="divider"></div>
-            "Now look at this morning's percent change calculation. Your biggest stat change was Z% in [stat]. The result changed by [residual]. Is the change in your performance proportional to the change in your configuration?"
-          </div>
-          <div class="timing">
-            <span class="timing-icon">⏱</span>
-            Give them 60 seconds to look at both worksheets.
-          </div>
-          <div class="note">
-            <strong>Do not provide the interpretation — ask for theirs.</strong> If they changed a stat by 50% and the result barely moved, the model is missing something. If the result moved proportionally, the model is working. Either finding is useful.
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="step">
-        <div class="step-header">
-          <div class="step-number">Step 3</div>
-          <div class="step-title">Restore hypothesis-making</div>
-        </div>
-        <div class="step-body">
-          <div class="say-block">
-            <span class="say-label">Say — word for word</span>
-            "You have N matches left in Season 2. Your Prediction Market card calls for W wins. What is the one adjustment — configuration or strategy — most likely to close the gap?"
-          </div>
-          <div class="timing">
-            <span class="timing-icon">✏️</span>
-            Write their answer down. That is their hypothesis going into the next match.
-          </div>
-          <div class="note">
-            <strong>Do not evaluate the hypothesis now.</strong> Your job is to get them into planning mode, not to approve the plan.
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 4 -->
-      <div class="step optional">
-        <div class="step-header">
-          <div class="step-number">Step 4 · Optional</div>
-          <div class="step-title">Go public with the residual</div>
-        </div>
-        <div class="step-body">
-          <div class="say-block">
-            <span class="say-label">Say — if using</span>
-            "Walk to one other team. Tell them: 'Our residual was _____, so we're changing _____.' One sentence. Then come back."
-          </div>
-          <div class="timing">
-            <span class="timing-icon">⏱</span>
-            60 seconds. If a student declines, let it go. If time is tight, skip Step 4.
-          </div>
-        </div>
-      </div>
-
     </div>
 
-    <!-- Footer rule -->
-    <div class="footer-rule">
-      <div class="footer-rule-label">The rule</div>
-      <p>A team stuck in frustration is not learning. <span>Data focus restores agency.</span> Every question you ask points back to the dashboard — not to the loss.</p>
+    <div class="step optional">
+      <div class="step-header">
+        <div class="step-number">Step 04 · Optional</div>
+        <div class="step-title">Go public with the residual</div>
+      </div>
+      <div class="step-body">
+        <div class="say-block">
+          <span class="say-label">Say — if using</span>
+          "Walk to one other team. Tell them: 'Our residual was _____, so we're changing _____.' One sentence. Then come back."
+        </div>
+        <div class="timing">
+          <span class="timing-icon">⏱</span>
+          60 seconds. If a student declines, let it go. If time is tight, skip Step 4.
+        </div>
+      </div>
     </div>
 
   </div>
+
+  <div class="footer-rule">
+    <div class="footer-rule-label">The rule</div>
+    <p>A team stuck in frustration is not learning. <span>Data focus restores agency.</span> Every question you ask points back to the dashboard — not to the loss.</p>
+  </div>
+
+</main>
+
 </body>
 </html>
