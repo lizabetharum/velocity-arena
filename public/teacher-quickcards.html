@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Quick Cards by Day</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  /* Two-column layout for the day cards */
+  .qc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;align-items:start;}
+  .qc-grid > div{min-width:0;}
+  @media (max-width:60rem){.qc-grid{grid-template-columns:1fr;}}
+  .qc-week{
+    grid-column:1 / -1;
+    font-size:0.6875rem;font-weight:700;color:var(--cyan);
+    text-transform:uppercase;letter-spacing:.08em;
+    margin:0.5rem 0 0.25rem;
+  }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="page-body">
+
+  <h1 style="font-size:1.625rem;font-weight:800;color:var(--white);margin-bottom:0.375rem;">Quick Cards by Day</h1>
+  <p style="font-size:0.9375rem;color:var(--slate);line-height:1.6;margin-bottom:1.5rem;max-width:55rem;">
+    One printable card per activity, grouped by day. Print individually, or use the
+    <a href="/resources/quick-cards/print.html" target="_blank" style="color:var(--cyan);">Print all / by week</a>
+    page to batch-print a whole week at once.
+  </p>
+
+  <div class="qc-grid" id="quickcard-grid">
+    <!-- populated by renderQuickCards() from days.js -->
+  </div>
+
+  <p style="font-size:0.8125rem;color:var(--slate);margin-top:2rem;">
+    <a href="/teachers.html" style="color:var(--cyan);">← Back to Teacher Resources</a>
+  </p>
+</main>
+
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script src="/days-default.js"></script>
+<script src="/days-tn.js"></script>
+<script src="/days.js"></script>
+<script>
+renderHeader('teachers');
+
+const WEEK_HEADINGS = {
+  1: 'Week 1 — Play Lab + Boot Camp',
+  2: 'Week 2 — Season 1',
+  3: "Week 3 — Commissioner's Week + Season 2",
+  4: 'Week 4 — Championship + Exhibition',
+};
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function renderQuickCards() {
+  const grid = document.getElementById('quickcard-grid');
+  if (!grid || typeof DAYS === 'undefined') return;
+
+  let html = '';
+  let lastWeek = -1;
+  for (const day of DAYS) {
+    const acts = (day.activities || []).filter(a => a.quickCard);
+    if (acts.length === 0) continue;
+    if (day.week !== lastWeek) {
+      lastWeek = day.week;
+      html += '<div class="qc-week">' + escapeHtml(WEEK_HEADINGS[day.week] || ('Week ' + day.week)) + '</div>';
+    }
+    html += '<div class="resource-card">';
+    html += '<div class="resource-title">Day ' + day.day + ' &mdash; ' + escapeHtml(day.theme || '') + '</div>';
+    for (const a of acts) {
+      html += '<a class="resource-link" href="' + a.quickCard + '" target="_blank">' + escapeHtml(a.name) + ' &rarr;</a>';
+    }
+    html += '</div>';
+  }
+  if (!html) {
+    html = '<div style="font-size:0.8125rem;color:var(--slate);font-style:italic;">No quick cards attached yet.</div>';
+  }
+  grid.innerHTML = html;
+}
+
+renderQuickCards();
+</script>
+</body>
+</html>
