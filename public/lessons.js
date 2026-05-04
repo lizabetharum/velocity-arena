@@ -38,7 +38,6 @@ const ACTIVITY_LESSONS = {
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
-    { url: '/lessons/crack-the-bot.html',           label: 'Crack the bot' },
   ],
 };
 
