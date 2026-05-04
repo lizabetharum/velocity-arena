@@ -252,11 +252,13 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function kindFor(block) {
-  const b = String(block || '').toLowerCase();
-  if (/(ice breaker|warm.?up|hook|opener)/.test(b)) return 'warmup';
-  if (/(build|match|make|lab|test|drive)/.test(b)) return 'build';
-  if (/(ends|reflect|wind|close|debrief|share)/.test(b)) return 'reflect';
+function kindFor(activity) {
+  const block = String(activity && activity.block || '').toLowerCase();
+  const name = String(activity && activity.name || '').toLowerCase();
+  const hay = block + ' ' + name;
+  if (/(open lab|wind.?down|ends|reflect|closing|debrief|journal|send.?off)/.test(hay)) return 'reflect';
+  if (/(ice breaker|warm.?up|hook|opener|stretch|sound and movement|mirror)/.test(hay)) return 'warmup';
+  if (/(build|match|make|test|drive|cutebot|championship|exhibition)/.test(hay)) return 'build';
   return 'discuss';
 }
 
@@ -265,7 +267,7 @@ function rhythmFor(activities) {
   let total = 0;
   for (const a of activities) {
     const m = Number(a.mins) || 0;
-    sums[kindFor(a.block)] += m;
+    sums[kindFor(a)] += m;
     total += m;
   }
   if (total === 0) return null;
@@ -316,7 +318,7 @@ function renderWeeks() {
         : '';
 
       const cards = panelActivities.map((a, i) => {
-        const kind = kindFor(a.block);
+        const kind = kindFor(a);
         const seq = String(i + 1).padStart(2, '0');
         const kindLabel = a.block ? a.block : (kind === 'warmup' ? 'Warm-up' : kind === 'build' ? 'Build' : kind === 'reflect' ? 'Reflect' : 'Discuss');
         const mins = Number(a.mins) || 0;
