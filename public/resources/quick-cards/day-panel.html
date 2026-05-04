@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- vla-quickcard-gate:start -->
+<script>
+(function(){
+  var KEY = 'va_teacher_auth';
+  if (localStorage.getItem(KEY) === '1') return;
+  document.documentElement.style.visibility = 'hidden';
+  function bounce() { location.href = '/teachers.html'; }
+  var s = document.createElement('script');
+  s.src = '/config.js';
+  s.onload = function() {
+    var pw = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) || '';
+    var ans = prompt('Teacher password required to view day panel:');
+    if (ans !== null && ans.trim() === String(pw).trim()) {
+      localStorage.setItem(KEY, '1');
+      document.documentElement.style.visibility = '';
+    } else {
+      bounce();
+    }
+  };
+  s.onerror = bounce;
+  document.head.appendChild(s);
+})();
+</script>
+<!-- vla-quickcard-gate:end -->
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Day Panel</title>
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { margin: 0; padding: 0; }
+body{
+  background:var(--bg-1);color:var(--fg-1);
+  font-family:var(--font-sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:var(--accent-ink);}
+
+.topnav{position:sticky;top:0;z-index:10;background:var(--bg-0);border-bottom:1px solid var(--line-strong);padding:14px 32px 0;}
+.topnav .row{display:flex;align-items:center;gap:28px;max-width:1400px;margin:0 auto;}
+.topnav .brand{font:800 13px/1 var(--font-sans);letter-spacing:.04em;color:var(--fg-0);display:flex;align-items:center;gap:8px;text-decoration:none;}
+.topnav .brand .mark{width:18px;height:18px;background:var(--accent);display:inline-block;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.topnav nav{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.topnav nav a{font:600 11.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);padding:14px;text-decoration:none;position:relative;white-space:nowrap;}
+.topnav nav a:hover{color:var(--fg-0);}
+.topnav nav a.active{color:var(--accent);}
+.topnav nav a.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--accent);}
+.topnav .util{font:600 11px/1 var(--font-mono);color:var(--fg-1);letter-spacing:.04em;padding-bottom:14px;}
+.topnav .accent-rule{height:1px;background:var(--line-cyan);margin:0 -32px;}
+@media (max-width:780px){.topnav nav{display:none;}}
+
+.page{max-width:1320px;margin:0 auto;padding:32px 24px 80px;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);text-decoration:none;margin-bottom:18px;}
+.back-link:hover{color:var(--accent-bright);}
+
+.section-eyebrow{font:600 10px/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--fg-2);margin:0 0 12px;}
+.section-eyebrow .lab{color:var(--accent);margin-right:8px;}
+
+/* ─── DAY PICKER ─── */
+.day-picker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;}
+.day-pill{
+  font:600 10px/1 var(--font-mono);letter-spacing:.06em;
+  color:var(--fg-2);background:transparent;
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:6px 9px;text-decoration:none;cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:color var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out),background var(--dur-1) var(--ease-out);
+}
+.day-pill:hover{color:var(--fg-0);border-color:var(--line-strong);}
+.day-pill.current{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);}
+
+/* ─── DAY PANEL ─── */
+.day-panel{
+  background:var(--bg-2);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-md);
+  padding:22px 24px 18px;
+}
+.day-panel .meta-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
+.day-panel .day-num{font:700 12px/1 var(--font-mono);letter-spacing:.08em;color:var(--accent);font-variant-numeric:tabular-nums;}
+.day-panel .day-week{font:500 10px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);}
+.day-panel .day-time{margin-left:auto;font:500 11px/1 var(--font-mono);color:var(--fg-2);font-variant-numeric:tabular-nums;letter-spacing:.04em;text-transform:uppercase;}
+.day-panel h1{font:800 32px/1.1 var(--font-sans);letter-spacing:-.02em;color:var(--fg-0);margin:0 0 8px;text-wrap:balance;max-width:30ch;}
+.day-panel h1 .em{color:var(--accent);}
+.day-panel .lede{font:400 13px/1.5 var(--font-sans);color:var(--fg-1);margin:0 0 18px;max-width:60ch;}
+
+/* ─── DECK HEAD + DECK ─── */
+.deck-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  border-top:1px solid var(--line);
+  padding-top:14px;margin-bottom:10px;
+  gap:12px;flex-wrap:wrap;
+}
+.deck-name{font:600 10px/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--fg-2);}
+.deck-name strong{color:var(--fg-0);font-weight:600;}
+.deck-actions{display:flex;gap:8px;}
+.deck-btn{
+  font:600 10px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);background:transparent;
+  border:1px solid var(--line-strong);border-radius:var(--r-sm);
+  padding:6px 10px;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:background var(--dur-1) var(--ease-out),color var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out);
+}
+.deck-btn:hover{background:var(--accent);color:var(--bg-1);border-color:var(--accent);}
+.deck-btn .ico{width:11px;height:11px;}
+
+.deck{
+  display:flex;gap:14px;
+  padding:8px 2px 14px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;
+}
+.deck::-webkit-scrollbar{height:6px;}
+.deck::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+
+.dp-card{
+  flex:0 0 230px;
+  scroll-snap-align:start;
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-md);
+  padding:14px 14px 12px;
+  background:var(--bg-1);
+  display:flex;flex-direction:column;gap:8px;
+  position:relative;
+  text-decoration:none;color:inherit;cursor:pointer;
+  transition:border-color var(--dur-1) var(--ease-out),transform var(--dur-1) var(--ease-out);
+}
+.dp-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.dp-card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;}
+.dp-card .seq{
+  position:absolute;top:-7px;left:12px;
+  background:var(--bg-2);
+  padding:0 6px;
+  font:700 10px/1.2 var(--font-mono);letter-spacing:.04em;
+  color:var(--accent);font-variant-numeric:tabular-nums;
+}
+.dp-card .kind{
+  display:inline-flex;align-items:center;gap:6px;
+  font:600 9px/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--fg-2);margin-top:4px;
+}
+.dp-card .kind .swatch{width:8px;height:8px;border-radius:2px;background:var(--accent);flex-shrink:0;}
+.dp-card.kind-warmup  .swatch{background:var(--fg-2);}
+.dp-card.kind-discuss .swatch{background:var(--accent);}
+.dp-card.kind-build   .swatch{background:#FF7A45;}
+.dp-card.kind-reflect .swatch{background:#B59CFF;}
+.dp-card .ttl{font:700 14px/1.25 var(--font-sans);color:var(--fg-0);text-wrap:balance;flex:1;margin:0;}
+.dp-card .meta{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font:500 10px/1.2 var(--font-mono);color:var(--fg-2);
+  border-top:1px dashed var(--line);
+  padding-top:8px;gap:8px;
+  font-variant-numeric:tabular-nums;
+}
+.dp-card .meta .time{color:var(--accent);font-weight:700;flex-shrink:0;}
+.dp-card .meta .printed{color:var(--fg-2);text-align:right;text-transform:uppercase;letter-spacing:.04em;}
+
+/* ─── PREVIEW STRIP ─── */
+.preview-strip{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);}
+.preview-strip-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;gap:16px;flex-wrap:wrap;}
+.preview-strip-head h3{font:600 11px/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--fg-0);margin:0;}
+.preview-strip-head .meta{font:500 11px/1 var(--font-mono);color:var(--fg-2);font-variant-numeric:tabular-nums;}
+.preview-strip-head .meta b{color:var(--accent);}
+
+.preview-row{display:grid;grid-template-columns:660px 1fr;gap:28px;align-items:start;}
+@media (max-width:1080px){.preview-row{grid-template-columns:1fr;}}
+
+.preview-frame-wrap{
+  width:660px;height:510px;
+  overflow:hidden;
+  border:1px solid var(--line-strong);
+  background:#fff;
+  box-shadow:0 12px 48px rgba(0,0,0,0.45);
+  position:relative;
+  border-radius:2px;
+}
+@media (max-width:720px){
+  .preview-frame-wrap{width:100%;height:auto;aspect-ratio:11/8.5;}
+}
+.preview-frame-wrap iframe{
+  width:1056px;height:816px;
+  border:0;display:block;
+  transform-origin:top left;
+  transform:scale(0.625);
+}
+@media (max-width:720px){
+  .preview-frame-wrap iframe{
+    width:100%;height:100%;transform:none;
+  }
+}
+.preview-frame-empty{
+  width:100%;height:100%;
+  display:grid;place-items:center;
+  font:500 13px/1.5 var(--font-sans);color:var(--fg-2);
+  background:var(--bg-2);
+}
+
+.annotation{font:400 13px/1.55 var(--font-sans);color:var(--fg-1);text-wrap:pretty;}
+.annotation strong{color:var(--fg-0);}
+.annotation .pin{color:var(--accent);font-weight:600;font-family:var(--font-mono);margin-right:6px;letter-spacing:.04em;}
+.annotation hr{border:0;border-top:1px dashed var(--line);margin:12px 0;}
+.annotation ul{padding-left:0;list-style:none;margin:6px 0 0;}
+.annotation li{margin-bottom:8px;}
+.annotation .open-card{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;
+  font:600 10px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent);
+  border:1px solid var(--accent);border-radius:var(--r-sm);
+  padding:7px 11px;text-decoration:none;
+  transition:background var(--dur-1) var(--ease-out);
+}
+.annotation .open-card:hover{background:var(--accent-bright);}
+
+.empty-state{
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-radius:var(--r-md);padding:18px 22px;
+  color:var(--fg-1);font:400 14px/1.6 var(--font-sans);
+}
+.empty-state code{font-family:var(--font-mono);background:var(--bg-1);padding:1px 6px;border-radius:2px;font-size:13px;color:var(--fg-0);}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">FACILITATOR · DAY PANEL</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<main class="page">
+
+  <a class="back-link" href="/teacher-quickcards.html">← Back to Quick Cards</a>
+
+  <p class="section-eyebrow"><span class="lab">B</span>Day panel as a deck of facilitator quick cards</p>
+
+  <nav class="day-picker" id="day-picker" aria-label="Pick a day"></nav>
+
+  <article class="day-panel" id="day-panel">
+    <div class="empty-state">Loading day…</div>
+  </article>
+
+</main>
+
+<script src="/config.js"></script>
+<script src="/days-default.js"></script>
+<script src="/days-tn.js"></script>
+<script src="/days.js"></script>
+<script>
+const WEEK_HEADINGS = {
+  1: 'Week 1 · Onboarding',
+  2: 'Week 2 · Season 1',
+  3: "Week 3 · Commissioner's Week + Season 2",
+  4: 'Week 4 · Championship + Exhibition',
+};
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function kindFor(activity) {
+  const block = String(activity && activity.block || '').toLowerCase();
+  const name = String(activity && activity.name || '').toLowerCase();
+  const hay = block + ' ' + name;
+  if (/(open lab|wind.?down|ends|reflect|closing|debrief|journal|send.?off)/.test(hay)) return 'reflect';
+  if (/(ice breaker|warm.?up|hook|opener|stretch|sound and movement|mirror)/.test(hay)) return 'warmup';
+  if (/(build|match|make|test|drive|cutebot|championship|exhibition)/.test(hay)) return 'build';
+  return 'discuss';
+}
+
+function getQuery() {
+  const p = new URLSearchParams(location.search);
+  return {
+    day: p.get('day') ? Math.max(1, parseInt(p.get('day'), 10)) : null,
+    card: p.get('card') ? Math.max(0, parseInt(p.get('card'), 10)) : 0,
+  };
+}
+
+// Emphasize the last word of the theme in cyan, like the design.
+function emphasizeLastWord(theme) {
+  if (!theme) return '';
+  const m = theme.match(/^(.*?)([A-Za-z][A-Za-z'’-]*)([.!?]?)$/);
+  if (!m) return escapeHtml(theme);
+  return escapeHtml(m[1]) + '<span class="em">' + escapeHtml(m[2]) + '</span>' + escapeHtml(m[3]);
+}
+
+function render() {
+  const { day: requestedDay, card: requestedCard } = getQuery();
+  const picker = document.getElementById('day-picker');
+  const panel = document.getElementById('day-panel');
+
+  if (typeof DAYS === 'undefined') return;
+
+  const eligibleDays = DAYS.filter(d => (d.activities || []).some(a => a.quickCard));
+  if (eligibleDays.length === 0) {
+    panel.innerHTML = '<div class="empty-state">No quick cards mapped yet — add a <code>quickCard</code> URL to any activity in <code>days.js</code>.</div>';
+    picker.innerHTML = '';
+    return;
+  }
+
+  const day = eligibleDays.find(d => d.day === requestedDay) || eligibleDays[0];
+  const sheetActs = (day.activities || []).filter(a => a.quickCard);
+  const totalMins = sheetActs.reduce((s, a) => s + (Number(a.mins) || 0), 0);
+  const sheetCount = sheetActs.length;
+  const cardIdx = Math.min(Math.max(0, requestedCard), sheetCount - 1);
+  const active = sheetActs[cardIdx];
+
+  // Day picker
+  picker.innerHTML = eligibleDays.map(d => {
+    const isCurrent = d.day === day.day;
+    return `<a class="day-pill ${isCurrent ? 'current' : ''}" href="?day=${d.day}">DAY ${String(d.day).padStart(2, '0')}</a>`;
+  }).join('');
+
+  // Deck thumbnails
+  const cards = sheetActs.map((a, i) => {
+    const kind = kindFor(a);
+    const seq = String(i + 1).padStart(2, '0');
+    const kindLabel = a.block ? a.block : (kind === 'warmup' ? 'Warm-up' : kind === 'build' ? 'Build' : kind === 'reflect' ? 'Wind-down' : 'Discuss');
+    const mins = Number(a.mins) || 0;
+    const isActive = i === cardIdx;
+    return `
+      <a class="dp-card kind-${kind} ${isActive ? 'active' : ''}" href="?day=${day.day}&card=${i}" data-card-idx="${i}">
+        <span class="seq">${seq}</span>
+        <div class="kind"><span class="swatch"></span>${escapeHtml(kindLabel)}</div>
+        <p class="ttl">${escapeHtml(a.name)}</p>
+        <div class="meta">
+          ${mins ? `<span class="time">${mins} min</span>` : '<span class="time">—</span>'}
+          <span class="printed">Card</span>
+        </div>
+      </a>`;
+  }).join('');
+
+  // Active card metadata
+  const activeKind = kindFor(active);
+  const activeKindLabel = active.block || (activeKind === 'warmup' ? 'Warm-up' : activeKind === 'build' ? 'Build' : activeKind === 'reflect' ? 'Wind-down' : 'Discuss');
+  const activeMins = Number(active.mins) || 0;
+  const activeSeq = String(cardIdx + 1).padStart(2, '0');
+
+  panel.innerHTML = `
+    <div class="meta-row">
+      <span class="day-num">DAY ${String(day.day).padStart(2, '0')}</span>
+      <span class="day-week">${escapeHtml(WEEK_HEADINGS[day.week] || ('Week ' + day.week))}</span>
+      <span class="day-time">${totalMins ? totalMins + ' MIN · ' : ''}${sheetCount} SHEET${sheetCount === 1 ? '' : 'S'}</span>
+    </div>
+
+    <h1>${emphasizeLastWord(day.theme || '')}</h1>
+    <p class="lede">Each activity below is a printable facilitator quick card — one landscape letter sheet, full playbook. Print the day's stack before class.</p>
+
+    <div class="deck-head">
+      <span class="deck-name"><strong>Run-of-day</strong> · in order${totalMins ? `, ~${totalMins} min` : ''}</span>
+      <div class="deck-actions">
+        <a class="deck-btn" href="/resources/quick-cards/contact-sheet.html?day=${day.day}" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5h6M3 7.5h6"/><rect x="1.5" y="1.5" width="9" height="9" rx="1"/></svg>
+          Print all ${sheetCount}
+        </a>
+        <a class="deck-btn" href="/resources/quick-cards/print.html" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 10V4l4-2 4 2v6"/><path d="M2 4l4 2 4-2M6 6v4"/></svg>
+          PDF
+        </a>
+      </div>
+    </div>
+
+    <div class="deck">${cards}</div>
+
+    <div class="preview-strip">
+      <div class="preview-strip-head">
+        <h3>Card ${activeSeq} preview · 11×8.5 landscape · 1 sheet, full playbook</h3>
+        <span class="meta">Click any card above · this is what prints · <b>landscape letter, 1-up</b></span>
+      </div>
+      <div class="preview-row">
+        <div class="preview-frame-wrap">
+          ${active.quickCard
+            ? `<iframe src="${escapeHtml(active.quickCard)}" title="Card ${activeSeq} preview — ${escapeHtml(active.name)}" loading="lazy"></iframe>`
+            : `<div class="preview-frame-empty">No quick card for this activity yet.</div>`}
+        </div>
+        <div class="annotation">
+          <strong>This is what each card in the deck links to.</strong>
+          <p>One <em>landscape letter sheet</em> per activity — the full facilitator playbook on a single page: math bar, before-you-start checklist, minute-by-minute timing, scripted prompts, watch-for redirects, hard-stop rule, footer.</p>
+          <hr>
+          <strong>How the deck thumbnail and the sheet stay in lockstep:</strong>
+          <ul>
+            <li><span class="pin">SEQ</span> Thumbnail "${activeSeq}" matches sheet's "${cardIdx + 1} of ${sheetCount}" — a sheet found on the floor goes straight back.</li>
+            <li><span class="pin">TIME</span> Thumbnail "${activeMins} min" matches sheet's "${activeMins} min" header — single source of truth.</li>
+            <li><span class="pin">KIND</span> Thumbnail "${escapeHtml(activeKindLabel)}" matches sheet's frame; instructors see the day's rhythm at a glance.</li>
+            <li><span class="pin">PRINT ALL ${sheetCount}</span> Stitches the day's sheets into one landscape PDF — ${sheetCount} pages, ready for the clipboard.</li>
+          </ul>
+          ${active.quickCard ? `<a class="open-card" href="${escapeHtml(active.quickCard)}" target="_blank" rel="noopener">Open card in new tab →</a>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wire deck thumbnail clicks for SPA-feel without full reload
+  panel.querySelectorAll('.dp-card').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      const idx = parseInt(el.dataset.cardIdx, 10);
+      const url = new URL(location.href);
+      url.searchParams.set('day', day.day);
+      url.searchParams.set('card', idx);
+      history.replaceState(null, '', url);
+      // Re-render to update active state and preview iframe
+      render();
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', render);
+} else {
+  render();
+}
+
+window.addEventListener('popstate', render);
+</script>
+</body>
+</html>
