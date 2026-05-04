@@ -229,38 +229,33 @@ const MILESTONES = {
   20: 'Awards · post-task',
 };
 
-// On weekdays during camp, returns { status: 'today',  day: N }.
-// On weekends mid-camp,    returns { status: 'next',   day: N+1 } so the
-//                          *upcoming* weekday is what gets highlighted.
-// Before camp:             { status: 'before', day: null }
-// After camp:              { status: 'after',  day: null }
-// No CONFIG:                null
+// Weekday during camp:  { status: 'today',   day: N, lastDone: N-1 }
+// Weekend mid-camp:      { status: 'weekend', day: null, lastDone: N }  (no day is "current")
+// Before camp:           { status: 'before',  day: null, lastDone: 0 }
+// After camp:            { status: 'after',   day: null, lastDone: 20 }
+// No CONFIG:             null
 function campDayContext() {
   try {
     if (typeof CONFIG === 'undefined' || !CONFIG.startDate) return null;
     const start = new Date(CONFIG.startDate + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (today < start) return { status: 'before', day: null };
+    if (today < start) return { status: 'before', day: null, lastDone: 0 };
 
     const isWeekday = today.getDay() !== 0 && today.getDay() !== 6;
 
-    // Snap the target forward to the next weekday if today is Sat/Sun.
-    const target = new Date(today);
-    while (target.getDay() === 0 || target.getDay() === 6) {
-      target.setDate(target.getDate() + 1);
-    }
-
-    const calDays = Math.floor((target - start) / 86400000);
+    const calDays = Math.floor((today - start) / 86400000);
     let wd = 0;
     for (let i = 0; i <= calDays; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const dow = d.getDay();
       if (dow !== 0 && dow !== 6) wd++;
-      if (wd >= 21) return { status: 'after', day: null };
+      if (wd > 20) return { status: 'after', day: null, lastDone: 20 };
     }
-    return { status: isWeekday ? 'today' : 'next', day: wd };
+
+    if (isWeekday) return { status: 'today', day: wd, lastDone: wd - 1 };
+    return { status: 'weekend', day: null, lastDone: wd };
   } catch (e) { return null; }
 }
 
@@ -269,6 +264,10 @@ const ctx = campDayContext();
 function stateFor(dayNum) {
   if (!ctx || ctx.status === 'before') return 'is-future';
   if (ctx.status === 'after') return 'is-past';
+  if (ctx.status === 'weekend') {
+    return dayNum <= ctx.lastDone ? 'is-past' : 'is-future';
+  }
+  // status === 'today'
   if (dayNum < ctx.day) return 'is-past';
   if (dayNum === ctx.day) return 'is-current';
   return 'is-future';
@@ -311,8 +310,8 @@ grid.innerHTML = weeks.map(w => {
   if (!ctx) { el.innerHTML = 'STUDENT'; return; }
   if (ctx.status === 'today' && ctx.day) {
     el.innerHTML = `STUDENT · DAY <b>${ctx.day}</b> / 20`;
-  } else if (ctx.status === 'next' && ctx.day) {
-    el.innerHTML = `STUDENT · NEXT · DAY <b>${ctx.day}</b> / 20`;
+  } else if (ctx.status === 'weekend') {
+    el.innerHTML = `STUDENT · WEEKEND · <b>${ctx.lastDone}</b> / 20 DONE`;
   } else if (ctx.status === 'before') {
     el.innerHTML = `STUDENT · STARTING SOON`;
   } else if (ctx.status === 'after') {
