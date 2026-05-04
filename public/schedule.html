@@ -229,34 +229,48 @@ const MILESTONES = {
   20: 'Awards · post-task',
 };
 
-// Returns: 0 if camp hasn't started, 1–20 during camp, 21 if camp has ended, null if no config.
-function currentCampDay() {
+// On weekdays during camp, returns { status: 'today',  day: N }.
+// On weekends mid-camp,    returns { status: 'next',   day: N+1 } so the
+//                          *upcoming* weekday is what gets highlighted.
+// Before camp:             { status: 'before', day: null }
+// After camp:              { status: 'after',  day: null }
+// No CONFIG:                null
+function campDayContext() {
   try {
     if (typeof CONFIG === 'undefined' || !CONFIG.startDate) return null;
     const start = new Date(CONFIG.startDate + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (today < start) return 0;
-    const calDays = Math.floor((today - start) / 86400000);
+    if (today < start) return { status: 'before', day: null };
+
+    const isWeekday = today.getDay() !== 0 && today.getDay() !== 6;
+
+    // Snap the target forward to the next weekday if today is Sat/Sun.
+    const target = new Date(today);
+    while (target.getDay() === 0 || target.getDay() === 6) {
+      target.setDate(target.getDate() + 1);
+    }
+
+    const calDays = Math.floor((target - start) / 86400000);
     let wd = 0;
     for (let i = 0; i <= calDays; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const dow = d.getDay();
       if (dow !== 0 && dow !== 6) wd++;
-      if (wd >= 21) return 21;
+      if (wd >= 21) return { status: 'after', day: null };
     }
-    return wd;
+    return { status: isWeekday ? 'today' : 'next', day: wd };
   } catch (e) { return null; }
 }
 
-const today = currentCampDay();
+const ctx = campDayContext();
 
 function stateFor(dayNum) {
-  if (today == null || today === 0) return 'is-future';
-  if (today >= 21) return 'is-past';
-  if (dayNum < today) return 'is-past';
-  if (dayNum === today) return 'is-current';
+  if (!ctx || ctx.status === 'before') return 'is-future';
+  if (ctx.status === 'after') return 'is-past';
+  if (dayNum < ctx.day) return 'is-past';
+  if (dayNum === ctx.day) return 'is-current';
   return 'is-future';
 }
 
@@ -294,8 +308,18 @@ grid.innerHTML = weeks.map(w => {
 (function () {
   const el = document.getElementById('day-pill');
   if (!el) return;
-  const dayNum = (today != null && today >= 1 && today <= 20) ? today : null;
-  el.innerHTML = dayNum ? `STUDENT · DAY <b>${dayNum}</b> / 20` : 'STUDENT';
+  if (!ctx) { el.innerHTML = 'STUDENT'; return; }
+  if (ctx.status === 'today' && ctx.day) {
+    el.innerHTML = `STUDENT · DAY <b>${ctx.day}</b> / 20`;
+  } else if (ctx.status === 'next' && ctx.day) {
+    el.innerHTML = `STUDENT · NEXT · DAY <b>${ctx.day}</b> / 20`;
+  } else if (ctx.status === 'before') {
+    el.innerHTML = `STUDENT · STARTING SOON`;
+  } else if (ctx.status === 'after') {
+    el.innerHTML = `STUDENT · CAMP COMPLETE`;
+  } else {
+    el.innerHTML = 'STUDENT';
+  }
 })();
 </script>
 </body>
