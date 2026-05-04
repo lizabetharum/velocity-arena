@@ -16,8 +16,10 @@ const ACTIVITY_LESSONS = {
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
   'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power-stat-challenge.html',
-  'Budget Constraint': '/lessons/budget-constraint.html',
-  'Crack The Bot': '/lessons/crack-the-bot.html',
+  'The Budget Constraint: Speed + Power + Turning + Endurance = 20': [
+    { url: '/lessons/budget-constraint.html', label: 'Budget constraint' },
+    { url: '/lessons/crack-the-bot.html',     label: 'Crack the bot' },
+  ],
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
