@@ -55,15 +55,36 @@ body{
 .day-card{
   background:var(--bg-2);border:1px solid var(--line-strong);
   border-radius:var(--r-md);padding:16px 14px;
-  text-decoration:none;color:inherit;display:block;
-  transition:border-color var(--dur-1) var(--ease-out),background var(--dur-1) var(--ease-out),transform var(--dur-1) var(--ease-out);
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;min-height:140px;
+  transition:border-color var(--dur-1) var(--ease-out),background var(--dur-1) var(--ease-out),transform var(--dur-1) var(--ease-out),opacity var(--dur-1) var(--ease-out);
 }
 .day-card:hover{border-color:var(--line-cyan);background:var(--bg-3);transform:translateY(-1px);}
 .day-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-.dc-num{font:500 22px/1 var(--font-mono);color:var(--fg-0);font-variant-numeric:tabular-nums;margin-bottom:4px;}
-.dc-day{font:600 10.5px/1 var(--font-sans);color:var(--fg-2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px;}
-.dc-theme{font:400 12.5px/1.45 var(--font-sans);color:var(--fg-1);}
-.dc-acts{font:500 10.5px/1 var(--font-mono);color:var(--accent);margin-top:8px;letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+.dc-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.dc-num{font:500 22px/1 var(--font-mono);color:var(--fg-0);font-variant-numeric:tabular-nums;}
+.dc-day{font:600 10.5px/1 var(--font-sans);color:var(--fg-2);text-transform:uppercase;letter-spacing:.16em;}
+.dc-theme{font:400 12.5px/1.45 var(--font-sans);color:var(--fg-1);flex:1;}
+.dc-milestone{
+  font:600 9.5px/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--line);
+}
+
+/* ── state: past — dimmed, recoverable on hover ── */
+.day-card.is-past{opacity:.42;}
+.day-card.is-past:hover{opacity:1;}
+
+/* ── state: current — cyan accent ── */
+.day-card.is-current{
+  background:rgba(0,229,255,0.07);
+  border-color:var(--accent);
+}
+.day-card.is-current:hover{background:rgba(0,229,255,0.12);border-color:var(--accent);}
+.day-card.is-current .dc-num{color:var(--fg-0);}
+.day-card.is-current .dc-day{color:var(--accent);}
+.day-card.is-current .dc-theme{color:var(--fg-0);}
+
 @media (max-width:760px){.days-grid{grid-template-columns:repeat(2,1fr);}}
 
 /* ── daily structure timeline ───────────────────────────────── */
@@ -198,27 +219,71 @@ const weeks = [
   { num: 4, name: 'Championship + Exhibition' },
 ];
 
+// Milestone tags at the bottom of certain day cards. Keep concise — small caps, accent color.
+const MILESTONES = {
+  7:  'Season 1 kickoff',
+  10: 'Season 1 finals',
+  12: 'Rule change',
+  13: 'Season 2 kickoff',
+  18: 'Championship',
+  20: 'Awards · post-task',
+};
+
+// Returns: 0 if camp hasn't started, 1–20 during camp, 21 if camp has ended, null if no config.
+function currentCampDay() {
+  try {
+    if (typeof CONFIG === 'undefined' || !CONFIG.startDate) return null;
+    const start = new Date(CONFIG.startDate + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (today < start) return 0;
+    const calDays = Math.floor((today - start) / 86400000);
+    let wd = 0;
+    for (let i = 0; i <= calDays; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) wd++;
+      if (wd >= 21) return 21;
+    }
+    return wd;
+  } catch (e) { return null; }
+}
+
+const today = currentCampDay();
+
+function stateFor(dayNum) {
+  if (today == null || today === 0) return 'is-future';
+  if (today >= 21) return 'is-past';
+  if (dayNum < today) return 'is-past';
+  if (dayNum === today) return 'is-current';
+  return 'is-future';
+}
+
 const grid = document.getElementById('schedule-grid');
 grid.innerHTML = weeks.map(w => {
   const days = DAYS.filter(d => d.week === w.num);
   const cards = days.map(d => {
-    const actCount = d.activities ? d.activities.filter(a => !/^Lunch|^Break$|^Energy Reset$/i.test(a.name || '')).length : 0;
     const weekday = (typeof campDayWeekday === 'function' && campDates.length)
       ? campDayWeekday(campDates, d.day)
       : '';
+    const state = stateFor(d.day);
+    const milestone = MILESTONES[d.day];
     return `
-      <a class="day-card" href="/day.html?day=${d.day}">
-        <div class="dc-num">${String(d.day).padStart(2,'0')}</div>
-        <div class="dc-day">${weekday}</div>
+      <a class="day-card ${state}" href="/day.html?day=${d.day}">
+        <div class="dc-top">
+          <div class="dc-num">${String(d.day).padStart(2, '0')}</div>
+          <div class="dc-day">${weekday}</div>
+        </div>
         <div class="dc-theme">${d.theme || ''}</div>
-        ${actCount ? `<div class="dc-acts">${actCount} activities →</div>` : ''}
+        ${milestone ? `<div class="dc-milestone">${milestone}</div>` : ''}
       </a>`;
   }).join('');
 
   return `
     <div class="week-section">
       <div class="week-heading">
-        <span class="num">WEEK ${String(w.num).padStart(2,'0')}</span>
+        <span class="num">WEEK ${String(w.num).padStart(2, '0')}</span>
         <span class="name">${w.name}</span>
       </div>
       <div class="days-grid">${cards}</div>
@@ -229,22 +294,7 @@ grid.innerHTML = weeks.map(w => {
 (function () {
   const el = document.getElementById('day-pill');
   if (!el) return;
-  let dayNum = null;
-  try {
-    if (typeof CONFIG !== 'undefined' && CONFIG.startDate) {
-      const start = new Date(CONFIG.startDate + 'T00:00:00');
-      const today = new Date();
-      const calDays = Math.floor((today - start) / 86400000);
-      let wd = 0;
-      for (let i = 0; i <= calDays && wd < 20; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const dow = d.getDay();
-        if (dow !== 0 && dow !== 6) wd++;
-      }
-      if (wd >= 1 && wd <= 20) dayNum = wd;
-    }
-  } catch (e) {}
+  const dayNum = (today != null && today >= 1 && today <= 20) ? today : null;
   el.innerHTML = dayNum ? `STUDENT · DAY <b>${dayNum}</b> / 20` : 'STUDENT';
 })();
 </script>
