@@ -703,6 +703,16 @@ function checkStep(id) {
     inp.style.borderColor = 'var(--green)';
     inp.disabled = true;
 
+    // For percent-change steps, reveal the formula's result box now (after
+    // the student has committed to an answer) so they get visual confirmation.
+    if (id === 's4' || id === 'p4') {
+      const resultEl = document.getElementById(id + '-calc-result');
+      if (resultEl) {
+        resultEl.textContent = correct + '%';
+        resultEl.style.color = 'var(--green)';
+      }
+    }
+
     if (cfg.next) {
       unlockStep(cfg.next);
     } else if (cfg.phase === 'speed') {
@@ -744,18 +754,11 @@ function unlockStep(id) {
 }
 
 function calcPctDisplay(prefix) {
-  const nv  = parseFloat(document.getElementById(prefix + '-new').value);
-  const ov  = parseFloat(document.getElementById(prefix + '-old').value);
-  const ov2 = parseFloat(document.getElementById(prefix + '-old2').value);
-  const el  = document.getElementById(prefix + '-calc-result');
-  if (!isNaN(nv) && !isNaN(ov) && !isNaN(ov2) && ov2 !== 0) {
-    const result = Math.round((nv - ov) / ov2 * 1000) / 10; // 1 decimal place
-    el.textContent = result + '%';
-    el.style.color = 'var(--green)';
-  } else {
-    el.textContent = '?%';
-    el.style.color = 'var(--yellow)';
-  }
+  // Intentional no-op. The three scratch boxes (New / Orig / Orig) let
+  // students lay out their numbers, but we deliberately do NOT compute the
+  // answer here — auto-revealing it before they've entered their own answer
+  // defeats the point of the percent-change check. The result box stays at
+  // '?%' until checkStep() confirms a correct answer.
 }
 
 function clearFeedback(id) {
