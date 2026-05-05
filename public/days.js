@@ -63,7 +63,8 @@ const DAYS = [
         "facilitatorDescription": "Put one formula on the board: Speed % = (Speed points / 20) x 100. Teams calculate motor power for Speed values of 1, 3, 5, 6, and 8. Then teams compare answers with the team next to them and reconcile any disagreements before asking for help. Do not resolve disagreements yourself -- the productive work happens in the between-team conversation.",
         "script": "https://docs.google.com/document/d/12wViKxrKPix59HkDOGzY5YdpanDO5o_j6hbpYZlg3MM/edit?usp=drivesdk",
         "worksheet": "https://drive.google.com/file/d/1K51qc8WHn95uEqbp0sOxFxXN9cgcjm7W/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html",
+        'webpage': 'https://velocity-arena-gold.vercel.app/lessons/speed-stat.html' 
       },
       {
         "name": "Lunch / Snack Break",
@@ -404,6 +405,7 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1qtE-c80NIwHmAZBYp-aFF3alFVtrdfwHuow5CL9zKFg/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1phpZXVdhlbUXIrBv_lv1Q4njeCX116chos0deJRs360/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-03-budget-constraint.html"
+         
       },
       {
         "name": "Lunch / Snack Break",
@@ -423,15 +425,24 @@ const DAYS = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-04-cold-recall.html"
       },
       {
+        "name": "Dashboard Introduction",
+        "mins": 10,
+        "block": "Transition",
+        "description": "Teams set up the Match Log dashboard they will use for the full program. Each team assigns a Data Owner and learns the 11-column structure: date, match number, stat allocations, opponent, score, predicted goals, result, and notes. The paper-first capture workflow is introduced: complete the paper row at the table within 60 seconds of each match, then transfer to the digital dashboard within 10 minutes. Week 1 data does not count toward standings, but every row in this dashboard feeds the algebra work in Weeks 2 through 4.",
+        "facilitatorDescription": "Open the digital dashboard on the projector before students arrive with one sample row pre-filled. Walk teams through all 11 columns by name and purpose. Emphasize Predicted Goals as its own column -- the gap between prediction and actual score is the residual, the core concept in Week 3. State the completion standard directly: every cell filled by the end of each match day, no exceptions. Run the live demo in under 2 minutes -- click Add Row, fill the sample row, click Save. Do not fumble this. Confirm each team's Data Owner out loud before the session ends. Every team must pass the exit check: who is your Data Owner, and what are the three steps after every match?",
+        "script": "https://docs.google.com/document/d/1HZHM4CU6kodt298jeO6lzRn6O2o0x_n89aCiptxY0xY/edit?usp=sharing",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-dashboard-introduction.html"
+      },
+      {
         "name": "Match Format Briefing",
         "mins": 10,
-        "block": "",
+        "block": "Transition",
         "description": "Each match is 3 minutes, two teams on a flat field, first team to push the ball across the opposing end line scores a goal. Bots are pre-programmed. After each match, both teams record their score in the data dashboard immediately. Today's matches are practice only and do not count in Season 1 standings.",
         "facilitatorDescription": "Walk the whole camp through match format: 3 minutes each, two teams per match, first to push the ball across the end line scores. Bots are pre-programmed -- no joystick control during the match. Emphasize the programming commitment so teams understand their allocation choice is binding during play.",
         "script": "https://docs.google.com/document/d/1DDHa4QzzGpcFIWMZhXt1frwULDvcngx5uOZ25LzLNzw/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1PF0aj4YsLBO4HhphJ2yq1g42oZlClQpwL_v2JjEty5I/edit?usp=sharing",
         "webpage": "https://velocity-arena-gold.vercel.app/activities/dashboard/velocity-arena-dashboard.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-match-format-briefing.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-06-match-format-briefing.html"
       },
       {
         "name": "Simulation Matches: Your Loadout vs. Reality",
@@ -440,16 +451,16 @@ const DAYS = [
         "description": "Pick your best loadout from this morning, program it into your bot, and run practice matches. These do not count. After each run, compare: did your bot behave the way your allocation predicted? Record observations labeled 'simulation' in your dashboard.",
         "facilitatorDescription": "Teams pick their best loadout from the morning, program it into the bot, and run practice matches. These do not count toward any record. After each run, teams compare: did bot behavior match what the allocation predicted? Observations go in the dashboard labeled 'simulation.' First exposure to pre-match prediction and post-match comparison.",
         "script": "https://docs.google.com/document/d/1dLE5nbDOkwBGEi6ejIJX1IT48ir071mXRRU2A1_6Kvw/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-06-simulation-matches.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-simulation-matches.html"
       },
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 40,
+        "mins": 30,
         "block": "Open Lab",
         "description": "Experiment with the loadouts you designed this morning. Try each one. Which one produces the behavior your formulas predicted?",
         "facilitatorDescription": "Teams experiment with the three loadouts they designed in the morning. Each gets tested. The question: which one produces the behavior their formulas predicted? This is the hinge where teams notice formula-vs-reality gaps heading into Season 1.",
         "script": "https://docs.google.com/document/d/1b-dHky2JBEv8cZp-h9htJNm8CnTfeaA9Tz9ENb_GP1Y/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-open-lab-closing.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-08-open-lab-closing.html",
         "worksheet":"https://docs.google.com/document/d/1qAIWuumIOSJ18bQEGq2PDC8lpjbU0ChAsQtj-ks77jY/edit?usp=sharing"
       }
     ],
@@ -999,7 +1010,7 @@ const DAYS = [
         "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power², so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected.",
         "facilitatorDescription": "Phase 1 (20 min): teams calculate what happens when a stat is scaled by 50%. Speed is proportional (50% more Speed gives 50% more motor power). Power is not (charge speed = Power², so 50% more Power gives more than 50% more charge speed -- quadratic). Phase 2 (25 min): teams draft a rule change proposal using those scaling calculations as evidence, backed by at least two dashboard numbers and addressing how the current last-place team is affected. This sets up tomorrow's formal Commissioner's Meeting.",
         "script": "https://docs.google.com/document/d/1s9wUXxuyLnXP-TNXoZV22tcXRDgv5g6wBUYuzYEQjk8/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1_VhsD2hZb2VBH7-lwdKmMHGJAq5x8VJqHUwdI6GsdZg/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/14uTaGn7Zv2sGw_Xo4yJN90oteLD1qaBh/view?usp=drive_link",
         "webpage" :["https://velocity-arena-gold.vercel.app/lessons/proportional-scaling.html",
           "https://velocity-arena-gold.vercel.app/lessons/day11-commissioner-proposal.html"
         ],
@@ -1112,7 +1123,10 @@ const DAYS = [
         "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed. Your facilitator also checks Criterion 6: at least one of the following concept types must be named in the proposal -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay. Your facilitator asks one student per team: 'How did you calculate this number? What kind of math is that?' before the meeting starts.",
         "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one student per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
         "script": "https://docs.google.com/document/d/1rZES5FM1sbJcv16FcgLuV0mhrjpyPj2OaPZU_F1rJng/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1Gk98vJySwPowrqkMj1LTYlvm8b5U3g5o/view?usp=drive_link",
+        "worksheet": [
+          "https://drive.google.com/file/d/1Gk98vJySwPowrqkMj1LTYlvm8b5U3g5o/view?usp=drive_link",
+          "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view?usp=drive_link"
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
       },
       {
