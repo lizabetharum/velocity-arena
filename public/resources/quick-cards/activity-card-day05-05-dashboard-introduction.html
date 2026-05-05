@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velocity Arena — Data Dashboard Introduction</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; border-bottom: 1.5px solid #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.08em; color: #999; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 5px 9px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.checklist li { font-size: 8pt; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 9.5pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 2px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 5px 7px 5px 0; vertical-align: top; line-height: 1.35; }
+.timing-table td.t-time { font-size: 7.5pt; font-weight: 800; width: 0.55in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1in; font-size: 8pt; }
+.timing-table td.t-focus { font-size: 7.5pt; font-style: italic; color: #333; line-height: 1.4; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 5px 7px; font-style: normal; }
+.say-list { display: flex; flex-direction: column; gap: 5px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+.watch-item { font-size: 7.5pt; line-height: 1.35; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 2px solid #999; background: #999; color: #fff; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1px solid #fff; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #fff; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 6.5pt; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '\25B8'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page">
+<div class="card">
+ <div class="card-header">
+    <div class="activity-name">Data Dashboard Introduction</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:57%;"></div></div>
+      <span class="progress-label">5 of 8</span>
+    </div>
+    <div class="header-meta">10 Min  ·  Transition Block  ·  Day 5  ·  PM<br>Follows Cold Recall</div>
+  </div>
+ 
+  <div class="math-bar">MATH: <span>Residual = Predicted Goals − Actual Score (Week 3 algebra foundation)</span></div>
+  <div class="card-body">
+    <div class="col">
+<div class="section">
+  <div class="section-label">Before You Start</div>
+  <ul class="checklist">
+    <li>Open digital dashboard on projector before students arrive</li>
+    <li>Pre-fill one sample row to demo add, enter, save in 60 seconds</li>
+    <li>Know your answer: 'Why does Predicted Goals have its own column?' (Answer: residual—the gap between prediction and actual is the core Week 3 concept)</li>
+    <li>Print paper dashboards with column headers; one per team</li>
+    <li>Have clipboard ready to record each team's Data Owner name</li>
+    <li class="note">*This is not a filing task—it is a mathematical prerequisite. Every blank row in the dashboard means missing data for Week 3 analysis. Week 1 data does not count for standings, making it the ideal practice window for building the habit.*</li>
+  </ul>
+</div>
+<div class="section">
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>Paper dashboard labeled with all 11 column headers and purpose</li>
+    <li>Team agreement on Data Owner role and name</li>
+    <li>Confirmation of three-step workflow: Load → Enter → Save</li>
+    <li>First match row completed (paper) before leaving match table</li>
+  </ul>
+</div>
+<div class="section grow">
+  <div class="section-label">Reference</div>
+  <div style="font-size:8pt; line-height:1.5; display:flex; flex-direction:column; gap:6px;">
+    <div><span style="font-weight:800;">COLUMN</span> <span style="font-weight:800;">REFERENCE</span></div>
+    <div>1: Date | 2: Match # | 3–6: S, P, E, T (independent vars) | 7: Opponent | 8: Score (outcome) | 9: Predicted Goals (residual source) | 10: W/L/D | 11: Notes</div>
+    <div><span style="font-weight:800;">COMPLETION</span> <span style="font-weight:800;">STANDARD</span></div>
+    <div>Every cell filled same day. Estimates with Notes flags are acceptable; blanks are not.</div>
+  </div>
+</div>
+</div>
+    <div class="col">
+<div class="section grow">
+  <div class="section-label">Timing</div>
+  <table class="timing-table">
+    <tr><td class="t-time">0:00</td><td class="t-action">Context: Why data matters</td><td class="t-focus">Connect first bot drive to need for evidence. Ask: 'What happened in that drive you'd want to remember in Week 3?' Listen for 2–3 responses about speed, control, scoring. Frame observations as data.</td></tr>
+    <tr><td class="t-time">0:03</td><td class="t-action">Column walkthrough</td><td class="t-focus">Show table on screen. Name each column and its purpose in one sentence. After columns 3–6, ask: 'Why does Predicted Goals get its own column?' (Probe for: 'it's what we expected.' Don't explain—they figure it out Week 3.)</td></tr>
+    <tr><td class="t-time">0:07</td><td class="t-action">Completion standard</td><td class="t-focus">State rule non-negotiably: every cell filled same day, no blanks. Ask: 'What happens if you have five blank rows?' (Encourage them to name it: missing data, can't compare.) Do not answer for them.</td></tr>
+    <tr><td class="t-time">0:10</td><td class="t-action">Data Owner assignment</td><td class="t-focus">Teams pick one person, 60 seconds. Circulate and record names. If team cannot agree, assign to captain: 'You're the Data Owner now; reassign after if you need.' Do not linger.</td></tr>
+    <tr><td class="t-time">0:12</td><td class="t-action">Live demo: digital dashboard</td><td class="t-focus">Smooth, fast. Click +Add row, fill one sample row (date, match #1, stats, opponent, score, prediction, W/L/D), click Save. Point to confirmation. Say: 'Paper is capture (60 sec at table). Digital is the real record (Load, Enter, Save within 10 min).'</td></tr>
+    <tr class="hard-row"><td class="t-time">0:14</td><td class="t-action">Exit check (non-optional)</td><td class="t-focus">Ask each team: 'Who is your Data Owner?' Then: 'What are the three steps after every match?' Wait for Load, Enter, Save. If any team falters, have another team model it. Do not move on until all teams confirm.</td></tr>
+  </table>
+</div></div>
+    <div class="col">
+<div class="section">
+  <div class="section-label">Say This</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Open</span><div class="say-quote">You just drove your bot for the first time. Before we move on, what's one thing that happened in that drive you'd want to remember in three weeks when you're deciding whether to change your stats? [Pause 7 sec.]</div></div>
+    <div class="say-item"><span class="say-tag">Key Point</span><div class="say-quote">Every number you don't write down today is a decision you can't make in Week 3. That's exactly what this dashboard is for.</div></div>
+    <div class="say-item"><span class="say-tag">On Predicted Goals</span><div class="say-quote">The gap between what you predicted and what actually happened—that gap has a name in math. You'll figure out what it's called in Week 3. For now: write it down every match.</div></div>
+    <div class="say-item"><span class="say-tag">On Completion</span><div class="say-quote">Here is the standard. It is not negotiable. By the end of each match day, every cell in that row is filled. If you don't have an exact number, write your best estimate and flag it in Notes. Blank cells mean the data is gone—and we cannot recover missing data.</div></div>
+    <div class="say-item"><span class="say-tag dont">Not This</span><div class="say-quote plain">Don't skip Week 1 entries because they don't count for standings. The teams that build this habit in Week 1 will be ahead in Week 3 when we start using this data mathematically.</div></div>
+  </div>
+</div>
+<div class="section grow">
+  <div class="section-label">Watch For → Redirect</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Student asks what to do if they miss data after a match</span><span class="watch-redirect">Write your best estimate in the cell and note it's estimated in Notes. An estimate we can flag is more useful than nothing.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team cannot agree on a Data Owner</span><span class="watch-redirect">Assign to team captain directly: 'You're the Data Owner for now. You can reassign after the session—just not right now.' Move on immediately.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student finishes early and goes off-task</span><span class="watch-redirect">Check your column order against the reference on screen. Then explain to your teammate: what is Predicted Goals used for and why is it separate from Score?</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team questions why Week 1 data is required if it doesn't count for standings</span><span class="watch-redirect">Your Week 3 algebra uses all 20 rows. Teams that skip Week 1 will have 8 fewer data points. The habit is the point.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Digital dashboard won't load or has a technical issue</span><span class="watch-redirect">Do not troubleshoot live. Say: 'Paper dashboards are the real record. Digital entry can happen next session. Keep going.' Note issue for tech support.</span></div>
+  </div>
+</div></div>
+  </div>
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">Exit check is non-optional. Every team must state their Data Owner name and confirm the three-step workflow (Load, Enter, Save) out loud before moving to the next session.</span>
+  </div>
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · Day 1 of 20</span>
+    <span>Data Dashboard Introduction · Summer Sparks 2026</span>
+  </div>
+</div>
+</div>
+</body>
+</html>
