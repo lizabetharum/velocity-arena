@@ -203,6 +203,7 @@ body{
 <script src="/days-default.js"></script>
 <script src="/days-tn.js"></script>
 <script src="/days.js"></script>
+<script src="/lessons.js"></script>
 <script>
 // ── Password gate ─────────────────────────────────────────────
 const PASSWORD = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) ? CONFIG.teacherPassword : '';
@@ -291,9 +292,19 @@ function renderDay(dayNum) {
   const actRows = (d.activities || []).map(a => {
     const linkPills = [];
     const asList = v => v == null ? [] : (Array.isArray(v) ? v : [v]);
+    const norm = u => String(u || '').replace(/^https?:\/\/[^/]+/, '').replace(/\/+$/, '');
+    const webpageUrls = asList(a.webpage);
+    const webpageNorm = new Set(webpageUrls.map(norm));
     for (const u of asList(a.script))    linkPills.push(`<a class="tact-link"           href="${u}" target="_blank" rel="noopener">Script</a>`);
     for (const u of asList(a.worksheet)) linkPills.push(`<a class="tact-link worksheet" href="${u}" target="_blank" rel="noopener">Worksheet</a>`);
-    for (const u of asList(a.webpage))   linkPills.push(`<a class="tact-link webpage"   href="${u}" target="_blank" rel="noopener">Page</a>`);
+    for (const u of webpageUrls)         linkPills.push(`<a class="tact-link webpage"   href="${u}" target="_blank" rel="noopener">Page</a>`);
+    // Pull lesson URLs from lessons.js for activities without an explicit webpage,
+    // deduped against any URL already covered by a.webpage (origin-stripped match).
+    const lessonLinks = (typeof getLessonLinks === 'function') ? getLessonLinks(a.name) : [];
+    for (const ll of lessonLinks) {
+      if (webpageNorm.has(norm(ll.url))) continue;
+      linkPills.push(`<a class="tact-link webpage" href="${ll.url}" target="_blank" rel="noopener">Page</a>`);
+    }
     for (const u of asList(a.quickCard)) linkPills.push(`<a class="tact-link quickcard" href="${u}" target="_blank" rel="noopener">Quick card</a>`);
     for (const u of asList(a.template))  linkPills.push(`<a class="tact-link template"  href="${u}" target="_blank" rel="noopener">Template</a>`);
     for (const u of asList(a.makecode))  linkPills.push(`<a class="tact-link makecode"  href="${u}" target="_blank" rel="noopener">MakeCode</a>`);
