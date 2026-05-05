@@ -23,10 +23,11 @@ const ACTIVITY_LESSONS = {
   'Simulation Matches: Your Loadout vs. Reality': '/lessons/simulation-matches.html',
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
-  'Proportional Scaling + Commissioner Proposal Prep': [
+  'Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep': [
     { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
     { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
   ],
+  'Underdog Mechanic Announced + Season 2 Stat Reallocation': '/lessons/season2-reallocation.html',
   'Final Proposal Verification': '/lessons/proposal-verification.html',
   'Building and Solving Linear Equations': '/lessons/day13-linear-equations.html',
   'Stat Auction + Prediction Check': '/lessons/stat-auction.html',
