@@ -295,7 +295,7 @@
         <div class="val" style="color: var(--slate);">📉</div>
       </div>
       <div class="slope-box">
-        <div class="lbl">Bot stops at</div>
+        <div class="lbl">Hits floor at</div>
         <div class="val" style="color: var(--orange);" id="stopTimeDisplay">t = 10</div>
       </div>
     </div>
@@ -499,12 +499,13 @@
   }
 
   function getStopTime(endurance) {
-    return 100 / getDecayRate(endurance);
+    // Bot floors at 20%, so it drops 80 points total
+    return 80 / getDecayRate(endurance);
   }
 
   function getPower(endurance, time) {
     const rate = getDecayRate(endurance);
-    return Math.max(0, 100 - rate * time);
+    return Math.max(20, 100 - rate * time);
   }
 
   function drawGraph() {
@@ -565,6 +566,22 @@
       ctx.fillText(i + '%', pad.left - 6, y + 4);
     }
 
+    // Floor line at 20%
+    const floorY = pad.top + gh - (20 / 100) * gh;
+    ctx.strokeStyle = 'rgba(255, 68, 102, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, floorY);
+    ctx.lineTo(pad.left + gw, floorY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Floor label
+    ctx.fillStyle = 'rgba(255, 68, 102, 0.7)';
+    ctx.font = 'bold 10px DM Sans';
+    ctx.textAlign = 'left';
+    ctx.fillText('FLOOR 20%', pad.left + 4, floorY - 4);
+
     // Decay line
     ctx.strokeStyle = '#00E5FF';
     ctx.lineWidth = 2.5;
@@ -574,11 +591,11 @@
     ctx.moveTo(startX, startY);
 
     const endX = pad.left + Math.min(stopTime / 10, 1) * gw;
-    const endY = pad.top + gh;
+    const endY = floorY; // line ends at 20%, not the bottom axis
     ctx.lineTo(endX, endY);
     ctx.stroke();
 
-    // Flat at zero after stopTime
+    // Flat at 20% after stopTime
     if (stopTime < 10) {
       ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
       ctx.setLineDash([4, 4]);
@@ -675,20 +692,13 @@
       botFace.style.filter = 'none';
       statusEl.textContent = 'LOW POWER';
       statusEl.style.color = '#CC7700';
-    } else if (power > 0) {
+    } else {
       ring.setAttribute('stroke', '#FF4466');
       powerEl.style.color = '#FF4466';
       botFace.style.opacity = 0.3;
       botFace.style.filter = 'none';
       statusEl.textContent = 'CRITICAL';
       statusEl.style.color = '#FF4466';
-    } else {
-      ring.setAttribute('stroke', '#8899AA');
-      powerEl.style.color = '#8899AA';
-      botFace.style.opacity = 0.15;
-      botFace.style.filter = 'grayscale(1)';
-      statusEl.textContent = 'STOPPED';
-      statusEl.style.color = '#8899AA';
     }
   }
 

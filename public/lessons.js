@@ -11,10 +11,12 @@
 // here with the activity's exact name from days.js as the key.
 const ACTIVITY_LESSONS = {
   'Speed Stat Challenge: What Does Motor Power Actually Mean?': '/lessons/speed-stat.html',
+  'Pre-Task Diagnostic: Prior Knowledge Assessment': '/activities/diagnostic/index.html',
   'First Bot Drive: Speed in Real Life': '/lessons/first-bot-drive.html',
   'Endurance Stat Challenge: Drawing the Decay': '/lessons/endurance-discovery.html',
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
   'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
+  'Distance-Time Graphs':'/lessons/coordinate-functions.html',
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power-stat-challenge.html',
   'The Budget Constraint: Speed + Power + Turning + Endurance = 20': [
     { url: '/lessons/budget-constraint.html', label: 'Budget constraint' },

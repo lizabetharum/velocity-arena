@@ -34,7 +34,7 @@ const DAYS = [
         "link": "/activities/diagnostic/index.html",
         "script": "https://docs.google.com/document/d/1ki4h4daYwPkqDaJ9BnYlwBNBxTpMsEi5MukBDviqwfI/edit?usp=drivesdk",
         "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic/index.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-05-pre-task-diagnostic.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-pre-task-diagnostic.html"
       },
       {
         "name": "Driving Question Reveal + Team Formation",
@@ -43,7 +43,7 @@ const DAYS = [
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet.",
         "facilitatorDescription": "Unveil the driving-question poster that will anchor the whole four weeks. Announce three-person teams and have students sit together at their team tables. No math content yet -- this activity is pure set-up and social orientation.",
         "script": "https://docs.google.com/document/d/1whCYZecdM3gyaziLFXggw8qiABDZVBvgxwAGWxMc3UQ/edit?usp=drivesdk",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-driving-question.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-driving-question.html"
       },
       {
         "name": "Stat Card Distribution",
@@ -80,7 +80,7 @@ const DAYS = [
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?",
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware.",
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/1LLHU2AGux0_DxKIzkUDRcMvzSoxAIOkhigtIn6HFcJ0/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1B9ZoQrgAhE6vG3juLvuBR4xoRz5K6jHJ/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
       {
@@ -236,7 +236,9 @@ const DAYS = [
         "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formulas on the board -- Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02). Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate.",
         "facilitatorDescription": "Part 1 (20 min): teams plot two bot runs on the same graph from a data card -- one line slopes down, the other stays flat. Teams figure out why before flipping the card for the stat allocations. Arc Approximation (10 min): draw one smooth curved turn on the board with three straight chord segments overlaid. Ask: are the segments together longer or shorter than the arc, and what happens with more, shorter segments? The point is the physical intuition that a curve can be broken into straight measurable pieces -- prerequisite for the distance formula. Walk the Plane (15 min): students walk to called coordinates on a life-sized taped grid, then estimate the distance from (1,1) to (4,5). Write d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time, calculate, and verify against two more pairs -- the formula gets verified by standing on the grid. Part 2 (20 min): Turning formulas go on the board (Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02)). Teams fill stat cards, then program the bot to navigate from (0,0) to a called coordinate.",
         "script": "https://docs.google.com/document/d/1Rha6U3CayswkxkooVnwXukkJv7dDJnZALeHko60_kyg/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing",
+        "worksheet": ["https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing",
+          "https://docs.google.com/document/d/1RHggdduPeGWT5enQ7ePXKJczlZ16xtZ8qMMPLIvswCE/edit?tab=t.0",
+          "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0"],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
       },
       {
@@ -260,7 +262,7 @@ const DAYS = [
         "description": "Keep programming your bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance.",
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1aeF19RNcyBKM9om7yd8hknRvRf-_ZDol6UTXm_xGEko/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {

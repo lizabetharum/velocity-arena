@@ -344,6 +344,29 @@
   }
   footer a { color: var(--purple); text-decoration: none; }
 
+  /* ─── CODE FALLBACK (when blocks can't render) ─────────── */
+  .blocks-render-area.code-mode {
+    background: #0d1117;
+    padding: 16px 20px;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+  }
+  .blocks-code-fallback {
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.85;
+    color: #cdd9e5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  /* basic syntax tinting for the fallback */
+  .blocks-code-fallback .kw   { color: #ff7b72; }
+  .blocks-code-fallback .fn   { color: #d2a8ff; }
+  .blocks-code-fallback .num  { color: #79c0ff; }
+  .blocks-code-fallback .str  { color: #a5d6ff; }
+  .blocks-code-fallback .cmt  { color: #8b949e; font-style: italic; }
+
   @media (max-width: 600px) {
     .var-row { grid-template-columns: 1fr; }
     .var-name { border-right: none; border-bottom: 1px solid var(--border); }
@@ -487,11 +510,11 @@ input.onButtonPressed(Button.A, function () {
                 break
             }
             if (TURNING == 1) {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(currentPower, currentPower)
             } else if (lastTurnWasLeft) {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(Math.round(currentPower * (1 - turnRatio)), currentPower)
             } else {
-                basic.pause(100)
+                CutebotPro.pwmCruiseControl(currentPower, Math.round(currentPower * (1 - turnRatio)))
             }
             driveAndWatch(thisDuration)
             if (watchResult == 1) {
@@ -1032,7 +1055,23 @@ function handleBorder () {
         pre.remove();
         if (area) area.appendChild(img);
       } else {
-        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Blocks preview unavailable — <a href='https://makecode.microbit.org/' target='_blank' style='color:#a78bfa;'>open in MakeCode</a> to view.</span>";
+        // Rendering failed — show the code directly in a readable styled view
+        if (loader) loader.remove();
+        if (area) {
+          area.classList.add("code-mode");
+          var fb = document.createElement("div");
+          fb.className = "blocks-code-fallback";
+          // Simple syntax tinting via regex replacements
+          var raw = pre.textContent.trim()
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          raw = raw
+            .replace(/\b(let|if|else|while|for|function|return|break|true|false|null)\b/g, '<span class="kw">$1</span>')
+            .replace(/\b(CutebotPro\.[A-Za-z]+|basic\.[A-Za-z]+|input\.[A-Za-z]+|Math\.[A-Za-z]+)\b/g, '<span class="fn">$1</span>')
+            .replace(/\b(\d+(\.\d+)?)\b/g, '<span class="num">$1</span>')
+            .replace(/(\/\/.*)/g, '<span class="cmt">$1</span>');
+          fb.innerHTML = raw;
+          area.appendChild(fb);
+        }
         pre.remove();
       }
     }
