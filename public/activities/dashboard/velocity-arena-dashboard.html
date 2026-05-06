@@ -582,6 +582,64 @@
   }
   .rw-sentence textarea:focus { border-color: var(--red); }
 
+  /* VIEW MODE BAR */
+  .mode-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1rem;
+    padding: 8px 14px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    flex-wrap: wrap;
+  }
+  .mode-bar .mode-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+  .mode-segments {
+    display: inline-flex;
+    background: var(--ice);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .mode-seg {
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--steel);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mode-seg + .mode-seg { border-left: 1px solid var(--border); }
+  .mode-seg:hover { color: var(--fg-0); }
+  .mode-seg.active {
+    background: var(--bg-2);
+    color: var(--red);
+    font-weight: 800;
+  }
+  .mode-effective {
+    font-size: 10px;
+    color: var(--steel);
+    margin-left: auto;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .mode-effective b { color: var(--fg-0); font-weight: 800; }
+
+  /* When pre-trial mode is active, hide match-data cards. */
+  body.pre-trial .pre-trial-hide { display: none !important; }
+
   /* SEASON/WEEK INFO */
   .meta-row {
     display: flex;
@@ -840,6 +898,17 @@
     <!-- MAIN -->
     <main class="main">
 
+  <!-- VIEW MODE -->
+  <div class="mode-bar">
+    <span class="mode-label">View</span>
+    <div class="mode-segments" id="mode-segments">
+      <button class="mode-seg" data-mode="auto" onclick="setPreTrialMode('auto')">Auto</button>
+      <button class="mode-seg" data-mode="on"   onclick="setPreTrialMode('on')">Pre-trial</button>
+      <button class="mode-seg" data-mode="off"  onclick="setPreTrialMode('off')">Full</button>
+    </div>
+    <span class="mode-effective" id="mode-effective"></span>
+  </div>
+
   <!-- META -->
   <div class="meta-row">
     <div class="meta-field">
@@ -983,7 +1052,7 @@
   </div>
 
   <!-- MATCH LOG -->
-  <div class="card">
+  <div class="card pre-trial-hide">
     <div class="card-title">
       <span>Match Log</span>
       <span style="font-size:10px;font-weight:400;color:var(--steel);">Fill every row by end of each match day</span>
@@ -1073,7 +1142,7 @@
   </div>
 
   <!-- STAT CHANGE LOG -->
-  <div class="card">
+  <div class="card pre-trial-hide">
     <div class="card-title">
       <span>Stat Change Log</span>
       <span style="font-size:10px;font-weight:400;color:var(--steel);">Every change you make, with your reason why</span>
@@ -1122,7 +1191,7 @@
   </div>
 
   <!-- FOUR VIEWS OF A FUNCTION -->
-  <div class="card">
+  <div class="card pre-trial-hide">
     <div class="card-title">
       <span>Four Views of a Function</span>
       <span style="font-size:10px;font-weight:400;color:var(--steel);">4 ways to see the same pattern</span>
@@ -1290,6 +1359,7 @@ function defaultTeam(name) {
     matchLog: [],
     justifications: [],
     simulationRounds: [],
+    preTrialOverride: 'auto',
     fourViews: {
       dataPoints: [
         { x: '', y: '' },
@@ -1412,6 +1482,7 @@ function renderAll() {
   document.getElementById('pts-turning').value = t.stats.turning;
   document.getElementById('pts-endurance').value = t.stats.endurance;
   calcStats();
+  applyPreTrialMode();
   renderSimTable();
   renderMatchTable();
   renderJustifications();
@@ -1439,6 +1510,8 @@ document.getElementById('meta-week').addEventListener('input', function() {
   currentTeam().week = parseInt(this.value)||1;
   // Show/hide the Ball column when the team advances into Season 2 (Wk 3+).
   if (typeof applyBallVisibility === 'function') applyBallVisibility();
+  // Re-evaluate pre-trial mode when the week changes (auto follows week).
+  if (typeof applyPreTrialMode === 'function') applyPreTrialMode();
 });
 
 // ─── UNDERDOG BUDGET MECHANIC ──────────────────────────────
@@ -1632,6 +1705,41 @@ function renderSimTable() {
     `;
     tbody.appendChild(tr);
   });
+}
+
+// ─── VIEW MODE: PRE-TRIAL vs FULL ──────────────────────────
+// Auto-default: Week 1 -> pre-trial, Week 2+ -> full.
+// Override: 'on' (force pre-trial), 'off' (force full), 'auto' (follow week).
+function isPreTrial() {
+  const t = currentTeam();
+  if (t.preTrialOverride === 'on')  return true;
+  if (t.preTrialOverride === 'off') return false;
+  return parseInt(t.week) === 1;
+}
+
+function setPreTrialMode(mode) {
+  currentTeam().preTrialOverride = mode;
+  applyPreTrialMode();
+  if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+}
+
+function applyPreTrialMode() {
+  const t = currentTeam();
+  const override = t.preTrialOverride || 'auto';
+  const isPre = isPreTrial();
+
+  document.body.classList.toggle('pre-trial', isPre);
+
+  document.querySelectorAll('.mode-seg').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === override);
+  });
+
+  const effEl = document.getElementById('mode-effective');
+  if (effEl) {
+    const stateName = isPre ? 'Pre-trial' : 'Full dashboard';
+    const reason = override === 'auto' ? `auto · Week ${t.week}` : 'manual override';
+    effEl.innerHTML = `→ <b>${stateName}</b> <span style="color:var(--steel);">(${reason})</span>`;
+  }
 }
 
 function addSimRound() {
