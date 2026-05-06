@@ -33,7 +33,7 @@ const DAYS = [
         "facilitatorDescription": "Students receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each student's starting point by math topic so the program meets students where they are. Frame it before distributing: this is a measure of what students already know about the eight math topics, not about Velocity Arena.",
         "link": "/activities/diagnostic/index.html",
         "script": "https://docs.google.com/document/d/1ki4h4daYwPkqDaJ9BnYlwBNBxTpMsEi5MukBDviqwfI/edit?usp=drivesdk",
-        "webpage": "https://velocity-arena-922bfwmu7-liz-arums-projects.vercel.app/activities/diagnostic/index.html",
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic/index.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-05-pre-task-diagnostic.html"
       },
       {
