@@ -1420,6 +1420,7 @@ document.getElementById('site-select').addEventListener('change', async function
   await loadFromSheets(currentSite);
   renderTeamBar();
   renderAll();
+  if (typeof renderSidebarDay === 'function') renderSidebarDay();
 });
 
 function renderTeamBar() {
@@ -2326,31 +2327,45 @@ function showToast(msg) {
 })();
 
 // ── Shell day-counter (sidebar + right rail) ─────────────────────
-(function () {
-  function approxCampDay() {
-    try {
-      const startISO = (window.CONFIG && CONFIG.startDate) || '2026-04-18';
-      const start = new Date(startISO + 'T00:00:00');
-      const today = new Date();
-      const calDays = Math.floor((today - start) / 86400000);
-      let wd = 0;
-      for (let i = 0; i <= calDays && wd < 20; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const dow = d.getDay();
-        if (dow !== 0 && dow !== 6) wd++;
-      }
-      return (wd >= 1 && wd <= 20) ? wd : null;
-    } catch (e) { return null; }
-  }
-  const d = approxCampDay();
-  const numEl = document.getElementById('sidebar-day-num');
+// Resolves the current camp day from the *currently selected site*,
+// not the default startDate. Re-rendered whenever the site selector
+// changes (see renderSidebarDay() call in the site-change handler).
+const DASHBOARD_SITE_TO_CFG = { tennessee: 'TN', nyc_1: 'NY1', nyc_2: 'NY2' };
+
+function getDashboardSiteStartISO() {
+  const cfgKey = DASHBOARD_SITE_TO_CFG[currentSite];
+  const perSite = window.CONFIG && CONFIG.siteStartDates && CONFIG.siteStartDates[cfgKey];
+  return perSite || (window.CONFIG && CONFIG.startDate) || '2026-04-18';
+}
+
+function approxCampDayForCurrentSite() {
+  try {
+    const startISO = getDashboardSiteStartISO();
+    const start = new Date(startISO + 'T00:00:00');
+    const today = new Date();
+    const calDays = Math.floor((today - start) / 86400000);
+    let wd = 0;
+    for (let i = 0; i <= calDays && wd < 20; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) wd++;
+    }
+    return (wd >= 1 && wd <= 20) ? wd : null;
+  } catch (e) { return null; }
+}
+
+function renderSidebarDay() {
+  const d = approxCampDayForCurrentSite();
+  const numEl  = document.getElementById('sidebar-day-num');
   const fillEl = document.getElementById('sidebar-day-fill');
   const pillEl = document.getElementById('rr-day-pill');
-  if (numEl) numEl.textContent = d != null ? String(d).padStart(2, '0') : '—';
+  if (numEl)  numEl.textContent  = d != null ? String(d).padStart(2, '0') : '—';
   if (fillEl) fillEl.style.width = d != null ? ((d / 20) * 100) + '%' : '0%';
   if (pillEl) pillEl.textContent = d != null ? `DAY ${String(d).padStart(2, '0')} / 20` : 'DAY — / 20';
-})();
+}
+
+renderSidebarDay();
 </script>
 </body>
 </html>
