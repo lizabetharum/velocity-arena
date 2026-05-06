@@ -238,7 +238,8 @@ const DAYS = [
         "script": "https://docs.google.com/document/d/1Rha6U3CayswkxkooVnwXukkJv7dDJnZALeHko60_kyg/edit?usp=drive_link",
         "worksheet": ["https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing",
           "https://docs.google.com/document/d/1RHggdduPeGWT5enQ7ePXKJczlZ16xtZ8qMMPLIvswCE/edit?tab=t.0",
-          "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0"],
+          "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0",
+        "https://docs.google.com/document/d/1DSFwsS2V4d9_GwrPjsxGdlth_IQ9DIk_kwdp7nFq9nI/edit?usp=sharing"],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
       },
       {
@@ -263,6 +264,7 @@ const DAYS = [
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
+        "makecode":"https://makecode.microbit.org/S65859-48740-99528-19122",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {
