@@ -1016,13 +1016,7 @@ const DAYS = [
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-02-commissioner-proposal-prep.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Lunch / Snack Break",
         "mins": 60,
@@ -1124,7 +1118,7 @@ const DAYS = [
         "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one student per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
         "script": "https://docs.google.com/document/d/1rZES5FM1sbJcv16FcgLuV0mhrjpyPj2OaPZU_F1rJng/edit?usp=drive_link",
         "worksheet": [
-          "https://drive.google.com/file/d/1Gk98vJySwPowrqkMj1LTYlvm8b5U3g5o/view?usp=drive_link",
+          "https://docs.google.com/document/d/1o07DH79Pt_wVu6tat-vi0H_V8CB4S-etZgQqAuHEdG8/edit?usp=sharing",
           "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view?usp=drive_link"
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
