@@ -12,11 +12,18 @@
 const ACTIVITY_LESSONS = {
   'Speed Stat Challenge: What Does Motor Power Actually Mean?': '/lessons/speed-stat.html',
   'Pre-Task Diagnostic: Prior Knowledge Assessment': '/activities/diagnostic/index.html',
-  'First Bot Drive: Speed in Real Life': '/lessons/first-bot-drive.html',
+  'First Bot Drive: Speed in Real Life': [
+    {url: '/lessons/first-bot-drive.html', label: "First Bot Drive Test"},
+    {url: "/lessons/speed-test-explainer.html", label: "Speed Test Explainer"}
+  ],
   'Endurance Stat Challenge: Drawing the Decay': '/lessons/endurance-discovery.html',
   'Endurance Decay Equations in Slope-Intercept Form': '/lessons/decay-equations-visual.html',
-  'Program Endurance Into Your Bot': '/lessons/endurance-formula-test.html',
+  'Program Endurance Into Your Bot': [
+    {url: '/lessons/endurance-formula-test.html', label: "Endurance Test"},
+    {url: "/lessons/endurance-test-explainer.html", label: "Endurance Test Explainer"}
+  ],
   'Distance-Time Graphs':'/lessons/coordinate-functions.html',
+  'Coordinate Navigation Practice: Arc Approximation':"/lessons/turning-test-explainer.html",
   'Power Stat Challenge: Ratio and Motor Speed': '/lessons/power-stat-challenge.html',
   'The Budget Constraint: Speed + Power + Turning + Endurance = 20': [
     { url: '/lessons/budget-constraint.html', label: 'Budget constraint' },
