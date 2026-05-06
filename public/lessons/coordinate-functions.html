@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate Functions — Program Your Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d1b2a;
+  --surface:  #132033;
+  --card:     #1a2d45;
+  --border:   #2a4060;
+  --cyan:     #00e5ff;
+  --yellow:   #ffd600;
+  --green:    #00e676;
+  --red:      #ff5252;
+  --orange:   #ff9100;
+  --purple:   #ce93d8;
+  --text:     #e8f0fe;
+  --muted:    #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #132d4a 100%);
+  border-bottom: 2px solid var(--cyan);
+  padding: 20px 24px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 860px; margin: 0 auto;
+}
+.day-badge {
+  background: var(--cyan); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+}
+.lesson-title { font-size: 20px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ── PROGRESS ────────────────────────────── */
+.progress-wrap { max-width: 860px; margin: 12px auto 0; }
+.progress-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--cyan); border-radius: 4px; transition: width 0.5s ease; width: 20%; }
+.progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.prog-tab {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color 0.2s;
+}
+.prog-tab.active { color: var(--cyan); }
+.prog-tab.done   { color: var(--green); }
+
+/* ── SECTIONS ────────────────────────────── */
+.section { display: none; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+.section.active { display: block; }
+
+/* ── CARDS ───────────────────────────────── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 14px;
+}
+
+/* ── SECTION HEADER ──────────────────────── */
+.sec-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.sec-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sec-icon.cyan   { background: rgba(0,229,255,.15); border: 2px solid var(--cyan);   color: var(--cyan); }
+.sec-icon.yellow { background: rgba(255,214,0,.12);  border: 2px solid var(--yellow); color: var(--yellow); }
+.sec-icon.green  { background: rgba(0,230,118,.12);  border: 2px solid var(--green);  color: var(--green); }
+.sec-icon.orange { background: rgba(255,145,0,.12);  border: 2px solid var(--orange); color: var(--orange); }
+.sec-icon.purple { background: rgba(206,147,216,.12); border: 2px solid var(--purple); color: var(--purple); }
+.sec-title    { font-size: 22px; font-weight: 800; }
+.sec-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+/* ── FORMULA BOARD ───────────────────────── */
+.formula-board {
+  background: linear-gradient(135deg, #0a2540 0%, #0d3360 100%);
+  border: 2px solid var(--cyan); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-bottom: 20px;
+}
+.formula-label { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.formula-main  { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.8; }
+.formula-eq    { color: var(--cyan); }
+.formula-note  { font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+/* ── VOCAB ───────────────────────────────── */
+.vocab-box {
+  background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.3);
+  border-left: 4px solid var(--cyan); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 20px;
+}
+.vocab-title { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.vocab-row   { display: flex; gap: 8px; align-items: baseline; margin-bottom: 8px; }
+.vocab-word  { font-weight: 700; color: var(--yellow); min-width: 150px; font-size: 14px; }
+.vocab-def   { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+/* ── STEPS ───────────────────────────────── */
+.step-list { list-style: none; }
+.step-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,229,255,.15); border: 2px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--cyan); flex-shrink: 0; margin-top: 1px;
+}
+.step-num.yellow-num {
+  background: rgba(255,214,0,.15); border-color: var(--yellow); color: var(--yellow);
+}
+.step-num.green-num {
+  background: rgba(0,230,118,.15); border-color: var(--green); color: var(--green);
+}
+.step-text { font-size: 14px; color: var(--text); line-height: 1.7; }
+.step-text strong { color: var(--yellow); }
+.step-text a { color: var(--cyan); text-decoration: none; }
+.step-text a:hover { text-decoration: underline; }
+.step-text code {
+  background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3);
+  padding: 1px 6px; border-radius: 4px; font-family: monospace;
+  color: var(--cyan); font-size: 13px;
+}
+
+/* ── PSEUDO / CODE BLOCK ─────────────────── */
+.code-block {
+  background: #060f1a; border: 1px solid var(--border);
+  border-left: 4px solid var(--purple); border-radius: 10px;
+  padding: 18px 20px; font-family: monospace; font-size: 13px;
+  color: var(--text); margin-bottom: 18px; line-height: 2.0;
+  overflow-x: auto;
+}
+.ck { color: var(--cyan); font-weight: 700; }
+.ckw { color: var(--orange); }
+.ckv { color: var(--yellow); }
+.ckn { color: var(--purple); }
+.ckc { color: var(--muted); font-style: italic; }
+
+/* ── CONCEPT BOX ─────────────────────────── */
+.concept-box {
+  background: rgba(206,147,216,.07); border: 1px solid rgba(206,147,216,.3);
+  border-left: 4px solid var(--purple); border-radius: 10px;
+  padding: 16px 20px; margin-bottom: 20px;
+}
+.concept-label { font-size: 12px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.concept-text  { font-size: 14px; color: var(--text); line-height: 1.8; }
+
+/* ── CHALLENGE CARDS ──────────────────────── */
+.challenge-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.challenge-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px;
+}
+.challenge-card.a-card  { border-top: 3px solid var(--cyan); }
+.challenge-card.b-card  { border-top: 3px solid var(--green); }
+.challenge-card.ab-card { border-top: 3px solid var(--yellow); }
+.challenge-badge {
+  display: inline-block; font-size: 11px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+}
+.badge-a  { background: rgba(0,229,255,.15);  color: var(--cyan);   border: 1px solid var(--cyan); }
+.badge-b  { background: rgba(0,230,118,.15);  color: var(--green);  border: 1px solid var(--green); }
+.badge-ab { background: rgba(255,214,0,.15);  color: var(--yellow); border: 1px solid var(--yellow); }
+.challenge-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.challenge-desc  { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+
+/* ── COORDINATE PATH ─────────────────────── */
+.path-steps { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.coord-node {
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 14px; font-weight: 700; font-family: monospace;
+  color: var(--text);
+}
+.coord-node.start { border-color: var(--muted); color: var(--muted); }
+.coord-node.stop  { border-color: var(--cyan);  color: var(--cyan);  }
+.coord-node.stop.green  { border-color: var(--green); color: var(--green); }
+.coord-node.stop.yellow { border-color: var(--yellow); color: var(--yellow); }
+.path-arrow { color: var(--muted); font-size: 18px; }
+
+/* ── CALL PREVIEW ────────────────────────── */
+.call-preview {
+  background: #060f1a; border: 1px solid var(--border);
+  border-left: 4px solid var(--orange); border-radius: 10px;
+  padding: 12px 18px; font-family: monospace; font-size: 14px;
+  color: var(--text); margin-top: 10px;
+}
+
+/* ── NOTICE / HINT ───────────────────────── */
+.notice {
+  background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.notice strong { color: var(--yellow); }
+.hint-pill {
+  display: inline-block; background: rgba(255,145,0,.12);
+  border: 1px solid rgba(255,145,0,.4); border-radius: 20px;
+  padding: 5px 14px; font-size: 12px; color: var(--orange);
+  font-weight: 600; margin-top: 10px; cursor: pointer;
+}
+.hint-text {
+  background: rgba(255,145,0,.08); border: 1px solid rgba(255,145,0,.3);
+  border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+  font-size: 13px; color: var(--text); display: none; line-height: 1.6;
+}
+.hint-text.show { display: block; }
+
+/* ── CHECK BUTTON ────────────────────────── */
+.check-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.check-btn {
+  flex: 1; min-width: 120px; padding: 11px 16px;
+  background: #0d1b2a; border: 2px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.check-btn:hover       { border-color: var(--cyan); color: var(--cyan); }
+.check-btn.sel-correct { border-color: var(--green); background: rgba(0,230,118,.1); color: var(--green); }
+.check-btn.sel-wrong   { border-color: var(--red);   background: rgba(255,82,82,.1);  color: var(--red); }
+.check-response {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; margin-top: 14px; font-size: 14px; line-height: 1.7; display: none;
+}
+.check-response.show    { display: block; }
+.check-response.correct { border-left: 4px solid var(--green); }
+.check-response.wrong   { border-left: 4px solid var(--red); }
+
+/* ── REFLECT ─────────────────────────────── */
+.reflect-q { margin-bottom: 24px; }
+.reflect-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+.reflect-frame {
+  font-size: 12px; color: var(--muted); font-style: italic;
+  background: rgba(255,255,255,.04); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px;
+}
+textarea {
+  width: 100%; background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; color: var(--text);
+  font-family: 'Montserrat', sans-serif; font-size: 14px;
+  resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,229,255,.15); }
+
+/* ── GRID VISUAL ─────────────────────────── */
+.grid-visual-wrap { text-align: center; margin-bottom: 20px; }
+.grid-visual {
+  display: inline-block;
+  background: #0a1e35; border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; overflow-x: auto;
+}
+.grid-svg { display: block; }
+
+/* ── CONGRATS ────────────────────────────── */
+.congrats-box {
+  background: linear-gradient(135deg, #0a2e1a 0%, #0d3320 100%);
+  border: 2px solid var(--green); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-top: 24px;
+}
+.congrats-icon  { font-size: 40px; margin-bottom: 12px; }
+.congrats-title { font-size: 20px; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+.congrats-body  { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+/* ── NEXT BTN ────────────────────────────── */
+.btn-next {
+  display: block; margin: 28px auto 0;
+  background: var(--cyan); color: #000;
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px;
+  padding: 14px 36px; border: none; border-radius: 10px;
+  cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+}
+.btn-next:hover { opacity: 0.88; }
+
+/* ── TWO-COL ─────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+@media (max-width: 620px) {
+  .two-col { grid-template-columns: 1fr; }
+  .formula-main { font-size: 17px; }
+}
+
+/* ── BLOCK VISUAL ────────────────────────── */
+.block-wrap {
+  background: #f0f0f0; border-radius: 10px; padding: 16px;
+  text-align: center; overflow-x: auto; margin-bottom: 18px;
+}
+.block-wrap img { max-width: 100%; height: auto; border-radius: 6px; }
+
+/* ── MAKECODE BLOCK VISUALS ─────────────── */
+.mc-wrap {
+  background: #040d18;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.mc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: max-content;
+  min-width: 100%;
+}
+/* Single block row */
+.mc-b {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+  width: max-content;
+}
+/* Hat (event trigger — curved top) */
+.mc-hat { border-radius: 14px 14px 4px 4px !important; }
+
+/* Category colors */
+.mc-c-event  { background: #1565c8; }   /* on start  */
+.mc-c-btn    { background: #c62f3e; }   /* on button */
+.mc-c-fn     { background: #1b3680; }   /* function definition */
+.mc-c-bot    { background: #1e7a68; }   /* Cutebot Pro / if-else */
+.mc-c-varset { background: #9e3030; }   /* set variable */
+.mc-c-call   { background: #5240a8; }   /* call function */
+
+/* Inline pills */
+.mc-pill {
+  border-radius: 10px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.mc-p-var  { background: #c62f3e; color: #fff; }                  /* variable ref */
+.mc-p-num  { background: rgba(255,255,255,.22); color: #fff; }     /* number literal */
+.mc-p-neg  { background: rgba(255,82,82,.35); color: #ffaaaa; }   /* negative number */
+.mc-p-math { background: #6830b8; color: #fff; }                  /* math expression */
+.mc-p-drop { background: rgba(255,255,255,.16); color: rgba(255,255,255,.8); } /* dropdown ▾ */
+.mc-p-unit { background: rgba(255,255,255,.12); color: rgba(255,255,255,.65); font-size: 10px; } /* unit label */
+
+/* Indented C-block body */
+.mc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 22px;
+  padding: 3px 0 5px 10px;
+  border-left: 3px solid rgba(255,255,255,.16);
+}
+/* Else label attached to C-block */
+.mc-else {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  background: #1e7a68;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  width: max-content;
+}
+/* Comment annotation */
+.mc-note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  padding: 2px 0 2px 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <div class="day-badge">Functions &amp; Coordinates</div>
+      <div class="lesson-title">Program Your Bot to Navigate the Grid</div>
+      <div class="lesson-sub">MakeCode · Cutebot Pro · Coordinate Geometry</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-labels">
+      <span class="prog-tab active" id="tab0" onclick="goTo(0)">Intro</span>
+      <span class="prog-tab" id="tab1" onclick="goTo(1)">Setup</span>
+      <span class="prog-tab" id="tab2" onclick="goTo(2)">Build</span>
+      <span class="prog-tab" id="tab3" onclick="goTo(3)">Challenges</span>
+      <span class="prog-tab" id="tab4" onclick="goTo(4)">Reflect</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════
+     SECTION 0 — INTRO
+═══════════════════════════════════════════ -->
+<section class="section active" id="sec0">
+  <div class="sec-header">
+    <div class="sec-icon cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 4v3"/><circle cx="9" cy="13" r="1.2"/><circle cx="15" cy="13" r="1.2"/><path d="M9 17h6"/></svg></div>
+    <div>
+      <div class="sec-title">Functions &amp; Coordinate Geometry</div>
+      <div class="sec-subtitle">Teach your bot to navigate any point on the grid</div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-label">Big Idea</div>
+    <div class="concept-text">
+      A <strong style="color:var(--purple)">function</strong> is a named mini-program that bundles steps you want to reuse. Instead of rebuilding the same sequence of blocks every time, you define the logic once, give it a name, and call it with different inputs. Today you'll build <code style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--purple);font-size:13px">moveToCoordinate(x, y)</code> — a function that tells your bot which square to drive to on the arena grid.
+    </div>
+  </div>
+
+  <div class="vocab-box">
+    <div class="vocab-title">Key Vocabulary</div>
+    <div class="vocab-row">
+      <span class="vocab-word">Function</span>
+      <span class="vocab-def">A named block of steps you can call over and over with different inputs.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Parameter</span>
+      <span class="vocab-def">An input slot in a function — like <em>x</em> or <em>y</em> — that changes each time you call it.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Constant (UNIT)</span>
+      <span class="vocab-def">A number that never changes. Here, 1 UNIT = 27 cm = the width of one grid square.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Absolute Value</span>
+      <span class="vocab-def">The distance from zero — always positive. |−3| = 3. Bots drive positive distances even when heading left or down.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Coordinate</span>
+      <span class="vocab-def">An ordered pair (x, y) that names a specific square on the grid. x moves left/right; y moves up/down.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Why Functions?</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:12px">
+      Imagine you need to send your bot to five different squares in a match. Without a function, you'd copy the same 10+ blocks five times. One mistake anywhere breaks everything.
+    </p>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:12px">
+      With a function, you write the logic <em>once</em>. To send the bot to square (3, 2) you just write:
+    </p>
+    <div class="call-preview">
+      <span class="ckw">call</span> <span class="ck">moveTo</span>(<span class="ckv">3</span>, <span class="ckv">2</span>)
+    </div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:12px">
+      Change the numbers and the bot goes somewhere else — same logic, zero rewriting. This is exactly how professional robotics software works.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Grid</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Your arena is a coordinate grid. The bot starts at <strong style="color:var(--cyan)">(0, 0)</strong>. Each square is <strong style="color:var(--yellow)">27 cm × 27 cm</strong> — that's your UNIT. Positive x goes right, negative x goes left. Positive y goes forward, negative y goes backward.
+    </p>
+    <div class="grid-visual-wrap">
+      <div class="grid-visual">
+        <svg class="grid-svg" width="280" height="280" viewBox="0 0 280 280">
+          <!-- grid lines -->
+          <defs>
+            <pattern id="smallGrid" width="56" height="56" patternUnits="userSpaceOnUse">
+              <path d="M 56 0 L 0 0 0 56" fill="none" stroke="#2a4060" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="280" height="280" fill="url(#smallGrid)"/>
+          <!-- axes -->
+          <line x1="0" y1="140" x2="280" y2="140" stroke="#00e5ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="140" y1="0" x2="140" y2="280" stroke="#00e5ff" stroke-width="1.5" opacity="0.5"/>
+          <!-- axis labels -->
+          <text x="268" y="136" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">x</text>
+          <text x="144" y="14" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">y</text>
+          <!-- coordinate labels -->
+          <text x="145" y="155" fill="#7a9cc0" font-size="10" font-family="monospace">(0,0)</text>
+          <text x="189" y="100" fill="#ffd600" font-size="10" font-family="monospace">(1,1)</text>
+          <text x="189" y="212" fill="#ff9100" font-size="10" font-family="monospace">(1,−1)</text>
+          <text x="77" y="100" fill="#ce93d8" font-size="10" font-family="monospace">(−1,1)</text>
+          <!-- origin dot -->
+          <circle cx="140" cy="140" r="5" fill="#00e5ff"/>
+          <!-- example point (3,2) -->
+          <circle cx="308" cy="28" r="6" fill="#ffd600" opacity="0"/>
+          <!-- point (1,1) -->
+          <circle cx="196" cy="84" r="5" fill="#ffd600"/>
+          <!-- point (1,-1) -->
+          <circle cx="196" cy="196" r="5" fill="#ff9100"/>
+          <!-- point (-1,1) -->
+          <circle cx="84" cy="84" r="5" fill="#ce93d8"/>
+        </svg>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.5">
+      The bot starts at (0, 0). Every square it moves right adds 1 to x. Every square forward adds 1 to y.
+    </p>
+  </div>
+
+  <!-- Quick check -->
+  <div class="card">
+    <div class="card-title">Quick Check</div>
+    <p style="font-size:14px;color:var(--text);margin-bottom:14px">If your bot is at (0, 0) and you call <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveTo(3, 2)</code>, which direction does the bot move first?</p>
+    <div class="check-row">
+      <button class="check-btn" onclick="checkAns(this,'wrong','qc1')">Forward (y first)</button>
+      <button class="check-btn" onclick="checkAns(this,'correct','qc1')">Right (x first)</button>
+      <button class="check-btn" onclick="checkAns(this,'wrong','qc1')">Left then forward</button>
+    </div>
+    <div class="check-response" id="qc1"></div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(1)">Next: Setup →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECTION 1 — SETUP
+═══════════════════════════════════════════ -->
+<section class="section" id="sec1">
+  <div class="sec-header">
+    <div class="sec-icon yellow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+    <div>
+      <div class="sec-title">Project Setup</div>
+      <div class="sec-subtitle">Get MakeCode ready and define your UNIT constant</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Before you start:</strong> You need a Cutebot Pro robot and a micro:bit v2. 
+  </div>
+
+  <div class="card">
+    <div class="card-title">Steps 1–7: Open MakeCode and Set Up Your Project</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">Open your computer and navigate to <strong><a href="https://makecode.microbit.org/" target="_blank">makecode.microbit.org</a></strong></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">Log in to your account.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">Click <strong>New Project</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text">Name the project <code>coordinates</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-text">Click <strong>Extensions</strong> and add <strong>Cutebot Pro</strong> so you can send commands to the robot.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-text">
+          Create a variable named <code>UNIT</code> (all caps). In the <strong>on start</strong> block, set <code>UNIT</code> to <strong style="color:var(--yellow)">27</strong>.
+          <div style="margin-top:8px;font-size:13px;color:var(--muted)">This tells the program that one grid square = 27 cm. Change this number if your arena squares are a different size.</div>
+          <span class="hint-pill" onclick="toggleHint('h6')">Why 27?</span>
+          <div class="hint-text" id="h6">27 cm is the physical width of one square on your arena mat. The bot uses this to know how far to drive. If you change the mat size, update UNIT and the function still works perfectly — no other edits needed.</div>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-text">Also in <strong>on start</strong>, add the block <code>set length of the squares as UNIT cm</code>. This registers the square size with the Cutebot extension.</div>
+      </li>
+    </ul>
+    <div class="mc-wrap" style="margin-top:16px">
+      <div class="mc-stack">
+        <div class="mc-b mc-c-event mc-hat">on start</div>
+        <div class="mc-body">
+          <div class="mc-b mc-c-varset">set <span class="mc-pill mc-p-var">UNIT</span> to <span class="mc-pill mc-p-num">27</span></div>
+          <div class="mc-b mc-c-bot">set length of squares as <span class="mc-pill mc-p-var">UNIT</span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-board">
+    <div class="formula-label">Your UNIT Constant</div>
+    <div class="formula-main">
+      <span class="formula-eq">UNIT</span> = 27 cm &nbsp;=&nbsp; 1 grid square
+    </div>
+    <div class="formula-note">One call to <span style="color:var(--cyan);font-weight:700">moveTo(x, y)</span> drives the bot exactly |x| × 27 cm sideways, then |y| × 27 cm forward.</div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(2)">Next: Build the Function →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECTION 2 — BUILD
+═══════════════════════════════════════════ -->
+<section class="section" id="sec2">
+  <div class="sec-header">
+    <div class="sec-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/></svg></div>
+    <div>
+      <div class="sec-title">Build <code style="font-size:18px">moveTo(x, y)</code></div>
+      <div class="sec-subtitle">Steps 8–25: Define the function, then wire up buttons</div>
+    </div>
+  </div>
+
+  <!-- Create the function -->
+  <div class="card">
+    <div class="card-title">Part A — Create the Function</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">8</div>
+        <div class="step-text">Click <strong>Advanced</strong> in the toolbox, then select <strong>Functions</strong>. Click <strong>Make a Function</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">9</div>
+        <div class="step-text">Name the function <code>moveTo</code>. Add <strong>two number inputs</strong> and rename them <code>x</code> and <code>y</code>. Press <strong>Done</strong>.
+          <div style="margin-top:8px;font-size:13px;color:var(--muted)">These two parameters are the coordinate the bot should drive to. Every time you call <code>moveTo</code>, you plug in different numbers.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- x direction -->
+  <div class="card">
+    <div class="card-title">Part B — Move in the X Direction First</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      The bot always handles x (left/right) before y (forward/back). It needs to decide <em>which way</em> to turn based on whether x is positive or negative.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">10</div>
+        <div class="step-text">Inside <code>moveTo</code>, add an <strong>if/else block</strong> from the Logic section.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">11</div>
+        <div class="step-text">Set the condition to <code>x &lt; 0</code>. If x is negative, the bot needs to face <strong>left</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">12</div>
+        <div class="step-text">In the <strong>then</strong> branch: add <code>set car turn left at place for angle 90</code> (Cutebot Pro section).</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">13</div>
+        <div class="step-text">In the <strong>else</strong> branch: add <code>set car turn right at place for angle 90</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">14</div>
+        <div class="step-text">
+          Below the if/else, add a <strong>go forward</strong> block (PID Control section). For the distance, use:
+          <div class="mc-wrap" style="margin-top:10px;margin-bottom:0">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-bot">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">x</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+            </div>
+          </div>
+          <span class="hint-pill" onclick="toggleHint('habs')">Why absolute value?</span>
+          <div class="hint-text" id="habs">Distance is always positive — you can't drive −3 cm. If x = −2, |−2| = 2, so the bot drives 2 squares. The direction was already set by the turn, so the forward distance is just the magnitude.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- y direction -->
+  <div class="card">
+    <div class="card-title">Part C — Move in the Y Direction Second</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      After finishing the x move, the bot now needs to face the right direction for y. The turn depends on both x and y: if the bot already turned right for x (x &gt; 0), it needs to turn left to face forward. If it turned left for x (x &lt; 0), it needs to turn right to face forward.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">15</div>
+        <div class="step-text">Add another <strong>if/else block</strong> below the go forward block.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">16</div>
+        <div class="step-text">Set the condition to <code>x &lt; 0</code>. If x was negative (bot turned left), it now turns <strong>right</strong> to face forward for the y move.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">17</div>
+        <div class="step-text">In the <strong>then</strong> branch: <code>set car turn right at place for angle 90</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">18</div>
+        <div class="step-text">In the <strong>else</strong> branch: <code>set car turn left at place for angle 90</code>. (If x was positive, the bot turned right to start, so it now turns left to face forward.)</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">19</div>
+        <div class="step-text">
+          Add a final <strong>go forward</strong> block with:
+          <div class="mc-wrap" style="margin-top:10px;margin-bottom:0">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-bot">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">y</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- what your function looks like -->
+  <div class="concept-box">
+    <div class="concept-label">What Your Function Looks Like</div>
+    <div class="mc-wrap" style="margin-top:12px;margin-bottom:0">
+      <div class="mc-stack">
+        <!-- function header -->
+        <div class="mc-b mc-c-fn">function <strong style="color:#7eb8ff;margin:0 2px">moveTo</strong> <span class="mc-pill mc-p-var">x</span> <span class="mc-pill mc-p-var">y</span></div>
+        <div class="mc-body">
+
+          <!-- X turn decision -->
+          <div class="mc-b mc-c-bot">if <span class="mc-pill mc-p-var">x</span> &lt; <span class="mc-pill mc-p-num">0</span> then</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">left ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-else">else</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">right ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+
+          <!-- Drive X -->
+          <div class="mc-b mc-c-bot" style="margin-top:4px">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">x</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+
+          <!-- Re-orient for Y -->
+          <div class="mc-b mc-c-bot" style="margin-top:6px">if <span class="mc-pill mc-p-var">x</span> &lt; <span class="mc-pill mc-p-num">0</span> then</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">right ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-else">else</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">left ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+
+          <!-- Drive Y -->
+          <div class="mc-b mc-c-bot" style="margin-top:4px">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">y</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wire up buttons -->
+  <div class="card">
+    <div class="card-title">Part D — Wire Up the Buttons</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Now create event handlers so you can trigger the bot from the micro:bit buttons. You'll build three: <strong>Button A</strong>, <strong>Button B</strong>, and <strong>Button A+B</strong>.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num green-num">20</div>
+        <div class="step-text">
+          <strong>Button A</strong> — send the bot from (0,0) to <strong style="color:var(--cyan)">(1, 1)</strong>.
+          <div class="mc-wrap" style="margin-top:10px">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">A ▾</span> pressed</div>
+              <div class="mc-body">
+                <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">1</span> <span class="mc-pill mc-p-num">1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num green-num">21</div>
+        <div class="step-text">
+          <strong>Button B</strong> — send the bot from (0,0) to <strong style="color:var(--cyan)">(1, 3)</strong>.
+          <div class="mc-wrap" style="margin-top:10px">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">B ▾</span> pressed</div>
+              <div class="mc-body">
+                <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">1</span> <span class="mc-pill mc-p-num">3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="notice" style="margin-top:16px;margin-bottom:0">
+      <strong>Test after each button.</strong> Flash your code, place the bot at (0,0), and press the button. Does it land on the right square? If not, check your turn directions and absolute value blocks before moving on.
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(3)">Next: Challenges →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECTION 3 — CHALLENGES
+═══════════════════════════════════════════ -->
+<section class="section" id="sec3">
+  <div class="sec-header">
+    <div class="sec-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="4" height="9" rx="1.5"/><rect x="10" y="6" width="4" height="14" rx="1.5"/><rect x="17" y="3" width="4" height="17" rx="1.5"/></svg></div>
+    <div>
+      <div class="sec-title">Bot Navigation Challenges</div>
+      <div class="sec-subtitle">Use your function to navigate multi-point routes</div>
+    </div>
+  </div>
+
+  <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+    For each challenge, place your bot at (0, 0) and program the correct button. Each call to <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveTo</code> moves the bot <em>from its current position</em> — so the coordinates are relative to the last stop.
+  </p>
+
+  <div class="challenge-grid">
+
+    <!-- BUTTON A -->
+    <div class="challenge-card a-card">
+      <div class="challenge-badge badge-a">Button A</div>
+      <div class="challenge-title">Single Move</div>
+      <div class="challenge-desc">Drive the bot from (0, 0) to square (3, 2). One call, one destination.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+      </div>
+      <div class="mc-wrap">
+        <div class="mc-stack">
+          <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">A ▾</span> pressed</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">3</span> <span class="mc-pill mc-p-num">2</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        The bot turns right 3 squares, then forward 2 squares. Total distance: 3 × 27 + 2 × 27 = <strong style="color:var(--cyan)">135 cm</strong>.
+      </div>
+    </div>
+
+    <!-- BUTTON B -->
+    <div class="challenge-card b-card">
+      <div class="challenge-badge badge-b">Button B</div>
+      <div class="challenge-title">Two-Stop Route</div>
+      <div class="challenge-desc">Drive from (0, 0) → (3, 2) → (5, 4). Two calls in sequence.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop green">(5, 4)</span>
+      </div>
+      <div class="mc-wrap">
+        <div class="mc-stack">
+          <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">B ▾</span> pressed</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">3</span> <span class="mc-pill mc-p-num">2</span></div>
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">2</span> <span class="mc-pill mc-p-num">2</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        The second call uses <strong style="color:var(--green)">(2, 2)</strong> — not (5, 4) — because the bot is already at (3, 2). You're telling it how far to move from where it is now.
+      </div>
+      <span class="hint-pill" onclick="toggleHint('hb')">Why (2, 2) not (5, 4)?</span>
+      <div class="hint-text" id="hb">The function moves the bot by the number you pass in, starting from its current position. If the bot is at (3, 2) and you want it at (5, 4), it needs to move 2 more squares right and 2 more squares forward. So you pass (2, 2).</div>
+    </div>
+
+    <!-- BUTTON A+B -->
+    <div class="challenge-card ab-card">
+      <div class="challenge-badge badge-ab">Button A+B</div>
+      <div class="challenge-title">Three-Stop Route</div>
+      <div class="challenge-desc">Drive from (0, 0) → (3, 2) → (5, 4) → (2, 4). Three calls in sequence.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop green">(5, 4)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop yellow">(2, 4)</span>
+      </div>
+      <!--div class="mc-wrap">
+        <div class="mc-stack">
+          <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">A+B ▾</span> pressed</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">3</span> <span class="mc-pill mc-p-num">2</span></div>
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">2</span> <span class="mc-pill mc-p-num">2</span></div>
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-neg">−3</span> <span class="mc-pill mc-p-num">0</span></div>
+          </div>
+        </div>
+      </div-->
+      <!--div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        The last move goes from (5, 4) to (2, 4) — that's 3 squares <em>left</em>, no change in y. x = −3 tells the bot to face left and drive 3 squares. y stays 0.
+      </div-->
+      <span class="hint-pill" onclick="toggleHint('hab')">Work out the third move</span>
+      <div class="hint-text" id="hab">Bot is at (5, 4). Target is (2, 4). Difference: x = 2 − 5 = −3, y = 4 − 4 = 0. So the third call is moveTo(−3, 0). Negative x = turn left.</div>
+    </div>
+  </div>
+
+  <!-- Math connection -->
+  <div class="concept-box">
+    <div class="concept-label">Math Connection: Relative vs. Absolute Coordinates</div>
+    <div class="concept-text">
+      Your function uses <strong style="color:var(--purple)">relative coordinates</strong> — each call describes how far to move from the current position, not from the origin. To find the input for a move, subtract the current position from the target:<br><br>
+      <code style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);padding:4px 10px;border-radius:6px;font-family:monospace;font-size:14px;color:var(--purple)">
+        Δx = x_target − x_current &nbsp;&nbsp; Δy = y_target − y_current
+      </code><br><br>
+      If you were building a GPS-style function that always started from (0, 0), you'd use absolute coordinates and pass the target directly. Both approaches are valid — they just require different logic inside the function.
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(4)">Next: Reflect →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECTION 4 — REFLECT
+═══════════════════════════════════════════ -->
+<section class="section" id="sec4">
+  <div class="sec-header">
+    <div class="sec-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></div>
+    <div>
+      <div class="sec-title">Reflect</div>
+      <div class="sec-subtitle">What did your function actually do?</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Discussion Questions</div>
+    <div class="reflect-q">
+      <div class="reflect-label">1. What is the difference between a function and a regular block sequence?</div>
+      <div class="reflect-frame">Think about what happens when you need to reuse the same logic 5 times in one program.</div>
+      <textarea placeholder="Write your answer..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">2. Why do we use absolute value for the distance in the go forward block?</div>
+      <div class="reflect-frame">What would happen if x = −3 and you passed x directly to the distance block?</div>
+      <textarea placeholder="Write your answer..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">3. In the A+B challenge, the third moveTo call uses x = −3. What does the negative sign tell the function to do?</div>
+      <div class="reflect-frame">Trace through the if/else logic inside moveTo with x = −3.</div>
+      <textarea placeholder="Write your answer..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">4. UNIT is set to 27. If your arena squares were 30 cm instead, what would you change?</div>
+      <div class="reflect-frame">How many blocks would you need to update?</div>
+      <textarea placeholder="Write your answer..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Extension Challenge</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:14px">
+      Can you build a second function called <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveToAbsolute(x, y)</code> that <em>always</em> navigates from (0, 0)?
+    </p>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:0">
+      You'd need two variables to track the bot's current position, then calculate the relative move inside the function. This is how real robot navigation works — the bot maintains a state and computes relative moves automatically.
+    </p>
+  </div>
+
+  <div class="congrats-box">
+    <div class="congrats-icon">🎯</div>
+    <div class="congrats-title">Function Built. Bot Navigating.</div>
+    <div class="congrats-body">
+      You defined a reusable function with two parameters, used absolute value to handle direction without breaking distance, and navigated a three-stop route — all with the same 20 blocks of logic. That's the core of software design.
+    </div>
+  </div>
+</section>
+
+<!-- ════ SCRIPT ════ -->
+<script>
+  let current = 0;
+  const TOTAL = 5;
+
+  function goTo(n) {
+    document.getElementById('sec' + current).classList.remove('active');
+    document.getElementById('tab' + current).classList.remove('active');
+    document.getElementById('tab' + current).classList.add('done');
+    current = n;
+    document.getElementById('sec' + current).classList.add('active');
+    document.querySelectorAll('.prog-tab').forEach((t, i) => {
+      if (i < n) t.classList.add('done');
+      if (i === n) { t.classList.add('active'); t.classList.remove('done'); }
+    });
+    document.getElementById('progFill').style.width = ((n + 1) / TOTAL * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleHint(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('show');
+  }
+
+  function checkAns(btn, type, responseId) {
+    const resp = document.getElementById(responseId);
+    document.querySelectorAll('.check-btn').forEach(b => {
+      b.classList.remove('sel-correct', 'sel-wrong');
+    });
+    btn.classList.add(type === 'correct' ? 'sel-correct' : 'sel-wrong');
+    resp.className = 'check-response show ' + (type === 'correct' ? 'correct' : 'wrong');
+    if (type === 'correct') {
+      resp.innerHTML = '✅ <strong style="color:var(--green)">Correct.</strong> The function handles x first — it turns the bot 90° left or right, drives |x| squares, then re-orients for the y move. X always comes first.';
+    } else {
+      resp.innerHTML = '❌ <strong style="color:var(--red)">Not quite.</strong> The function is designed to move in x first (left or right), then y (forward or back). Look at the order of the go forward blocks inside <code style="font-family:monospace;color:var(--cyan)">moveTo</code>.';
+    }
+  }
+</script>
+</body>
+</html>
