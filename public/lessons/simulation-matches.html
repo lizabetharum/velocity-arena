@@ -82,37 +82,6 @@
       font-size: .875rem; color: var(--slate); line-height: 1.65;
     }
 
-    /* Loadout banner — personalized from localStorage */
-    .loadout-banner {
-      background: linear-gradient(180deg, rgba(0,229,255,.06), rgba(0,229,255,.02));
-      border: 1px solid rgba(0,229,255,.25); border-left: 4px solid var(--cyan);
-      border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
-    }
-    .loadout-banner .lb-title {
-      font-size: .75rem; font-weight: 700; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem;
-    }
-    .loadout-row {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: .625rem; margin-bottom: 1rem;
-    }
-    .loadout-chip {
-      background: var(--navy3); border: 1px solid var(--card-border);
-      border-radius: 7px; padding: .625rem .75rem; text-align: center;
-    }
-    .loadout-chip .lc-label {
-      font-size: .625rem; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--slate); margin-bottom: .25rem;
-    }
-    .loadout-chip .lc-val { font-size: 1.375rem; font-weight: 800; color: var(--cyan); }
-    .loadout-chip.missing .lc-val { color: var(--slate); }
-    .loadout-total {
-      font-size: .8125rem; color: var(--slate);
-      text-align: center; margin-bottom: 1rem;
-    }
-    .loadout-total strong.ok   { color: var(--green); }
-    .loadout-total strong.off  { color: var(--yellow); }
-
     /* Step list — style only DIRECT children, so nested <ol> inside a
        step body falls back to normal list rendering. */
     .step-list { counter-reset: step; list-style: none; padding: 0; }
@@ -266,24 +235,12 @@
     <div class="eyebrow">Simulation matches · Day 5</div>
     <h2>Upload your loadout to your bot.</h2>
     <p>
-      You've locked Speed, Endurance, Turning, and Power. Time to put the loadout on the field.
+      You've designed three loadouts this morning. Now it's time to put a loadout on the field.
       Follow the five steps below to open MakeCode, add the Cutebot Pro extension, switch to
       JavaScript mode, and paste the match template. Then you'll change exactly two things:
       your four stats, and your launch sequence.
     </p>
   </section>
-
-  <!-- Personalized loadout -->
-  <div class="loadout-banner" id="loadout-banner">
-    <div class="lb-title">Your loadout (from Days 1–4)</div>
-    <div class="loadout-row" id="loadout-row">
-      <!-- chips injected by JS -->
-    </div>
-    <div class="loadout-total" id="loadout-total">—</div>
-    <p class="muted" style="font-size:.8125rem;" id="loadout-note">
-      The "Copy with my values" button below drops your four numbers straight into the code template. No retyping.
-    </p>
-  </div>
 
   <!-- Setup steps -->
   <div class="card">
@@ -331,8 +288,7 @@
           <div class="step-title">Replace everything with the match template</div>
           <div class="step-body">
             Select all the default code (<kbd>⌘ A</kbd> on Mac, <kbd>Ctrl A</kbd> on Windows/ChromeOS)
-            and delete it. Then paste the code from the block below. Use <strong>Copy with my values</strong>
-            if you want your stats pre-filled; use <strong>Copy template</strong> to paste the raw version.
+            and delete it. Then paste the code from the block below using <strong>Copy template</strong>.
           </div>
         </div>
       </li>
@@ -368,8 +324,7 @@
       <div class="code-toolbar">
         <span class="code-title">match-template.ts</span>
         <div class="copy-group">
-          <button class="btn-copy" id="copy-raw-btn" onclick="copyTemplate(false)">Copy template</button>
-          <button class="btn-copy primary" id="copy-filled-btn" onclick="copyTemplate(true)">Copy with my values</button>
+          <button class="btn-copy primary" id="copy-raw-btn" onclick="copyTemplate()">Copy template</button>
         </div>
       </div>
       <pre class="code-block" id="code-display"></pre>
@@ -388,12 +343,8 @@
         <p>
           Near the bottom of the code, find the lines starting with <code>SPEED =</code>,
           <code>ENDURANCE =</code>, <code>TURNING =</code>, <code>POWER =</code>. Replace
-          the placeholder 5s with <strong>your locked values from Days 1–4</strong>.
+          the placeholder 0s with <strong>your locked values from Days 1–4</strong>.
           They must add up to exactly <strong>20</strong>.
-        </p>
-        <p>
-          If you used the "Copy with my values" button above, these are already filled in for you.
-          Double-check them against your stat card anyway.
         </p>
       </div>
     </div>
@@ -982,114 +933,16 @@ basic.forever(function () {
 </script>
 
 <script>
-// ── Read locked stats from localStorage (set by the Day 1–4 lessons) ──
-// Turning has no interactive lesson page, so `va_turning_locked` is never
-// stored. We infer it from the other three: Turning = 20 − S − E − P.
-function getLocked(key) {
-  const v = parseInt(localStorage.getItem('va_' + key + '_locked'));
-  return isNaN(v) ? null : v;
-}
-
-// Resolve a complete loadout. Turning is inferred from the other three
-// unless explicitly stored (forward-compat for if a turning lesson is
-// added later).
-function resolveLoadout() {
-  const speed     = getLocked('speed');
-  const endurance = getLocked('endurance');
-  const power     = getLocked('power');
-  let   turning   = getLocked('turning');
-  let   inferredTurning = false;
-  if (turning === null && speed !== null && endurance !== null && power !== null) {
-    turning = 20 - speed - endurance - power;
-    inferredTurning = true;
-  }
-  const allResolved = [speed, endurance, turning, power].every(v => v !== null);
-  const turningValid = turning === null ? false : (turning >= 1 && turning <= 17);
-  return { speed, endurance, turning, power, inferredTurning, allResolved, turningValid };
-}
-
-function getCodeSource() {
-  // textContent of the hidden <script type="text/plain"> is the canonical
-  // source. We leave the leading newline from the opening <script> tag
-  // alone — MakeCode doesn't care, and it keeps the paste visually clean.
-  return document.getElementById('code-source').textContent;
-}
-
-function personalizeCode(src) {
-  const { speed, endurance, turning, power, allResolved } = resolveLoadout();
-  if (!allResolved) return src;  // bail to raw template if anything unknown
-
-  const total = speed + endurance + turning + power;
-  return src
-    .replace(/^SPEED\s*=\s*\d+.*$/m,     'SPEED = '     + speed     + '        // ← YOUR VALUE HERE  (current total: ' + total + ')')
-    .replace(/^ENDURANCE\s*=\s*\d+.*$/m, 'ENDURANCE = ' + endurance + '    // ← YOUR VALUE HERE')
-    .replace(/^TURNING\s*=\s*\d+.*$/m,   'TURNING = '   + turning   + '      // ← YOUR VALUE HERE  (inferred: 20 − S − E − P)')
-    .replace(/^POWER\s*=\s*\d+.*$/m,     'POWER = '     + power     + '        // ← YOUR VALUE HERE');
-}
-
 // ── Render the code block to the page ────────────────────────────────
-document.getElementById('code-display').textContent = getCodeSource();
+document.getElementById('code-display').textContent = document.getElementById('code-source').textContent;
 
-// ── Render the personalized loadout banner ───────────────────────────
-(function renderLoadout() {
-  const loadout = resolveLoadout();
-  const stats = [
-    { key: 'speed',     label: 'Speed',     val: loadout.speed,     inferred: false                   },
-    { key: 'endurance', label: 'Endurance', val: loadout.endurance, inferred: false                   },
-    { key: 'turning',   label: 'Turning',   val: loadout.turning,   inferred: loadout.inferredTurning },
-    { key: 'power',     label: 'Power',     val: loadout.power,     inferred: false                   },
-  ];
-  const row = document.getElementById('loadout-row');
-  row.innerHTML = stats.map(s => {
-    const missing = s.val === null ? ' missing' : '';
-    const inferredTag = s.inferred
-      ? '<div style="font-size:.5625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-top:.25rem;">inferred</div>'
-      : '';
-    return '<div class="loadout-chip' + missing + '">' +
-             '<div class="lc-label">' + s.label + '</div>' +
-             '<div class="lc-val">' + (s.val === null ? '—' : s.val) + '</div>' +
-             inferredTag +
-           '</div>';
-  }).join('');
-
-  const totalEl = document.getElementById('loadout-total');
-  const noteEl  = document.getElementById('loadout-note');
-  const copyBtn = document.getElementById('copy-filled-btn');
-
-  const { speed, endurance, power, turning, allResolved, inferredTurning, turningValid } = loadout;
-  const total = (speed || 0) + (endurance || 0) + (turning || 0) + (power || 0);
-  const storedMissing = [speed, endurance, power].filter(v => v === null).length;
-
-  if (storedMissing > 0) {
-    totalEl.innerHTML = storedMissing + ' stat' + (storedMissing === 1 ? '' : 's') + ' not yet locked (Speed/Endurance/Power) — "Copy with my values" is disabled until all three are set.';
-    noteEl.textContent = 'Complete the Day 1, 2, and 4 lessons to auto-fill your loadout. Turning is inferred from the others, so you don\'t need a separate lesson for it. For now, use "Copy template" and type your numbers into the code manually.';
-    copyBtn.disabled = true;
-    copyBtn.style.opacity = '.5';
-    copyBtn.style.cursor = 'not-allowed';
-  } else if (!turningValid) {
-    totalEl.innerHTML = 'Turning would be <strong class="off">' + turning + '</strong> (20 − ' + speed + ' − ' + endurance + ' − ' + power + '). That\'s outside the 1–17 range — your Speed + Endurance + Power must leave at least 1 point for Turning.';
-    noteEl.textContent = 'Revisit your stat cards with a facilitator — something sums wrong.';
-    copyBtn.disabled = true;
-    copyBtn.style.opacity = '.5';
-    copyBtn.style.cursor = 'not-allowed';
-  } else if (total === 20) {
-    totalEl.innerHTML = 'Total: <strong class="ok">' + total + ' / 20 ✓</strong>' +
-      (inferredTurning ? ' · Turning inferred as <strong class="ok">' + turning + '</strong>' : '');
-  } else {
-    totalEl.innerHTML = 'Total: <strong class="off">' + total + ' / 20</strong> — your four stats should add to 20.';
-  }
-})();
-
-// ── Copy handlers ────────────────────────────────────────────────────
-async function copyTemplate(personalized) {
-  const src = personalized ? personalizeCode(getCodeSource()) : getCodeSource();
-  const btn = document.getElementById(personalized ? 'copy-filled-btn' : 'copy-raw-btn');
-  if (btn.disabled) return;
-
+// ── Copy handler ─────────────────────────────────────────────────────
+async function copyTemplate() {
+  const src = document.getElementById('code-source').textContent;
+  const btn = document.getElementById('copy-raw-btn');
   try {
     await navigator.clipboard.writeText(src);
   } catch (_e) {
-    // Fallback: select + copy via a temp textarea (older browsers / iframes)
     const ta = document.createElement('textarea');
     ta.value = src;
     ta.style.position = 'fixed';
@@ -1099,7 +952,6 @@ async function copyTemplate(personalized) {
     try { document.execCommand('copy'); } catch (_ignored) {}
     document.body.removeChild(ta);
   }
-
   const originalText = btn.textContent;
   btn.textContent = '✓ Copied';
   btn.classList.add('copied');
