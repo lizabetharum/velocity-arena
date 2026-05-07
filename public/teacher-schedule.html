@@ -293,24 +293,44 @@ function renderDay(dayNum) {
 
   const actRows = (d.activities || []).map(a => {
     const linkPills = [];
-    const asList = v => v == null ? [] : (Array.isArray(v) ? v : [v]);
+    // Coerce a field into an array of {url, label} objects.
+    // Accepts: string | {url, label} | array of (string | {url, label}).
+    const asLinks = v => {
+      if (v == null) return [];
+      const items = Array.isArray(v) ? v : [v];
+      return items.map(item =>
+        typeof item === 'string'
+          ? { url: item, label: null }
+          : { url: item.url, label: item.label || null }
+      ).filter(x => x.url);
+    };
     const norm = u => String(u || '').replace(/^https?:\/\/[^/]+/, '').replace(/\/+$/, '');
-    const webpageUrls = asList(a.webpage);
-    const webpageNorm = new Set(webpageUrls.map(norm));
-    for (const u of asList(a.script))    linkPills.push(`<a class="tact-link"           href="${u}" target="_blank" rel="noopener">Script</a>`);
-    for (const u of asList(a.worksheet)) linkPills.push(`<a class="tact-link worksheet" href="${u}" target="_blank" rel="noopener">Worksheet</a>`);
-    for (const u of webpageUrls)         linkPills.push(`<a class="tact-link webpage"   href="${u}" target="_blank" rel="noopener">Page</a>`);
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const pushPill = (cls, link, defaultLabel) => {
+      const text = link.label || defaultLabel;
+      const clsAttr = cls ? ` ${cls}` : '';
+      linkPills.push(`<a class="tact-link${clsAttr}" href="${esc(link.url)}" target="_blank" rel="noopener">${esc(text)}</a>`);
+    };
+
+    const webpageLinks = asLinks(a.webpage);
+    const webpageNorm = new Set(webpageLinks.map(l => norm(l.url)));
+
+    asLinks(a.script).forEach(l    => pushPill('',          l, 'Script'));
+    asLinks(a.worksheet).forEach(l => pushPill('worksheet', l, 'Worksheet'));
+    webpageLinks.forEach(l         => pushPill('webpage',   l, 'Page'));
     // Pull lesson URLs from lessons.js for activities without an explicit webpage,
     // deduped against any URL already covered by a.webpage (origin-stripped match).
     const lessonLinks = (typeof getLessonLinks === 'function') ? getLessonLinks(a.name) : [];
     for (const ll of lessonLinks) {
       if (webpageNorm.has(norm(ll.url))) continue;
-      linkPills.push(`<a class="tact-link webpage" href="${ll.url}" target="_blank" rel="noopener">Page</a>`);
+      pushPill('webpage', ll, 'Page');
     }
-    for (const u of asList(a.quickCard)) linkPills.push(`<a class="tact-link quickcard" href="${u}" target="_blank" rel="noopener">Quick card</a>`);
-    for (const u of asList(a.template))  linkPills.push(`<a class="tact-link template"  href="${u}" target="_blank" rel="noopener">Template</a>`);
-    for (const u of asList(a.makecode))  linkPills.push(`<a class="tact-link makecode"  href="${u}" target="_blank" rel="noopener">MakeCode</a>`);
-    for (const u of asList(a.exit))      linkPills.push(`<a class="tact-link exit"      href="${u}" target="_blank" rel="noopener">Exit ticket</a>`);
+    asLinks(a.quickCard).forEach(l => pushPill('quickcard', l, 'Quick card'));
+    asLinks(a.template).forEach(l  => pushPill('template',  l, 'Template'));
+    asLinks(a.makecode).forEach(l  => pushPill('makecode',  l, 'MakeCode'));
+    asLinks(a.exit).forEach(l      => pushPill('exit',      l, 'Exit ticket'));
     return `<div class="tact-row">
       <div class="tact-mins">${a.mins}m</div>
       <div class="tact-body">
