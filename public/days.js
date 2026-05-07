@@ -52,7 +52,7 @@ const DAYS = [
         "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
         "facilitatorDescription": "Hand each student a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the student for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
         "script": "https://docs.google.com/document/d/1K0kG2dMqj8hDzy1uFp6OpIj4PZrtm1eb9zCeg_wqSx0/edit?usp=sharing",
-        "template": "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link",
+        "template": { url: "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link", label: "Stat Card"},
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html"
       },
       {
@@ -310,8 +310,9 @@ const DAYS = [
       {
         "name": "Power Allocation: Stat Card Fill-In",
         "mins": 3,
-        "block": "Ice Breaker",
+        "block": "Transition",
         "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
+    
         "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
       },
@@ -511,6 +512,10 @@ const DAYS = [
         "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool.",
         "facilitatorDescription": "Teams complete their official Season 1 stat allocation using a 12-problem interleaved set covering all four formula types (Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, Arc Segments = TURNING, and Speed/Endurance). Problems are shuffled so teams have to identify the formula before calculating -- no doing all Speed problems first. A concept tag column runs alongside each problem: teams name the concept (unit rate, ratio, linear decay, coordinate geometry, proportional scaling) before calculating. All four circled official values and all 12 concept tags must verify correct before any team touches a tool in the afternoon block.",
         "script": "https://docs.google.com/document/d/1Y6w0LgGfHSx_5icP4yTCNnHzYIYSofLFxoQVoNdZweY/edit?usp=drive_link",
+        "worksheet": [
+          { url: "https://drive.google.com/file/d/1vpbdrqpAyFEU8Rth55wJor90qT1f0SGg/view?usp=drive_link", label: "Questions" },
+          { url: "https://drive.google.com/file/d/1HTKprechKjPNoACQ-fWBMvjIPoCIACLS/view?usp=drive_link", label: "Answer Key" }
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-02-interleaved-problem-set.html"
       },
       {
@@ -520,41 +525,40 @@ const DAYS = [
         "description": "Eat, rest, and talk about anything except math.",
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
-      {
+     {
         "name": "Field Geometry + Approach Planning",
-        "mins": 35,
+        "mins": 50,
         "block": "Challenge",
         "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
         "facilitatorDescription": "Teams plot three coordinate points -- starting position, tip-off at (4, 2), and goal at (8, 2) -- then calculate approach distance and use the Speed formula to predict travel time. The sentence justification is a quality gate: vague reasoning gets sent back once, no repeat explanations. Common issue: teams conflate straight-line distance with actual bot path. Don't correct the geometry -- let the testing block surface it. The prediction they write here is the number they'll check against real bot behavior in the next block.",
+        "script": "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link",
+        "worksheet":"https://docs.google.com/document/d/1IrUQu-agjptsiOYcyiwMrs5T8pa7gWwwHhzM9b5FRFk/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-03-field-geometry-approach.html"
       },
       {
         "name": "Launch Sequence Programming + Testing",
-        "mins": 50,
+        "mins": 60,
         "block": "Match-Build-Make",
         "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
         "facilitatorDescription": "Teams program the launch sequence as a routine separate from the stat loadout coded in the morning. Two test runs, both timed, both logged. The comparison to the Speed prediction is the math moment: a mismatch is not a failure, it is data. If a team's times are off, ask one question only: 'What did your formula predict, and what did you observe?' Then let them work. Some teams will have approach angles that add distance not captured in their straight-line calculation -- that is the right kind of confusion to carry into Season 1. Do not resolve it for them.",
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
+        "script":"https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"
       },
       {
         "name": "Launch Showcase",
-        "mins": 45,
+        "mins": 20,
         "block": "Match-Build-Make",
         "description": "Commit to your final sequence and write down your run order -- that is what locks for Season 1. Each team runs their launch sequence once in front of the room. While another team runs, write one specific observation in your dashboard: not 'they were fast' but 'their bot reached the ball in under 3 seconds, which suggests their Speed allocation is above 8.' After all teams have run, you have 10 minutes for one final adjustment. Then sequences lock.",
         "facilitatorDescription": "Enforce the 2-minute commitment window before the showcase starts. Teams that haven't committed will stall the room. During each team's run, prompt observers writing vague notes: 'What number would make that observation useful?' The 10-minute adjustment window after all sequences have run is the highest-value moment in the block -- teams are adjusting based on what they saw, not just what they predicted. Let that happen without interruption. Sequences lock at the end of the 10 minutes with no exceptions. Season 1 begins tomorrow.",
+        "script": "https://docs.google.com/document/d/1u_t-Lcszhvz9VXyqGYMtgyzN6tI948pUgw-okpP7xBA/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1LhwiwjTChaUP8ThP3QIU7IYpBHiy5B7_/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-05-launch-showcase.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Free Code or Final Verification",
-        "mins": 45,
+        "mins": 15,
         "block": "Open Lab",
         "description": "Track A (Data Dive): Check each stat value in your dashboard against the formula output. Fix any mismatches before tomorrow's first match. Track B (Bot Lab): Test a loadout you would never use competitively. What happens at Speed = 2 with Power = 15?",
         "facilitatorDescription": "Two tracks available, self-selected. Track A (Data Dive): teams check each stat value in the dashboard against formula output and fix any mismatches before Season 1 begins tomorrow. Track B (Bot Lab): teams test a loadout they would never use competitively (e.g., Speed = 2 with Power = 15) to build intuition for edge behavior. Both are legitimate uses of the time.",
