@@ -152,6 +152,46 @@
   }
   .lookup-box .lookup-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 1.2em; }
 
+  /* PIN MODAL — gates Save behind a 4-digit per-team PIN */
+  .pin-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 110; padding: 24px; }
+  .pin-box { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 8px; padding: 26px 28px; width: 100%; max-width: 360px; text-align: center; }
+  .pin-box h3 { font-family: var(--font); font-size: 16px; font-weight: 800; color: var(--fg-0); margin: 0 0 4px; }
+  .pin-box .pin-team { font-size: 11px; font-weight: 700; color: var(--accent, var(--cyan)); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 6px; }
+  .pin-box p { font-size: 12px; color: var(--steel); margin: 0 0 18px; line-height: 1.5; }
+  .pin-box input.pin-input {
+    font-family: var(--font-mono, monospace); font-size: 22px; font-weight: 800;
+    letter-spacing: 0.5em; text-align: center; padding-left: 0.5em;
+    width: 100%; padding-top: 12px; padding-bottom: 12px; padding-right: 0;
+    border: 1.5px solid var(--border); border-radius: 6px;
+    color: var(--fg-0); background: var(--bg-1); outline: none;
+    margin-bottom: 8px;
+  }
+  .pin-box input.pin-input:focus { border-color: var(--accent, var(--cyan)); }
+  .pin-box .pin-go {
+    font-family: var(--font); font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+    background: var(--accent, var(--cyan)); color: var(--bg-1, #001218); border: 0;
+    padding: 11px 20px; border-radius: 6px; cursor: pointer; width: 100%;
+    text-transform: uppercase;
+  }
+  .pin-box .pin-go:hover { opacity: 0.9; }
+  .pin-box .pin-go:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pin-box .pin-cancel {
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    background: none; color: var(--steel); border: none; cursor: pointer;
+    margin-top: 12px; padding: 6px;
+  }
+  .pin-box .pin-cancel:hover { color: var(--fg-0); }
+  .pin-box .pin-error { font-size: 12px; color: var(--red); margin-top: 6px; min-height: 1.2em; }
+  .pin-box .pin-reset {
+    display: block; margin-top: 14px; padding-top: 12px;
+    border-top: 1px dashed var(--line);
+    font-size: 11px; color: var(--steel); cursor: pointer;
+    background: none; border-left: none; border-right: none; border-bottom: none;
+    width: 100%; font-family: inherit;
+  }
+  .pin-box .pin-reset:hover { color: var(--red); }
+  .pin-box .pin-reset.hidden { display: none; }
+
   /* TEAM BAR */
   .team-bar {
     background: var(--bg-2);
@@ -1342,6 +1382,21 @@
   </div>
 </div>
 
+<!-- PIN MODAL — gates Save behind a per-team 4-digit PIN -->
+<div class="pin-overlay" id="pin-overlay" style="display:none;" onclick="if(event.target===this)pinCancel()">
+  <div class="pin-box">
+    <div class="pin-team" id="pin-team-name">TEAM —</div>
+    <h3 id="pin-title">Enter team PIN</h3>
+    <p id="pin-sub">A 4-digit PIN protects this team's saves.</p>
+    <input class="pin-input" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" id="pin-input-1" autocomplete="off">
+    <input class="pin-input" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" id="pin-input-2" autocomplete="off" placeholder="Confirm" style="display:none;">
+    <button class="pin-go" id="pin-go" onclick="pinSubmit()">Unlock</button>
+    <div class="pin-error" id="pin-error"></div>
+    <button class="pin-cancel" onclick="pinCancel()">Cancel</button>
+    <button class="pin-reset hidden" id="pin-reset" onclick="pinTeacherReset()">Forgot? Teacher reset (clears PIN)</button>
+  </div>
+</div>
+
 <div class="toast" id="toast">Saved</div>
 
 <script>
@@ -1360,6 +1415,7 @@ function defaultTeam(name) {
     justifications: [],
     simulationRounds: [],
     preTrialOverride: 'auto',
+    pin: '',
     fourViews: {
       dataPoints: [
         { x: '', y: '' },
@@ -2183,8 +2239,148 @@ document.addEventListener('change', (e) => {
 });
 
 // ─── SAVE ──────────────────────────────────────────────────
+// ─── PIN GATE ──────────────────────────────────────────────
+// Each team has a 4-digit PIN stored on its team object. Save is
+// gated behind it: students must set a PIN on first save and re-
+// enter it on subsequent saves (cached in localStorage per session).
+// Teachers (va_teacher_auth=1) bypass entirely and can also reset
+// any team's PIN through the modal's "Teacher reset" link.
+
+const PIN_UNLOCK_KEY = 'va_pin_unlock_v1';
+
+function _pinUnlockSet() {
+  try { return new Set(JSON.parse(localStorage.getItem(PIN_UNLOCK_KEY) || '[]')); }
+  catch (e) { return new Set(); }
+}
+function _pinSaveUnlockSet(s) {
+  localStorage.setItem(PIN_UNLOCK_KEY, JSON.stringify([...s]));
+}
+function _pinUnlockKey() {
+  return currentSite + '|' + (currentTeam().name || '');
+}
+function isTeacherAuthed() {
+  return localStorage.getItem('va_teacher_auth') === '1';
+}
+function isCurrentTeamUnlocked() {
+  if (isTeacherAuthed()) return true;
+  const t = currentTeam();
+  if (!t.pin) return true; // no PIN set yet — anyone can save (and gets prompted to set one)
+  return _pinUnlockSet().has(_pinUnlockKey());
+}
+
+let _pinResolver = null; // pending requireUnlock() promise resolver
+let _pinMode = null;     // 'set' | 'enter'
+
+function requireUnlock() {
+  if (isCurrentTeamUnlocked()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    _pinResolver = resolve;
+    const t = currentTeam();
+    _pinMode = t.pin ? 'enter' : 'set';
+    showPinModal(_pinMode);
+  });
+}
+
+function showPinModal(mode) {
+  const overlay = document.getElementById('pin-overlay');
+  const teamEl  = document.getElementById('pin-team-name');
+  const titleEl = document.getElementById('pin-title');
+  const subEl   = document.getElementById('pin-sub');
+  const i1      = document.getElementById('pin-input-1');
+  const i2      = document.getElementById('pin-input-2');
+  const goBtn   = document.getElementById('pin-go');
+  const errEl   = document.getElementById('pin-error');
+  const resetEl = document.getElementById('pin-reset');
+
+  teamEl.textContent = (currentTeam().name || 'TEAM').toUpperCase();
+  errEl.textContent = '';
+  i1.value = ''; i2.value = '';
+
+  if (mode === 'set') {
+    titleEl.textContent = 'Set a team PIN';
+    subEl.textContent = 'Pick a 4-digit PIN. You\'ll need it to save changes for this team.';
+    i1.placeholder = 'New PIN';
+    i2.style.display = '';
+    goBtn.textContent = 'Set PIN';
+    resetEl.classList.add('hidden');
+  } else {
+    titleEl.textContent = 'Enter team PIN';
+    subEl.textContent = 'A 4-digit PIN protects this team\'s saves.';
+    i1.placeholder = 'PIN';
+    i2.style.display = 'none';
+    goBtn.textContent = 'Unlock';
+    resetEl.classList.toggle('hidden', !isTeacherAuthed());
+  }
+
+  overlay.style.display = 'flex';
+  setTimeout(() => i1.focus(), 0);
+
+  // Submit on Enter
+  const submitOnEnter = e => { if (e.key === 'Enter') { e.preventDefault(); pinSubmit(); } };
+  i1.onkeydown = submitOnEnter;
+  i2.onkeydown = submitOnEnter;
+}
+
+function _pinHide() {
+  document.getElementById('pin-overlay').style.display = 'none';
+}
+
+function pinCancel() {
+  _pinHide();
+  if (_pinResolver) { _pinResolver(false); _pinResolver = null; }
+}
+
+function pinSubmit() {
+  const i1 = document.getElementById('pin-input-1');
+  const i2 = document.getElementById('pin-input-2');
+  const errEl = document.getElementById('pin-error');
+  const v1 = (i1.value || '').trim();
+
+  if (!/^\d{4}$/.test(v1)) {
+    errEl.textContent = 'PIN must be exactly 4 digits.';
+    return;
+  }
+
+  if (_pinMode === 'set') {
+    const v2 = (i2.value || '').trim();
+    if (v1 !== v2) {
+      errEl.textContent = 'PINs do not match.';
+      return;
+    }
+    currentTeam().pin = v1;
+    const s = _pinUnlockSet(); s.add(_pinUnlockKey()); _pinSaveUnlockSet(s);
+    _pinHide();
+    if (_pinResolver) { _pinResolver(true); _pinResolver = null; }
+    return;
+  }
+
+  // Enter mode
+  if (v1 === currentTeam().pin) {
+    const s = _pinUnlockSet(); s.add(_pinUnlockKey()); _pinSaveUnlockSet(s);
+    _pinHide();
+    if (_pinResolver) { _pinResolver(true); _pinResolver = null; }
+  } else {
+    errEl.textContent = 'Wrong PIN. Try again.';
+    i1.value = '';
+    i1.focus();
+  }
+}
+
+function pinTeacherReset() {
+  if (!isTeacherAuthed()) return;
+  if (!confirm('Teacher reset: clear this team\'s PIN? Anyone will be able to save until a new PIN is set.')) return;
+  currentTeam().pin = '';
+  const s = _pinUnlockSet(); s.delete(_pinUnlockKey()); _pinSaveUnlockSet(s);
+  _pinHide();
+  if (_pinResolver) { _pinResolver(true); _pinResolver = null; }
+  showToast('Team PIN cleared. Save again to set a new one.');
+}
+
 async function saveDashboard() {
   if (isSaving) return;
+  // PIN gate — set or unlock the team's PIN before any save proceeds.
+  const ok = await requireUnlock();
+  if (!ok) return;
 
   // Always write to localStorage as cache
   localStorage.setItem('va_dashboard', JSON.stringify(allData));
