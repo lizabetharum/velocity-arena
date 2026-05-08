@@ -43,7 +43,7 @@ const ACTIVITY_LESSONS = {
 
 'Formula Relay: All Five Types in One Race':
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Formula Race Cards"}],
-  'Season 1 Match Day 3': '/lessons/match-day-3.html',
+  'Season 1 Match Day 3': [{url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'}],
   "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
   'Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep': [
