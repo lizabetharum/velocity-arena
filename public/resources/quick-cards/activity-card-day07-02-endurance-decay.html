@@ -1,37 +1,12 @@
-<!DOCTYPE html><html lang="en"><head>
-<!-- vla-quickcard-gate:start -->
-<script>
-(function(){
-  var KEY = 'va_teacher_auth';
-  // localStorage so auth persists across tabs and reloads (sessionStorage is per-tab).
-  if (localStorage.getItem(KEY) === '1') return;
-  document.documentElement.style.visibility = 'hidden';
-  function bounce() { location.href = '/teachers.html'; }
-  var s = document.createElement('script');
-  s.src = '/config.js';
-  s.onload = function() {
-    // CONFIG is a top-level const — accessible globally as CONFIG, NOT as window.CONFIG.
-    var pw = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) || '';
-    var ans = prompt('Teacher password required to view quick cards:');
-    if (ans !== null && ans.trim() === String(pw).trim()) {
-      localStorage.setItem(KEY, '1');
-      document.documentElement.style.visibility = '';
-    } else {
-      bounce();
-    }
-  };
-  s.onerror = bounce;
-  document.head.appendChild(s);
-})();
-</script>
-<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
-<link rel="stylesheet" href="/styles/va-tokens.css">
-<title>Endurance Decay</title>
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velocity Arena — Endurance Decay Equations in Slope-Intercept Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { font-family: var(--font-sans); background: var(--bg-1); color: #000; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
 @media print {
   html, body { background: white; margin: 0; padding: 0; }
   @page { size: 11in 8.5in landscape; margin: 0; }
@@ -40,172 +15,148 @@ html, body { font-family: var(--font-sans); background: var(--bg-1); color: #000
 }
 .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
 .card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
-.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.card-header { background: #fff; color: #000; border-bottom: 1.5px solid #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
 .activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
-.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; text-align: right; line-height: 1.5; flex-shrink: 0; }
 .progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
-.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; background: #000; border-radius: 2px; }
-.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.progress-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.08em; color: #999; text-transform: uppercase; }
 .math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
 .math-bar span { font-weight: 500; }
 .card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
 .col { display: flex; flex-direction: column; min-height: 0; }
 .col + .col { border-left: 1.5px solid #000; }
-.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section { border-bottom: 1px solid #000; padding: 5px 9px; display: flex; flex-direction: column; }
 .section:last-child { border-bottom: none; flex: 1; }
 .section.grow { flex: 1; min-height: 0; }
-.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
-.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
-.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
-.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.checklist li { font-size: 8pt; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 9.5pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 2px; }
 .checklist li.note::before { content: '→'; font-style: normal; }
-.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
 .timing-table tr { border-bottom: 1px solid #ddd; }
 .timing-table tr:last-child { border-bottom: none; }
-.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
-.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
-.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
-.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
-.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
-.answer-grid { display: grid; grid-template-columns: auto auto auto; }
-.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
-.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
-.answer-grid .ar.last { border-bottom: none; }
-.answer-grid .bold { font-weight: 700; }
-.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
-.say-list { display: flex; flex-direction: column; gap: 7px; }
+.timing-table td { padding: 5px 7px 5px 0; vertical-align: top; line-height: 1.35; }
+.timing-table td.t-time { font-size: 7.5pt; font-weight: 800; width: 0.55in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1in; font-size: 8pt; }
+.timing-table td.t-focus { font-size: 7.5pt; font-style: italic; color: #333; line-height: 1.4; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 5px 7px; font-style: normal; }
+.say-list { display: flex; flex-direction: column; gap: 5px; }
 .say-item { display: flex; gap: 7px; align-items: flex-start; }
 .say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
 .say-tag.dont { background: white; color: #000; border: 1px solid #000; }
 .say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
 .say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
-.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
-.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+.watch-item { font-size: 7.5pt; line-height: 1.35; }
 .watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
 .watch-redirect { font-style: italic; color: #333; }
-.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
-.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop { flex-shrink: 0; border-top: 2px solid #999; background: #999; color: #fff; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1px solid #fff; padding: 2px 7px; }
 .hard-stop-text { font-weight: 600; line-height: 1.4; }
-.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
-.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: var(--bg-1); font-family: var(--font-sans); }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #fff; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 6.5pt; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
 .produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
 .produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
-.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
-/* card-specific */
-*{box-sizing:border-box;margin:0;padding:0;}
-section{padding:4px 8px;border-bottom:1px solid #e0e0e0;}
-section:last-child{border-bottom:none;}
-h2{font-size:7pt;font-weight:700;margin-bottom:3px;}
-p,li{font-size:7pt;line-height:1.3;}
-ul,ol{padding-left:13px;}
-li{margin-bottom:2px;}
-.t-time{font-size:6.5pt;font-weight:700;white-space:nowrap;width:0.48in;}
-.t-action{font-size:7pt;font-weight:600;width:0.9in;}
-.t-focus{font-size:6.5pt;color:#444;font-style:italic;line-height:1.25;}
-.prob-table{width:100%;border-collapse:collapse;}
-.prob-table th{font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;
-  padding:2px 5px;border-bottom:1.5px solid #000;text-align:left;}
-.prob-table td{font-size:7pt;padding:3px 5px;border-bottom:1px solid #e0e0e0;
-  vertical-align:top;}
-.prob-table tr:last-child td{border-bottom:none;}
-.footer-left{font-size:6.5pt;font-weight:700;color:#555;}
-.footer-right{font-size:6.5pt;color:#555;text-align:right;}
-
-/* card-specific — tighter layout to fit print */
-.section { padding: 5px 10px; }
-.section-label { margin-bottom: 4px; }
-.checklist { gap: 4px; }
-.checklist li { font-size: 8pt; }
-.timing-table td { padding: 4px 6px 4px 0; }
-.timing-table td.t-action { font-size: 8pt; font-weight: 600; }
-.timing-table td.t-focus { font-size: 7.5pt; line-height: 1.3; }
-.say-list { gap: 5px; }
-.say-item { font-size: 8pt; line-height: 1.4; }
-.say-quote { font-size: 8pt; line-height: 1.35; }
-.watch-grid { gap: 5px 12px; }
-.watch-item { font-size: 7.5pt; line-height: 1.3; }
-.produces li { font-size: 7pt; }
-.pattern-note { font-size: 7pt; margin-top: 5px; padding-top: 4px; }
+.produces li::before { content: '\25B8'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head><body>
+</head>
+<body>
 <div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
-<div class="page"><div class="card">
+<div class="page">
+<div class="card">
   <div class="card-header">
     <div class="activity-name">Endurance Decay</div>
     <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div>
-      <span class="progress-label">2 of 5</span>
+      <div class="progress-bar"><div class="progress-fill" style="width:33%;"></div></div>
+      <span class="progress-label">2 of 6</span>
     </div>
-    <div class="header-meta">50 min &nbsp;|&nbsp; Challenge Block<br>Day 7 &nbsp;|&nbsp; Follows Trashketball</div>
+    <div class="header-meta">Day 7 · Launch-Explore-Summarize · 50 min<br>Follows Trashketball</div>
   </div>
-  <div class="math-bar">MATH: <span>P(t) = 100 − r·t &nbsp;&nbsp; r = (20−E)×1.5 &nbsp;&nbsp; x-intercept = 100÷r</span></div>
+  <div class="math-bar">MATH: <span>Slope-Intercept Form · P(t) = 100 − rt · Floor Time vs. X-Intercept</span></div>
   <div class="card-body">
     <div class="col">
-<section>
-  <div class="section-label">Before Block Starts</div>
+<div class="section">
+  <div class="section-label">Before You Start</div>
   <ul class="checklist">
-    <li>Write on board and leave up all block:<br>P(t) = 100 − r·t &nbsp;&nbsp; r = (20 − E) × 1.5</li>
-    <li>Endurance Decay Worksheets at every seat (Parts 1–3)</li>
-    <li>Stat cards on tables — students need their personal E value</li>
-    <li>Worked example: E=6 → r=21 → P(t)=100−21t → x-intercept ≈ 4.76 min</li>
+    <li>How to calculate 20% floor time for E = 10?</li>
+    <li>Difference between floor time and x-intercept?</li>
+    <li>Print monitoring chart — one per facilitator</li>
+    <li>Load interactive lesson Section 2 on student devices</li>
+    <li class="note">*t_floor and t_xi differ because P = 20 vs. P = 0. Ratio: t_xi = 1.25 × t_floor.*</li>
   </ul>
-</section>
-<section>
-  <div class="section-label">Math Context (LO 2.2)</div>
-  <p>Students have calculated P(t) values (Day 2) but never written the full slope-intercept equation. Today: name the form, calculate personal r, find x-intercept.</p>
-  <p style="margin-top:4px;">The x-intercept is match-relevant: a team whose bot hits zero at minute 2.1 <em>feels</em> that in their first match. Recording it before the match creates an evidence chain for Season 1.</p>
-</section>
-<section>
+</div>
+<div class="section">
   <div class="section-label">Students Produce</div>
   <ul class="produces">
-    <li>Personal decay equation: P(t) = 100 − r·t (with their E value)</li>
-    <li>X-intercept = 100 ÷ r (minute bot hits zero)</li>
-    <li>Team comparison: whose bot runs longest in a 3-min match?</li>
-    <li>Data log entry: equation + x-intercept before first match</li>
+    <li>Computed r value: r = (20 − E) × 1.5</li>
+    <li>20% power floor time: t_floor = 80/r</li>
+    <li>True x-intercept: t_xi = 100/r</li>
+    <li>Exit ticket: problem comparing floor times</li>
+    <li>Data log entry: equation and both times</li>
   </ul>
-</section>
+</div>
+<div class="section grow">
+  <div class="section-label">Reference</div>
+  <div style="font-size:8pt; line-height:1.5; display:flex; flex-direction:column; gap:6px;">
+    <div><span style="font-weight:800;">EQUATION</span>: P(t) = 100 − rt, where r = (20 − E) × 1.5</div>
+    <div><span style="font-weight:800;">P-INTERCEPT</span>: 100 · <span style="font-weight:800;">SLOPE</span>: −r</div>
+    <div><span style="font-weight:800;">TWO CRITICAL TIMES</span>:</div>
+    <div>• t_floor = 80/r (when P = 20)</div>
+    <div>• t_xi = 100/r (when P = 0)</div>
+    <div><span style="font-weight:800;">KEY</span>: t_xi = 1.25 × t_floor</div>
+  </div>
+</div>
 </div>
     <div class="col">
-<section>
+<div class="section grow">
   <div class="section-label">Timing</div>
   <table class="timing-table">
-    <tr><th class="t-time">Time</th><th class="t-action">Action</th><th class="t-focus">Watch For</th></tr>
-    <tr><td class="t-time">0:00–0:05</td><td class="t-action">Launch: connect to Day 2 P(t) values. Point to board. Send them.</td><td class="t-focus">Step back after "Go" — 90 sec before circulating</td></tr>
-    <tr><td class="t-time">0:05–0:30</td><td class="t-action">Grapple: individual work through Parts 1–3</td><td class="t-focus">Every equation is different — each person has a different E</td></tr>
-    <tr><td class="t-time">0:30–0:40</td><td class="t-action">Team Share: read x-intercepts aloud; whose bot runs longest?</td><td class="t-focus">Listen for ratio language between r values</td></tr>
-    <tr><td class="t-time">0:40–0:47</td><td class="t-action">Share-Out: one high-E team, one low-E team read equation + x-intercept aloud</td><td class="t-focus">Same match clock, different x-intercepts</td></tr>
-    <tr><td class="t-time">0:47–0:50</td><td class="t-action">Data Log: write equation + x-intercept in gray box before matches</td><td class="t-focus">Non-optional — blank log = nothing to compare after match</td></tr>
-    <tr class="hard-row"><td class="t-time">0:50</td><td class="t-action">Transition → Pre-Match Prediction Huddle</td><td class="t-focus">Data log entry required before transition</td></tr>
+    <tr><td class="t-time">0:00</td><td class="t-action">Open</td><td class="t-focus">Recall P(t) formula. Introduce dual-calculation task: two different points.</td></tr>
+    <tr class="hard-row"><td class="t-time">0:08</td><td class="t-action">Compute r first</td><td class="t-focus">Students compute r = (20 − E) × 1.5 before solving. Do not proceed until most teams have r.</td></tr>
+    <tr><td class="t-time">0:10</td><td class="t-action">Explore: Section 2</td><td class="t-focus">Teams solve for floor time (P = 20) and x-intercept (P = 0). Monitor for same number in both boxes.</td></tr>
+    <tr><td class="t-time">0:30</td><td class="t-action">Team share</td><td class="t-focus">Teams read both numbers. Ask: whose bot hits floor during 3-minute match?</td></tr>
+    <tr><td class="t-time">0:38</td><td class="t-action">Summarize</td><td class="t-focus">Highest E (largest times), then lowest E (smallest times). Contrast between shares.</td></tr>
+    <tr class="hard-row"><td class="t-time">0:53</td><td class="t-action">Exit ticket + log</td><td class="t-focus">Exit ticket (4-part). Data log: equation and both times. Scan all boxes before release.</td></tr>
   </table>
-</section>
-</div>
+</div></div>
     <div class="col">
-<section>
-  <div class="section-label">Watch For — Common Errors</div>
-  <div class="watch-grid">
-    <div class="watch-item"><span class="watch-trigger">Skipping the subtraction: r = E × 1.5</span> <span class="watch-redirect">"If Endurance = 15, what does your bot do? Does that r make sense?" Make them trace it.</span></div>
-    <div class="watch-item"><span class="watch-trigger">Confusing r with E: P(t) = 100 − E·t</span> <span class="watch-redirect">"What did you use for r? Where did that come from?" Trace back to board formula.</span></div>
-    <div class="watch-item"><span class="watch-trigger">Stuck on x-intercept algebra</span> <span class="watch-redirect">"What value of t makes 100 − rt = 0? What do you need to do to isolate t?" Walk away — do not solve it.</span></div>
-    <div class="watch-item"><span class="watch-trigger">X-intercept larger than 3 min (not an error)</span> <span class="watch-redirect">"Your bot doesn't hit zero in a 3-min match. What's your power at exactly t = 3?" Send to Reflect Q2.</span></div>
-  </div>
-</section>
-<section>
-  <div class="section-label">Share-Out Script</div>
+<div class="section">
+  <div class="section-label">Say This</div>
   <div class="say-list">
-    <div class="say-item"><span class="say-tag">Say</span> "Two teams — one high-E, one low-E. Read your complete equation and your x-intercept. Nothing else."</div>
-    <div class="say-item"><span class="say-tag">After</span> "Different allocations, different slopes, different x-intercepts. Same match clock. That gap is the whole point of the stat."</div>
-    <div class="say-item"><span class="say-tag">Data Log</span> "Write your equation and your x-intercept in the gray box. That data goes in your match log before your first match."</div>
+    <div class="say-item"><span class="say-tag">Open</span><div class="say-quote">Your bot has a decay curve. There are TWO moments on that line we care about, not just one.</div></div>
+    <div class="say-item"><span class="say-tag">Context</span><div class="say-quote">High Endurance = longer power. Low Endurance = faster decay. P(t) = 100 − rt. Today we find two different points on your bot's decay curve.</div></div>
+    <div class="say-item"><span class="say-tag">Task</span><div class="say-quote">Two calculations: '20% floor time' and 'x-intercept (P = 0).' Same equation, different P values. P = 20 gives floor time. P = 0 gives x-intercept.</div></div>
+    <div class="say-item"><span class="say-tag">Stuck</span><div class="say-quote">What do you know? [E stat, formula, r value.] Read Section 2 heading. What does P equal? Write that and solve for t.</div></div>
+    <div class="say-item"><span class="say-tag dont">Not This</span><div class="say-quote plain">Floor time requires P = 20. X-intercept requires P = 0. Do not mix them.</div></div>
   </div>
-</section>
 </div>
-  </div>
-  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">0:50 — Transition to Prediction Huddle. Data log entry required before leaving.</span></div>
-  <div class="card-footer">
-    <span class="footer-left">Velocity Arena &middot; Facilitator Activity Card &middot; Day 7 of 20</span>
-    <span class="footer-right">50 min &nbsp;|&nbsp; Challenge Block</span>
+<div class="section grow">
+  <div class="section-label">Watch For → Redirect</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Same number in both boxes</span><span class="watch-redirect">What is different about 'floor time' and 'P = 0'? What does P equal when engine locks power?</span></div>
+    <div class="watch-item"><span class="watch-trigger">P = 0 for both calculations</span><span class="watch-redirect">Go back to first box. What does Section 2 say P equals? Re-read and solve.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Uses E as r directly</span><span class="watch-redirect">Compute: 20 − E, then × 1.5. Show both steps.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Strategy A: Full algebra</span><span class="watch-redirect">Good setup. In game terms, why are these two answers different?</span></div>
+    <div class="watch-item"><span class="watch-trigger">Strategy B: Direct formula</span><span class="watch-redirect">Show algebraically: why t_xi = 100/r? Start from P = 0 in P(t) = 100 − rt.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Strategy C: 1.25 shortcut</span><span class="watch-redirect">Why is t_xi always 1.25 × t_floor? Does it depend on E, or any E works?</span></div>
   </div>
 </div></div>
-</body></html>
+  </div>
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">HARD STOP (Launch): Write E stat and compute r = (20 − E) × 1.5 first. Do not solve for time yet.
+
+HARD STOP (Exit): Data log entry is non-optional. Visual scan all boxes. Any blank: stop team, fill in (30 sec). Do not transition until complete.</span>
+  </div>
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · Day 7 of 20</span>
+    <span>Endurance Decay Equations in Slope-Intercept Form · Summer Sparks 2026</span>
+  </div>
+</div>
+</div>
+</body>
+</html>
