@@ -1109,78 +1109,69 @@
       <table class="match-table" id="match-table">
         <thead>
           <tr>
-            <th>Week</th>
-            <th>Date</th>
-            <th>Match #</th>
+            <th>Round</th>
+            <th>Day</th>
             <th>Opponent</th>
-            <th class="ball-col">Ball</th>
-            <th>Score</th>
+            <th>Source</th>
             <th>Predicted</th>
-            <th>Pred. Error</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>Error</th>
             <th>W/L</th>
-            <th>Notes</th>
+            <th>What happened?</th>
+            <th>Next round?</th>
             <th></th>
           </tr>
         </thead>
-        <tbody id="match-tbody">
-          <!-- populated by JS -->
-        </tbody>
+        <tbody id="match-tbody"><!-- populated by JS --></tbody>
       </table>
     </div>
     <div class="add-match-form">
+      <!-- Pre-match block -->
       <div class="form-field">
-        <label>Week</label>
-        <select id="new-week">
-          <option value="1">1 (Trial)</option>
-          <option value="2" selected>2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
+        <label>Round</label>
+        <input type="number" id="new-round" min="1" max="20" placeholder="1">
       </div>
       <div class="form-field">
-        <label>Date</label>
-        <input type="date" id="new-date">
-      </div>
-      <div class="form-field">
-        <label>Match #</label>
-        <input type="number" id="new-match" min="1" placeholder="1">
+        <label>Day</label>
+        <input type="number" id="new-day" min="1" max="20" placeholder="—">
       </div>
       <div class="form-field">
         <label>Opponent</label>
         <input type="text" id="new-opponent" placeholder="Team name">
       </div>
-      <div class="form-field ball-field" id="new-ball-field">
-        <label>Ball</label>
-        <select id="new-ball">
-          <option value="">--</option>
-          <option value="Standard">Standard</option>
-          <option value="Chaos">Chaos</option>
-          <option value="Heavy Touch">Heavy Touch</option>
-          <option value="Endurance">Endurance</option>
+      <div class="form-field">
+        <label>Prediction source</label>
+        <select id="new-source">
+          <option value="">— pick —</option>
+          <option value="Scatter Plot Equation">Scatter Plot Equation</option>
+          <option value="Endurance Formula">Endurance Formula</option>
+          <option value="Estimate">Estimate</option>
         </select>
       </div>
       <div class="form-field">
-        <label>Score</label>
-        <input type="text" id="new-score" placeholder="2-1">
-      </div>
-      <div class="form-field">
-        <label>Predicted Goals</label>
+        <label>Predicted goals</label>
         <input type="number" id="new-predicted" min="0" placeholder="0">
       </div>
+
+      <!-- Post-match block — gated until Source is picked -->
       <div class="form-field">
-        <label>W/L</label>
-        <select id="new-wl">
-          <option value="">--</option>
-          <option value="W">W</option>
-          <option value="L">L</option>
-          <option value="D">D</option>
-        </select>
+        <label>Goals For</label>
+        <input type="number" id="new-gf" min="0" placeholder="—" disabled>
+      </div>
+      <div class="form-field">
+        <label>Goals Against</label>
+        <input type="number" id="new-ga" min="0" placeholder="—" disabled>
       </div>
       <div class="form-field" style="grid-column: span 2">
-        <label>Notes</label>
-        <input type="text" id="new-notes" placeholder="What happened? What to change?">
+        <label>What happened? (one sentence — not the score)</label>
+        <input type="text" id="new-what" placeholder="">
       </div>
-      <button class="add-row-btn" onclick="addMatchRow()">+ Add row</button>
+      <div class="form-field" style="grid-column: span 2">
+        <label>What are you testing next round?</label>
+        <input type="text" id="new-next" placeholder="">
+      </div>
+      <button class="add-row-btn" onclick="addMatchRow()">+ Log match</button>
     </div>
   </div>
 
@@ -1545,6 +1536,7 @@ function renderAll() {
   applyPreTrialMode();
   renderSimTable();
   renderMatchTable();
+  if (typeof refreshMatchFormDefaults === 'function') refreshMatchFormDefaults();
   renderJustifications();
   renderDataPoints();
   document.getElementById('x-field').value = t.fourViews.xField || '';
@@ -1687,8 +1679,10 @@ function renderPredErrorSparkline() {
   const points = [];
   log.forEach(m => {
     const p = parseFloat(m.predictedGoals);
-    const a = parseInt((m.score || '').split('-')[0], 10);
-    if (!isNaN(p) && !isNaN(a)) points.push(Math.abs(p - a));
+    const a = (typeof rowGoalsFor === 'function')
+      ? rowGoalsFor(m)
+      : parseInt((m.score || '').split('-')[0], 10);
+    if (!isNaN(p) && a != null && !isNaN(a)) points.push(Math.abs(p - a));
   });
   const tail = points.slice(-MAX_POINTS);
 
@@ -1827,148 +1821,186 @@ function deleteSimRound(i) {
   if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
 }
 
+// ─── MATCH ROW ADAPTERS ────────────────────────────────────
+// Old shape: { week, date, match, opponent, ball, score:"2-1",
+//              predictedGoals, wl, notes }
+// New shape: { round, day, opponent, source, predictedGoals,
+//              goalsFor, goalsAgainst, what, next, wl }
+// Adapters fall through to old fields so existing matchLog rows
+// keep rendering correctly. New edits write new field names.
+function rowGoalsFor(r) {
+  if (r.goalsFor != null && r.goalsFor !== '') return Number(r.goalsFor);
+  if (r.score) {
+    const n = parseInt(String(r.score).split('-')[0], 10);
+    if (!isNaN(n)) return n;
+  }
+  return null;
+}
+function rowGoalsAgainst(r) {
+  if (r.goalsAgainst != null && r.goalsAgainst !== '') return Number(r.goalsAgainst);
+  if (r.score) {
+    const n = parseInt(String(r.score).split('-')[1], 10);
+    if (!isNaN(n)) return n;
+  }
+  return null;
+}
+function rowRound(r) { return r.round != null && r.round !== '' ? r.round : (r.match || ''); }
+function rowDay(r)   { return r.day   != null && r.day   !== '' ? r.day   : ''; }
+function rowWhat(r)  { return r.what  != null && r.what  !== '' ? r.what  : (r.notes || ''); }
+function rowError(r) {
+  const pred = parseFloat(r.predictedGoals);
+  const gf = rowGoalsFor(r);
+  if (isNaN(pred) || gf == null) return null;
+  return Math.abs(pred - gf);
+}
+function rowWL(r) {
+  const gf = rowGoalsFor(r), ga = rowGoalsAgainst(r);
+  if (gf != null && ga != null) {
+    if (gf > ga) return 'W';
+    if (gf < ga) return 'L';
+    return 'D';
+  }
+  return r.wl || '';
+}
+// Color the prediction error: green 0–1, yellow 2, red 3+.
+function errColor(err) {
+  if (err == null) return 'var(--steel)';
+  if (err <= 1) return '#1a7a3e';
+  if (err <= 2) return '#b45309';
+  return 'var(--red)';
+}
+
 function renderMatchTable() {
   const tbody = document.getElementById('match-tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
   const rows = currentTeam().matchLog;
-  // Empty-state colspan covers the visible columns only; ball is hidden in Wk 1–2.
-  const showBall = shouldShowBallCol();
-  const emptyColspan = showBall ? 11 : 10;
   if (rows.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="' + emptyColspan + '" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
+    tr.innerHTML = '<td colspan="12" style="color:var(--steel);font-size:11px;text-align:center;padding:16px;">No matches logged yet.</td>';
     tbody.appendChild(tr);
-    applyBallVisibility();
     renderPredErrorSparkline();
     return;
   }
+  const inputCSS = "font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;outline:none;color:var(--fg-0);";
+  const focusOn  = "this.style.borderColor='var(--border)'";
+  const focusOff = "this.style.borderColor='transparent'";
   rows.forEach((r, i) => {
     const tr = document.createElement('tr');
-    const isTrial = r.week == 1;
-    if (isTrial) tr.style.opacity = '0.55';
+    const err = rowError(r);
+    const wl = rowWL(r);
     tr.innerHTML = `
-      <td><select onchange="updateMatch(${i},'week',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color:${isTrial?'var(--steel)':'var(--fg-0)'};" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
-        <option value="1" ${r.week==1?'selected':''}>1 (Trial)</option>
-        <option value="2" ${r.week==2?'selected':''}>2</option>
-        <option value="3" ${r.week==3?'selected':''}>3</option>
-        <option value="4" ${r.week==4?'selected':''}>4</option>
+      <td><input type="number" min="1" value="${rowRound(r)}" onchange="updateMatch(${i},'round',this.value)" style="${inputCSS}width:46px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><input type="number" min="1" max="20" value="${rowDay(r)}" onchange="updateMatch(${i},'day',this.value)" style="${inputCSS}width:46px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><input type="text" value="${(r.opponent||'').replace(/"/g,'&quot;')}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="${inputCSS}width:100%;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><select onchange="updateMatch(${i},'source',this.value)" style="${inputCSS}padding:2px;">
+        <option value=""                       ${!r.source?'selected':''}>--</option>
+        <option value="Scatter Plot Equation"  ${r.source==='Scatter Plot Equation'?'selected':''}>Scatter Plot</option>
+        <option value="Endurance Formula"      ${r.source==='Endurance Formula'?'selected':''}>Endurance</option>
+        <option value="Estimate"               ${r.source==='Estimate'?'selected':''}>Estimate</option>
       </select></td>
-      <td><input type="date" value="${r.date||''}" onchange="updateMatch(${i},'date',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color: var(--fg-0);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
-      <td><input type="number" value="${r.match||''}" onchange="updateMatch(${i},'match',this.value)" min="1" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color: var(--fg-0);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
-      <td><input type="text" value="${r.opponent||''}" onchange="updateMatch(${i},'opponent',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color: var(--fg-0);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
-      <td class="ball-col"><select onchange="updateMatch(${i},'ball',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color: var(--fg-0);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
-        <option value="" ${!r.ball?'selected':''}>--</option>
-        <option value="Standard"    ${r.ball==='Standard'?'selected':''}>Standard</option>
-        <option value="Chaos"       ${r.ball==='Chaos'?'selected':''}>Chaos</option>
-        <option value="Heavy Touch" ${r.ball==='Heavy Touch'?'selected':''}>Heavy Touch</option>
-        <option value="Endurance"   ${r.ball==='Endurance'?'selected':''}>Endurance</option>
-      </select></td>
-      <td><input type="text" value="${r.score||''}" onchange="updateMatch(${i},'score',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:60px;outline:none;color: var(--fg-0);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
-      <td><input type="number" value="${r.predictedGoals||''}" onchange="updateMatch(${i},'predictedGoals',this.value)" min="0" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:50px;outline:none;color: var(--fg-0);text-align:center;" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
-      <td style="text-align:center;font-size:11px;color:var(--steel);">${(() => { const predicted = parseFloat(r.predictedGoals); const actual = parseInt((r.score||'').split('-')[0]); if (isNaN(predicted) || isNaN(actual)) return '—'; return Math.abs(predicted - actual); })()}</td>
-      <td><select onchange="updateMatch(${i},'wl',this.value)" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px;outline:none;color: var(--fg-0);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'">
-        <option value="" ${!r.wl?'selected':''}>--</option>
-        <option value="W" ${r.wl==='W'?'selected':''}>W</option>
-        <option value="L" ${r.wl==='L'?'selected':''}>L</option>
-        <option value="D" ${r.wl==='D'?'selected':''}>D</option>
-      </select></td>
-      <td><input type="text" value="${r.notes||''}" onchange="updateMatch(${i},'notes',this.value)" placeholder="--" style="font-family:var(--font);font-size:11px;border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;outline:none;color: var(--fg-0);" onfocus="this.style.borderColor='var(--border)'" onblur="this.style.borderColor='transparent'"></td>
+      <td><input type="number" min="0" value="${r.predictedGoals||''}" onchange="updateMatch(${i},'predictedGoals',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><input type="number" min="0" value="${rowGoalsFor(r) ?? ''}" onchange="updateMatch(${i},'goalsFor',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><input type="number" min="0" value="${rowGoalsAgainst(r) ?? ''}" onchange="updateMatch(${i},'goalsAgainst',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td style="text-align:center;font-size:12px;font-weight:800;color:${errColor(err)};">${err == null ? '—' : err}</td>
+      <td style="text-align:center;font-size:11px;">${wl ? `<span class="outcome-badge outcome-${wl.toLowerCase()}">${wl}</span>` : '—'}</td>
+      <td><input type="text" value="${(rowWhat(r)||'').replace(/"/g,'&quot;')}" onchange="updateMatch(${i},'what',this.value)" placeholder="One sentence." style="${inputCSS}width:100%;min-width:160px;" onfocus="${focusOn}" onblur="${focusOff}"></td>
+      <td><input type="text" value="${(r.next||'').replace(/"/g,'&quot;')}" onchange="updateMatch(${i},'next',this.value)" placeholder="One sentence." style="${inputCSS}width:100%;min-width:160px;" onfocus="${focusOn}" onblur="${focusOff}"></td>
       <td><button class="delete-btn" onclick="deleteMatchRow(${i})">✕</button></td>
     `;
     tbody.appendChild(tr);
   });
-  applyBallVisibility();
   renderPredErrorSparkline();
 }
 
-function getNextMatchNum(week) {
-  const log = currentTeam().matchLog || [];
-  let max = 0;
-  log.forEach(m => {
-    if (String(m.week) === String(week) && parseInt(m.match) > max) max = parseInt(m.match);
+// Next round number for the given camp day, scoped to this team.
+function getNextRoundForDay(day) {
+  const dayN = Number(day);
+  if (!dayN) return 1;
+  const matches = (currentTeam().matchLog || [])
+    .filter(r => Number(rowDay(r)) === dayN)
+    .map(r => Number(rowRound(r)) || 0);
+  return matches.length ? Math.max(...matches) + 1 : 1;
+}
+
+// Refill the form's Round + Day defaults based on the current camp day.
+function refreshMatchFormDefaults() {
+  const dayEl   = document.getElementById('new-day');
+  const roundEl = document.getElementById('new-round');
+  if (!dayEl || !roundEl) return;
+  if (typeof approxCampDayForCurrentSite === 'function') {
+    const today = approxCampDayForCurrentSite();
+    if (today != null) dayEl.value = today;
+  }
+  roundEl.value = getNextRoundForDay(dayEl.value);
+}
+
+// Source unlocks Goals For/Against to enforce "pick a prediction
+// source before recording results" — the Day-8 common error catch.
+const _sourceEl = document.getElementById('new-source');
+if (_sourceEl) {
+  _sourceEl.addEventListener('change', function() {
+    const enabled = !!this.value;
+    document.getElementById('new-gf').disabled = !enabled;
+    document.getElementById('new-ga').disabled = !enabled;
   });
-  return max + 1;
 }
 
-function hasDuplicateMatch(week, matchNum) {
-  return currentTeam().matchLog.some(m => String(m.week) === String(week) && String(m.match) === String(matchNum));
+// Recompute Round when Day is hand-edited.
+const _newDayEl = document.getElementById('new-day');
+if (_newDayEl) {
+  _newDayEl.addEventListener('change', function() {
+    document.getElementById('new-round').value = getNextRoundForDay(this.value);
+  });
 }
-
-// Auto-fill match # when week changes
-document.getElementById('new-week').addEventListener('change', function() {
-  document.getElementById('new-match').value = getNextMatchNum(this.value);
-});
-
-// Auto-fill W/L when a complete score is typed (left > right = W, etc.).
-// Only overwrites the W/L field if it's still blank so manual choices stick.
-document.getElementById('new-score').addEventListener('input', function() {
-  const wlEl = document.getElementById('new-wl');
-  const derived = deriveWLFromScore(this.value);
-  if (derived && !wlEl.value) wlEl.value = derived;
-});
 
 function addMatchRow() {
-  const week = document.getElementById('new-week').value;
-  const matchNum = document.getElementById('new-match').value;
+  const round    = document.getElementById('new-round').value;
+  const day      = document.getElementById('new-day').value;
+  const opponent = document.getElementById('new-opponent').value;
+  const source   = document.getElementById('new-source').value;
+  const pred     = document.getElementById('new-predicted').value;
+  const gf       = document.getElementById('new-gf').value;
+  const ga       = document.getElementById('new-ga').value;
+  const what     = document.getElementById('new-what').value;
+  const next     = document.getElementById('new-next').value;
 
-  // Warn on duplicate
-  if (matchNum && hasDuplicateMatch(week, matchNum)) {
-    if (!confirm('Match #' + matchNum + ' already exists for Week ' + week + '. Add it anyway?')) return;
+  if (!source) {
+    alert('Pick a prediction source before logging a match.');
+    return;
   }
 
   const row = {
-    week,
-    date: document.getElementById('new-date').value,
-    match: matchNum,
-    opponent: document.getElementById('new-opponent').value,
-    ball: document.getElementById('new-ball').value,
-    score: document.getElementById('new-score').value,
-    predictedGoals: document.getElementById('new-predicted').value,
-    wl: document.getElementById('new-wl').value,
-    notes: document.getElementById('new-notes').value
+    round, day, opponent, source,
+    predictedGoals: pred,
+    goalsFor: gf, goalsAgainst: ga,
+    what, next
   };
   currentTeam().matchLog.push(row);
-  ['new-date','new-opponent','new-score','new-predicted','new-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('new-wl').value = '';
-  document.getElementById('new-ball').value = '';
-  // Auto-increment match # for next entry
-  document.getElementById('new-match').value = getNextMatchNum(week);
+
+  // Reset post-match fields for the next round; keep Source picked
+  // since teams usually use the same source across a session.
+  ['new-opponent','new-predicted','new-gf','new-ga','new-what','new-next']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('new-gf').disabled = !document.getElementById('new-source').value;
+  document.getElementById('new-ga').disabled = !document.getElementById('new-source').value;
+  refreshMatchFormDefaults();
   renderMatchTable();
 }
 
 function updateMatch(i, field, val) {
   currentTeam().matchLog[i][field] = val;
-  // When score changes, derive W/L if empty (don't overwrite a manual choice)
-  if (field === 'score') {
-    const row = currentTeam().matchLog[i];
-    const derived = deriveWLFromScore(val);
-    if (derived && !row.wl) {
-      row.wl = derived;
-      renderMatchTable();
-      renderPredErrorSparkline();
-    } else if (field === 'score') {
-      renderPredErrorSparkline();
-    }
+  // Re-render so derived columns (Error, W/L) update inline.
+  if (['goalsFor','goalsAgainst','predictedGoals'].includes(field)) {
+    renderMatchTable();
   }
-  if (field === 'predictedGoals') renderPredErrorSparkline();
-  // Editing a row's week inline can flip the Ball column on or off.
-  if (field === 'week') applyBallVisibility();
-}
-
-// Parse a score string like "2-1" and return 'W' | 'L' | 'D' | null.
-// Left side of the dash is the team's own goals, right side is the opponent's.
-function deriveWLFromScore(scoreStr) {
-  if (!scoreStr || !scoreStr.includes('-')) return null;
-  const parts = scoreStr.split('-').map(s => parseInt(s.trim(), 10));
-  if (isNaN(parts[0]) || isNaN(parts[1])) return null;
-  if (parts[0] > parts[1]) return 'W';
-  if (parts[0] < parts[1]) return 'L';
-  return 'D';
 }
 
 function deleteMatchRow(i) {
   const m = currentTeam().matchLog[i] || {};
-  const label = m.opponent ? ('match vs ' + m.opponent) : ('match #' + (m.match || (i+1)));
+  const label = m.opponent
+    ? ('match vs ' + m.opponent)
+    : ('Round ' + (rowRound(m) || (i + 1)));
   if (!confirm('Delete ' + label + '? This cannot be undone.')) return;
   currentTeam().matchLog.splice(i, 1);
   renderMatchTable();
