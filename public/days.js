@@ -762,7 +762,7 @@ const DAYS = [
         "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
-        "name": "Open Lab",
+        "name": "Day 8 Open Lab",
         "mins": 25,
         "block": "Open Lab",
         "description": "Track A (Data Dive): Review your scatter plot equation against today's match results. Does the line fit the new data points? Note one variable your equation is not capturing. Track B (Bot Lab): Adjust one MakeCode setting and run the bot for 90 seconds. What changes? The 25 minutes is short today.",
@@ -855,11 +855,11 @@ const DAYS = [
         "name": "Open Lab: Post-Match Debrief and Free Code",
         "mins": 40,
         "block": "Open Lab",
-        "description": "Track A (Data Dive): Look at your three match results. Does any pattern in the data suggest a loadout adjustment? Write one hypothesis entry in the dashboard: 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): Run the bot and experiment with whatever you want. If you find something useful, it goes in the dashboard before you leave.",
-        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at their three match results, spot patterns, and write one hypothesis entry in the dashboard -- 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): teams experiment freely with the bot. Any useful finding goes in the dashboard before they leave.",
+        "description": "Track A (Data Dive): Look at your three match results. Does any pattern in the data suggest a loadout adjustment? Write one hypothesis entry in the dashboard: 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): Run the bot and experiment with whatever you want. If you find something useful, it goes in your journal before you leave.",
+        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at their three match results, spot patterns, and write one hypothesis entry in the dashboard -- 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): teams experiment freely with the bot. Any useful finding goes in journals before they leave.",
         "script": "https://docs.google.com/document/d/15gZrKNFwogagCQQUGQOWAwVur95G9jX9lQ1tpNBYhuc/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-04-open-lab-post-match.html"
-      }
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-04-open-lab-post-match.html",
+        "exit":"https://docs.google.com/document/d/16PB8rDAAedy88v8A6hx23gmnQqIKfgN1eD22wc60i2c/edit?usp=sharing"      }
     ],
     "produce": [
       "Sticky note — rival's card annotated with accuracy check; corrected calculation written if wrong",  

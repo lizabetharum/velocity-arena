@@ -38,6 +38,11 @@ const ACTIVITY_LESSONS = {
     {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard Intro"}, 
     {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"}
   ],
+  'Day 8 Open Lab':
+[{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Prepare Formula Race Cards"}],
+
+'Formula Relay: All Five Types in One Race':
+[{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Formula Race Cards"}],
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
   "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
