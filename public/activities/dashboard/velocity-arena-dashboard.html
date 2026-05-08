@@ -7,6 +7,8 @@
 <title>Velocity Arena · Team Data Dashboard</title>
 <link rel="stylesheet" href="/styles/va-tokens.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="/config.js"></script>
+<script src="/site.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1453,7 +1455,16 @@ const SHEET_ENDPOINTS = {
 // Local cache — mirrors what's in Sheets. Falls back to
 // localStorage when endpoints are not configured yet.
 let allData = JSON.parse(localStorage.getItem('va_dashboard') || 'null') || initSiteData();
-let currentSite = document.getElementById('site-select').value;
+
+// Resolve the initial site from site.js's cross-page picker:
+//   getSelectedSite() returns 'NY1' | 'NY2' | 'TN' | null.
+// Map that to the dashboard's internal codes; default to nyc_1
+// (Gotham Tech) if nothing has been selected yet.
+const _CFG_TO_DASH = { NY1: 'nyc_1', NY2: 'nyc_2', TN: 'tennessee' };
+const _selectedCfg = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+let currentSite = (_selectedCfg && _CFG_TO_DASH[_selectedCfg]) || 'nyc_1';
+const _siteSelectEl = document.getElementById('site-select');
+if (_siteSelectEl) _siteSelectEl.value = currentSite;
 let currentTeamIdx = 0;
 let fourViewsChart = null;
 let isSaving = false;
@@ -1466,6 +1477,12 @@ function sheetsEnabled() { return !!SHEET_ENDPOINTS[currentSite]; }
 document.getElementById('site-select').addEventListener('change', async function() {
   currentSite = this.value;
   currentTeamIdx = 0;
+  // Persist to the cross-page picker so other pages pick up the same site.
+  if (typeof setSelectedSite === 'function') {
+    const _DASH_TO_CFG = { tennessee: 'TN', nyc_1: 'NY1', nyc_2: 'NY2' };
+    const cfg = _DASH_TO_CFG[currentSite];
+    if (cfg) setSelectedSite(cfg);
+  }
   // Reset this site to fresh defaults before loading from cloud.
   // If the cloud has data, it overwrites the defaults. If not (no
   // endpoint or empty response), the user sees a clean slate instead
@@ -2560,10 +2577,8 @@ function showToast(msg) {
 (async () => {
   await loadFromSheets(currentSite);
   renderTeamBar();
-  renderAll();
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('new-date').value = today;
-  document.getElementById('new-match').value = getNextMatchNum(document.getElementById('new-week').value);
+  renderAll();   // also calls refreshMatchFormDefaults() to fill Round + Day
+  if (typeof renderSidebarDay === 'function') renderSidebarDay();
 })();
 
 // ── Shell day-counter (sidebar + right rail) ─────────────────────
