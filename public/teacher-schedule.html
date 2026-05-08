@@ -314,19 +314,26 @@ function renderDay(dayNum) {
       linkPills.push(`<a class="tact-link${clsAttr}" href="${esc(link.url)}" target="_blank" rel="noopener">${esc(text)}</a>`);
     };
 
-    const webpageLinks = asLinks(a.webpage);
-    const webpageNorm = new Set(webpageLinks.map(l => norm(l.url)));
-
     asLinks(a.script).forEach(l    => pushPill('',          l, 'Script'));
     asLinks(a.worksheet).forEach(l => pushPill('worksheet', l, 'Worksheet'));
-    webpageLinks.forEach(l         => pushPill('webpage',   l, 'Page'));
-    // Pull lesson URLs from lessons.js for activities without an explicit webpage,
-    // deduped against any URL already covered by a.webpage (origin-stripped match).
-    const lessonLinks = (typeof getLessonLinks === 'function') ? getLessonLinks(a.name) : [];
+
+    // Merge webpage + lessons.js entries by URL so a lesson's label fills
+    // in when the webpage value is a bare string. Prevents losing labels
+    // like 'Formula Race Cards' to dedupe.
+    const webpageLinks = asLinks(a.webpage);
+    const lessonLinks  = (typeof getLessonLinks === 'function') ? getLessonLinks(a.name) : [];
+    const mergedByUrl  = new Map();
+    for (const l of webpageLinks) mergedByUrl.set(norm(l.url), { url: l.url, label: l.label });
     for (const ll of lessonLinks) {
-      if (webpageNorm.has(norm(ll.url))) continue;
-      pushPill('webpage', ll, 'Page');
+      const key = norm(ll.url);
+      if (mergedByUrl.has(key)) {
+        const existing = mergedByUrl.get(key);
+        if (!existing.label && ll.label) existing.label = ll.label;
+      } else {
+        mergedByUrl.set(key, { url: ll.url, label: ll.label });
+      }
     }
+    [...mergedByUrl.values()].forEach(l => pushPill('webpage', l, 'Page'));
     asLinks(a.quickCard).forEach(l => pushPill('quickcard', l, 'Quick card'));
     asLinks(a.template).forEach(l  => pushPill('template',  l, 'Template'));
     asLinks(a.makecode).forEach(l  => pushPill('makecode',  l, 'MakeCode'));

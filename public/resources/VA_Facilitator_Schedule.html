@@ -354,8 +354,9 @@ function renderBlock(activity, runStartMin) {
   }
 
   // Build link chips. Worksheet/webpage/etc. honor optional {url, label}.
-  // Lessons.js entries only render if their URL isn't already a webpage.
-  const webpageNorm = new Set(asLinks(activity.webpage).map(l => normUrl(l.url)));
+  // Webpage + lessons.js entries are merged by URL: if both reference the
+  // same URL, prefer the lesson's label (since lessons.js is where labels
+  // for those URLs are typically defined). New lesson URLs append.
   const chips = [];
   const pushChip = (link, defaultLabel) => {
     chips.push(
@@ -366,13 +367,21 @@ function renderBlock(activity, runStartMin) {
 
   asLinks(activity.script).forEach(l    => pushChip(l, 'Facilitator Script'));
   asLinks(activity.worksheet).forEach(l => pushChip(l, 'Worksheet'));
-  asLinks(activity.webpage).forEach(l   => pushChip(l, 'Web page'));
 
-  const lessonLinks = (typeof getLessonLinks === 'function') ? getLessonLinks(activity.name) : [];
+  const webpageLinks = asLinks(activity.webpage);
+  const lessonLinks  = (typeof getLessonLinks === 'function') ? getLessonLinks(activity.name) : [];
+  const mergedByUrl = new Map();
+  for (const l of webpageLinks) mergedByUrl.set(normUrl(l.url), { url: l.url, label: l.label });
   for (const ll of lessonLinks) {
-    if (webpageNorm.has(normUrl(ll.url))) continue;
-    pushChip(ll, 'Web page');
+    const key = normUrl(ll.url);
+    if (mergedByUrl.has(key)) {
+      const existing = mergedByUrl.get(key);
+      if (!existing.label && ll.label) existing.label = ll.label;
+    } else {
+      mergedByUrl.set(key, { url: ll.url, label: ll.label });
+    }
   }
+  [...mergedByUrl.values()].forEach(l => pushChip(l, 'Web page'));
 
   asLinks(activity.quickCard).forEach(l => pushChip(l, 'Quick card'));
   asLinks(activity.template).forEach(l  => pushChip(l, 'Template'));
