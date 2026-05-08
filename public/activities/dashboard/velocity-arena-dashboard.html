@@ -1868,11 +1868,23 @@ function rowGoalsAgainst(r) {
 function rowRound(r) { return r.round != null && r.round !== '' ? r.round : (r.match || ''); }
 function rowDay(r)   { return r.day   != null && r.day   !== '' ? r.day   : ''; }
 function rowWhat(r)  { return r.what  != null && r.what  !== '' ? r.what  : (r.notes || ''); }
+// SIGNED prediction error: predicted − actual.
+//   positive = over-predicted, negative = under-predicted, 0 = exact.
+// Used directly by the Match Log Error column; absolute value used for
+// color coding (errColor) and the prediction-error sparkline.
 function rowError(r) {
   const pred = parseFloat(r.predictedGoals);
   const gf = rowGoalsFor(r);
   if (isNaN(pred) || gf == null) return null;
-  return Math.abs(pred - gf);
+  return pred - gf;
+}
+// Format a signed error with explicit '+' for non-negative and '−' (real
+// minus glyph, not hyphen) for negative. Cleaner read at a glance.
+function formatSignedError(err) {
+  if (err == null) return '—';
+  if (err > 0) return '+' + err;
+  if (err < 0) return '−' + Math.abs(err);
+  return '0';
 }
 function rowWL(r) {
   const gf = rowGoalsFor(r), ga = rowGoalsAgainst(r);
@@ -1883,11 +1895,13 @@ function rowWL(r) {
   }
   return r.wl || '';
 }
-// Color the prediction error: green 0–1, yellow 2, red 3+.
+// Color the prediction error by *magnitude* (sign carries info but
+// closeness is what we want to flag visually): green 0–1, yellow 2, red 3+.
 function errColor(err) {
   if (err == null) return 'var(--steel)';
-  if (err <= 1) return '#1a7a3e';
-  if (err <= 2) return '#b45309';
+  const a = Math.abs(err);
+  if (a <= 1) return '#1a7a3e';
+  if (a <= 2) return '#b45309';
   return 'var(--red)';
 }
 
@@ -1928,7 +1942,7 @@ function renderMatchTable() {
       <td><input type="number" min="0" value="${r.predictedGoals||''}" onchange="updateMatch(${i},'predictedGoals',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
       <td><input type="number" min="0" value="${rowGoalsFor(r) ?? ''}" onchange="updateMatch(${i},'goalsFor',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
       <td><input type="number" min="0" value="${rowGoalsAgainst(r) ?? ''}" onchange="updateMatch(${i},'goalsAgainst',this.value)" placeholder="--" style="${inputCSS}width:50px;text-align:center;" onfocus="${focusOn}" onblur="${focusOff}"></td>
-      <td style="text-align:center;font-size:12px;font-weight:800;color:${errColor(err)};">${err == null ? '—' : err}</td>
+      <td style="text-align:center;font-size:12px;font-weight:800;color:${errColor(err)};" title="predicted − actual · positive = over-predicted">${formatSignedError(err)}</td>
       <td style="text-align:center;font-size:11px;">${wl ? `<span class="outcome-badge outcome-${wl.toLowerCase()}">${wl}</span>` : '—'}</td>
       <td><input type="text" value="${(rowWhat(r)||'').replace(/"/g,'&quot;')}" onchange="updateMatch(${i},'what',this.value)" placeholder="One sentence." style="${inputCSS}width:100%;min-width:160px;" onfocus="${focusOn}" onblur="${focusOff}"></td>
       <td><input type="text" value="${(r.next||'').replace(/"/g,'&quot;')}" onchange="updateMatch(${i},'next',this.value)" placeholder="One sentence." style="${inputCSS}width:100%;min-width:160px;" onfocus="${focusOn}" onblur="${focusOff}"></td>
