@@ -245,9 +245,14 @@ const WEEK_NAMES = {
   4: 'Week 4 · Championship',
 };
 
+// Total days in the active site's schedule. Drives the day-pill loop,
+// "Day N / TOTAL" label, and bounds checks. TN renders 16; default 20.
+function totalDays() { return (typeof DAYS !== 'undefined' && DAYS.length) || 20; }
+
 function getDefaultDay() {
+  const total = totalDays();
   const hashDay = parseInt((location.hash || '').replace('#day-', ''), 10);
-  if (hashDay >= 1 && hashDay <= 20) return hashDay;
+  if (hashDay >= 1 && hashDay <= total) return hashDay;
   try {
     const dates = buildCampDates();
     const tz = (CONFIG && CONFIG.timezone) || 'America/New_York';
@@ -261,10 +266,14 @@ function getDefaultDay() {
 
 function renderPills(selectedDay) {
   const pills = document.getElementById('nav-pills');
+  const total = totalDays();
   const nodes = [];
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 1; i <= total; i++) {
     nodes.push(`<a href="#day-${i}" class="nav-pill${i === selectedDay ? ' active' : ''}" onclick="selectDay(${i});return false;">${i}</a>`);
-    if (i === 5 || i === 10 || i === 15) nodes.push('<div class="nav-pill-sep"></div>');
+    // Week dividers — every 5 days, but never after the final day.
+    if ((i === 5 || i === 10 || i === 15) && i < total) {
+      nodes.push('<div class="nav-pill-sep"></div>');
+    }
   }
   pills.innerHTML = nodes.join('');
 }
@@ -375,13 +384,14 @@ function renderDay(dayNum) {
       <div class="tlo-text">${d.los.split(/[#*+=-]{3,}/)[0].trim()}</div>
     </div>` : '';
 
+  const total = totalDays();
   const prev = dayNum > 1 ? `<a href="#day-${dayNum-1}" onclick="selectDay(${dayNum-1});return false;">← Day ${dayNum-1}</a>` : '<a class="disabled">← Day</a>';
-  const next = dayNum < 20 ? `<a href="#day-${dayNum+1}" onclick="selectDay(${dayNum+1});return false;">Day ${dayNum+1} →</a>` : '<a class="disabled">Day →</a>';
+  const next = dayNum < total ? `<a href="#day-${dayNum+1}" onclick="selectDay(${dayNum+1});return false;">Day ${dayNum+1} →</a>` : '<a class="disabled">Day →</a>';
 
   out.innerHTML = `
     <div class="day-header">
       <div class="day-week-label">${WEEK_NAMES[d.week] || ('Week ' + d.week)}</div>
-      <div class="day-number">DAY ${String(d.day).padStart(2,'0')} / 20${weekday ? ' · ' + weekday.toUpperCase() : ''}</div>
+      <div class="day-number">DAY ${String(d.day).padStart(2,'0')} / ${total}${weekday ? ' · ' + weekday.toUpperCase() : ''}</div>
       <div class="day-theme">${d.theme || ''}</div>
     </div>
 
@@ -405,7 +415,7 @@ function renderDay(dayNum) {
 }
 
 function selectDay(n) {
-  if (n < 1 || n > 20) return;
+  if (n < 1 || n > totalDays()) return;
   location.hash = 'day-' + n;
   renderPills(n);
   renderDay(n);
@@ -419,7 +429,7 @@ function initSchedule() {
 
 window.addEventListener('hashchange', () => {
   const hashDay = parseInt((location.hash || '').replace('#day-', ''), 10);
-  if (hashDay >= 1 && hashDay <= 20) {
+  if (hashDay >= 1 && hashDay <= totalDays()) {
     renderPills(hashDay);
     renderDay(hashDay);
   }
