@@ -2,9 +2,13 @@
 // Loaded on every page. Used only when the site picker is set to "TN"
 // (see dispatcher in days.js).
 //
-// Days 1–14 borrow directly from DAYS_DEFAULT (TN runs identical content
-// for the first three weeks; the only difference is the 8:00 AM start
-// time, which is handled by the renderer via CONFIG.siteDayStartMin).
+// Days 1–14 inherit from DAYS_DEFAULT (TN runs identical content for
+// the first three weeks; the only difference is the 8:00 AM start
+// time, handled by the renderer via CONFIG.siteDayStartMin).
+//
+// To OVERRIDE a Day 1–14 with TN-specific content, add an entry to
+// TN_OVERRIDES below keyed by day number. The dispatcher swaps the
+// default day for your override during the slice.
 //
 // Day 15  — Bot Identity + Match Day 3 (replaces default Day 15)
 // Day 16  — Community Exhibition + Awards/Post-Task Diagnostic
@@ -12,9 +16,21 @@
 //           Championship arc from Days 16–18 is cut for the 16-day
 //           program)
 
+// Per-day overrides for Days 1–14. Key by day number. The override
+// object's full activity shape replaces the default day entirely.
+// Example:
+//   5: {
+//     day: 5, week: 1, weekName: "Play Lab + Boot Camp",
+//     theme: "TN-specific Day 5 theme",
+//     activities: [ ... ]
+//   },
+const TN_OVERRIDES = {
+  // (no overrides yet — add as needed)
+};
+
 const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
-  // ── Days 1–14: borrowed from the master schedule ─────────────
-  ...DAYS_DEFAULT.slice(0, 14),
+  // ── Days 1–14: inherit from default, with TN_OVERRIDES applied ──
+  ...DAYS_DEFAULT.slice(0, 14).map(d => TN_OVERRIDES[d.day] || d),
 
   // ── Day 15 (TN) — Creative Expression: Bot Identity + Scouting ────
   {
