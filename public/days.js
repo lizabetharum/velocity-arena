@@ -510,8 +510,8 @@ const DAYS = [
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool.",
-        "facilitatorDescription": "Teams complete their official Season 1 stat allocation using a 12-problem interleaved set covering all four formula types (Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, Arc Segments = TURNING, and Speed/Endurance). Problems are shuffled so teams have to identify the formula before calculating -- no doing all Speed problems first. A concept tag column runs alongside each problem: teams name the concept (unit rate, ratio, linear decay, coordinate geometry, proportional scaling) before calculating. All four circled official values and all 12 concept tags must verify correct before any team touches a tool in the afternoon block.",
+        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. Teams must lock in their official allocation at the end of this block. This is the last time they can change their numbers before competition begins on Day 7.",
+        "facilitatorDescription": "Teams complete their official Season 1 stat allocation using a 12-problem interleaved set covering all four formula types (Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, Arc Segments = TURNING, and Speed/Endurance). Problems are shuffled so teams have to identify the formula before calculating -- no doing all Speed problems first. A concept tag column runs alongside each problem: teams name the concept (unit rate, ratio, linear decay, coordinate geometry, proportional scaling) before calculating. Teams must also lock in official allocation.",
         "script": "https://docs.google.com/document/d/1Y6w0LgGfHSx_5icP4yTCNnHzYIYSofLFxoQVoNdZweY/edit?usp=drive_link",
         "worksheet": [
           { url: "https://drive.google.com/file/d/1vpbdrqpAyFEU8Rth55wJor90qT1f0SGg/view?usp=drive_link", label: "Questions" },
@@ -619,8 +619,9 @@ const DAYS = [
         "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. When r is revealed, your facilitator names it explicitly: the slope of a line is its rate of change, and r is how fast your bot loses power per minute. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept in your match data log before the first match.",
         "facilitatorDescription": "Teams use their Endurance allocation to write the bot's power decay equation as P(t) = 100 - rt and calculate r. When r is revealed, name it explicitly: the slope of a line is its rate of change, and r is how fast the bot loses power per minute. Teams find the x-intercept -- the minute at which bot power reaches zero. Equation and x-intercept go in the match data log before the first match. This is the first formal slope-intercept form in the program.",
         "script": "https://docs.google.com/document/d/1dP6KVB-fWDv-ulZJRhvX-apJJddyM98OY2hAy0Tu7Mk/edit?usp=sharing",
-        "worksheet": "https://docs.google.com/document/d/11D4S7jFGcahxFwMQL7qUohiTy0u_fp3ALbOBTy0iHaM/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-02-endurance-decay.html"
+        "worksheet": "https://drive.google.com/file/d/11UkVVv6an0sm_UbK0StSpWWE3NcogS4z/view?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-02-endurance-decay.html",
+        "exit": "https://docs.google.com/document/d/1QpcTTJ8aDJbZCcCkHCmmJKpGEO6zOHugmBK_CDauYKk/edit?usp=sharing"
       },
       {
         "name": "Pre-Match Prediction Huddle",
@@ -640,11 +641,13 @@ const DAYS = [
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
       {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
+        "name": "Dashboard + Match Rules",
+        "mins": 15,
+        "block": "Transition",
+        "description": "Meet week 2 of the data dashboard and hear the match rules.",
+        "facilitatorDescription": "Introduce Dashboard and matchrules. Explain match rules in under 10 minutes: each match is 3 minutes, two teams on a flat field, first team to push the ball across the opposing end line scores a goal. Bots are pre-programmed.  After each match, both teams record their score in the data dashboard immediately.",
+        "script": "https://docs.google.com/document/d/1UdA_VLw9w9KdW86dGt7fNlohmnURdLi-xajLQFpfWKc/edit?usp=sharing",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-05-dashboard-introduction.html"
       },
       {
         "name": "Season 1 Round-Robin Matches, Day 1",
@@ -657,7 +660,7 @@ const DAYS = [
       },
       {
         "name": "Leaderboard Reveal + Open Lab",
-        "mins": 35,
+        "mins": 30,
         "block": "Match-Build-Make / Open Lab",
         "description": "The physical leaderboard goes up on the wall or Velocity Arena Dashboard Leaderboard. Update the dashboard. Then 20 minutes of open bot time: review your dashboard, strategize, or adjust code.",
         "facilitatorDescription": "Post the physical leaderboard on the wall (or update the Velocity Arena Dashboard Leaderboard). Include the Best Prediction column -- rewards mathematical accuracy, not just winning. Then 20 minutes of open bot time for dashboard review, strategy, or code adjustments. Leaderboard is a permanent artifact from today forward.",
@@ -706,20 +709,8 @@ const DAYS = [
         "description": "",
         "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
-      {
-        "name": "Energy Reset",
-        "mins": 3,
-        "block": "",
-        "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down.",
-        "facilitatorDescription": "Lead the group through 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch, then seats. Under 3 minutes, no talking during stretch. Use this to break a cognitive slump, not as a reward."
-      },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+      
+      
       {
         "name": "Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
@@ -727,7 +718,8 @@ const DAYS = [
         "description": "Part 1 (20 min): Each team adds their data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together and explain why. Part 2 (20 min): Use two data points from the scatter plot to write the linear equation -- slope calculated, y-intercept solved. Teams share. Everyone's equation is different. That is the point. SUMMER SPARKS EVALUATION FLAG: Day 8 is a candidate mid-program measurement point for the JHU evaluation team.",
         "facilitatorDescription": "Part 1 (20 min): each team adds a data point to a shared class scatter plot -- Speed on x-axis, Goals Scored on y-axis. Teams match card sets: verbal situations, data tables, and graphed lines. They must match three that belong together and explain why -- the explanation is the work. Do not let teams match by elimination. Part 2 (20 min): teams use two points from the scatter plot to write a linear equation, slope labeled, y-intercept solved. Every team's equation is different. Share aloud. Summer Sparks evaluation flag: Day 8 is a candidate mid-program measurement point for the JHU evaluation team.",
         "script": "https://docs.google.com/document/d/1_NMcPHteA9cyqcFjleHkZkEdTaw29GxEtwPibEvCvU4/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/10iIpzkn-Hl3IGQTJyZn91YI_wCHu0FbYeoZCqGEVyys/edit?usp=drive_link",
+        "worksheet": [{url: "https://drive.google.com/file/d/1Dz4v-rCu0t16ssPUBvY1s4SBUafiwud6/view?usp=drive_link", label: "Worksheet"},
+          {url:"https://docs.google.com/document/d/1_tLR5byNHvxL2uZcr1Qtv-Ys1TbSgIOlfSmxtn2TvX0/edit?tab=t.0", label: "Cards"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-02-matching-situations.html"
       },
       {

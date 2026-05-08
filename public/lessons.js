@@ -34,7 +34,12 @@ const ACTIVITY_LESSONS = {
   'Simulation Matches: Your Loadout vs. Reality': [{url: "/lessons/simulation-matches.html", label: "Simulation matches Code"},
     {url:"/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"}
   ],
+  'Dashboard + Match Rules': [
+    {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard Intro"}, 
+    {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"}
+  ],
   'Season 1 Match Day 3': '/lessons/match-day-3.html',
+  "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
   'Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep': [
     { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
