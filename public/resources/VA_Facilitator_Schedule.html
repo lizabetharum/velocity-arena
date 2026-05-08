@@ -280,10 +280,24 @@ function weekdayForDay(dayNum) {
   return '';
 }
 
-// Compute time-of-day slot strings from cumulative mins, default
-// start 10:00 AM. Returns '10:05–10:25' style strings.
+// Resolve the day-start time for the active site. CONFIG.siteDayStartMin
+// can override per site (e.g. TN starts at 8:05); otherwise defaultDayStartMin
+// applies (typically 10:00 = 600 minutes since midnight).
+function getSiteDayStartMin() {
+  const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  if (typeof CONFIG !== 'undefined') {
+    if (code && CONFIG.siteDayStartMin && CONFIG.siteDayStartMin[code] != null) {
+      return CONFIG.siteDayStartMin[code];
+    }
+    if (CONFIG.defaultDayStartMin != null) return CONFIG.defaultDayStartMin;
+  }
+  return 600; // 10:00 AM fallback
+}
+
+// Compute time-of-day slot strings from cumulative mins. Returns
+// '10:05–10:25' style strings. Day-start time is site-aware.
 function timeFromMin(min0, mins) {
-  const dayStartMin = 10 * 60; // 10:00 AM
+  const dayStartMin = getSiteDayStartMin();
   const startTotal = dayStartMin + min0;
   const endTotal = startTotal + mins;
   const fmt = total => {

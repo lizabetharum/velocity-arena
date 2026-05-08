@@ -1,6 +1,6 @@
-// Master 20-day schedule. Used by all sites by default (NY1, NY2, TN, ...).
+// Master 20-day schedule. Used by all sites by default (NY1, NY2).
 // Per-site overrides live in their own files (e.g. days-tn.js) and are
-// selected by the tiny dispatcher in days.js.
+// selected by the dispatcher in days.js.
 const DAYS_DEFAULT = [
   {
     "day": 1,
@@ -36,8 +36,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Students receive a reference card showing general math contexts -- no bot content, no stat system. Working individually, they answer 8 questions in 12 minutes. There is no grade. Use the results to map each student's starting point by math topic so the program meets students where they are. Frame it before distributing: this is a measure of what students already know about the eight math topics, not about Velocity Arena.",
         "link": "/activities/diagnostic/index.html",
         "script": "https://docs.google.com/document/d/1ki4h4daYwPkqDaJ9BnYlwBNBxTpMsEi5MukBDviqwfI/edit?usp=drivesdk",
-        "webpage": "https://velocity-arena-922bfwmu7-liz-arums-projects.vercel.app/activities/diagnostic/index.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-05-pre-task-diagnostic.html"
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic/index.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-pre-task-diagnostic.html"
       },
       {
         "name": "Driving Question Reveal + Team Formation",
@@ -46,7 +46,7 @@ const DAYS_DEFAULT = [
         "description": "A big poster is unveiled with the question that drives everything we do for four weeks. Your three-person team is announced. You meet your teammates and sit together. No math yet.",
         "facilitatorDescription": "Unveil the driving-question poster that will anchor the whole four weeks. Announce three-person teams and have students sit together at their team tables. No math content yet -- this activity is pure set-up and social orientation.",
         "script": "https://docs.google.com/document/d/1whCYZecdM3gyaziLFXggw8qiABDZVBvgxwAGWxMc3UQ/edit?usp=drivesdk",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-driving-question.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-driving-question.html"
       },
       {
         "name": "Stat Card Distribution",
@@ -55,7 +55,7 @@ const DAYS_DEFAULT = [
         "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
         "facilitatorDescription": "Hand each student a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the student for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
         "script": "https://docs.google.com/document/d/1K0kG2dMqj8hDzy1uFp6OpIj4PZrtm1eb9zCeg_wqSx0/edit?usp=sharing",
-        "template": "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link",
+        "template": { url: "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link", label: "Stat Card"},
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html"
       },
       {
@@ -65,8 +65,9 @@ const DAYS_DEFAULT = [
         "description": "One formula goes on the board: Speed % = (Speed points / 20) x 100. Your team calculates motor power for Speed values of 1, 3, 5, 6, and 8. Then compare answers with the team next to you. If you disagree, figure out where the split is -- without asking the facilitator first.",
         "facilitatorDescription": "Put one formula on the board: Speed % = (Speed points / 20) x 100. Teams calculate motor power for Speed values of 1, 3, 5, 6, and 8. Then teams compare answers with the team next to them and reconcile any disagreements before asking for help. Do not resolve disagreements yourself -- the productive work happens in the between-team conversation.",
         "script": "https://docs.google.com/document/d/12wViKxrKPix59HkDOGzY5YdpanDO5o_j6hbpYZlg3MM/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/14AtbbAZ9NygFtvebCek_SXmQKuzPbJxZKpGsp0DiFc8/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html"
+        "worksheet": "https://drive.google.com/file/d/1K51qc8WHn95uEqbp0sOxFxXN9cgcjm7W/view?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html",
+        'webpage': 'https://velocity-arena-gold.vercel.app/lessons/speed-stat.html' 
       },
       {
         "name": "Lunch / Snack Break",
@@ -82,7 +83,7 @@ const DAYS_DEFAULT = [
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?",
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware.",
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/1LLHU2AGux0_DxKIzkUDRcMvzSoxAIOkhigtIn6HFcJ0/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1B9ZoQrgAhE6vG3juLvuBR4xoRz5K6jHJ/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
       {
@@ -141,8 +142,7 @@ const DAYS_DEFAULT = [
         "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example and names the rate of change out loud -- this number is the slope of the decay line, how fast your bot loses power per minute. Then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you.",
         "facilitatorDescription": "Formula on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Step 1 (5 min): work one full example on the board -- Endurance = 6, decay rate = 21% per minute, P(1) = 79%, P(2) = 58%, P(3) = 37%, P(4) = 16%, P(5) capped at 0%. Every number shown, no steps skipped. Name the rate of change explicitly as the slope. Step 2 (10 min): teams calculate for Endurance = 4 using a scaffolded worksheet. Step 3 (10 min): teams calculate for Endurance = 2 with no scaffolding. Step 4 (10 min): teams plot their own Endurance allocation over five t-values. Step 5 (5 min): two teams with different allocations read their t=3 values aloud -- that comparison is where the formula becomes strategic.",
         "script": "https://docs.google.com/document/d/1sYI4n2zRgr-a98835xcq0P6UdhhoHvJjBZjFPbl2fbg/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/10AvFGU5Dss1FNtHiuFk1ZGqquCrM2KYKX0_UK3gf4zo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html"
+       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -158,7 +158,7 @@ const DAYS_DEFAULT = [
         "description": "Open MakeCode and write code that reduces your bot's motor power over time based on your Endurance allocation. Test it by running the bot for 2 minutes. Record distance in the first 30 seconds vs. the last 30 seconds, and write one sentence about the gap between what the formula predicted and what actually happened.",
         "facilitatorDescription": "Teams open MakeCode and write code that reduces the bot's motor power over time based on their Endurance allocation. They test by running the bot for 2 minutes, recording distance in the first 30 seconds vs. the last 30 seconds. Each team writes one sentence about the gap between what the formula predicted and what actually happened -- that gap is the productive noticing.",
         "script": "https://docs.google.com/document/d/1DC_OoLC1Cz_QbwkvVGKaorM9pTOcouWny7Sw4qrqLaw/edit?usp=drivesdk",
-        "worksheet": "https://docs.google.com/document/d/1H-sRKYvSqgAfmtK2Jo3f5cTc1706qA3OmmZUYd8Exro/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html"
       },
       {
@@ -239,7 +239,11 @@ const DAYS_DEFAULT = [
         "description": "Part 1 (20 min): You get a data card with two bot runs. Plot both on the same graph. One line slopes down, the other stays flat. Figure out why without asking the facilitator, then flip the card to see the stat allocations on the back. Arc Approximation (10 min): Your facilitator draws one smooth curved turn on the board. Three straight segments are overlaid as chords. Two questions: are the segments together longer or shorter than the arc? What happens as you add more, shorter segments? The point is physical intuition that a curve can be broken into straight pieces with measurable lengths -- the prerequisite for the distance formula. Walk the Plane (15 min): On a life-sized taped coordinate grid, walk to called coordinates. Then: 'Move from (1,1) to (4,5). Estimate the straight-line distance.' Your facilitator writes d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time. Calculate it, then verify against two more pairs. The formula is verified by standing on the grid. Part 2 (20 min): Turning formulas on the board -- Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02). Fill in your stat card, then program your bot to navigate from (0,0) to a called coordinate.",
         "facilitatorDescription": "Part 1 (20 min): teams plot two bot runs on the same graph from a data card -- one line slopes down, the other stays flat. Teams figure out why before flipping the card for the stat allocations. Arc Approximation (10 min): draw one smooth curved turn on the board with three straight chord segments overlaid. Ask: are the segments together longer or shorter than the arc, and what happens with more, shorter segments? The point is the physical intuition that a curve can be broken into straight measurable pieces -- prerequisite for the distance formula. Walk the Plane (15 min): students walk to called coordinates on a life-sized taped grid, then estimate the distance from (1,1) to (4,5). Write d = sqrt((x2-x1)^2 + (y2-y1)^2) on the board for the first time, calculate, and verify against two more pairs -- the formula gets verified by standing on the grid. Part 2 (20 min): Turning formulas go on the board (Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02)). Teams fill stat cards, then program the bot to navigate from (0,0) to a called coordinate.",
         "script": "https://docs.google.com/document/d/1Rha6U3CayswkxkooVnwXukkJv7dDJnZALeHko60_kyg/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing",
+        "worksheet": [{url: "https://docs.google.com/document/d/1uSOxGbf6KWQ7JUs-1vSq4q2-jqeo0EU54PFz4M9rmeA/edit?usp=sharing", label: "Navigation Challenge Record"},
+          {url: "https://docs.google.com/document/d/1RHggdduPeGWT5enQ7ePXKJczlZ16xtZ8qMMPLIvswCE/edit?tab=t.0", label: "Card A"},
+           {url: "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0", label: "Card B"}
+    ],
+   "exit": "https://docs.google.com/document/d/1DSFwsS2V4d9_GwrPjsxGdlth_IQ9DIk_kwdp7nFq9nI/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
       },
       {
@@ -263,7 +267,8 @@ const DAYS_DEFAULT = [
         "description": "Keep programming your bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance.",
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1aeF19RNcyBKM9om7yd8hknRvRf-_ZDol6UTXm_xGEko/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
+        "makecode":"https://makecode.microbit.org/S65859-48740-99528-19122",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {
@@ -309,8 +314,9 @@ const DAYS_DEFAULT = [
       {
         "name": "Power Allocation: Stat Card Fill-In",
         "mins": 3,
-        "block": "Ice Breaker",
+        "block": "Transition",
         "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
+    
         "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
       },
@@ -321,7 +327,8 @@ const DAYS_DEFAULT = [
         "description": "Two rules go on the board: charge speed = Power², and follow through = POWER x 200. Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you.",
         "facilitatorDescription": "Two rules on the board: charge speed = Power², follow through = POWER x 200. Teams calculate charge speed for Power = 1, 2, 4, 8 (0.5, 2, 8, 32) and the ratios between them. Side-by-side with Day 1's Speed formula: Speed is proportional (double the stat, double the output); Power is not (double the stat, quadruple the output). That contrast is the mathematical core of today. Test physically: teams program Power 4 (charge speed 8), place the bot exactly 40 cm from the ball, kick, measure. Repeat with Power 8 (charge speed 32). Both results should surprise them.",
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1hibUDAxPyYtzHXAbZb7Z2A0tmaMKNz8BX0fSDL6hzc0/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/1VYv53hKADZFrZ6SdqIb_1KwrQ6NnYTm8/view?usp=drive_link",
+        "makecode":"https://makecode.microbit.org/S50384-96547-11729-75922",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
       {
@@ -338,8 +345,8 @@ const DAYS_DEFAULT = [
         "description": "Build a cardboard front scoop for your Cutebot. One rule: it has to make clean contact with the ball. Test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in your dashboard. Then write: 'Quadrupling charge speed did / did not quadruple kick distance, because...'",
         "facilitatorDescription": "Teams build a cardboard front scoop for the Cutebot. One rule: it must make clean contact with the ball. Teams test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in the dashboard. Each team writes: 'Quadrupling charge speed did / did not quadruple kick distance, because...' Keep the build loose -- iteration is the point, not a perfect first scoop.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1VqQrWMrNWUKKHIVaulGEyOchsYJ4Xs4D5TC2WWuRhDM/edit?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S48965-41345-37286-67819",
+        "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
+        "makecode":"https://makecode.microbit.org/S22168-97257-26692-28283",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
@@ -406,8 +413,12 @@ const DAYS_DEFAULT = [
         "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power², follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
         "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power², follow through = POWER x 200, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
         "script": "https://docs.google.com/document/d/1qtE-c80NIwHmAZBYp-aFF3alFVtrdfwHuow5CL9zKFg/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1phpZXVdhlbUXIrBv_lv1Q4njeCX116chos0deJRs360/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-03-budget-constraint.html"
+        "worksheet":[
+          {url: "https://drive.google.com/file/d/144kRGshFNWApDR3r4ZPojoxgUCethU0C/view?usp=drive_link", label: "Questions"},
+          {url: "https://docs.google.com/document/d/16C_9YMX6Szv5DiSE_71MBRQAclnXx0yRoyBLDajxnfw/edit?usp=sharing", label: "Answers"}
+        ],
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-03-budget-constraint.html",
+        "exit": "https://docs.google.com/document/d/1uVOCL4yHuHIx7_7xe-JrsE93CYdqSgKfK0p_Zrg4HhU/edit?usp=sharing"
       },
       {
         "name": "Lunch / Snack Break",
@@ -423,38 +434,39 @@ const DAYS_DEFAULT = [
         "description": "Five questions, 10 minutes, by yourself, no notes. General math -- slopes, recipes, percentages, distances. No grade. This is just a check on what is sticking after four days.",
         "facilitatorDescription": "Five questions, 10 minutes, individual, no notes. General math contexts -- slopes, recipes, percentages, distances. No grade. Diagnostic for what is sticking after four days. Frame explicitly as not a grade; use results to inform Week 2 reteach priorities.",
         "script": "https://docs.google.com/document/d/1TuqKRSipwR2pC5txnlN7Eh3y-p1Rh2dCIVb8uFO9iKA/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1NbIfiz0bZfl6K0YYQNTrqZKObripBDC7fB7Y7NLeAOs/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1t3KadS_ovd8PpUfEzQcN4bXOmzFi8GDn/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-04-cold-recall.html"
       },
       {
-        "name": "Match Format Briefing",
+        "name": "Dashboard Introduction",
         "mins": 10,
-        "block": "",
-        "description": "Each match is 3 minutes, two teams on a flat field, first team to push the ball across the opposing end line scores a goal. Bots are pre-programmed. After each match, both teams record their score in the data dashboard immediately. Today's matches are practice only and do not count in Season 1 standings.",
-        "facilitatorDescription": "Walk the whole camp through match format: 3 minutes each, two teams per match, first to push the ball across the end line scores. Bots are pre-programmed -- no joystick control during the match. Emphasize the programming commitment so teams understand their allocation choice is binding during play.",
-        "script": "https://docs.google.com/document/d/1DDHa4QzzGpcFIWMZhXt1frwULDvcngx5uOZ25LzLNzw/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1PF0aj4YsLBO4HhphJ2yq1g42oZlClQpwL_v2JjEty5I/edit?usp=sharing",
-        "webpage": "https://velocity-arena-gold.vercel.app/activities/dashboard/velocity-arena-dashboard.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-match-format-briefing.html"
+        "block": "Transition",
+        "description": "Teams enter their 20-point stat loadout into the dashboard and learn the Simulation Lab. The dashboard is in pre-trial mode this week — only two sections are visible: Stat Loadout, where teams type in their four stat values and confirm the total equals exactly 20, and Simulation Lab, where teams log a gap sentence for every simulation round. A gap sentence has three parts: what the formula predicted, what the bot actually did, and the gap stated as a number. Every gap sentence logged this week feeds the Friday reflection question: for one simulation round, what was the gap between formula and reality?",
+        "facilitatorDescription": "Open the dashboard at /activities/dashboard/velocity-arena-dashboard.html on the projector before students arrive. Confirm it is in Auto mode and shows only Stat Loadout and Simulation Lab — if the Match Log is visible, the View is wrong. Do not walk through Match Log columns. Students cannot see them and you will confuse them. Take verbal confirmation of each team's four stats and total before anyone opens their device. Run the loadout entry first, then the Simulation Lab. Model a complete gap sentence live: state the formula prediction, state what the bot did, state the gap as a number. The gap sentence format is non-negotiable — vague entries with no number are not accepted. Confirm each team's Data Owner before the session ends. Every team must pass the exit check: loadout total equals 20, gap sentence has three parts, Data Owner is named.",
+        "script": "https://docs.google.com/document/d/1HZHM4CU6kodt298jeO6lzRn6O2o0x_n89aCiptxY0xY/edit?usp=sharing",
+        "worksheet":"https://docs.google.com/document/d/1PF0aj4YsLBO4HhphJ2yq1g42oZlClQpwL_v2JjEty5I/edit?usp=sharing",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-dashboard-introduction.html"
       },
+      
       {
         "name": "Simulation Matches: Your Loadout vs. Reality",
-        "mins": 80,
+        "mins": 90,
         "block": "Match-Build-Make",
         "description": "Pick your best loadout from this morning, program it into your bot, and run practice matches. These do not count. After each run, compare: did your bot behave the way your allocation predicted? Record observations labeled 'simulation' in your dashboard.",
         "facilitatorDescription": "Teams pick their best loadout from the morning, program it into the bot, and run practice matches. These do not count toward any record. After each run, teams compare: did bot behavior match what the allocation predicted? Observations go in the dashboard labeled 'simulation.' First exposure to pre-match prediction and post-match comparison.",
         "script": "https://docs.google.com/document/d/1dLE5nbDOkwBGEi6ejIJX1IT48ir071mXRRU2A1_6Kvw/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-06-simulation-matches.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-simulation-matches.html",
+        "exit": "https://docs.google.com/document/d/1oKYXqje3BTpjz0dP2PdVla2iYO8AsNsje_8kERxn5d0/edit?usp=sharing"
       },
       {
         "name": "Open Lab: Free Code Time",
-        "mins": 40,
+        "mins": 30,
         "block": "Open Lab",
         "description": "Experiment with the loadouts you designed this morning. Try each one. Which one produces the behavior your formulas predicted?",
         "facilitatorDescription": "Teams experiment with the three loadouts they designed in the morning. Each gets tested. The question: which one produces the behavior their formulas predicted? This is the hinge where teams notice formula-vs-reality gaps heading into Season 1.",
         "script": "https://docs.google.com/document/d/1b-dHky2JBEv8cZp-h9htJNm8CnTfeaA9Tz9ENb_GP1Y/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-open-lab-closing.html"
-      }
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-08-open-lab-closing.html"
+         }
     ],
     "produce": [
       "Two-formula warm-up — Speed and Endurance outputs calculated for one allocation",  
@@ -501,9 +513,13 @@ const DAYS_DEFAULT = [
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. All four circled answers and all 12 concept tags must be verified correct before you touch a tool.",
-        "facilitatorDescription": "Teams complete their official Season 1 stat allocation using a 12-problem interleaved set covering all four formula types (Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, Arc Segments = TURNING, and Speed/Endurance). Problems are shuffled so teams have to identify the formula before calculating -- no doing all Speed problems first. A concept tag column runs alongside each problem: teams name the concept (unit rate, ratio, linear decay, coordinate geometry, proportional scaling) before calculating. All four circled official values and all 12 concept tags must verify correct before any team touches a tool in the afternoon block.",
+        "description": "Complete your official Season 1 stat allocation using a problem set with 12 shuffled problems across all four formula types, including Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, and Arc Segments = TURNING. You cannot just do all Speed problems first -- you have to figure out which formula applies before you calculate. A concept tag column runs alongside each problem: before calculating, write the concept name that the problem targets (unit rate, ratio, linear decay, coordinate geometry, or proportional scaling). Circle your four official values. Teams must lock in their official allocation at the end of this block. This is the last time they can change their numbers before competition begins on Day 7.",
+        "facilitatorDescription": "Teams complete their official Season 1 stat allocation using a 12-problem interleaved set covering all four formula types (Turn Ratio = 0.2 + (TURNING x 0.02), follow through = Power x 200, Arc Segments = TURNING, and Speed/Endurance). Problems are shuffled so teams have to identify the formula before calculating -- no doing all Speed problems first. A concept tag column runs alongside each problem: teams name the concept (unit rate, ratio, linear decay, coordinate geometry, proportional scaling) before calculating. Teams must also lock in official allocation.",
         "script": "https://docs.google.com/document/d/1Y6w0LgGfHSx_5icP4yTCNnHzYIYSofLFxoQVoNdZweY/edit?usp=drive_link",
+        "worksheet": [
+          { url: "https://drive.google.com/file/d/1vpbdrqpAyFEU8Rth55wJor90qT1f0SGg/view?usp=drive_link", label: "Questions" },
+          { url: "https://drive.google.com/file/d/1HTKprechKjPNoACQ-fWBMvjIPoCIACLS/view?usp=drive_link", label: "Answer Key" }
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-02-interleaved-problem-set.html"
       },
       {
@@ -513,45 +529,47 @@ const DAYS_DEFAULT = [
         "description": "Eat, rest, and talk about anything except math.",
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
-      {
+     {
         "name": "Field Geometry + Approach Planning",
-        "mins": 35,
+        "mins": 50,
         "block": "Challenge",
         "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
         "facilitatorDescription": "Teams plot three coordinate points -- starting position, tip-off at (4, 2), and goal at (8, 2) -- then calculate approach distance and use the Speed formula to predict travel time. The sentence justification is a quality gate: vague reasoning gets sent back once, no repeat explanations. Common issue: teams conflate straight-line distance with actual bot path. Don't correct the geometry -- let the testing block surface it. The prediction they write here is the number they'll check against real bot behavior in the next block.",
+        "script": "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link",
+        "worksheet":"https://docs.google.com/document/d/1IrUQu-agjptsiOYcyiwMrs5T8pa7gWwwHhzM9b5FRFk/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-03-field-geometry-approach.html"
       },
       {
         "name": "Launch Sequence Programming + Testing",
-        "mins": 50,
+        "mins": 60,
         "block": "Match-Build-Make",
         "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
         "facilitatorDescription": "Teams program the launch sequence as a routine separate from the stat loadout coded in the morning. Two test runs, both timed, both logged. The comparison to the Speed prediction is the math moment: a mismatch is not a failure, it is data. If a team's times are off, ask one question only: 'What did your formula predict, and what did you observe?' Then let them work. Some teams will have approach angles that add distance not captured in their straight-line calculation -- that is the right kind of confusion to carry into Season 1. Do not resolve it for them.",
+        "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
+        "script":"https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"
       },
       {
         "name": "Launch Showcase",
-        "mins": 45,
+        "mins": 20,
         "block": "Match-Build-Make",
         "description": "Commit to your final sequence and write down your run order -- that is what locks for Season 1. Each team runs their launch sequence once in front of the room. While another team runs, write one specific observation in your dashboard: not 'they were fast' but 'their bot reached the ball in under 3 seconds, which suggests their Speed allocation is above 8.' After all teams have run, you have 10 minutes for one final adjustment. Then sequences lock.",
         "facilitatorDescription": "Enforce the 2-minute commitment window before the showcase starts. Teams that haven't committed will stall the room. During each team's run, prompt observers writing vague notes: 'What number would make that observation useful?' The 10-minute adjustment window after all sequences have run is the highest-value moment in the block -- teams are adjusting based on what they saw, not just what they predicted. Let that happen without interruption. Sequences lock at the end of the 10 minutes with no exceptions. Season 1 begins tomorrow.",
+        "script": "https://docs.google.com/document/d/1u_t-Lcszhvz9VXyqGYMtgyzN6tI948pUgw-okpP7xBA/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1LhwiwjTChaUP8ThP3QIU7IYpBHiy5B7_/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-05-launch-showcase.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Free Code or Final Verification",
-        "mins": 45,
+        "mins": 15,
         "block": "Open Lab",
         "description": "Track A (Data Dive): Check each stat value in your dashboard against the formula output. Fix any mismatches before tomorrow's first match. Track B (Bot Lab): Test a loadout you would never use competitively. What happens at Speed = 2 with Power = 15?",
         "facilitatorDescription": "Two tracks available, self-selected. Track A (Data Dive): teams check each stat value in the dashboard against formula output and fix any mismatches before Season 1 begins tomorrow. Track B (Bot Lab): teams test a loadout they would never use competitively (e.g., Speed = 2 with Power = 15) to build intuition for edge behavior. Both are legitimate uses of the time.",
         "script": "https://docs.google.com/document/d/1tfwcohDC_tUJ700pCwIWLIa4j31qdFJoUgcJdhvyd1A/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-06-open-lab-verification.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-06-open-lab-verification.html",
+         "worksheet":"https://docs.google.com/document/d/1qAIWuumIOSJ18bQEGq2PDC8lpjbU0ChAsQtj-ks77jY/edit?usp=sharing"
+    
       }
     ],
     "produce": [
@@ -604,8 +622,9 @@ const DAYS_DEFAULT = [
         "description": "Using your Endurance allocation, write your bot's power decay equation as P(t) = 100 - rt. Calculate r from your allocation. When r is revealed, your facilitator names it explicitly: the slope of a line is its rate of change, and r is how fast your bot loses power per minute. Then find the x-intercept: at what minute does your bot's power reach zero? Record the equation and x-intercept in your match data log before the first match.",
         "facilitatorDescription": "Teams use their Endurance allocation to write the bot's power decay equation as P(t) = 100 - rt and calculate r. When r is revealed, name it explicitly: the slope of a line is its rate of change, and r is how fast the bot loses power per minute. Teams find the x-intercept -- the minute at which bot power reaches zero. Equation and x-intercept go in the match data log before the first match. This is the first formal slope-intercept form in the program.",
         "script": "https://docs.google.com/document/d/1dP6KVB-fWDv-ulZJRhvX-apJJddyM98OY2hAy0Tu7Mk/edit?usp=sharing",
-        "worksheet": "https://docs.google.com/document/d/11D4S7jFGcahxFwMQL7qUohiTy0u_fp3ALbOBTy0iHaM/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-02-endurance-decay.html"
+        "worksheet": "https://drive.google.com/file/d/11UkVVv6an0sm_UbK0StSpWWE3NcogS4z/view?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-02-endurance-decay.html",
+        "exit": "https://docs.google.com/document/d/1QpcTTJ8aDJbZCcCkHCmmJKpGEO6zOHugmBK_CDauYKk/edit?usp=sharing"
       },
       {
         "name": "Pre-Match Prediction Huddle",
@@ -625,11 +644,13 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
       {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
+        "name": "Dashboard + Match Rules",
+        "mins": 15,
+        "block": "Transition",
+        "description": "Meet week 2 of the data dashboard and hear the match rules.",
+        "facilitatorDescription": "Introduce Dashboard and matchrules. Explain match rules in under 10 minutes: each match is 3 minutes, two teams on a flat field, first team to push the ball across the opposing end line scores a goal. Bots are pre-programmed.  After each match, both teams record their score in the data dashboard immediately.",
+        "script": "https://docs.google.com/document/d/1UdA_VLw9w9KdW86dGt7fNlohmnURdLi-xajLQFpfWKc/edit?usp=sharing",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-05-dashboard-introduction.html"
       },
       {
         "name": "Season 1 Round-Robin Matches, Day 1",
@@ -642,7 +663,7 @@ const DAYS_DEFAULT = [
       },
       {
         "name": "Leaderboard Reveal + Open Lab",
-        "mins": 35,
+        "mins": 30,
         "block": "Match-Build-Make / Open Lab",
         "description": "The physical leaderboard goes up on the wall or Velocity Arena Dashboard Leaderboard. Update the dashboard. Then 20 minutes of open bot time: review your dashboard, strategize, or adjust code.",
         "facilitatorDescription": "Post the physical leaderboard on the wall (or update the Velocity Arena Dashboard Leaderboard). Include the Best Prediction column -- rewards mathematical accuracy, not just winning. Then 20 minutes of open bot time for dashboard review, strategy, or code adjustments. Leaderboard is a permanent artifact from today forward.",
@@ -691,20 +712,8 @@ const DAYS_DEFAULT = [
         "description": "",
         "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
-      {
-        "name": "Energy Reset",
-        "mins": 3,
-        "block": "",
-        "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down.",
-        "facilitatorDescription": "Lead the group through 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch, then seats. Under 3 minutes, no talking during stretch. Use this to break a cognitive slump, not as a reward."
-      },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+      
+      
       {
         "name": "Matching Situations, Graphs, and Linear Equations",
         "mins": 50,
@@ -712,7 +721,8 @@ const DAYS_DEFAULT = [
         "description": "Part 1 (20 min): Each team adds their data point to a shared class graph -- Speed on x-axis, Goals Scored on y-axis. Match sets of cards: verbal situations, data tables, and graphed lines. Find which three belong together and explain why. Part 2 (20 min): Use two data points from the scatter plot to write the linear equation -- slope calculated, y-intercept solved. Teams share. Everyone's equation is different. That is the point. SUMMER SPARKS EVALUATION FLAG: Day 8 is a candidate mid-program measurement point for the JHU evaluation team.",
         "facilitatorDescription": "Part 1 (20 min): each team adds a data point to a shared class scatter plot -- Speed on x-axis, Goals Scored on y-axis. Teams match card sets: verbal situations, data tables, and graphed lines. They must match three that belong together and explain why -- the explanation is the work. Do not let teams match by elimination. Part 2 (20 min): teams use two points from the scatter plot to write a linear equation, slope labeled, y-intercept solved. Every team's equation is different. Share aloud. Summer Sparks evaluation flag: Day 8 is a candidate mid-program measurement point for the JHU evaluation team.",
         "script": "https://docs.google.com/document/d/1_NMcPHteA9cyqcFjleHkZkEdTaw29GxEtwPibEvCvU4/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/10iIpzkn-Hl3IGQTJyZn91YI_wCHu0FbYeoZCqGEVyys/edit?usp=drive_link",
+        "worksheet": [{url: "https://drive.google.com/file/d/1Dz4v-rCu0t16ssPUBvY1s4SBUafiwud6/view?usp=drive_link", label: "Worksheet"},
+          {url:"https://docs.google.com/document/d/1_tLR5byNHvxL2uZcr1Qtv-Ys1TbSgIOlfSmxtn2TvX0/edit?tab=t.0", label: "Cards"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-02-matching-situations.html"
       },
       {
@@ -755,7 +765,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
       },
       {
-        "name": "Open Lab",
+        "name": "Day 8 Open Lab",
         "mins": 25,
         "block": "Open Lab",
         "description": "Track A (Data Dive): Review your scatter plot equation against today's match results. Does the line fit the new data points? Note one variable your equation is not capturing. Track B (Bot Lab): Adjust one MakeCode setting and run the bot for 90 seconds. What changes? The 25 minutes is short today.",
@@ -848,11 +858,11 @@ const DAYS_DEFAULT = [
         "name": "Open Lab: Post-Match Debrief and Free Code",
         "mins": 40,
         "block": "Open Lab",
-        "description": "Track A (Data Dive): Look at your three match results. Does any pattern in the data suggest a loadout adjustment? Write one hypothesis entry in the dashboard: 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): Run the bot and experiment with whatever you want. If you find something useful, it goes in the dashboard before you leave.",
-        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at their three match results, spot patterns, and write one hypothesis entry in the dashboard -- 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): teams experiment freely with the bot. Any useful finding goes in the dashboard before they leave.",
+        "description": "Track A (Data Dive): Look at your three match results. Does any pattern in the data suggest a loadout adjustment? Write one hypothesis entry in the dashboard: 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): Run the bot and experiment with whatever you want. If you find something useful, it goes in your journal before you leave.",
+        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at their three match results, spot patterns, and write one hypothesis entry in the dashboard -- 'If we change [stat] from [X] to [Y], we expect [specific outcome] because [cited data].' Track B (Bot Lab): teams experiment freely with the bot. Any useful finding goes in journals before they leave.",
         "script": "https://docs.google.com/document/d/15gZrKNFwogagCQQUGQOWAwVur95G9jX9lQ1tpNBYhuc/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-04-open-lab-post-match.html"
-      }
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-04-open-lab-post-match.html",
+        "exit":"https://docs.google.com/document/d/16PB8rDAAedy88v8A6hx23gmnQqIKfgN1eD22wc60i2c/edit?usp=sharing"      }
     ],
     "produce": [
       "Sticky note — rival's card annotated with accuracy check; corrected calculation written if wrong",  
@@ -901,16 +911,10 @@ const DAYS_DEFAULT = [
         "description": "Week 2 continuation of the coordinate geometry introduced on Day 3. On Day 3 you walked the grid physically and computed straight-line distance with your bodies. Today the formula puts numbers to that same motion using real Season 1 match data. Using three coordinate pairs from your team's data log, calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Record every calculation. Then answer: does the computed distance match what was observed during the match? If not, name the source of the discrepancy -- measurement error, bot drift, or formula misapplication. This session closes the coordinate geometry arc started on Day 3.",
         "facilitatorDescription": "Reconnect to Day 3 explicitly: students used this formula on the floor grid, walking to coordinates and estimating diagonals. Today applies it to real Season 1 match data. Teams use three coordinate pairs from their data log and calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Every calculation recorded. Then teams answer: does the computed distance match what was observed during the match? If not, name the discrepancy source -- measurement error, bot drift, or formula misapplication. Closes the coordinate geometry arc started on Day 3. Do not let teams treat this as a new formula.",
         "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
-        "worksheet": "https://docs.google.com/document/d/1rlvuktLelGSmNZhlcX6xbDgxutA3qaG4DMdsaJxRdmw/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1reQoXFXaUQ-FidUnysXkSfSf9mAlaiz0/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html"
       },
-      {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
-      },
+      
       {
         "name": "Lunch / Snack Break",
         "mins": 60,
@@ -925,7 +929,7 @@ const DAYS_DEFAULT = [
         "description": "Five questions, 10 minutes, individual work, non-bot context, no grade. Write on paper without notes or devices. (1) Percent change in motor power between Speed = 6 and Speed = 9. (2) Slope-intercept form from slope 2 through (1,3). (3) Distance from (2,5) to (7,17). (4) When does P(t) = 100 - 12t reach zero? (5) A bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far at that rate for 8 seconds?",
         "facilitatorDescription": "Five questions, 10 minutes, individual work, no grade, no notes or devices. Non-bot context. Questions: (1) percent change in motor power between Speed = 6 and Speed = 9; (2) slope-intercept form from slope 2 through (1,3); (3) distance from (2,5) to (7,17); (4) when does P(t) = 100 - 12t reach zero; (5) a bot travels 150 cm in 5 seconds -- speed in cm/sec and distance at that rate for 8 seconds. Diagnostic, not assessment.",
         "script": "https://docs.google.com/document/d/1024tZLvwZFUNsyWOCjqZPvSyYATN3y7V_JNpg0d78MU/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/10V50AccSWPvzq6iGe3ICkOFLgG9zZbVCrkbzAx5E_TU/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/1vWkVXoyWBPglVvLyA4tca0BKgmr88F6I/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-03-cold-recall-check.html"
       },
       {
@@ -939,10 +943,11 @@ const DAYS_DEFAULT = [
         "name": "Season 1 Final Round",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete data dashboard -- goals per minute, possession time, win/loss by stat matchup. No blanks. Leaderboard final Season 1 update.",
-        "facilitatorDescription": "Final Season 1 round-robin matches. Loss-recovery for every losing team, same three-step script. After all matches: complete data dashboard -- goals per minute, possession time, win/loss by stat matchup. No blank cells. Leaderboard gets its final Season 1 update. This is the close of Season 1 and the setup for the Commissioner's Week.",
+        "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete data dashboard —win/loss by stat matchup. Leaderboard final Season 1 update.",
+        "facilitatorDescription": "Final Season 1 round-robin matches. Loss-recovery for every losing team, same three-step script. After all matches: complete data dashboard --  win/loss by stat matchup.  Leaderboard gets its final Season 1 update. This is the close of Season 1 and the setup for the Commissioner's Week.",
         "script": "https://docs.google.com/document/d/1nDIFSSs9hH2m1YF55zIwJxYLpvB6c4gepoi7yyzRj_c/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-04-season1-final-round.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-04-season1-final-round.html",
+        "exit": "https://docs.google.com/document/d/107J961KuTWvqb6B6CFyopDkdD8PnyV-9RjHNZ7TnLkM/edit?usp=sharing"
       },
       {
         "name": "Open Lab: Season 2 Planning",
@@ -1001,19 +1006,13 @@ const DAYS_DEFAULT = [
         "description": "Phase 1 (20 min): Calculate what happens to bot behavior when a stat is scaled by 50%. Speed is proportional -- 50% more Speed gives 50% more motor power. Power is not -- charge speed = Power², so 50% more Power gives more than 50% more charge speed (quadratic). Phase 2 (25 min): Draft a rule change proposal using those scaling calculations as data evidence. Back it with at least two numbers from your dashboard, and make sure the change addresses how the team currently in last place is affected.",
         "facilitatorDescription": "Phase 1 (20 min): teams calculate what happens when a stat is scaled by 50%. Speed is proportional (50% more Speed gives 50% more motor power). Power is not (charge speed = Power², so 50% more Power gives more than 50% more charge speed -- quadratic). Phase 2 (25 min): teams draft a rule change proposal using those scaling calculations as evidence, backed by at least two dashboard numbers and addressing how the current last-place team is affected. This sets up tomorrow's formal Commissioner's Meeting.",
         "script": "https://docs.google.com/document/d/1s9wUXxuyLnXP-TNXoZV22tcXRDgv5g6wBUYuzYEQjk8/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1_VhsD2hZb2VBH7-lwdKmMHGJAq5x8VJqHUwdI6GsdZg/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/14uTaGn7Zv2sGw_Xo4yJN90oteLD1qaBh/view?usp=drive_link",
         "webpage" :["https://velocity-arena-gold.vercel.app/lessons/proportional-scaling.html",
           "https://velocity-arena-gold.vercel.app/lessons/day11-commissioner-proposal.html"
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-02-commissioner-proposal-prep.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Lunch / Snack Break",
         "mins": 60,
@@ -1114,7 +1113,10 @@ const DAYS_DEFAULT = [
         "description": "Check every number in your proposal against the actual dashboard. Is the data accurate? Does the rule change genuinely help the last-place team, or does it just help your team? Revise if needed. Your facilitator also checks Criterion 6: at least one of the following concept types must be named in the proposal -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay. Your facilitator asks one student per team: 'How did you calculate this number? What kind of math is that?' before the meeting starts.",
         "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one student per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
         "script": "https://docs.google.com/document/d/1rZES5FM1sbJcv16FcgLuV0mhrjpyPj2OaPZU_F1rJng/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1Gk98vJySwPowrqkMj1LTYlvm8b5U3g5o/view?usp=drive_link",
+        "worksheet": [
+          "https://docs.google.com/document/d/1o07DH79Pt_wVu6tat-vi0H_V8CB4S-etZgQqAuHEdG8/edit?usp=sharing",
+          "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view?usp=drive_link"
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
       },
       {

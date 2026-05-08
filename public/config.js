@@ -24,8 +24,9 @@ const CONFIG = {
   // skipping weekends and any holidays listed below.
   siteStartDates: {
     NY1: "2026-05-04",   // New York 1
-    NY2: "2026-04-18",   // New York 2
-    TN:  "2026-05-04",   // Tennessee
+    NY2: "2026-07-13",   // New York 2
+    NY3: "2026-04-18",   // New York 2
+    TN:  "2026-06-29",   // Tennessee
   },
 
   // Your timezone — affects what "today" means.
@@ -37,7 +38,16 @@ const CONFIG = {
 
   // Holidays to skip (camp days won't fall on these).
   // Format: ["YYYY-MM-DD", ...]
-  holidays: [],
+  holidays: ['2026-07-04'],
+
+  // Day start time (minutes since midnight). Drives the time slots
+  // shown on the facilitator schedule. If a site code isn't listed in
+  // siteDayStartMin, the renderer falls back to defaultDayStartMin.
+  //   600 = 10:00 AM   485 = 8:05 AM
+  defaultDayStartMin: 600,
+  siteDayStartMin: {
+    TN: 485,    // Tennessee runs 8:05 AM – 12:00 PM
+  },
 
   // Password for the Teacher Resources page.
   // Change this before sharing the site with students.
