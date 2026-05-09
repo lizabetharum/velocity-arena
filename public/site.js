@@ -8,7 +8,7 @@ const SITE_OPTIONS = [
   { code: 'NY1', label: 'Gotham Tech' },
   { code: 'NY2', label: 'Claremont International HS' },
   { code: 'NY3', label: 'South Bronx Community' },
-  { code: 'TN',  label: 'Tennessee' },
+  { code: 'TN',  label: 'Crosstown' },
 ];
 
 function getSelectedSite() {
