@@ -24,9 +24,18 @@
 //     theme: "TN-specific Day 5 theme",
 //     activities: [ ... ]
 //   },
-const TN_OVERRIDES = {
-  // (no overrides yet — add as needed)
-};
+// Week reassignments for the 4-week × 4-day TN grid:
+//   Week 1: Days 1–4   (default Day 5 moves into Week 2)
+//   Week 2: Days 5–8
+//   Week 3: Days 9–12  (default Days 9–10 are Week 2 in the 20-day arc)
+//   Week 4: Days 13–16 (default Days 13–14 are Week 3 in the 20-day arc)
+const TN_OVERRIDES = (typeof DAYS_DEFAULT !== 'undefined') ? {
+  5:  { ...DAYS_DEFAULT[4],  week: 2, weekName: 'Season 1' },
+  9:  { ...DAYS_DEFAULT[8],  week: 3, weekName: 'Commissioner / Season 2' },
+  10: { ...DAYS_DEFAULT[9],  week: 3, weekName: 'Commissioner / Season 2' },
+  13: { ...DAYS_DEFAULT[12], week: 4, weekName: 'Showcase Week' },
+  14: { ...DAYS_DEFAULT[13], week: 4, weekName: 'Showcase Week' },
+} : {};
 
 const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
   // ── Days 1–14: inherit from default, with TN_OVERRIDES applied ──

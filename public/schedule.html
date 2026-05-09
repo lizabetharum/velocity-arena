@@ -51,7 +51,7 @@ body{
 .week-heading{font:600 13px/1 var(--font-sans);letter-spacing:.04em;color:var(--fg-2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:baseline;gap:12px;}
 .week-heading .num{font:500 11px/1 var(--font-mono);color:var(--accent);font-variant-numeric:tabular-nums;}
 .week-heading .name{color:var(--fg-0);font-weight:700;letter-spacing:0;text-transform:none;font-size:14px;}
-.days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.days-grid{display:grid;grid-template-columns:repeat(var(--days-per-week,5),1fr);gap:10px;}
 .day-card{
   background:var(--bg-2);border:1px solid var(--line-strong);
   border-radius:var(--r-md);padding:16px 14px;
@@ -129,14 +129,14 @@ body{
 
   <section class="page-head">
     <p class="eyebrow"><b>00</b>Schedule</p>
-    <h1>Twenty days. Four weeks.</h1>
+    <h1 id="schedule-heading">Twenty days. Four weeks.</h1>
     <p class="lede">The full curriculum at a glance. Click any day for the full activity list. The daily structure repeats — only the content changes.</p>
   </section>
 
   <!-- ── WEEKS ────────────────────────────────────────────────── -->
   <div class="sec-head">
     <h2>Weekly arc <small>— click any day to open it</small></h2>
-    <span class="meta">04 WEEKS · 20 DAYS</span>
+    <span class="meta" id="schedule-meta">04 WEEKS · 20 DAYS</span>
   </div>
 
   <div id="schedule-grid">
@@ -212,12 +212,33 @@ body{
 <script>
 const campDates = (typeof buildCampDates === 'function') ? buildCampDates() : [];
 
-const weeks = [
-  { num: 1, name: 'Play Lab + Boot Camp' },
-  { num: 2, name: 'Season 1' },
-  { num: 3, name: 'Season 2 + Commissioner' },
-  { num: 4, name: 'Championship + Exhibition' },
-];
+const TOTAL_DAYS = (DAYS && DAYS.length) || 20;
+
+// Derive weeks from DAYS so per-site overrides (e.g. TN Showcase Week)
+// flow through. Falls back to the 20-day defaults if a week is empty.
+const DEFAULT_WEEK_NAMES = {
+  1: 'Play Lab + Boot Camp',
+  2: 'Season 1',
+  3: 'Season 2 + Commissioner',
+  4: 'Championship + Exhibition',
+};
+const weeks = [1, 2, 3, 4].map(num => {
+  const first = DAYS.find(d => d.week === num);
+  return { num, name: (first && first.weekName) || DEFAULT_WEEK_NAMES[num] };
+});
+
+// ── Heading / meta / grid columns ─ site-aware ─────────────────
+(function () {
+  const NUM_WORDS = { 16: 'Sixteen', 20: 'Twenty' };
+  const word = NUM_WORDS[TOTAL_DAYS] || TOTAL_DAYS;
+  const h = document.getElementById('schedule-heading');
+  if (h) h.textContent = `${word} days. Four weeks.`;
+  const meta = document.getElementById('schedule-meta');
+  if (meta) meta.textContent = `04 WEEKS · ${String(TOTAL_DAYS).padStart(2, '0')} DAYS`;
+  // 16 days → 4 cols, 20 days → 5 cols (default)
+  const cols = TOTAL_DAYS === 16 ? 4 : 5;
+  document.documentElement.style.setProperty('--days-per-week', cols);
+})();
 
 // Milestone tags at the bottom of certain day cards. Keep concise — small caps, accent color.
 const MILESTONES = {
@@ -232,7 +253,7 @@ const MILESTONES = {
 // Weekday during camp:  { status: 'today',   day: N, lastDone: N-1 }
 // Weekend mid-camp:      { status: 'weekend', day: null, lastDone: N }  (no day is "current")
 // Before camp:           { status: 'before',  day: null, lastDone: 0 }
-// After camp:            { status: 'after',   day: null, lastDone: 20 }
+// After camp:            { status: 'after',   day: null, lastDone: TOTAL_DAYS }
 // No CONFIG:             null
 function campDayContext() {
   try {
@@ -251,7 +272,7 @@ function campDayContext() {
       d.setDate(start.getDate() + i);
       const dow = d.getDay();
       if (dow !== 0 && dow !== 6) wd++;
-      if (wd > 20) return { status: 'after', day: null, lastDone: 20 };
+      if (wd > TOTAL_DAYS) return { status: 'after', day: null, lastDone: TOTAL_DAYS };
     }
 
     if (isWeekday) return { status: 'today', day: wd, lastDone: wd - 1 };
@@ -309,9 +330,9 @@ grid.innerHTML = weeks.map(w => {
   if (!el) return;
   if (!ctx) { el.innerHTML = 'STUDENT'; return; }
   if (ctx.status === 'today' && ctx.day) {
-    el.innerHTML = `STUDENT · DAY <b>${ctx.day}</b> / 20`;
+    el.innerHTML = `STUDENT · DAY <b>${ctx.day}</b> / ${TOTAL_DAYS}`;
   } else if (ctx.status === 'weekend') {
-    el.innerHTML = `STUDENT · WEEKEND · <b>${ctx.lastDone}</b> / 20 DONE`;
+    el.innerHTML = `STUDENT · WEEKEND · <b>${ctx.lastDone}</b> / ${TOTAL_DAYS} DONE`;
   } else if (ctx.status === 'before') {
     el.innerHTML = `STUDENT · STARTING SOON`;
   } else if (ctx.status === 'after') {
