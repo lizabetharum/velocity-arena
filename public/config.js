@@ -16,16 +16,17 @@ const CONFIG = {
 
   // Per-site start dates. Each pilot site may begin camp on a different
   // day of the week. Keys are the internal site codes:
-  //   NY1 = New York 1
-  //   NY2 = New York 2
+  //   NY1 = New York 1 (Gotham Tech)
+  //   NY2 = New York 2 (Claremont International HS)
+  //   NY3 = New York 3 (South Bronx Community)
   //   TN  = Tennessee
   // Format: "YYYY-MM-DD". The site computes each site's Day 20
   // (last day of camp) by counting 20 weekdays forward from the start,
   // skipping weekends and any holidays listed below.
   siteStartDates: {
-    NY1: "2026-05-04",   // New York 1
-    NY2: "2026-07-13",   // New York 2
-    NY3: "2026-04-18",   // New York 2
+    NY1: "2026-05-04",   // Gotham Tech
+    NY2: "2026-07-13",   // Claremont International HS
+    NY3: "2026-04-18",   // South Bronx Community
     TN:  "2026-06-29",   // Tennessee
   },
 
