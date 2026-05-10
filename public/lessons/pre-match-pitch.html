@@ -819,33 +819,6 @@ select{cursor:pointer;height:54px;font-size:16px}
   <p class="sec-desc">Everything on this list must be done before 10:10. Tap each item when it's complete.</p>
 
   <div class="card">
-    <div class="card-label"><i data-lucide="mic"></i> Pitch Rehearsal</div>
-    <div class="checklist">
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="ticon sm"><i data-lucide="mic"></i></div>
-        <div class="check-text">My team completed our pitch rehearsal
-          <div class="check-sub">We presented in front of the room — under 2 minutes</div>
-        </div>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="ticon sm"><i data-lucide="hash"></i></div>
-        <div class="check-text">Every claim in our pitch included a specific number
-          <div class="check-sub">Speed %, Endurance, Turning, Power, and opponent stat — all said out loud</div>
-        </div>
-      </div>
-      <div class="check-item" onclick="toggleCheck(this)">
-        <div class="check-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0b1220" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="ticon sm g"><i data-lucide="check-circle"></i></div>
-        <div class="check-text">We got YES — or we corrected any NO before Teach the Math started
-          <div class="check-sub">If we got a NO, we said the correct number before the next team went</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
     <div class="card-label yellow"><i data-lucide="calculator"></i> Teach the Math</div>
     <div class="checklist">
       <div class="check-item" onclick="toggleCheck(this)">
@@ -1316,21 +1289,54 @@ function useStarter(i) {
   document.getElementById('plainExplain').focus();
 }
 
-function checkPlainLang() {
+async function checkPlainLang() {
   const text = document.getElementById('plainExplain').value.trim();
   const fb = document.getElementById('plainFeedback');
+
   if (text.length < 40) {
     fb.innerHTML = '<div class="err-box" style="display:block">Your explanation is too short. Expand it — explain what the formula does, what numbers you used, and what the answer means in real life.</div>';
     return;
   }
-  const jargon = ['loadout','scouting report','stat chip','speed motor','endurance chip','power module'];
-  const found = jargon.filter(j => text.toLowerCase().includes(j));
-  if (found.length > 0) {
-    fb.innerHTML = `<div class="warn-box"><div class="ticon sm y"><i data-lucide="alert-triangle"></i></div><div class="warn-box-body"><strong>Watch your word choices!</strong><br>You used: <strong>${found.join(', ')}</strong>.<br>The listener doesn't know those words. Replace them with everyday words — like "battery level" instead of "endurance chip."</div></div>`;
-    lucide.createIcons();
-    return;
+
+  const btn = document.querySelector('#plainLangCard .btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader"></i> Checking...';
+  lucide.createIcons();
+  fb.innerHTML = '';
+
+  const calcName = selectedCalc ? calcData[selectedCalc]?.formula : '';
+  const formulaLabel = selectedCalc || '';
+
+  try {
+    const res = await fetch('/api/check-explanation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ explanation: text, calcName: formulaLabel, formula: calcName })
+    });
+    const data = await res.json();
+
+    if (data.result === 'clear') {
+      fb.innerHTML = `
+        <div class="info-box green" style="margin-top:0">
+          <strong>${data.headline}</strong><br>${data.feedback}
+        </div>`;
+    } else {
+      const jargonNote = data.jargon?.length
+        ? `<br><strong>Words to replace:</strong> ${data.jargon.join(', ')}`
+        : '';
+      fb.innerHTML = `
+        <div class="warn-box">
+          <div class="ticon sm y"><i data-lucide="alert-triangle"></i></div>
+          <div class="warn-box-body"><strong>${data.headline}</strong><br>${data.feedback}${jargonNote}</div>
+        </div>`;
+    }
+  } catch (e) {
+    fb.innerHTML = `<div class="info-box green" style="margin-top:0"><strong>Looks good!</strong> Could not reach the check service — read your explanation out loud one more time and you're ready.</div>`;
   }
-  fb.innerHTML = `<div class="info-box green" style="margin-top:0"><strong>Your explanation sounds clear.</strong> Read it out loud one more time — if a stranger could understand it without any help, you're ready.</div>`;
+
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="check-circle"></i> Check My Explanation';
+  lucide.createIcons();
 }
 
 // ── CHECKLIST ────────────────────────────

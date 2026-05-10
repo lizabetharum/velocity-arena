@@ -350,13 +350,6 @@ const DAYS_DEFAULT = [
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
-      },
-      {
         "name": "Open Lab: Free Code Time",
         "mins": 40,
         "block": "Open Lab",
@@ -503,13 +496,6 @@ const DAYS_DEFAULT = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-01-equation-relay-race.html"
       },
       {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
-      },
-      {
         "name": "Official Stat Allocation: Interleaved Problem Set",
         "mins": 50,
         "block": "Challenge Block",
@@ -608,13 +594,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1Bi2GyylzUmAMF3L-9mChiZvNsaOFzTQuidpxHfFU-S4/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-01-trashketball.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Endurance Decay Equations in Slope-Intercept Form",
         "mins": 50,
@@ -705,13 +685,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1LsBHj1fZelZGJysKmNXpW42IlD4GokWiVK0D9KvpBYQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-01-scavenger-hunt.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       
       
       {
@@ -741,13 +715,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1cDzAaPXt3_Dw0tMcW1HhyzLZHhy476vrmZ--eLWcdE0/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-03-match-day-2.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Rivalry Cards",
         "mins": 20,
@@ -757,13 +725,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1nPSD1hV8jj-v_G17Ylau1FFYMEIzU446v00SRzFM4dg/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-04-rivalry-cards.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Day 8 Open Lab",
         "mins": 25,
@@ -807,13 +769,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1eP8t3uCa2TjUVkS6a5wyDKHBfYIUqCkXeM0nGRysT4o/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-01-rivalry-card-response.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Formula Relay: All Five Types in One Race",
         "mins": 50,
@@ -823,13 +779,6 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1Ec2G293mPaGajilq-H2jMTSDgBCMNziSXGasL7Bd5wE/edit?usp=drive_link",
         "webpage": "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-02-formula-relay.html"
-      },
-      {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Lunch / Snack Break",
@@ -847,13 +796,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1D1CHjrAQSb-416lwkp8oU7HxM79GZYlLDU7Fih8qmc4/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-03-match-day-3.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Post-Match Debrief and Free Code",
         "mins": 40,
@@ -897,13 +840,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1xMUVjmU2S0wIzAEcFF8N4Gx7ol96ItPGM5AMiu8rI-g/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-01-best-match-gallery-walk.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+     
       {
         "name": "Distance Formula: How Far Did the Ball Travel",
         "mins": 50,
@@ -912,7 +849,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Reconnect to Day 3 explicitly: students used this formula on the floor grid, walking to coordinates and estimating diagonals. Today applies it to real Season 1 match data. Teams use three coordinate pairs from their data log and calculate d = sqrt((x2-x1)^2 + (y2-y1)^2) for each. Every calculation recorded. Then teams answer: does the computed distance match what was observed during the match? If not, name the discrepancy source -- measurement error, bot drift, or formula misapplication. Closes the coordinate geometry arc started on Day 3. Do not let teams treat this as a new formula.",
         "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1reQoXFXaUQ-FidUnysXkSfSf9mAlaiz0/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html",
+        "exit":"https://docs.google.com/document/d/1_7vn0APALILJ1_RhcentRcNefrvXIhIMttt3RKbMQZg/edit?usp=sharing"
       },
       
       {
@@ -932,13 +870,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://drive.google.com/file/d/1vWkVXoyWBPglVvLyA4tca0BKgmr88F6I/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-03-cold-recall-check.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+   
       {
         "name": "Season 1 Final Round",
         "mins": 90,
@@ -992,13 +924,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1d7vhhtcpL9ZhEbacI4QChLFig33nDHQgb2pGtZjzpg8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-01-human-number-line.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+   
       {
         "name": "Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep",
         "mins": 45,
@@ -1028,17 +954,10 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Announce publicly: the current last-place team gets one free stat reallocation before Season 2, no Commissioner approval required. Public announcement is essential -- it creates the comeback narrative and keeps the last-place team mathematically engaged. The underdog team reworks their allocation sheet now. All teams begin planning Season 2 loadouts under the rules that will pass tomorrow.",
         "script": "https://docs.google.com/document/d/1uub9UpMbQF4he0B55d5SCFc8Jg7RbYljg-A5i_nHo9E/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1uUZX29Zj8tEQ64mf7fKm0PYlzEpkn-2LqDcZBG8Vg4k/edit?usp=sharing",
-        "webpage": "hhttps://velocity-arena-gold.vercel.app/lessons/day11-season2-reallocation.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-03-underdog-mechanic-reallocation.html"
     
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+   
       {
         "name": "Practice Matches: Test New Loadout Hypotheses",
         "mins": 60,
@@ -1049,13 +968,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://docs.google.com/document/d/1pItb3fZdZ8cUOn0rbo2xBQuszboddc8JLooLeVEJMgU/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-04-practice-matches.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Commissioner Proposal Refinement",
         "mins": 40,
@@ -1099,13 +1012,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1l06bjK0a6reS5dN-4UL5IPTkn3-ICBddpaWUmpTLjPw/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-01-lobby-commissioners.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+   
       {
         "name": "Final Proposal Verification",
         "mins": 35,
@@ -1114,9 +1021,9 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams check every number in their proposal against the actual dashboard. Two questions: is the data accurate, and does the rule change genuinely help the last-place team or only the proposing team? Check Criterion 6: at least one concept type -- proportional scaling, unit rate, ratio, slope as rate of change, or linear decay -- must be explicitly named in the proposal. Ask one student per team before the meeting: 'How did you calculate this number? What kind of math is that?'",
         "script": "https://docs.google.com/document/d/1rZES5FM1sbJcv16FcgLuV0mhrjpyPj2OaPZU_F1rJng/edit?usp=drive_link",
         "worksheet": [
-          "https://docs.google.com/document/d/1o07DH79Pt_wVu6tat-vi0H_V8CB4S-etZgQqAuHEdG8/edit?usp=sharing",
-          "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view?usp=drive_link"
+          {url: "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view", label: "Final Proposal Verificatio"}
         ],
+      
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
       },
       {
@@ -1133,16 +1040,13 @@ const DAYS_DEFAULT = [
         "description": "Each team has 3 minutes. Cite two data points, explain your reasoning, describe how the change affects the last-place team. The league votes. Proposals that pass become rules -- written on the wall in permanent marker. Then adjust your Season 2 allocation under the new constraints before you leave.",
         "facilitatorDescription": "Each team has 3 minutes to cite two data points, explain reasoning, and describe how the change affects the last-place team. The league votes. Passing proposals become rules -- write them on the wall in permanent marker. After the meeting, teams adjust their Season 2 allocation under the new constraints before leaving. After every presentation, ask the room: 'Does this proposal use the data correctly? Can anyone verify the math?' -- including for strong presentations. Highest-agency moment of the program.",
         "script": "https://docs.google.com/document/d/11b4vHFTJAh9U815GM9ss0bsvUEQsRfxzD0WYuLgc_58/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing",
+        "worksheet": [
+          {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
+          {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
       },
-      {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
-      },
+     
       {
         "name": "Open Lab: Season 2 Allocation Verification",
         "mins": 35,
@@ -1150,7 +1054,8 @@ const DAYS_DEFAULT = [
         "description": "Verify your Season 2 allocation calculations. Program the new loadout into MakeCode. Run one test drive to confirm the code matches the math.",
         "facilitatorDescription": "Teams verify Season 2 allocation calculations, program the new loadout into MakeCode, and run one test drive to confirm code matches math. Last chance to catch a mis-coded stat before Season 2 matches begin tomorrow.",
         "script": "https://docs.google.com/document/d/1rQO_FefyE0XsqYJGit2EcfBexmNWm_vQEcS0WyKXOuA/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-04-open-lab-s2-verification.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-04-open-lab-s2-verification.html",
+        "exit":"https://docs.google.com/document/d/1mreyR2RmUD6DKjmsZzAhMYzV28-sPFNdOVrc3Ekh11A/edit?usp=sharing"
       }
     ],
     "produce": [
@@ -1186,20 +1091,8 @@ const DAYS_DEFAULT = [
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
-      {
-        "name": "Energy Reset",
-        "mins": 3,
-        "block": "",
-        "description": "Stand up. 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch. Sit back down.",
-        "facilitatorDescription": "Lead the group through 30 seconds of jumping jacks, 30 seconds of arm circles, 30 seconds of silent stretch, then seats. Under 3 minutes, no talking during stretch. Use this to break a cognitive slump, not as a reward."
-      },
+      
+      
       {
         "name": "Building and Solving Linear Equations",
         "mins": 50,
@@ -1207,16 +1100,10 @@ const DAYS_DEFAULT = [
         "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is student-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point.",
         "facilitatorDescription": "Part 1: using Season 1 and early Season 2 data, teams write the equation that predicts their win probability. Two past data points, slope calculated, y-intercept solved, equation in slope-intercept form. Student-generated, not formula-imposed. Part 2: teams test the equation against two past matches and calculate residuals (predicted minus actual). Teams also calculate wins per Speed point (Season 1 wins / Speed stat) as a unit rate. Each team reports two residuals and the unit rate to the class. Every team's equation is different -- that is the point. Before releasing to afternoon: each team's equation must be on the whiteboard with slope, y-intercept, and source data points labeled.",
         "script": "https://docs.google.com/document/d/1F-g0L6Z_d2klUamK6SFWQSTv7J6Zg4SPUqTAzzHDibc/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1nix-JvEGlUqGEOWzDaELTovsFCR5zP5P92qYIHK2NFU/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/1YDfUjSl0OVNG0vXNUMXGFsmKiLngEjb9/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-02-linear-equations.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Lunch / Snack Break",
         "mins": 60,
@@ -1231,16 +1118,10 @@ const DAYS_DEFAULT = [
         "description": "First matches under the new Commissioner-approved rules. Before your first match, log your equation-based prediction. After each match, record the actual. Loss-recovery for every losing team. Compare today's prediction residuals to your Season 1 residuals. Is your model improving?",
         "facilitatorDescription": "First matches under the new Commissioner-approved rules. Before each match, teams log their equation-based prediction. After each match, actual result is recorded. Loss-recovery runs for every losing team. Teams compare today's residuals to Season 1 residuals -- is the model improving? The rule change means fresh start energy for every team.",
         "script": "https://docs.google.com/document/d/18HoVS51dmWMg0yHU5rjWg6EY7Uz4MAjbJ-cPaOmZavU/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1UM4pLp4yKSaOSmiVgriOliPi5zmOb5t-_cnlgv81Qik/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1cGFkZDRtoV8mLz6rQKcN1fHR2zSfHnl7/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-03-s2-match-day-1.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Residual Analysis or Bot Calibration",
         "mins": 35,
@@ -1286,13 +1167,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1I0rnGaWYvPDzWDUkHi0JcHJqQRY5i3pHKwyRMeUvF_U/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day14-01-stat-auction-prediction.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Percent Change: Season 1 to Season 2 Configurations",
         "mins": 50,
@@ -1319,13 +1194,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://docs.google.com/document/d/1BDDPR3_KtBbqVmK3XSt3HgHBHNcMujno8whS0izoUoo/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day14-03-s2-match-day-2.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Equation Revision or Loadout Experiments",
         "mins": 40,
@@ -1370,13 +1239,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://docs.google.com/document/d/1YiobKPGJCQGe9n7Usf7SN1dZnsYxBsj2vaOnsAMhdl4/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-01-bot-lore-gallery-walk.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Scouting Report: Mathematical Foundation",
         "mins": 50,
@@ -1403,13 +1266,6 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1VRuoTtA4ZSBNUsULeeu-7rSjM_GTGBJSNVQUZu5C-Wc/edit?usp=sharing",
         "worksheet": "https://docs.google.com/document/d/1XH5m0SvKEsFTnwZm2Akp9gWldMiqI_BXLBYlGYNgvpQ/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-03-match-day-3.html"
-      },
-      {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Scouting Continuation or Identity Refinement",
@@ -1456,13 +1312,7 @@ const DAYS_DEFAULT = [
       "script": "https://docs.google.com/document/d/13EAWLvzOpJzSWD48ie6-Ti6RsVMJySXtF03AYYh9Nz0/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-01-know-your-opponent.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Scouting Report Completion: Sections 3 and 4",
         "mins": 50,
@@ -1490,13 +1340,6 @@ const DAYS_DEFAULT = [
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day16-commissioner-proposal.html",
         "worksheet":"https://docs.google.com/document/d/1bOi-qqmVXnb-Uhr6HAw-ezLjD1jYr0-e_-Ui-nJpeAw/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-03-commissioners-meeting-pt1.html"
-      },
-      {
-        "name": "Break",
-        "mins": 10,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "10-minute break. Students stand, move, get water. Longer break lets energy fully reset before the next heavy block."
       },
       {
         "name": "Open Lab: Championship Loadout Verification",
@@ -1548,6 +1391,7 @@ const DAYS_DEFAULT = [
         "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in.",
         "facilitatorDescription": "Teams rehearse a 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback centers on one question: did they cite a specific number for every claim? Each team then picks one calculation and explains it in plain language, visitor-ready. Every claim in the pitch needs a number next to it before teams leave -- 'Our bot is fast' scores zero; 'Speed = 7 gives us 35% motor power' scores full points.",
         "script": "https://docs.google.com/document/d/1WPsfN7Gwbz809PmeEuuqzo5GNhcu8cyOpFxlT7JVdVg/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/181fmb7UpFIObB5jJroJDxmk2k_amVA1x/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-02-pitch-rehearsal-teach-math.html"
       },
       {
@@ -1566,13 +1410,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1dbjceeZa7y2mn6nBB8iLlIc2YIpWn34S_A3z7FENCUo/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-03-commissioners-pt2-bracket-reveal.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "What-If? Analysis",
         "mins": 45,
@@ -1624,13 +1462,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1ghkcMGT4HXJNR4lpWKilIdLigMZX1g5dJ-da9jdZMfY/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day18-01-pre-championship-ritual.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Championship Rounds 1 and 2",
         "mins": 90,
@@ -1656,13 +1488,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1I06T4pVWfBJApBca4Y3O7we4C1HjhVKI4KmG6uolTUQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day18-03-championship-semis-final.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Open Lab: Reflection Time",
         "mins": 40,
@@ -1702,13 +1528,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1jcYn0LTmP2IHZHdX9WhYk0U2-2KKItI05cvSWAWhWbQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-01-expert-setup-exhibition-prep.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Community Exhibition: Teaching Begins",
         "mins": 90,
@@ -1782,13 +1602,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1XDCeJ8J2U_zF0_vdgpfAYD6L4EFX8oRX8ZoRXOLapJ8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-01-walk-the-wall-final-gallery.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
         "mins": 15,
@@ -1799,13 +1613,7 @@ const DAYS_DEFAULT = [
         "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic-post/index.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Awards Ceremony",
         "mins": 60,
@@ -1815,13 +1623,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1FPkaluCh58L3kfr2E7mx8GKXUJpYzD9391KWC2kBKlQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-03-awards-ceremony.html"
       },
-      {
-        "name": "Break",
-        "mins": 5,
-        "block": "Break",
-        "description": "",
-        "facilitatorDescription": "Short 5-minute break. Let students stand, move, get water."
-      },
+    
       {
         "name": "Lunch / Snack Break",
         "mins": 60,

@@ -1,35 +1,12 @@
-<!DOCTYPE html><html lang="en"><head>
-<!-- vla-quickcard-gate:start -->
-<script>
-(function(){
-  var KEY = 'va_teacher_auth';
-  // localStorage so auth persists across tabs and reloads (sessionStorage is per-tab).
-  if (localStorage.getItem(KEY) === '1') return;
-  document.documentElement.style.visibility = 'hidden';
-  function bounce() { location.href = '/teachers.html'; }
-  var s = document.createElement('script');
-  s.src = '/config.js';
-  s.onload = function() {
-    // CONFIG is a top-level const — accessible globally as CONFIG, NOT as window.CONFIG.
-    var pw = (typeof CONFIG !== 'undefined' && CONFIG.teacherPassword) || '';
-    var ans = prompt('Teacher password required to view quick cards:');
-    if (ans !== null && ans.trim() === String(pw).trim()) {
-      localStorage.setItem(KEY, '1');
-      document.documentElement.style.visibility = '';
-    } else {
-      bounce();
-    }
-  };
-  s.onerror = bounce;
-  document.head.appendChild(s);
-})();
-</script>
-<!-- vla-quickcard-gate:end --><meta charset="UTF-8">
-<link rel="stylesheet" href="/styles/va-tokens.css">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velocity Arena — Stat Auction + Prediction Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { font-family: var(--font-sans); background: var(--bg-1); color: #000; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
 @media print {
   html, body { background: white; margin: 0; padding: 0; }
   @page { size: 11in 8.5in landscape; margin: 0; }
@@ -38,142 +15,139 @@ html, body { font-family: var(--font-sans); background: var(--bg-1); color: #000
 }
 .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
 .card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
-.card-header { background: #fff; color: #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; border-bottom: 1.5px solid #000; }
+.card-header { background: #fff; color: #000; border-bottom: 1.5px solid #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
 .activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
-.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; text-align: right; line-height: 1.5; flex-shrink: 0; }
 .progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
-.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1.5px solid #000; border-radius: 2px; overflow: hidden; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; background: #000; border-radius: 2px; }
-.progress-label { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.08em; color: #000; text-transform: uppercase; }
+.progress-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.08em; color: #999; text-transform: uppercase; }
 .math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
 .math-bar span { font-weight: 500; }
 .card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
 .col { display: flex; flex-direction: column; min-height: 0; }
 .col + .col { border-left: 1.5px solid #000; }
-.section { border-bottom: 1px solid #000; padding: 7px 11px; display: flex; flex-direction: column; }
+.section { border-bottom: 1px solid #000; padding: 5px 9px; display: flex; flex-direction: column; }
 .section:last-child { border-bottom: none; flex: 1; }
 .section.grow { flex: 1; min-height: 0; }
-.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 4px; margin-bottom: 7px; flex-shrink: 0; }
-.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.checklist li { font-size: 8.5pt; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
-.checklist li::before { content: '☐'; font-size: 10pt; line-height: 1.1; flex-shrink: 0; }
-.checklist li.note { font-style: italic; color: #444; margin-top: 3px; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.checklist li { font-size: 8pt; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 9.5pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 2px; }
 .checklist li.note::before { content: '→'; font-style: normal; }
-.timing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
 .timing-table tr { border-bottom: 1px solid #ddd; }
 .timing-table tr:last-child { border-bottom: none; }
-.timing-table td { padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.4; }
-.timing-table td.t-time { font-size: 8pt; font-weight: 800; width: 0.6in; white-space: nowrap; color: #000; }
-.timing-table td.t-action { font-weight: 700; width: 1.1in; font-size: 8.5pt; }
-.timing-table td.t-focus { font-size: 8pt; font-style: italic; color: #333; line-height: 1.45; }
-.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 7px 8px; font-style: normal; }
-.answer-grid { display: grid; grid-template-columns: auto auto auto; }
-.answer-grid .ah { font-weight: 700; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #000; padding: 3px 10px 3px 0; }
-.answer-grid .ar { font-size: 8.5pt; padding: 4px 10px 4px 0; border-bottom: 1px solid #e8e8e8; }
-.answer-grid .ar.last { border-bottom: none; }
-.answer-grid .bold { font-weight: 700; }
-.pattern-note { font-size: 7.5pt; font-style: italic; margin-top: 7px; padding-top: 6px; border-top: 1px solid #ccc; color: #333; line-height: 1.4; }
-.say-list { display: flex; flex-direction: column; gap: 7px; }
+.timing-table td { padding: 5px 7px 5px 0; vertical-align: top; line-height: 1.35; }
+.timing-table td.t-time { font-size: 7.5pt; font-weight: 800; width: 0.55in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1in; font-size: 8pt; }
+.timing-table td.t-focus { font-size: 7.5pt; font-style: italic; color: #333; line-height: 1.4; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 5px 7px; font-style: normal; }
+.say-list { display: flex; flex-direction: column; gap: 5px; }
 .say-item { display: flex; gap: 7px; align-items: flex-start; }
 .say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
 .say-tag.dont { background: white; color: #000; border: 1px solid #000; }
 .say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
 .say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
-.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 16px; }
-.watch-item { font-size: 8pt; line-height: 1.4; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+.watch-item { font-size: 7.5pt; line-height: 1.35; }
 .watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
 .watch-redirect { font-style: italic; color: #333; }
-.hard-stop { flex-shrink: 0; border-top: 1.5px solid #000; background: #fff; color: #000; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
-.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1.5px solid #000; padding: 2px 7px; }
+.hard-stop { flex-shrink: 0; border-top: 2px solid #999; background: #999; color: #fff; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1px solid #fff; padding: 2px 7px; }
 .hard-stop-text { font-weight: 600; line-height: 1.4; }
-.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #f5f5f5; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 7pt; font-weight: 800; color: #000; letter-spacing: 0.08em; text-transform: uppercase; }
-.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: var(--bg-1); font-family: var(--font-sans); }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #fff; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 6.5pt; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
 .produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
 .produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
-.produces li::before { content: '▸'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
-/* card-specific */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-      *{box-sizing:border-box;margin:0;padding:0}
-.prob-table{width:calc(100% - 20px);border-collapse:collapse;font-size:8pt;margin:4px 10px}
-.prob-table th{font-weight:700;padding:2px 5px;border-bottom:1px solid #000;text-align:left;font-size:8pt}
-.prob-table td{padding:2px 5px;border-bottom:.5px solid #ccc;font-size:8pt;line-height:1.45}
-
-/* card-specific — tighter layout to fit print */
-.section { padding: 5px 10px; }
-.section-label { margin-bottom: 4px; }
-.checklist { gap: 4px; }
-.checklist li { font-size: 8pt; }
-.timing-table td { padding: 4px 6px 4px 0; }
-.timing-table td.t-action { font-size: 8pt; font-weight: 600; }
-.timing-table td.t-focus { font-size: 7.5pt; line-height: 1.3; }
-.say-list { gap: 5px; }
-.say-item { font-size: 8pt; line-height: 1.4; }
-.say-quote { font-size: 8pt; line-height: 1.35; }
-.watch-grid { gap: 5px 12px; }
-.watch-item { font-size: 7.5pt; line-height: 1.3; }
-.produces li { font-size: 7pt; }
-.pattern-note { font-size: 7pt; margin-top: 5px; padding-top: 4px; }
-</style><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head><body>
+.produces li::before { content: '\25B8'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+</style>
+</head>
+<body>
 <div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
-<div class="page"><div class="card">
+<div class="page">
+<div class="card">
   <div class="card-header">
     <div class="activity-name">Stat Auction + Prediction Check</div>
     <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" style="width:25%;"></div></div>
-      <span class="progress-label">1 of 4</span>
     </div>
-    <div class="header-meta">25 MIN · HOOK<br>Day 14 · 9:35–10:00 AM</div>
+    <div class="header-meta">Day 14 · Hook · 25 min</div>
   </div>
-  <div class="math-bar">Auction: 3 tokens per team (4 for last-place) · simultaneous sealed bids · sum stays at 20 · no carryover</div>
+  <div class="math-bar">MATH: <span>motorPower% = S × 5 | P(t) = 100 − (20 − E) × 1.5 × t | Turn Ratio = 0.2 + (T × 0.02) | Output = P²</span></div>
   <div class="card-body">
-    <div class="col"><div class="section-label">Before</div>
-<ul class="checklist">
-  <li>5 auction package cards written large — posted on board in order 1–5</li>
-  <li>Tokens distributed: 3 per team, 4 for last-place team (echoes Underdog Mechanic)</li>
-  <li>Prediction Market cards from Day 13 still posted — pens at every table</li>
-  <li>Coin in pocket for tie-bid situations</li>
-  <li>Fill in Token Distribution table before session</li>
-</ul>
-<div class="section-label">Auction Rules (Read Aloud)</div>
-<table class="prob-table">
-<thead><tr><th>#</th><th>Rule</th></tr></thead>
-<tbody>
-<tr><td>1</td><td>One package per team — can win at most one</td></tr>
-<tr><td>2</td><td>Allocation must stay at 20 — add to one stat, subtract from another immediately</td></tr>
-<tr><td>3</td><td>Tokens don't carry over — unspent tokens are lost</td></tr>
-<tr><td>4</td><td>Simultaneous sealed bids — write tokens on a slip, reveal on signal</td></tr>
-<tr><td>5</td><td>Tie bid = coin flip, no debate</td></tr>
-</tbody></table>
-<div class="section-label">Students Produce</div>
-<ul class="produces">
-  <li>Updated allocation sheet immediately after auction win (show to facilitator before next package)</li>
-  <li>Prediction card revised with one number + one sentence citing dashboard data</li>
-</ul></div><div class="col"><div class="section-label">Timing</div>
-<table class="timing-table">
-<thead><tr><th>Time</th><th>Action</th><th>Watch For</th></tr></thead>
-<tbody>
-<tr><td>0:00</td><td>Read all 4 auction rules aloud word-for-word. Distribute tokens.</td><td>Teams counting other teams' tokens → "Focus on your own."</td></tr>
-<tr><td>0:03</td><td>Auction opens. Package 1: hold it up, read it, call for bids. Each package: simultaneous reveal on signal, call winner, record on board. Winner updates allocation sheet immediately.</td><td>Tie bid → coin flip. Team bidding immediately without strategy — their call, don't slow them down.</td></tr>
-<tr><td>0:14</td><td>Auction closes — all 5 packages done or 10 min elapsed. No late bids.</td><td>Team still holding tokens → "They don't carry over. They're done."</td></tr>
-<tr><td>0:15</td><td>Prediction Check opens. Teams go to wall. Two requirements: one number, one sentence citing data. Write on the card.</td><td>Revision without a number → not valid. "Write the number first."</td></tr>
-<tr><td>0:23</td><td>Check every revised card before 9:57. Both requirements must be met.</td><td>Vague revision ("we think we'll do better") → "What number from your dashboard supports that?"</td></tr>
-<tr><td>0:27</td><td>Read updated Prediction Market cards aloud for whole room.</td><td></td></tr>
-<tr><td>0:30</td><td colspan="2">Close. Bridge to Percent Change Challenge Block.</td></tr>
-</tbody></table></div><div class="col"><div class="section-label">Say Script</div>
-<div class="say-list">
-  <div class="say-item"><span class="say-tag">Launch</span>
-    <span class="say-quote">You have lived with your Season 2 allocation for two days. You have match data, residuals, and bot calibration. The auction gives you one final, binding choice. Listen carefully — I'm going to read the rules once.</span></div>
-  <div class="say-item"><span class="say-tag">Each Package</span>
-    Hold it up. Read description. <span class="say-quote">Write your bid — how many tokens — on your slip. Keep it face down. On my signal, everyone flips at the same time.</span> Count down: 3-2-1, flip.</div>
-  <div class="say-item"><span class="say-tag">Auction Winner</span>
-    <span class="say-quote">[Team] wins this package. Update your allocation sheet now and show me before the next package opens. Sum must still equal 20.</span></div>
-  <div class="say-item"><span class="say-tag">Prediction Check</span>
-    <span class="say-quote">Auction is closed. Walk to your prediction card. You have one number and one sentence to write. The number is your revised win prediction. The sentence cites one specific number from your dashboard that supports the revision. Both must be on the card before you sit down.</span></div>
-  <div class="say-item"><span class="say-tag">Read-Back</span>
-    Read each revised card aloud. For any card with no number: <span class="say-quote">This revision is incomplete. Write the specific number before we move on.</span></div>
+    <div class="col">
+<div class="section">
+  <div class="section-label">Before You Start</div>
+  <ul class="checklist">
+    <li>Identify last-place team; calculate one example formula output per package</li>
+    <li>Load HTML page; verify all 5 packages and calculator load</li>
+    <li>Write pre-calculated formula results on sticky note</li>
+    <li>Prepare tokens (3 per team, 4 for underdog), coin, auction cards, sheets</li>
+    <li>Post Day 13 cards on wall; have formula reference cards at every table</li>
+    <li class="note">*Most common error: teams revise predictions with no data—redirect to a residual, probability, or equation output.*</li>
+  </ul>
+</div>
+<div class="section">
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>One allocation decision with formula output stated aloud</li>
+    <li>Revised Prediction card with one dashboard number and one connecting sentence</li>
+    <li>Updated stat sheet showing all values sum to 20</li>
+    <li>Exit answer: one formula fact and one number</li>
+  </ul>
+</div>
+<div class="section grow">
+  <div class="section-label">Reference</div>
+  <div style="font-size:8pt; line-height:1.5; display:flex; flex-direction:column; gap:6px;">
+    <div>**Tokens:** 3 per team; 4 for last-place. **Packages:** Pkg 1 (+2 Speed): motorPower%=(S+2)×5 | Pkg 2 (+2 E): decay slows | Pkg 3 (+2 T): Ratio=0.2+(T+2)×0.02 | Pkg 4 (+2 P): (P+2)² | Pkg 5 (+3 Wild): team chooses largest gain.</div>
+  </div>
+</div>
+</div>
+    <div class="col">
+<div class="section grow">
+  <div class="section-label">Timing</div>
+  <table class="timing-table">
+    <tr><td class="t-time">0:00–0:05</td><td class="t-action">HTML Orientation</td><td class="t-focus">Show roadmap. Students read panels silently. Ask 2 comprehension questions per panel.</td></tr>
+    <tr><td class="t-time">0:05–0:07</td><td class="t-action">Practice Bid</td><td class="t-focus">Everyone makes fist, bids 0–3. State rule: 'Once hand opens, bid is final. No corrections, no bargaining.'</td></tr>
+    <tr><td class="t-time">0:07–0:17</td><td class="t-action">Auction (5 packages)</td><td class="t-focus">For each: (1) Announce boost, give 20 sec calc time. (2) Bid. (3) Winner states formula result aloud. (4) Update board, verify sum to 20. No result = no package.</td></tr>
+    <tr><td class="t-time">0:17–0:22</td><td class="t-action">Prediction Check</td><td class="t-focus">Revise Day 13 card: one dashboard number AND one sentence linking to new total. If vague: 'Which residual or output supports this?' No number = original stands.</td></tr>
+    <tr><td class="t-time">0:22–0:24</td><td class="t-action">Card Gate</td><td class="t-focus">Check: original visible, revision below if changed, one number, explanation sentence. Missing = 60-sec fix before matches.</td></tr>
+    <tr><td class="t-time">0:24–0:27</td><td class="t-action">Wrap</td><td class="t-focus">Read cards. Select one formula bid, revoice reasoning, ask room to restate. Name the practice: 'quantitative reasoning.'</td></tr>
+    <tr class="hard-row"><td class="t-time">0:27–0:30</td><td class="t-action">Exit Check</td><td class="t-focus">Each team: what stat changed and what it does—one number. If stuck, use formula card. Do not start matches until all answer.</td></tr>
+  </table>
+</div></div>
+    <div class="col">
+<div class="section">
+  <div class="section-label">Say This</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Open</span><div class="say-quote">The page shows the process. We go through it once before bidding so nobody loses tokens.</div></div>
+    <div class="say-item"><span class="say-tag">Enforcement</span><div class="say-quote">Once your hand opens, that is your bid. No corrections, no bargaining.</div></div>
+    <div class="say-item"><span class="say-tag">Prediction Redirect</span><div class="say-quote">I need a number from your dashboard—a residual, equation output, or win probability. Which one supports this?</div></div>
+    <div class="say-item"><span class="say-tag">Exit Check</span><div class="say-quote">What stat changed and what does it do to formula output? Give me one number.</div></div>
+    <div class="say-item"><span class="say-tag dont">Not This</span><div class="say-quote plain">We will do better because we have more power. / Allocation does not sum to 20. / That revision sounds good without a number.</div></div>
+  </div>
+</div>
+<div class="section grow">
+  <div class="section-label">Watch For → Redirect</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Team bids without calculating formula first</span><span class="watch-redirect">Require result aloud before confirming. No result = bid goes to next bidder.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Allocation does not sum to 20</span><span class="watch-redirect">Catch immediately. Do not open next package until verified.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Prediction revision has no data point</span><span class="watch-redirect">Send back. 'I need one number—residual, probability, or equation output.'</span></div>
+    <div class="watch-item"><span class="watch-trigger">Team compares +2 Speed to +2 Power as equivalent</span><span class="watch-redirect">Ask: 'Speed uses ×5, Power uses P². Are those the same?' Probe for nonlinear insight.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Exit check: team cannot state formula output</span><span class="watch-redirect">Point to reference card. Find the formula, calculate output. Minimum 30 sec.</span></div>
+  </div>
 </div></div>
   </div>
-  <div class="hard-stop"><span class="hard-stop-label">Hard Stop</span><span class="hard-stop-text">10:00 — Every auction winner's allocation sheet verified (sum = 20) and every Prediction Card revised with one number + one sentence before Percent Change begins.</span></div>
-  <div class="card-footer"><span>Velocity Arena · Day 14</span><span>Hook · LO 5.1, 9.1</span></div>
-</div></div></body></html>
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">Exit Check (0:27–0:30) is non-optional. If wrap runs long, drop adding-on, not exit check. Every team must answer one formula fact and one number before their first match. Do not start until all have answered.</span>
+  </div>
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · Day 14 of 20</span>
+    <span>Stat Auction + Prediction Check · Summer Sparks 2026</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

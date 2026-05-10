@@ -61,13 +61,13 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-01-bot-lore-gallery-walk.html"
       },
       {
-        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
+        "name": "Teach the Math",
         "mins": 45,
         "block": "Challenge Block",
-        "description": "Rehearse your 2-minute pre-match pitch. Format: 'Our stat optimization strategy is X, because [specific equation result]. Our opponent's predicted behavior is Y based on their [stat] allocation.' Then in the Teach the Math round, pick one calculation from your scouting report and explain it as if a visitor just walked in and has never seen the system. No bot jargon. Plain terms.",
-        "facilitatorDescription": "Teams rehearse their 2-minute pre-match pitch. Peer feedback after each: did they cite a specific number for every claim? Yes or no. Then the Teach the Math round: 3 minutes per team to explain one calculation in plain terms (no bot jargon). Room asks one follow-up per team: 'How did you get that specific number?' If the answer requires a calculation, do it on the board in real time.",
-        "script": "https://docs.google.com/document/d/1WPsfN7Gwbz809PmeEuuqzo5GNhcu8cyOpFxlT7JVdVg/edit?usp=drive_link",
-        "webpage": "https://velocity-arena-gold.vercel.app/lessons/pre-match-pitch.html",
+        "description": "The Teach the Math round, pick one calculation from the four weeks and explain it as if a visitor just walked in and has never seen the system. No bot jargon. Plain terms.",
+        "facilitatorDescription": "Teach the Math round: 3 minutes per team to explain one calculation in plain terms (no bot jargon). Room asks one follow-up per team: 'How did you get that specific number?' If the answer requires a calculation, do it on the board in real time.",
+        "script": "https://docs.google.com/document/d/1BUI5_XlppNhAiimv8aDCcuHaWTYVaPKSX_4rOGvZ1yU/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1YxCKCOr07VSMC8RnMHKfDmvni1-6dBP4/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-02-pitch-rehearsal-teach-math.html"
       },
       {
@@ -87,21 +87,30 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "worksheet": "https://drive.google.com/file/d/1B3wx_eZdLcpXvfKFcWDbhrGj3OJ6YzVN/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-03-match-day-3.html"
       },
+       {
+        "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
+        "mins": 15,
+        "block": "Challenge Block",
+        "description": "Same concept set as the Day 1 pre-task: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay. Same age-appropriate non-bot contexts. 15 minutes, individual. The only formal assessment of the day.",
+        "facilitatorDescription": "Parallel form of the Day 1 pre-task. Compare results to Day 1 per concept. The only formal assessment today.",
+        "script": "https://docs.google.com/document/d/1KYGrQCGgyWRPsgwlafFgnID0cetHfHpnEK8oQ3o7kr8/edit?usp=drive_link",
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic-post/index.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
+      },
       {
         "name": "Open Lab: Reflection + Pitch Refinement",
-        "mins": 15,
+        "mins": 30,
         "block": "Open Lab",
         "description": "Rehearse your pitch one more time as a team. Add specific numbers to any claim that is still vague. Every claim in the pitch needs a number next to it before tomorrow.",
         "facilitatorDescription": "Teams rehearse the pitch once more. Every vague claim needs a specific number. By end of session, every claim in every pitch has a number next to it.",
         "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?usp=drive_link",
-        "webpage": "https://velocity-arena-gold.vercel.app/lessons/open-lab-reflection.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-05-open-lab-pitch-bot-prep.html"
       },
       {
         "name": "ENDS Closing Ritual",
         "mins": 10,
         "block": "ENDS",
-        "description": "Describe a moment when the data changed your mind. What did you believe before you saw the data? What do you believe now? Name the specific number or calculation that changed your thinking. You have 5 minutes.",
+        "description": "What will you tell someone tomorrow at the Exhibition about what you learned? You have 5 minutes.",
         "facilitatorDescription": "Closing reflection. Each student names a moment where data changed their mind, with a specific number or calculation cited."
       }
     ]
@@ -120,23 +129,14 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
     "activities": [
       {
         "name": "Expert Setup",
-        "mins": 25,
+        "mins": 40,
         "block": "Hook",
         "description": "Set up your station: scouting report, bot, coordinate grid, and data dashboard on display. Practice teaching the three visitor mini-challenges on a teammate: unit rate calculation, coordinate distance, and proportional scaling explanation. Write down the one thing you want every visitor to understand before they leave.",
         "facilitatorDescription": "Teams set up their station: scouting report, bot, coordinate grid, dashboard on display. Practice teaching the three visitor mini-challenges on a teammate. Each team writes down the one thing they want every visitor to understand before they leave.",
         "script": "https://docs.google.com/document/d/1jcYn0LTmP2IHZHdX9WhYk0U2-2KKItI05cvSWAWhWbQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-01-expert-setup-exhibition-prep.html"
       },
-      {
-        "name": "Post-Task Diagnostic: Prior Knowledge Reassessment",
-        "mins": 15,
-        "block": "Challenge Block",
-        "description": "Same concept set as the Day 1 pre-task: proportional reasoning, unit rate, ratio, proportional scaling, coordinate geometry (including distance), slope as rate of change, and linear decay. Same age-appropriate non-bot contexts. 15 minutes, individual. The only formal assessment of the day.",
-        "facilitatorDescription": "Parallel form of the Day 1 pre-task. Compare results to Day 1 per concept. The only formal assessment today.",
-        "script": "https://docs.google.com/document/d/1KYGrQCGgyWRPsgwlafFgnID0cetHfHpnEK8oQ3o7kr8/edit?usp=drive_link",
-        "webpage": "https://velocity-arena-gold.vercel.app/activities/diagnostic-post/index.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
-      },
+      
       {
         "name": "Community Exhibition: Teaching Begins + Best Teacher Voting",
         "mins": 70,
@@ -147,7 +147,7 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-02-community-exhibition-teaching.html"
       },
       {
-        "name": "Lunch / Snack Break",
+        "name": " Snack Break",
         "mins": 20,
         "block": "Break",
         "description": "Eat and rest. The afternoon belongs to the ceremony and free time.",
@@ -162,6 +162,7 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "script": "https://docs.google.com/document/d/1XDCeJ8J2U_zF0_vdgpfAYD6L4EFX8oRX8ZoRXOLapJ8/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-01-walk-the-wall-final-gallery.html"
       },
+     
       {
         "name": "Awards Ceremony",
         "mins": 60,
@@ -171,8 +172,9 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "script": "https://docs.google.com/document/d/1FPkaluCh58L3kfr2E7mx8GKXUJpYzD9391KWC2kBKlQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-03-awards-ceremony.html"
       },
+      
       {
-        "name": "Open Lab: Final Debrief and Prep",
+        "name": "Open Lab: Final Debrief",
         "mins": 10,
         "block": "Open Lab",
         "description": "What did visitors understand quickly? What confused them? Identify one explanation that did not land and write a revised version. Prepare anything you want to say at the closing ceremony. Review the full data dashboard from Day 1 to today.",
@@ -185,7 +187,7 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "mins": 10,
         "block": "ENDS",
         "description": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes.",
-        "facilitatorDescription": "Final ENDS reflection. Each student names a specific moment where they solved something they thought they couldn't, and what they did differently than before camp."
+        "facilitatorDescription": "Final ENDS reflection. Each student writes what they learned about themselves as a problem solver. Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes."
       }
     ]
   }

@@ -43,14 +43,15 @@ const ACTIVITY_LESSONS = {
 
 'Formula Relay: All Five Types in One Race':
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Formula Race Cards"}],
-  'Season 1 Match Day 3': [{url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'}],
+  'Season 1 Match Day 3': {url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'},
   "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
+  'Season 1 Final Round':{url:'/lessons/analysis-block.html', label: 'Season 1 Analysis Block'},
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
   'Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep': [
     { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
     { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
   ],
-  'Underdog Mechanic Announced + Season 2 Stat Reallocation': '/lessons/season2-reallocation.html',
+  'Underdog Mechanic Announced + Season 2 Stat Reallocation':[{url:'/lessons/season2-reallocation.html', label: 'Season 2 reallocation'}], 
   'Final Proposal Verification': '/lessons/proposal-verification.html',
   'Building and Solving Linear Equations': '/lessons/day13-linear-equations.html',
   'Stat Auction + Prediction Check': '/lessons/stat-auction.html',
@@ -58,7 +59,9 @@ const ACTIVITY_LESSONS = {
   'Scouting Report Completion: Sections 3 and 4': '/lessons/scouting-report-helper.html',
   'What-If? Analysis': '/lessons/what-if-analysis.html',
   'Open Lab: Reflection Time': '/lessons/open-lab-reflection.html',
-  'Post-Task Diagnostic: Prior Knowledge Reassessment': '/activities/diagnostic-post/index.html',
+   'Post-Task Diagnostic: Prior Knowledge Reassessment': '/activities/diagnostic-post/index.html',
+    'Pre-Match Pitch Rehearsal + Teach the Math': '/lessons/pre-match-pitch.html',
+  'Teach the Math': '/lessons/pre-match-pitch-v2.html',
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
