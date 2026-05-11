@@ -74,5 +74,6 @@ function getLessonLinks(activityName) {
   const v = ACTIVITY_LESSONS[activityName];
   if (!v) return [];
   if (typeof v === 'string') return [{ url: v, label: null }];
-  return v;
+  if (Array.isArray(v)) return v;
+  return [v];
 }
