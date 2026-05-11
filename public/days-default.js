@@ -1310,7 +1310,9 @@ const DAYS_DEFAULT = [
         "description": "Your Championship opponent's stat card is face down on the table. Flip it. Read the numbers. Stand up for the one stat you fear most — your body is your vote. Then sketch a four-bar chart of their build and circle the biggest threat. One word on the board. That stat determines your ball mode and your Skills Arena target this afternoon.",
       "facilitatorDescription": "Championship opponent stat cards are waiting face down when students arrive. They flip, read, and vote physically — standing for the one stat they fear most. Then a quick bar chart sketch of the opponent's build, one circled threat. Six threat words go on the board, one per team, and students receive a direct promise: that stat determines their ball mode and Skills Arena focus in the afternoon session. No writing beyond one word and four bar labels. The physical vote replaces discussion and moves the room fast.",
       "script": "https://docs.google.com/document/d/13EAWLvzOpJzSWD48ie6-Ti6RsVMJySXtF03AYYh9Nz0/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-01-know-your-opponent.html"
+      "worksheet":[   {url:"https://drive.google.com/file/d/1ljfIn5Z6DYZtlghayZpXs3kWOYLz0KZU/view?usp=drive_link", label: "Bar Chart Worksheet"}],
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-01-know-your-opponent.html",
+        "exit":"https://drive.google.com/file/d/1n50E2Fy4FeQceL-OyZbNP6iAVKpseGL0/view?usp=drive_link"
       },
     
       {
@@ -1320,8 +1322,13 @@ const DAYS_DEFAULT = [
         "description": "Section 3: Use two of your opponent's data points to write their Speed vs. Goals trend line equation and make a prediction for Championship. Section 4: Write one strategy recommendation backed by an inequality constraint analysis -- show three loadouts that counter your opponent.",
         "facilitatorDescription": "Section 3: teams use two of the opponent's data points to write the Speed vs. Goals trend line equation and make a Championship prediction. Section 4: teams write one strategy recommendation backed by inequality constraint analysis, showing three counter-loadouts. Frame verbal check-ins as expert preparation ('walk me through one calculation as if I am a visitor'), not evaluation.",
         "script": "https://docs.google.com/document/d/1HnlCodPGtO0lxBhnOEEgnekpeWE2qCJEOyWTV5TmtTc/edit?usp=drive_link",
-        "template": "https://docs.google.com/document/d/1LELkBNge6avite1E60qRi_rU829oVV_M7FIyFNHyayg/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-02-scouting-report-sections-3-4.html"
+        "worksheet":[
+          {url: "https://drive.google.com/file/d/1t65kZ51Ftt7VnvsB3lBH1yhlji-lAKeq/view?usp=drive_link", label: "Opponent Cards"},
+          {url: "https://docs.google.com/document/d/1LELkBNge6avite1E60qRi_rU829oVV_M7FIyFNHyayg/edit?usp=drive_link", label: "Scouting Report"}
+        ] ,
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-02-scouting-report-sections-3-4.html",
+        "exit":"https://docs.google.com/document/d/16bh7jAHqHqX57liuVosHDTziCjyP9rx5S-iKLB-KrMg/edit?usp=sharing"
+
       },
       {
         "name": "Lunch / Snack Break",
@@ -1385,7 +1392,7 @@ const DAYS_DEFAULT = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-cold-retrieval-scouting-annotation.html"
       },
       {
-        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
+        "name": "Teach the Math",
         "mins": 45,
         "block": "Challenge Block",
         "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in.",

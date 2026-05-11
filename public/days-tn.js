@@ -37,9 +37,45 @@ const TN_OVERRIDES = (typeof DAYS_DEFAULT !== 'undefined') ? {
   14: { ...DAYS_DEFAULT[13], week: 4, weekName: 'Showcase Week' },
 } : {};
 
+// ── TN per-activity timing overrides ──────────────────────────
+// TN runs a shorter day (8:05–12:00 ≈ 3h55m vs default 10:00–2:45 ≈ 4h45m),
+// so many activities need shorter durations. Key by activity NAME (matched
+// exactly) → new mins. Applies to every Day 1–14 occurrence of that name.
+//
+// Edge case: if two activities on different days share a name but need
+// different TN minutes, key by "Day N:Activity Name" instead — see the
+// `${d.day}:${a.name}` lookup in tnPatchDay below; it falls back to the
+// plain name if the day-scoped key is missing.
+const TN_ACTIVITY_MINS = {
+  // 'Activity name exactly as it appears in days-default.js': minutesForTN,
+  // 'Day 2:Activity name': minutesForTN,   // day-scoped override
+  'Day 1:Open Lab: Free Code Time':20,
+  'Day 2:Program Endurance Into Your Bot': 70,
+
+};
+
+// Activities to DROP entirely from TN. Same key shape as TN_ACTIVITY_MINS:
+// either 'Activity Name' (drops on every day) or 'Day N:Activity Name'
+// (drops only on that day).
+const TN_ACTIVITY_SKIP = new Set([
+  'Day 2:Open Lab: Free Code Time',
+]);
+
+function tnPatchDay(d) {
+  const acts = d.activities
+    .filter(a => !TN_ACTIVITY_SKIP.has(`Day ${d.day}:${a.name}`) && !TN_ACTIVITY_SKIP.has(a.name))
+    .map(a => {
+      const scoped = TN_ACTIVITY_MINS[`Day ${d.day}:${a.name}`];
+      const plain  = TN_ACTIVITY_MINS[a.name];
+      const mins = scoped != null ? scoped : (plain != null ? plain : null);
+      return mins != null ? { ...a, mins } : a;
+    });
+  return { ...d, activities: acts };
+}
+
 const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
-  // ── Days 1–14: inherit from default, with TN_OVERRIDES applied ──
-  ...DAYS_DEFAULT.slice(0, 14).map(d => TN_OVERRIDES[d.day] || d),
+  // ── Days 1–14: inherit from default, apply TN_OVERRIDES, then patch timing ──
+  ...DAYS_DEFAULT.slice(0, 14).map(d => tnPatchDay(TN_OVERRIDES[d.day] || d)),
 
   // ── Day 15 (TN) — Creative Expression: Bot Identity + Scouting ────
   {
