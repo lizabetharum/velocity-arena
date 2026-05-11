@@ -1349,13 +1349,13 @@ const DAYS_DEFAULT = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-03-commissioners-meeting-pt1.html"
       },
       {
-        "name": "Open Lab: Championship Loadout Verification",
+        "name": "Open Lab: Recalculate + Scout",
         "mins": 45,
         "block": "Open Lab",
         "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
         "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
         "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-championship-loadout.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
       }
     ],
     "produce": [
@@ -1381,19 +1381,10 @@ const DAYS_DEFAULT = [
     "theme": "Championship Prep: Pre-Match Pitch Rehearsal + Final Adjustments",
     "bigMathIdea": "What-if analysis. A hypothetical constraint forces recalculation of every affected loadout. Practice surfacing which stats move and which don't.",
     "activities": [
+      
       {
-        "name": "Cold Retrieval + Scouting Annotation",
-        "mins": 25,
-        "block": "Ice Breaker",
-        "description": "Part 1 (8 min): From memory, write down five numbers -- your opponent's Speed motor power, their Endurance decay rate, their Season 1 best single-match goal count, your own Endurance output at t = 3, and your Speed motor power. Part 2 (17 min): All scouting reports go up. Read your opponent's report about your team. Find one calculation they got right and one they got wrong. Annotate with sticky notes.",
-        "facilitatorDescription": "Part 1 (8 min): from memory, students write five numbers -- opponent's Speed motor power, Endurance decay rate, Season 1 best single-match goal count, own Endurance output at t = 3, and own Speed motor power. Part 2 (17 min): post all scouting reports. Teams read the opponent's report about them, find one calculation the opponent got right and one they got wrong, and annotate with sticky notes.",
-        "script": "https://docs.google.com/document/d/1CqRMPNEMrwuD__AO8xXUpXKYu7z0FRbgVkU47bvCDv0/edit?usp=drive_link",
-        "template": "https://docs.google.com/document/d/1LELkBNge6avite1E60qRi_rU829oVV_M7FIyFNHyayg/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-cold-retrieval-scouting-annotation.html"
-      },
-      {
-        "name": "Teach the Math",
-        "mins": 45,
+        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
+        "mins": 50,
         "block": "Challenge Block",
         "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in.",
         "facilitatorDescription": "Teams rehearse a 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback centers on one question: did they cite a specific number for every claim? Each team then picks one calculation and explains it in plain language, visitor-ready. Every claim in the pitch needs a number next to it before teams leave -- 'Our bot is fast' scores zero; 'Speed = 7 gives us 35% motor power' scores full points.",
