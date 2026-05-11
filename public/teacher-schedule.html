@@ -270,9 +270,15 @@ function renderPills(selectedDay) {
   const nodes = [];
   for (let i = 1; i <= total; i++) {
     nodes.push(`<a href="#day-${i}" class="nav-pill${i === selectedDay ? ' active' : ''}" onclick="selectDay(${i});return false;">${i}</a>`);
-    // Week dividers — every 5 days, but never after the final day.
-    if ((i === 5 || i === 10 || i === 15) && i < total) {
-      nodes.push('<div class="nav-pill-sep"></div>');
+    // Week dividers — placed wherever the next day belongs to a different
+    // week. Works for both the 20-day default (boundaries at 5/10/15) and
+    // the 16-day TN schedule (boundaries at 4/8/12).
+    if (i < total) {
+      const me = DAYS.find(x => x.day === i);
+      const next = DAYS.find(x => x.day === i + 1);
+      if (me && next && me.week !== next.week) {
+        nodes.push('<div class="nav-pill-sep"></div>');
+      }
     }
   }
   pills.innerHTML = nodes.join('');
