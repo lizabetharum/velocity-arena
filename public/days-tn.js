@@ -56,7 +56,11 @@ const TN_ACTIVITY_PATCH = {
   'Day 6:Open Lab: Free Code or Final Verification': 10,
   'Day 8:Season 1 Match Day 2': 80,
   // Snack rename + 20-min cap applies everywhere TN has a Lunch slot.
-  'Lunch / Snack Break': { name: 'Snack Break', mins: 20 },
+  'Lunch / Snack Break': {
+    name: 'Snack Break',
+    mins: 20,
+    facilitatorDescription: 'Eat and rest. 20-minute protected break. No math talk.',
+  },
 };
 
 // Activities to DROP entirely from TN. Same key shape as TN_ACTIVITY_PATCH:
