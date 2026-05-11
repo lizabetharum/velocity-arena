@@ -37,48 +37,55 @@ const TN_OVERRIDES = (typeof DAYS_DEFAULT !== 'undefined') ? {
   14: { ...DAYS_DEFAULT[13], week: 4, weekName: 'Showcase Week' },
 } : {};
 
-// ── TN per-activity timing overrides ──────────────────────────
+// ── TN per-activity patches ───────────────────────────────────
 // TN runs a shorter day (8:05–12:00 ≈ 3h55m vs default 10:00–2:45 ≈ 4h45m),
-// so many activities need shorter durations. Key by activity NAME (matched
-// exactly) → new mins. Applies to every Day 1–14 occurrence of that name.
+// so many activities need shorter durations or different labels.
 //
-// Edge case: if two activities on different days share a name but need
-// different TN minutes, key by "Day N:Activity Name" instead — see the
-// `${d.day}:${a.name}` lookup in tnPatchDay below; it falls back to the
-// plain name if the day-scoped key is missing.
-const TN_ACTIVITY_MINS = {
-  // 'Activity name exactly as it appears in days-default.js': minutesForTN,
-  // 'Day 2:Activity name': minutesForTN,   // day-scoped override
-  'Day 1:Open Lab: Free Code Time':20,
+// Values may be a NUMBER (shorthand for { mins: N }) or an OBJECT with any
+// subset of { mins, name, ... } to merge in. Key shapes:
+//   'Activity Name'         applies on every day that activity appears
+//   'Day N:Activity Name'   applies only on Day N (wins over the plain key)
+const TN_ACTIVITY_PATCH = {
+  'Day 1:Open Lab: Free Code Time': 20,
   'Day 2:Program Endurance Into Your Bot': 70,
-
+  'Day 3:Human Robot Programming Challenge': 20,
+  'Day 3:Distance-Time Graphs': 70,
+  'Day 3:Open Lab: Free Code Time': 25,
+  'Day 5:Open Lab: Free Code Time': 25,
+  'Day 6:Launch Showcase': 15,
+  'Day 6:Open Lab: Free Code or Final Verification': 10,
+  'Day 8:Season 1 Match Day 2': 80,
+  // Snack rename + 20-min cap applies everywhere TN has a Lunch slot.
+  'Lunch / Snack Break': { name: 'Snack Break', mins: 20 },
 };
 
-// Activities to DROP entirely from TN. Same key shape as TN_ACTIVITY_MINS:
-// either 'Activity Name' (drops on every day) or 'Day N:Activity Name'
-// (drops only on that day).
+// Activities to DROP entirely from TN. Same key shape as TN_ACTIVITY_PATCH:
+// 'Activity Name' drops on every day; 'Day N:Activity Name' drops only that day.
 const TN_ACTIVITY_SKIP = new Set([
   'Day 2:Open Lab: Free Code Time',
+  'Day 3:Energy Reset',
 ]);
 
 function tnPatchDay(d) {
   const acts = d.activities
     .filter(a => !TN_ACTIVITY_SKIP.has(`Day ${d.day}:${a.name}`) && !TN_ACTIVITY_SKIP.has(a.name))
     .map(a => {
-      const scoped = TN_ACTIVITY_MINS[`Day ${d.day}:${a.name}`];
-      const plain  = TN_ACTIVITY_MINS[a.name];
-      const mins = scoped != null ? scoped : (plain != null ? plain : null);
-      return mins != null ? { ...a, mins } : a;
+      const scoped = TN_ACTIVITY_PATCH[`Day ${d.day}:${a.name}`];
+      const plain  = TN_ACTIVITY_PATCH[a.name];
+      const patch  = scoped != null ? scoped : plain;
+      if (patch == null) return a;
+      const overrides = (typeof patch === 'number') ? { mins: patch } : patch;
+      return { ...a, ...overrides };
     });
   return { ...d, activities: acts };
 }
 
 const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
-  // ── Days 1–14: inherit from default, apply TN_OVERRIDES, then patch timing ──
+  // ── Days 1–14: inherit from default, apply TN_OVERRIDES, then patch ─────
   ...DAYS_DEFAULT.slice(0, 14).map(d => tnPatchDay(TN_OVERRIDES[d.day] || d)),
 
   // ── Day 15 (TN) — Creative Expression: Bot Identity + Scouting ────
-  {
+  tnPatchDay({
     "day": 15,
     "week": 4,
     "weekName": "Showcase Week",
@@ -150,12 +157,12 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "facilitatorDescription": "Closing reflection. Each student names a moment where data changed their mind, with a specific number or calculation cited."
       }
     ]
-  },
+  }),
 
   // ── Day 16 (TN) — Community Exhibition + Awards/Post-Task ─────────
   // Condenses default Days 19 + 20: Exhibition, Best Teacher voting,
   // Post-Task Diagnostic, Final Gallery Walk, Awards Ceremony.
-  {
+  tnPatchDay({
     "day": 16,
     "week": 4,
     "weekName": "Showcase Week",
@@ -183,7 +190,7 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-02-community-exhibition-teaching.html"
       },
       {
-        "name": " Snack Break",
+        "name": "Snack Break",
         "mins": 20,
         "block": "Break",
         "description": "Eat and rest. The afternoon belongs to the ceremony and free time.",
@@ -226,5 +233,5 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "facilitatorDescription": "Final ENDS reflection. Each student writes what they learned about themselves as a problem solver. Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes."
       }
     ]
-  }
+  })
 ] : [];
