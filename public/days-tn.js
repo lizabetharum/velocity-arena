@@ -57,7 +57,10 @@ const TN_ACTIVITY_PATCH = {
   'Day 8:Season 1 Match Day 2': 80,
   'Day 10:Open Lab: Season 2 Planning':20,
   'Day 11:Practice Matches: Test New Loadout Hypotheses':65,
-  'Day 12:Open Lab: Season 2 Allocation':50,
+  'Day 12:Open Lab: Season 2 Allocation Verification': {
+  name: 'Open Lab: Season 2 Allocation',
+  mins: 50
+},
   'Day 14:Open Lab: Equation Revision or Loadout Experiments':30,
   // Snack rename + 20-min cap applies everywhere TN has a Lunch slot.
   'Lunch / Snack Break': {
