@@ -24,7 +24,7 @@ const CONFIG = {
   // (last day of camp) by counting 20 weekdays forward from the start,
   // skipping weekends and any holidays listed below.
   siteStartDates: {
-    NY1: "2026-05-04",   // Gotham Tech
+    NY1: "2026-07-06",   // Gotham Tech
     NY2: "2026-07-13",   // Claremont International HS
     NY3: "2026-04-18",   // South Bronx Community
     TN:  "2026-06-29",   // Tennessee
@@ -92,7 +92,7 @@ const CONFIG = {
   //   2. File → Share → Publish to web → choose that tab → CSV → Publish.
   //   3. Paste the resulting URL between the quotes below.
   // Leave empty to show setup instructions on the lock-ins page.
-  whatIfLockinsCsvUrl: "",
+  whatIfLockinsCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=1131538118&single=true&output=csv",
 
   // Optional Apps Script Web App URL for auto-publishing the What-If URL
   // straight into the Google Sheet (no copy/paste). When set, the
