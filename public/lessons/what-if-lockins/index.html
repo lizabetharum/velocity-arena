@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Team Lock-Ins</title>
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<link rel="stylesheet" href="/styles/site-header.css">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { margin: 0; padding: 0; }
+body{
+  background:var(--bg-1);color:var(--fg-0);
+  font-family:var(--font-sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:var(--accent-ink);}
+
+/* ---- page wrapper ---- */
+.page{max-width:1100px;margin:0 auto;padding:36px 24px 80px;}
+.page-head{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.page-head .eyebrow{font:600 11px/1 var(--font-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--fg-2);margin:0 0 12px;}
+.page-head .eyebrow b{color:var(--accent);margin-right:8px;font-weight:600;}
+.page-head h1{font:800 32px/1.1 var(--font-sans);letter-spacing:-.02em;color:var(--fg-0);margin:0 0 8px;}
+.page-head .lede{font:400 14px/1.5 var(--font-sans);color:var(--fg-1);max-width:60ch;margin:0;}
+
+/* ---- toolbar ---- */
+.toolbar{display:flex;align-items:center;gap:14px;margin:0 0 24px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.toolbar .field{display:flex;align-items:center;gap:10px;}
+.toolbar label{font:700 10px/1 var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-2);}
+.toolbar select{font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 12px;border:1px solid var(--line-strong);border-radius:6px;color:var(--fg-0);background:var(--bg-3);cursor:pointer;}
+.toolbar select:hover,.toolbar select:focus{outline:none;border-color:var(--accent);}
+.toolbar select option{background:var(--bg-3);color:var(--fg-0);}
+.toolbar .btn{font-family:var(--font-sans);font-weight:700;font-size:12px;letter-spacing:.04em;padding:8px 16px;border-radius:6px;border:1px solid var(--line-strong);cursor:pointer;background:transparent;color:var(--fg-1);transition:background .15s,color .15s,border-color .15s;}
+.toolbar .btn:hover{background:var(--bg-3);color:var(--fg-0);border-color:var(--accent);}
+.toolbar .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+.toolbar .btn.primary:hover{background:var(--accent-bright);}
+.toolbar .meta{margin-left:auto;font:500 11px/1 var(--font-mono);color:var(--fg-2);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+
+/* ---- table ---- */
+.lockins-wrap{overflow-x:auto;background:var(--bg-2);border:1px solid var(--line-strong);border-radius:10px;}
+table.lockins{width:100%;border-collapse:collapse;font-size:13px;}
+table.lockins th{background:var(--bg-3);color:var(--fg-1);padding:10px 14px;font:700 10.5px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap;}
+table.lockins th:first-child{text-align:left;padding-left:20px;}
+table.lockins td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:center;color:var(--fg-1);font-variant-numeric:tabular-nums;}
+table.lockins td:first-child{text-align:left;font-weight:700;color:var(--fg-0);padding-left:20px;}
+table.lockins tr:last-child td{border-bottom:none;}
+table.lockins tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.stat-cell{font-weight:800;color:var(--fg-0);}
+.formula-cell{color:var(--fg-1);}
+.dec-cell{text-align:left !important;color:var(--fg-1);font-style:italic;max-width:340px;}
+.ts-cell{color:var(--fg-2);font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;}
+.team-cell .team-label{display:block;font-size:13px;color:var(--fg-0);}
+.team-cell .team-site{display:block;font:500 10px/1.4 var(--font-mono);color:var(--fg-2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px;}
+
+/* ---- status panels ---- */
+.status-card{background:var(--bg-2);border:1px solid var(--line-strong);border-radius:10px;padding:24px;}
+.status-card.warn{border-color:var(--warn);}
+.status-card.error{border-color:var(--error);}
+.status-card h3{font:700 15px/1.3 var(--font-sans);color:var(--fg-0);margin-bottom:8px;}
+.status-card p{font:400 13px/1.55 var(--font-sans);color:var(--fg-1);margin-bottom:8px;}
+.status-card code{font:500 12px/1 var(--font-mono);background:var(--bg-0);padding:2px 6px;border-radius:3px;color:var(--accent);}
+.status-card ol{margin:10px 0 6px 22px;color:var(--fg-1);font-size:13px;line-height:1.7;}
+
+footer{max-width:1100px;margin:48px auto 0;padding:24px;font:500 11px/1.4 var(--font-mono);color:var(--fg-2);text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<main class="page">
+
+  <section class="page-head">
+    <div>
+      <p class="eyebrow"><b>17</b>Lesson · Lock-Ins</p>
+      <h1>Team Lock-Ins</h1>
+      <p class="lede">Every team that's clicked <strong>Lock In Loadout</strong> shows up here with their final stats, key formula values, and written reasoning. Updates as students submit.</p>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="field">
+      <label for="siteFilter">Site</label>
+      <select id="siteFilter">
+        <option value="__all__">All sites</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="viewMode">View</label>
+      <select id="viewMode">
+        <option value="latest">Latest per team</option>
+        <option value="all">All submissions (history)</option>
+      </select>
+    </div>
+    <button class="btn primary" onclick="loadLockins()">Refresh</button>
+    <span class="meta" id="metaInfo">Loading…</span>
+  </div>
+
+  <div id="content">
+    <div class="status-card"><p>Loading lock-ins…</p></div>
+  </div>
+
+</main>
+
+<footer>
+  VELOCITY ARENA · TEAM LOCK-INS · NYC FIRST &middot;
+  <a href="/lessons/what-if/" style="color:inherit;">Back to picker</a>
+</footer>
+
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script>
+// ---- helpers ----
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function parseCsv(text) {
+  var rows = [];
+  var lines = String(text || '').replace(/\r\n/g, '\n').split('\n');
+  for (var L = 0; L < lines.length; L++) {
+    var line = lines[L];
+    if (!line.trim()) continue;
+    var cells = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (inQ) {
+        if (c === '"' && line[i+1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cur += c;
+      } else {
+        if (c === ',') { cells.push(cur); cur = ''; }
+        else if (c === '"') inQ = true;
+        else cur += c;
+      }
+    }
+    cells.push(cur);
+    rows.push(cells.map(function(s){ return s.trim(); }));
+  }
+  return rows;
+}
+
+function rowsToObjects(rows) {
+  if (!rows.length) return [];
+  var headers = rows[0].map(function(h){ return h.toLowerCase().trim(); });
+  return rows.slice(1).map(function(r) {
+    var obj = {};
+    for (var i = 0; i < headers.length; i++) obj[headers[i]] = (r[i] || '').trim();
+    return obj;
+  });
+}
+
+// Formula calcs match the lesson page exactly.
+function speedPower(s){ return Number(s) * 5; }
+function decayRate(e){ return (20 - Number(e)) * 1.5; }
+function chargeSpeed(p){ return Number(p) * Number(p); }
+function turnRatio(t){ return parseFloat((0.2 + Number(t) * 0.02).toFixed(2)); }
+
+function fmtTimestamp(raw) {
+  if (!raw) return '';
+  // Apps Script writes ISO-ish dates. Try to parse; fall back to raw.
+  var d = new Date(raw);
+  if (isNaN(d.getTime())) return raw;
+  return d.toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// Render header ribbon ASAP.
+if (typeof renderHeader === 'function') {
+  try { renderHeader(); } catch(e) { console.warn('renderHeader failed:', e); }
+}
+
+// Populate site filter dropdown from SITE_OPTIONS + add "All sites".
+(function initSiteFilter() {
+  var sel = document.getElementById('siteFilter');
+  if (!sel) return;
+  var opts = (typeof SITE_OPTIONS !== 'undefined') ? SITE_OPTIONS : [];
+  opts.forEach(function(o) {
+    var el = document.createElement('option');
+    el.value = o.label;
+    el.textContent = o.label;
+    sel.appendChild(el);
+  });
+  // Default the filter to the user's selected site, if any.
+  var mine = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  if (mine) {
+    var match = opts.find(function(o){ return o.code === mine; });
+    if (match) sel.value = match.label;
+  }
+  sel.addEventListener('change', render);
+  var view = document.getElementById('viewMode');
+  if (view) view.addEventListener('change', render);
+})();
+
+var allRows = [];
+var content = document.getElementById('content');
+var metaInfo = document.getElementById('metaInfo');
+
+function showStatus(html, kind) {
+  content.innerHTML = '<div class="status-card' + (kind ? ' ' + kind : '') + '">' + html + '</div>';
+}
+
+function render() {
+  if (!allRows.length) {
+    showStatus(
+      '<h3>No lock-ins yet.</h3>' +
+      '<p>Once a student clicks <strong>Lock In Loadout</strong> on the student lesson page, their row will show up here.</p>',
+      'warn'
+    );
+    metaInfo.textContent = '0';
+    return;
+  }
+  var site = document.getElementById('siteFilter').value;
+  var view = document.getElementById('viewMode').value;
+
+  var filtered = (site === '__all__')
+    ? allRows.slice()
+    : allRows.filter(function(r) {
+        return (r.site || '').toLowerCase() === site.toLowerCase();
+      });
+
+  if (view === 'latest') {
+    // Dedupe to latest-per-team
+    var byTeam = {};
+    filtered.forEach(function(r) {
+      var key = (r.site || '') + '|' + (r.team || '');
+      var prev = byTeam[key];
+      var rTs = new Date(r['submitted at'] || r.timestamp || 0).getTime();
+      var pTs = prev ? new Date(prev['submitted at'] || prev.timestamp || 0).getTime() : 0;
+      if (!prev || rTs > pTs) byTeam[key] = r;
+    });
+    filtered = Object.keys(byTeam).map(function(k){ return byTeam[k]; });
+  }
+
+  // Sort newest first
+  filtered.sort(function(a, b) {
+    var aTs = new Date(a['submitted at'] || a.timestamp || 0).getTime();
+    var bTs = new Date(b['submitted at'] || b.timestamp || 0).getTime();
+    return bTs - aTs;
+  });
+
+  if (!filtered.length) {
+    showStatus(
+      '<h3>No lock-ins for this site yet.</h3>' +
+      '<p>Switch to "All sites" or pick a different site above.</p>',
+      'warn'
+    );
+    metaInfo.textContent = '0 / ' + allRows.length;
+    return;
+  }
+
+  var siteCellMode = (site === '__all__');
+  var html = '<div class="lockins-wrap"><table class="lockins">';
+  html += '<thead><tr>' +
+    '<th>Team</th>' +
+    '<th>S</th><th>E</th><th>T</th><th>P</th>' +
+    '<th>Speed Pwr</th><th>Decay</th><th>Charge</th><th>Turn Ratio</th>' +
+    '<th>Decision</th>' +
+    '<th>Submitted</th>' +
+  '</tr></thead><tbody>';
+
+  filtered.forEach(function(r) {
+    var s = r.s || '0', e = r.e || '0', t = r.t || '0', p = r.p || '0';
+    var teamLabel = r.team || '(unnamed)';
+    var siteLabel = r.site || '';
+    var teamCell = siteCellMode
+      ? '<span class="team-label">' + esc(teamLabel) + '</span>' +
+        (siteLabel ? '<span class="team-site">' + esc(siteLabel) + '</span>' : '')
+      : '<span class="team-label">' + esc(teamLabel) + '</span>';
+    html += '<tr>';
+    html += '<td class="team-cell">' + teamCell + '</td>';
+    html += '<td class="stat-cell">' + esc(s) + '</td>';
+    html += '<td class="stat-cell">' + esc(e) + '</td>';
+    html += '<td class="stat-cell">' + esc(t) + '</td>';
+    html += '<td class="stat-cell">' + esc(p) + '</td>';
+    html += '<td class="formula-cell">' + speedPower(s) + '</td>';
+    html += '<td class="formula-cell">' + decayRate(e) + '</td>';
+    html += '<td class="formula-cell">' + chargeSpeed(p) + '</td>';
+    html += '<td class="formula-cell">' + turnRatio(t) + '</td>';
+    html += '<td class="dec-cell">' + (r.decision ? esc(r.decision) : '<span style="color:var(--fg-3)">—</span>') + '</td>';
+    html += '<td class="ts-cell">' + esc(fmtTimestamp(r['submitted at'])) + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = html;
+  metaInfo.textContent = filtered.length + ' / ' + allRows.length + ' shown';
+}
+
+function loadLockins() {
+  var url = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfLockinsCsvUrl : '';
+  if (!url) {
+    showStatus(
+      '<h3>Lock-Ins viewer isn\'t configured yet.</h3>' +
+      '<p>To activate this page:</p>' +
+      '<ol>' +
+        '<li>In Google Sheets, click the <strong>Student Lock-Ins</strong> tab (auto-created the first time a student clicks Lock In Loadout).</li>' +
+        '<li>File → Share → Publish to web → choose that tab → CSV → <strong>Publish</strong>.</li>' +
+        '<li>Paste the resulting URL into <code>public/config.js</code> as <code>whatIfLockinsCsvUrl</code>.</li>' +
+        '<li>Commit + push.</li>' +
+      '</ol>',
+      'warn'
+    );
+    metaInfo.textContent = 'NOT CONFIGURED';
+    return;
+  }
+  metaInfo.textContent = 'Loading…';
+  fetch(url, { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(txt) {
+      var rows = parseCsv(txt);
+      allRows = rowsToObjects(rows);
+      render();
+    })
+    .catch(function(err) {
+      console.error('Lock-ins fetch failed:', err);
+      showStatus(
+        '<h3>Couldn\'t load lock-ins.</h3>' +
+        '<p>Tried: <code>' + esc(url) + '</code></p>' +
+        '<p>Error: <code>' + esc(err.message) + '</code></p>' +
+        '<p>Most common cause: the Student Lock-Ins tab isn\'t published to web yet.</p>',
+        'error'
+      );
+      metaInfo.textContent = 'ERROR';
+    });
+}
+
+loadLockins();
+</script>
+</body>
+</html>

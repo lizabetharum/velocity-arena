@@ -82,6 +82,18 @@ const CONFIG = {
   TN:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=37878490&single=true&output=csv",
   },
 
+  // Published Google Sheet (CSV) URL for the "Student Lock-Ins" tab.
+  // The /lessons/what-if-lockins/ page reads this to show facilitators
+  // every team's final locked loadout for their site.
+  //
+  // Setup:
+  //   1. In Google Sheets, click the "Student Lock-Ins" tab (auto-created
+  //      the first time a student clicks Lock In Loadout).
+  //   2. File → Share → Publish to web → choose that tab → CSV → Publish.
+  //   3. Paste the resulting URL between the quotes below.
+  // Leave empty to show setup instructions on the lock-ins page.
+  whatIfLockinsCsvUrl: "",
+
   // Optional Apps Script Web App URL for auto-publishing the What-If URL
   // straight into the Google Sheet (no copy/paste). When set, the
   // recalculator shows a "Publish to Sheet" button beside Generate URL.
@@ -89,6 +101,5 @@ const CONFIG = {
   // bound to the same spreadsheet that whatIfSheetCsvUrl reads from).
   // Leave empty to disable auto-publish (Generate Shareable URL still works).
   whatIfPublishEndpoint: "https://script.google.com/macros/s/AKfycbz2OauwNlB16epK02Asw3SGRNnlrLwBA2ykZVwOZvYvcVQBmXdpuSNsjEhdkStq1BUyJw/exec"
- 
 
 };
