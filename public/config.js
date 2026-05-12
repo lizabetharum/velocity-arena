@@ -54,13 +54,26 @@ const CONFIG = {
   // Change this before sharing the site with students.
   teacherPassword: "velocityNYCFIRST2026",
 
-  // Published Google Sheet (CSV) URL for the per-site What-If lesson URLs.
+  // Published Google Sheet (CSV) URL(s) for the per-site What-If lesson URLs.
   // The picker page at /lessons/what-if/ reads this to render a "Pick your
-  // site" card. To set up:
-  //   1. Create a Google Sheet with columns: Site, URL, Rules, Last Updated
-  //   2. File → Share → Publish to web → CSV → Publish
-  //   3. Paste the resulting CSV URL here (looks like:
-  //      https://docs.google.com/spreadsheets/d/e/.../pub?output=csv)
+  // site" card.
+  //
+  // Two supported shapes:
+  //
+  //   A) Single shared sheet (one tab, everyone's row in it):
+  //      whatIfSheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
+  //
+  //   B) Per-site tabs (each site owns its own tab, can be protected
+  //      individually — recommended for multi-site programs):
+  //      whatIfSheetCsvUrl: {
+  //        NY1: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&output=csv",
+  //        NY2: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=12345&output=csv",
+  //        NY3: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=67890&output=csv",
+  //        TN:  "https://docs.google.com/spreadsheets/d/e/.../pub?gid=11111&output=csv",
+  //      }
+  //      Each tab's CSV URL differs only by the gid= parameter. Get it from
+  //      Sheets: File → Share → Publish to web → choose the tab → CSV → Publish.
+  //
   // Leave empty to show teacher setup instructions on the picker page.
   whatIfSheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?output=csv"
 

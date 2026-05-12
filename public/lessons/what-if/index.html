@@ -160,8 +160,30 @@ footer{max-width:1000px;margin:48px auto 0;padding:24px;font:500 11px/1.4 var(--
       <h4>4. Generate and paste each site's URL</h4>
       <p>Each site's facilitator opens <code>/lessons/what-if-loadout-recalculator.html</code>, configures their Commissioner rules and teams, clicks <strong>Generate Shareable URL</strong>, and pastes the URL into their row in the sheet. Updates take effect the next time a student opens this page (no redeploy needed).</p>
 
-      <h4>Tab protection (optional)</h4>
-      <p>Give each site its own tab and use Google Sheets <em>Protect range</em> on the other tabs so a teacher at Gotham Tech can't accidentally clobber Crosstown's URL. Publish each tab separately and add them to <code>whatIfSheetCsvUrl</code> via a switch by site code — let me know if you want that wired up.</p>
+      <h4>Per-site tabs with protection (recommended for multi-site programs)</h4>
+      <p>If you want each site's facilitator to own their own row without any chance of accidentally editing another site's URL, give each site its own tab:</p>
+      <ol>
+        <li>In the Sheet, add a tab per site (e.g. <code>NY1</code>, <code>NY2</code>, <code>NY3</code>, <code>TN</code>) with the same column headers (Site, URL, Rules, Last Updated).</li>
+        <li>For each tab, use <strong>Data → Protect sheets and ranges</strong> to restrict edit access to that site's facilitator.</li>
+        <li>For each tab, <strong>File → Share → Publish to web</strong>, pick that specific tab in the dropdown, choose CSV, click <strong>Publish</strong>. Note the URL — it has a <code>gid=&lt;number&gt;</code> param identifying the tab.</li>
+        <li>In <code>public/config.js</code>, replace the single <code>whatIfSheetCsvUrl: "..."</code> with an object keyed by site code:</li>
+      </ol>
+      <p style="white-space:pre;font:500 12px/1.5 var(--font-mono);background:var(--bg-0);padding:10px 14px;border-radius:6px;color:var(--accent);overflow-x:auto;">whatIfSheetCsvUrl: {
+  NY1: "https://docs.google.com/.../pub?gid=0&output=csv",
+  NY2: "https://docs.google.com/.../pub?gid=12345&output=csv",
+  NY3: "https://docs.google.com/.../pub?gid=67890&output=csv",
+  TN:  "https://docs.google.com/.../pub?gid=11111&output=csv",
+}</p>
+      <p>The picker fetches all four tabs in parallel and merges them. Any tab that fails to load (sheet not published, range protected too aggressively) shows up as a disabled card with "No URL yet" — the other sites keep working.</p>
+
+      <h4>If a single site's facilitator only has their own row</h4>
+      <p>When using per-site tabs, each tab typically holds <strong>one</strong> row of data. The Site column can be left blank — the picker defaults it to the site code on that tab. So a Crosstown tab can be just:</p>
+      <table>
+        <thead><tr><th>Site</th><th>URL</th><th>Rules</th><th>Last Updated</th></tr></thead>
+        <tbody>
+          <tr><td><em>(blank)</em></td><td>https://…#eyJ…</td><td>E ≤ 7</td><td>2026-06-04</td></tr>
+        </tbody>
+      </table>
     </div>
   </details>
 
@@ -240,43 +262,68 @@ function showStatus(html, kind) {
   if (howto) howto.open = true;
 }
 
-function renderSites(entries) {
+// Merge SITE_OPTIONS (the canonical site list from site.js) with the sheet
+// rows so every configured site always renders a card, even if the
+// facilitator hasn't published its URL yet. Sheet rows that don't match
+// any SITE_OPTIONS entry are appended at the end so nothing's hidden.
+function mergeSitesWithSheet(sheetRows) {
+  var byCode = {};
+  var unmatched = [];
+  sheetRows.forEach(function(e) {
+    var code = siteCodeFor(e.site);
+    if (code) byCode[code] = e;
+    else unmatched.push(e);
+  });
+  var merged = [];
+  var siteOpts = (typeof SITE_OPTIONS !== 'undefined') ? SITE_OPTIONS : [];
+  siteOpts.forEach(function(opt) {
+    var row = byCode[opt.code] || {};
+    merged.push({
+      siteName: row.site || opt.label,
+      code: opt.code,
+      url: row.url || '',
+      rules: row.rules || '',
+      updated: row['last updated'] || row.updated || ''
+    });
+  });
+  // Append unmatched sheet rows so a teacher who typoed the site name still
+  // sees their entry instead of having it silently dropped.
+  unmatched.forEach(function(e) {
+    merged.push({
+      siteName: e.site || '(unnamed)',
+      code: null,
+      url: e.url || '',
+      rules: e.rules || '',
+      updated: e['last updated'] || e.updated || ''
+    });
+  });
+  return merged;
+}
+
+function renderSites(sheetRows) {
+  var entries = mergeSitesWithSheet(sheetRows);
   if (!entries.length) {
     showStatus(
-      '<h3>No sites are listed in the sheet yet.</h3>' +
-      '<p>The connected sheet has its header row but no data rows. Each site\'s facilitator needs to add their row.</p>' +
-      '<p><strong>To add a row:</strong></p>' +
-      '<ol>' +
-        '<li>Open <a href="/lessons/what-If-loadout-recalculator.html" style="color:var(--accent)">the What-If lesson page</a> and click <strong>⚙ Facilitator Setup</strong>.</li>' +
-        '<li>Set today\'s Commissioner rule(s) and your teams.</li>' +
-        '<li>Click <strong>Generate Shareable URL</strong> (it auto-copies).</li>' +
-        '<li>Open the Google Sheet and paste the URL into the <code>URL</code> column, with your site name in <code>Site</code>.</li>' +
-      '</ol>' +
-      '<p>This page picks up the new row on its next refresh — no redeploy needed.</p>',
+      '<h3>No sites configured.</h3>' +
+      '<p>SITE_OPTIONS in <code>site.js</code> is empty and the sheet has no rows. Add at least one site code in <code>site.js</code> to get started.</p>',
       'warn'
     );
     metaInfo.textContent = '0 SITES';
     return;
   }
+  var anyUrls = entries.some(function(e){ return !!e.url; });
   var mine = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
   var html = '<div class="sites-grid">';
   entries.forEach(function(e) {
-    var siteName = e.site || '(unnamed)';
-    var url = e.url || '';
-    var rules = e.rules || '';
-    var updated = e['last updated'] || e.updated || '';
-    var code = siteCodeFor(e.site);
-    var isMine = mine && code === mine;
-    var disabled = !url;
+    var isMine = mine && e.code === mine;
+    var disabled = !e.url;
     var cardCls = 'site-card' + (isMine ? ' is-mine' : '') + (disabled ? ' disabled' : '');
-    var rulesHtml = rules
-      ? esc(rules)
-      : '<em>(no rule listed yet)</em>';
-    var updatedHtml = updated ? 'Updated ' + esc(updated) : '';
+    var rulesHtml = e.rules ? esc(e.rules) : '<em>(no rule listed yet)</em>';
+    var updatedHtml = e.updated ? 'Updated ' + esc(e.updated) : '';
     var ctaText = disabled ? 'No URL yet' : 'Open lesson →';
-    var hrefAttr = disabled ? '' : ' href="' + esc(url) + '"';
+    var hrefAttr = disabled ? '' : ' href="' + esc(e.url) + '"';
     html += '<a class="' + cardCls + '"' + hrefAttr + ' rel="noopener">' +
-      '<div class="name">' + esc(siteName) + '</div>' +
+      '<div class="name">' + esc(e.siteName) + '</div>' +
       '<div class="rules-label">Commissioner rule</div>' +
       '<div class="rules">' + rulesHtml + '</div>' +
       (updatedHtml ? '<div class="updated">' + updatedHtml + '</div>' : '') +
@@ -284,15 +331,56 @@ function renderSites(entries) {
     '</a>';
   });
   html += '</div>';
+
+  // If the sheet has no URLs published yet, show a setup banner above the
+  // cards so the next steps are obvious without making the cards disappear.
+  if (!anyUrls) {
+    html = '<div class="status-card warn" style="margin-bottom:18px">' +
+      '<h3>No URLs published yet.</h3>' +
+      '<p>Every site below is showing as <em>No URL yet</em>. To activate a site:</p>' +
+      '<ol>' +
+        '<li>Open <a href="/lessons/what-If-loadout-recalculator.html" style="color:var(--accent)">the What-If lesson page</a> and click <strong>⚙ Facilitator Setup</strong>.</li>' +
+        '<li>Set the Commissioner rule(s) and teams, click <strong>Generate Shareable URL</strong>.</li>' +
+        '<li>Paste it into your row in the Google Sheet.</li>' +
+      '</ol>' +
+    '</div>' + html;
+  }
+
   content.innerHTML = html;
+  // Trigger any auto-open behavior in the showStatus helper above by hand —
+  // we want the Teachers panel open whenever URLs are missing.
+  if (!anyUrls) {
+    var howto = document.querySelector('.howto');
+    if (howto) howto.open = true;
+  }
   var filled = entries.filter(function(e){ return !!e.url; }).length;
   metaInfo.textContent = filled + ' / ' + entries.length + ' SITES READY';
 }
 
 // ---- load ----
+// Normalize CONFIG.whatIfSheetCsvUrl into a list of fetch targets so the
+// picker handles both supported shapes:
+//   - string: single shared sheet (one tab); rows have their own Site column.
+//   - object: per-site tabs keyed by site code (NY1/NY2/NY3/TN). Each tab's
+//     CSV usually has one row of data; we tag rows missing a Site cell with
+//     the tab's code.
+function resolveCsvTargets() {
+  var conf = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfSheetCsvUrl : '';
+  if (!conf) return [];
+  if (typeof conf === 'string') return [{ code: null, url: conf }];
+  if (typeof conf === 'object') {
+    var out = [];
+    Object.keys(conf).forEach(function(k) {
+      if (conf[k]) out.push({ code: k, url: conf[k] });
+    });
+    return out;
+  }
+  return [];
+}
+
 (function init() {
-  var url = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfSheetCsvUrl : '';
-  if (!url) {
+  var targets = resolveCsvTargets();
+  if (!targets.length) {
     showStatus(
       '<h3>The site picker isn\'t configured yet.</h3>' +
       '<p>To activate this page, a facilitator needs to:</p>' +
@@ -308,27 +396,52 @@ function renderSites(entries) {
     return;
   }
   metaInfo.textContent = 'Loading…';
-  fetch(url, { cache: 'no-store' })
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    })
-    .then(function(txt) {
-      var rows = parseCsv(txt);
-      var objs = rowsToObjects(rows);
-      renderSites(objs);
-    })
-    .catch(function(err) {
-      console.error('What-If picker — failed to load sheet:', err);
+
+  // Fetch all targets in parallel, tolerate individual failures.
+  Promise.allSettled(targets.map(function(t) {
+    return fetch(t.url, { cache: 'no-store' })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + (t.code || 'sheet'));
+        return r.text();
+      })
+      .then(function(txt) {
+        var rows = parseCsv(txt);
+        var objs = rowsToObjects(rows);
+        // Per-tab CSVs commonly omit the Site column (the tab IS the site).
+        // Default any blank Site cell to the tab's code.
+        if (t.code) {
+          objs.forEach(function(o) { if (!o.site) o.site = t.code; });
+        }
+        return objs;
+      });
+  })).then(function(results) {
+    var rows = [];
+    var failures = [];
+    results.forEach(function(r, i) {
+      if (r.status === 'fulfilled') {
+        rows = rows.concat(r.value);
+      } else {
+        failures.push({ target: targets[i], reason: r.reason });
+        console.warn('What-If picker — failed target:', targets[i], r.reason);
+      }
+    });
+    // All targets failed → error state. Some failed → render what we have
+    // and log warnings; the per-site cards for missing sites will simply
+    // show 'No URL yet' which is the correct affordance.
+    if (failures.length === targets.length) {
+      var first = failures[0];
       showStatus(
         '<h3>Couldn\'t load the site list.</h3>' +
-        '<p>Tried fetching: <code>' + esc(url) + '</code></p>' +
-        '<p>Error: <code>' + esc(err.message) + '</code></p>' +
+        '<p>Tried fetching: <code>' + esc(first.target.url) + '</code></p>' +
+        '<p>Error: <code>' + esc((first.reason && first.reason.message) || String(first.reason)) + '</code></p>' +
         '<p>Most common causes: the sheet isn\'t published, the URL has a typo, or the sheet isn\'t public. See the Teachers panel below.</p>',
         'error'
       );
       metaInfo.textContent = 'ERROR';
-    });
+      return;
+    }
+    renderSites(rows);
+  });
 })();
 </script>
 </body>
