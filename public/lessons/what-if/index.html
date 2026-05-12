@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Pick Your Site (What-If Lesson)</title>
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<style>
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { margin: 0; padding: 0; }
+body{
+  background:var(--bg-1);color:var(--fg-0);
+  font-family:var(--font-sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent);color:var(--accent-ink);}
+
+/* topnav */
+.topnav{position:sticky;top:0;z-index:10;background:var(--bg-0);border-bottom:1px solid var(--line-strong);padding:14px 32px 0;}
+.topnav .row{display:flex;align-items:center;gap:28px;max-width:1400px;margin:0 auto;}
+.topnav .brand{font:800 13px/1 var(--font-sans);letter-spacing:.04em;color:var(--fg-0);display:flex;align-items:center;gap:8px;text-decoration:none;}
+.topnav .brand .mark{width:18px;height:18px;background:var(--accent);display:inline-block;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
+.topnav nav{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
+.topnav nav a{font:600 11.5px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);padding:14px;text-decoration:none;position:relative;white-space:nowrap;transition:color var(--dur-1) var(--ease-out);}
+.topnav nav a:hover{color:var(--fg-0);}
+.topnav .util{font:600 11px/1 var(--font-mono);color:var(--fg-1);letter-spacing:.04em;padding-bottom:14px;}
+.topnav .accent-rule{height:1px;background:var(--line-cyan);margin:0 -32px;}
+@media (max-width:780px){.topnav nav{display:none;}}
+
+/* page wrapper */
+.page{max-width:1000px;margin:0 auto;padding:48px 24px 80px;}
+.page-head{margin-bottom:36px;}
+.page-head .eyebrow{font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-2);margin:0 0 12px;}
+.page-head .eyebrow b{color:var(--accent);margin-right:8px;font-weight:600;}
+.page-head h1{font:800 36px/1.05 var(--font-sans);letter-spacing:-.02em;color:var(--fg-0);margin:0 0 10px;}
+.page-head .lede{font:400 14px/1.5 var(--font-sans);color:var(--fg-1);max-width:60ch;margin:0;}
+
+/* sec-head */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin:32px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line);}
+.sec-head h2{font:700 16px/1 var(--font-sans);letter-spacing:-.005em;margin:0;color:var(--fg-0);}
+.sec-head h2 small{font:400 13px/1.4 var(--font-sans);color:var(--fg-2);margin-left:12px;letter-spacing:0;}
+.sec-head .meta{font:500 11px/1 var(--font-mono);color:var(--fg-2);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+
+/* site cards grid */
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.site-card{
+  background:var(--bg-2);border:1px solid var(--line-strong);
+  border-radius:var(--r-md);padding:18px 18px 16px;
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  transition:border-color var(--dur-1) var(--ease-out),background var(--dur-1) var(--ease-out),transform var(--dur-1) var(--ease-out);
+  position:relative;
+}
+.site-card:hover{border-color:var(--line-cyan);background:var(--bg-3);transform:translateY(-1px);}
+.site-card.is-mine{border-color:var(--accent);background:rgba(0,229,255,0.07);}
+.site-card.is-mine::before{content:"YOUR SITE";position:absolute;top:8px;right:10px;font:600 9px/1 var(--font-mono);letter-spacing:.18em;color:var(--accent);}
+.site-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.site-card.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
+.site-card .name{font:800 18px/1.2 var(--font-sans);color:var(--fg-0);margin-bottom:10px;}
+.site-card .rules-label{font:600 10px/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);margin-bottom:6px;}
+.site-card .rules{font:500 13px/1.45 var(--font-mono);color:var(--fg-1);font-variant-numeric:tabular-nums;margin-bottom:14px;flex:1;}
+.site-card .rules em{font-style:normal;color:var(--fg-2);font-family:var(--font-sans);}
+.site-card .updated{font:400 11px/1 var(--font-mono);color:var(--fg-2);margin-bottom:10px;}
+.site-card .cta{font:700 11px/1 var(--font-sans);letter-spacing:.04em;color:var(--accent);text-transform:uppercase;}
+
+/* status panels */
+.status-card{background:var(--bg-2);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:24px;}
+.status-card.error{border-color:#C62828;}
+.status-card.warn{border-color:#E8A020;}
+.status-card h3{font:700 15px/1.3 var(--font-sans);color:var(--fg-0);margin-bottom:8px;}
+.status-card p{font:400 13px/1.5 var(--font-sans);color:var(--fg-1);margin-bottom:8px;}
+.status-card code{font:500 12px/1 var(--font-mono);background:var(--bg-0);padding:2px 6px;border-radius:3px;color:var(--accent);}
+.status-card ol, .status-card ul{margin:8px 0 8px 20px;color:var(--fg-1);font-size:13px;line-height:1.6;}
+
+/* teacher how-to */
+.howto{margin-top:48px;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+.howto summary{cursor:pointer;padding:14px 20px;font:700 12px/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--fg-1);background:var(--bg-3);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+.howto summary::-webkit-details-marker{display:none;}
+.howto summary::after{content:"▾";color:var(--fg-2);transition:transform var(--dur-1) var(--ease-out);}
+.howto[open] summary::after{transform:rotate(180deg);}
+.howto-body{padding:20px;font:400 13px/1.6 var(--font-sans);color:var(--fg-1);}
+.howto-body h4{font:700 12px/1 var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--fg-0);margin:14px 0 6px;}
+.howto-body h4:first-child{margin-top:0;}
+.howto-body ol, .howto-body ul{margin:6px 0 12px 20px;}
+.howto-body code{font:500 12px/1 var(--font-mono);background:var(--bg-0);padding:2px 6px;border-radius:3px;color:var(--accent);font-size:11.5px;}
+.howto-body table{border-collapse:collapse;font:500 12px/1.4 var(--font-mono);font-variant-numeric:tabular-nums;margin:10px 0;width:100%;}
+.howto-body th{background:var(--bg-0);color:var(--fg-1);padding:6px 10px;text-align:left;border:1px solid var(--line);}
+.howto-body td{padding:6px 10px;border:1px solid var(--line);color:var(--fg-2);}
+
+footer{max-width:1000px;margin:48px auto 0;padding:24px;font:500 11px/1.4 var(--font-mono);color:var(--fg-2);text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">WHAT-IF · PICKER</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<main class="page">
+
+  <section class="page-head">
+    <p class="eyebrow"><b>17</b>Lesson</p>
+    <h1>Pick your site.</h1>
+    <p class="lede">Each site has its own Commissioner rule for the Championship. Tap your site card below to open the What-If Loadout Recalculator with the right rule loaded.</p>
+  </section>
+
+  <div class="sec-head">
+    <h2>Sites <small>— pulled live from the facilitator sheet</small></h2>
+    <span class="meta" id="meta-info">Loading…</span>
+  </div>
+
+  <div id="content">
+    <div class="status-card"><p>Loading site list…</p></div>
+  </div>
+
+  <details class="howto">
+    <summary>Teachers — how this list works ▾</summary>
+    <div class="howto-body">
+      <p>This page reads a single Google Sheet that every site's facilitator updates with their day-17 What-If URL. Students stay on one stable bookmark (this page) and always see the latest URL for their site.</p>
+
+      <h4>1. Create the sheet (once per program)</h4>
+      <p>Make a new Google Sheet with these columns (the first row must be headers, spelled exactly):</p>
+      <table>
+        <thead><tr><th>Site</th><th>URL</th><th>Rules</th><th>Last Updated</th></tr></thead>
+        <tbody>
+          <tr><td>Gotham Tech</td><td>https://…#eyJ…</td><td>E ≤ 8</td><td>2026-06-04</td></tr>
+          <tr><td>Crosstown</td><td>https://…#eyJ…</td><td>E ≤ 7</td><td>2026-06-04</td></tr>
+          <tr><td>Claremont International HS</td><td>https://…#eyJ…</td><td>S ≥ 4</td><td>2026-06-04</td></tr>
+        </tbody>
+      </table>
+      <p>The <strong>Site</strong> cell can be the site's display name (e.g. "Crosstown") or the site code (NY1, NY2, NY3, TN). Either matches the user's site selection for highlighting "YOUR SITE".</p>
+
+      <h4>2. Publish the sheet as CSV</h4>
+      <ol>
+        <li>File → <strong>Share</strong> → <strong>Publish to web</strong></li>
+        <li>Under "Link", choose the tab you want and change the format from "Web page" to <strong>Comma-separated values (.csv)</strong></li>
+        <li>Click <strong>Publish</strong></li>
+        <li>Copy the URL it shows you (it looks like <code>https://docs.google.com/spreadsheets/d/e/2PACX-1v…/pub?output=csv</code>)</li>
+      </ol>
+
+      <h4>3. Paste it into config.js</h4>
+      <p>Open <code>public/config.js</code> and set:</p>
+      <p><code>whatIfSheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1v…/pub?output=csv"</code></p>
+      <p>Commit and push. This page will start rendering cards as soon as Vercel finishes building.</p>
+
+      <h4>4. Generate and paste each site's URL</h4>
+      <p>Each site's facilitator opens <code>/lessons/what-if-loadout-recalculator.html</code>, configures their Commissioner rules and teams, clicks <strong>Generate Shareable URL</strong>, and pastes the URL into their row in the sheet. Updates take effect the next time a student opens this page (no redeploy needed).</p>
+
+      <h4>Tab protection (optional)</h4>
+      <p>Give each site its own tab and use Google Sheets <em>Protect range</em> on the other tabs so a teacher at Gotham Tech can't accidentally clobber Crosstown's URL. Publish each tab separately and add them to <code>whatIfSheetCsvUrl</code> via a switch by site code — let me know if you want that wired up.</p>
+    </div>
+  </details>
+
+</main>
+
+<footer>
+  VELOCITY ARENA · WHAT-IF SITE PICKER · NYC FIRST &middot; <a href="/teachers.html" style="color:inherit;">Teacher Resources</a>
+</footer>
+
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script>
+// ---- helpers ----
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Minimal CSV parser — handles quoted cells containing commas and ""-escaped
+// quotes. Does NOT handle multi-line cells (rare for URL / rule rows).
+function parseCsv(text) {
+  var rows = [];
+  var lines = text.replace(/\r\n/g, '\n').split('\n');
+  for (var L = 0; L < lines.length; L++) {
+    var line = lines[L];
+    if (!line.trim()) continue;
+    var cells = [];
+    var cur = '';
+    var inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (inQ) {
+        if (c === '"' && line[i+1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cur += c;
+      } else {
+        if (c === ',') { cells.push(cur); cur = ''; }
+        else if (c === '"') inQ = true;
+        else cur += c;
+      }
+    }
+    cells.push(cur);
+    rows.push(cells.map(function(s){ return s.trim(); }));
+  }
+  return rows;
+}
+
+function rowsToObjects(rows) {
+  if (!rows.length) return [];
+  var headers = rows[0].map(function(h){ return h.toLowerCase(); });
+  return rows.slice(1).map(function(r) {
+    var obj = {};
+    for (var i = 0; i < headers.length; i++) obj[headers[i]] = r[i] || '';
+    return obj;
+  });
+}
+
+// Match a sheet row's "Site" cell to a SITE_OPTIONS entry (label or code).
+function siteCodeFor(siteCellValue) {
+  if (!siteCellValue || typeof SITE_OPTIONS === 'undefined') return null;
+  var needle = siteCellValue.trim().toLowerCase();
+  var match = SITE_OPTIONS.find(function(o) {
+    return o.code.toLowerCase() === needle || o.label.toLowerCase() === needle;
+  });
+  return match ? match.code : null;
+}
+
+// ---- render ----
+var content = document.getElementById('content');
+var metaInfo = document.getElementById('meta-info');
+
+function showStatus(html, kind) {
+  content.innerHTML = '<div class="status-card' + (kind ? ' ' + kind : '') + '">' + html + '</div>';
+}
+
+function renderSites(entries) {
+  if (!entries.length) {
+    showStatus(
+      '<h3>The sheet is empty.</h3>' +
+      '<p>The published sheet at <code>CONFIG.whatIfSheetCsvUrl</code> has no data rows yet.</p>' +
+      '<p>Open the Teachers panel below for setup details.</p>',
+      'warn'
+    );
+    metaInfo.textContent = '0 SITES';
+    return;
+  }
+  var mine = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  var html = '<div class="sites-grid">';
+  entries.forEach(function(e) {
+    var siteName = e.site || '(unnamed)';
+    var url = e.url || '';
+    var rules = e.rules || '';
+    var updated = e['last updated'] || e.updated || '';
+    var code = siteCodeFor(e.site);
+    var isMine = mine && code === mine;
+    var disabled = !url;
+    var cardCls = 'site-card' + (isMine ? ' is-mine' : '') + (disabled ? ' disabled' : '');
+    var rulesHtml = rules
+      ? esc(rules)
+      : '<em>(no rule listed yet)</em>';
+    var updatedHtml = updated ? 'Updated ' + esc(updated) : '';
+    var ctaText = disabled ? 'No URL yet' : 'Open lesson →';
+    var hrefAttr = disabled ? '' : ' href="' + esc(url) + '"';
+    html += '<a class="' + cardCls + '"' + hrefAttr + ' rel="noopener">' +
+      '<div class="name">' + esc(siteName) + '</div>' +
+      '<div class="rules-label">Commissioner rule</div>' +
+      '<div class="rules">' + rulesHtml + '</div>' +
+      (updatedHtml ? '<div class="updated">' + updatedHtml + '</div>' : '') +
+      '<div class="cta">' + ctaText + '</div>' +
+    '</a>';
+  });
+  html += '</div>';
+  content.innerHTML = html;
+  var filled = entries.filter(function(e){ return !!e.url; }).length;
+  metaInfo.textContent = filled + ' / ' + entries.length + ' SITES READY';
+}
+
+// ---- load ----
+(function init() {
+  var url = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfSheetCsvUrl : '';
+  if (!url) {
+    showStatus(
+      '<h3>The site picker isn\'t configured yet.</h3>' +
+      '<p>To activate this page, a facilitator needs to:</p>' +
+      '<ol>' +
+        '<li>Create a Google Sheet with columns <code>Site</code>, <code>URL</code>, <code>Rules</code>, <code>Last Updated</code></li>' +
+        '<li>File → Share → Publish to web → CSV</li>' +
+        '<li>Paste that CSV URL into <code>public/config.js</code> as <code>whatIfSheetCsvUrl</code></li>' +
+      '</ol>' +
+      '<p>Detailed instructions in the Teachers panel below.</p>',
+      'warn'
+    );
+    metaInfo.textContent = 'NOT CONFIGURED';
+    return;
+  }
+  metaInfo.textContent = 'Loading…';
+  fetch(url, { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(txt) {
+      var rows = parseCsv(txt);
+      var objs = rowsToObjects(rows);
+      renderSites(objs);
+    })
+    .catch(function(err) {
+      console.error('What-If picker — failed to load sheet:', err);
+      showStatus(
+        '<h3>Couldn\'t load the site list.</h3>' +
+        '<p>Tried fetching: <code>' + esc(url) + '</code></p>' +
+        '<p>Error: <code>' + esc(err.message) + '</code></p>' +
+        '<p>Most common causes: the sheet isn\'t published, the URL has a typo, or the sheet isn\'t public. See the Teachers panel below.</p>',
+        'error'
+      );
+      metaInfo.textContent = 'ERROR';
+    });
+})();
+</script>
+</body>
+</html>

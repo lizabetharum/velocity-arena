@@ -52,6 +52,16 @@ const CONFIG = {
 
   // Password for the Teacher Resources page.
   // Change this before sharing the site with students.
-  teacherPassword: "velocityNYCFIRST2026"
+  teacherPassword: "velocityNYCFIRST2026",
+
+  // Published Google Sheet (CSV) URL for the per-site What-If lesson URLs.
+  // The picker page at /lessons/what-if/ reads this to render a "Pick your
+  // site" card. To set up:
+  //   1. Create a Google Sheet with columns: Site, URL, Rules, Last Updated
+  //   2. File → Share → Publish to web → CSV → Publish
+  //   3. Paste the resulting CSV URL here (looks like:
+  //      https://docs.google.com/spreadsheets/d/e/.../pub?output=csv)
+  // Leave empty to show teacher setup instructions on the picker page.
+  whatIfSheetCsvUrl: ""
 
 };
