@@ -1397,24 +1397,7 @@ const DAYS_DEFAULT = [
 ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-03-commissioners-pt2-bracket-reveal.html"
       },
-      {
-        "name": "Championship Simulation",
-        "mins": 60,
-        "block": "Open Lab",
-        "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
-        "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
-        "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
-      },
-      {
-        "name": "Lunch / Snack Break",
-        "mins": 60,
-        "block": "Break",
-        "description": "Eat, rest, and talk about anything except math.",
-        "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
-      },
-      
-      {
+          {
         "name": "Pre-Match Pitch Rehearsal + Teach the Math",
         "mins": 60,
         "block": "Challenge Block",
@@ -1427,14 +1410,34 @@ const DAYS_DEFAULT = [
     
       
       {
-        "name": "Open Lab: Pitch Refinement and Bot Prep",
-        "mins": 15,
+        "name": "Lunch / Snack Break",
+        "mins": 60,
+        "block": "Break",
+        "description": "Eat, rest, and talk about anything except math.",
+        "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
+      },
+      
+  
+      
+      {
+        "name": "Skills Arena Championship Loadout Verification",
+        "mins": 60,
         "block": "Open Lab",
         "description": "Rehearse your pitch one more time. Add specific numbers to any claim that is still vague. Every claim needs a number next to it before tomorrow.",
         "facilitatorDescription": "Teams rehearse the pitch one more time and add specific numbers to any vague claim. Every claim must have a number next to it before students leave for the day. Short 15-minute window -- keep it focused on number-for-claim matching.",
-        "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?usp=drive_link",
+        "script": "hhttps://docs.google.com/document/d/1w7H2QdlUzEUackIo3-dUMNrmzbsGSiduotMmAYj2khs/edit?usp=sharing",
+        "worksheet":"https://drive.google.com/file/d/1q5yZVp_6tx_mfR9fhbpiVIi5TbQKtvdE/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-05-open-lab-pitch-bot-prep.html"
-      }
+      },
+      {
+        "name": "Open Lab: Pitch Refinement and Bot Prep",
+        "mins": 60,
+        "block": "Open Lab",
+        "description": "Rehearse your pitch one more time as a team. Add specific numbers to any claim that is still vague. Every claim in the pitch needs a number next to it before tomorrow",
+        "facilitatorDescription": "Teams rehearse their pitch one more time as a team. Add specific numbers to any claim that is still vague. Every claim in the pitch needs a number next to it before tomorrow.",
+        "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?tab=t.0",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
+      },
     ],
     "produce": [
       "Cold retrieval paper — five numbers written from memory (opponent's motor power, decay rate r, best goal count; own decay at t=3, own motor power)",  
