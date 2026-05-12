@@ -1398,6 +1398,15 @@ const DAYS_DEFAULT = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-03-commissioners-pt2-bracket-reveal.html"
       },
       {
+        "name": "Championship Simulation",
+        "mins": 60,
+        "block": "Open Lab",
+        "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
+        "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
+        "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
+      },
+      {
         "name": "Lunch / Snack Break",
         "mins": 60,
         "block": "Break",
@@ -1415,15 +1424,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://drive.google.com/file/d/181fmb7UpFIObB5jJroJDxmk2k_amVA1x/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-pitch-rehearsal-teach-math.html"
       },
-    {
-        "name": "Open Lab: Championship Simulation",
-        "mins": 60,
-        "block": "Open Lab",
-        "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
-        "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
-        "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
-      },
+    
       
       {
         "name": "Open Lab: Pitch Refinement and Bot Prep",
