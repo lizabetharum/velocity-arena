@@ -92,6 +92,22 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 .eq-hint{font-size:11px;color:var(--muted);font-style:italic;display:block;margin-top:2px}
 .surprising-row td{background:var(--amber-bg) !important}
 .surprising-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;color:#856404;background:#FFF3CD;border:1px solid var(--amber);padding:1px 6px;border-radius:10px;margin-left:6px;text-transform:uppercase;vertical-align:middle}
+.surprising-info{display:inline-block;margin-left:6px;vertical-align:middle}
+.surprising-info summary{cursor:pointer;list-style:none;font-size:10px;font-weight:800;letter-spacing:.6px;color:#856404;background:#FFF3CD;border:1px solid var(--amber);padding:1px 8px;border-radius:10px;text-transform:uppercase;display:inline-block}
+.surprising-info summary::-webkit-details-marker{display:none}
+.surprising-info summary::after{content:' ⓘ';font-size:10px;margin-left:2px}
+.surprising-info[open] summary{background:var(--amber);color:#fff}
+.surprising-explainer{font-size:11px;font-weight:500;color:#856404;background:#FFF8E1;border:1px solid var(--amber);border-radius:6px;padding:8px 10px;margin-top:6px;line-height:1.5;max-width:340px;font-style:normal;text-transform:none;letter-spacing:0}
+
+/* ---- RECEIVED SUBMISSION (from #answer=... URL) ---- */
+.received-panel{background:#fff;border:2px solid var(--green);border-radius:10px;padding:16px 20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(46,125,50,.12)}
+.received-panel h3{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.received-panel .rp-team{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:10px}
+.received-panel .rp-stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px}
+.received-panel .rp-stat{font-size:18px;font-weight:800;color:var(--navy)}
+.received-panel .rp-stat small{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
+.received-panel .rp-decision{background:#f8f9fc;border-left:3px solid var(--green);padding:10px 14px;font-size:13px;color:var(--navy);border-radius:0 6px 6px 0;white-space:pre-wrap;line-height:1.5}
+.received-panel .rp-meta{font-size:11px;color:var(--muted);margin-top:10px}
 
 /* ---- STAT INPUT BOXES + STEPPERS ---- */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
@@ -340,7 +356,7 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
               <td class="dp">+10 ↑</td>
             </tr>
             <tr class="surprising-row">
-              <td>Decay Rate<span class="eq-hint">(20 − E) × 1.5</span><span class="surprising-tag" title="Stat went DOWN but formula went UP — counterintuitive">Surprising</span></td>
+              <td>Decay Rate<span class="eq-hint">(20 − E) × 1.5</span><details class="surprising-info"><summary>Surprising</summary><div class="surprising-explainer">The formula is (20 − E) × 1.5. When E drops from 11 to 8, the (20 − E) part goes UP from 9 to 12 — so Decay Rate climbs. Lower Endurance means the bot slows down faster.</div></details></td>
               <td>(20−11) × 1.5 = <strong>13.5</strong></td>
               <td>(20−8) × 1.5 = <strong>18.0</strong></td>
               <td class="dp">+4.5 ↑</td>
@@ -413,10 +429,13 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 // ============================================================
 var state = { rules: [], teams: [] };
 var s2nexus = null;
+var receivedAnswer = null;  // populated when the page loads with a #answer=... URL
 
 // Per-team persisted state (snapshots, lock, decision text). Keyed by team name.
 var LS_KEY = 'va_whatif_v1';
 var teamState = {};  // teamName → { snapshots: [...], locked: {stats, ts}|null, decision: '...' }
+
+var STAT_NAMES = {S:'Speed', E:'Endurance', T:'Turning', P:'Power'};
 
 // ============================================================
 // FORMULAS
@@ -424,12 +443,42 @@ var teamState = {};  // teamName → { snapshots: [...], locked: {stats, ts}|nul
 function calcFormulas(s, e, t, p) {
   return [
     { name:'Speed Power',    eq:'S × 5',            primary:'S', val: s * 5 },
-    { name:'Decay Rate',     eq:'(20 − E) × 1.5',   primary:'E', val: (20 - e) * 1.5 },
+    { name:'Decay Rate',     eq:'(20 − E) × 1.5',   primary:'E', val: (20 - e) * 1.5,
+      surprisingExplain: 'The formula is (20 − E) × 1.5. When E drops, the (20 − E) part goes UP, so Decay Rate climbs. Lower Endurance means the bot slows down faster.' },
     { name:'Turn Ratio',     eq:'0.2 + T × 0.02',   primary:'T', val: parseFloat((0.2 + t * 0.02).toFixed(2)) },
     { name:'Arc Segments',   eq:'T',                 primary:'T', val: t },
     { name:'Charge Speed',   eq:'P²',                primary:'P', val: p * p },
     { name:'Follow-through', eq:'P × 200',           primary:'P', val: p * 200 }
   ];
+}
+
+// ----- Small helpers -----
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function surprisingBadge(formula) {
+  var explain = formula.surprisingExplain ||
+    'Stat moved one direction, formula moved the other. Look at how the formula is written — that\'s where the inversion comes from.';
+  return '<details class="surprising-info"><summary>Surprising</summary>' +
+    '<div class="surprising-explainer">' + escapeHtml(explain) + '</div></details>';
+}
+
+function formatSnapshotTime(ts) {
+  var now = Date.now();
+  var diff = now - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + ' min ago';
+  var d = new Date(ts);
+  var todayMid = new Date(); todayMid.setHours(0,0,0,0);
+  var snapMid = new Date(ts); snapMid.setHours(0,0,0,0);
+  var dayDiff = Math.round((todayMid - snapMid) / 86400000);
+  var timeStr = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  if (dayDiff === 0) return timeStr;
+  if (dayDiff === 1) return 'Yesterday ' + timeStr;
+  return d.toLocaleDateString([], {month:'short', day:'numeric'}) + ' ' + timeStr;
 }
 
 // A formula change is "surprising" when its primary stat moved the OPPOSITE direction
@@ -456,14 +505,58 @@ function budgetOK(stats) { return stats.S + stats.E + stats.T + stats.P === 20; 
 // URL ENCODING / LOCALSTORAGE
 // ============================================================
 function loadFromHash() {
+  var h = window.location.hash.slice(1);
+  if (!h) return;
   try {
-    var h = window.location.hash.slice(1);
-    if (h) {
+    if (h.indexOf('answer=') === 0) {
+      // Student-shared answer URL: { team, stats, decision, ts, setup }
+      var ans = JSON.parse(atob(h.slice(7)));
+      receivedAnswer = ans;
+      if (ans.setup) {
+        state.rules = ans.setup.rules || [];
+        state.teams = ans.setup.teams || [];
+      }
+    } else {
+      // Facilitator setup URL: { rules, teams }
       var d = JSON.parse(atob(h));
       state.rules = d.rules || [];
       state.teams = d.teams || [];
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('What-If: could not decode hash —', e.message);
+  }
+}
+
+function renderReceivedPanel() {
+  if (!receivedAnswer) return;
+  var ans = receivedAnswer;
+  var stats = ans.stats || {S:0, E:0, T:0, P:0};
+  var ts = ans.ts ? new Date(ans.ts) : null;
+  var rulesText = (ans.setup && ans.setup.rules || []).map(function(r){
+    return STAT_NAMES[r.stat] + ' ' + r.dir + ' ' + r.threshold;
+  }).join(', ') || '(none)';
+
+  var statsHtml = ['S','E','T','P'].map(function(s) {
+    return '<div class="rp-stat"><small>' + STAT_NAMES[s] + ' (' + s + ')</small>' +
+      (stats[s] != null ? stats[s] : '—') + '</div>';
+  }).join('');
+
+  var decisionHtml = ans.decision
+    ? '<div class="rp-decision">' + escapeHtml(ans.decision) + '</div>'
+    : '<div class="rp-decision" style="color:var(--muted);font-style:italic">(no written reasoning)</div>';
+
+  var panel = document.createElement('div');
+  panel.className = 'received-panel';
+  panel.innerHTML =
+    '<h3>📩 Received submission</h3>' +
+    '<div class="rp-team">' + escapeHtml(ans.team || '(unnamed team)') + '</div>' +
+    '<div class="rp-stats">' + statsHtml + '</div>' +
+    decisionHtml +
+    '<div class="rp-meta">Rules in effect: ' + escapeHtml(rulesText) +
+      (ts ? ' &middot; Submitted ' + ts.toLocaleString() : '') + '</div>';
+
+  var main = document.querySelector('.main');
+  if (main) main.insertBefore(panel, main.firstChild);
 }
 
 function generateURL() {
@@ -707,7 +800,7 @@ function renderS2() {
   html += '</tbody></table>';
 
   html += '<div class="viol"><strong>The problem:</strong> '+statName[r.stat]+' = '+violVal+', rule says '+statName[r.stat]+' '+r.dir+' '+thresh+'. Team Nexus must '+moveWord+' '+statName[r.stat]+' by at least '+excess+' point'+(excess!==1?'s':'')+'. Any new loadout that satisfies the rule and sums to 20 is valid.</div>';
-  html += '<div class="hint"><strong>Your job:</strong> Edit Team Nexus\'s stats below. Watch the live feedback. When everything is green, click Check My Answer to see the formula breakdown.</div>';
+  html += '<div class="hint"><strong>Your job:</strong> Edit Team Nexus\'s stats below. The boxes turn green when the rule is satisfied and the budget balances at 20. Once everything looks right, click <strong>Show formula impact</strong> to see how the formulas changed.</div>';
 
   // Stat inputs — all editable, pre-filled with current values (the violating loadout).
   html += '<div class="stat-grid">';
@@ -727,7 +820,7 @@ function renderS2() {
   '</div>';
 
   html += '<div class="flex-gap">';
-  html += '<button class="btn btn-navy" onclick="checkS2()">Check My Answer</button>';
+  html += '<button class="btn btn-navy" onclick="checkS2()">Show formula impact</button>';
   html += '<button class="btn btn-ghost" onclick="resetS2()">Reset</button>';
   html += '</div>';
 
@@ -858,7 +951,7 @@ function renderS2Formulas(newStats) {
     var surp = isSurprising(primary, statChange, diff);
     html += '<tr'+(surp?' class="surprising-row"':'')+'>';
     html += '<td>'+oldF[i].name+'<span class="eq-hint">'+oldF[i].eq+'</span>'+
-      (surp?'<span class="surprising-tag" title="Stat moved one way, formula moved the other">Surprising</span>':'')+'</td>';
+      (surp?surprisingBadge(oldF[i]):'')+'</td>';
     html += '<td>'+oldF[i].val+'</td>';
     html += '<td style="font-weight:700">'+newF[i].val+'</td>';
     html += '<td class="'+dc+'">'+ds+'</td>';
@@ -1098,7 +1191,7 @@ function s3Update() {
       var surp = isSurprising(primary, statChange, diff);
       rows += '<tr'+(surp?' class="surprising-row"':'')+'>';
       rows += '<td>'+oldF[i].name+'<span class="eq-hint">'+oldF[i].eq+'</span>'+
-        (surp?'<span class="surprising-tag" title="Stat moved one way, formula moved the other">Surprising</span>':'')+'</td>';
+        (surp?surprisingBadge(oldF[i]):'')+'</td>';
       rows += '<td>'+oldF[i].val+'</td>';
       rows += '<td style="font-weight:'+(diff!==0?'800':'400')+'">'+newF[i].val+'</td>';
       rows += '<td class="'+dc+'">'+ds+'</td>';
@@ -1185,8 +1278,7 @@ function renderSnapshots() {
     '<th>Speed Pwr</th><th>Decay</th><th>Turn Ratio</th><th>Charge</th>'+
     '<th></th></tr></thead><tbody>';
   rec.snapshots.forEach(function(sn, i) {
-    var time = new Date(sn.ts);
-    var label = time.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    var label = formatSnapshotTime(sn.ts);
     var f = calcFormulas(sn.stats.S, sn.stats.E, sn.stats.T, sn.stats.P);
     function fv(name) { var x = f.find(function(o){ return o.name===name; }); return x ? x.val : ''; }
     html += '<tr>';
@@ -1341,6 +1433,7 @@ function renderChangeSummary(containerId, origStats, newStats) {
 window.addEventListener('DOMContentLoaded', function() {
   loadFromHash();
   loadTeamState();
+  renderReceivedPanel();
   if (state.rules.length === 0 && state.teams.length === 0) {
     state.rules = [{ stat:'E', dir:'≤', threshold:8 }];
     state.teams = [
