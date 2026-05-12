@@ -48,6 +48,13 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--navy);
 .share-status{font-size:11px;color:#FFE082;font-weight:700;margin-bottom:6px}
 .share-link{font-size:10px;color:rgba(255,255,255,.9);word-break:break-all;line-height:1.5;font-family:'Menlo','SF Mono',monospace;-webkit-user-select:all;user-select:all}
 
+/* ---- TOAST ---- */
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-12px);z-index:9999;background:var(--green);color:#fff;padding:12px 22px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;display:flex;align-items:center;gap:12px;max-width:min(560px,calc(100vw - 28px))}
+.toast.shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast.toast-warn{background:var(--amber);color:var(--navy)}
+.toast .toast-msg{flex:1;line-height:1.4}
+.toast .toast-x{background:transparent;border:none;color:inherit;font-size:18px;font-weight:800;cursor:pointer;line-height:1;padding:0 4px}
+
 /* ---- MAIN ---- */
 .main{max-width:880px;margin:0 auto;padding:24px 16px}
 
@@ -554,12 +561,41 @@ function renderReceivedPanel() {
   if (main) main.insertBefore(panel, main.firstChild);
 }
 
+function showToast(msg, kind) {
+  // kind = 'ok' (default green) or 'warn' (amber)
+  var existing = document.getElementById('va-toast');
+  if (existing) existing.remove();
+  var t = document.createElement('div');
+  t.id = 'va-toast';
+  t.className = 'toast' + (kind === 'warn' ? ' toast-warn' : '');
+  t.innerHTML = '<span class="toast-msg">' + msg + '</span>' +
+    '<button class="toast-x" aria-label="Dismiss" onclick="this.parentNode.remove()">&times;</button>';
+  document.body.appendChild(t);
+  // Force reflow so the transition fires
+  void t.offsetWidth;
+  t.classList.add('shown');
+  // Auto-dismiss after 4 seconds
+  setTimeout(function() {
+    if (t.parentNode) {
+      t.classList.remove('shown');
+      setTimeout(function(){ if (t.parentNode) t.remove(); }, 300);
+    }
+  }, 4000);
+}
+
 function generateURL() {
+  console.log('[What-If] Generating shareable URL…');
   var issues = collectSetupState();
+  console.log('[What-If] Collected', state.rules.length, 'rule(s) and', state.teams.length, 'team(s);',
+    issues.droppedTeams.length, 'team(s) skipped.');
   var encoded = btoa(JSON.stringify(state));
   window.location.hash = encoded;
   var url = window.location.href;
   var el = document.getElementById('shareURL');
+  if (!el) {
+    console.error('[What-If] #shareURL element not found — page may be out of date. Hard-refresh.');
+    return;
+  }
   el.style.display = 'block';
 
   var html = '';
@@ -569,12 +605,22 @@ function generateURL() {
       issues.dropReasons.map(escapeHtml).join(' &middot; ') +
       '. Fix the values in the setup panel and regenerate if needed.</div>';
   }
+
   var copyOk = false;
-  if (navigator.clipboard) {
-    try { navigator.clipboard.writeText(url); copyOk = true; } catch(e) {}
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      navigator.clipboard.writeText(url).then(
+        function() {},
+        function(err) { console.warn('[What-If] clipboard write rejected:', err); }
+      );
+      copyOk = true;
+    } catch(e) {
+      console.warn('[What-If] clipboard throw:', e.message);
+    }
   }
+
   html += '<div class="share-status">' +
-    (copyOk ? '✓ Copied to clipboard.' : 'Clipboard not available — select and copy the URL below.') +
+    (copyOk ? '✓ Copied to clipboard.' : 'Clipboard not available — select the URL below to copy.') +
     '</div>';
   html += '<div class="share-link">' + escapeHtml(url) + '</div>';
   el.innerHTML = html;
@@ -583,6 +629,17 @@ function generateURL() {
   // new rules + Team Nexus generation without reloading.
   try { renderS2(); } catch(e) { console.warn('renderS2 failed:', e.message); }
   try { renderS3(); } catch(e) { console.warn('renderS3 failed:', e.message); }
+
+  // Prominent, page-level confirmation that's visible regardless of scroll.
+  var toastMsg = copyOk
+    ? 'Shareable URL copied to clipboard.'
+    : 'Shareable URL generated — copy it from the setup panel.';
+  if (issues.droppedTeams.length) {
+    toastMsg += ' ' + issues.droppedTeams.length + ' team(s) skipped (see warning).';
+    showToast(toastMsg, 'warn');
+  } else {
+    showToast(toastMsg, 'ok');
+  }
 
   // On smaller screens the share box can sit below the fold after the setup
   // grid expands; bring it into view.
