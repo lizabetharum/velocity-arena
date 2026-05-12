@@ -42,7 +42,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--navy);
 .ibtn-del:hover{background:rgba(220,0,0,.6)}
 .share-btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;padding:9px 18px;border-radius:6px;border:none;cursor:pointer;background:var(--amber);color:var(--navy);margin-top:12px}
 .share-btn:hover{background:#f5b82e}
-.share-url{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:7px 11px;font-size:10px;color:rgba(255,255,255,.7);word-break:break-all;margin-top:10px;display:none}
+.share-url{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:9px 12px;font-size:10px;color:rgba(255,255,255,.7);word-break:break-all;margin-top:10px;display:none}
+.share-warn{background:rgba(220,0,0,.25);border-left:3px solid #FF8A80;padding:7px 11px;margin-bottom:8px;font-size:11px;color:#FFCDD2;line-height:1.45;border-radius:0 4px 4px 0}
+.share-warn strong{color:#FFEBEE}
+.share-status{font-size:11px;color:#FFE082;font-weight:700;margin-bottom:6px}
+.share-link{font-size:10px;color:rgba(255,255,255,.9);word-break:break-all;line-height:1.5;font-family:'Menlo','SF Mono',monospace;-webkit-user-select:all;user-select:all}
 
 /* ---- MAIN ---- */
 .main{max-width:880px;margin:0 auto;padding:24px 16px}
@@ -578,14 +582,38 @@ function renderReceivedPanel() {
 }
 
 function generateURL() {
-  collectSetupState();
+  var issues = collectSetupState();
   var encoded = btoa(JSON.stringify(state));
   window.location.hash = encoded;
   var url = window.location.href;
   var el = document.getElementById('shareURL');
   el.style.display = 'block';
-  el.textContent = url;
-  if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+
+  var html = '';
+  if (issues.droppedTeams.length) {
+    html += '<div class="share-warn"><strong>' + issues.droppedTeams.length +
+      ' team' + (issues.droppedTeams.length === 1 ? '' : 's') + ' skipped:</strong> ' +
+      issues.dropReasons.map(escapeHtml).join(' &middot; ') +
+      '. Fix the values in the setup panel and regenerate if needed.</div>';
+  }
+  var copyOk = false;
+  if (navigator.clipboard) {
+    try { navigator.clipboard.writeText(url); copyOk = true; } catch(e) {}
+  }
+  html += '<div class="share-status">' +
+    (copyOk ? '✓ Copied to clipboard.' : 'Clipboard not available — select and copy the URL below.') +
+    '</div>';
+  html += '<div class="share-link">' + escapeHtml(url) + '</div>';
+  el.innerHTML = html;
+
+  // Refresh the live preview below so the facilitator can sanity-check the
+  // new rules + Team Nexus generation without reloading.
+  try { renderS2(); } catch(e) { console.warn('renderS2 failed:', e.message); }
+  try { renderS3(); } catch(e) { console.warn('renderS3 failed:', e.message); }
+
+  // On smaller screens the share box can sit below the fold after the setup
+  // grid expands; bring it into view.
+  el.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
 function loadTeamState() {
@@ -685,6 +713,7 @@ function addTeamRow(container, t) {
 }
 
 function collectSetupState() {
+  var issues = { droppedTeams: [], dropReasons: [] };
   state.rules = [];
   var ruleRows = document.querySelectorAll('#rulesContainer .rule-row');
   ruleRows.forEach(function(row) {
@@ -699,10 +728,21 @@ function collectSetupState() {
   teamRows.forEach(function(row) {
     var inputs = row.querySelectorAll('.sv');
     var name = row.querySelector('.nm').value.trim();
-    if (!name) return;
     var stats = { S:parseInt(inputs[0].value)||0, E:parseInt(inputs[1].value)||0, T:parseInt(inputs[2].value)||0, P:parseInt(inputs[3].value)||0 };
-    if (stats.S+stats.E+stats.T+stats.P === 20) state.teams.push(Object.assign({name:name}, stats));
+    var total = stats.S+stats.E+stats.T+stats.P;
+    if (!name) {
+      issues.droppedTeams.push('(unnamed)');
+      issues.dropReasons.push('team with no name (' + total + ' pts)');
+      return;
+    }
+    if (total !== 20) {
+      issues.droppedTeams.push(name);
+      issues.dropReasons.push(name + ' has S+E+T+P = ' + total + ' (need 20)');
+      return;
+    }
+    state.teams.push(Object.assign({name:name}, stats));
   });
+  return issues;
 }
 
 // ============================================================
