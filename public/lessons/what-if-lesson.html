@@ -420,6 +420,7 @@ var state = { rules: [], teams: [] };
 var s2nexus = null;
 var receivedAnswer = null;  // populated when the page loads with a #answer=... URL
 var IS_VIEW_MODE = false;   // true when the page is rendering a received submission
+var receivedSite = null;    // site code (NY1/NY2/NY3/TN) embedded in the share URL by the facilitator
 
 // Per-team persisted state (snapshots, lock, decision text). Keyed by team name.
 var LS_KEY = 'va_whatif_v1';
@@ -507,10 +508,11 @@ function loadFromHash() {
         state.teams.push({name: ans.team, S: ans.stats.S, E: ans.stats.E, T: ans.stats.T, P: ans.stats.P});
       }
     } else {
-      // Facilitator setup URL: { rules, teams }
+      // Facilitator setup URL: { rules, teams, site? }
       var d = JSON.parse(b64DecodeUtf8(h));
       state.rules = d.rules || [];
       state.teams = d.teams || [];
+      if (d.site) receivedSite = d.site;
     }
   } catch(e) {
     console.warn('What-If: could not decode hash —', e.message);
@@ -1503,6 +1505,69 @@ function lockS3() {
   rec.locked = { stats: stats, ts: Date.now() };
   saveTeamState();
   applyLockUI();
+  // Also send the final pick to the Apps Script so the facilitator can see
+  // every team's lock-in in one place (Student Lock-Ins tab in the sheet).
+  submitLockToSheet(stats);
+}
+
+// Posts the locked loadout to CONFIG.whatIfPublishEndpoint with
+// action='lockSubmit'. The Apps Script writes it to a 'Student Lock-Ins'
+// tab (auto-creates the tab + header row on first submission). Fire-and-
+// forget: we don't block the lock UI on the network response, but we log
+// status to the console for debugging.
+function submitLockToSheet(stats) {
+  var endpoint = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfPublishEndpoint : '';
+  if (!endpoint) {
+    console.log('[What-If] submitLockToSheet: no endpoint configured, skipping.');
+    return;
+  }
+  // Site to record: prefer the code embedded in the share URL, then the
+  // student's header-picker selection, then blank. Convert code → display
+  // label so the Apps Script's siteMapping (keyed by display names like
+  // "Crosstown") matches.
+  var siteCode = receivedSite ||
+    (typeof getSelectedSite === 'function' ? getSelectedSite() : null) || '';
+  var siteLabel = siteCode;
+  if (siteCode && typeof SITE_OPTIONS !== 'undefined') {
+    var match = SITE_OPTIONS.find(function(o){ return o.code === siteCode; });
+    if (match) siteLabel = match.label;
+  }
+  var dec = document.getElementById('s3decision');
+  var payload = {
+    action: 'lockSubmit',
+    team: s3currentTeam ? s3currentTeam.name : '',
+    site: siteLabel,
+    stats: stats,
+    decision: dec ? dec.value : '',
+    ts: Date.now()
+  };
+  console.log('[What-If] Lock submit POSTing:', payload);
+  fetch(endpoint, {
+    method: 'POST',
+    redirect: 'follow',
+    body: JSON.stringify(payload)
+  })
+    .then(function(r) {
+      console.log('[What-If] Lock submit status:', r.status);
+      return r.text();
+    })
+    .then(function(txt) {
+      try {
+        var parsed = JSON.parse(txt);
+        if (parsed && parsed.result === 'success') {
+          if (typeof showToast === 'function') {
+            showToast('Locked in. Your facilitator can now see this loadout.', 'ok');
+          }
+        } else if (parsed && parsed.result === 'error') {
+          console.warn('[What-If] Lock submit error from script:', parsed.error);
+        }
+      } catch(e) { /* not JSON — assume opaque success */ }
+    })
+    .catch(function(err) {
+      console.warn('[What-If] Lock submit failed:', err);
+      // Don't surface a scary error — the loadout is still saved locally
+      // via localStorage, the network leg is just for facilitator visibility.
+    });
 }
 
 function unlockS3() {

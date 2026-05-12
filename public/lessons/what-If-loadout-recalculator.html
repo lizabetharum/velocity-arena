@@ -722,7 +722,15 @@ function generateURL() {
   var issues = collectSetupState();
   console.log('[What-If] Collected', state.rules.length, 'rule(s) and', state.teams.length, 'team(s);',
     issues.droppedTeams.length, 'team(s) skipped.');
-  var encoded = b64EncodeUtf8(JSON.stringify(state));
+  // Embed the facilitator's selected site code into the encoded payload so
+  // the student page can recover it when a student locks their loadout
+  // (the lock-submit POST needs to know which site to write under).
+  var encodedPayload = {
+    rules: state.rules,
+    teams: state.teams,
+    site: (typeof getSelectedSite === 'function') ? (getSelectedSite() || null) : null
+  };
+  var encoded = b64EncodeUtf8(JSON.stringify(encodedPayload));
   // Build the student-facing URL (different page from this one). Don't
   // pollute the facilitator's address bar with the hash either.
   var url = window.location.origin + STUDENT_PAGE_PATH + '#' + encoded;
