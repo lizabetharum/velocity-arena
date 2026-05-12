@@ -23,7 +23,13 @@
  * → Edit (pencil) → Version: New version → Deploy. The /exec URL stays
  * the same so you don't need to re-edit config.js.
  *
- * Payload shape (POST body, content-type: text/plain):
+ * Why GET and not POST: Apps Script Web Apps with "Anyone" access serve
+ * doGet directly to anonymous callers, but POSTs are redirected through
+ * an internal Google URL that blocks unauthenticated traffic — even when
+ * the dropdown says "Anyone". The dashboard endpoints in this codebase
+ * use the same GET-with-query-params trick.
+ *
+ * Request: GET ?payload=<URL-encoded JSON> where the JSON is:
  *   { "site": "NY1", "url": "https://…#eyJ…", "rules": "E ≤ 8" }
  *
  * Response (JSON):
@@ -53,12 +59,16 @@ var COLUMNS = {
 // data after the header row, so we overwrite row 2.
 var DATA_ROW = 2;
 
-function doPost(e) {
+function doGet(e) {
+  // No payload query param → return a help string (handy for sanity-checking
+  // the deploy URL by visiting it in a browser).
+  if (!e || !e.parameter || !e.parameter.payload) {
+    return ContentService
+      .createTextOutput('What-If publish endpoint. Call with ?payload=<URL-encoded JSON> where the JSON is { site, url, rules }.')
+      .setMimeType(ContentService.MimeType.TEXT);
+  }
   try {
-    if (!e || !e.postData || !e.postData.contents) {
-      return jsonResponse({ ok: false, error: 'Missing POST body' });
-    }
-    var body = JSON.parse(e.postData.contents);
+    var body = JSON.parse(e.parameter.payload);
     var site = (body.site || '').trim();
     var url = (body.url || '').trim();
     var rules = (body.rules || '').trim();
@@ -98,12 +108,6 @@ function doPost(e) {
   } catch (err) {
     return jsonResponse({ ok: false, error: String(err && err.message || err) });
   }
-}
-
-function doGet() {
-  return ContentService
-    .createTextOutput('What-If publish endpoint. POST JSON: { site, url, rules }.')
-    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 function findTabForSite(siteCode) {

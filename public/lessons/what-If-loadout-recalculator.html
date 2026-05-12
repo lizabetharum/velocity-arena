@@ -652,15 +652,14 @@ function publishToSheet() {
   var btn = document.getElementById('publishBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
 
-  // Apps Script Web Apps choke on CORS preflight; use text/plain so the
-  // browser sends a "simple" request that doesn't need preflight. The
-  // Apps Script JSON.parses the body itself.
-  fetch(endpoint, {
-    method: 'POST',
-    redirect: 'follow',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ site: site, url: url, rules: rules })
-  })
+  // Apps Script Web Apps with "Anyone" access serve doGet to anonymous
+  // callers but block anonymous POSTs (the 302 redirect target rejects
+  // unauthenticated traffic). Same GET-with-payload pattern the dashboard
+  // endpoints in this codebase use.
+  var payload = JSON.stringify({ site: site, url: url, rules: rules });
+  var getUrl = endpoint + (endpoint.indexOf('?') >= 0 ? '&' : '?') +
+    'payload=' + encodeURIComponent(payload);
+  fetch(getUrl, { method: 'GET', redirect: 'follow' })
     .then(function(r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
