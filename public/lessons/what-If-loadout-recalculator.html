@@ -462,6 +462,16 @@ function escapeHtml(s) {
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// UTF-8 safe base64 helpers. btoa() only accepts Latin1 — the rule
+// directions (≤, ≥) and any non-ASCII team name break it. We encode the
+// JSON as UTF-8 first, then base64 that byte sequence.
+function b64EncodeUtf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64DecodeUtf8(b64) {
+  return decodeURIComponent(escape(atob(b64)));
+}
+
 function formatSnapshotTime(ts) {
   var now = Date.now();
   var diff = now - ts;
@@ -498,7 +508,7 @@ function loadFromHash() {
   try {
     if (h.indexOf('answer=') === 0) {
       // Student-shared answer URL: { team, stats, decision, ts, setup }
-      var ans = JSON.parse(atob(h.slice(7)));
+      var ans = JSON.parse(b64DecodeUtf8(h.slice(7)));
       receivedAnswer = ans;
       IS_VIEW_MODE = true;
       if (ans.setup) {
@@ -512,7 +522,7 @@ function loadFromHash() {
       }
     } else {
       // Facilitator setup URL: { rules, teams }
-      var d = JSON.parse(atob(h));
+      var d = JSON.parse(b64DecodeUtf8(h));
       state.rules = d.rules || [];
       state.teams = d.teams || [];
     }
@@ -588,7 +598,7 @@ function generateURL() {
   var issues = collectSetupState();
   console.log('[What-If] Collected', state.rules.length, 'rule(s) and', state.teams.length, 'team(s);',
     issues.droppedTeams.length, 'team(s) skipped.');
-  var encoded = btoa(JSON.stringify(state));
+  var encoded = b64EncodeUtf8(JSON.stringify(state));
   window.location.hash = encoded;
   var url = window.location.href;
   var el = document.getElementById('shareURL');
@@ -1488,7 +1498,7 @@ function shareS3Loadout() {
     // Include the facilitator setup so the receiving page renders the same context
     setup: { rules: state.rules, teams: state.teams }
   };
-  var encoded = btoa(JSON.stringify(answer));
+  var encoded = b64EncodeUtf8(JSON.stringify(answer));
   var url = window.location.origin + window.location.pathname + '#answer=' + encoded;
   var out = document.getElementById('s3shareUrl');
   if (out) {
