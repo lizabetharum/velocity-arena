@@ -61,7 +61,10 @@ const ACTIVITY_LESSONS = {
    'Post-Task Diagnostic: Prior Knowledge Reassessment': '/activities/diagnostic-post/index.html',
     'Pre-Match Pitch Rehearsal + Teach the Math': '/lessons/pre-match-pitch.html',
   'Teach the Math': '/lessons/pre-match-pitch-v2.html',
-  'What-If? Analysis':'/lessons/what-if/',
+  'Open Lab: Season 2 Allocation': [{url: '/lessons/what-if/', label: 'What-If? Analysis'},
+  {url: '/lessons/what-if-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
+  'What-If? Analysis':[{url: '/lessons/what-if/', label: 'What-If? Analysis'},
+  {url: '/lessons/what-if-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
