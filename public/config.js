@@ -88,6 +88,7 @@ const CONFIG = {
   // Source script: apps-script/what-if-publish.gs (deploy as a Web App
   // bound to the same spreadsheet that whatIfSheetCsvUrl reads from).
   // Leave empty to disable auto-publish (Generate Shareable URL still works).
-  whatIfPublishEndpoint: "https://script.google.com/macros/s/AKfycbyHJHr1D8E6PCZsHtEdI6yg9Yb0rIs81A4FKpXVVrGYZH9LhHymH0NMYpGLpvmP6KO1-g/exec"
+  whatIfPublishEndpoint: "https://script.google.com/macros/s/AKfycbxaDcDtPAP36Roo_9oPbEje6hiFiqRFXOMthxV4mhhfJgPbH6se3iQYYcXjKwH8TKIclA/exec"
+ 
 
 };
