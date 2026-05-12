@@ -75,6 +75,19 @@ const CONFIG = {
   //      Sheets: File → Share → Publish to web → choose the tab → CSV → Publish.
   //
   // Leave empty to show teacher setup instructions on the picker page.
-  whatIfSheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?output=csv"
+  whatIfSheetCsvUrl: {
+  NY1: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=0&single=true&output=csv",
+  NY2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=229813507&single=true&output=csv",
+  NY3: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=2121279537&single=true&output=csv",
+  TN:  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?gid=37878490&single=true&output=csv",
+  },
+
+  // Optional Apps Script Web App URL for auto-publishing the What-If URL
+  // straight into the Google Sheet (no copy/paste). When set, the
+  // recalculator shows a "Publish to Sheet" button beside Generate URL.
+  // Source script: apps-script/what-if-publish.gs (deploy as a Web App
+  // bound to the same spreadsheet that whatIfSheetCsvUrl reads from).
+  // Leave empty to disable auto-publish (Generate Shareable URL still works).
+  whatIfPublishEndpoint: ""
 
 };

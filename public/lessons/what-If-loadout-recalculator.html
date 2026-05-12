@@ -218,7 +218,14 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 .change-summary{background:#1a2438;border-radius:8px;padding:12px 16px;margin-top:10px;font-size:12px;line-height:2;color:#ccc}
 .change-summary strong{font-weight:700}
 .ch-drop{color:#FF6B6B}.ch-gain{color:#69DB7C}.ch-same{color:rgba(255,255,255,.45)}
+
+/* Publish-to-Sheet button styling — sits beside Generate URL */
+.publish-btn{background:var(--green);color:#fff;margin-left:8px}
+.publish-btn:hover{background:#1b5e20}
+.publish-btn:disabled{opacity:.5;cursor:not-allowed}
 </style>
+<script src="/config.js"></script>
+<script src="/site.js"></script>
 </head>
 <body>
 
@@ -253,6 +260,7 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
   </div>
   <div style="margin-top:16px">
     <button class="share-btn" onclick="generateURL()">Generate Shareable URL</button>
+    <button class="share-btn publish-btn" id="publishBtn" onclick="publishToSheet()">Publish to Sheet</button>
     <div class="share-url" id="shareURL"></div>
   </div>
 </div>
@@ -603,6 +611,90 @@ function showToast(msg, kind) {
       setTimeout(function(){ if (t.parentNode) t.remove(); }, 300);
     }
   }, 4000);
+}
+
+// Auto-publish the generated URL to the Google Sheet via the Apps Script
+// Web App configured in CONFIG.whatIfPublishEndpoint. Requires the user
+// to have selected a site (we publish under that site's code).
+function publishToSheet() {
+  console.log('[What-If] Publish to Sheet pressed…');
+  var endpoint = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfPublishEndpoint : '';
+  if (!endpoint) {
+    showToast('Auto-publish not configured. Set CONFIG.whatIfPublishEndpoint in config.js (see apps-script/what-if-publish.gs).', 'warn');
+    return;
+  }
+  var site = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  if (!site) {
+    showToast('Pick your site in the header dropdown first — we publish under that site\'s tab.', 'warn');
+    return;
+  }
+  var issues = collectSetupState();
+  if (issues.droppedTeams.length) {
+    console.warn('[What-If] Publish proceeding with ' + issues.droppedTeams.length + ' team(s) skipped:',
+      issues.dropReasons);
+  }
+  var encoded;
+  try {
+    encoded = b64EncodeUtf8(JSON.stringify(state));
+  } catch(e) {
+    showToast('Could not encode setup: ' + e.message, 'warn');
+    return;
+  }
+  var url = window.location.origin + window.location.pathname + '#' + encoded;
+  var rules = state.rules.map(function(r) {
+    return STAT_NAMES[r.stat] + ' ' + r.dir + ' ' + r.threshold;
+  }).join(', ');
+
+  var btn = document.getElementById('publishBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
+
+  // Apps Script Web Apps choke on CORS preflight; use text/plain so the
+  // browser sends a "simple" request that doesn't need preflight. The
+  // Apps Script JSON.parses the body itself.
+  fetch(endpoint, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ site: site, url: url, rules: rules })
+  })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(resp) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Publish to Sheet'; }
+      if (resp && resp.ok) {
+        var tab = resp.tab ? '"' + resp.tab + '" tab' : site + ' tab';
+        showToast('Published to ' + tab + '. Students will see the new URL on next refresh.', 'ok');
+        // Surface URL in the existing share box too, in case the facilitator
+        // wants to copy it directly.
+        var el = document.getElementById('shareURL');
+        if (el) {
+          el.style.display = 'block';
+          el.innerHTML =
+            '<div class="share-status">✓ Published to Google Sheet · ' +
+              esc(resp.tab || site) + ' · ' + esc(resp.lastUpdated || '') + '</div>' +
+            '<div class="share-link">' + esc(url) + '</div>';
+        }
+      } else {
+        var msg = (resp && resp.error) ? resp.error : 'unknown error';
+        console.error('[What-If] Publish endpoint returned not-ok:', resp);
+        showToast('Publish failed: ' + msg, 'warn');
+      }
+    })
+    .catch(function(err) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Publish to Sheet'; }
+      console.error('[What-If] Publish fetch failed:', err);
+      showToast('Publish failed: ' + err.message + '. Check the endpoint URL and that the Apps Script is deployed.', 'warn');
+    });
+}
+
+// `esc` is used by publishToSheet's status box but lives in the picker
+// page; mirror it here so the recalculator is self-contained.
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function generateURL() {
@@ -1579,6 +1671,12 @@ window.addEventListener('DOMContentLoaded', function() {
   hideFacilitatorEntry();
   renderReceivedPanel();
   applyViewMode();
+  // Hide the Publish-to-Sheet button if no endpoint is configured —
+  // avoid offering a feature that can't work.
+  if (typeof CONFIG === 'undefined' || !CONFIG.whatIfPublishEndpoint) {
+    var pb = document.getElementById('publishBtn');
+    if (pb) pb.style.display = 'none';
+  }
   if (state.rules.length === 0 && state.teams.length === 0) {
     state.rules = [{ stat:'E', dir:'≤', threshold:8 }];
     state.teams = [
