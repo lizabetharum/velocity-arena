@@ -1345,18 +1345,21 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams present final Championship rule proposals. Same format as Day 12: 3 minutes, two data points cited, address the last-place team. League votes. Passing rules go on the wall. After voting, teams adjust their Championship loadout under the new constraints -- fix any math errors before leaving. Final rule-setting meeting of the program.",
         "script": "https://docs.google.com/document/d/1uw_04mJk0wg6xibN7EcWCWRgKNHZP_-h60m6ucufcsI/edit?usp=drive_link",
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day16-commissioner-proposal.html",
-        "worksheet":"https://docs.google.com/document/d/1bOi-qqmVXnb-Uhr6HAw-ezLjD1jYr0-e_-Ui-nJpeAw/edit?usp=sharing",
+        "worksheet":[{url:"https://drive.google.com/file/d/1F2z2eAMIXcnO7LL43DqV1wg3WimurcZ6/view?usp=drive_link", label: "Rule Log"},
+          {url:"https://docs.google.com/document/d/1bOi-qqmVXnb-Uhr6HAw-ezLjD1jYr0-e_-Ui-nJpeAw/edit?usp=sharing", label: "Commissioner Proposal"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-03-commissioners-meeting-pt1.html"
       },
       {
-        "name": "Open Lab: Recalculate + Scout",
+        "name": "What-If? Analysis",
         "mins": 45,
-        "block": "Open Lab",
-        "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
-        "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
-        "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
+        "block": "Challenge Block",
+        "description": "The facilitator posts one constraint: 'The Commissioner has capped Endurance at 4 for the Championship.' You have 10 minutes to answer for every team: which loadouts violate this constraint? For each, calculate how their decay rate changes if they reallocate excess points to Speed. State the new motor power output. Does this rule change help or hurt your team? Show the math.",
+        "facilitatorDescription": "Post one constraint: 'The Commissioner has capped Endurance at 4 for the Championship.' In 10 minutes, each team answers for every team in the room: which loadouts violate the constraint? For each violator, calculate the decay rate change if excess points reallocate to Speed and state the new motor power output. Each team analyzes whether the rule change helps or hurts them. Show all math.",
+        "script": "https://docs.google.com/document/d/17eclDcJ_fBES8hiqnBz6L6mJ_mvo_tMcz2qr67_GonI/edit?usp=drive_link",
+        "worksheet":"https://drive.google.com/file/d/1iS672HKPBa53LlwEtZ2swkJxX9Mpb4tF/view?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-what-if-analysis.html"
       }
+      
     ],
     "produce": [
       "Bar chart — opponent's four stats drawn; biggest threat circled",  
@@ -1383,14 +1386,16 @@ const DAYS_DEFAULT = [
     "activities": [
       
       {
-        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
-        "mins": 65,
-        "block": "Challenge Block",
-        "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in.",
-        "facilitatorDescription": "Teams rehearse a 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback centers on one question: did they cite a specific number for every claim? Each team then picks one calculation and explains it in plain language, visitor-ready. Every claim in the pitch needs a number next to it before teams leave -- 'Our bot is fast' scores zero; 'Speed = 7 gives us 35% motor power' scores full points.",
-        "script": "https://docs.google.com/document/d/1WPsfN7Gwbz809PmeEuuqzo5GNhcu8cyOpFxlT7JVdVg/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/181fmb7UpFIObB5jJroJDxmk2k_amVA1x/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-pitch-rehearsal-teach-math.html"
+        "name": "Final Commissioner's Meeting, Part 2 + Championship Bracket Reveal",
+        "mins": 90,
+        "block": "Match-Build-Make",
+        "description": "Final rule adjustments confirmed. Championship bracket revealed and posted. Final bot tune-up: program your Championship loadout, verify code against math, run one test drive.",
+        "facilitatorDescription": "Confirm final rule adjustments. Reveal and post the Championship bracket. Teams do their final bot tune-up: program Championship loadout, verify code against math, run one test drive. Highest-anticipation moment before tournament day.",
+        "script": "https://docs.google.com/document/d/1dbjceeZa7y2mn6nBB8iLlIc2YIpWn34S_A3z7FENCUo/edit?usp=drive_link",
+"worksheet":[{url:"https://drive.google.com/file/d/1F2z2eAMIXcnO7LL43DqV1wg3WimurcZ6/view?usp=drive_link", label: "Rule Log"},
+  {url:"https://drive.google.com/file/d/14WmDx_fEm3fxMwmLoaUdu4BU1QS5efkV/view?usp=drive_link", label: "Ball Modes"}
+],
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-03-commissioners-pt2-bracket-reveal.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -1399,25 +1404,27 @@ const DAYS_DEFAULT = [
         "description": "Eat, rest, and talk about anything except math.",
         "facilitatorDescription": "Eat and rest. 60-minute protected break. No math talk."
       },
+      
       {
-        "name": "Final Commissioner's Meeting, Part 2 + Championship Bracket Reveal",
-        "mins": 90,
-        "block": "Match-Build-Make",
-        "description": "Final rule adjustments confirmed. Championship bracket revealed and posted. Final bot tune-up: program your Championship loadout, verify code against math, run one test drive.",
-        "facilitatorDescription": "Confirm final rule adjustments. Reveal and post the Championship bracket. Teams do their final bot tune-up: program Championship loadout, verify code against math, run one test drive. Highest-anticipation moment before tournament day.",
-        "script": "https://docs.google.com/document/d/1dbjceeZa7y2mn6nBB8iLlIc2YIpWn34S_A3z7FENCUo/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-03-commissioners-pt2-bracket-reveal.html"
-      },
-    
-      {
-        "name": "What-If? Analysis",
-        "mins": 45,
+        "name": "Pre-Match Pitch Rehearsal + Teach the Math",
+        "mins": 60,
         "block": "Challenge Block",
-        "description": "The facilitator posts one constraint: 'The Commissioner has capped Endurance at 4 for the Championship.' You have 10 minutes to answer for every team: which loadouts violate this constraint? For each, calculate how their decay rate changes if they reallocate excess points to Speed. State the new motor power output. Does this rule change help or hurt your team? Show the math.",
-        "facilitatorDescription": "Post one constraint: 'The Commissioner has capped Endurance at 4 for the Championship.' In 10 minutes, each team answers for every team in the room: which loadouts violate the constraint? For each violator, calculate the decay rate change if excess points reallocate to Speed and state the new motor power output. Each team analyzes whether the rule change helps or hurts them. Show all math.",
-        "script": "https://docs.google.com/document/d/17eclDcJ_fBES8hiqnBz6L6mJ_mvo_tMcz2qr67_GonI/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-04-what-if-analysis.html"
+        "description": "Rehearse your 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback: did they cite a specific number for every claim? Then each team picks one calculation and explains it in plain language as if a visitor just walked in.",
+        "facilitatorDescription": "Teams rehearse a 2-minute pre-match pitch for Championship judges: 'Our strategy is [X] because [equation result]. Our opponent will do [Y] based on their [stat].' Peer feedback centers on one question: did they cite a specific number for every claim? Each team then picks one calculation and explains it in plain language, visitor-ready. Every claim in the pitch needs a number next to it before teams leave -- 'Our bot is fast' scores zero; 'Speed = 7 gives us 35% motor power' scores full points.",
+        "script": "https://docs.google.com/document/d/1WPsfN7Gwbz809PmeEuuqzo5GNhcu8cyOpFxlT7JVdVg/edit?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/181fmb7UpFIObB5jJroJDxmk2k_amVA1x/view?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-01-pitch-rehearsal-teach-math.html"
       },
+    {
+        "name": "Open Lab: Championship Simulation",
+        "mins": 60,
+        "block": "Open Lab",
+        "description": "Program your Championship loadout into MakeCode. Run one test drive. Verify every stat's behavior matches its formula output. If anything mismatches, fix it now.",
+        "facilitatorDescription": "Teams program their Championship loadout into MakeCode, run one test drive, and verify every stat's behavior matches formula output. Any mismatch gets fixed now. Last uninterrupted debugging window before the tournament.",
+        "script": "https://docs.google.com/document/d/1ROa_mZe7Ty9dhv7wBGwa_xwpsU-il_jnexl03spmoTo/edit?usp=drive_link",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day16-04-open-lab-recalculate-and-scout.html"
+      },
+      
       {
         "name": "Open Lab: Pitch Refinement and Bot Prep",
         "mins": 15,
