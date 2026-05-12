@@ -92,12 +92,15 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 .eq-hint{font-size:11px;color:var(--muted);font-style:italic;display:block;margin-top:2px}
 .surprising-row td{background:var(--amber-bg) !important}
 .surprising-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;color:#856404;background:#FFF3CD;border:1px solid var(--amber);padding:1px 6px;border-radius:10px;margin-left:6px;text-transform:uppercase;vertical-align:middle}
-.surprising-info{display:inline-block;margin-left:6px;vertical-align:middle}
+.surprising-info{display:inline-block;margin-left:6px;vertical-align:middle;position:relative}
 .surprising-info summary{cursor:pointer;list-style:none;font-size:10px;font-weight:800;letter-spacing:.6px;color:#856404;background:#FFF3CD;border:1px solid var(--amber);padding:1px 8px;border-radius:10px;text-transform:uppercase;display:inline-block}
 .surprising-info summary::-webkit-details-marker{display:none}
 .surprising-info summary::after{content:' ⓘ';font-size:10px;margin-left:2px}
 .surprising-info[open] summary{background:var(--amber);color:#fff}
-.surprising-explainer{font-size:11px;font-weight:500;color:#856404;background:#FFF8E1;border:1px solid var(--amber);border-radius:6px;padding:8px 10px;margin-top:6px;line-height:1.5;max-width:340px;font-style:normal;text-transform:none;letter-spacing:0}
+.surprising-explainer{position:absolute;top:calc(100% + 4px);left:0;z-index:20;width:300px;font-size:11px;font-weight:500;color:#856404;background:#FFF8E1;border:1px solid var(--amber);border-radius:6px;padding:8px 10px;line-height:1.5;font-style:normal;text-transform:none;letter-spacing:0;box-shadow:0 4px 14px rgba(0,0,0,.14);text-align:left;white-space:normal}
+/* Let popovers escape the card's overflow:hidden when open */
+.card:has(.surprising-info[open]){overflow:visible}
+@media(max-width:560px){.surprising-explainer{width:240px;right:0;left:auto}}
 
 /* ---- RECEIVED SUBMISSION (from #answer=... URL) ---- */
 .received-panel{background:#fff;border:2px solid var(--green);border-radius:10px;padding:16px 20px;margin-bottom:18px;box-shadow:0 2px 10px rgba(46,125,50,.12)}
@@ -258,7 +261,7 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 <div class="main">
 
   <!-- SECTION 1: WORKED EXAMPLE -->
-  <div class="card">
+  <div class="card" id="sec1Card">
     <div class="card-hdr">
       <span class="card-badge">Section 1</span>
       <span class="card-title">Worked Example — Follow Along</span>
@@ -398,7 +401,7 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
   </div>
 
   <!-- SECTION 2: GUIDED PRACTICE -->
-  <div class="card">
+  <div class="card" id="sec2Card">
     <div class="card-hdr">
       <span class="card-badge">Section 2</span>
       <span class="card-title">Guided Practice — Team Nexus</span>
@@ -430,6 +433,7 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 var state = { rules: [], teams: [] };
 var s2nexus = null;
 var receivedAnswer = null;  // populated when the page loads with a #answer=... URL
+var IS_VIEW_MODE = false;   // true when the page is rendering a received submission
 
 // Per-team persisted state (snapshots, lock, decision text). Keyed by team name.
 var LS_KEY = 'va_whatif_v1';
@@ -512,9 +516,15 @@ function loadFromHash() {
       // Student-shared answer URL: { team, stats, decision, ts, setup }
       var ans = JSON.parse(atob(h.slice(7)));
       receivedAnswer = ans;
+      IS_VIEW_MODE = true;
       if (ans.setup) {
         state.rules = ans.setup.rules || [];
         state.teams = ans.setup.teams || [];
+      }
+      // Make sure the submitted team is selectable even if the share URL
+      // didn't include it in the setup.
+      if (ans.team && ans.stats && !state.teams.some(function(t){return t.name===ans.team;})) {
+        state.teams.push({name: ans.team, S: ans.stats.S, E: ans.stats.E, T: ans.stats.T, P: ans.stats.P});
       }
     } else {
       // Facilitator setup URL: { rules, teams }
@@ -525,6 +535,14 @@ function loadFromHash() {
   } catch(e) {
     console.warn('What-If: could not decode hash —', e.message);
   }
+}
+
+function applyViewMode() {
+  if (!IS_VIEW_MODE) return;
+  var s1 = document.getElementById('sec1Card');
+  var s2 = document.getElementById('sec2Card');
+  if (s1) s1.style.display = 'none';
+  if (s2) s2.style.display = 'none';
 }
 
 function renderReceivedPanel() {
@@ -548,7 +566,7 @@ function renderReceivedPanel() {
   var panel = document.createElement('div');
   panel.className = 'received-panel';
   panel.innerHTML =
-    '<h3>📩 Received submission</h3>' +
+    '<h3>Received submission</h3>' +
     '<div class="rp-team">' + escapeHtml(ans.team || '(unnamed team)') + '</div>' +
     '<div class="rp-stats">' + statsHtml + '</div>' +
     decisionHtml +
@@ -764,14 +782,13 @@ function renderS2() {
   }
 
   var r = state.rules[0];
-  var statName = {S:'Speed',E:'Endurance',T:'Turning',P:'Power'};
   var thresh = parseInt(r.threshold);
   var violVal = s2nexus[r.stat];
   var excess = r.dir === '≤' ? violVal - thresh : thresh - violVal;
   var moveWord = r.dir === '≤' ? 'reduce' : 'increase';
 
   var rulesHtml = state.rules.map(function(rule) {
-    return '<span class="chip chip-neutral">'+statName[rule.stat]+' '+rule.dir+' '+rule.threshold+'</span>';
+    return '<span class="chip chip-neutral">'+STAT_NAMES[rule.stat]+' '+rule.dir+' '+rule.threshold+'</span>';
   }).join('');
 
   var html = '';
@@ -785,7 +802,7 @@ function renderS2() {
     var check = checks.find(function(c){ return c.stat===s; });
     var violated = check && !check.ok;
     html += '<tr'+(violated?' class="amber-row"':'')+'>';
-    html += '<td>'+statName[s]+' ('+s+')</td>';
+    html += '<td>'+STAT_NAMES[s]+' ('+s+')</td>';
     html += '<td'+(violated?' class="viol-cell"':'')+'>'+s2nexus[s]+'</td>';
     if (violated) {
       html += '<td class="viol-cell">❌ '+r.dir+' '+thresh+' — '+moveWord+' by '+check.gap+'</td>';
@@ -799,13 +816,13 @@ function renderS2() {
   html += '<tr style="background:#f0f4f9"><td style="font-weight:700">Total</td><td style="font-weight:800">20 ✓</td><td>—</td></tr>';
   html += '</tbody></table>';
 
-  html += '<div class="viol"><strong>The problem:</strong> '+statName[r.stat]+' = '+violVal+', rule says '+statName[r.stat]+' '+r.dir+' '+thresh+'. Team Nexus must '+moveWord+' '+statName[r.stat]+' by at least '+excess+' point'+(excess!==1?'s':'')+'. Any new loadout that satisfies the rule and sums to 20 is valid.</div>';
+  html += '<div class="viol"><strong>The problem:</strong> '+STAT_NAMES[r.stat]+' = '+violVal+', rule says '+STAT_NAMES[r.stat]+' '+r.dir+' '+thresh+'. Team Nexus must '+moveWord+' '+STAT_NAMES[r.stat]+' by at least '+excess+' point'+(excess!==1?'s':'')+'. Any new loadout that satisfies the rule and sums to 20 is valid.</div>';
   html += '<div class="hint"><strong>Your job:</strong> Edit Team Nexus\'s stats below. The boxes turn green when the rule is satisfied and the budget balances at 20. Once everything looks right, click <strong>Show formula impact</strong> to see how the formulas changed.</div>';
 
   // Stat inputs — all editable, pre-filled with current values (the violating loadout).
   html += '<div class="stat-grid">';
   ['S','E','T','P'].forEach(function(s) {
-    html += statBoxHtml('s2', s, statName[s], s2nexus[s], s2nexus[s]);
+    html += statBoxHtml('s2', s, STAT_NAMES[s], s2nexus[s], s2nexus[s]);
   });
   html += '</div>';
 
@@ -843,7 +860,6 @@ function renderS2() {
 
 function s2Update() {
   if (!state.rules || !state.rules.length) return;
-  var statName = {S:'Speed',E:'Endurance',T:'Turning',P:'Power'};
   var stats = {};
   var total = 0;
   ['S','E','T','P'].forEach(function(s) {
@@ -869,7 +885,7 @@ function s2Update() {
     ruleStatus.innerHTML = results.map(function(rr) {
       var cls = rr.ok ? 'chip-ok' : 'chip-bad';
       var icon = rr.ok ? '✓' : '✗';
-      return '<span class="chip '+cls+'">'+icon+' '+statName[rr.stat]+' '+rr.dir+' '+rr.threshold+' (now '+rr.val+')</span>';
+      return '<span class="chip '+cls+'">'+icon+' '+STAT_NAMES[rr.stat]+' '+rr.dir+' '+rr.threshold+' (now '+rr.val+')</span>';
     }).join('');
   }
 
@@ -915,19 +931,22 @@ function checkS2() {
     stats[s] = parseInt(el.value)||0;
   });
   var fb = document.getElementById('s2feedback');
+  var reveal = document.getElementById('s2reveal');
   var total = stats.S+stats.E+stats.T+stats.P;
   if (total !== 20) {
-    fb.className='feedback err'; fb.textContent='Total is '+total+', not 20. Adjust your stats — the budget must balance exactly.'; return;
+    fb.className='feedback err'; fb.textContent='Total is '+total+', not 20. Adjust your stats — the budget must balance exactly.';
+    if (reveal) reveal.classList.remove('shown');
+    return;
   }
   var results = checkRules(stats);
   var bad = results.filter(function(r){ return !r.ok; });
   if (bad.length > 0) {
-    var statName = {S:'Speed',E:'Endurance',T:'Turning',P:'Power'};
-    var msgs = bad.map(function(b){ return statName[b.stat]+' = '+b.val+' (must be '+b.dir+' '+b.threshold+')'; });
-    fb.className='feedback err'; fb.textContent='Rule violated: '+msgs.join('; ')+'. Try again.'; return;
+    var msgs = bad.map(function(b){ return STAT_NAMES[b.stat]+' = '+b.val+' (must be '+b.dir+' '+b.threshold+')'; });
+    fb.className='feedback err'; fb.textContent='Rule violated: '+msgs.join('; ')+'. Try again.';
+    if (reveal) reveal.classList.remove('shown');
+    return;
   }
   fb.className='feedback ok'; fb.textContent='✓ Valid loadout — budget balanced and all rules satisfied!';
-  var reveal = document.getElementById('s2reveal');
   if (reveal) {
     reveal.classList.add('shown');
     renderS2Formulas(stats);
@@ -988,9 +1007,8 @@ function renderS3() {
     return;
   }
 
-  var statName = {S:'Speed',E:'Endurance',T:'Turning',P:'Power'};
   var rulesHtml = state.rules.map(function(r) {
-    return '<span class="chip chip-neutral">'+statName[r.stat]+' '+r.dir+' '+r.threshold+'</span>';
+    return '<span class="chip chip-neutral">'+STAT_NAMES[r.stat]+' '+r.dir+' '+r.threshold+'</span>';
   }).join('');
 
   var html = '';
@@ -1013,7 +1031,7 @@ function renderS3() {
 
   html += '<div class="stat-grid">';
   ['S','E','T','P'].forEach(function(s) {
-    html += statBoxHtml('s3', s, statName[s]);
+    html += statBoxHtml('s3', s, STAT_NAMES[s]);
   });
   html += '</div>';
 
@@ -1043,16 +1061,20 @@ function renderS3() {
   html += '<textarea id="s3decision" oninput="onDecisionInput()" placeholder="Based on my new loadout, my bot will perform differently because... The trade I made was... My strategy for the Championship is..."></textarea>';
   html += '</div>';
 
-  // Action row: snapshot / lock / share
-  html += '<div class="flex-gap" style="margin-top:14px">';
-  html += '<button class="btn btn-ghost" id="s3snapBtn" onclick="saveS3Snapshot()">📌 Save snapshot</button>';
-  html += '<button class="btn btn-navy" id="s3lockBtn" onclick="lockS3()">🔒 Lock In Loadout</button>';
-  html += '<button class="btn btn-amber" id="s3shareBtn" onclick="shareS3Loadout()">↗ Share My Loadout</button>';
-  html += '</div>';
+  // Action row: snapshot / lock / share (hidden in view mode)
+  if (IS_VIEW_MODE) {
+    html += '<div class="viol" style="background:var(--blue-bg);border-left-color:var(--navy);color:var(--navy);margin-top:14px"><strong>View mode.</strong> This page is showing a shared submission. To enter your own loadout, open the page without the <code>#answer=…</code> URL.</div>';
+  } else {
+    html += '<div class="flex-gap" style="margin-top:14px">';
+    html += '<button class="btn btn-ghost" id="s3snapBtn" onclick="saveS3Snapshot()">Save snapshot</button>';
+    html += '<button class="btn btn-navy" id="s3lockBtn" onclick="lockS3()">Lock In Loadout</button>';
+    html += '<button class="btn btn-amber" id="s3shareBtn" onclick="shareS3Loadout()">Share My Loadout</button>';
+    html += '</div>';
+  }
 
   // Lock banner (shown when locked)
   html += '<div class="lock-banner" id="s3lockBanner">'+
-    '<span>🔒 Loadout locked in</span>'+
+    '<span>Loadout locked in</span>'+
     '<span class="lock-time" id="s3lockTime"></span>'+
     '<button class="btn btn-ghost lock-unlock" onclick="unlockS3()">Unlock to edit</button>'+
   '</div>';
@@ -1072,6 +1094,32 @@ function renderS3() {
 }
 
 function s3TeamChanged() {
+  // View mode: use the received submission's team + stats, ignore the dropdown.
+  if (IS_VIEW_MODE && receivedAnswer) {
+    var origTeam = state.teams.find(function(t){ return t.name === receivedAnswer.team; });
+    s3currentTeam = origTeam || {
+      name: receivedAnswer.team || 'Submitted',
+      S: receivedAnswer.stats.S, E: receivedAnswer.stats.E,
+      T: receivedAnswer.stats.T, P: receivedAnswer.stats.P
+    };
+    var startStats = receivedAnswer.stats;
+    ['S','E','T','P'].forEach(function(s) {
+      var el = document.getElementById('s3in-'+s);
+      if (el) { el.value = startStats[s]; el.disabled = true; }
+      var box = document.getElementById('s3box-'+s);
+      if (box) box.querySelectorAll('.stepper-btn').forEach(function(b){ b.disabled = true; });
+      var origLine = document.querySelector('#s3box-'+s+' .sbox-orig');
+      if (origLine) origLine.textContent = 'was: '+s3currentTeam[s];
+    });
+    var dec = document.getElementById('s3decision');
+    if (dec) { dec.value = receivedAnswer.decision || ''; dec.disabled = true; }
+    var teamSel = document.getElementById('s3teamsel');
+    if (teamSel) teamSel.disabled = true;
+    renderSnapshots();   // will hide section (no local snapshots for received view)
+    s3Update();
+    return;
+  }
+
   var sel = document.getElementById('s3teamsel');
   var idx = sel ? parseInt(sel.value) : -1;
   if (idx >= 0 && state.teams[idx]) {
@@ -1103,7 +1151,6 @@ function s3TeamChanged() {
 
 function s3Update() {
   if (!s3currentTeam) return;
-  var statName = {S:'Speed',E:'Endurance',T:'Turning',P:'Power'};
   var stats = {};
   var total = 0;
   ['S','E','T','P'].forEach(function(s) {
@@ -1153,7 +1200,7 @@ function s3Update() {
       ruleStatus.innerHTML = results.map(function(r) {
         var cls = r.ok ? 'chip-ok' : 'chip-bad';
         var icon = r.ok ? '✓' : '✗';
-        return '<span class="chip '+cls+'">'+icon+' '+statName[r.stat]+' '+r.dir+' '+r.threshold+' (now '+r.val+')</span>';
+        return '<span class="chip '+cls+'">'+icon+' '+STAT_NAMES[r.stat]+' '+r.dir+' '+r.threshold+' (now '+r.val+')</span>';
       }).join('');
       results.forEach(function(r) {
         var box = document.getElementById('s3box-'+r.stat);
@@ -1207,6 +1254,7 @@ function s3Update() {
 
 // ----- Decision text persistence -----
 function onDecisionInput() {
+  if (IS_VIEW_MODE) return;  // viewer's typing must not pollute their localStorage
   if (!s3currentTeam) return;
   var dec = document.getElementById('s3decision');
   if (!dec) return;
@@ -1226,9 +1274,12 @@ function currentS3Stats() {
 }
 
 function saveS3Snapshot() {
-  if (!s3currentTeam) return;
+  if (!s3currentTeam || IS_VIEW_MODE) return;
   var stats = currentS3Stats();
-  if (stats.S+stats.E+stats.T+stats.P === 0) return;
+  if (stats.S+stats.E+stats.T+stats.P !== 20) {
+    alert('Budget must equal 20 to save a snapshot. (Rules are allowed to be violated — snapshots are for exploring.)');
+    return;
+  }
   var rec = getTeamRec(s3currentTeam.name);
   rec.snapshots.push({
     ts: Date.now(),
@@ -1260,11 +1311,19 @@ function loadSnapshot(idx) {
 
 function renderSnapshots() {
   if (!s3currentTeam) return;
-  var rec = getTeamRec(s3currentTeam.name);
   var sec = document.getElementById('s3snapSection');
   var tbl = document.getElementById('s3snapTbl');
   var countEl = document.getElementById('s3snapCount');
   if (!sec || !tbl) return;
+  if (IS_VIEW_MODE) {
+    // Snapshots are local-only; don't expose the viewer's prior snapshots
+    // (or any other team's) inside a received-submission view.
+    sec.classList.add('empty');
+    tbl.innerHTML = '';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  var rec = getTeamRec(s3currentTeam.name);
   if (rec.snapshots.length === 0) {
     sec.classList.add('empty');
     tbl.innerHTML = '';
@@ -1434,6 +1493,7 @@ window.addEventListener('DOMContentLoaded', function() {
   loadFromHash();
   loadTeamState();
   renderReceivedPanel();
+  applyViewMode();
   if (state.rules.length === 0 && state.teams.length === 0) {
     state.rules = [{ stat:'E', dir:'≤', threshold:8 }];
     state.teams = [
