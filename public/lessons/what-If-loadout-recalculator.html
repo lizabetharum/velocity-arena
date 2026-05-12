@@ -264,7 +264,6 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
   </div>
   <div style="margin-top:16px">
     <button class="share-btn" onclick="generateURL()">Generate Shareable URL</button>
-    <button class="share-btn publish-btn" id="publishBtn" onclick="publishToSheet()">Publish to Sheet</button>
     <div class="share-url" id="shareURL"></div>
   </div>
 </div>
@@ -617,89 +616,6 @@ function showToast(msg, kind) {
   }, 4000);
 }
 
-// Auto-publish the generated URL to the Google Sheet via the Apps Script
-// Web App configured in CONFIG.whatIfPublishEndpoint. Requires the user
-// to have selected a site (we publish under that site's code).
-function publishToSheet() {
-  console.log('[What-If] Publish to Sheet pressed…');
-  var endpoint = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfPublishEndpoint : '';
-  if (!endpoint) {
-    showToast('Auto-publish not configured. Set CONFIG.whatIfPublishEndpoint in config.js (see apps-script/what-if-publish.gs).', 'warn');
-    return;
-  }
-  var site = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
-  if (!site) {
-    showToast('Pick your site in the header dropdown first — we publish under that site\'s tab.', 'warn');
-    return;
-  }
-  var issues = collectSetupState();
-  if (issues.droppedTeams.length) {
-    console.warn('[What-If] Publish proceeding with ' + issues.droppedTeams.length + ' team(s) skipped:',
-      issues.dropReasons);
-  }
-  var encoded;
-  try {
-    encoded = b64EncodeUtf8(JSON.stringify(state));
-  } catch(e) {
-    showToast('Could not encode setup: ' + e.message, 'warn');
-    return;
-  }
-  var url = window.location.origin + window.location.pathname + '#' + encoded;
-  var rules = state.rules.map(function(r) {
-    return STAT_NAMES[r.stat] + ' ' + r.dir + ' ' + r.threshold;
-  }).join(', ');
-
-  var btn = document.getElementById('publishBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
-
-  // Apps Script Web Apps with "Anyone" access serve doGet to anonymous
-  // callers but block anonymous POSTs (the 302 redirect target rejects
-  // unauthenticated traffic). Same GET-with-payload pattern the dashboard
-  // endpoints in this codebase use.
-  var payload = JSON.stringify({ site: site, url: url, rules: rules });
-  var getUrl = endpoint + (endpoint.indexOf('?') >= 0 ? '&' : '?') +
-    'payload=' + encodeURIComponent(payload);
-  fetch(getUrl, { method: 'GET', redirect: 'follow' })
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    })
-    .then(function(resp) {
-      if (btn) { btn.disabled = false; btn.textContent = 'Publish to Sheet'; }
-      if (resp && resp.ok) {
-        var tab = resp.tab ? '"' + resp.tab + '" tab' : site + ' tab';
-        showToast('Published to ' + tab + '. Students will see the new URL on next refresh.', 'ok');
-        // Surface URL in the existing share box too, in case the facilitator
-        // wants to copy it directly.
-        var el = document.getElementById('shareURL');
-        if (el) {
-          el.style.display = 'block';
-          el.innerHTML =
-            '<div class="share-status">✓ Published to Google Sheet · ' +
-              esc(resp.tab || site) + ' · ' + esc(resp.lastUpdated || '') + '</div>' +
-            '<div class="share-link">' + esc(url) + '</div>';
-        }
-      } else {
-        var msg = (resp && resp.error) ? resp.error : 'unknown error';
-        console.error('[What-If] Publish endpoint returned not-ok:', resp);
-        showToast('Publish failed: ' + msg, 'warn');
-      }
-    })
-    .catch(function(err) {
-      if (btn) { btn.disabled = false; btn.textContent = 'Publish to Sheet'; }
-      console.error('[What-If] Publish fetch failed:', err);
-      showToast('Publish failed: ' + err.message + '. Check the endpoint URL and that the Apps Script is deployed.', 'warn');
-    });
-}
-
-// `esc` is used by publishToSheet's status box but lives in the picker
-// page; mirror it here so the recalculator is self-contained.
-function esc(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function generateURL() {
   console.log('[What-If] Generating shareable URL…');
   var issues = collectSetupState();
@@ -747,10 +663,69 @@ function generateURL() {
   try { renderS2(); } catch(e) { console.warn('renderS2 failed:', e.message); }
   try { renderS3(); } catch(e) { console.warn('renderS3 failed:', e.message); }
 
+  // Also POST the URL to the Apps Script Web App configured in
+  // CONFIG.whatIfPublishEndpoint so it lands in the Google Sheet without
+  // a manual paste. The clipboard copy above still happens so the
+  // facilitator has the URL either way.
+  var publishEndpoint = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfPublishEndpoint : '';
+  var publishStatus = null;  // 'ok' | 'fail' | null (not configured)
+  if (publishEndpoint) {
+    var selectedSite = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+    var sitePickerEl = document.getElementById('site-picker-select');
+    var siteLabel = sitePickerEl
+      ? (sitePickerEl.options[sitePickerEl.selectedIndex] && sitePickerEl.options[sitePickerEl.selectedIndex].text || '')
+      : '';
+    var rulesText = state.rules.map(function(r) {
+      return STAT_NAMES[r.stat] + ' ' + r.dir + ' ' + r.threshold;
+    }).join(', ');
+    var publishPayload = {
+      url: url,
+      site: selectedSite || siteLabel || '',
+      siteLabel: siteLabel,
+      rules: rulesText
+    };
+    console.log('[What-If] POSTing to publish endpoint:', publishPayload);
+    fetch(publishEndpoint, {
+      method: 'POST',
+      redirect: 'follow',
+      // No explicit Content-Type → browser sends text/plain;charset=UTF-8
+      // for a string body, which avoids the CORS preflight Apps Script
+      // can't handle. The Apps Script JSON.parses the body itself.
+      body: JSON.stringify(publishPayload)
+    })
+      .then(function(r) {
+        console.log('[What-If] Publish POST status:', r.status);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(txt) {
+        // Apps Script doPost responses are JSON when our script handles them,
+        // but the redirect chain can return HTML — tolerate both.
+        try {
+          var parsed = JSON.parse(txt);
+          if (parsed && parsed.ok === false) {
+            console.warn('[What-If] Publish endpoint returned not-ok:', parsed.error);
+            publishStatus = 'fail';
+            showToast('Saved URL but Sheet rejected it: ' + parsed.error, 'warn');
+            return;
+          }
+        } catch(e) { /* not JSON — treat as opaque success */ }
+        publishStatus = 'ok';
+        console.log('[What-If] Publish POST appeared to succeed.');
+      })
+      .catch(function(err) {
+        publishStatus = 'fail';
+        console.warn('[What-If] Publish POST failed:', err);
+        // Don't override the clipboard-copy toast with a scary error — the
+        // facilitator still has the URL and can paste manually. Log only.
+      });
+  }
+
   // Prominent, page-level confirmation that's visible regardless of scroll.
   var toastMsg = copyOk
     ? 'Shareable URL copied to clipboard.'
     : 'Shareable URL generated — copy it from the setup panel.';
+  if (publishEndpoint) toastMsg += ' Saving to Google Sheet…';
   if (issues.droppedTeams.length) {
     toastMsg += ' ' + issues.droppedTeams.length + ' team(s) skipped (see warning).';
     showToast(toastMsg, 'warn');
@@ -1679,12 +1654,6 @@ window.addEventListener('DOMContentLoaded', function() {
   hideFacilitatorEntry();
   renderReceivedPanel();
   applyViewMode();
-  // Hide the Publish-to-Sheet button if no endpoint is configured —
-  // avoid offering a feature that can't work.
-  if (typeof CONFIG === 'undefined' || !CONFIG.whatIfPublishEndpoint) {
-    var pb = document.getElementById('publishBtn');
-    if (pb) pb.style.display = 'none';
-  }
   if (state.rules.length === 0 && state.teams.length === 0) {
     state.rules = [{ stat:'E', dir:'≤', threshold:8 }];
     state.teams = [
