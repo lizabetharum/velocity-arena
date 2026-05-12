@@ -511,6 +511,102 @@ function checkRules(stats) {
 function budgetOK(stats) { return stats.S + stats.E + stats.T + stats.P === 20; }
 
 // ============================================================
+// CSV helper + load existing site state from the published sheet
+// ============================================================
+// Tiny CSV parser — handles quoted cells with commas and ""-escaped quotes.
+function _parseCsvSimple(text) {
+  var rows = [];
+  var lines = String(text || '').replace(/\r\n/g, '\n').split('\n');
+  for (var L = 0; L < lines.length; L++) {
+    var line = lines[L];
+    if (!line.trim()) continue;
+    var cells = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (inQ) {
+        if (c === '"' && line[i+1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cur += c;
+      } else {
+        if (c === ',') { cells.push(cur); cur = ''; }
+        else if (c === '"') inQ = true;
+        else cur += c;
+      }
+    }
+    cells.push(cur);
+    rows.push(cells.map(function(s){ return s.trim(); }));
+  }
+  return rows;
+}
+
+// Pulls the active site's URL hash out of the published CSV and decodes
+// it into state.rules / state.teams. Returns a Promise<boolean> — true if
+// existing state was loaded, false if there was nothing to load.
+function loadStateFromSheet() {
+  if (typeof getSelectedSite !== 'function') return Promise.resolve(false);
+  var site = getSelectedSite();
+  if (!site) return Promise.resolve(false);
+  var csvCfg = (typeof CONFIG !== 'undefined') ? CONFIG.whatIfSheetCsvUrl : null;
+  if (!csvCfg) return Promise.resolve(false);
+
+  // Resolve the right CSV target — either the shared sheet or this site's tab.
+  var csvUrl = null;
+  if (typeof csvCfg === 'string') csvUrl = csvCfg;
+  else if (typeof csvCfg === 'object') csvUrl = csvCfg[site] || null;
+  if (!csvUrl) return Promise.resolve(false);
+
+  return fetch(csvUrl, { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(txt) {
+      var rows = _parseCsvSimple(txt);
+      if (rows.length < 2) return false;
+      var header = rows[0].map(function(h){ return h.toLowerCase(); });
+      var urlCol = header.indexOf('url');
+      var siteCol = header.indexOf('site');
+      if (urlCol < 0) return false;
+
+      // Find the row matching this site (by site code OR display label) or
+      // fall back to the first data row when the tab holds a single site.
+      var labels = {};
+      if (typeof SITE_OPTIONS !== 'undefined') {
+        SITE_OPTIONS.forEach(function(o) {
+          labels[o.code.toLowerCase()] = o.code;
+          labels[o.label.toLowerCase()] = o.code;
+        });
+      }
+      var matchRow = null;
+      for (var i = 1; i < rows.length; i++) {
+        if (siteCol < 0) { matchRow = rows[i]; break; }
+        var cell = (rows[i][siteCol] || '').toLowerCase();
+        if (labels[cell] === site || cell === site.toLowerCase()) { matchRow = rows[i]; break; }
+      }
+      if (!matchRow) matchRow = rows[1];
+
+      var existingUrl = matchRow[urlCol];
+      if (!existingUrl) return false;
+      var fragment = existingUrl.split('#')[1];
+      if (!fragment) return false;
+      var decoded;
+      try {
+        decoded = JSON.parse(b64DecodeUtf8(fragment));
+      } catch(e) {
+        console.warn('[What-If] Could not decode existing URL fragment:', e.message);
+        return false;
+      }
+      if (decoded.rules && decoded.rules.length) state.rules = decoded.rules;
+      if (decoded.teams && decoded.teams.length) state.teams = decoded.teams;
+      return true;
+    })
+    .catch(function(err) {
+      console.warn('[What-If] Could not load existing site state from sheet:', err.message);
+      return false;
+    });
+}
+
+// ============================================================
 // URL ENCODING / LOCALSTORAGE
 // ============================================================
 function loadFromHash() {
@@ -1660,7 +1756,8 @@ window.addEventListener('DOMContentLoaded', function() {
   hideFacilitatorEntry();
   renderReceivedPanel();
   applyViewMode();
-  if (state.rules.length === 0 && state.teams.length === 0) {
+  var startedEmpty = (state.rules.length === 0 && state.teams.length === 0);
+  if (startedEmpty) {
     state.rules = [{ stat:'E', dir:'≤', threshold:8 }];
     state.teams = [
       {name:'Team Alpha', S:5, E:9, T:3, P:3},
@@ -1669,12 +1766,40 @@ window.addEventListener('DOMContentLoaded', function() {
       {name:'Team Delta', S:4, E:6, T:6, P:4}
     ];
     var notice = document.createElement('div');
+    notice.id = 'va-demo-notice';
     notice.style.cssText='background:var(--amber-bg);border:1px solid var(--amber);border-radius:0;padding:10px 24px;font-size:12px;font-weight:600;color:#856404;text-align:center';
-    notice.textContent='Demo mode — showing example teams and rules. Your facilitator will share a URL with the real Championship rules and your team\'s stats.';
+    notice.textContent='Demo mode — showing example teams and rules. Pick your site in the header to load this site\'s saved configuration.';
     document.querySelector('.main').insertBefore(notice, document.querySelector('.main').firstChild);
   }
   renderS2();
   renderS3();
+
+  // If the page wasn't opened via a #hash and a site is selected, try to
+  // pre-fill the facilitator setup with whatever this site has already
+  // published to the sheet. Lets a facilitator return and tweak instead of
+  // rebuilding from scratch. Fires in the background so the page renders
+  // fast; if it succeeds, sections and the setup panel re-render with the
+  // saved data.
+  if (startedEmpty && !window.location.hash && typeof loadStateFromSheet === 'function') {
+    loadStateFromSheet().then(function(loaded) {
+      if (!loaded) return;  // nothing in the sheet for this site yet — stay in demo
+      var oldNotice = document.getElementById('va-demo-notice');
+      if (oldNotice) {
+        oldNotice.style.cssText = 'background:#E8F5E9;border:1px solid #2E7D32;border-radius:0;padding:10px 24px;font-size:12px;font-weight:600;color:#2E7D32;text-align:center';
+        oldNotice.textContent = 'Loaded your site\'s saved setup from the Google Sheet. Edit and click Generate Shareable URL to update.';
+      }
+      // Re-render setup panel (if open) + sections with the freshly loaded data
+      if (typeof renderSetupFromState === 'function') {
+        var panel = document.getElementById('setupPanel');
+        if (panel && panel.classList.contains('open')) renderSetupFromState();
+      }
+      try { renderS2(); } catch(e) {}
+      try { renderS3(); } catch(e) {}
+      if (typeof showToast === 'function') {
+        showToast('Loaded your site\'s saved setup. Edit and click Generate Shareable URL to update.', 'ok');
+      }
+    });
+  }
 });
 </script>
 </body>
