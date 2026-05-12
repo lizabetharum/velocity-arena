@@ -245,7 +245,10 @@ table.data tr:nth-child(even) td{background:#f8f9fc}
 
 <!-- FACILITATOR SETUP PANEL -->
 <div class="setup-panel" id="setupPanel">
-  <h2>Facilitator Setup — Configure &amp; Share</h2>
+  <h2 style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <span>Facilitator Setup — Configure &amp; Share</span>
+    <button class="ibtn" onclick="lockTeacherSetup()" style="background:rgba(255,255,255,.12);color:#fff;font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:5px 11px" aria-label="Lock facilitator setup">🔒 Lock setup</button>
+  </h2>
   <div class="setup-grid">
 
     <div class="setup-sec">
@@ -876,9 +879,51 @@ function toggleAxonReveal(btn) {
 }
 
 // ============================================================
-// SETUP PANEL
+// SETUP PANEL — password-gated for facilitators
 // ============================================================
+// Reuse the same key + password the /teacher-schedule.html gate uses,
+// so unlocking once gives access to both.
+var TEACHER_AUTH_KEY = 'va_teacher_auth';
+
+function isTeacherAuthed() {
+  try { return localStorage.getItem(TEACHER_AUTH_KEY) === '1'; } catch(e) { return false; }
+}
+
+function setTeacherAuth(yes) {
+  try {
+    if (yes) localStorage.setItem(TEACHER_AUTH_KEY, '1');
+    else localStorage.removeItem(TEACHER_AUTH_KEY);
+  } catch(e) {}
+}
+
+function lockTeacherSetup() {
+  setTeacherAuth(false);
+  var p = document.getElementById('setupPanel');
+  if (p) p.classList.remove('open');
+  if (typeof showToast === 'function') {
+    showToast('Facilitator setup locked. Re-enter the password to unlock again.', 'ok');
+  }
+}
+
 function toggleSetup() {
+  // Gate access behind CONFIG.teacherPassword. Students who click the gear
+  // get a password prompt and are gracefully turned away. Facilitators
+  // unlock once per browser and stay unlocked.
+  if (!isTeacherAuthed()) {
+    var expected = (typeof CONFIG !== 'undefined') ? (CONFIG.teacherPassword || '') : '';
+    if (!expected) {
+      // No password configured → fall through (developer mode / preview build).
+      console.warn('[What-If] CONFIG.teacherPassword is empty — facilitator setup is unlocked.');
+    } else {
+      var entered = prompt('Facilitator password:');
+      if (entered == null) return;  // user hit Cancel
+      if (entered.trim() !== String(expected).trim()) {
+        alert('Incorrect password.');
+        return;
+      }
+      setTeacherAuth(true);
+    }
+  }
   var p = document.getElementById('setupPanel');
   p.classList.toggle('open');
   if (p.classList.contains('open')) renderSetupFromState();
