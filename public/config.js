@@ -62,6 +62,6 @@ const CONFIG = {
   //   3. Paste the resulting CSV URL here (looks like:
   //      https://docs.google.com/spreadsheets/d/e/.../pub?output=csv)
   // Leave empty to show teacher setup instructions on the picker page.
-  whatIfSheetCsvUrl: ""
+  whatIfSheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfI9d2x7jkv9aEBAf78GVAOsp6960u60r2X1DvVv-HMwgZ3oGAb5df7xV6OvBW28-vCvJazO9PCjie/pub?output=csv"
 
 };
