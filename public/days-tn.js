@@ -1,20 +1,19 @@
-// Tennessee 16-day compressed schedule.
-// Loaded on every page. Used only when the site picker is set to "TN"
-// (see dispatcher in days.js).
+// 16-day "4 days a week × 4 weeks" schedules.
+// Loaded on every page. Two sites currently use this shape:
+//   - TN (Crosstown) — 8:05 AM start, compressed activity timings, snack break
+//   - NY1 (Gotham Tech) — Mon–Thu 10:00–2:50, full-length activities, lunch
+// See dispatcher in days.js.
 //
-// Days 1–14 inherit from DAYS_DEFAULT (TN runs identical content for
-// the first three weeks; the only difference is the 8:00 AM start
-// time, handled by the renderer via CONFIG.siteDayStartMin).
+// Days 1–14 inherit from DAYS_DEFAULT with TN_OVERRIDES re-tagging the
+// week numbers so they fit into 4 weeks of 4 days each. Days 15 and 16
+// are a compressed closing arc that condenses the default Days 15–20
+// (Bot Identity → Scouting → Championship → Exhibition → Awards) into
+// just two days — used by both TN and NY1.
 //
-// To OVERRIDE a Day 1–14 with TN-specific content, add an entry to
-// TN_OVERRIDES below keyed by day number. The dispatcher swaps the
-// default day for your override during the slice.
-//
-// Day 15  — Bot Identity + Match Day 3 (replaces default Day 15)
-// Day 16  — Community Exhibition + Awards/Post-Task Diagnostic
-//           (condenses default Days 19 + 20 into one final day; the
-//           Championship arc from Days 16–18 is cut for the 16-day
-//           program)
+// Site-specific timing compressions live in TN_ACTIVITY_PATCH /
+// TN_ACTIVITY_SKIP and are applied via buildFourWeekDays() when a site
+// passes them in. NY1 calls buildFourWeekDays(null, null) to opt out
+// (so Gotham keeps full-length activities and the regular 60-min lunch).
 
 // Per-day overrides for Days 1–14. Key by day number. The override
 // object's full activity shape replaces the default day entirely.
@@ -77,26 +76,9 @@ const TN_ACTIVITY_SKIP = new Set([
   'Day 3:Energy Reset',
 ]);
 
-function tnPatchDay(d) {
-  const acts = d.activities
-    .filter(a => !TN_ACTIVITY_SKIP.has(`Day ${d.day}:${a.name}`) && !TN_ACTIVITY_SKIP.has(a.name))
-    .map(a => {
-      const scoped = TN_ACTIVITY_PATCH[`Day ${d.day}:${a.name}`];
-      const plain  = TN_ACTIVITY_PATCH[a.name];
-      const patch  = scoped != null ? scoped : plain;
-      if (patch == null) return a;
-      const overrides = (typeof patch === 'number') ? { mins: patch } : patch;
-      return { ...a, ...overrides };
-    });
-  return { ...d, activities: acts };
-}
-
-const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
-  // ── Days 1–14: inherit from default, apply TN_OVERRIDES, then patch ─────
-  ...DAYS_DEFAULT.slice(0, 14).map(d => tnPatchDay(TN_OVERRIDES[d.day] || d)),
-
-  // ── Day 15 (TN) — Creative Expression: Bot Identity + Scouting ────
-  tnPatchDay({
+// ── Day 15 — Creative Expression: Bot Identity + Scouting ──────────
+// Shared by TN and NY1 (and any future 16-day site).
+const DAY_15_INLINE = {
     "day": 15,
     "week": 4,
     "weekName": "Showcase Week",
@@ -168,12 +150,13 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "facilitatorDescription": "Closing reflection. Each student names a moment where data changed their mind, with a specific number or calculation cited."
       }
     ]
-  }),
+};
 
-  // ── Day 16 (TN) — Community Exhibition + Awards/Post-Task ─────────
-  // Condenses default Days 19 + 20: Exhibition, Best Teacher voting,
-  // Post-Task Diagnostic, Final Gallery Walk, Awards Ceremony.
-  tnPatchDay({
+// ── Day 16 — Community Exhibition + Awards/Post-Task ──────────────
+// Condenses default Days 19 + 20: Exhibition, Best Teacher voting,
+// Post-Task Diagnostic, Final Gallery Walk, Awards Ceremony.
+// Shared by TN and NY1.
+const DAY_16_INLINE = {
     "day": 16,
     "week": 4,
     "weekName": "Showcase Week",
@@ -244,5 +227,46 @@ const DAYS_TN = (typeof DAYS_DEFAULT !== 'undefined') ? [
         "facilitatorDescription": "Final ENDS reflection. Each student writes what they learned about themselves as a problem solver. Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes."
       }
     ]
-  })
-] : [];
+};
+
+// ── Generic 4-day-week builder ────────────────────────────────
+// Assembles the 16-day schedule (default Days 1–14 with TN_OVERRIDES
+// re-weeking, then DAY_15_INLINE and DAY_16_INLINE for the closing arc).
+// Pass patches + skips to apply per-site compressions; pass null/null to
+// keep the default activity durations and labels.
+function buildFourWeekDays(patches, skips) {
+  patches = patches || {};
+  skips = (skips && skips.has) ? skips : new Set(skips || []);
+  function patchDay(d) {
+    var acts = d.activities
+      .filter(function(a) {
+        return !skips.has('Day ' + d.day + ':' + a.name) && !skips.has(a.name);
+      })
+      .map(function(a) {
+        var scoped = patches['Day ' + d.day + ':' + a.name];
+        var plain  = patches[a.name];
+        var patch  = scoped != null ? scoped : plain;
+        if (patch == null) return a;
+        var overrides = (typeof patch === 'number') ? { mins: patch } : patch;
+        return Object.assign({}, a, overrides);
+      });
+    return Object.assign({}, d, { activities: acts });
+  }
+  if (typeof DAYS_DEFAULT === 'undefined') return [];
+  return [
+    // Days 1–14: default content reshuffled into 4 weeks of 4, then patched.
+    ...DAYS_DEFAULT.slice(0, 14).map(function(d) {
+      return patchDay(TN_OVERRIDES[d.day] || d);
+    }),
+    patchDay(DAY_15_INLINE),
+    patchDay(DAY_16_INLINE)
+  ];
+}
+
+// Tennessee / Crosstown — compressed timings + 20-min snack break.
+const DAYS_TN = buildFourWeekDays(TN_ACTIVITY_PATCH, TN_ACTIVITY_SKIP);
+
+// Gotham Tech (NY1) — 4 days/week, full-length activities, 60-min lunch.
+// Day 15 + Day 16 still use the compressed closing-arc inline content
+// (Bot Identity, Exhibition, Awards, Post-Task Diagnostic).
+const DAYS_NY1 = buildFourWeekDays(null, null);
