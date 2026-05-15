@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turning Test Program — MakeCode Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:        #0b0f1a;
+    --surface:   #111827;
+    --card:      #1a2235;
+    --border:    #1f2d45;
+    --text:      #e2e8f0;
+    --muted:     #8899b0;
+
+    --cyan:      #00d4ff;
+    --green:     #22c55e;
+    --gold:      #f59e0b;
+    --red:       #f43f5e;
+    --purple:    #a78bfa;
+    --orange:    #fb923c;
+    --teal:      #14b8a6;
+    --pink:      #ec4899;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter',sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* ─── HERO ─────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px 24px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse 120% 80% at 50% -20%, #1a0e3a 0%, transparent 70%), var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0px, transparent 59px, rgba(167,139,250,0.03) 59px, rgba(167,139,250,0.03) 60px),
+                repeating-linear-gradient(0deg,  transparent 0px, transparent 59px, rgba(167,139,250,0.03) 59px, rgba(167,139,250,0.03) 60px);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--purple);
+    border: 1px solid rgba(167,139,250,0.3);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    background: rgba(167,139,250,0.07);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    max-width: 640px;
+    margin: 0 auto 32px;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .hero-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--purple);
+    text-decoration: none;
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.25);
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .hero-link:hover { background: rgba(167,139,250,0.15); }
+
+  /* ─── LAYOUT ────────────────────────────────────────────── */
+  .content { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+  section  { margin-top: 64px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+  h2 { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; color: #fff; }
+  h3 { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  p  { color: var(--text); margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ─── BUTTON CARDS ──────────────────────────────────────── */
+  .btn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .btn-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .btn-card:hover { transform: translateY(-2px); }
+  .btn-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .btn-card.a::before  { background: var(--gold); }
+  .btn-card.b::before  { background: var(--purple); }
+  .btn-card.ab::before { background: var(--teal); }
+  .btn-card.a:hover  { border-color: rgba(245,158,11,0.4); }
+  .btn-card.b:hover  { border-color: rgba(167,139,250,0.4); }
+  .btn-card.ab:hover { border-color: rgba(20,184,166,0.4); }
+
+  .btn-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 10px;
+    font-weight: 900; font-size: 14px; margin-bottom: 14px;
+  }
+  .btn-badge.a  { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .btn-badge.b  { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .btn-badge.ab { background: rgba(20,184,166,0.15);  color: var(--teal); }
+  .btn-card p   { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* ─── TURNING DIAGRAM ───────────────────────────────────── */
+  .arc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .arc-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .arc-card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.3); }
+  .arc-header {
+    padding: 14px 18px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .arc-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--purple);
+  }
+  .arc-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .arc-sub   { font-size: 11px; color: var(--muted); }
+  .arc-svg-wrap {
+    padding: 8px 18px 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .arc-desc {
+    padding: 0 18px 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* ─── BLOCK SECTION ─────────────────────────────────────── */
+  .block-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .blocks-render-area {
+    background: #f5f5f5;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    min-height: 80px;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .blocks-render-area img { max-width: 100%; height: auto; border-radius: 6px; display: block; }
+
+  .blocks-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #ddd;
+    border-top-color: #888;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  pre.blocks { display: none; }
+
+  .block-explain { padding: 20px; }
+  .block-explain p { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step  { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    background: rgba(167,139,250,0.1); color: var(--purple);
+    border: 1px solid rgba(167,139,250,0.25); margin-top: 2px;
+  }
+  .step-text { font-size: 13.5px; color: var(--text); line-height: 1.6; flex: 1; }
+
+  /* ─── INLINE CODE ───────────────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(251,146,60,0.12);
+    color: var(--orange);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  code.cyan   { background: rgba(0,212,255,0.1);   color: var(--cyan); }
+  code.gold   { background: rgba(245,158,11,0.12); color: var(--gold); }
+  code.purple { background: rgba(167,139,250,0.12); color: var(--purple); }
+  code.green  { background: rgba(34,197,94,0.12);  color: var(--green); }
+  code.red    { background: rgba(244,63,94,0.12);  color: var(--red); }
+  code.teal   { background: rgba(20,184,166,0.12); color: var(--teal); }
+
+  /* ─── CALLOUTS ──────────────────────────────────────────── */
+  .callout {
+    display: flex; gap: 14px; background: var(--card);
+    border-radius: 10px; padding: 16px 18px;
+    border: 1px solid var(--border); margin: 16px 0; align-items: flex-start;
+  }
+  .callout-icon  { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .callout-text  { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .callout-text strong { color: var(--text); font-weight: 600; }
+  .callout.tip   { border-left: 3px solid var(--green); }
+  .callout.warn  { border-left: 3px solid var(--gold); }
+  .callout.info  { border-left: 3px solid var(--purple); }
+  .callout.alert { border-left: 3px solid var(--red); }
+
+  /* ─── FORMULA BOX ───────────────────────────────────────── */
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--purple);
+    line-height: 2;
+  }
+  .formula-box .comment { color: var(--muted); font-style: italic; }
+
+  /* ─── VARIABLES TABLE ───────────────────────────────────── */
+  .var-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .var-row {
+    display: grid; grid-template-columns: 220px 1fr;
+    background: var(--card); border-radius: 10px;
+    border: 1px solid var(--border); overflow: hidden; transition: border-color 0.2s;
+  }
+  .var-row:hover { border-color: rgba(167,139,250,0.25); }
+  .var-name {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    border-right: 1px solid var(--border);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  }
+  .var-name.you-set  { color: var(--gold);   background: rgba(245,158,11,0.06); }
+  .var-name.computed { color: var(--cyan);   background: rgba(0,212,255,0.04); }
+  .var-name.constant { color: var(--purple); background: rgba(167,139,250,0.05); }
+  .var-name.new      { color: var(--green);  background: rgba(34,197,94,0.05); }
+  .var-desc {
+    padding: 14px 16px; font-size: 13px; color: var(--muted);
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  }
+  .var-desc strong { font-size: 13px; font-weight: 600; color: var(--text); display: block; }
+  .tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 4px; display: inline-block;
+  }
+  .tag.you-set  { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .tag.auto     { background: rgba(0,212,255,0.12);  color: var(--cyan); }
+  .tag.constant { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .tag.new-tag  { background: rgba(34,197,94,0.15);  color: var(--green); }
+
+  /* ─── SENSOR DIAGRAM ────────────────────────────────────── */
+  .sensor-diagram { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+  .sensor-row { display: flex; gap: 8px; }
+  .sensor-box {
+    width: 62px; height: 42px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1px;
+    font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    border: 2px solid var(--border); background: var(--surface); color: var(--muted);
+  }
+  .sensor-box .snum  { font-size: 13px; }
+  .sensor-box .slabel{ font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sensor-box.left   { border-color: var(--gold);   color: var(--gold);   background: rgba(245,158,11,0.07); }
+  .sensor-box.right  { border-color: var(--red);    color: var(--red);    background: rgba(244,63,94,0.07); }
+  .sensor-box.mid    { border-color: var(--purple);  color: var(--purple); background: rgba(167,139,250,0.07); }
+  .bot-body {
+    width: 110px; height: 72px; border-radius: 10px;
+    background: var(--card); border: 2px solid var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--purple); margin: 10px 0; letter-spacing: 0.05em;
+  }
+  .sensor-label { font-size: 11px; color: var(--muted); font-weight: 600; margin: 4px 0; }
+  .sensor-legend { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 14px; font-size: 12px; }
+  .legend-item   { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .legend-dot    { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ─── TIPS ──────────────────────────────────────────────── */
+  .tips-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-top: 20px;
+  }
+  .tip-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; transition: border-color 0.2s, transform 0.2s;
+  }
+  .tip-card:hover { border-color: rgba(167,139,250,0.25); transform: translateY(-2px); }
+  .tip-number { font-size: 28px; font-weight: 900; color: rgba(167,139,250,0.15); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; line-height: 1; }
+  .tip-card h3 { font-size: 14px; margin-bottom: 6px; }
+  .tip-card p  { font-size: 12.5px; color: var(--muted); }
+
+  footer {
+    text-align: center; padding: 32px 24px; font-size: 12px;
+    color: var(--muted); border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--purple); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .var-row { grid-template-columns: 1fr; }
+    .var-name { border-right: none; border-bottom: 1px solid var(--border); }
+    .sensor-row { gap: 5px; }
+    .sensor-box { width: 52px; height: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-tag">MakeCode Blocks · Beginner Guide</div>
+  <h1>Turning Test<br>Program</h1>
+  <p>Learn how this MakeCode program drives your bot through arc patterns, tests how the TURNING stat shapes movement, and watches for the border while it works.</p>
+  <a class="hero-link" href="https://makecode.microbit.org/" target="_blank">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    Open in MakeCode
+  </a>
+</div>
+
+<!-- ── CONTENT ────────────────────────────────────────────── -->
+<div class="content">
+
+  <!-- ── WHAT IT DOES ─────────────────────────────── -->
+  <section>
+    <div class="section-label">Overview</div>
+    <h2>What does this program do?</h2>
+    <p>This program tests how your bot <strong>moves in arcs</strong> based on your TURNING stat. While driving, it continuously watches the track sensors and recovers if it hits the border. You can change the arc style mid-session and simulate different points in a match to see how ENDURANCE affects speed.</p>
+    <p>The key idea: your TURNING stat doesn't just control whether you turn — it controls the <em>shape</em> of the pattern your bot traces around the ring. Testing it here tells you what to expect in a real match.</p>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-text">
+        <strong>Before running:</strong> Set <code>SPEED</code> and <code>ENDURANCE</code> in the <strong>on start</strong> block to your character's actual stats. Both start at zero — leave them there and the bot won't move.
+      </div>
+    </div>
+
+    <div class="callout alert">
+      <div class="callout-icon">🔄</div>
+      <div class="callout-text">
+        <strong>Button roles changed from the Endurance Test.</strong> Button B now cycles the TURNING value. Button A+B now cycles the simulated match time. There is no dedicated emergency stop button in this program — press A again to let the test time out, or power down the micro:bit.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── THREE BUTTONS ──────────────────────────────── -->
+  <section>
+    <div class="section-label">Controls</div>
+    <h2>Three buttons. Different roles than before.</h2>
+    <div class="btn-grid">
+      <div class="btn-card a">
+        <div class="btn-badge a">A</div>
+        <h3>Run the Test</h3>
+        <p>Calculates power and arc settings from your stats, then drives the full arc pattern for TEST_DURATION_MS. Watch the shape it traces and how it reacts at the border.</p>
+      </div>
+      <div class="btn-card b">
+        <div class="btn-badge b">B</div>
+        <h3>Cycle TURNING Value</h3>
+        <p>Switches between 2 → 5 → 10 → 2. Each value changes the arc segment count and sharpness. Set this <em>before</em> pressing A to try a different pattern.</p>
+      </div>
+      <div class="btn-card ab">
+        <div class="btn-badge ab">A+B</div>
+        <h3>Cycle Match Time</h3>
+        <p>Cycles through 0 → 60 → 120 → 180 seconds. Shows the time as text on the LED screen. Use this to simulate how endurance decay affects the arc at different points in a match.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TURNING PATTERNS ───────────────────────────── -->
+  <section>
+    <div class="section-label">Core Concept</div>
+    <h2>What TURNING actually does</h2>
+    <p>TURNING controls two things at once: how many arc <em>segments</em> are in each driving cycle, and how sharp each arc is. Higher TURNING = more segments per cycle + tighter arcs.</p>
+
+    <div class="arc-grid">
+
+      <!-- TURNING = 2 -->
+      <div class="arc-card">
+        <div class="arc-header">
+          <div class="arc-badge">2</div>
+          <div>
+            <div class="arc-title">Gentle S-curve</div>
+            <div class="arc-sub">turnRatio ≈ 0.24 · long segments</div>
+          </div>
+        </div>
+        <div class="arc-svg-wrap">
+          <svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Ring border suggestion -->
+            <rect x="10" y="10" width="180" height="100" rx="8" stroke="#1f2d45" stroke-width="1.5" fill="none"/>
+            <!-- S-curve path: 2 long arcs -->
+            <path d="M 20 100 Q 50 10 100 60 Q 150 110 180 20" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Direction arrows -->
+            <circle cx="20" cy="100" r="4" fill="#22c55e"/>
+            <circle cx="180" cy="20" r="4" fill="#f59e0b"/>
+            <!-- Labels -->
+            <text x="14" y="116" font-family="monospace" font-size="9" fill="#22c55e">start</text>
+            <text x="168" y="16" font-family="monospace" font-size="9" fill="#f59e0b">end</text>
+          </svg>
+        </div>
+        <div class="arc-desc">Two long arcs — one curving left, one right. The bot sweeps wide and covers a large area before reversing direction. Good for bots with high SPEED who need to control ground coverage.</div>
+      </div>
+
+      <!-- TURNING = 5 -->
+      <div class="arc-card">
+        <div class="arc-header">
+          <div class="arc-badge">5</div>
+          <div>
+            <div class="arc-title">Tighter S-curves</div>
+            <div class="arc-sub">turnRatio = 0.30 · medium segments</div>
+          </div>
+        </div>
+        <div class="arc-svg-wrap">
+          <svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="180" height="100" rx="8" stroke="#1f2d45" stroke-width="1.5" fill="none"/>
+            <!-- 5 shorter arcs alternating -->
+            <path d="M 20 60 Q 38 25 56 60 Q 74 95 92 60 Q 110 25 128 60 Q 146 95 164 60 Q 175 40 180 30" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="20" cy="60" r="4" fill="#22c55e"/>
+            <circle cx="180" cy="30" r="4" fill="#f59e0b"/>
+            <text x="14" y="74" font-family="monospace" font-size="9" fill="#22c55e">start</text>
+            <text x="168" y="26" font-family="monospace" font-size="9" fill="#f59e0b">end</text>
+          </svg>
+        </div>
+        <div class="arc-desc">Five medium arcs in a wave pattern. The bot covers ground more evenly and returns to the center more often. A balanced choice for most TURNING stat values.</div>
+      </div>
+
+      <!-- TURNING = 10 -->
+      <div class="arc-card">
+        <div class="arc-header">
+          <div class="arc-badge">10</div>
+          <div>
+            <div class="arc-title">Tight zigzag</div>
+            <div class="arc-sub">turnRatio = 0.40 · short segments</div>
+          </div>
+        </div>
+        <div class="arc-svg-wrap">
+          <svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="180" height="100" rx="8" stroke="#1f2d45" stroke-width="1.5" fill="none"/>
+            <!-- 10 short tight arcs -->
+            <path d="M 20 60 Q 29 40 38 60 Q 47 80 56 60 Q 65 40 74 60 Q 83 80 92 60 Q 101 40 110 60 Q 119 80 128 60 Q 137 40 146 60 Q 155 80 164 60 Q 173 40 180 55" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="20" cy="60" r="4" fill="#22c55e"/>
+            <circle cx="180" cy="55" r="4" fill="#f59e0b"/>
+            <text x="14" y="74" font-family="monospace" font-size="9" fill="#22c55e">start</text>
+            <text x="168" y="50" font-family="monospace" font-size="9" fill="#f59e0b">end</text>
+          </svg>
+        </div>
+        <div class="arc-desc">Ten short sharp arcs. The bot zigzags rapidly across a narrow band. The sharpest arc setting — maximum turnRatio (0.40 cap) means the biggest speed difference between left and right wheels.</div>
+      </div>
+
+    </div>
+
+    <div class="callout info" style="margin-top: 20px;">
+      <div class="callout-icon">🔢</div>
+      <div class="callout-text">
+        <strong>How the math works:</strong> Higher TURNING = higher <code class="purple">turnRatio</code> = bigger wheel speed difference = sharper arc. Each segment also gets shorter because the total arc time stays fixed and is split more ways. These two effects combine to create the pattern shapes you see above.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BLOCK BY BLOCK ─────────────────────────────── -->
+  <section>
+    <div class="section-label">Block by Block</div>
+    <h2>How each section works</h2>
+
+    <!-- ON START -->
+    <div class="block-section">
+      <div class="block-header" style="color: #cf6033;">
+        <div class="block-dot" style="background: #cf6033;"></div>
+        on start — Setting Up Variables
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-onstart">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+let TURNING = 2
+let TEST_DURATION_MS = 15000
+let BORDER_CHECK_MS = 60
+let BORDER_PIVOT_MS = 400
+let BORDER_PIVOT_POWER = 50
+let BACKUP_MS = 600
+let BASE_SEGMENT_MS = 1800
+let BORDER_THRESHOLD = 200
+let SPEED = 0
+let ENDURANCE = 0
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Runs once when the micro:bit powers on. Fills in all the starting values before any button is pressed.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><code class="gold">TURNING = 2</code> — Start with the gentle 2-arc pattern. Change with Button B before running.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><code class="gold">TEST_DURATION_MS = 15000</code> — Each test runs for 15 seconds (15,000ms). Increase this for longer observation time.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><code class="gold">BASE_SEGMENT_MS = 1800</code> — New in this program. Controls the "base length" of each arc segment before it's divided by TURNING. 1800ms × 12 = 21.6 seconds of total arc time per cycle.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><code class="gold">SPEED = 0</code> and <code class="gold">ENDURANCE = 0</code> — <strong style="color:#f59e0b;">Fill these in</strong> with your character's actual stats before uploading.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON A -->
+    <div class="block-section">
+      <div class="block-header" style="color: #e6b222;">
+        <div class="block-dot" style="background: #e6b222;"></div>
+        on button A pressed — Run the Arc Test
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-buttonA">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+input.onButtonPressed(Button.A, function () {
+    computeStats()
+    basic.showString("" + (TURNING))
+    running = true
+    testStart = input.runningTime()
+    while (running && input.runningTime() - testStart < TEST_DURATION_MS) {
+        lastTurnWasLeft = !(lastTurnWasLeft)
+        for (let index = 0; index < TURNING; index++) {
+            if (input.runningTime() - testStart >= TEST_DURATION_MS) {
+                running = false
+                break
+            }
+            if (TURNING == 1) {
+                basic.pause(100)
+            } else if (lastTurnWasLeft) {
+                basic.pause(100)
+            } else {
+                basic.pause(100)
+            }
+            driveAndWatch(thisDuration)
+            if (watchResult == 1) {
+                handleBorder()
+                break
+            }
+            basic.pause(80)
+        }
+    }
+    running = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>The main test loop. This is the most complex block in the program — it has a loop inside a loop. Here's how to read it:</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>call computeStats</strong> → calculates <code class="purple">currentPower</code>, <code class="purple">turnRatio</code>, and <code class="purple">thisDuration</code> from your stats. Then displays the current TURNING value on screen.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>outer while loop</strong> — keeps running until time expires. Each iteration: flip direction (<code>lastTurnWasLeft</code>), then run one full set of TURNING segments.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>inner for loop</strong> — runs TURNING times. Each pass checks if time is up, sets wheel speeds based on the current direction, calls <code class="teal">driveAndWatch</code>, then pauses 80ms between segments.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>Wheel speed logic:</strong> If <code>lastTurnWasLeft</code> is true → left wheel slower, right wheel faster (arcs left). If false → left faster, right slower (arcs right). The difference is controlled by <code class="purple">turnRatio</code>.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text">If <code class="teal">driveAndWatch</code> sets <code>watchResult = 1</code> (border hit), call <code>handleBorder</code> and <strong>break</strong> out of the inner loop to restart the outer loop from a fresh direction.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div class="step-text">When time expires: stop all motors, show an ✕ on the LED screen, then clear it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON B -->
+    <div class="block-section">
+      <div class="block-header" style="color: #7b5ea7;">
+        <div class="block-dot" style="background: #7b5ea7;"></div>
+        on button B pressed — Cycle TURNING Value
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-buttonB">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+input.onButtonPressed(Button.B, function () {
+    if (TURNING == 2) {
+        TURNING = 5
+        basic.showString("5")
+    } else if (TURNING == 5) {
+        TURNING = 10
+        basic.showString("10")
+    } else {
+        TURNING = 2
+        basic.showString("2")
+    }
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Each press cycles TURNING through three values: <strong>2 → 5 → 10 → 2</strong>. The current value flashes on the LED screen so you always know what's set. Press B before pressing A to choose your arc pattern.</p>
+          <div class="callout tip" style="margin-top: 12px;">
+            <div class="callout-icon">✅</div>
+            <div class="callout-text">
+              <strong>Try all three in sequence.</strong> Run at TURNING = 2, watch the path. Press B, run at TURNING = 5. Press B again, run at TURNING = 10. The bot should trace a visibly different pattern each time.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON A+B -->
+    <div class="block-section">
+      <div class="block-header" style="color: #14b8a6;">
+        <div class="block-dot" style="background: #14b8a6;"></div>
+        on button A+B pressed — Cycle Simulated Match Time
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-buttonAB">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+input.onButtonPressed(Button.AB, function () {
+    if (simulatedMatchTime == 0) {
+        simulatedMatchTime = 60
+        basic.showString("60s")
+    } else if (simulatedMatchTime == 60) {
+        simulatedMatchTime = 120
+        basic.showString("120s")
+    } else if (simulatedMatchTime == 120) {
+        simulatedMatchTime = 180
+        basic.showString("180s")
+    } else {
+        simulatedMatchTime = 0
+        basic.showString("0s")
+    }
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Cycles the simulated match time: 0 → 60 → 120 → 180 → 0. The current time shows as text on the LED screen (e.g. "60s"). This feeds into <code>computeStats</code> to apply endurance decay — so you can feel how a tired bot arcs differently at the end of a match.</p>
+          <div class="callout alert" style="margin-top: 12px;">
+            <div class="callout-icon">⚡</div>
+            <div class="callout-text">
+              <strong>This is not an emergency stop.</strong> If you need to stop the bot urgently, let the test time out or power down the micro:bit. There is no emergency stop button in this program.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPUTE STATS -->
+    <div class="block-section">
+      <div class="block-header" style="color: #7b5ea7;">
+        <div class="block-dot" style="background: #7b5ea7;"></div>
+        function computeStats — Calculating Power and Arc Shape
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-computeStats">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function computeStats () {
+    currentPower = SPEED * 100 / 20
+    totalArcTime = BASE_SEGMENT_MS * 12
+    thisDuration = Math.round(totalArcTime / TURNING)
+    turnRatio = 0.2 + TURNING * 0.02
+    turnRatio = Math.min(turnRatio, 0.4)
+    DECAY_RATE = 20 - ENDURANCE
+    endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
+    endurancePercent = Math.max(endurancePercent, 20)
+    enduranceFactor = endurancePercent / 100
+    currentPower = Math.round(currentPower * enduranceFactor)
+    currentPower = Math.max(currentPower, 15)
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>This function calculates everything before any motor turns. It does two jobs: sets the arc shape (turnRatio and thisDuration) and applies endurance decay to currentPower.</p>
+          <div class="formula-box">
+            currentPower = SPEED × 100 ÷ 20   <span class="comment">← converts stat to motor %</span><br>
+            totalArcTime = BASE_SEGMENT_MS × 12 <span class="comment">← 1800 × 12 = 21,600ms total</span><br>
+            thisDuration = totalArcTime ÷ TURNING <span class="comment">← time per segment</span><br>
+            turnRatio = 0.2 + TURNING × 0.02     <span class="comment">← arc sharpness (max 0.40)</span><br>
+            currentPower × enduranceFactor        <span class="comment">← decay applied last</span>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">📐</div>
+              <div class="step-text"><strong>thisDuration example:</strong> With TURNING = 5 → <code>21600 ÷ 5 = 4320ms</code> per segment. With TURNING = 10 → <code>21600 ÷ 10 = 2160ms</code> per segment. More segments = shorter each.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">〰️</div>
+              <div class="step-text"><strong>turnRatio example:</strong> TURNING = 2 → ratio = 0.24 (gentle arc). TURNING = 10 → ratio = 0.40 (capped, sharpest possible). The cap prevents the wheels from running backward.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">⬇️</div>
+              <div class="step-text"><strong>Endurance decay:</strong> Same math as the Endurance Test — power fades based on ENDURANCE stat and simulatedMatchTime. A bot with low ENDURANCE will arc more slowly at 180s than at 0s.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRIVE AND WATCH -->
+    <div class="block-section">
+      <div class="block-header" style="color: #00d4ff;">
+        <div class="block-dot" style="background: #00d4ff;"></div>
+        function driveAndWatch — Drive + Monitor Sensors Simultaneously
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-driveAndWatch">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function driveAndWatch (ms: number) {
+    watchResult = 0
+    elapsed = 0
+    while (elapsed < ms) {
+        halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(halfChunk)
+        elapsed += halfChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            watchResult = 1
+            return
+        }
+        if (elapsed >= ms) {
+            return
+        }
+        remainChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(remainChunk)
+        elapsed += remainChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            watchResult = 1
+            return
+        }
+    }
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>This is a <strong>new function</strong> not in the Endurance Test. Instead of driving for a full segment and <em>then</em> checking the sensors, this function checks the sensors <em>during</em> the drive — up to twice per 60ms window. That means the bot can react to the border in the middle of a segment rather than waiting until it's over.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text">Sets <code>watchResult = 0</code> (no border) and <code>elapsed = 0</code> (time used so far). The motors are already running — the calling code set wheel speeds before calling this function.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>while loop</strong> — keeps going until <code>elapsed ≥ ms</code>. Each pass: wait a small chunk of time, add it to elapsed, check sensors. Two sensor checks per iteration for faster reaction.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><code>halfChunk = Math.min(BORDER_CHECK_MS, ms − elapsed)</code> — this prevents overshooting the target time. If less than 60ms remains, it waits only the remainder, not a full 60ms.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text">If <code>checkBorder()</code> returns anything other than 0 → set <code>watchResult = 1</code> and <strong>return immediately</strong>. The calling code (Button A loop) sees <code>watchResult = 1</code> and calls <code>handleBorder</code>.</div>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top: 12px;">
+            <div class="callout-icon">💡</div>
+            <div class="callout-text">
+              <strong>Why not just pause the full segment?</strong> If the bot drove for 4,320ms without checking sensors, it could go deep into the white border before reacting. This function checks every 60ms, so at full speed it stops within 1–2 sensor cycles of hitting the edge.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECK BORDER -->
+    <div class="block-section">
+      <div class="block-header" style="color: #14b8a6;">
+        <div class="block-dot" style="background: #14b8a6;"></div>
+        function checkBorder — Reading the Sensors
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-checkBorder">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function checkBorder () {
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Same as the Endurance Test — reads four sensors and returns a number based on which side (if any) detected the white border.</p>
+          <div class="sensor-diagram">
+            <div class="sensor-label">↑ Front of robot</div>
+            <div class="sensor-row">
+              <div class="sensor-box left"><span class="snum">S1</span><span class="slabel">left</span></div>
+              <div class="sensor-box mid"><span class="snum">S2</span><span class="slabel">mid</span></div>
+              <div class="sensor-box mid"><span class="snum">S3</span><span class="slabel">mid</span></div>
+              <div class="sensor-box right"><span class="snum">S4</span><span class="slabel">right</span></div>
+            </div>
+            <div class="bot-body">BOT BODY</div>
+            <div class="sensor-label">↓ Back of robot</div>
+            <div class="sensor-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>S1 fires → returns 1 (left)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>S4 fires → returns 2 (right)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>S2 or S3 → returns 3 (head-on)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>All clear → returns 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HANDLE BORDER -->
+    <div class="block-section">
+      <div class="block-header" style="color: #fb923c;">
+        <div class="block-dot" style="background: #fb923c;"></div>
+        function handleBorder — Recovering from the Edge
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-handleBorder">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function handleBorder () {
+    basic.pause(50)
+    basic.pause(BACKUP_MS)
+    basic.pause(100)
+    if (borderSide == 1) {
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = false
+    } else if (borderSide == 2) {
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = true
+    } else {
+        basic.pause(BACKUP_MS + 300)
+        basic.pause(100)
+        basic.pause(BORDER_PIVOT_MS * 2)
+        lastTurnWasLeft = false
+    }
+    basic.pause(100)
+    recheck = checkBorder()
+    if (recheck > 0) {
+        basic.pause(BACKUP_MS)
+        basic.pause(100)
+        basic.pause(BORDER_PIVOT_MS)
+        basic.pause(100)
+    }
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Same recovery sequence as the Endurance Test — stop, back up, pivot based on which side hit the border. One new addition in this version: <code>lastTurnWasLeft</code> gets set based on the recovery direction, so the arc pattern resumes with the correct orientation after a border event.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Stop and back up</strong> for BACKUP_MS (600ms) to clear the border zone.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Pivot away</strong> based on <code>borderSide</code>. Left danger → pivot right. Right danger → pivot left. Head-on → extra backup + bigger turn.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Reset arc direction:</strong> After recovering left (pivoting right), set <code>lastTurnWasLeft = false</code> so the next segment arcs right — away from the side that was just hit.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>Recheck</strong> — if still on white, does one more backup-and-turn before resuming the main loop.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── VARIABLES ─────────────────────────────────────── -->
+  <section>
+    <div class="section-label">Variables</div>
+    <h2>What every variable means</h2>
+    <p>Gold = you set it. Cyan = calculated automatically. Purple = fixed constant. Green = new in this program.</p>
+
+    <div class="var-grid">
+      <div class="var-row">
+        <div class="var-name you-set">SPEED <span class="tag you-set">You Set</span></div>
+        <div class="var-desc"><strong>Your character's speed stat</strong>Sets the base motor power. Used to calculate <code style="font-size:11px;">currentPower</code> before decay is applied.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name you-set">ENDURANCE <span class="tag you-set">You Set</span></div>
+        <div class="var-desc"><strong>Your character's endurance stat</strong>Controls how much motor power fades over simulated match time. Low ENDURANCE = noticeable slowdown at 180s.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name you-set">TURNING <span class="tag you-set">You Set (via B)</span></div>
+        <div class="var-desc"><strong>Number of arc segments per driving cycle</strong>Set by pressing Button B. Options: 2, 5, or 10. Controls both the segment count and the arc sharpness (via turnRatio).</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name new">turnRatio <span class="tag new-tag">New</span></div>
+        <div class="var-desc"><strong>Wheel speed difference that creates the arc</strong>Calculated as <code style="font-size:11px;">0.2 + TURNING × 0.02</code>, capped at 0.40. The higher this is, the tighter each arc curves.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name new">thisDuration <span class="tag new-tag">New</span></div>
+        <div class="var-desc"><strong>How long each individual arc segment lasts (ms)</strong>Calculated as <code style="font-size:11px;">totalArcTime ÷ TURNING</code>. More segments = shorter each.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name new">totalArcTime <span class="tag new-tag">New</span></div>
+        <div class="var-desc"><strong>Total time budget for one full arc cycle (ms)</strong>Always <code style="font-size:11px;">BASE_SEGMENT_MS × 12 = 21,600ms</code>. Divided among all segments to get thisDuration.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name new">lastTurnWasLeft <span class="tag new-tag">New</span></div>
+        <div class="var-desc"><strong>Tracks which direction the last arc went</strong>Flips each outer loop iteration so arcs alternate left/right. Also reset by handleBorder to resume in the correct direction after recovery.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name new">watchResult <span class="tag new-tag">New</span></div>
+        <div class="var-desc"><strong>Output from driveAndWatch</strong>0 = segment completed cleanly. 1 = border was hit mid-segment. The main loop checks this after each call to driveAndWatch.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">currentPower <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Actual motor power sent to wheels (0–100)</strong>Calculated from SPEED, then reduced by endurance decay. Minimum is 15 in this program (slightly different from the Endurance Test's 20% floor).</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">simulatedMatchTime <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Fake "time into the match" for endurance testing</strong>Set by pressing A+B. 0 = start, 180 = near the end. Passed to computeStats to apply decay.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BASE_SEGMENT_MS <span class="tag constant">Constant</span></div>
+        <div class="var-desc"><strong>Base arc segment length before dividing by TURNING</strong>Set to 1800ms. Change this to make all segments longer or shorter without touching TURNING.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BORDER_THRESHOLD <span class="tag constant">Constant</span></div>
+        <div class="var-desc"><strong>Sensor brightness cutoff for border detection</strong>Set to 200. Sensor readings above this = white border detected.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TIPS ──────────────────────────────────────────── -->
+  <section>
+    <div class="section-label">Next Steps</div>
+    <h2>Tips for using this program</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-number">01</div>
+        <h3>Set stats before uploading</h3>
+        <p>Find <code style="font-size:11px;">SPEED = 0</code> and <code style="font-size:11px;">ENDURANCE = 0</code> in the on start block. Replace zeros with your character's actual values or nothing will move.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">02</div>
+        <h3>Try all three TURNING values</h3>
+        <p>Run with TURNING = 2, 5, and 10 in sequence. Watch the floor pattern each one traces. The difference is especially visible at high SPEED stats.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">03</div>
+        <h3>Combine TURNING + match time</h3>
+        <p>Set match time to 180s with A+B, then run your chosen TURNING value. Compare to 0s. If the arcs are noticeably tighter or slower, ENDURANCE is affecting your arc style.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">04</div>
+        <h3>Watch the border recovery</h3>
+        <p>Use a longer TEST_DURATION_MS (e.g. 20000 = 20s) to give the bot more time to hit the border and recover. See how handleBorder adjusts the arc direction after each incident.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">05</div>
+        <h3>Adjust BASE_SEGMENT_MS</h3>
+        <p>Lowering BASE_SEGMENT_MS makes all segments shorter. Raising it makes them longer. Try 900 for half-length arcs or 3600 for double — observe how this changes coverage without touching TURNING.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">06</div>
+        <h3>No emergency stop — plan ahead</h3>
+        <p>A+B is not a stop button here. Place the bot in a safe area before testing, stay close to the power switch, and use a shorter TEST_DURATION_MS if you're worried about runaway behavior.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Turning Test Program · Velocity Arena · <a href="endurance-test-explainer.html">← Back to Endurance Test Guide</a></p>
+</footer>
+
+<!-- ── MAKECODE BLOCKS RENDERER ───────────────────────────── -->
+<!--
+  Uses the official MakeCode blocks embedding API.
+  Docs: https://makecode.microbit.org/blocks-embed
+
+  The hidden iframe loads the rendering engine from makecode.microbit.org.
+  Each <pre class="blocks"> element gets its JS compiled into a block image
+  and replaced with an <img> showing real MakeCode blocks.
+-->
+<script>
+(function () {
+  var MAKECODE_URL = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+
+  var blockId = 0;
+
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE }
+    }, MAKECODE_URL);
+  }
+
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src = msg.uri;
+        img.width = msg.width;
+        img.height = msg.height;
+        img.alt = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Blocks preview unavailable — <a href='https://makecode.microbit.org/' target='_blank' style='color:#a78bfa;'>open in MakeCode</a> to view.</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+
+</body>
+</html>
