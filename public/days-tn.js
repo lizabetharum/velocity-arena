@@ -1,10 +1,13 @@
 // 16-day "4 days a week × 4 weeks" schedules.
-// Loaded on every page. Three sites currently use this shape:
-//   - TN  (Crosstown)                — 8:05 AM start, compressed activity timings, snack break
-//   - NY1 (Gotham Tech)              — Mon–Thu 10:00–3:00, full-length activities, lunch
+// Loaded on every page. All four pilot sites except none use this shape;
+// the only outlier was the default 20-day program which currently has no
+// active pilot site assigned:
+//   - TN  (Crosstown)                  — 8:05 AM start, compressed activity timings, snack break
+//   - NY1 (Gotham Tech)                — Mon–Thu 10:00–3:00, full-length activities, lunch
 //   - NY2 (Claremont International HS) — Mon–Thu 10:00–3:00, same as Gotham
-// NY1 and NY2 share DAYS_NY1; TN has its own DAYS_TN with the patches/skips.
-// See dispatcher in days.js.
+//   - NY3 (South Bronx Community)      — Mon–Thu 10:00–3:00, same as Gotham
+// NY1, NY2, and NY3 share DAYS_NY1; TN has its own DAYS_TN with the
+// patches/skips. See dispatcher in days.js.
 //
 // Days 1–14 inherit from DAYS_DEFAULT with TN_OVERRIDES re-tagging the
 // week numbers so they fit into 4 weeks of 4 days each. Days 15 and 16
