@@ -69,6 +69,15 @@ body{
 
 .btn-outline{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;color:var(--fg-1);text-decoration:none;padding:9px 14px;border:1px solid var(--line-strong);border-radius:var(--r-sm);transition:all var(--dur-1) var(--ease-out);}
 .btn-outline:hover{color:var(--accent);border-color:var(--line-cyan);}
+
+/* Pilot sites table — Site + dates + day count */
+.pilot-row{display:grid;grid-template-columns:1.7fr 1.6fr auto;gap:18px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line);}
+.pilot-row:last-child{border-bottom:none;}
+.pilot-name{font:700 14px/1.4 var(--font-sans);color:var(--fg-0);}
+.pilot-code{font:500 10.5px/1 var(--font-mono);color:var(--fg-2);margin-left:8px;letter-spacing:.08em;}
+.pilot-dates{font:500 13px/1.4 var(--font-mono);color:var(--fg-1);font-variant-numeric:tabular-nums;}
+.pilot-meta{font:600 10px/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);}
+@media(max-width:600px){.pilot-row{grid-template-columns:1fr;gap:4px}.pilot-meta{justify-self:start}}
 </style>
 </head>
 <body>
@@ -113,6 +122,15 @@ body{
             <div class="stat-box"><div class="stat-num">20</div><div class="stat-label">Days</div></div>
             <div class="stat-box"><div class="stat-num">90</div><div class="stat-label">Min / Day</div></div>
             <div class="stat-box"><div class="stat-num">09</div><div class="stat-label">Rising Grade</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><h2>Pilot sites</h2><span class="meta">SUMMER 2026</span></div>
+        <div class="card">
+          <div id="pilot-sites-rows">
+            <p style="color:var(--fg-2);font-size:13px;">Loading sites…</p>
           </div>
         </div>
       </div>
@@ -209,5 +227,61 @@ body{
 
 </main>
 
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script>
+// Pilot-sites table. Reads CONFIG.siteStartDates + SITE_OPTIONS, computes
+// each site's end date by counting program days forward from the start
+// (skipping weekends + CONFIG.holidays), accounting for the per-site
+// schedule length (16-day 4-day-week sites vs 20-day default).
+(function () {
+  if (typeof CONFIG === 'undefined' || typeof SITE_OPTIONS === 'undefined') return;
+  // Mirror the dispatcher in days.js — keep these in sync if sites change.
+  var SITE_TOTAL_DAYS = { NY1: 16, NY2: 16, NY3: 20, TN: 16 };
+  var SITE_DAYS_PER_WEEK = { NY1: [1,2,3,4], NY2: [1,2,3,4], NY3: [1,2,3,4,5], TN: [1,2,3,4] };
+
+  function fmt(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function endDate(startISO, totalDays, allowedWeekdays) {
+    var d = new Date(startISO + 'T00:00:00');
+    var holidaySet = new Set(CONFIG.holidays || []);
+    var count = 0, last = new Date(d);
+    while (count < totalDays) {
+      var dow = d.getDay();
+      var iso = d.toISOString().slice(0, 10);
+      if (allowedWeekdays.indexOf(dow) !== -1 && !holidaySet.has(iso)) {
+        count++;
+        last = new Date(d);
+      }
+      if (count < totalDays) d.setDate(d.getDate() + 1);
+    }
+    return last;
+  }
+
+  var rows = SITE_OPTIONS.map(function(opt) {
+    var startISO = CONFIG.siteStartDates && CONFIG.siteStartDates[opt.code];
+    if (!startISO) return null;
+    var total = SITE_TOTAL_DAYS[opt.code] || 20;
+    var allowed = SITE_DAYS_PER_WEEK[opt.code] || [1,2,3,4,5];
+    var start = new Date(startISO + 'T00:00:00');
+    var end = endDate(startISO, total, allowed);
+    return { code: opt.code, label: opt.label, start: start, end: end, total: total };
+  }).filter(Boolean);
+
+  rows.sort(function(a, b) { return a.start - b.start; });
+
+  var html = rows.map(function(r) {
+    return '<div class="pilot-row">' +
+      '<div class="pilot-name">' + r.label + '<span class="pilot-code">' + r.code + '</span></div>' +
+      '<div class="pilot-dates">' + fmt(r.start) + ' → ' + fmt(r.end) + '</div>' +
+      '<div class="pilot-meta">' + r.total + ' days</div>' +
+    '</div>';
+  }).join('');
+
+  var host = document.getElementById('pilot-sites-rows');
+  if (host) host.innerHTML = html || '<p style="color:var(--fg-2);font-size:13px;">No sites configured.</p>';
+})();
+</script>
 </body>
 </html>
