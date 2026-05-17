@@ -32,11 +32,14 @@ const ACTIVITY_LESSONS = {
   ],
   'Dashboard Introduction': '/student/week-1.html',
   'Simulation Matches: Your Loadout vs. Reality': [{url: "/lessons/simulation-matches.html", label: "Simulation matches Code"},
-    {url:"/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"}
+    {url:"/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"},
+    {url:"/activities/dashboard/dashboard-guide-preseason.html", label: "Dashboard Guide"}
+
   ],
   'Dashboard + Match Rules': [
     {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard Intro"}, 
-    {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"}
+    {url: "/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"},
+    {url:"/activities/dashboard/dashboard-guide-inseason.html", label: "Dashboard Guide"}
   ],
   'Day 8 Open Lab':
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Prepare Formula Race Cards"}],
