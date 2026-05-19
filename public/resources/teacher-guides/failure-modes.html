@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Failure Mode Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #F4F5F7; color: #1a1a2e; }
+
+/* ── NAV ── */
+.nav { background: #1a1a2e; padding: 14px 32px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.nav a { color: #fff; text-decoration: none; font-size: 13px; font-weight: 500; opacity: .65; transition: opacity .2s; }
+.nav a:hover { opacity: 1; }
+.nav-brand { color: #fff; font-weight: 800; font-size: 15px; opacity: 1 !important; margin-right: 8px; }
+.nav-badge { background: #e94560; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+
+/* ── HERO ── */
+.hero { background: linear-gradient(135deg, #1a1a2e 0%, #2d1515 100%); color: #fff; padding: 52px 40px 44px; }
+.hero-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #e94560; margin-bottom: 10px; }
+.hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 10px; }
+.hero p { font-size: 15px; opacity: .7; font-weight: 500; max-width: 680px; line-height: 1.65; margin-bottom: 24px; }
+.hero-insight { background: rgba(233,69,96,.15); border: 1px solid rgba(233,69,96,.3); border-radius: 10px; padding: 16px 20px; max-width: 680px; }
+.hi-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #f87171; margin-bottom: 6px; }
+.hi-text { font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.6; font-weight: 500; }
+
+/* ── LAYOUT ── */
+.page { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
+
+/* ── SECTION ── */
+.fm-section { margin-bottom: 56px; }
+.fm-section-head { margin-bottom: 24px; }
+.fm-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #9ca3af; margin-bottom: 4px; }
+.fm-title { font-size: 24px; font-weight: 800; color: #1a1a2e; letter-spacing: -.5px; margin-bottom: 6px; }
+.fm-when { font-size: 13px; color: #6b7280; font-weight: 500; }
+
+/* ── CONTRAST CARD ── */
+.contrast { display: grid; grid-template-columns: 1fr 1fr; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.1); margin-bottom: 20px; }
+.contrast-bad { background: #fff5f5; border-right: 3px solid #fca5a5; }
+.contrast-good { background: #f0fdf4; }
+.contrast-head { padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,.06); display: flex; align-items: center; gap: 8px; }
+.ch-bad { background: #fee2e2; }
+.ch-good { background: #dcfce7; }
+.c-badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
+.c-badge.bad { background: #e94560; color: #fff; }
+.c-badge.good { background: #059669; color: #fff; }
+.c-label { font-size: 12px; font-weight: 700; }
+.ch-bad .c-label { color: #991b1b; }
+.ch-good .c-label { color: #065f46; }
+.contrast-body { padding: 20px; }
+
+/* dialogue blocks */
+.dialogue { margin-bottom: 14px; }
+.d-who { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+.d-text { font-size: 13px; line-height: 1.6; padding: 10px 14px; border-radius: 8px; }
+.facilitator .d-who { color: #7c3aed; }
+.facilitator .d-text { background: #f5f3ff; color: #4c1d95; border-left: 3px solid #8b5cf6; }
+.student .d-who { color: #1e40af; }
+.student .d-text { background: #eff6ff; color: #1e3a8a; border-left: 3px solid #3b82f6; }
+
+/* bad facilitator */
+.bad .facilitator .d-text { background: #fee2e2; color: #991b1b; border-left: 3px solid #e94560; }
+.bad .facilitator .d-who { color: #e94560; }
+.good .facilitator .d-text { background: #dcfce7; color: #065f46; border-left: 3px solid #059669; }
+.good .facilitator .d-who { color: #059669; }
+
+/* annotation */
+.annotation { margin-top: 14px; border-radius: 8px; padding: 12px 14px; font-size: 12px; line-height: 1.6; }
+.annotation.bad-note { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+.annotation.good-note { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+.annotation .a-label { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+.annotation.bad-note .a-label { color: #dc2626; }
+.annotation.good-note .a-label { color: #16a34a; }
+
+/* ── PATTERN CALLOUT ── */
+.pattern { background: #1a1a2e; color: #fff; border-radius: 12px; padding: 20px 24px; margin-top: 20px; display: flex; gap: 16px; align-items: flex-start; }
+.p-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.p-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #e94560; margin-bottom: 5px; }
+.p-text { font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.6; }
+
+/* ── SIGNAL TABLE ── */
+.signal-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+.signal-table th { background: #1a1a2e; color: #fff; padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.signal-table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; vertical-align: top; line-height: 1.55; background: #fff; }
+.signal-table tr:last-child td { border-bottom: none; }
+.signal-table tr:nth-child(even) td { background: #f9fafb; }
+.bad-text { color: #dc2626; font-weight: 600; }
+.good-text { color: #059669; font-weight: 600; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid #e5e7eb; margin: 48px 0; }
+
+/* FOOTER */
+.footer { background: #1a1a2e; padding: 20px 40px; text-align: center; font-size: 11px; color: rgba(255,255,255,.35); font-weight: 500; }
+
+@media (max-width: 800px) {
+  .contrast { grid-template-columns: 1fr; }
+  .contrast-bad { border-right: none; border-bottom: 3px solid #fca5a5; }
+  .page { padding: 32px 20px 60px; }
+  .hero { padding: 36px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">Velocity Arena</span>
+  <span class="nav-badge">Training</span>
+  <a href="guide-00-program-overview.html">Program Overview</a>
+  <a href="guide-01-facilitation.html">Facilitation</a>
+  <a href="battlefield-cards.html">⚡ Battlefield Cards</a>
+  <a href="experience-map.html">Experience Map</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Failure Mode Library — Training Resource</div>
+  <h1>What bad facilitation<br>actually looks like.</h1>
+  <p>You can read about ideal facilitation all day. You learn it faster by seeing the breakdown — the exact moment things go wrong, why it happens, and what it should look like instead. Every example below is based on real failure patterns in programs like this.</p>
+  <div class="hero-insight">
+    <div class="hi-label">Core Insight from Reviewer</div>
+    <div class="hi-text">"Facilitator execution variance is where programs like this usually fail. You are trying to engineer culture through facilitation behavior. That is much harder than teaching robotics."</div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══════════ FAILURE MODE 1 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 01</div>
+    <div class="fm-title">Accepting Vague Answers</div>
+    <div class="fm-when">Happens during: Challenge Block, Match debrief, any discussion. Most common in Days 1–4.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator lets the claim stand</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Our bot is really fast. We think Speed is the most important stat."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Great point! Speed is definitely important. What else did everyone notice?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Different student</div>
+          <div class="d-text">"Yeah, their bot was fast too."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Exactly. Okay, let's move on to Endurance."</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          "Our bot is fast" was accepted as a complete thought. The facilitator validated it, amplified it, and moved on. No formula. No number. No trade-off. The standard "every claim needs a number" was abandoned on Day 2. Now you'll fight it for 14 more days.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Facilitator presses for the number</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Our bot is really fast. We think Speed is the most important stat."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"What's your Speed value? And what does that give you for Motor%?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"S is 12. So... Motor% is 60."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Okay. And what does a team lose when they allocate 12 to Speed? What's not getting those points?"</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          The facilitator didn't accept the vague claim. Pressed once for a number. Got it. Then immediately redirected to the trade-off. Two moves. The standard is held without confrontation.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-label">The Pattern to Break</div>
+      <div class="p-text">Every time you accept "I think" or "it feels like" or "it's good" — you train students that vague answers are acceptable. Do it once and the class sets its own standard. Press for evidence every single time in Days 1–5 and you almost never have to in Days 6–16.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 2 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 02</div>
+    <div class="fm-title">Rescuing the Silence Early</div>
+    <div class="fm-when">Happens during: Any question asked to the full group. Worse in Days 1–3 before norms are established.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator fills the silence at 3 seconds</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"If S = 10, what's Motor%? ... [2 seconds] ... No one? Okay, let me rephrase. If Speed equals 10 and the max is 20, what percent of the maximum is that? ... [1 second] ... It's 50%. Motor% = 50%."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Students</div>
+          <div class="d-text">[Write down 50% and wait for the next question.]</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          Facilitator asked, waited 2 seconds, rephrased, waited 1 more second, then answered their own question. Students learned: if you wait, you don't have to think. The facilitator trained learned helplessness in one exchange. This pattern compounds across every Challenge Block.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Facilitator holds the gap to 7 seconds, then deploys Turn and Talk</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"If S = 10, what's Motor%?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">[Silence — 7 seconds. Facilitator scans. No hands.]</div>
+          <div class="d-text" style="background:transparent;border:none;color:#6b7280;font-style:italic;">...counting internally, not moving, not nodding...</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Take 90 seconds. Tell your partner: what formula gets you Motor%, and what's the answer when S is 10."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">[After Turn and Talk]</div>
+          <div class="d-text">"We got 50%. It's 10 divided by 20, times 100."</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          Silence held. No rephrasing. At 7 seconds with no hands, Turn and Talk — not a repeat of the question. Students did the thinking. The facilitator collected the answer, not produced it.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-label">Why This Is Hard</div>
+      <div class="p-text">7 seconds of silence in front of 15 students feels like 7 minutes. You feel responsible for their discomfort. You're not. That discomfort is distributed thinking — don't resolve it. The moment you rephrase, you signal that the silence was a problem instead of a process.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 3 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 03</div>
+    <div class="fm-title">Over-Scaffolding the Formula</div>
+    <div class="fm-when">Happens during: Challenge Block instruction. Most common when facilitator is anxious about time or student confusion.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator walks students through every step before they try</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Okay, so for Motor%, here's how you do it. Take your S value — let's say it's 8 — and you divide it by 20. So 8 ÷ 20 is 0.4. Then you multiply by 100 to get the percent. So 0.4 × 100 = 40%. Motor% is 40. Got it? Now you try with your S value."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"My S is 10... so 10 divided by 20 is 0.5... times 100 is 50."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Perfect! You all got it."</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          The facilitator modeled the entire procedure before students attempted anything. The "try" phase was just copying the steps with a different number. Students learned a procedure. They did not learn why the formula works, what percent means, or how to apply this when the parameters change in Week 3.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Facilitator asks before modeling</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Motor% tells you what percent of your motor's capacity you're using. If S = 10 and the max is 20 — what percent is that? Don't calculate yet. Just think about what 10 out of 20 means."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"It's half. 50%."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Right. And the formula just makes that explicit: S ÷ 20 × 100. Why divide by 20? What does that represent?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Because 20 is the maximum Speed value?"</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Exactly. Now calculate Motor% for your own S value."</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          Meaning before procedure. The student explained the formula's logic before being given steps. That understanding transfers when parameters change. Procedure-only learning doesn't.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 4 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 04</div>
+    <div class="fm-title">Incomplete Loss Recovery</div>
+    <div class="fm-when">Happens during: Match-Build-Make after any team loss. Most damaging on Day 7 (first loss) and Day 10 (Season 1 Final).</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator skips Step 1 to get to the analysis</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Student [immediately after loss]</div>
+          <div class="d-text">"This is so stupid. Our bot literally did nothing. I don't want to do this anymore."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"I know it's frustrating — let's look at what we can learn from this. Open your Match Log. What did you predict?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">[stares at the table, doesn't open the log]</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Come on, this is useful data. Your allocation might just need a small adjustment..."</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          The facilitator moved directly to analysis — "let's look at what we can learn" — while the student was still in the emotional spike. The student didn't hear any of it. Step 1 (acknowledge, sit with it, 30 seconds of silence) was completely skipped. Pushing analysis onto an unresolved emotional state produces resistance, not reflection.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Step 1 first. Always.</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Student [immediately after loss]</div>
+          <div class="d-text">"This is so stupid. Our bot literally did nothing. I don't want to do this anymore."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">[sits down next to the team. Makes eye contact. Says nothing for ~25 seconds.]</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">[breathing slows slightly] "...it just didn't move the way we coded it."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Open the Match Log. What did you predict would happen before the match?"</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          Silence first. No explanation, no redirect, no "I know it's frustrating." Just presence. The student resolved the spike enough to hear Step 2. The whole exchange took 40 seconds longer than the bad version — and it actually worked.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-label">The Instinct to Fight</div>
+      <div class="p-text">Your instinct is to be helpful — to redirect the pain into productivity. That's the wrong order. Emotional regulation comes before cognitive engagement. You can't skip Step 1 and get Step 3. Run the protocol in sequence, every time, even when it feels slow.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 5 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 05</div>
+    <div class="fm-title">Identity-Triggering Phrasing</div>
+    <div class="fm-when">Happens during: Pre-diagnostic (Day 1), Cold Recall (Day 10), post-diagnostic (Day 15), any comparison moment. Often unintentional.</div>
+  </div>
+
+  <table class="signal-table">
+    <thead>
+      <tr>
+        <th>You Say This</th>
+        <th>Student Hears This</th>
+        <th>Say This Instead</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bad-text">"This should be easy — it's just percentages."</td>
+        <td>"If I don't get it, I'm worse than other students."</td>
+        <td class="good-text">"This is a percent calculation. Take a minute and try it."</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"You already know how to do this from school."</td>
+        <td>"If I don't remember, I failed at school."</td>
+        <td class="good-text">"Some of you may have seen this before. Start with what you know."</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"Who got this?" [scanning the room]</td>
+        <td>"I am being evaluated on whether I raise my hand."</td>
+        <td class="good-text">"Take 90 seconds with your partner. Tell each other what you got."</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"Does everyone understand?" [to full group]</td>
+        <td>"If I say no, I'm admitting I'm behind."</td>
+        <td class="good-text">"Tell me one thing that still feels unclear — write it, don't say it yet."</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"How did everyone do on the diagnostic?" [publicly]</td>
+        <td>"My score is about to become public."</td>
+        <td class="good-text">Don't ask this. Collect individually. Results are between you and each student.</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"Team A did great — let's all learn from them."</td>
+        <td>"I am being ranked against Team A."</td>
+        <td class="good-text">"Team A made an interesting choice — what data led them there? Can you ask them?"</td>
+      </tr>
+      <tr>
+        <td class="bad-text">"This is your chance to show what you've learned."</td>
+        <td>"This is a performance. My learning is being evaluated right now."</td>
+        <td class="good-text">"This is the same as Day 1 — information for the program, not a grade for you."</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pattern">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-label">How Identity Threat Works</div>
+      <div class="p-text">You don't have to say anything overtly negative to trigger academic identity threat. The phrase "this should be easy" is enough. Once a student believes they're being evaluated on a fixed trait (ability), they protect the ego by not trying. Phrases that create comparison, imply prior knowledge, or frame performance as public produce this effect. It's not about intention — it's about what students hear.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 6 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 06</div>
+    <div class="fm-title">Bad Debrief — Match Without Data</div>
+    <div class="fm-when">Happens during: Post-match discussion in Match-Build-Make. Any match day, Days 7–15.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Debrief focuses on winning, not data</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator [after match]</div>
+          <div class="d-text">"Great match, everyone! Team Apex really showed up today. What did people notice about how the bots moved?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Team Apex was way faster."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Yeah, they had great Speed. What else? Did anyone notice the turning?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Their turns were tighter."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Exactly! Good observations. Okay, next match."</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          No gap sentence. No Match Log. No formula reference. No prediction versus actual. The "debrief" was an oral recap of impressions — "faster," "tighter" — with no numbers. Five minutes of conversation produced zero data. Teams have nothing to take into the next match.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Debrief anchored to the Match Log and gap sentence</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator [after match]</div>
+          <div class="d-text">"Open your Match Log. What did you predict before this match? What happened? And what's the gap — give me a number."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"We predicted 2 goals. We scored 0. Gap is 2."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"What decision connects most directly to that gap? One decision."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Our Motor% was 40 — we thought that was enough but the field is bigger than we thought."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"What would you test differently? Finish this: if we change ___, we predict ___."</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          Match Log open. Prediction stated. Actual stated. Gap computed. One decision identified. Hypothesis formed. The team leaves with something testable. That's a debrief.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 7 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 07</div>
+    <div class="fm-title">Commissioner's Meeting — Over-Facilitation</div>
+    <div class="fm-when">Happens during: Day 12 Commissioner's Meeting. The most common facilitation mistake on this specific day.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator improves the proposal in real time</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Team presenting proposal</div>
+          <div class="d-text">"We think the underdog team should get 3 extra points instead of 2, because 2 isn't enough."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Interesting — but have you thought about what happens to the competitive balance? Maybe you could add a constraint, like the 3 extra points can only go to specific stats?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Oh yeah, that's a good idea. We can add that."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Okay, so the proposal is 3 extra points with a stat restriction. Does that make it stronger?"</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          The facilitator added content to the proposal. The "stat restriction" idea came from the facilitator, not the team. Now the class is voting on something the facilitator designed — not a student-authored rule change. The community ownership is gone. The facilitator also cued the class that weak proposals need improving, so teams will look to them for help instead of the data.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Facilitator holds the format, not the content</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue student">
+          <div class="d-who">Team presenting proposal</div>
+          <div class="d-text">"We think the underdog team should get 3 extra points instead of 2, because 2 isn't enough."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Does your proposal cite two dashboard numbers as required?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student</div>
+          <div class="d-text">"Um... not really."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"The proposal requirement is two dashboard numbers. You can add them now, or present as-is and the class will evaluate. Your choice."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student [during class debate later]</div>
+          <div class="d-text">"But they didn't show any data."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"That's a valid point for the vote. Anyone else before we vote?"</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          The facilitator enforced the format requirement (two dashboard numbers) without improving the proposal. The class debate exposed the weakness. The class voted — and they own the outcome, not the facilitator.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern">
+    <div class="p-icon">⚡</div>
+    <div>
+      <div class="p-label">Why This Is Hard</div>
+      <div class="p-text">You can see the proposal is weak. You know a better version exists. Your instinct is to help. But the moment you improve a proposal, you own it — not the student. The class debate is where learning happens. A weak proposal that gets rejected in a community vote teaches more about evidence-based reasoning than a strong proposal that the facilitator co-wrote.</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════ FAILURE MODE 8 ═══════════ -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Failure Mode 08</div>
+    <div class="fm-title">Rushing the Bot Naming Ceremony</div>
+    <div class="fm-when">Happens during: Day 2, Hook and Match-Build-Make. Often caused by time pressure and not recognizing the activity's function.</div>
+  </div>
+
+  <div class="contrast">
+    <div class="contrast-bad bad">
+      <div class="contrast-head ch-bad">
+        <span class="c-badge bad">✗ Breakdown</span>
+        <span class="c-label">Facilitator treats naming as a logistics task</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Okay teams, quick — pick a name for your bot. You've got 3 minutes. It doesn't have to be anything fancy, just something to identify you on the leaderboard."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student A</div>
+          <div class="d-text">"Just call it Team 4."</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Student B</div>
+          <div class="d-text">"Fine."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator [3 minutes later]</div>
+          <div class="d-text">"Okay, what did everyone come up with? Let me write them down."</div>
+        </div>
+        <div class="annotation bad-note">
+          <div class="a-label">What went wrong</div>
+          "It doesn't have to be anything fancy" told students the activity was low-stakes. "Just something to identify you on the leaderboard" made it a logistics task. One student checked out and said "Team 4." The other agreed. No discussion. No ownership. That team will change strategy the moment results are hard — they have no emotional investment in the bot.
+        </div>
+      </div>
+    </div>
+    <div class="contrast-good good">
+      <div class="contrast-head ch-good">
+        <span class="c-badge good">✓ Correct</span>
+        <span class="c-label">Facilitator treats naming as identity formation</span>
+      </div>
+      <div class="contrast-body">
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"This name is permanent. It goes on the wall today and stays there until Day 16. It's how we'll talk about your bot in matches, on the leaderboard, and in every gap sentence. Take the time to get it right. What's your bot's story? What does the name mean?"</div>
+        </div>
+        <div class="dialogue student">
+          <div class="d-who">Students [10 minutes of debate later]</div>
+          <div class="d-text">"We're calling it Voltcore. Because we want maximum Power but we also have high Endurance — like a volt that never dies."</div>
+        </div>
+        <div class="dialogue facilitator">
+          <div class="d-who">Facilitator</div>
+          <div class="d-text">"Voltcore. [Writes it on the wall immediately.] That name just got permanent. Remember it — I'll be calling this bot by name for 15 more days."</div>
+        </div>
+        <div class="annotation good-note">
+          <div class="a-label">What's different</div>
+          Permanence stated upfront. Story required. Ten minutes of debate happened — that was team ownership forming in real time. The name was connected to their allocation strategy before they even submitted Day 5's numbers. That team will work harder to defend Voltcore's design through Week 3 losses.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- QUICK REFERENCE -->
+<div class="fm-section">
+  <div class="fm-section-head">
+    <div class="fm-num">Quick Reference</div>
+    <div class="fm-title">Facilitation Failure Signals</div>
+    <div class="fm-when">Use this to self-diagnose during or after a session. If you spot a failure signal, check the corresponding failure mode above.</div>
+  </div>
+
+  <table class="signal-table">
+    <thead>
+      <tr>
+        <th>You Notice This</th>
+        <th>Likely Failure Mode</th>
+        <th>Immediate Correction</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Students using "it feels like" or "our bot is good" with no numbers</td>
+        <td>Failure Mode 01 — Vague answers accepted</td>
+        <td class="good-text">Stop. Ask: "What's the formula output for that? Give me a number."</td>
+      </tr>
+      <tr>
+        <td>You rephrased a question before 7 seconds elapsed</td>
+        <td>Failure Mode 02 — Silence rescued early</td>
+        <td class="good-text">Next question: ask once, hold silence to 7 sec, then Turn and Talk.</td>
+      </tr>
+      <tr>
+        <td>Students can calculate the formula but can't explain why it works</td>
+        <td>Failure Mode 03 — Over-scaffolded instruction</td>
+        <td class="good-text">Next session: ask "why does this formula work?" before modeling the procedure.</td>
+      </tr>
+      <tr>
+        <td>Team is still in emotional shutdown 6+ minutes after a loss</td>
+        <td>Failure Mode 04 — Loss Recovery skipped or rushed</td>
+        <td class="good-text">Run Step 1 now — sit, silence, no explanation. Don't move to the log until the emotional spike visibly drops.</td>
+      </tr>
+      <tr>
+        <td>Students disengaged during diagnostics or refusing to try</td>
+        <td>Failure Mode 05 — Identity-triggering phrasing</td>
+        <td class="good-text">Reframe immediately: "This is information for the program, not a grade for you."</td>
+      </tr>
+      <tr>
+        <td>Post-match discussion is opinions and impressions, no numbers</td>
+        <td>Failure Mode 06 — Bad debrief</td>
+        <td class="good-text">Stop. "Open the Match Log. Prediction. Actual. Gap. Give me a number."</td>
+      </tr>
+      <tr>
+        <td>You suggested an improvement to a Commissioner's Meeting proposal</td>
+        <td>Failure Mode 07 — Over-facilitation</td>
+        <td class="good-text">Stop improving. Return to format enforcement: "Does this proposal cite two dashboard numbers?"</td>
+      </tr>
+      <tr>
+        <td>Teams with no emotional investment in their bot name by Day 3</td>
+        <td>Failure Mode 08 — Bot Naming rushed</td>
+        <td class="good-text">Reference bot names in every session. Ask teams what their bot's name means. Rebuild investment through language.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div><!-- end page -->
+
+<div class="footer">
+  Velocity Arena Failure Mode Library · Facilitator Training Resource · velocityarena.io
+</div>
+
+</body>
+</html>

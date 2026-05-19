@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Battlefield Cards v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #080810; color: #fff; min-height: 100vh; }
+/* ── TOP BAR ── */
+.topbar { background: #0d0d1e; border-bottom: 1px solid rgba(255,255,255,.08); padding: 10px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+.tb-brand { font-size: 13px; font-weight: 800; color: #fff; }
+.tb-badge { background: #e94560; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+.tb-note { font-size: 10px; color: rgba(255,255,255,.35); font-weight: 500; }
+.tb-link { font-size: 11px; color: rgba(255,255,255,.35); text-decoration: none; margin-left: auto; transition: color .2s; }
+.tb-link:hover { color: #fff; }
+/* ── MODE TABS ── */
+.mode-tabs { display: flex; gap: 0; background: #0a0a18; border-bottom: 1px solid rgba(255,255,255,.07); }
+.mode-tab { padding: 11px 22px; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: rgba(255,255,255,.4); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Montserrat', sans-serif; }
+.mode-tab:hover { color: rgba(255,255,255,.7); }
+.mode-tab.active-daily { color: #60a5fa; border-bottom-color: #3b82f6; }
+.mode-tab.active-emergency { color: #fb923c; border-bottom-color: #f97316; }
+.mode-tab.active-metrics { color: #a78bfa; border-bottom-color: #8b5cf6; }
+/* ── DAY SELECTOR ── */
+.day-selector { padding: 14px 18px 0; }
+.ds-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.25); margin-bottom: 8px; }
+.ds-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }
+.ds-btn { border: none; border-radius: 6px; padding: 7px 2px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+.ds-btn .d-num { font-size: 13px; font-weight: 800; line-height: 1; }
+.ds-btn .d-w { font-size: 8px; opacity: .6; }
+.ds-btn.w1 { background: rgba(37,99,235,.2); color: #93c5fd; border: 1px solid rgba(37,99,235,.25); }
+.ds-btn.w2 { background: rgba(124,58,237,.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,.25); }
+.ds-btn.w3 { background: rgba(217,119,6,.2); color: #fcd34d; border: 1px solid rgba(217,119,6,.25); }
+.ds-btn.w4 { background: rgba(16,185,129,.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+.ds-btn.active.w1 { background: #2563eb; color: #fff; border-color: #3b82f6; }
+.ds-btn.active.w2 { background: #7c3aed; color: #fff; border-color: #8b5cf6; }
+.ds-btn.active.w3 { background: #d97706; color: #fff; border-color: #f59e0b; }
+.ds-btn.active.w4 { background: #059669; color: #fff; border-color: #10b981; }
+.ds-btn.ms::after { content: '★'; font-size: 7px; position: absolute; top: 2px; right: 3px; }
+/* ── CARD WRAP ── */
+.card-wrap { padding: 14px 18px 24px; }
+.card { background: #0d0d1e; border-radius: 12px; border: 1px solid rgba(255,255,255,.07); overflow: hidden; }
+/* card header */
+.card-header { padding: 14px 18px 12px; display: grid; grid-template-columns: 1fr auto; align-items: start; border-bottom: 1px solid rgba(255,255,255,.06); gap: 12px; }
+.ch-day { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+.ch-title { font-size: 18px; font-weight: 800; letter-spacing: -.5px; line-height: 1; margin-bottom: 6px; }
+.ch-event { display: inline-flex; align-items: center; border-radius: 20px; padding: 3px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.ch-formula-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.3); margin-bottom: 4px; text-align: right; }
+.ch-formula-val { font-family: monospace; font-size: 11px; font-weight: 700; color: #60a5fa; background: rgba(37,99,235,.15); padding: 4px 8px; border-radius: 5px; white-space: nowrap; }
+/* card body */
+.card-body { display: flex; flex-direction: column; }
+.cs { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.04); }
+.cs:last-child { border-bottom: none; }
+.card-bottom { display: grid; grid-template-columns: 1fr 1fr; }
+.card-bottom .cs { border-bottom: none; }
+.card-bottom .cs:first-child { border-right: 1px solid rgba(255,255,255,.04); }
+.cs-lbl { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 7px; display: flex; align-items: center; gap: 4px; }
+.cs-lbl .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.lbl-g .cs-lbl { color: #34d399; }  .lbl-g .dot { background: #34d399; }
+.lbl-r .cs-lbl { color: #f87171; }  .lbl-r .dot { background: #f87171; }
+.lbl-b .cs-lbl { color: #60a5fa; }  .lbl-b .dot { background: #60a5fa; }
+.lbl-y .cs-lbl { color: #fbbf24; }  .lbl-y .dot { background: #fbbf24; }
+.lbl-d .cs-lbl { color: rgba(255,255,255,.3); } .lbl-d .dot { background: rgba(255,255,255,.2); }
+.cs-risk { font-size: 12px; font-weight: 700; color: #fff; line-height: 1.4; }
+.cs-risk-hi { display: block; margin-top: 7px; font-size: 11px; font-weight: 700; color: #fca5a5; background: rgba(248,113,113,.1); border-left: 2px solid #e94560; padding: 6px 8px; border-radius: 0 5px 5px 0; line-height: 1.45; }
+.cs-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.cs-list li { font-size: 11px; line-height: 1.4; color: rgba(255,255,255,.75); display: flex; gap: 6px; align-items: flex-start; }
+.li-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.lbl-g .li-dot { background: #34d399; }
+.lbl-r .li-dot { background: #f87171; }
+.lbl-b .li-dot { background: #60a5fa; }
+.lbl-y .li-dot { background: #fbbf24; }
+.lbl-d .li-dot { background: rgba(255,255,255,.25); }
+.q { font-style: italic; }
+.q-blue { color: #93c5fd; }
+.q-red { color: #fca5a5; text-decoration: line-through; text-decoration-color: rgba(248,113,113,.35); }
+/* card footer */
+.card-footer { padding: 8px 16px; border-top: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,.15); }
+.cf-ends { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.35); }
+.cf-ends span { color: rgba(255,255,255,.6); font-weight: 700; }
+.cf-kb { font-size: 10px; color: rgba(255,255,255,.2); margin-left: auto; }
+/* week header colors */
+.w1-h .ch-day { color: #60a5fa; }
+.w1-h .ch-event { background: rgba(37,99,235,.2); color: #93c5fd; border: 1px solid rgba(37,99,235,.3); }
+.w2-h .ch-day { color: #a78bfa; }
+.w2-h .ch-event { background: rgba(124,58,237,.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,.3); }
+.w3-h .ch-day { color: #fbbf24; }
+.w3-h .ch-event { background: rgba(217,119,6,.2); color: #fcd34d; border: 1px solid rgba(217,119,6,.3); }
+.w4-h .ch-day { color: #34d399; }
+.w4-h .ch-event { background: rgba(16,185,129,.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,.3); }
+/* ═══════════════════════════════════
+   EMERGENCY CARDS
+═══════════════════════════════════ */
+.emergency-wrap { padding: 8px 18px 24px; display: none; }
+.em-filter { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.em-chip { background: rgba(251,146,60,.08); border: 1px solid rgba(251,146,60,.2); color: rgba(251,146,60,.6); font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all .15s; white-space: nowrap; }
+.em-chip.active { background: #f97316; border-color: #fb923c; color: #fff; }
+.em-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.em-card { background: #120a00; border: 1px solid rgba(251,146,60,.2); border-radius: 12px; overflow: hidden; }
+.em-card-head { background: rgba(249,115,22,.12); padding: 12px 16px; border-bottom: 1px solid rgba(251,146,60,.15); display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.em-scenario { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fb923c; margin-bottom: 4px; }
+.em-title { font-size: 15px; font-weight: 800; color: #fff; }
+.em-tag { font-size: 9px; font-weight: 700; background: rgba(249,115,22,.25); color: #fdba74; border-radius: 4px; padding: 2px 7px; white-space: nowrap; flex-shrink: 0; }
+.em-body { display: grid; grid-template-columns: 1fr 1fr; }
+.em-section { padding: 11px 14px; border-right: 1px solid rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.04); }
+.em-section:nth-child(even) { border-right: none; }
+.em-section:nth-last-child(-n+2) { border-bottom: none; }
+.em-lbl { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.em-move .em-lbl { color: #34d399; }
+.em-dont .em-lbl { color: #f87171; }
+.em-thresh .em-lbl { color: #fbbf24; }
+.em-say .em-lbl { color: #60a5fa; }
+.em-text { font-size: 11px; line-height: 1.5; color: rgba(255,255,255,.75); }
+.em-text strong { color: #fff; font-weight: 700; }
+.em-say-q { font-style: italic; color: #93c5fd; font-size: 11px; line-height: 1.5; }
+/* ═══════════════════════════════════
+   METRICS
+═══════════════════════════════════ */
+.metrics-wrap { padding: 16px 18px 32px; display: none; }
+.metrics-head { margin-bottom: 20px; }
+.mh-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.5px; margin-bottom: 4px; }
+.mh-sub { font-size: 12px; color: rgba(255,255,255,.4); font-weight: 500; }
+.day-sel-m { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.day-sel-m label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: 1px; margin-right: 4px; }
+.day-btn-m { background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.25); color: #c4b5fd; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all .15s; }
+.day-btn-m.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; }
+.metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+.m-section-label { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.25); grid-column: 1/-1; padding-top: 4px; }
+.m-focus-label { font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(139,92,246,.5); grid-column: 1/-1; margin-top: 12px; }
+.focus-tabs { display: flex; gap: 6px; flex-wrap: wrap; grid-column: 1/-1; }
+.focus-tab { background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.2); color: rgba(139,92,246,.7); font-size: 10px; font-weight: 700; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all .15s; }
+.focus-tab.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; }
+.focus-panel { grid-column: 1/-1; }
+.m-card { background: #0d0d1e; border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.07); }
+.m-name { font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+.m-target { font-size: 10px; color: rgba(255,255,255,.4); margin-bottom: 10px; font-weight: 600; }
+.m-target span { color: #a78bfa; font-weight: 700; }
+.m-input-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.m-label-small { font-size: 10px; color: rgba(255,255,255,.4); font-weight: 600; min-width: 60px; }
+.m-num { width: 52px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 5px; padding: 5px 8px; font-size: 13px; font-weight: 700; color: #fff; font-family: 'Montserrat', sans-serif; text-align: center; }
+.m-num:focus { outline: none; border-color: #8b5cf6; }
+.m-divider { color: rgba(255,255,255,.3); font-size: 13px; }
+.m-rate { font-size: 18px; font-weight: 800; min-width: 48px; }
+.m-check { display: flex; gap: 10px; flex-wrap: wrap; }
+.m-check label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,.65); cursor: pointer; font-weight: 500; }
+.m-check input[type=checkbox] { width: 14px; height: 14px; accent-color: #8b5cf6; cursor: pointer; }
+.m-counter { display: flex; align-items: center; gap: 8px; }
+.m-counter-btn { width: 28px; height: 28px; border-radius: 5px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; transition: background .15s; }
+.m-counter-btn:hover { background: rgba(255,255,255,.12); }
+.m-count-val { font-size: 22px; font-weight: 800; color: #fff; min-width: 32px; text-align: center; }
+.m-warn { color: #f87171; }
+.m-ok { color: #34d399; }
+/* summary bar */
+.m-summary { background: #0d0d1e; border-radius: 10px; padding: 16px 18px; border: 1px solid rgba(255,255,255,.07); }
+.ms-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 12px; }
+.ms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ms-item { text-align: center; }
+.ms-val { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 3px; }
+.ms-lbl { font-size: 10px; color: rgba(255,255,255,.4); font-weight: 600; }
+/* metrics framing note */
+.metrics-note { background: rgba(139,92,246,.08); border: 1px solid rgba(139,92,246,.2); border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; font-size: 11px; line-height: 1.6; color: rgba(255,255,255,.7); }
+.metrics-note strong { color: #c4b5fd; font-weight: 700; display: block; margin-bottom: 4px; }
+/* notes area */
+.m-notes-wrap { margin-top: 12px; background: #0d0d1e; border-radius: 10px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.07); }
+.m-notes-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.m-notes { width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 6px; padding: 10px 12px; font-size: 12px; color: rgba(255,255,255,.75); font-family: 'Montserrat', sans-serif; resize: vertical; min-height: 70px; }
+.m-notes:focus { outline: none; border-color: #8b5cf6; }
+.m-reset { margin-top: 10px; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.2); color: #fca5a5; font-size: 10px; font-weight: 700; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+.m-reset:hover { background: rgba(248,113,113,.2); }
+@media (max-width: 720px) {
+  .ds-grid { grid-template-columns: repeat(8, 1fr); }
+  .card-body { grid-template-columns: 1fr; }
+  .cs:nth-child(even) { border-right: none; }
+  .cs { border-right: none; }
+  .em-grid { grid-template-columns: 1fr; }
+  .em-body { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .ms-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div class="topbar">
+  <span class="tb-brand">Velocity Arena</span>
+  <span class="tb-badge">⚡ Runtime</span>
+  <span class="tb-note">In-session use only — not a reading document</span>
+  <a class="tb-link" href="guide-00-program-overview.html">← Training Docs</a>
+</div>
+<!-- MODE TABS -->
+<div class="mode-tabs">
+  <button class="mode-tab active-daily" id="tab-daily" onclick="setMode('daily')">⚡ Daily Cards</button>
+  <button class="mode-tab" id="tab-emergency" onclick="setMode('emergency')">🚨 Emergency</button>
+  <button class="mode-tab" id="tab-metrics" onclick="setMode('metrics')">📊 Session Metrics</button>
+</div>
+<!-- ═══════ DAILY MODE ═══════ -->
+<div id="mode-daily">
+  <div class="day-selector">
+    <div class="ds-label">Select day — ← → to navigate</div>
+    <div class="ds-grid" id="dayGrid"></div>
+  </div>
+  <div class="card-wrap">
+    <div class="card" id="dayCard"></div>
+  </div>
+</div>
+<!-- ═══════ EMERGENCY MODE ═══════ -->
+<div id="mode-emergency" style="display:none;">
+  <div class="emergency-wrap" style="display:block;">
+    <div class="em-filter">
+      <button class="em-chip active" onclick="filterEmergency('all',this)">Show all</button>
+      <button class="em-chip" onclick="filterEmergency('match',this)">Match days only</button>
+      <button class="em-chip" onclick="filterEmergency('week1',this)">Week 1 only</button>
+    </div>
+    <div class="em-grid" id="emergencyGrid"></div>
+  </div>
+</div>
+<!-- ═══════ METRICS MODE ═══════ -->
+<div id="mode-metrics" style="display:none;">
+  <div class="metrics-wrap" style="display:block;">
+    <div class="metrics-head">
+      <div class="mh-title">Session Metrics</div>
+      <div class="mh-sub">Use these after the session to notice patterns. Numbers inform reflection — they are not a compliance score.</div>
+    </div>
+    <div class="metrics-note">
+      <strong>Metrics are reflection tools, not scoreboards.</strong>
+      Occasional lightweight encouragement — "Nice catch," "Good one," "Clever" — is not a failure. The actual problem is praise replacing a follow-up question. If you find yourself withholding encouragement to keep a ratio clean, or forcing silence artificially, the tool is working against you. Stop tracking that number and write a note instead.
+    </div>
+    <div class="day-sel-m">
+      <label>Day</label>
+      <div id="metricsDayBtns"></div>
+    </div>
+    <div style="font-size:10px; color:rgba(255,255,255,.28); font-weight:600; margin-bottom:14px; margin-top:-10px;">Day buttons are labels only — inputs don't reset or save per day. Use Session Notes to record day-specific observations.</div>
+    <div class="metrics-grid">
+      <!-- Always Track -->
+      <div class="m-section-label">Always Track</div>
+      <div class="m-card">
+        <div class="m-name">Loss Recovery</div>
+        <div class="m-target">Target: <span>Runs after every loss</span></div>
+        <div class="m-input-row">
+          <span class="m-label-small">Losses</span>
+          <input class="m-num" id="losses" type="number" min="0" value="0" oninput="calcRate('losses','protocols','lossRate')">
+          <span class="m-divider">/</span>
+          <span class="m-label-small">Protocols run</span>
+          <input class="m-num" id="protocols" type="number" min="0" value="0" oninput="calcRate('losses','protocols','lossRate')">
+          <span class="m-rate" id="lossRate">—</span>
+        </div>
+      </div>
+      <div class="m-card">
+        <div class="m-name">Pre-Match Predictions</div>
+        <div class="m-target">Target: <span>Logged before every match starts</span></div>
+        <div class="m-input-row">
+          <span class="m-label-small">Matches</span>
+          <input class="m-num" id="matches" type="number" min="0" value="0" oninput="calcRate('matches','preds','predRate')">
+          <span class="m-divider">/</span>
+          <span class="m-label-small">Pre-logged</span>
+          <input class="m-num" id="preds" type="number" min="0" value="0" oninput="calcRate('matches','preds','predRate')">
+          <span class="m-rate" id="predRate">—</span>
+        </div>
+      </div>
+      <!-- Focus Metric -->
+      <div class="m-focus-label">Focus Metric — pick one per session, stick with it for 3–4 sessions to see a pattern</div>
+      <div class="focus-tabs">
+        <button class="focus-tab active" onclick="setFocus('evidence', this)">Evidence Prompts</button>
+        <button class="focus-tab" onclick="setFocus('gaps', this)">Gap Sentences</button>
+        <button class="focus-tab" onclick="setFocus('praise', this)">Praise → Follow-Up</button>
+        <button class="focus-tab" onclick="setFocus('waittime', this)">Wait Time</button>
+      </div>
+      <div id="focus-evidence" class="m-card focus-panel">
+        <div class="m-name">Evidence Prompts</div>
+        <div class="m-target">Target: <span>≥10 — "give me a number / show me the formula"</span></div>
+        <div class="m-counter">
+          <button class="m-counter-btn" onclick="changeCount('evidenceCount',1)">+</button>
+          <div class="m-count-val" id="evidenceCount">0</div>
+          <button class="m-counter-btn" onclick="changeCount('evidenceCount',-1)">−</button>
+          <span id="evidenceSignal" style="font-size:11px;margin-left:6px;"></span>
+        </div>
+      </div>
+      <div id="focus-gaps" class="m-card focus-panel" style="display:none">
+        <div class="m-name">Gap Sentences</div>
+        <div class="m-target">Target: <span>All 3 parts completed after every match</span></div>
+        <div class="m-input-row">
+          <span class="m-label-small">Matches</span>
+          <input class="m-num" id="matchesGap" type="number" min="0" value="0" oninput="calcRate('matchesGap','gaps','gapRate')">
+          <span class="m-divider">/</span>
+          <span class="m-label-small">Complete</span>
+          <input class="m-num" id="gaps" type="number" min="0" value="0" oninput="calcRate('matchesGap','gaps','gapRate')">
+          <span class="m-rate" id="gapRate">—</span>
+        </div>
+      </div>
+      <div id="focus-praise" class="m-card focus-panel" style="display:none">
+        <div class="m-name">Praise → Follow-Up</div>
+        <div class="m-target">Target: <span>Praise followed by a question — not praise as a full stop</span></div>
+        <div class="m-counter">
+          <button class="m-counter-btn" onclick="changeCount('vagueCount',1)">+</button>
+          <div class="m-count-val" id="vagueCount">0</div>
+          <button class="m-counter-btn" onclick="changeCount('vagueCount',-1)">−</button>
+          <span id="vagueSignal" style="font-size:11px;margin-left:6px;"></span>
+        </div>
+      </div>
+      <div id="focus-waittime" class="m-card focus-panel" style="display:none">
+        <div class="m-name">Wait Time</div>
+        <div class="m-target">Target: <span>Did I fill silence before students had time to think?</span></div>
+        <div class="m-check" style="flex-direction:column; gap:8px;">
+          <label><input type="checkbox" id="wt1" onchange="calcSummary()"> Held silence most of the time</label>
+          <label><input type="checkbox" id="wt2" onchange="calcSummary()"> Used Turn and Talk instead of repeating the question <span style="font-weight:500; color:rgba(255,255,255,.35);">— "Take 30 sec, turn to your partner: [question]"</span></label>
+          <label><input type="checkbox" id="wt3" onchange="calcSummary()"> Caught myself moving too fast</label>
+        </div>
+      </div>
+    </div>
+    <!-- Summary -->
+    <div class="m-summary">
+      <div class="ms-title">Session Summary</div>
+      <div class="ms-grid">
+        <div class="ms-item">
+          <div class="ms-val" id="sum-loss">—</div>
+          <div class="ms-lbl">Loss Recovery</div>
+        </div>
+        <div class="ms-item">
+          <div class="ms-val" id="sum-pred">—</div>
+          <div class="ms-lbl">Pre-Match Preds</div>
+        </div>
+      </div>
+    </div>
+    <div class="m-notes-wrap">
+      <div class="m-notes-label">Session Notes — Reflection, not score</div>
+      <textarea class="m-notes" id="sessionNotes" placeholder="Where did I rescue too early? Where did I feel stiff or unnatural? What did I accept without evidence? Which team needs attention tomorrow? Anything you'd do differently — write it here, not in a ratio."></textarea>
+    </div>
+    <button class="m-reset" onclick="resetMetrics()">Reset for Next Session</button>
+  </div>
+</div>
+<script>
+// ════════════════════════════════════
+// DAILY CARD DATA (compressed v2)
+// ════════════════════════════════════
+const days = [
+  {
+    day:1,week:1,wc:'w1',hc:'w1-h',ms:true,
+    title:'Speed',event:'★ Pre-Diagnostic',
+    formula:'Motor% = S ÷ 20 × 100',ends:'Goal Setting',
+    goals:['Run pre-diagnostic','Teach Motor% with meaning: why S × 100 ÷ 20? Not just how.','Plant the standard Day 1: every claim needs a number'],
+    sayThis:['"This tells us where you start. Not where you end. No grade."','"S is 10. What does that give you? Show me the formula."','"Why do we divide by 20? What does that number represent?"','"What\'s the trade-off if someone puts S at 20?"'],
+    dontSay:['"This is easy — it\'s just percentages."','"Anyone?" after 2 seconds','"Good job!" and then moving on — always follow praise with a question','"Does everyone understand?"'],
+  },
+  {
+    day:2,week:1,wc:'w1',hc:'w1-h',ms:true,
+    title:'Endurance',event:'★ Bot Naming Ceremony',
+    formula:'P(t) = 100 − (20−E) × 1.5 × t',ends:'Math Connection',
+    goals:['Bot Naming — names posted immediately after activity','Endurance decay understood as a curve, not a formula to memorize','Every team states the decay rate for their E value'],
+    sayThis:['"This name is permanent. Wall. Day 1 to Day 16."','"E = 5 at minute 3 — what\'s P(t)? Show the formula."','"What does P(t) equal when E = 20? Why is that a problem?"'],
+    dontSay:['"It doesn\'t really matter what you call it."','"Just memorize the formula."'],
+  },
+  {
+    day:3,week:1,wc:'w1',hc:'w1-h',ms:false,
+    title:'Turning',event:'Ratio Formula',
+    formula:'Ratio = 0.2 + T × 0.02',ends:'Team Pulse',
+    goals:['Turning Ratio understood physically — not just calculated','Every team tests ≥2 T values and logs results','Budget cost of high T articulated by each team'],
+    sayThis:['"What does T = 10 do to your bot\'s left motor physically?"','"What T value gives you exactly Ratio = 0.50? Work backward."','"So if you push T higher, what breaks?"'],
+    dontSay:['"Higher T is better."','"Just test it and see."','"Don\'t worry about the budget yet."'],
+  },
+  {
+    day:4,week:1,wc:'w1',hc:'w1-h',ms:false,
+    title:'Power',event:'Budget Preview',
+    formula:'Charge% = P²  |  Follow-Through = P × 80',ends:'Journal Entry',
+    goals:['Charge% understood as quadratic — not linear — growth','Both Power formulas applied for P = 4, 7, 10','Seed the budget question before Day 5'],
+    sayThis:['"P = 10 gives Charge% = 100. P = 5 gives 25. Why isn\'t it double?"','"P is bounded at 10. Why can\'t it be 15 like the others?"','"Okay, all 4 stats now — if your total is exactly 20, what do you choose?"','"To get Follow-Through ≥ 400ms, what\'s the minimum P?"'],
+    dontSay:['"P = 10 gives you twice the power of P = 5."','"Just maximize Power."','"Don\'t worry about the other stats yet."'],
+  },
+  {
+    day:5,week:2,wc:'w2',hc:'w2-h',ms:false,
+    title:'Budget Constraint',event:'Simulation Matches',
+    formula:'S + P + E + T = 20',ends:'Goal Setting',
+    goals:['Every team designs 3 different loadouts — not 3 versions of the same idea','All 4 formula outputs calculated for each loadout — not just Motor%','"If Speed = 8, what do you give up?" answered with every calculation shown'],
+    sayThis:['"Three loadouts. Push the constraint — make them actually different."','"If Speed = 8, what drops? Show me every formula output."','"You\'re picking your best loadout to test this afternoon. The data will tell you if you\'re right."','"One row per simulation run. Predicted, actual, gap. That\'s the habit."'],
+    dontSay:['"Just pick one and go."','"Good job" without checking if they ran all 4 formula outputs','"We\'ll lock allocations later." (They pick a loadout today to test)'],
+  },
+  {
+    day:6,week:2,wc:'w2',hc:'w2-h',ms:true,
+    title:'Field Geometry',event:'★ Allocations &amp; Launch Sequence Locked',
+    formula:'d = √[(x₂−x₁)² + (y₂−y₁)²]',ends:'Math Connection',
+    goals:['Stat allocations locked for Season 1','Every team completes all 12 concept tags correctly and budget check = 20 before locking stats','Geometry block produces a timing prediction — distance calculated AND seconds-to-ball written using Speed formula'],
+    sayThis:['"What\'s the concept tag — not the formula name. What mathematical idea is this problem using?"','"You have a distance. Now — how many seconds at your Motor%? Write the calculation."','"Two runs, two logged results. No blanks."','"That\'s not an observation. Give me a number — time, stat, something specific."'],
+    dontSay:['"Close enough on the concept tag." (wrong tag means knowledge didn\'t transfer)','"You can check the stats later." (verification happens before the showcase)','"Good observation." without confirming it cites a number or stat','"Just lock it in." before budget sums to 20'],
+  },
+  {
+    day:7,week:2,wc:'w2',hc:'w2-h',ms:true,
+    title:'Season 1 — Match 1',event:'★ First Real Match',
+    formula:'P(t) = 100 − rt  |  "predicted ___, actual ___, gap = ___"',ends:'Team Pulse',
+    goals:['Endurance decay equation written in slope-intercept form with x-intercept calculated — before matches begin','Every team states their prediction out loud and logs it before each match — no prediction, no match starts','Loss Recovery Protocol runs for every losing team before their next match — all 3 steps, no shortcuts'],
+    sayThis:['"What\'s your prediction? Say it out loud. Log it — before the match starts."','"Your model predicted [X]. You scored [Y]. That gap is the most interesting thing that happened today."','"One stat only. Which decision created that gap?"','"You have [N] matches left. You now have data you didn\'t have before. What\'s one thing you\'d change? Write it."'],
+    dontSay:['"We\'ll log predictions after the match." (Default: prediction comes before)','"Let\'s just move to the next match." (Default: Loss Recovery runs first — skip only if something more urgent takes over)','Anything after the 30-second emotion window in Step 1 — wait, say nothing.','"Which stats could have been better?" (Step 2 is one stat only — open the dashboard, find it)'],
+  },
+  {
+    day:8,week:2,wc:'w2',hc:'w2-h',ms:true,
+    title:'Linear Equations + Match 2',event:'★ Rivalry Cards',
+    formula:'y = mx + b  (Speed vs. Goals)',ends:'Journal Entry',
+    goals:['Every team writes a linear equation from their own scatter plot data — slope calculated, y-intercept solved (different equations are correct)','Equation prediction logged before each match; actual result recorded after — no blanks','Every Rivalry Card reviewed before posting — dashboard number + correct formula required, no exceptions'],
+    sayThis:['"Your equation is different from theirs. That\'s correct — you used different data points."','"Log your equation\'s prediction before the match starts. What does y = mx + b say?"','"Open dashboard. Find their row. Write the number before you write anything else on the card."','"I need a dashboard number on this card. What does it say? Hand it back."'],
+    dontSay:['"Let\'s agree on one class equation." (Different equations are the point)','"Close enough on the card." (No number = send it back — Day 9 corrects publicly)','"Fill in predictions after the match."','"Good trash talk!" without checking for a specific number and formula'],
+  },
+  {
+    day:9,week:3,wc:'w3',hc:'w3-h',ms:false,
+    title:'Season 1 — Match 3',event:'Formula Relay',
+    formula:'All 6 types: Speed · Endurance · Turning · Power · Follow-Through · Budget',ends:'Math Connection',
+    goals:['Every team verifies the numbers on their received Rivalry Card against the dashboard — incorrect data gets marked with the correct number before matches begin','Formula Relay used diagnostically — error sort by type identifies each team\'s target formula for today\'s prediction','Every team logs prediction from target formula before each match; >20% gap between prediction and actual gets one sentence naming the missed variable'],
+    sayThis:['"Sort by type, count errors per type. That\'s your target formula for today\'s prediction."','"Zero errors doesn\'t mean equal confidence. Which formula do you understand least? That\'s your target."','"Prediction from your target formula — log it before the match starts."','"Your prediction and actual differ by more than 20%. One sentence: what variable did your model miss?"'],
+    dontSay:['"Great, no errors!" and move on. (Zero errors → still must identify target formula)','"Pick your strongest formula for the prediction." (Prediction comes from weakest type)','"Close enough to your prediction." (>20% gap requires a written sentence)','"Let\'s just move to the next match." (Default: Loss Recovery runs first)'],
+  },
+  {
+    day:10,week:3,wc:'w3',hc:'w3-h',ms:true,
+    title:'Season 1 Final',event:'★ Cold Recall Check',
+    formula:'d = √[(x₂−x₁)² + (y₂−y₁)²]',ends:'Math Connection',
+    goals:['Cold Recall: 5 questions, individual, no notes, no devices, no grade — flag anyone who misses Q4 (Endurance decay gap breaks Season 2 planning)','Season 1 Final: Loss Recovery for every losing team; leaderboard finalized before matches end','Distance formula reflection: every team names one Season 2 stat adjustment with an explicit tradeoff argument'],
+    sayThis:['"No notes, no devices. This is not a test, just a check in. This is information, not judgment. Try every question anyway — your work helps us figure out where we are."','"Dot sticker goes to the most mathematically interesting finding — not the team with the most wins."','"If Q4 is incorrect, it means your Endurance decay model has a gap. That will break your Season 2 plan. We\'ll fix it now."','"Not one stat to adjust — one stat with a tradeoff. What do you gain and what do you give up?"'],
+    dontSay:['"Don\'t worry. It doesn\'t count." (Cold Recall is diagnostic — use the data)','"Let\'s vote for the team with the best record." (Vote is for most interesting finding)','"Just name a stat to change." (Must include an explicit tradeoff argument)'],
+  },
+  {
+    day:11,week:3,wc:'w3',hc:'w3-h',ms:true,
+    title:'Proportional Scaling',event:'★ Season 2 Reallocation',
+    formula:'Motor%: S×5 (linear) | Charge%: P² (quadratic) | % change = (new−old)/old×100',ends:'Team Pulse',
+    goals:['Every team calculates percent change for both Motor Power and Charge Speed — linear vs. quadratic contrast must be explicit in writing','Commissioner Proposal exit check complete: rule written (stat + CAP/FLOOR + number) + at least one formula computation + last-place team named','Every team reviews their proposal for causal language — all causal claims revised to pattern language ("is associated with")'],
+    sayThis:['"When you add Speed, does Motor Power go up by the same percentage? More? Less?"','"Motor scales linearly. Charge doesn\'t. That difference matters for your proposal."','"Pick a stat, direction (CAP or FLOOR), and a number 1–18. All three in Section 1 before you move."','"Don\'t write \'difference = 15.\' Use percent change: (45 − 30) / 30 × 100 = 50%."','"Don\'t accept \'Power causes wins.\' Flag it — revise to: \'is associated with.\'"','"Don\'t let them skip Section 1. Stat + direction + number — all three before Section 2."'],
+    dontSay:['"Just take the difference between the two numbers." (the real move: percent change)','"Good — Power causes wins." (the real move: \'is associated with\')','"You can fill in Section 1 later." (the real move: Section 2 is gated — no Section 1, no Section 2)'],
+  },
+  {
+    day:12,week:3,wc:'w3',hc:'w3-h',ms:true,
+    title:"Commissioner's Meeting",event:'★ Season 2 Rules Vote',
+    formula:'% change = (new−old)/old×100 | Allocation: S+P+E+T=20 (Underdog: 22)',ends:'Skill Bridge',
+    goals:['Every team verifies all cited numbers against the dashboard and calculates percent change correctly — divided by the before value, not the after','Every team presents in 3 minutes with two verified data points; math checked by the room before any vote is called','Every team submits a revised Season 2 allocation satisfying all passed rules with sum = 20 (or 22 for Underdog)'],
+    sayThis:['"You have 10 minutes. Talk to at least two teams. Two sentences, your number, ask what they think. Go."','"Every number you cite must be on the dashboard. If you can\'t point to it, it doesn\'t count."','"3 minutes. Two data points. Room checks math before vote. Proposing team does not vote. Mathematical objections only — name the number and calculation."'],
+    dontSay:['"Don\'t acknowledge objections without a specific number and calculation — window closes in 30 seconds."','"Don\'t call a vote before at least one team verifies the math."','"Don\'t give answers during verification — ask \'Out of what starting value?\' and step back."'],
+  },
+  {
+    day:13,week:4,wc:'w4',hc:'w4-h',ms:true,
+    title:'Linear Equations + S2 Match 1',event:'★ Residuals + Prediction Market',
+    formula:'y=mx+b | slope=(y₂−y₁)/(x₂−x₁) | residual=predicted−actual',ends:'Goal Setting',
+    goals:['Every team writes a linear equation in slope-intercept form from two data points — slope calculated, y-intercept found, prediction uses "approximately" and "based on class data"','Every team calculates at least one residual with sign interpreted: positive = over-predicted, negative = under-predicted','Every team logs a written equation-based prediction before every match and records the actual result, residual, and diagnosis after — no blanks in the data log'],
+    sayThis:['"Use the class data — every team\'s stats against win percentage. Which stats predict winning?"','"Predicted minus actual. Positive = over-predicted. Negative = under-predicted."','"Read equation. Find their x. Plug in. Show both teams the probability. Match starts in 10 seconds."'],
+    dontSay:['"Don\'t accept predictions without \'approximately\' or \'based on class data.\'"','"Don\'t claim Diagnosis 3 in Round 1 — Standard Mode only. Which of 1 or 2 fits?"','"Don\'t skip the pause after a loss. Round 3 hits hardest — the pause is non-negotiable."'],
+  },
+  {
+    day:14,week:4,wc:'w4',hc:'w4-h',ms:false,
+    title:'Stat Auction + Percent Change',event:'Stat Auction',
+    formula:'% change = (S2−S1)÷S1×100 | denominator = Season 1 | residual = predicted−actual',ends:'Math Connection',
+    goals:['Every team states the formula output aloud before any bid is accepted — allocation must sum to 20 after every transaction','Every team calculates percent change for all four stats with all steps shown — denominator is always Season 1, never Season 2','Written equation-based prediction before every match; residual and direction (UP/DOWN/SAME) recorded with reasoning after each match'],
+    sayThis:['"Once your hand opens, that is your bid. No corrections, no bargaining."','"The denominator is always the original value — where you started."','"Today same ping pong ball, all rounds. If residuals change, that\'s your strategy, slope, or x estimate — not the ball."'],
+    dontSay:['"That revision sounds good." — not without a dashboard number.','"The denominator doesn\'t matter much." — it\'s always Season 1; S2 produces the wrong answer.','"The ball was different today — your model\'s still good." — ping pong (chaos mode) is fixed all rounds; diagnose the model.'],
+  },
+  {
+    day:15,week:4,wc:'w4',hc:'w4-h',ms:true,
+    title:'Scouting Report + S2 Final Matches',event:'★ Bracket Reveal + Post-Diagnostic',
+    formula:'P(t) = 100 − r×t | r = (20−E)×1.5 | t* = 100÷r (zero-power minute)',ends:'Team Pulse',
+    goals:['Every team calculates their opponent\'s decay rate r, writes P(t), finds the x-intercept, and delivers a quantitative interpretation sentence with P(3) stated','Every team\'s strategy pitch cites a specific equation result for every claim — peer feedback confirms number cited: yes or no for each','MY EQUATION complete before Match 1; Prediction Tracker filled with signed residuals for all three rounds; Exit Ticket done before Bracket Reveal'],
+    sayThis:['"Section 1 first — that\'s their allocation. Section 2 uses it. 30 seconds, no calculating yet."','"If E = 20, what does r = (20 − E) × 1.5 give? Would a bot with all Endurance last longer or decay faster?"','"Season 2 ends today. Three matches. Complete MY EQUATION before Match 1. Your equation predicts all three rounds."'],
+    dontSay:['"That claim sounds convincing." — not without a specific equation result; each claim needs a number.','"r is approximately E × 1.5." — the formula is (20 − E) × 1.5; inverted inputs produce the wrong decay rate.','"Fill in residuals after — just play." — every prediction must be written before the match starts.'],
+  },
+  {
+    day:16,week:4,wc:'w4',hc:'w4-h',ms:true,
+    title:'Community Exhibition',event:'★ Awards + Season Close',
+    formula:'Unit rate: wins÷Speed | Manhattan: |x₂−x₁|+|y₂−y₁| (grid path, not diagonal) | Motor%=S×5 (proportional)',ends:'Journal Entry',
+    goals:['Every team teaches all three mini-challenges with specific numbers: unit rate, coordinate distance, and proportional scaling explanation','Every visitor completes all three independently after one explanation — no second prompt; if they need one, identify the gap','Every student names one personal growth area and one specific moment from the program demonstrating that growth — not a general statement'],
+    sayThis:['"Practice the three mini-challenges on a teammate first. Every claim needs a specific number before visitors arrive."','"The goal is for each visitor to complete all three independently — without prompting after your initial explanation. That is the assessment."','"Name one personal growth area and one specific moment from this program that demonstrates that growth."'],
+    dontSay:['"You all really grew a lot." — name a specific mathematical moment per team, not a general statement.','"Let me jump in and help explain." — the visitor needs to complete it independently; redirect, don\'t rescue.','"That\'s close enough." — the diagnostic parallels Day 1 exactly; full completion, not approximation.'],
+  }
+];
+// ════════════════════════════════════
+// EMERGENCY CARD DATA
+// ════════════════════════════════════
+const emergencies = [
+  {
+    id:'meltdown', scenario:'Emergency 01', tag:'Any Match Day', ft:['all','match'],
+    title:'Team Meltdown',
+    move1: '<strong>Physical proximity.</strong> Sit down. Say nothing for 60 seconds. Don\'t go to the data yet.',
+    move2: '"Is there anything you need right now — not about the bot, just for you?" Only move to the Match Log when the student signals readiness.',
+    dont: 'Reason with them while dysregulated. Quote the protocol. Drag them back to the task.',
+    thresh: 'Still shutdown at 8 minutes → pause that team, continue others, return.',
+    say: '"When you\'re ready, open the log. Just one thing."'
+  },
+  {
+    id:'dominant', scenario:'Emergency 02', tag:'Days 1–8', ft:['all','week1'],
+    title:'Dominant Student',
+    move1: 'Address during Open Lab, not in front of the full team. "Who did the calculations today?"',
+    move2: 'Role enforcement: "Tomorrow the Analyst logs every match, and it can\'t be [name]." Make it structural, not personal.',
+    dont: 'Call out the dominant student publicly. Frame it as a problem about them.',
+    thresh: 'Pattern continues Day 3+ → reassign roles formally before session starts.',
+    say: '"I need all three of you running this. Walk me through who\'s doing what."'
+  },
+  {
+    id:'deaden', scenario:'Emergency 03', tag:'Mid-Week 2', ft:['all'],
+    title:'Dead Energy',
+    move1: '<strong>Physical change first.</strong> "Stand up. Move to a different spot for the next 10 minutes." Energy problem, not understanding problem.',
+    move2: 'Lower the stakes of the next question. Pair work instead of whole group.',
+    dont: 'Talk more. Add content. Increase lecture. That makes it worse.',
+    thresh: 'Energy flat at session START → delay Challenge Block, run a physical Hook activity first.',
+    say: '"Okay — stand up. We\'re moving before we do anything else."'
+  },
+  {
+    id:'silence', scenario:'Emergency 04', tag:'Any Challenge Block', ft:['all','week1','match'],
+    title:'Nobody Answering',
+    move1: 'After Turn and Talk with no response: "Hold up one finger if you have something, flat hand if still working." Private signal, no shame.',
+    move2: 'Break the question down. "Just step 1: what formula are we using here?"',
+    dont: 'Answer it yourself. Rephrase and re-ask to the full group. Call on someone who looks scared.',
+    thresh: 'Repeat across 3 questions = content gap. Stop. "What\'s the specific word in this formula you don\'t understand?"',
+    say: '"One finger if you\'ve got something. Flat hand if you\'re still in it."'
+  },
+  {
+    id:'techfail', scenario:'Emergency 05', tag:'Any Match Day', ft:['all','match'],
+    title:'Technical Failure',
+    move1: '"What did your formula predict? Log that now — before we debug anything." Prediction must be recorded before the result is known.',
+    move2: 'Debug has a 5-minute limit. After 5 minutes → forfeit, log a forfeit gap sentence.',
+    dont: 'Spend 20 minutes debugging during match time. Skip the gap sentence because "nothing happened."',
+    thresh: 'Second technical failure → physical check (battery, connections) before third match.',
+    say: '"A bot that doesn\'t run is data. What does it tell you about your build?"'
+  },
+  {
+    id:'rivalry', scenario:'Emergency 06', tag:'Days 8–15', ft:['all','match'],
+    title:'Runaway Rivalry',
+    move1: '<strong>Pause the rivalry activity immediately.</strong> Don\'t negotiate in the moment.',
+    move2: 'Remove the offending card. One-on-one: "What\'s the rule? Card targets the bot, not the person."',
+    dont: 'Address it publicly. Let it slide once. Accept "I was just joking."',
+    thresh: 'Personal attack after redirect → pull that team\'s Rivalry Card privileges for the session.',
+    say: '"What does the formula say about their allocation? That\'s the only thing that goes on this card."'
+  },
+  {
+    id:'time', scenario:'Emergency 07', tag:'Any Day', ft:['all','week1','match'],
+    title:'Time Collapse',
+    move1: '<strong>Name it.</strong> "We\'re behind. I\'m cutting [X] to protect [Y]." Decide fast.',
+    move2: 'Cut priority order: Extended Hook → long Challenge Block debrief → Open Lab. Default: protect Match-Build-Make, gap sentence, ENDS ritual — these are the last to go.',
+    dont: 'Rush everything simultaneously. Cut core structures without naming what you\'re doing and why.',
+    thresh: 'ENDS ritual can shrink to 3 minutes. Gap sentence survives unless a genuine crisis takes precedence — then note it and recover next session.',
+    say: '"We\'re cutting the debrief to protect match time. Prediction first — write it now."'
+  },
+  {
+    id:'unfin', scenario:'Emergency 08', tag:'Days 7–15', ft:['all','match'],
+    title:'Unfinished Protocol',
+    move1: '<strong>Before anyone leaves:</strong> "Open your log. One sentence. Predicted X, actual Y, gap = Z."',
+    move2: 'Loss Recovery Steps 2 and 3 can carry to Day 8\'s opening 5 minutes. Step 1 cannot be skipped — it happened at the time of loss or not at all.',
+    dont: 'Let teams leave without a gap sentence. Call it "done" when Step 3 is unfinished.',
+    thresh: 'Start of next session: "Before Hook — [Bot name], finish the hypothesis from yesterday."',
+    say: '"One sentence before you go. Predicted, actual, gap. Go."'
+  },
+  {
+    id:'crying', scenario:'Emergency 09', tag:'Any Match Day', ft:['all','match'],
+    title:'Crying Student After Loss',
+    move1: 'Move away from the team. Step to the side — <strong>maintain line of sight to the room.</strong> If a co-facilitator is present, have them cover the group. Follow your site\'s protocols for one-on-one student contact. "Can we take a minute?"',
+    move2: 'No protocol. No data. No bot talk. "Are you okay? What\'s going on?" Human moment first.',
+    dont: 'Run the Loss Recovery Protocol. Push the Match Log. Ask about the gap sentence. This is not a data moment.',
+    thresh: 'Still distressed after 5 minutes → involve a co-facilitator, support staff, or follow site escalation policy. Don\'t manage this alone.',
+    say: '"Hey — forget the bot for a second. Are you okay?"'
+  },
+  {
+    id:'facioverload', scenario:'Emergency 10', tag:'Any Day', ft:['all','week1','match'],
+    title:'Facilitator Overload',
+    move1: 'Name it to yourself: "I\'m losing this." Stop talking. Give a Turn &amp; Talk — buy 90 seconds. Use it to reset, not to plan your next five moves.',
+    move2: 'Pick one thing. Whatever is most broken right now — address that. Let the rest go. A partial session that stays intact is better than a full session that collapses.',
+    dont: 'Keep talking to cover the panic. Speed up. Add more structure. Fake competence is read immediately by adolescents and makes the room more anxious, not less.',
+    thresh: 'If you\'ve fully lost the thread: stop, say "Give me a moment," sit down, regroup visibly. Students can handle an adult regrouping. They cannot handle anxious performance.',
+    say: '"Give me a second to think about this." (That\'s also exactly what you want from them.)'
+  },
+  {
+    id:'exhibition', scenario:'Emergency 11', tag:'Day 16', ft:['all'],
+    title:'Guest Taking Over Station',
+    move1: 'Step in directly. "I\'d love to hear from [student] about this one. [Student], can you explain what Charge% means to our guest?"',
+    move2: 'Stay near the station until the student is fully running it. Leave only when they\'re in control.',
+    dont: 'Let it continue. Redirect only the guest without engaging the student.',
+    thresh: 'If the student is frozen: "Tell them one number from your bot\'s data — just one."',
+    say: '"Ask them. They\'ve been living with these formulas for 16 days."'
+  }
+];
+// ════════════════════════════════════
+// RENDER FUNCTIONS
+// ════════════════════════════════════
+let currentDay = 0;
+let currentMode = 'daily';
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-daily').style.display = mode === 'daily' ? 'block' : 'none';
+  document.getElementById('mode-emergency').style.display = mode === 'emergency' ? 'block' : 'none';
+  document.getElementById('mode-metrics').style.display = mode === 'metrics' ? 'block' : 'none';
+  ['tab-daily','tab-emergency','tab-metrics'].forEach(id => {
+    document.getElementById(id).className = 'mode-tab';
+  });
+  document.getElementById(`tab-${mode}`).classList.add(`active-${mode}`);
+}
+function renderDaySelector() {
+  const grid = document.getElementById('dayGrid');
+  days.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = `ds-btn ${d.wc}${d.ms ? ' ms' : ''}`;
+    btn.innerHTML = `<span class="d-num">${d.day}</span><span class="d-w">W${d.week}</span>`;
+    btn.onclick = () => renderCard(i);
+    btn.id = `btn-${d.day}`;
+    grid.appendChild(btn);
+  });
+}
+function li(text, qcls='') {
+  return `<li><span class="li-dot"></span>${qcls ? `<span class="${qcls}">${text}</span>` : text}</li>`;
+}
+function renderCard(index) {
+  currentDay = index;
+  document.querySelectorAll('.ds-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`btn-${days[index].day}`).classList.add('active');
+  const d = days[index];
+  document.getElementById('dayCard').innerHTML = `
+    <div class="card-header ${d.hc}">
+      <div>
+        <div class="ch-day">Day ${d.day} · Week ${d.week}</div>
+        <div class="ch-title">${d.title}</div>
+        <div class="ch-event">${d.event}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="ch-formula-label">Formula</div>
+        <div class="ch-formula-val">${d.formula}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="cs lbl-g">
+        <div class="cs-lbl"><span class="dot"></span>3 Goals</div>
+        <ul class="cs-list">${d.goals.map(g=>li(g)).join('')}</ul>
+      </div>
+      <div class="card-bottom">
+        <div class="cs lbl-b">
+          <div class="cs-lbl"><span class="dot"></span>Say This</div>
+          <ul class="cs-list">${d.sayThis.map(s=>li(s,'q q-blue')).join('')}</ul>
+        </div>
+        <div class="cs lbl-r">
+          <div class="cs-lbl"><span class="dot"></span>Don't Say</div>
+          <ul class="cs-list">${d.dontSay.map(s=>li(s,'q q-red')).join('')}</ul>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="cf-ends">ENDS: <span>${d.ends}</span></span>
+      <span class="cf-kb">← → to navigate</span>
+    </div>`;
+}
+function filterEmergency(filter, btn) {
+  document.querySelectorAll('.em-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.em-card').forEach(card => {
+    const ft = card.dataset.ft ? card.dataset.ft.split(',') : ['all'];
+    card.style.display = ft.includes(filter) ? 'block' : 'none';
+  });
+}
+function renderEmergencyCards() {
+  const grid = document.getElementById('emergencyGrid');
+  emergencies.forEach(e => {
+    grid.innerHTML += `
+      <div class="em-card" data-ft="${(e.ft||['all']).join(',')}" style="display:block">
+        <div class="em-card-head">
+          <div>
+            <div class="em-scenario">${e.scenario}</div>
+            <div class="em-title">${e.title}</div>
+          </div>
+          <div class="em-tag">${e.tag}</div>
+        </div>
+        <div class="em-body">
+          <div class="em-section em-move">
+            <div class="em-lbl">First Move</div>
+            <div class="em-text">${e.move1}</div>
+          </div>
+          <div class="em-section em-move">
+            <div class="em-lbl">Second Move</div>
+            <div class="em-text">${e.move2}</div>
+          </div>
+          <div class="em-section em-dont">
+            <div class="em-lbl">Don't</div>
+            <div class="em-text">${e.dont}</div>
+          </div>
+          <div class="em-section em-thresh">
+            <div class="em-lbl">Threshold / Say</div>
+            <div class="em-text">${e.thresh}<br><br><span class="em-say-q">${e.say}</span></div>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+function renderMetricsDayButtons() {
+  const wrap = document.getElementById('metricsDayBtns');
+  wrap.style.display = 'flex';
+  wrap.style.gap = '4px';
+  wrap.style.flexWrap = 'wrap';
+  for (let i = 1; i <= 16; i++) {
+    const b = document.createElement('button');
+    b.className = `day-btn-m${i===1?' active':''}`;
+    b.textContent = i;
+    b.id = `mday-${i}`;
+    b.onclick = () => {
+      document.querySelectorAll('.day-btn-m').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    };
+    wrap.appendChild(b);
+  }
+}
+// ═══ METRICS LOGIC ═══
+const counts = { vagueCount: 0, evidenceCount: 0 };
+function setFocus(panel, btn) {
+  document.querySelectorAll('.focus-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.focus-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('focus-' + panel).style.display = 'block';
+  btn.classList.add('active');
+}
+function changeCount(id, delta) {
+  counts[id] = Math.max(0, (counts[id] || 0) + delta);
+  document.getElementById(id).textContent = counts[id];
+  updateSignals();
+  calcSummary();
+}
+function updateSignals() {
+  const vc = counts.vagueCount;
+  const vs = document.getElementById('vagueSignal');
+  vs.textContent = vc <= 2 ? '✓ Within range' : vc <= 5 ? '⚠ Notice the pattern' : '↑ Praise replacing questions?';
+  vs.className = vc <= 2 ? 'm-ok' : 'm-warn';
+  const ec = counts.evidenceCount;
+  const es = document.getElementById('evidenceSignal');
+  es.textContent = ec >= 10 ? '✓ On target' : ec >= 6 ? '↑ Getting there' : '↑ Push more';
+  es.className = ec >= 10 ? 'm-ok' : 'm-warn';
+}
+function calcRate(aId, bId, rateId) {
+  const a = parseInt(document.getElementById(aId).value)||0;
+  const b = parseInt(document.getElementById(bId).value)||0;
+  const el = document.getElementById(rateId);
+  if (a === 0) { el.textContent = '—'; el.className='m-rate'; return; }
+  const pct = Math.round((b/a)*100);
+  el.textContent = pct + '%';
+  el.className = `m-rate ${pct >= 100 ? 'm-ok' : pct >= 80 ? '' : 'm-warn'}`;
+  calcSummary();
+}
+function calcSummary() {
+  const getRate = (aId, bId) => {
+    const a = parseInt(document.getElementById(aId).value)||0;
+    const b = parseInt(document.getElementById(bId).value)||0;
+    if (a===0) return '—';
+    return Math.round((b/a)*100)+'%';
+  };
+  document.getElementById('sum-loss').textContent = getRate('losses','protocols');
+  document.getElementById('sum-pred').textContent = getRate('matches','preds');
+}
+function resetMetrics() {
+  ['losses','protocols','matches','preds','matchesGap','gaps'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.value = 0;
+  });
+  ['lossRate','predRate','gapRate'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) { el.textContent='—'; el.className='m-rate'; }
+  });
+  ['wt1','wt2','wt3'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+  counts.vagueCount=0; counts.evidenceCount=0;
+  document.getElementById('vagueCount').textContent='0';
+  document.getElementById('evidenceCount').textContent='0';
+  document.getElementById('sessionNotes').value='';
+  document.getElementById('vagueSignal').textContent='';
+  document.getElementById('evidenceSignal').textContent='';
+  ['sum-loss','sum-pred'].forEach(id=>document.getElementById(id).textContent='—');
+}
+// ═══ KEYBOARD NAV ═══
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'daily') return;
+  if (e.key === 'ArrowRight' && currentDay < 15) renderCard(currentDay+1);
+  if (e.key === 'ArrowLeft' && currentDay > 0) renderCard(currentDay-1);
+});
+// ═══ INIT ═══
+renderDaySelector();
+renderCard(0);
+renderEmergencyCards();
+renderMetricsDayButtons();
+updateSignals();
+</script>
+</body>
+</html>

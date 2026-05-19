@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velocity Arena — What-If? Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; border-bottom: 1.5px solid #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.08em; color: #999; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 5px 9px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.checklist li { font-size: 8pt; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 9.5pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 2px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 5px 7px 5px 0; vertical-align: top; line-height: 1.35; }
+.timing-table td.t-time { font-size: 7.5pt; font-weight: 800; width: 0.55in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1in; font-size: 8pt; }
+.timing-table td.t-focus { font-size: 7.5pt; font-style: italic; color: #333; line-height: 1.4; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 5px 7px; font-style: normal; }
+.say-list { display: flex; flex-direction: column; gap: 5px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+.watch-item { font-size: 7.5pt; line-height: 1.35; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 2px solid #999; background: #999; color: #fff; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1px solid #fff; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #fff; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 6.5pt; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '\25B8'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page">
+<div class="card">
+  <div class="card-header">
+    <div class="activity-name">What-If? Analysis</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+      <span class="progress-label">4 of 4</span>
+    </div>
+    <div class="header-meta">Day 16 · Match-Build-Make · 45 min<br>Follows Final Commissioner's Meeting</div>
+  </div>
+  <div class="math-bar">MATH: <span>Constraint satisfaction: S+E+T+P=20. Decay Rate=(20-E)×1.5. Charge Speed=P². Turn Ratio formula.</span></div>
+  <div class="card-body">
+    <div class="col">
+<div class="section">
+  <div class="section-label">Before You Start</div>
+  <ul class="checklist">
+    <li>Navigate to Facilitator Setup and enter Commissioner rule(s) exactly as stated</li>
+    <li>Input each team's Second Season stat allocation (must total 20)</li>
+    <li>Generate shareable URL and write student link on board</li>
+    <li>Write Commissioner rule on board for reference</li>
+    <li>Print or prepare monitoring chart to track student strategies</li>
+    <li class="note">*Before reading the script, predict what happens if Speed goes up 3 points — check your predictions against the formulas.*</li>
+  </ul>
+</div>
+<div class="section">
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>Written prediction of violation status (yes/no, point count) before opening tool</li>
+    <li>Completed Sections 1, 2, and 3 of Loadout Recalculator with new stat allocation</li>
+    <li>Exit ticket: final stat allocation (S, E, T, P=20) and one-sentence trade justification</li>
+  </ul>
+</div>
+<div class="section grow">
+  <div class="section-label">Reference</div>
+  <div style="font-size:8pt; line-height:1.5; display:flex; flex-direction:column; gap:6px;">
+    <div><span style="font-weight:800;">MONITORING</span> <span style="font-weight:800;">CHART</span> — Track strategy type:</div>
+    <div>• Minimum-change: reduces capped stat to threshold, puts freed points in one stat</div>
+    <div>• Spread redistribution: divides freed points across 2–3 stats</div>
+    <div>• Championship-optimize: restructures entire loadout for advantage</div>
+    <div><span style="font-weight:800;">COMMON</span> <span style="font-weight:800;">ERRORS</span>:</div>
+    <div>• Budget drift: freed points not redistributed; total ≠20</div>
+    <div>• Fixed transfer error: assumes all freed points go to one stat</div>
+    <div>• Decay Rate confusion: E↓ causes Decay Rate↑ (formula: (20-E)×1.5)</div>
+  </div>
+</div>
+</div>
+    <div class="col">
+<div class="section grow">
+  <div class="section-label">Timing</div>
+  <table class="timing-table">
+    <tr><td class="t-time">0:00</td><td class="t-action">Launch — Activate Prior Knowledge</td><td class="t-focus">Connect to first stat allocation decision. Say: &quot;The vote is in. The Commissioner's rule is real. Before anyone touches a computer, think about whether your loadout is affected.&quot;</td></tr>
+    <tr class="hard-row"><td class="t-time">0:05</td><td class="t-action">Hard Stop — Write Prediction</td><td class="t-focus">Before opening Recalculator, students write on paper: Is your team over cap or under floor? Yes or no. By how many points? Walk around and glance at predictions — first data point on who knows their loadout.</td></tr>
+    <tr><td class="t-time">0:08</td><td class="t-action">Explore — Section 1 Worked Example</td><td class="t-focus">Students predict outcome, click Reveal, compare. Ask: &quot;What do you notice?&quot; and &quot;Is that what you expected?&quot; Do NOT explain Power squared or Decay Rate direction — let the tool surface it.</td></tr>
+    <tr><td class="t-time">0:20</td><td class="t-action">Explore — Section 2 Guided Practice</td><td class="t-focus">Fix Team Nexus loadout. Click Check to unlock formula comparison. If running behind, skip to Section 3.</td></tr>
+    <tr><td class="t-time">0:30</td><td class="t-action">Explore — Section 3 Own Team</td><td class="t-focus">Live inputs with budget tracker and rule chips. Circulate with prompts: &quot;What would happen if you split those points?&quot; and &quot;Walk me through why you chose that spread.&quot; Watch for budget drift and Decay Rate confusion.</td></tr>
+    <tr class="hard-row"><td class="t-time">0:42</td><td class="t-action">Exit Ticket — Non-Negotiable</td><td class="t-focus">Students write final allocation (S, E, T, P=20) and sentence: &quot;I made this trade because...&quot; Trim Explore if needed. Collect slips for facilitator folder.</td></tr>
+  </table>
+</div></div>
+    <div class="col">
+<div class="section">
+  <div class="section-label">Say This</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Open</span><div class="say-quote">The vote is in. The Commissioner's rule is real. Before anyone touches a computer, think about whether your loadout is affected.</div></div>
+    <div class="say-item"><span class="say-tag">Prediction</span><div class="say-quote">Before you touch anything — on your paper, write this: Is your team over the cap or under the floor? Yes or no. By how many points? Write your prediction now. Do NOT open the Recalculator yet.</div></div>
+    <div class="say-item"><span class="say-tag">Probe Strategy</span><div class="say-quote">You moved all your points to one stat. What did that do to your other formula outputs — did anything surprise you?</div></div>
+    <div class="say-item"><span class="say-tag">Advance Thinking</span><div class="say-quote">What would happen if you split those points between two stats instead? Would that change anything important?</div></div>
+    <div class="say-item"><span class="say-tag dont">Not This</span><div class="say-quote plain">Do NOT explain Power squared, Decay Rate direction, or formula patterns upfront. Let the Recalculator surface them, then ask: What do you notice?</div></div>
+  </div>
+</div>
+<div class="section grow">
+  <div class="section-label">Watch For → Redirect</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Student reduces a stat but total S+E+T+P drops below 20</span><span class="watch-redirect">Ask: What does your total equal right now? Remember, freed points must go somewhere to keep your budget at 20.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student says: All freed points must go to one stat</span><span class="watch-redirect">Ask: Where does it say that? What if you put two points in Speed and one in Turning — does anything break?</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student lowers Endurance and is shocked Decay Rate went UP</span><span class="watch-redirect">Ask: Look at the Decay Rate formula. What happens in that formula when E gets smaller? (Making math visible, not explaining.)</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student moves points to/from Power and is surprised by Charge Speed change</span><span class="watch-redirect">Ask: Why did Charge Speed change so much more than you expected? (Do not explain P² in advance.)</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student is completely stuck on the rule or violation concept</span><span class="watch-redirect">Scaffold: What stat does the rule mention? What does your team currently have for that stat? Are you on the right side or wrong side of the rule right now?</span></div>
+    <div class="watch-item"><span class="watch-trigger">Student satisfies one rule but violates another (if 2+ rules exist)</span><span class="watch-redirect">Ask: Can you check every rule on the screen — not just the first one?</span></div>
+  </div>
+</div></div>
+  </div>
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">Exit Ticket is NON-OPTIONAL. Trim Explore phase if needed. Never skip. Students write final stat allocation and one justification sentence, then leave slip on desk.</span>
+  </div>
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · Day 16 of 20</span>
+    <span>What-If? Analysis · Summer Sparks 2026</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Facilitator MVP Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --w1: #3b82f6; --w2: #ef4444; --w3: #8b5cf6; --w4: #10b981;
+    --dark: #111827; --mid: #374151; --light: #6b7280;
+    --border: #e5e7eb; --bg: #f9fafb; --card: #ffffff;
+    --red: #dc2626; --amber: #d97706; --green: #059669;
+  }
+  body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+  /* VARIANCE BANNER */
+  .variance-banner {
+    background: #1c1917; border-bottom: 1px solid #292524;
+    padding: 9px 24px; display: flex; align-items: flex-start; gap: 12px;
+  }
+  .vb-text { font-size: 11px; color: #a8a29e; font-weight: 600; line-height: 1.5; flex: 1; }
+  .vb-text strong { color: #f5f5f4; font-weight: 800; }
+  .vb-dismiss {
+    flex-shrink: 0; background: transparent; border: 1px solid #44403c; color: #78716c;
+    font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 4px; cursor: pointer;
+    letter-spacing: .06em; text-transform: uppercase; align-self: center;
+  }
+  .vb-dismiss:hover { color: #a8a29e; border-color: #78716c; }
+
+  /* NAV */
+  .app-header {
+    background: var(--dark); color: white; padding: 0 24px;
+    display: flex; align-items: stretch; height: 52px;
+  }
+  .app-title {
+    font-size: 12px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; display: flex; align-items: center;
+    margin-right: 28px; color: #f9fafb; flex-shrink: 0;
+  }
+  .layer-tabs { display: flex; }
+  .layer-tab {
+    padding: 0 18px; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; border: none; background: transparent;
+    color: #9ca3af; cursor: pointer; border-bottom: 3px solid transparent;
+    transition: all .15s; height: 52px;
+  }
+  .layer-tab:hover { color: white; }
+  .layer-tab.active { color: white; border-bottom-color: #f59e0b; }
+
+  /* LAYER PANELS */
+  .layer-panel { display: none; }
+  .layer-panel.active { display: block; }
+
+  /* LAYER 1 */
+  .l1-layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 88px); }
+  .day-sidebar { background: var(--dark); padding: 16px 0; overflow-y: auto; }
+  .week-label {
+    font-size: 9px; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; color: #6b7280; padding: 14px 14px 5px;
+  }
+  .week-label:first-child { padding-top: 6px; }
+  .day-btn {
+    display: block; width: 100%; padding: 9px 14px; background: transparent;
+    border: none; color: #d1d5db; font-family: 'Montserrat', sans-serif;
+    font-size: 11px; font-weight: 600; text-align: left; cursor: pointer;
+    border-left: 3px solid transparent; transition: all .12s; line-height: 1.3;
+  }
+  .day-btn:hover { background: #1f2937; color: white; }
+  .day-btn.active { color: white; background: #1f2937; }
+  .day-btn .day-num { font-size: 9px; font-weight: 700; opacity: .45; display: block; margin-bottom: 1px; }
+  .day-btn.w1.active { border-left-color: var(--w1); }
+  .day-btn.w2.active { border-left-color: var(--w2); }
+  .day-btn.w3.active { border-left-color: var(--w3); }
+  .day-btn.w4.active { border-left-color: var(--w4); }
+
+  .day-content { padding: 28px; overflow-y: auto; max-height: calc(100vh - 88px); }
+  .day-header {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 20px; padding-bottom: 18px; border-bottom: 2px solid var(--border);
+  }
+  .day-badge {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 900; color: white; font-size: 20px; line-height: 1;
+  }
+  .day-badge small { font-size: 9px; font-weight: 700; opacity: .75; margin-top: 2px; }
+  .day-title-block h1 { font-size: 17px; font-weight: 800; line-height: 1.2; margin-bottom: 3px; }
+  .day-week-tag { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .45; }
+
+  .op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .op-grid.full { grid-template-columns: 1fr; }
+  .op-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 9px; padding: 14px;
+  }
+  .op-label {
+    font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--light); margin-bottom: 7px; display: flex; align-items: center; gap: 5px;
+  }
+  .op-label .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .op-card p { font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--mid); }
+  .op-card.risk { border-left: 3px solid var(--red); }
+  .op-card.risk .op-label { color: var(--red); }
+  .op-card.risk p { color: var(--dark); }
+  .risk-trigger {
+    margin-top: 7px; padding: 7px 9px; background: #fef2f2;
+    border-radius: 5px; font-size: 11px; font-weight: 600; color: var(--red);
+  }
+  .risk-trigger span { font-weight: 800; }
+
+  .phrase-item {
+    padding: 7px 10px; background: #f0f7ff; border-radius: 5px;
+    font-size: 12px; font-weight: 700; color: #1e40af;
+    line-height: 1.35; border-left: 3px solid #3b82f6; margin-bottom: 6px;
+  }
+  .phrase-item:last-child { margin-bottom: 0; }
+
+  .trigger-item {
+    display: flex; align-items: flex-start; gap: 7px; margin-bottom: 7px;
+    font-size: 12px; color: var(--mid); line-height: 1.4;
+  }
+  .trigger-item::before {
+    content: "▶"; color: var(--amber); font-size: 8px; margin-top: 3px; flex-shrink: 0;
+  }
+  .trigger-item:last-child { margin-bottom: 0; }
+
+  .sched-row {
+    display: flex; align-items: baseline; gap: 9px;
+    padding: 5px 0; border-bottom: 1px solid #f3f4f6; font-size: 11.5px;
+  }
+  .sched-row:last-child { border-bottom: none; }
+  .sched-time { font-weight: 700; color: var(--dark); min-width: 62px; flex-shrink: 0; }
+  .sched-dur { font-size: 10px; color: var(--light); min-width: 40px; flex-shrink: 0; }
+  .sched-act { color: var(--mid); font-weight: 500; flex: 1; }
+  .sched-tag {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    padding: 2px 5px; border-radius: 3px; flex-shrink: 0;
+  }
+  .sched-tag.hook { background: #dbeafe; color: #1d4ed8; }
+  .sched-tag.challenge { background: #fef3c7; color: #b45309; }
+  .sched-tag.match { background: #dcfce7; color: #166534; }
+  .sched-tag.lab { background: #f3f4f6; color: #374151; }
+  .sched-tag.ends { background: #ede9fe; color: #5b21b6; }
+  .sched-tag.break { background: #f9fafb; color: #9ca3af; border: 1px solid #e5e7eb; }
+
+  .protocol-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--dark); color: white; border-radius: 7px;
+    padding: 9px 13px; font-size: 11px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  /* GOALS LIST */
+  .goals-list { display: flex; flex-direction: column; gap: 7px; margin-top: 2px; }
+  .goal-item {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 11px; font-weight: 600; color: var(--dark); line-height: 1.45;
+  }
+  .goal-num {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 4px;
+    background: var(--dark); color: white; font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+
+  /* LAYER 2 */
+  .l2-layout { padding: 28px; max-width: 1200px; margin: 0 auto; }
+  .l2-intro { margin-bottom: 24px; }
+  .l2-intro h2 { font-size: 20px; font-weight: 800; margin-bottom: 5px; }
+  .l2-intro p { font-size: 12px; color: var(--light); font-weight: 500; }
+  .proto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+  .proto-card { background: var(--card); border: 1px solid var(--border); border-radius: 11px; overflow: hidden; }
+  .proto-head {
+    padding: 13px 16px; background: var(--dark); color: white;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .proto-head h3 { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .proto-icon { font-size: 17px; flex-shrink: 0; }
+  .proto-body { padding: 16px; }
+  .proto-step { display: flex; gap: 10px; margin-bottom: 11px; align-items: flex-start; }
+  .proto-step:last-child { margin-bottom: 0; }
+  .step-num {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--dark); color: white;
+    font-size: 10px; font-weight: 800; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 12px; font-weight: 600; color: var(--dark); line-height: 1.4; }
+  .step-note { font-size: 10px; font-weight: 500; color: var(--light); margin-top: 2px; display: block; }
+  .proto-divider { height: 1px; background: var(--border); margin: 12px 0; }
+  .proto-use-when { font-size: 10px; font-weight: 600; color: var(--light); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px; }
+  .proto-use-item { display: flex; align-items: flex-start; gap: 5px; font-size: 11px; color: var(--mid); margin-bottom: 3px; line-height: 1.35; }
+  .proto-use-item::before { content: "→"; color: var(--amber); flex-shrink: 0; font-weight: 700; }
+  .proto-avoid { margin-top: 12px; padding: 9px 11px; background: #fef2f2; border-radius: 5px; border-left: 3px solid var(--red); }
+  .proto-avoid-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--red); margin-bottom: 5px; }
+  .proto-avoid-item { font-size: 11px; font-weight: 500; color: #7f1d1d; line-height: 1.35; margin-bottom: 3px; }
+  .proto-avoid-item:last-child { margin-bottom: 0; }
+  .proto-calibration { margin-top: 12px; padding: 9px 11px; background: #fffbeb; border-radius: 5px; border-left: 3px solid var(--amber); }
+  .proto-calibration-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); margin-bottom: 5px; }
+  .proto-calibration-text { font-size: 11px; color: #78350f; font-weight: 500; line-height: 1.45; }
+
+  /* LAYER 3 */
+  .l3-layout { padding: 28px; max-width: 860px; margin: 0 auto; }
+  .l3-intro {
+    margin-bottom: 24px; padding: 18px 22px; background: var(--dark); border-radius: 11px; color: white;
+  }
+  .l3-intro h2 { font-size: 18px; font-weight: 800; margin-bottom: 5px; }
+  .l3-intro p { font-size: 12px; color: #9ca3af; font-weight: 500; line-height: 1.5; }
+  .sim-section-head {
+    margin: 26px 0 14px; padding-bottom: 11px; border-bottom: 2px solid var(--border);
+  }
+  .sim-section-head .sh-label { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--amber); margin-bottom: 3px; }
+  .sim-section-head .sh-desc { font-size: 12px; color: var(--light); font-weight: 500; }
+  .sim-card { background: var(--card); border: 1px solid var(--border); border-radius: 11px; margin-bottom: 14px; overflow: hidden; }
+  .sim-top { padding: 16px 18px 12px; }
+  .sim-q-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--light); margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+  .sim-num { width: 19px; height: 19px; background: var(--dark); color: white; border-radius: 50%; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .compound-tag { display: inline-flex; align-items: center; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 4px; font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 2px 6px; }
+  .fa-tag { display: inline-flex; align-items: center; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 4px; font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 2px 6px; }
+  .sim-q { font-size: 13px; font-weight: 700; color: var(--dark); line-height: 1.45; margin-bottom: 13px; }
+  .sim-opts { display: grid; gap: 7px; }
+  .sim-opt {
+    display: flex; gap: 9px; align-items: flex-start; padding: 9px 11px;
+    border: 1.5px solid var(--border); border-radius: 7px; font-size: 12px;
+    color: var(--mid); line-height: 1.4; cursor: pointer; transition: all .12s; background: #f9fafb;
+  }
+  .sim-opt:hover { border-color: #9ca3af; background: white; }
+  .sim-opt.sel-ok { border-color: var(--green); background: #f0fdf4; color: #166534; }
+  .sim-opt.sel-bad { border-color: var(--red); background: #fef2f2; color: #991b1b; }
+  .sim-opt.rev-ok { border-color: var(--green); background: #f0fdf4; color: #166534; }
+  .opt-l { font-weight: 800; flex-shrink: 0; min-width: 14px; }
+  .sim-hint { font-size: 10px; color: var(--light); font-weight: 600; padding: 0 18px 10px; }
+  .sim-reveal { display: none; padding: 14px 18px; background: #f0fdf4; border-top: 1px solid #bbf7d0; }
+  .sim-reveal.open { display: block; }
+  .rev-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: 5px; }
+  .rev-answer { font-size: 13px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+  .rev-why { font-size: 12px; color: #374151; line-height: 1.5; font-weight: 500; margin-bottom: 8px; }
+  .rev-proto { padding: 7px 9px; background: #dcfce7; border-radius: 5px; font-size: 11px; font-weight: 700; color: #166534; }
+
+  /* LAYER 4 — FACILITATOR PROFILE */
+  .l4-layout { padding: 28px; max-width: 960px; margin: 0 auto; }
+  .l4-head { margin-bottom: 28px; }
+  .l4-head h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .l4-head p { font-size: 13px; color: var(--light); font-weight: 500; max-width: 640px; line-height: 1.5; }
+  .l4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .l4-card { background: var(--card); border: 1px solid var(--border); border-radius: 11px; padding: 20px; }
+  .l4-card.disqualify { border-left: 4px solid var(--red); }
+  .l4-card.greenlight { border-left: 4px solid var(--green); }
+  .l4-card.drift { border-left: 4px solid var(--amber); grid-column: 1 / -1; }
+  .l4-card-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+  .l4-card.disqualify .l4-card-label { color: var(--red); }
+  .l4-card.greenlight .l4-card-label { color: var(--green); }
+  .l4-card.drift .l4-card-label { color: var(--amber); }
+  .l4-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 11px; font-size: 13px; color: var(--dark); line-height: 1.4; font-weight: 600; }
+  .l4-item:last-child { margin-bottom: 0; }
+  .l4-item .l4-icon { flex-shrink: 0; font-size: 15px; }
+  .l4-item .l4-sub { font-size: 11px; color: var(--light); font-weight: 500; margin-top: 2px; display: block; }
+  .l4-test { background: #1c1917; border-radius: 11px; padding: 20px 24px; }
+  .l4-test-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #a8a29e; margin-bottom: 12px; }
+  .l4-test-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 11px 0; border-bottom: 1px solid #292524;
+    font-size: 12px; color: #d6d3d1; line-height: 1.45; font-weight: 500;
+  }
+  .l4-test-item:last-child { border-bottom: none; }
+  .l4-test-num { font-size: 10px; font-weight: 800; color: #78716c; flex-shrink: 0; min-width: 18px; }
+  .drift-items { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+  .drift-col-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--light); margin-bottom: 7px; }
+  .drift-item { font-size: 12px; color: var(--mid); font-weight: 500; line-height: 1.4; margin-bottom: 6px; display: flex; gap: 6px; }
+  .drift-item::before { content: "•"; color: var(--amber); flex-shrink: 0; }
+
+  @media print {
+    .variance-banner, .app-header, .day-sidebar { display: none; }
+    .l1-layout { grid-template-columns: 1fr; }
+    .day-content { max-height: none; overflow: visible; }
+    .layer-panel { display: block !important; }
+  }
+
+  /* LAYER 5 */
+  .l5-layout { max-width: 980px; margin: 0 auto; padding: 32px 28px; }
+  .l5-head { margin-bottom: 28px; padding-bottom: 18px; border-bottom: 2px solid var(--border); }
+  .l5-head h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .l5-head p { font-size: 13px; color: var(--light); font-weight: 500; line-height: 1.5; max-width: 660px; }
+  .l5-section { margin-bottom: 36px; }
+  .l5-section-title { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--light); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .l5-section > p { font-size: 12px; color: var(--mid); font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+  .l5-env-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .env-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 16px; }
+  .env-card.warning { border-left: 3px solid var(--red); }
+  .env-card.action { border-left: 3px solid var(--green); }
+  .env-card.caution { border-left: 3px solid var(--amber); }
+  .env-card-icon { font-size: 18px; margin-bottom: 7px; }
+  .env-card-title { font-size: 12px; font-weight: 800; margin-bottom: 6px; color: var(--dark); }
+  .env-card-body { font-size: 11.5px; color: var(--mid); line-height: 1.6; font-weight: 500; }
+  .l5-gravity { background: #1c1917; border-radius: 10px; padding: 20px; margin-bottom: 14px; }
+  .l5-gravity-title { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #d6d3d1; margin-bottom: 14px; }
+  .l5-gravity-item { display: flex; gap: 10px; margin-bottom: 10px; }
+  .l5-gravity-num { font-size: 11px; font-weight: 800; color: #f59e0b; flex-shrink: 0; padding-top: 1px; }
+  .l5-gravity-text { font-size: 12px; color: #a8a29e; font-weight: 500; line-height: 1.5; }
+  .l5-gravity-text strong { color: #f5f5f4; }
+  .tree-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 18px; margin-bottom: 14px; }
+  .tree-title { font-size: 12px; font-weight: 700; color: var(--mid); margin-bottom: 14px; line-height: 1.5; }
+  .tree-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .tree-if { font-size: 9px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--light); flex-shrink: 0; padding-top: 3px; min-width: 28px; }
+  .tree-then { font-size: 12px; color: var(--dark); font-weight: 700; line-height: 1.4; }
+  .tree-note { font-size: 11px; color: var(--light); font-weight: 500; margin-top: 3px; line-height: 1.4; }
+
+  /* L4 IDEOLOGY CARD */
+  .l4-card.ideology { border-left: 4px solid #8b5cf6; }
+
+  /* ── Layer 2: Minimum Success Floor ── */
+  .l2-floor-box {
+    background: #f0fdf4;
+    border: 1.5px solid #6ee7b7;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .l2-floor-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #065f46;
+    margin-bottom: 14px;
+  }
+  .l2-floor-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .l2-floor-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13px;
+    color: #1a2e1a;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .l2-floor-check {
+    color: #10b981;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .l2-floor-note {
+    font-size: 11px;
+    color: #065f46;
+    font-weight: 600;
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px solid #a7f3d0;
+  }
+
+  /* ── Layer 2: Guidance Ladder ── */
+  .l2-ladder-box {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .l2-ladder-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+  .l2-ladder-subtitle {
+    font-size: 12px;
+    color: var(--mid);
+    font-weight: 500;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .l2-ladder-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .l2-rung {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .l2-rung-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+    background: rgba(255,255,255,0.6);
+  }
+  .l2-rung-1 { background: #dbeafe; color: #1e3a5f; }
+  .l2-rung-2 { background: #e0f2fe; color: #0c4a6e; }
+  .l2-rung-3 { background: #f0fdf4; color: #14532d; }
+  .l2-rung-4 { background: #fefce8; color: #713f12; }
+  .l2-rung-5 { background: #fff7ed; color: #7c2d12; }
+  .l2-rung-6 { background: #fef3c7; color: #92400e; }
+  .l2-rung-7 { background: #fee2e2; color: #7f1d1d; }
+
+  /* ── Silence rule ── */
+  .l2-silence-rule {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e3a5f;
+    background: #dbeafe;
+    border-left: 3px solid #3b82f6;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin: 8px 0 14px;
+    line-height: 1.5;
+  }
+
+  /* ── When in doubt shortcut card ── */
+  .l2-shortcut-card {
+    background: var(--dark);
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .l2-shortcut-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #6ee7b7;
+    white-space: nowrap;
+  }
+  .l2-shortcut-steps {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .l2-sc-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+  }
+  .l2-sc-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: #6ee7b7;
+    flex-shrink: 0;
+  }
+
+  /* ── Layer 4 appendix ── */
+  .l4-appendix {
+    margin-top: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .l4-appendix-summary {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--mid);
+    padding: 12px 16px;
+    cursor: pointer;
+    background: var(--card);
+    list-style: none;
+    user-select: none;
+  }
+  .l4-appendix-summary:hover { color: var(--dark); }
+  .l4-appendix-body {
+    padding: 16px 20px 20px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .l4-appendix-section { display: flex; flex-direction: column; gap: 6px; }
+  .l4-appendix-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .l4-appendix-item {
+    font-size: 12px;
+    color: var(--mid);
+    font-weight: 500;
+    line-height: 1.5;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+
+  /* ── First Day Mode ── */
+  .fd-tab { background: #1a2e1a !important; color: #6ee7b7 !important; }
+  .fd-tab.active, .fd-tab:hover { color: white !important; background: #065f46 !important; border-bottom-color: #6ee7b7 !important; }
+  .fd-layout { max-width: 900px; margin: 0 auto; padding: 32px 20px 48px; }
+  .fd-header { margin-bottom: 28px; }
+  .fd-title { font-size: 24px; font-weight: 800; color: var(--dark); }
+  .fd-subtitle { font-size: 13px; color: var(--mid); font-weight: 500; margin-top: 4px; }
+  .fd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media(max-width:640px){ .fd-grid { grid-template-columns: 1fr; } }
+  .fd-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .fd-card-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .fd-card-body { font-size: 13px; color: var(--mid); font-weight: 500; line-height: 1.6; }
+  .fd-goal { border-left: 4px solid #10b981; }
+  .fd-goal .fd-card-label { color: #065f46; }
+  .fd-risk { border-left: 4px solid var(--amber); }
+  .fd-risk .fd-card-label { color: #92400e; }
+  .fd-phrases { border-left: 4px solid #3b82f6; }
+  .fd-phrases .fd-card-label { color: #1e3a5f; }
+  .fd-phrase-list { display: flex; flex-direction: column; gap: 8px; }
+  .fd-phrase {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    background: #eff6ff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+  }
+  .fd-schedule { border-left: 4px solid var(--mid); grid-column: 1 / -1; }
+  .fd-schedule .fd-card-label { color: var(--mid); }
+  .fd-schedule-list { display: flex; flex-direction: column; gap: 4px; }
+  .fd-sched-item { display: flex; gap: 12px; align-items: baseline; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .fd-sched-item:last-child { border-bottom: none; }
+  .fd-time { font-weight: 800; color: var(--dark); width: 44px; flex-shrink: 0; }
+  .fd-dur { font-size: 11px; color: var(--light); width: 44px; flex-shrink: 0; }
+  .fd-act { color: var(--mid); font-weight: 500; }
+  .fd-protocol { border-left: 4px solid var(--red); grid-column: 1 / -1; }
+  .fd-protocol .fd-card-label { color: var(--red); }
+  .fd-protocol-body { display: flex; flex-direction: column; gap: 8px; }
+  .fd-proto-step { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--dark); font-weight: 500; line-height: 1.5; }
+  .fd-proto-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--red); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+  }
+  .fd-proto-avoid {
+    font-size: 11px; color: var(--red); font-weight: 600;
+    background: #fff5f5; border-radius: 6px; padding: 8px 10px;
+    border-left: 3px solid var(--red); margin-top: 4px;
+  }
+  .fd-footer {
+    font-size: 12px; color: var(--light); font-weight: 500;
+    text-align: center; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="variance-banner" id="vb">
+  <span class="vb-text"><strong>What this system does:</strong> Supports facilitators in acting as cognitive coaches — modeling strategically, intervening selectively, and preserving student ownership of thinking. Facilitators should model, clarify, and teach when needed. The goal is adult support that leaves students responsible for thinking. Protocols constrain common failure modes; architecture reduces facilitator burden; the Minimum Success Floor in Layer 2 sets a realistic baseline.</span>
+  <button class="vb-dismiss" onclick="document.getElementById('vb').style.display='none'">Dismiss</button>
+</div>
+
+<header class="app-header">
+  <div class="app-title">Velocity Arena · Facilitator MVP Stack</div>
+  <nav class="layer-tabs">
+    <button class="layer-tab active" onclick="showLayer(1,this)">Daily One-Pager</button>
+    <button class="layer-tab" onclick="showLayer(2,this)">Protocol Cards</button>
+    <button class="layer-tab" onclick="showLayer(3,this)">Sim Training</button>
+    <button class="layer-tab" onclick="showLayer(4,this)">System Architecture</button>
+  </nav>
+</header>
+
+<div id="layer1" class="layer-panel active">
+  <div class="l1-layout">
+    <aside class="day-sidebar" id="daySidebar"></aside>
+    <main class="day-content" id="dayContent"></main>
+  </div>
+</div>
+
+<div id="layer2" class="layer-panel">
+  <div class="l2-layout">
+    <div class="l2-intro">
+      <h2>Protocol Cards</h2>
+      <p>Physical. Portable. Ultra-short. Memorize the steps. Do not improvise.</p>
+    </div>
+
+    <div class="l2-floor-box">
+      <div class="l2-floor-title">Minimum Success Floor — if you do these five things consistently, the program works</div>
+      <div class="l2-floor-grid">
+        <div class="l2-floor-item"><span class="l2-floor-check">✓</span><div>Students are participating — talking, writing, or building. A student who has stopped is a signal to act.</div></div>
+        <div class="l2-floor-item"><span class="l2-floor-check">✓</span><div>The room is emotionally safe. Students take intellectual risks when they aren't afraid of embarrassment. Safety before rigor.</div></div>
+        <div class="l2-floor-item"><span class="l2-floor-check">✓</span><div>You ask students to explain their reasoning, not just give answers. "How did you get that?" matters more than most protocols.</div></div>
+        <div class="l2-floor-item"><span class="l2-floor-check">✓</span><div>You redirect answers to data or back to students, rather than providing solutions directly.</div></div>
+        <div class="l2-floor-item"><span class="l2-floor-check">✓</span><div>Students are allowed to revise after mistakes. Error → correction is the learning sequence. Don't skip it.</div></div>
+      </div>
+      <div class="l2-floor-note">These five, done consistently, produce a functional learning environment. The protocol cards in this layer are optimizations built on this floor — not substitutes for it.</div>
+      <div class="l2-floor-note" style="margin-top:8px;background:#fff7ed;border-left-color:var(--amber);color:#78350f;">These are diagnostic prompts, not performance scores. If you catch yourself monitoring your talk ratio or timing your silences while facilitating, you're watching the wrong thing. Watch the students.</div>
+    </div>
+
+    <div class="l2-ladder-box">
+      <div class="l2-ladder-title">Guidance Ladder — when and how much to intervene</div>
+      <div class="l2-ladder-subtitle">Start at the lowest rung that might work. Move up only if the student remains stuck after a genuine attempt.</div>
+      <div class="l2-silence-rule">Silence is useful only when students are still thinking. If students are frozen, confused, dysregulated, or withdrawn, intervene earlier.</div>
+      <div class="l2-ladder-steps">
+        <div class="l2-rung l2-rung-1"><div class="l2-rung-num">1</div><div><strong>Wait.</strong> Hold silence for 15–30 seconds. Students often solve it themselves if given the pause.</div></div>
+        <div class="l2-rung l2-rung-2"><div class="l2-rung-num">2</div><div><strong>Name what you notice.</strong> "You've been on that number for a bit — what are you thinking?" Surfaces the student's reasoning without providing any.</div></div>
+        <div class="l2-rung l2-rung-3"><div class="l2-rung-num">3</div><div><strong>Ask a clarifying question.</strong> "What did your prediction say?" or "What does the graph show between those two points?" Narrows the problem without answering it.</div></div>
+        <div class="l2-rung l2-rung-4"><div class="l2-rung-num">4</div><div><strong>Redirect to a resource.</strong> "Check the dashboard — that stat is in there." Points students to the tool they already have.</div></div>
+        <div class="l2-rung l2-rung-5"><div class="l2-rung-num">5</div><div><strong>Give the method, not the answer.</strong> "The formula is (new − old) ÷ old × 100. You have the numbers." Student still does the work.</div></div>
+        <div class="l2-rung l2-rung-6"><div class="l2-rung-num">6</div><div><strong>Model one example.</strong> "Here's how I'd set this up. Now you do the next one." Show it once. Hand it back immediately.</div></div>
+        <div class="l2-rung l2-rung-7"><div class="l2-rung-num">7</div><div><strong>Direct instruction.</strong> Explain the concept fully when the student has no entry point and no resource will unlock it. Use sparingly — if you reach this rung frequently, that's a signal to revisit the task design or the student's readiness for that concept.</div></div>
+      </div>
+    </div>
+
+    <div class="l2-shortcut-card">
+      <div class="l2-shortcut-title">When in doubt</div>
+      <div class="l2-shortcut-steps">
+        <div class="l2-sc-item"><span class="l2-sc-num">1</span>Make the room safe</div>
+        <div class="l2-sc-item"><span class="l2-sc-num">2</span>Ask for reasoning</div>
+        <div class="l2-sc-item"><span class="l2-sc-num">3</span>Point to data</div>
+        <div class="l2-sc-item"><span class="l2-sc-num">4</span>Keep students participating</div>
+        <div class="l2-sc-item"><span class="l2-sc-num">5</span>Let mistakes become revision</div>
+      </div>
+    </div>
+
+    <div class="proto-grid" id="protoGrid"></div>
+  </div>
+</div>
+
+<div id="layer3" class="layer-panel">
+  <div class="l3-layout">
+    <div class="l3-intro">
+      <h2>Facilitator Simulation Training</h2>
+      <p>Train via reps, not reading. Pick your response, then reveal. Run through all scenarios before Day 1 and again after Day 4. The last section trains facilitator self-awareness — because you are often the unstable variable.</p>
+    </div>
+    <div id="simContainer"></div>
+  </div>
+</div>
+
+<div id="layer4" class="layer-panel">
+  <div class="l5-layout">
+    <div class="l5-head">
+      <h2>System Architecture</h2>
+      <p>Physical setup and system-level triggers reduce what depends on facilitator memory under pressure. Do these before Day 1.</p>
+    </div>
+
+    <div class="l5-section">
+      <div class="l5-section-title">Room Setup</div>
+      <div class="l5-env-grid">
+        <div class="env-card action">
+          <div class="env-card-icon">🏟️</div>
+          <div class="env-card-title">Arena Layout</div>
+          <div class="env-card-body">Tape or place space for 4 Velocity Arenas + 1 Skills Arena. Mats are 8×4. Leave enough clearance that students can stand back from all sides — bots must not read students as balls.</div>
+        </div>
+        <div class="env-card action">
+          <div class="env-card-icon">📌</div>
+          <div class="env-card-title">Wall Space</div>
+          <div class="env-card-body"><strong>Room environment is curriculum. Students read the walls before they read the materials.</strong> Set up before Day 1: four corner labels (one per stat name); Driving Question poster — large, visible from every seat; bot-naming wall; Commissioner's rules wall; rivalry card display; skills badge wall.</div>
+        </div>
+        <div class="env-card action">
+          <div class="env-card-icon">🖥️</div>
+          <div class="env-card-title">Dashboard Screen Position</div>
+          <div class="env-card-body">Facilitator-facing dashboard visible during all match blocks.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <details class="l4-appendix">
+      <summary class="l4-appendix-summary">Appendix — Extended notes on group dynamics and system design</summary>
+      <div class="l4-appendix-body">
+        <div class="l4-appendix-section">
+          <div class="l4-appendix-title">Four ways group dynamics can concentrate around one student</div>
+          <div class="l4-appendix-item"><strong>Intellectual:</strong> Their framing of a problem becomes the team's default before anyone else forms a different hypothesis.</div>
+          <div class="l4-appendix-item"><strong>Physical:</strong> They migrate to other teams' workspaces during any gap in structure. Proximity tends to generate collaboration, which removes individual sense-making.</div>
+          <div class="l4-appendix-item"><strong>Social:</strong> Other students defer in Commissioner's Meetings, pitch preparation, and prediction choices. Deference is invisible until it becomes the default.</div>
+          <div class="l4-appendix-item"><strong>Recovery:</strong> After losses, they recover fastest and frame the team's interpretation before quieter students have finished processing.</div>
+        </div>
+        <div class="l4-appendix-section">
+          <div class="l4-appendix-title">Signs the protocol system is overloaded</div>
+          <div class="l4-appendix-item">Facilitators are reading protocol cards live during sessions — cards are preparation tools, not real-time references.</div>
+          <div class="l4-appendix-item">Execution varies significantly between facilitators — this is a design problem, not a training problem.</div>
+          <div class="l4-appendix-item">Systematic cuts happen on match days — the protocol exceeds the actual conditions it was designed for.</div>
+          <div class="l4-appendix-item">The right response is better architecture (auto-triggers, physical constraints), not more protocols.</div>
+        </div>
+        <div class="l4-appendix-section">
+          <div class="l4-appendix-title">Contribution visibility (future feature)</div>
+          <div class="l4-appendix-item">A facilitator-facing view that shows contribution count per student — predictions logged, dashboard prompts answered, calculations completed. Makes airtime imbalance visible before it becomes a cultural norm. Not yet implemented.</div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA — DAYS (ACTUAL SCHEDULE FROM DOCX)
+// ═══════════════════════════════════════════════════════
+const DAYS = [
+  {
+    id:1, week:1, wn:"WEEK 1 · PLAY LAB + BOOT CAMP",
+    title:"First Contact: Speed, Bots, and the Question That Drives Everything",
+    goal:"Frame the diagnostic before it lands. Introduce Speed. Get every bot moving before 11:30.",
+    risk:{
+      desc:"Pre-task diagnostic triggers math shame before trust is established. Students who've failed Algebra 1 see a question sheet and associate it with prior failure.",
+      trigger:"Student goes quiet, refuses to write, or says anything about not being good at math."
+    },
+    phrases:[
+      '"This tells us where to start. Not what you\'re worth."',
+      '"Your bot ran X. Formula said what?"',
+      '"No wrong way to do Sound and Movement. Copy it, add yours."'
+    ],
+    triggers:[
+      "Student stares at diagnostic without writing → Frame it out loud before handing it out. Protect this routine whenever possible.",
+      "Student says 'I hate math' or shuts down → Redirect to the bot: 'What does Speed = 4 predict?'",
+      "Student skips prediction → Pause the run if needed. Prediction first. Use this as the default."
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Sound and Movement: Circle Pass",ty:"hook"},
+      {t:"8:25",d:"15 min",a:"Mirror: Pairs",ty:"hook"},
+      {t:"8:40",d:"15 min",a:"Pre-Task Diagnostic (frame before distributing)",ty:"challenge"},
+      {t:"8:55",d:"10 min",a:"Driving Question Reveal + Team Formation",ty:"hook"},
+      {t:"9:05",d:"5 min",a:"Stat Card Distribution",ty:"hook"},
+      {t:"9:10",d:"40 min",a:"Speed Stat Challenge: motor power calculations",ty:"challenge"},
+      {t:"9:50",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"10:10",d:"80 min",a:"First Bot Drive: Speed in real life",ty:"match"},
+      {t:"11:30",d:"20 min",a:"Open Lab: Free Code Time",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: personal + team goals posted to wall",ty:"ends"}
+    ],
+    proto:{name:"MATH SHAME RECOVERY",icon:"🛡️"},
+    goals:["Run pre-diagnostic","Teach Motor% = S × 100 ÷ 20","Plant the standard that every claim needs a number"]
+  },
+  {
+    id:2, week:1, wn:"WEEK 1 · PLAY LAB + BOOT CAMP",
+    title:"Endurance: When Your Bot Runs Out of Power",
+    goal:"Teach Endurance formula through physical experience. Bot Naming Activity — name posts today and stays four weeks.",
+    risk:{
+      desc:"Students copy Endurance values without running the calculation, leaving them unable to explain the formula during matches.",
+      trigger:"Student programs the value without showing the calculation on the stat card."
+    },
+    phrases:[
+      '"You felt that slowdown. That\'s what Endurance does."',
+      '"What does P(3) give you with your allocation?"',
+      '"Name it. Post it. That\'s on the wall for four weeks."'
+    ],
+    triggers:[
+      "Student codes without showing the calculation → 'Show me the number before you type it'",
+      "Bot dies mid-run and student shrugs → 'What does your Endurance predict at t=3? Calculate it now.'",
+      "Bot Naming feels rushed → Hold it. This is the program's first permanent artifact."
+    ],
+    sched:[
+      {t:"8:05",d:"15 min",a:"Failure Bow (improv trust — model this yourself)",ty:"hook"},
+      {t:"8:20",d:"15 min",a:"Slow Down, Slow Down (jumping jacks at decay rate)",ty:"hook"},
+      {t:"8:40",d:"50 min",a:"Endurance Allocation Stat Card: P(t) formula + all values",ty:"challenge"},
+      {t:"9:30",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:50",d:"70 min",a:"Program Endurance: code + run, observe power decay at low values",ty:"match"},
+      {t:"11:00",d:"10 min",a:"Role Rotation Briefing: Coder / Fabricator / Analyst",ty:"match"},
+      {t:"11:10",d:"40 min",a:"Bot Naming Ceremony: name + one-sentence origin story → wall",ty:"match"},
+      {t:"11:50",d:"10 min",a:"ENDS: math connections journal",ty:"ends"}
+    ],
+    proto:{name:"BLANK CALCULATION REDIRECT",icon:"📋"},
+    goals:["Bot Naming — names posted immediately after activity","Endurance decay understood as a curve, not a formula to memorize","Every team states the decay rate for their E value"]
+  },
+  {
+    id:3, week:1, wn:"WEEK 1 · PLAY LAB + BOOT CAMP",
+    title:"Turning + The Story Your Data Tells",
+    goal:"Introduce coordinate geometry through Turning. Build distance-time graphs. Students explain what the slope means — not just what it looks like.",
+    risk:{
+      desc:"Students treat the graph as decoration — they plot points but can't connect slope to bot behavior.",
+      trigger:"Student finishes the graph but can't say what the slope tells them."
+    },
+    phrases:[
+      '"Two runs, same graph. Steeper line — what does that mean about the bot?"',
+      '"Two points. What do you do with two points?"',
+      '"Post it. What do you notice next to theirs?"'
+    ],
+    triggers:[
+      "Graph has no axis labels → Stop. Labels make it an argument, not a sketch.",
+      "Student says 'What does this mean?' → 'What does your line look like compared to theirs? What would cause that difference?'",
+      "No coordinates on arc approximation → 'Where is it starting? Where is it going? Two numbers.'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Human Robot Programming Challenge (verbal navigation instructions)",ty:"hook"},
+      {t:"8:25",d:"70 min",a:"Distance-Time Graphs: plot Run A and Run B, explain slope",ty:"challenge"},
+      {t:"9:35",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:55",d:"90 min",a:"Coordinate Navigation Practice: arc approximation + launch sequence design",ty:"match"},
+      {t:"11:25",d:"25 min",a:"Open Lab: Free Code Time — navigation experiments",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Team Pulse",ty:"ends"}
+    ],
+    proto:{name:"INTERPRETATION REDIRECT",icon:"🔁"},
+    goals:["Turning Ratio understood physically","Every team tests ≥2 T values and logs results","Every team can articulate what the budget cost is of a high T"]
+  },
+  {
+    id:4, week:1, wn:"WEEK 1 · PLAY LAB + BOOT CAMP",
+    title:"Power: Ratio, Motor Speed, and the Scoop",
+    goal:"Teach Power² and expose the quadratic trap. Students calculate P=1,2,4,8 and discover that doubling points does NOT double output.",
+    risk:{
+      desc:"Students apply additive reasoning to a non-linear formula — they assume Power × 2 = double output.",
+      trigger:"Student says 'We doubled our Power so we doubled our charge speed.'"
+    },
+    phrases:[
+      '"Speed doubled. Did goals double? Show the numbers."',
+      '"Power 4: what percent? Power 8: what percent? Same ratio?"',
+      '"That\'s the trap. You found it. Now you own it."'
+    ],
+    triggers:[
+      "Student writes Power × 2 instead of Power² → Put the formula on the board, work one example together",
+      "Student assumes doubling inputs doubles outputs → 'Calculate it. Don't assume it.'",
+      "Student can't explain why P8 ≠ double P4 → Write both numbers. Compare. No explanation first."
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Finger Speed-Sums (competitive mental math warm-up)",ty:"hook"},
+      {t:"8:30",d:"50 min",a:"Power Stat Challenge: Power² calculations, contrast with Speed",ty:"challenge"},
+      {t:"9:20",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:40",d:"90 min",a:"Scoop Build + Testing: design cardboard scoop, calibrate Power",ty:"match"},
+      {t:"11:10",d:"40 min",a:"Open Lab: refine scoop geometry + Power value, record which change mattered more",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: journal — what are you good at that people don't know?",ty:"ends"}
+    ],
+    proto:{name:"MULTIPLICATIVE MISCONCEPTION",icon:"✖️"},
+    goals:["Charge% understood as quadratic — not linear — growth","Both Power formulas applied for P = 4, 7, 10","Seed the budget question before Day 5"]
+  },
+  {
+    id:5, week:2, wn:"WEEK 2 · THE BUILD + FIRST SEASON",
+    title:"The Full System: 20 Points, Four Stats, One Equation",
+    goal:"Run all four formulas together for the first time. Introduce the 20-point budget equation. Correct the equals sign misconception before Season 1 begins.",
+    risk:{
+      desc:"First time running all four stats simultaneously — cognitive overload peaks. Students managing math anxiety and a new social environment may shut down here.",
+      trigger:"Student stares at the four-formula sheet and doesn't start writing."
+    },
+    phrases:[
+      '"You\'ve seen each one separately. Today they run together."',
+      '"Equals sign means balance. Not \'the answer is.\'"',
+      '"Write the prediction. Then run it. Not the other way."'
+    ],
+    triggers:[
+      "Student overwhelmed by four formulas → 'Speed first. One formula. Then add the next.'",
+      "Prediction written after the run → 'Predictions go in before the match. Protect this routine whenever possible.'",
+      "Equals sign confusion → Write both sides on the board: 20 = S + E + T + P. Ask what it means."
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Conditional Simon Says (IF/THEN with stat values)",ty:"hook"},
+      {t:"8:25",d:"10 min",a:"Two-Formula Warm-Up: bridge from isolated to combined",ty:"hook"},
+      {t:"8:35",d:"50 min",a:"Budget Constraint: design 3 loadouts under S+E+T+P=20",ty:"challenge"},
+      {t:"9:25",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:45",d:"10 min",a:"Dashboard Introduction: enter loadout, learn gap sentences",ty:"challenge"},
+      {t:"9:55",d:"90 min",a:"Simulation Matches: test best loadout, practice format — no standings",ty:"match"},
+      {t:"11:25",d:"25 min",a:"Open Lab: Free Code Time — compare loadout results",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Week 2 goals — name a stat and a leaderboard target",ty:"ends"}
+    ],
+    proto:{name:"EQUALS SIGN CORRECTION",icon:"⚖️"},
+    goals:["Every team designs 3 different loadouts — not 3 versions of the same idea","All 4 formula outputs calculated for each loadout — not just Motor%","'If Speed = 8, what do you give up?' answered with every calculation shown"]
+  },
+  {
+    id:6, week:2, wn:"WEEK 2 · THE BUILD + FIRST SEASON",
+    title:"Lock In Your Build: Allocations, Fabrication, One Hard Correction",
+    goal:"Finalize Season 1 allocations. Deliver the percent change correction. Loadout locks at the showcase — no changes after.",
+    risk:{
+      desc:"Students write percent point difference and call it percent change. This error compounds every time they analyze match data for the rest of the program.",
+      trigger:"Student writes '6 to 8 is a 2% change' instead of '33% change.'"
+    },
+    phrases:[
+      '"Percent change: new minus old, divided by old, times 100. Not the difference."',
+      '"This locks at the showcase."',
+      '"Verify the calc before you code it."'
+    ],
+    triggers:[
+      "Percent point vs percent change confusion → Both formulas on the board simultaneously. 'Which one did they ask for?'",
+      "Student changes allocation after lock-in → 'That locked at the showcase. Change it in Season 2.'",
+      "Problem set rushed without checking → 'Show me one calculation. Walk me through it.'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Equation Relay Race (tagged team whiteboard, multi-step)",ty:"hook"},
+      {t:"8:25",d:"50 min",a:"Official Stat Allocation: 12-problem interleaved set, all formula types",ty:"challenge"},
+      {t:"9:15",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:35",d:"50 min",a:"Field Geometry + Approach Planning: coordinate grid, three target points",ty:"challenge"},
+      {t:"10:25",d:"60 min",a:"Launch Sequence Programming + Testing in MakeCode",ty:"match"},
+      {t:"11:25",d:"15 min",a:"Launch Showcase — sequence locks here, no changes after",ty:"match"},
+      {t:"11:40",d:"10 min",a:"Open Lab: verify stat values against formula output",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: math connection — one formula from today's allocation",ty:"ends"}
+    ],
+    proto:{name:"PERCENT CHANGE CORRECTION",icon:"📐"},
+    goals:["Stat allocations locked for Season 1","Every team calculates distance to two candidate handoff points using the distance formula and selects one citing at least two strategic criteria","Every team tests two launch strategies (3 trials each), records hit rate and post-kick position for both, and commits to a sequence before the showcase"]
+  },
+  {
+    id:7, week:2, wn:"WEEK 2 · THE BUILD + FIRST SEASON",
+    title:"Season 1 Begins: First Blood and the Leaderboard",
+    goal:"Run three round-robin matches. Every prediction logged before every match. Loss-recovery protocol for every loss — this is the highest dropout-risk moment in the program.",
+    risk:{
+      desc:"First real loss without structured recovery. Facilitators who improvise emotional responses cut losing teams off from their data.",
+      trigger:"Team loses first match and facilitator says anything beyond 30 seconds of acknowledgment, or skips straight to reassurance."
+    },
+    phrases:[
+      '"That was frustrating. Real feeling, makes sense." [Stop. 30 sec. Nothing else.]',
+      '"You predicted X. You scored Y. That gap is what we\'re here to find."',
+      '"N matches left. One thing to change. Write it down."'
+    ],
+    triggers:[
+      "Loss without data pivot → Run the three-step script. Word for word.",
+      "Student says 'It doesn't matter' → 'Your data says it does. What did your formula predict?'",
+      "Facilitator improvising past 30 seconds → Stop. Return to the script."
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Trashketball: warm-up, allocation equations, crumpled paper shots",ty:"hook"},
+      {t:"8:30",d:"50 min",a:"Endurance Decay Equations in slope-intercept form: P(t) = 100 − rt",ty:"challenge"},
+      {t:"9:25",d:"10 min",a:"Pre-Match Prediction Huddle: read allocation aloud, log prediction",ty:"challenge"},
+      {t:"9:35",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:55",d:"15 min",a:"Dashboard + Match Rules briefing (under 10 min)",ty:"challenge"},
+      {t:"10:10",d:"90 min",a:"Season 1 Round-Robin Matches Day 1 — loss-recovery for every loss",ty:"match"},
+      {t:"11:40",d:"10 min",a:"Leaderboard Reveal + Open Lab",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Team Pulse",ty:"ends"}
+    ],
+    proto:{name:"LOSS RECOVERY — REQUIRED TODAY",icon:"🔴"},
+    goals:["Endurance decay equation written in slope-intercept form with x-intercept calculated — before matches begin","Every team states their prediction out loud and logs it before each match","Loss Recovery Protocol runs for every losing team before their next match"]
+  },
+  {
+    id:8, week:2, wn:"WEEK 2 · THE BUILD + FIRST SEASON",
+    title:"Matching Situations, Graphs, and Linear Equations",
+    goal:"Build a shared class scatter plot from Season 1 data. Write a linear equation predicting goals from stat allocations. Run Season 1 Match Day 2. Rivalry Cards.",
+    risk:{
+      desc:"Students write their equation after watching the match — a rationalization, not a prediction. Corrupts the dataset for the rest of the program.",
+      trigger:"Dashboard shows prediction logged at the same time as the actual result, or prediction is blank before match."
+    },
+    phrases:[
+      '"Equation goes in before the match. That\'s what makes it a prediction."',
+      '"Two points on the graph. What do you do?"',
+      '"Off by X. Which variable did you miss?"'
+    ],
+    triggers:[
+      "Equation written after match → 'That's a description, not a prediction. Before match 3.'",
+      "Scatter plot missing prediction → Stop match until it's written.",
+      "Student says 'We're just bad' → 'Bad at which stat specifically? Show me the gap.'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Math Scavenger Hunt: leaderboard problem cards posted around room",ty:"hook"},
+      {t:"8:35",d:"50 min",a:"Matching Situations → Graphs → Equations: class scatter plot build",ty:"challenge"},
+      {t:"9:25",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:45",d:"80 min",a:"Season 1 Match Day 2 — prediction logged before every match",ty:"match"},
+      {t:"11:05",d:"20 min",a:"Rivalry Cards: data-backed trash talk, one stat cited per card",ty:"match"},
+      {t:"11:25",d:"25 min",a:"Open Lab: scatter plot vs new match data, identify missing variable",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: journal — most surprising number this week",ty:"ends"}
+    ],
+    proto:{name:"LOSS RECOVERY / EQUATION TIMING",icon:"🔴"},
+    goals:["Every team writes a linear equation from their own scatter plot data — slope calculated, y-intercept solved (different equations are correct)","Equation prediction logged before each match; actual result recorded after — no blanks","Every Rivalry Card reviewed before posting — dashboard number + correct formula required, no exceptions"]
+  },
+  {
+    id:9, week:3, wn:"WEEK 3 · COMMISSIONER'S WEEK + SECOND SEASON",
+    title:"Season 1 Adjustments: Linear Equations and the Gap",
+    goal:"Third match day. Teams revise hypotheses from actual data. One-variable test protocol enforced.",
+    risk:{
+      desc:"Teams change three or more stats between matches, making it impossible to isolate cause. They get a result. They learn nothing causal from it.",
+      trigger:"Team shows allocation sheet with three stats changed from the previous match."
+    },
+    phrases:[
+      '"One change. So you can tell what caused it."',
+      '"What did yesterday\'s data tell you? Act on that."',
+      '"Which stat had the biggest gap? Start there."'
+    ],
+    triggers:[
+      "Team changes 3+ stats at once → 'Pick the one you're most confident about. The rest stay.'",
+      "Prediction not logged before match → Pause the run if needed — prediction first.",
+      "Team adjusts without data → 'What does your data say? Not your instinct.'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Rivalry Card Response: verify rival's cited numbers against dashboard",ty:"hook"},
+      {t:"8:30",d:"50 min",a:"Formula Relay: all five formula types, random stack, competitive",ty:"challenge"},
+      {t:"9:20",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:40",d:"90 min",a:"Season 1 Match Day 3 — one-variable test protocol enforced",ty:"match"},
+      {t:"11:10",d:"40 min",a:"Open Lab: post-match debrief + free code",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: math connection",ty:"ends"}
+    ],
+    proto:{name:"LOSS RECOVERY / ONE-VARIABLE TEST",icon:"🔴"},
+    goals:["Every team verifies the numbers on their received Rivalry Card against the dashboard — incorrect data gets marked with the correct number before matches begin","Formula Relay used diagnostically — error sort by type identifies each team's target formula for today's prediction","Every team logs prediction from target formula before each match; >20% gap between prediction and actual gets one sentence naming the missed variable"]
+  },
+  {
+    id:10, week:3, wn:"WEEK 3 · COMMISSIONER'S WEEK + SECOND SEASON",
+    title:"Season 1 Final Matches + Distance Formula",
+    goal:"Apply distance formula to match coordinate data. Cold Recall check before matches. Season 1 closes. Season 2 planning begins.",
+    risk:{
+      desc:"Students fill in predictions retrospectively — after they know the outcome. Dashboard looks complete. Contains no real predictive data.",
+      trigger:"Dashboard prediction column filled in during or after match time."
+    },
+    phrases:[
+      '"Show me where you wrote it. What time did the match start?"',
+      '"Two coordinates. One formula. Distance."',
+      '"Season 1 is done. What does the data say you didn\'t know on Day 1?"'
+    ],
+    triggers:[
+      "Retroactive predictions → Note it. In debrief: 'If you knew the answer, it wasn't a prediction. What does that do to your data?'",
+      "Distance formula skipped → 'You have the field coordinates from your match. Use them.'",
+      "Team disengaging from gallery walk → Ask one specific question about another team's card."
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Best Match Gallery Walk: post best match card, dot-sticker vote",ty:"hook"},
+      {t:"8:30",d:"50 min",a:"Distance Formula: applied to Season 1 field coordinate data",ty:"challenge"},
+      {t:"9:30",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:50",d:"10 min",a:"Cold Recall Check: 5 questions, individual, no notes, no grade",ty:"challenge"},
+      {t:"10:00",d:"90 min",a:"Season 1 Final Round — loss-recovery, final leaderboard update",ty:"match"},
+      {t:"11:30",d:"20 min",a:"Open Lab: Season 2 Planning",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: write win-probability equation, name slope in bot terms",ty:"ends"}
+    ],
+    proto:{name:"DASHBOARD INTEGRITY CHECK",icon:"📊"},
+    goals:["Cold Recall: 5 questions, individual, no notes, no devices, no grade — flag anyone who misses Q4 (Endurance decay gap breaks Season 2 planning)","Season 1 Final: Loss Recovery for every losing team; leaderboard finalized before matches end","Distance formula reflection: every team names one Season 2 stat adjustment with an explicit tradeoff argument"]
+  },
+  {
+    id:11, week:3, wn:"WEEK 3 · COMMISSIONER'S WEEK + SECOND SEASON",
+    title:"You Run the League Now: Commissioner Prep + the Underdog Mechanic",
+    goal:"Introduce Commissioner role. Announce Underdog Mechanic publicly. Students begin writing data-backed rule change proposals.",
+    risk:{
+      desc:"Students write 'Speed causes wins' without controlling for other stats — correlation presented as causation in Commissioner proposals.",
+      trigger:"Proposal states 'more Speed = more wins' without data controlling for other stats."
+    },
+    phrases:[
+      '"You\'re arguing why. Not describing what. Show the math."',
+      '"Does your rule specifically help last place? Name the team."',
+      '"What else changed between those two matches?"'
+    ],
+    triggers:[
+      "Proposal is correlational → 'What else changed between those matches? Could that explain it?'",
+      "Proposal doesn't name last-place team → 'Name them. Show the numbers.'",
+      "Facilitator corrects proposal mid-presentation → Stop yourself. Redirect to room: 'Anyone see a data issue?'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"Human Number Line: rank stats by Season 1 win impact (instinct first)",ty:"hook"},
+      {t:"8:30",d:"45 min",a:"Proportional Scaling (20 min) + Commissioner Proposal Prep (25 min)",ty:"challenge"},
+      {t:"9:15",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:35",d:"30 min",a:"Season 2 Stat Reallocation — Underdog Mechanic announced publicly",ty:"match"},
+      {t:"10:05",d:"65 min",a:"Practice Matches: test new loadout hypotheses, no formal scoring",ty:"match"},
+      {t:"11:10",d:"40 min",a:"Open Lab: Commissioner Proposal Refinement — verify every number",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Team Pulse",ty:"ends"}
+    ],
+    proto:{name:"CORRELATION/CAUSATION REDIRECT",icon:"🔗"},
+    goals:["Every team calculates percent change for both Motor Power and Charge Speed — linear vs. quadratic contrast must be explicit in writing","Commissioner Proposal exit check complete: rule written (stat + CAP/FLOOR + number) + at least one formula computation + last-place team named","Every team reviews their proposal for causal language — all causal claims revised to pattern language (\"is associated with\")"]
+  },
+  {
+    id:12, week:3, wn:"WEEK 3 · COMMISSIONER'S WEEK + SECOND SEASON",
+    title:"The Commissioner's Meeting: You Change the Rules",
+    goal:"Formal 3-minute presentations. League votes. Winning rules go on the wall in permanent marker. Facilitator is mostly silent.",
+    risk:{
+      desc:"Facilitator over-scaffolds during high-agency presentations — corrects proposals mid-pitch, suggests data, clarifies arguments. Destroys the agency structure built over three weeks.",
+      trigger:"Facilitator speaks during a team's live presentation for any reason other than time."
+    },
+    phrases:[
+      '"Can anyone in the room verify that calculation?"',
+      '"[During pitches: say nothing.]"',
+      '"Math error during a live pitch: note it. Debrief after. Not during."'
+    ],
+    triggers:[
+      "Team cites data without calculation → Redirect to room: 'Can anyone verify that number?'",
+      "Facilitator answers 'Is this right?' → 'What does your data show? Ask the room.'",
+      "Math error mid-pitch → Note it. Say nothing. Address in post-pitch debrief."
+    ],
+    sched:[
+      {t:"8:05",d:"25 min",a:"Lobby the Commissioners: informal proposal conversations (not presentations)",ty:"hook"},
+      {t:"8:35",d:"35 min",a:"Final Proposal Verification: check every number, confirm last-place impact",ty:"challenge"},
+      {t:"9:10",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:30",d:"90 min",a:"Commissioner's Meeting: 3-min pitches, room verifies, league votes",ty:"match"},
+      {t:"11:00",d:"50 min",a:"Open Lab: Season 2 allocation verification, one test drive",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: skill bridge",ty:"ends"}
+    ],
+    proto:{name:"PRESENTATION SUPPORT BOUNDARY — CRITICAL TODAY",icon:"🚫"},
+    goals:["Every team verifies all cited numbers against the dashboard and calculates percent change correctly — divided by the before value, not the after","Every team presents in 3 minutes with two verified data points; math checked by the room before any vote is called","Every team submits a revised Season 2 allocation satisfying all passed rules with sum = 20 (or 22 for Underdog)"]
+  },
+  {
+    id:13, week:4, wn:"WEEK 4 · CHAMPIONSHIP + EXHIBITION",
+    title:"Your Win Equation + Season 2 Begins",
+    goal:"Write a linear equation predicting win probability. First Season 2 matches under Commissioner-approved rules and new ball modes.",
+    risk:{
+      desc:"Teams use their Season 1 equation unchanged for Season 2, ignoring that Commissioner-approved rule changes altered the game variables.",
+      trigger:"Team shows Season 2 prediction identical to Season 1 equation with no adjustment."
+    },
+    phrases:[
+      '"Season 1 equation. What changed in the rules? Recalculate."',
+      '"Two points. One slope. One equation. You have it."',
+      '"Log the prediction before every match. No exceptions."'
+    ],
+    triggers:[
+      "Season 1 equation reused → 'Name one rule that changed. How does that affect your equation?'",
+      "Prediction not logged → Pause the run if needed. Log first.",
+      "Ball mode ignored → 'Standard vs Chaos. What does your equation predict for each?'"
+    ],
+    sched:[
+      {t:"8:05",d:"20 min",a:"The Prediction Market: public win-total predictions posted on index cards",ty:"hook"},
+      {t:"8:35",d:"50 min",a:"Building and Solving Linear Equations: win-probability from stat data",ty:"challenge"},
+      {t:"9:25",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:45",d:"90 min",a:"Season 2 Match Day 1: Standard Mode + Chaos Mode (ping pong ball)",ty:"match"},
+      {t:"11:15",d:"35 min",a:"Open Lab: Residual Analysis or Bot Calibration",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Season 2 personal goal — name math concept for Exhibition",ty:"ends"}
+    ],
+    proto:{name:"LOSS RECOVERY / EQUATION REVISION",icon:"🔴"},
+    goals:["Every team writes a linear equation in slope-intercept form from two data points — slope calculated, y-intercept found, prediction uses \"approximately\" and \"based on class data\"","Every team calculates at least one residual with sign interpreted: positive = over-predicted, negative = under-predicted","Every team logs a written equation-based prediction before every match and records the actual result, residual, and diagnosis after — no blanks in the data log"]
+  },
+  {
+    id:14, week:4, wn:"WEEK 4 · CHAMPIONSHIP + EXHIBITION",
+    title:"Season 2: Percent Change and the Model vs. the Match",
+    goal:"Calculate percent change Season 1 → Season 2 for every stat. Run Season 2 Match Day 2. Compare residuals to identify the missing variable.",
+    risk:{
+      desc:"Students use percentage point difference instead of percent change — same error as Day 6, now corrupting Season 2 analysis. Harder to catch here because the numbers look plausible.",
+      trigger:"Student writes 'Power went from 4 to 6, that's a 2% change.'"
+    },
+    phrases:[
+      '"Show me: new minus old, divided by old, times 100."',
+      '"Residual went up from Day 13. Which variable moved?"',
+      '"Standard or Chaos mode? Different prediction for each."'
+    ],
+    triggers:[
+      "Percent point error → Write the formula. Work one example together on their sheet.",
+      "Residual analysis skipped → 'Your model missed by X. That's the most important number today.'",
+      "Ball mode ignored → 'Chaos mode. Is your equation calibrated for that?'"
+    ],
+    sched:[
+      {t:"8:05",d:"30 min",a:"Stat Auction + Prediction Check (math tokens bidding, 25 min + 5 min check)",ty:"hook"},
+      {t:"8:40",d:"50 min",a:"Percent Change Season 1 → Season 2: calculate for every stat",ty:"challenge"},
+      {t:"9:30",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:50",d:"90 min",a:"Season 2 Match Day 2 — three matches, equation-based prediction logged",ty:"match"},
+      {t:"11:20",d:"30 min",a:"Open Lab: Equation Revision or Loadout Experiments",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: math connection from pre-match pitch rehearsals",ty:"ends"}
+    ],
+    proto:{name:"PERCENT CHANGE CORRECTION (REPEAT)",icon:"📐"},
+    goals:["Every team states the formula output aloud before any bid is accepted — allocation must sum to 20 after every transaction","Every team calculates percent change for all four stats with all steps shown — denominator is always Season 1, never Season 2","Written equation-based prediction before every match; residual and direction (UP/DOWN/SAME) recorded with reasoning after each match"]
+  },
+  {
+    id:15, week:4, wn:"WEEK 4 · CHAMPIONSHIP + EXHIBITION",
+    title:"Teach the Math + Season 2 Final Match",
+    goal:"Season 2 final matches. Post-Task Diagnostic — same risk as Day 1, now with four weeks of investment at stake. Championship pitch rehearsal.",
+    risk:{
+      desc:"Post-task diagnostic re-triggers math shame. Students who've invested four weeks now fear that the test will show it wasn't enough.",
+      trigger:"Student rushes through the diagnostic or says 'I probably did worse.'"
+    },
+    phrases:[
+      '"You\'re being compared to where you started. That\'s it."',
+      '"What belongs in your bot\'s story now that wasn\'t there on Day 2?"',
+      '"If a visitor asks why you chose this allocation, what do you say?"'
+    ],
+    triggers:[
+      "Student rushes post-diagnostic → 'Slow down. Question 3. What formula does that use? You've run it every match.'",
+      "Student says 'I probably did worse' → 'You didn't know any of these formulas on Day 1. Re-read question 1.'",
+      "Bot Lore entry blank → 'Something happened this month. What belongs in your bot's story now?'"
+    ],
+    sched:[
+      {t:"8:05",d:"25 min",a:"Bot Lore Gallery Walk: re-read origin stories, write one new sentence",ty:"hook"},
+      {t:"8:30",d:"45 min",a:"Teach the Math: rehearse 2-min pre-match pitch for Championship judges",ty:"challenge"},
+      {t:"9:15",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"9:35",d:"85 min",a:"Season 2 Match Day 3: Standard + Chaos alternating, loss-recovery every loss",ty:"match"},
+      {t:"11:05",d:"15 min",a:"Post-Task Diagnostic: individual, no notes (frame before distributing)",ty:"challenge"},
+      {t:"11:20",d:"30 min",a:"Open Lab: reflection + pitch refinement, every claim needs a number",ty:"lab"},
+      {t:"11:50",d:"10 min",a:"ENDS: Team Pulse",ty:"ends"}
+    ],
+    proto:{name:"MATH SHAME RECOVERY (POST-TASK)",icon:"🛡️"},
+    goals:["Every team calculates their opponent's decay rate r, writes P(t), finds the x-intercept, and delivers a quantitative interpretation sentence with P(3) stated","Every team's strategy pitch cites a specific equation result for every claim — peer feedback confirms number cited: yes or no for each","MY EQUATION complete before Match 1; Prediction Tracker filled with signed residuals for all three rounds; Exit Ticket done before Bracket Reveal"]
+  },
+  {
+    id:16, week:4, wn:"WEEK 4 · CHAMPIONSHIP + EXHIBITION",
+    title:"Community Exhibition: You Are the Experts Now",
+    goal:"Students teach visitors. Best Teacher vote collected. Awards ceremony closes the program. Your job: stay silent and let students be the authority.",
+    risk:{
+      desc:"Students defer to the facilitator when visitors ask questions. Four weeks of expertise collapses in 30 seconds if you answer for them.",
+      trigger:"Visitor asks a student a math question and the facilitator responds first."
+    },
+    phrases:[
+      '"You\'ve done this math. They haven\'t. You\'re the expert here."',
+      '"Teach them to calculate one unit rate. Start there."',
+      '"[Visitor asks you a question:] Actually, [name] designed that allocation."'
+    ],
+    triggers:[
+      "Student defers to you when visitor asks → 'Tell them what you told me.'",
+      "Student says 'I don't know' and stops → 'Show them the dashboard. Walk through it.'",
+      "You answer a visitor's math question → Stop. 'Actually, [student] can walk you through that.'"
+    ],
+    sched:[
+      {t:"8:05",d:"40 min",a:"Expert Setup: station setup, practice three visitor mini-challenges on a teammate",ty:"hook"},
+      {t:"8:45",d:"75 min",a:"Community Exhibition: teach visitors, Best Teacher voting open",ty:"match"},
+      {t:"10:00",d:"20 min",a:"Snack break",ty:"break"},
+      {t:"10:20",d:"20 min",a:"Walk the Wall: final gallery — all artifacts four weeks",ty:"lab"},
+      {t:"10:40",d:"60 min",a:"Awards Ceremony: Championship, Best Teacher, one specific math moment per team",ty:"match"},
+      {t:"11:50",d:"10 min",a:"ENDS: journal — one thing you solved that you thought you couldn't",ty:"ends"}
+    ],
+    proto:{name:"STUDENT-AS-EXPERT / FACILITATOR SILENCE",icon:"🎓"},
+    goals:["Every team teaches all three mini-challenges with specific numbers: unit rate, coordinate distance, and proportional scaling explanation","Every visitor completes all three independently after one explanation — no second prompt; if they need one, identify the gap","Every student names one personal growth area and one specific moment from the program demonstrating that growth — not a general statement"]
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+// DATA — PROTOCOL CARDS
+// ═══════════════════════════════════════════════════════
+const PROTOCOLS = [
+  {
+    icon:"🔴", name:"LOSS RECOVERY",
+    useWhen:["Team just lost a match","Every match day: Days 7, 8, 9, 10, 13, 14, 15"],
+    steps:[
+      {text:"Acknowledge briefly and genuinely.", note:'"That was frustrating. Real feeling, makes sense." Pause. Let it land. Don\'t pivot immediately.'},
+      {text:"Dashboard. One stat. Find the gap.", note:"Point to prediction vs. actual. One stat only. The data is the path back."},
+      {text:"Restore them as hypothesis-makers.", note:'"N matches left. One thing to change. What is it?"'},
+      {text:"Write it down.", note:"Get something written before continuing. The writing is the pivot from feeling to action."}
+    ],
+    avoid:['"It\'s okay."',"Extended reassurance that replaces the data pivot","Jumping to the dashboard before acknowledging the feeling"],
+    calibration:"Students need a beat to feel heard before they can think again. Championship losses may warrant more time before the data pivot. If a student is crying, the script waits."
+  },
+  {
+    icon:"🛡️", name:"MATH SHAME RECOVERY",
+    useWhen:["Day 1 pre-task diagnostic","Day 15 post-task diagnostic","Any time a student shuts down during math work"],
+    steps:[
+      {text:"Frame before you distribute.", note:'"This tells us where to start. Not what you\'re worth."'},
+      {text:"Redirect to the bot, not the paper.", note:'"Your bot ran 2 meters. What does your formula predict for Speed = 4?"'},
+      {text:"Find the smallest entry point.", note:"One formula. One number. Get the pencil moving."},
+      {text:"Do not compare to other students.", note:"Not even positively."}
+    ],
+    avoid:['"This is easy."',"Comparing to other students","Leaving a shut-down student without a concrete redirect"]
+  },
+  {
+    icon:"🚫", name:"PRESENTATION SUPPORT BOUNDARY",
+    useWhen:["Day 12 Commissioner's Meeting","Championship pre-match pitch","Any moment students present publicly"],
+    steps:[
+      {text:"Hold back during pitches.", note:"Take notes. Watch for errors to address afterward. Interrupt only if the entire process breaks down."},
+      {text:"Accuracy questions go to the room.", note:'"Can anyone verify that calculation?" — keeps accuracy in student hands.'},
+      {text:"Math error mid-pitch: note it for the debrief.", note:"Exception: if the error will invalidate the entire vote, a brief pause — 'hold on, let\'s verify that one number' — is appropriate."},
+      {text:"Score against the rubric while they present.", note:"Rubric in hand shifts your focus from 'should I fix this?' to 'is this meeting criteria?'"}
+    ],
+    avoid:["Correcting proposals mid-presentation when the error isn't vote-critical","Answering 'Is this right?' with anything other than a room redirect","Reframing their argument during the pitch"]
+  },
+  {
+    icon:"🔁", name:"ANSWER REDIRECT",
+    useWhen:["Student asks for the answer directly","Correctness, answer-seeking, or interpretation questions"],
+    steps:[
+      {text:"Correctness question: 'Did we do this right?'", note:'"What would a correct answer look like on your graph? Is that what you see?"'},
+      {text:"Answer-seeking: 'What is the equation?'", note:'"Two data points. What do you do with two points?"'},
+      {text:"Interpretation: 'What does this mean?'", note:'"What does your line look like compared to theirs?"'},
+      {text:"Still stuck after redirect: give the method, not the answer.", note:'"Formula is (new − old) ÷ old × 100. You have the numbers."'}
+    ],
+    avoid:["Giving the answer directly","Doing the calculation for the student",'"Let me show you" followed by showing the answer']
+  },
+  {
+    icon:"✅", name:"GUIDANCE IS APPROPRIATE WHEN…",
+    useWhen:["Student frozen for 2+ minutes with no productive thinking","New concept has no entry point without a model","Directions are genuinely ambiguous — not just hard","Vocabulary is blocking understanding"],
+    steps:[
+      {text:"Model one example, then return the thinking.", note:"'Here's how I'd set up this formula. Now you do the next one.' Show once. Hand it back."},
+      {text:"Clarify directions when confusion is about instructions, not content.", note:"Confusion about what to do is not productive struggle. Clarify it immediately."},
+      {text:"Revoice a student's discovery as a named pattern.", note:"'What [student] just found is a rule about non-linear functions. Everyone look at what they did.' Amplifying student thinking is teaching."},
+      {text:"Scaffold an entry point for a frozen student.", note:"'Try Speed = 4. One number. Start there.' Frozen is not the same as struggling."}
+    ],
+    avoid:["Explaining before students have had a chance to try","Mistaking productive struggle for a problem to solve","Modeling so thoroughly that students have no thinking left to do"],
+    calibration:"Guidance is not the opposite of good facilitation. A 3-minute explanation that unlocks 20 minutes of productive work is better than 20 minutes of confused wandering. The question is when — and whether the explanation preserves the student's need to think."
+  },
+  {
+    icon:"😶", name:"SILENT TEAM PROTOCOL",
+    useWhen:["Team goes quiet after a loss","Team not engaging with data post-match","Group discussion flatlines"],
+    steps:[
+      {text:"Address one person, not the team.", note:"Use a name. Ask about one number. A named question is harder to ignore than a group question."},
+      {text:"Put something physical in their hands.", note:"Dashboard, calculator, stat card — an object creates a task."},
+      {text:"Ask the smallest possible question.", note:'"What was your prediction? What was the actual? What\'s the gap?"'},
+      {text:"Pause after asking. Then follow if needed.", note:"Give it time to land. If silence isn't working after 10–15 seconds, rephrase — don't just wait longer."}
+    ],
+    avoid:["'Is everything okay?'","Moving on without a response",'"Does everyone understand?"']
+  },
+  {
+    icon:"😢", name:"CRYING STUDENT",
+    useWhen:["Student is visibly upset after a loss","Student crying during Commissioner's Meeting or Championship"],
+    steps:[
+      {text:"Acknowledge genuinely, briefly.", note:'"That hurt. Makes sense." Warmth here is real. Don\'t suppress it. Don\'t extend it into a processing session.'},
+      {text:"Give a low-stakes task.", note:"'Find which stat had the biggest gap.' Purpose re-grounds without dismissing the feeling."},
+      {text:"Brief exit if needed.", note:"Two-minute walk. Return with a specific job: 'Log the match result when you're back.'"},
+      {text:"Reconnect when they're ready.", note:"Some students need 3 minutes, not 2. Watch whether they're moving toward or away from the work."}
+    ],
+    avoid:["Extended emotional processing that displaces all learning time","'Don't cry, you were so close!'","Moving to data so fast the acknowledgment felt procedural"],
+    calibration:"Warmth is not rescuing. You can be genuinely kind and still return to data. Stay attuned — a student who needed 4 minutes and got 4 is more ready to think than one who got 90 seconds and still feels dismissed."
+  },
+  {
+    icon:"💪", name:"PARTICIPATION BALANCE PROTOCOL",
+    useWhen:["One student takes over keyboard or build","Team members go passive or stop contributing"],
+    steps:[
+      {text:"Reassign roles by physical position.", note:"Analyst holds the dashboard and speaks first. Coder cannot touch MakeCode until Analyst logs the prediction."},
+      {text:"Direct questions to quieter students first.", note:"'[Name], what does your allocation predict?' Target students who aren't speaking."},
+      {text:"Enforce role rotation if takeover continues.", note:"'Your role today is Fabricator. The Coder programs. You tell them what to enter.'"},
+      {text:"Name the behavior privately, not publicly.", note:"'I need you to let [name] lead the next one. You can be the checker.'"}
+    ],
+    avoid:["Letting one student code for multiple sessions uninterrupted","Addressing the takeover in front of the group","Relying on the high-participation student to answer your questions"]
+  },
+  {
+    icon:"⏱️", name:"TRANSITION PROTOCOLS",
+    useWhen:["Block runs short or long","Tech failure mid-session","Late arrival","Fast finisher"],
+    steps:[
+      {text:"3-MINUTE RESET: Room is loud or fractured.", note:"'Stop. Sit. Open your dashboard. Find one thing you predicted wrong today.' Clear question, let them work."},
+      {text:"BOT FAILURE: Bot stops mid-block.", note:"Direct that team to the dashboard immediately. 'Bot is down. Your data isn't. Find the question you haven't answered.'"},
+      {text:"LATE ARRIVAL: Student arrives 20+ min late.", note:"One task: 'Find your team. Ask what the prediction was. Log it.' Don't re-explain, don't delay the group."},
+      {text:"FAST FINISHER: Team finishes 15+ min early.", note:"'Explain problem X out loud without notes.' If yes: write the next match prediction with calculation. If no: back to the problem."}
+    ],
+    avoid:["Explaining the branch to the whole group","Apologizing for the disruption","Free time without a specific task"]
+  },
+  {
+    icon:"✖️", name:"MULTIPLICATIVE MISCONCEPTION",
+    useWhen:["Day 4 Power stat","Any time a student assumes doubling points doubles output"],
+    steps:[
+      {text:"Put both values on the board.", note:"Write Power=4 → 16%. Write Power=8 → 64%. Let them sit before saying anything."},
+      {text:"Ask: 'Is 64 double 16?'", note:"Wait for them to divide. 64 ÷ 16 = 4. They found it, not you."},
+      {text:"Name the error type.", note:'"You used additive reasoning on a non-linear formula. Speed is linear. Power is not."'},
+      {text:"Return the calculation to them.", note:"New allocation. They calculate it and verify it in writing."}
+    ],
+    avoid:["Explaining the pattern before they've seen the numbers","Skipping the calculation and going straight to the rule","Moving on without a confirmed written recalculation"]
+  },
+  {
+    icon:"📐", name:"PERCENT CHANGE CORRECTION",
+    useWhen:["Day 6 stat allocation","Day 14 Season 2 analysis","Any time percentage point difference is labeled as percent change"],
+    steps:[
+      {text:"Both formulas on the board simultaneously.", note:"Percent change: (new − old) ÷ old × 100. Percentage point: new − old."},
+      {text:"Show one number going both ways.", note:"'Speed 6 to 8. Percent change: 33%. Percentage points: 2. Not the same.'"},
+      {text:"Ask which one the question is asking for.", note:"Make them re-read and identify the question type. Don't tell them."},
+      {text:"Have them recalculate using the correct formula.", note:"Require a written recalculation — 'I see' is not confirmation."}
+    ],
+    avoid:["Telling them which formula before they identify it","Moving past the error without a recalculation"]
+  },
+  {
+    icon:"🔢", name:"PRIORITY HIERARCHY — IF OVERWHELMED",
+    useWhen:["Multiple things wrong simultaneously","Noise + schedule pressure + emotional event at the same time"],
+    steps:[
+      {text:"FIRST: Give the room a task.", note:"3-minute reset. Everyone sits. Dashboard open. One question. Use this as the default — buys time before you address anything else."},
+      {text:"SECOND: Crisis student.", note:"Crying, non-responsive, or escalating. Private check-in while the room is on task."},
+      {text:"THIRD: Tech failure blocking a team.", note:"Assign a student to reboot. Delegate and return — don't troubleshoot it yourself."},
+      {text:"FOURTH: Academic redirect.", note:"Missing prediction, wrong formula. This can wait 3 minutes. It doesn't cascade the way the first three do."}
+    ],
+    avoid:["Triaging by loudness instead of cascade risk","Addressing multiple problems at the same time","Leaving the room without a task while handling a student privately"]
+  },
+  {
+    icon:"🛑", name:"WHEN TO ABANDON THE FLOW",
+    useWhen:["The current structure is not recoverable","Multiple students have disengaged and protocols aren't working","A significant emotional event has changed the room","You are more than 20 minutes behind and compressing will produce worse outcomes than stopping"],
+    steps:[
+      {text:"Name it directly.", note:"'We're going to stop here.' Don't frame it as a problem — frame it as a decision. 'This isn't the right moment for this. We're switching.'"},
+      {text:"Move to whole-group reset.", note:"Everyone together. One shared task. Low stakes. 'Open your dashboard. Find the weirdest number you see. Tell me one thing.' Reconnects the room before you try to restart."},
+      {text:"Decide: restart or redirect.", note:"If the flow is recoverable, re-enter at the simplest possible point. If not, run a shorter version of the day's goal or move to free build. A real session matters more than a complete one."},
+      {text:"Don't explain what went wrong in the moment.", note:"Post-session debrief if needed. Mid-session analysis wastes the time you just recovered."}
+    ],
+    avoid:["Pushing through a dead structure hoping it recovers","Apologizing to the group for stopping","Over-explaining the switch","Trying to restart exactly where you left off"],
+    calibration:"Some sessions die. Good facilitators know when to stop recovering and start redirecting. Killing the flow is not failure — dragging a dead session forward is."
+  },
+  {
+    icon:"🏗️", name:"PARTICIPATION BALANCE ARCHITECTURE",
+    useWhen:["One student coding for multiple teams","One voice answering most debrief questions","Commissioner's Meeting dominated by one team's framing"],
+    steps:[
+      {text:"Physical separation first.", note:"If one student is at another team's table: return them. 'I need you at your own table, in your role.' Not a correction — a structural call."},
+      {text:"Role lock — state it, don't request it.", note:"'Coder role is hands-on-keyboard for your team only.' Call it when it happens."},
+      {text:"Written-first before any verbal debrief.", note:"Everyone writes before anyone speaks. This is the default — hold to it."},
+      {text:"Reverse-calling order in every debrief.", note:"Quieter students first. Name them: 'I want to hear from [student] before we move on.'"}
+    ],
+    avoid:["'Let others try' without a structural change","Addressing participation imbalance publicly as a behavior problem","Waiting for role rotation to handle it without enforcement"],
+    calibration:"The high-participation student is not doing anything wrong. Treat this as a design problem. The fix belongs to the program: role enforcement, written-first rules, reverse-calling order."
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+// DATA — SIMULATIONS
+// ═══════════════════════════════════════════════════════
+const SCENARIOS = [
+  // ─── STANDARD SCENARIOS ───
+  {
+    q:"Day 7, first match day. A team just lost 0–3. One student puts their head on the table. Another says 'Our bot is trash.' You're 30 seconds in. What do you do?",
+    opts:[
+      {l:"A",t:"Say 'That was really close, you almost had it — let's look at what happened.' Open the dashboard together."},
+      {l:"B",t:"Say 'That was frustrating. Real feeling, makes sense.' Stop. Wait 30 seconds in silence. Then open the dashboard to one stat."},
+      {l:"C",t:"Say 'Don't worry, you have more matches. Let's focus on the next one and adjust your allocation.'"}
+    ],
+    ok:"B", answer:"B. Acknowledge, then pause before pivoting to data.",
+    why:"A skips acknowledgment and jumps to analysis — the student with their head down isn't ready for the dashboard yet. C reassures without a data pivot, which cuts the team off from learning. The pause in B feels counterintuitive under pressure. Do it anyway. Students need a beat to feel heard before they can engage with evidence. The goal is not to withhold support — it's to avoid removing their need to think about what happened.",
+    proto:"Loss Recovery Protocol — Step 1"
+  },
+  {
+    q:"Day 12, Commissioner's Meeting. A team is mid-pitch and cites a number you know is wrong — they said 'Speed 6 gives 40% motor power' when it's 30%. The room hasn't noticed. What do you do?",
+    opts:[
+      {l:"A",t:"Wait until they finish, then quietly tell them the correct number before the vote."},
+      {l:"B",t:"Interrupt gently: 'Let's pause — can we verify that number together?'"},
+      {l:"C",t:"Say nothing during the pitch. When it ends, ask the room: 'Does anyone want to verify any of the data cited?'"}
+    ],
+    ok:"C", answer:"C. Stay silent during the pitch. Redirect to the room afterward.",
+    why:"Interrupting mid-pitch — gently or otherwise — signals that you are the accuracy authority, not the data. A is better than B but still positions you as the corrector. C is the Commissioner's Meeting protocol: accuracy checks go to the room, not to you.",
+    proto:"Presentation Support Boundary — Step 2"
+  },
+  {
+    q:"Day 9, Match Day 3. A team just changed Speed from 6 to 8, Endurance from 4 to 3, and Turning from 2 to 4 before their next match. They're excited. What do you do?",
+    opts:[
+      {l:"A",t:"Let them run it. More data is better, and they're engaged."},
+      {l:"B",t:"'One change. Not three. Pick the one you're most confident about. The rest stay.' Have them revert two of the three."},
+      {l:"C",t:"Ask which two seem most promising and let them run those."}
+    ],
+    ok:"B", answer:"B. One variable. Use this as the default.",
+    why:"A gets data, not knowledge. C is still a multi-variable test. B is harder to enforce — students resist it. The correct response acknowledges their enthusiasm and enforces the scientific thinking the program requires. One change is how you build a model, not a hunch.",
+    proto:"One-Variable Test Protocol"
+  },
+  {
+    q:"Day 5. A student asks: 'What's the equation for scoring goals?' You know the answer. What do you say?",
+    opts:[
+      {l:"A",t:"Give them the formula and tell them to practice with it before the next run."},
+      {l:"B",t:"'What two data points do you have from your last run? What would you do with two points to find a relationship?'"},
+      {l:"C",t:"'That's what we're figuring out together — what's your current best guess based on your Season 0 data?'"}
+    ],
+    ok:"B", answer:"B. Method without the answer.",
+    why:"A is fastest and least useful — they get the formula without building the reasoning. C is vague enough that a stuck student stays stuck. B gives the method — the entry point — without handing over the answer. If after this redirect they're still frozen, giving the method more explicitly is appropriate. The goal is not to withhold help — it's to preserve where the thinking happens. They need to build the equation, not copy yours.",
+    proto:"Answer Redirect Protocol — Step 2"
+  },
+  {
+    q:"Day 4. You show the Power formula. A student says: 'So Power 8 is double Power 4 because 8 is double 4.' Three students nod. What do you do?",
+    opts:[
+      {l:"A",t:"Correct it: 'Actually it's not double — 4² = 16% and 8² = 64%, and 64 is four times 16.'"},
+      {l:"B",t:"Write Power=4 → ? and Power=8 → ? on the board. Ask them to calculate both. Say nothing until both numbers are written."},
+      {l:"C",t:"Explain that the Power formula is non-linear and show them a quadratic curve."}
+    ],
+    ok:"B", answer:"B. Let the numbers be the correction.",
+    why:"A gives the answer before they feel the contradiction. C adds abstraction they don't need yet. B makes them calculate it themselves. When they write 16% and 64% and divide, the correction belongs to them — not you.",
+    proto:"Multiplicative Misconception Protocol — Steps 1 & 2"
+  },
+  {
+    q:"Day 1. You're about to hand out the pre-task diagnostic. Two students in the room failed Algebra 1 last year. What do you do first?",
+    opts:[
+      {l:"A",t:"Hand it out and say 'Do your best — this is just so we know where to start.'"},
+      {l:"B",t:"Skip the framing and give them extra time instead."},
+      {l:"C",t:"Before handing it out: 'This tells us where to start — not what you're worth. None of these use the bot system you haven't learned yet. Go as far as you go.' Then distribute."}
+    ],
+    ok:"C", answer:"C. Frame before you distribute. Protect this routine whenever possible.",
+    why:"A is well-intentioned but 'do your best' is still performance language. B removes the learning objective. C is the Day 1 risk script. The framing matters because students read the paper before they read your face. The frame has to come before the paper.",
+    proto:"Math Shame Recovery Protocol — Step 1"
+  },
+  {
+    q:"Day 11. A team's Commissioner proposal states: 'We should increase the Speed multiplier because teams with higher Speed win more games.' They haven't controlled for Endurance or Power. What do you do?",
+    opts:[
+      {l:"A",t:"Tell them privately before the meeting: 'Your argument is correlational — you haven't controlled for other stats.'"},
+      {l:"B",t:"During their presentation, redirect to the room: 'Does anyone see another stat that might explain these results?'"},
+      {l:"C",t:"Ask them before the presentation: 'What else changed between the matches you're comparing? Could that variable have caused the difference?'"}
+    ],
+    ok:"C", answer:"C. Fix it in preparation, not mid-pitch.",
+    why:"A is correct but too close to the pitch — if they can't fix it, they go in with a flawed argument and lose confidence. B is the right move if the error surfaces during the meeting. C applies the correction in time to actually strengthen the proposal.",
+    proto:"Correlation/Causation Redirect Protocol"
+  },
+  {
+    q:"Day 8. During the break, you notice three teams wrote pre-match predictions for Match 2 in the same handwriting and ink as the actual results. The predictions are accurate. What do you do?",
+    opts:[
+      {l:"A",t:"Don't bring it up — you can't be certain, and accusation could damage trust."},
+      {l:"B",t:"Address the class: 'The prediction goes in before the match. If it was written after, it's not a prediction — it's a description. That changes what the data means.'"},
+      {l:"C",t:"Speak to each team individually and ask them to re-enter predictions for upcoming matches with timestamps."}
+    ],
+    ok:"B", answer:"B. Name the protocol. Not the students.",
+    why:"A lets corrupted data persist for the rest of the program. C punishes without fixing anything. B names the protocol, not the students — explains why it matters and resets going forward. Goal: clean data, not punishment.",
+    proto:"Dashboard Integrity Check"
+  },
+  {
+    q:"Day 16, Exhibition. A visitor asks a student: 'Why did you choose Speed 6 instead of Speed 8?' The student looks at you and says nothing. What do you do?",
+    opts:[
+      {l:"A",t:"Step in: 'Great question — [student] found that Speed 6 gave them a better balance with their Endurance.'"},
+      {l:"B",t:"Say to the student: 'Tell them what you told me on Day 10.' Then step back."},
+      {l:"C",t:"Say to the visitor: '[Student] is the expert on this — let me let them explain it.'"}
+    ],
+    ok:"C", answer:"C. Name the student as the authority. Step back.",
+    why:"A is the most natural response and the most damaging — you answered the question the whole program built toward. B is slightly prescriptive. C names the student as the authority publicly. That statement changes how they hold themselves for the next visitor.",
+    proto:"Student-as-Expert Protocol"
+  },
+  {
+    q:"Day 3. You ask a student to explain what the slope on their distance-time graph means. They say: 'It means the bot went fast.' What do you do?",
+    opts:[
+      {l:"A",t:"Correct them: 'Slope represents rate of change — it's distance divided by time, which gives speed.'"},
+      {l:"B",t:"Ask: 'What two things are on your axes? What does the slope connect?'"},
+      {l:"C",t:"Accept it as a valid informal interpretation and move on."}
+    ],
+    ok:"B", answer:"B. The graph's axes are the correction.",
+    why:"A gives the formal definition before they've connected it to their actual graph. C accepts informal language that will cause problems in Week 2. B redirects to what's on the page. Once they say 'distance over time,' they own the connection — you didn't hand it to them.",
+    proto:"Interpretation Redirect Protocol"
+  },
+  {
+    q:"Day 7, Match Day 1. After the first match you realize you have 25 extra minutes because MakeCode setup was faster than expected. Students are energized. What do you do?",
+    opts:[
+      {l:"A",t:"Give teams free build time — they're energized and you don't want to break momentum."},
+      {l:"B",t:"Open the dashboard: 'Find the prediction you're least confident in for the next match. Show me the calculation.' Work from there."},
+      {l:"C",t:"Start the next scheduled activity early and adjust the rest of the timeline."}
+    ],
+    ok:"B", answer:"B. Dead time = data time.",
+    why:"A wastes the moment. C risks rushing the next activity. Dead time = data time. A team with a dashboard is never unoccupied. There's always a gap to find.",
+    proto:"Transition Protocol — Dead Time"
+  },
+  {
+    q:"Day 13, Season 2 debrief. Three teams are justifying their allocation changes by citing rank ('We need to win more matches') rather than formula output ('Our Endurance prediction was off by 12 points'). The leaderboard has been visible all day. What do you do?",
+    opts:[
+      {l:"A",t:"Address it directly: 'We optimize for formula accuracy, not just wins. Reframe your justification around your data.'"},
+      {l:"B",t:"Cover or remove the leaderboard before tomorrow's session. Run the debrief using only dashboard data — forbid rank as a justification. 'What does your Best Prediction column say?'"},
+      {l:"C",t:"Accept it for now — winning motivation is engagement. It will convert to data motivation once they start losing."}
+    ],
+    ok:"B", answer:"B. Change the environment. Don't argue against it.",
+    why:"A is arguing against what the visual field has been saying all day. The leaderboard has been winning that argument for hours — your voice won't undo it in a debrief. C is wishful — losing doesn't automatically produce data motivation without structured recovery. B changes the room before trying to change behavior. If the leaderboard drives rank-thinking during problem-solving, it should not be visible during problem-solving. No script fixes what the room is continuously saying.",
+    proto:"Room Architecture — Leaderboard Visibility"
+  },
+  // ─── COMPOUND SCENARIOS ───
+  {
+    compound:true,
+    q:"Day 9, 45 minutes in. MakeCode has a 3-minute lag. One student is quietly crying from the previous loss. A dominant coder is now programming for two teams. The room is loud. You're 15 minutes behind schedule. What do you do first?",
+    opts:[
+      {l:"A",t:"Address the crying student first — emotional safety before everything else."},
+      {l:"B",t:"3-minute reset: everyone sits, every team opens dashboard to one specific question. Then check in with the crying student privately while the room is occupied."},
+      {l:"C",t:"Fix the MakeCode lag first — without working bots, nothing else matters."}
+    ],
+    ok:"B", answer:"B. 3-minute reset first. Then the student privately.",
+    why:"A puts you in emotional processing while the room deteriorates. C ignores two human situations for logistics. B stops the entropy: reset gives everyone a task, which buys you 3 minutes to check on the crying student quietly. Triage by what cascades. A loud unoccupied room cascades. One quiet student does not.",
+    proto:"3-Minute Reset → Loss Recovery (private)"
+  },
+  {
+    compound:true,
+    q:"Day 16, Exhibition. A community visitor arrives 25 minutes early while you're still in prep. One team hasn't finished practicing their mini-challenges. Another team's bot isn't calibrated. What do you do?",
+    opts:[
+      {l:"A",t:"Ask the visitor to wait in the hallway until the official Exhibition start time."},
+      {l:"B",t:"Invite the visitor to sit and observe prep. Give the uncalibrated team 5 minutes for one calibration run. Let the unprepared team do an abbreviated practice with the visitor watching."},
+      {l:"C",t:"Start the Exhibition early — the visitor's presence will motivate the unprepared teams."}
+    ],
+    ok:"B", answer:"B. Invite them in. Adapt.",
+    why:"A wastes a community relationship and creates awkwardness. C strips the unprepared team's agency to protect the schedule. B turns the early arrival into an asset. Watching prep is interesting. The unprepared team practices with a live audience — which is better rehearsal. Adapt to the real situation. Don't protect the plan.",
+    proto:"Fast Finisher Branch + Transition Protocol"
+  },
+  {
+    compound:true,
+    q:"Day 6, Challenge Block. One team finishes the problem set in 10 minutes. Another team's bot stopped responding. A third team is on question 2 and visibly frustrated. You are the only facilitator. What do you do first?",
+    opts:[
+      {l:"A",t:"Fix the bot — without hardware, that team is blocked for the entire match block."},
+      {l:"B",t:"Support the struggling team first — frustration is the early signal for disengagement."},
+      {l:"C",t:"Give the fast team a verbal extension task, ask a student near the broken bot to try rebooting it, give the struggling team one redirect ('Which formula is this asking for?') before rotating."}
+    ],
+    ok:"C", answer:"C. Distribute your attention. Delegate what you can.",
+    why:"A and B each solve one problem while two others deteriorate. C distributes: most students can reboot a disconnected bot — delegate it. The fast team gets depth-checked. The struggling team gets one specific redirect instead of extended support. Set all three in motion. Then rotate back.",
+    proto:"Fast Finisher + Bot Failure + Answer Redirect"
+  },
+  {
+    compound:true,
+    q:"Day 12, Commissioner's Meeting. A team makes a clear math error mid-pitch: 'Speed 8 gives 64% more power than Speed 4' (it's 4× more). Another student looks at you expectantly. Community members are recording. What do you do?",
+    opts:[
+      {l:"A",t:"Correct it immediately — a public math error during a recorded session cannot stand."},
+      {l:"B",t:"Let the pitch finish. When it ends, ask the room: 'Does anyone want to verify any of the math cited?'"},
+      {l:"C",t:"Interrupt mid-pitch: 'Hold on — can someone in the room verify that number?'"}
+    ],
+    ok:"B", answer:"B. Let the pitch finish. Then redirect to the room.",
+    why:"A and C both interrupt — they differ only in degree. Both signal that you are the accuracy authority. B lets the pitch finish, then redirects verification to the room. The error was recorded. That's fine. If it passes a vote on a flawed number, that's a teaching moment in the debrief — not a reason to own the correction during the presentation.",
+    proto:"Over-Scaffolding Stop — Step 2"
+  },
+  // ─── FACILITATOR SELF-AWARENESS ───
+  {
+    fa:true,
+    q:"Day 8, Match Day 2. After two losses, your team is clearly disengaged — not logging predictions, not watching matches, one student is drawing. You feel personally frustrated. You've worked hard on this program. What do you do?",
+    opts:[
+      {l:"A",t:"Express your frustration: 'I need you to be more engaged. This matters.'"},
+      {l:"B",t:"Ignore the feeling. Call the 3-minute reset. Give everyone a dashboard task. Address the drawing student privately afterward."},
+      {l:"C",t:"Stop the activity: 'I'm noticing disengagement. What's going on?'"}
+    ],
+    ok:"B", answer:"B. Your frustration is real. It's also irrelevant.",
+    why:"A makes your emotional state the student's problem. Adolescents who feel they're disappointing adults often disengage more, not less. C might surface something useful but is likely to produce silence or deflection. B bypasses your emotional state and gives everyone something to do. Your frustration is information for you — not a program input.",
+    proto:"Facilitator Self-Check: Your state is the variable."
+  },
+  {
+    fa:true,
+    q:"Day 11. An administrator you don't know well has entered and is observing quietly. A team just made a significant math error in a pitch rehearsal — stated wrong percent change, confidently. You feel the urge to correct it definitively to demonstrate your competence. What do you do?",
+    opts:[
+      {l:"A",t:"Correct the error immediately and clearly — the administrator needs to see that you catch these things."},
+      {l:"B",t:"Ask the team: 'Can anyone in the room verify that calculation?' Let the room find it."},
+      {l:"C",t:"Wait until the administrator leaves, then correct the student privately."}
+    ],
+    ok:"B", answer:"B. Do what you'd do if no one was watching.",
+    why:"The administrator's presence is the variable disrupting your behavior — not the math error. A redirects you toward performance for an observer, which is exactly when facilitation breaks down. C is cowardly and delays learning. B is what you'd do if no one was watching. If your protocol changes when someone is watching, the protocol is fragile.",
+    proto:"Facilitator Self-Check: Observer effect."
+  },
+  {
+    fa:true,
+    q:"Day 7, first match day. You're 25 minutes behind schedule because MakeCode setup took longer than expected. You can't fit all three matches and keep the full loss-recovery protocol. What do you do?",
+    opts:[
+      {l:"A",t:"Cut the loss-recovery protocol and get all three matches in."},
+      {l:"B",t:"Run two matches instead of three and keep full loss-recovery for every loss."},
+      {l:"C",t:"Run all three matches but shorten loss-recovery to 'we'll debrief later.'"}
+    ],
+    ok:"B", answer:"B. Two matches with full recovery. Not three without it.",
+    why:"'We'll debrief later' means it doesn't happen. Loss-recovery on the first match day is the highest-impact intervention in the program. Its absence is a structural failure, not a scheduling inconvenience. Your discomfort with being behind schedule is not a reason to cut the most important protocol.",
+    proto:"Facilitator Self-Check: Schedule pressure drives protocol cuts."
+  },
+  {
+    fa:true,
+    q:"Day 7, post-loss. You've said 'That was frustrating. Real feeling, makes sense.' The team is silent. Fifteen seconds have passed. You feel the silence as failure — like you've handled it wrong. You have an impulse to fill it. What do you do?",
+    opts:[
+      {l:"A",t:"Say something warm to break the silence: 'I know this is hard. We'll figure it out together.'"},
+      {l:"B",t:"Stay quiet. Count to 30. Don't move. Let the silence hold."},
+      {l:"C",t:"Move to the dashboard: 'Let's look at the data' — the task will break the tension."}
+    ],
+    ok:"B", answer:"B. Pause long enough for thinking before stepping in.",
+    why:"Filling it immediately (A) collapses the acknowledgment before it lands. Moving to data (C) makes the protocol feel procedural. B uses the pause as a tool — giving the student time to feel heard before they're asked to think analytically. The discomfort you feel during the pause is real information about you. It is not, by itself, a reason to speak. The pause is not a virtue — it's a strategy. If 30 seconds pass and the student is clearly in distress rather than processing, responding to that distress is appropriate.",
+    proto:"Facilitator Self-Check: Your discomfort with silence is the variable, not the silence itself."
+  },
+  {
+    fa:true,
+    q:"Day 12, Commissioner's Meeting. The program director is watching. One team's proposal is weak — superficial data, unclear equity argument. You know it will probably pass the vote. You feel pressure to intervene so the director doesn't think the program lacks rigor. What do you do?",
+    opts:[
+      {l:"A",t:"Ask clarifying questions during the pitch to strengthen it in real time."},
+      {l:"B",t:"Say nothing during the pitch. Let the vote happen. Note the weak proposal for your debrief."},
+      {l:"C",t:"Redirect the group before the vote: 'Before we vote, does anyone want to suggest a revision?'"}
+    ],
+    ok:"B", answer:"B. Trust the process even when it's being watched.",
+    why:"The director's presence is changing your behavior. That's the problem, not the weak proposal. A intervenes mid-pitch to manage your reputation. C uses the group to avoid looking like you let a weak proposal pass. B trusts the process: a weak proposal that passes becomes a teaching moment when the rule is applied. A program that only works when no one is watching is not a working program.",
+    proto:"Facilitator Self-Check: Audience changes behavior. Notice it."
+  },
+  {
+    fa:true,
+    q:"Day 9, after a third consecutive loss. A student says to you directly: 'This program is stupid. The formulas don't work.' Other students are watching. You feel defensive. What do you do?",
+    opts:[
+      {l:"A",t:"Defend the program: explain that the formulas do work and the problem is the application."},
+      {l:"B",t:"Agree partially: 'You're right that your model isn't predicting correctly. Let's find out why.'"},
+      {l:"C",t:"Redirect firmly: 'That's frustration talking. Open your dashboard.'"}
+    ],
+    ok:"B", answer:"B. Find the truth in the frustration.",
+    why:"The student is right. Their model isn't predicting correctly. 'The formulas don't work' is inaccurate — but 'my formula isn't working' is exactly what the dashboard should show. A defends the program to protect your investment. C is too dismissive. B validates the specific truth in the frustration — which is the opening for the data pivot. Your defensiveness is information about you, not a program input.",
+    proto:"Facilitator Self-Check: Student frustration directed at you is not about you."
+  },
+  {
+    fa:true,
+    q:"Day 10, Open Lab. You notice your highest-functioning student has migrated to another team's table and is suggesting code changes. The other team looks grateful — they're getting unstuck. You feel reluctant to stop something that looks like learning. What is the structural problem and what do you do?",
+    opts:[
+      {l:"A",t:"Let it happen. Collaborative learning is valuable, and stopping it would create friction with both teams."},
+      {l:"B",t:"Address it verbally: 'Hey [student], I need you back at your own team.' Return to circulation."},
+      {l:"C",t:"Return the student to their table without framing it as a correction — 'I need your analyst to complete that calculation first. Back to your team.' Then physically increase the distance between the tables."}
+    ],
+    ok:"C", answer:"C. Physical separation. The table distance is the fix.",
+    why:"A removes the other team's productive struggle — which is where their learning is. The dominant student getting them unstuck means they are not getting themselves unstuck. B is verbal and creates social friction without addressing the cause. C solves the immediate situation and the structural one: if the student can migrate to another team's table, the tables are too close. Your reluctance to stop it is real — it does look like learning. That's the variable disrupting your judgment. Dominant student migration is an architecture problem before it is a behavior problem.",
+    proto:"Participation Balance Architecture — Physical Separation"
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function weekColor(w){return['','var(--w1)','var(--w2)','var(--w3)','var(--w4)'][w];}
+function weekClass(w){return['','w1','w2','w3','w4'][w];}
+
+function buildSidebar(){
+  const sb=document.getElementById('daySidebar');
+  let html='',lastWeek=0;
+  DAYS.forEach(d=>{
+    if(d.week!==lastWeek){html+=`<div class="week-label">${d.wn}</div>`;lastWeek=d.week;}
+    html+=`<button class="day-btn ${weekClass(d.week)}${d.id===1?' active':''}" onclick="showDay(${d.id},this)" id="db-${d.id}">
+      <span class="day-num">DAY ${d.id}</span>${d.title.split(':')[0]||d.title}
+    </button>`;
+  });
+  sb.innerHTML=html;
+}
+
+function showDay(id,btn){
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const d=DAYS.find(x=>x.id===id);
+  if(!d)return;
+  const sH=d.sched.map(s=>`<div class="sched-row">
+    <span class="sched-time">${s.t}</span>
+    <span class="sched-dur">${s.d}</span>
+    <span class="sched-act">${s.a}</span>
+    <span class="sched-tag ${s.ty}">${{hook:'Hook',challenge:'Challenge',match:'Match/Build',lab:'Open Lab',ends:'ENDS',break:'Break'}[s.ty]||s.ty}</span>
+  </div>`).join('');
+  document.getElementById('dayContent').innerHTML=`
+    <div class="day-header">
+      <div class="day-badge" style="background:${weekColor(d.week)}">${d.id}<small>WK${d.week}</small></div>
+      <div class="day-title-block"><div class="day-week-tag">${d.wn}</div><h1>${d.title}</h1></div>
+    </div>
+    <div class="op-grid">
+      <div class="op-card">
+        <div class="op-label"><span class="dot" style="background:#10b981"></span>Today's Goal</div>
+        ${d.goals?`<div class="goals-list">${d.goals.map((g,i)=>`<div class="goal-item"><span class="goal-num">${i+1}</span><span>${g}</span></div>`).join('')}</div>`:`<p>${d.goal}</p>`}
+      </div>
+      <div class="op-card risk">
+        <div class="op-label"><span class="dot"></span>Today's Risk</div>
+        <p>${d.risk.desc}</p>
+        <div class="risk-trigger"><span>Trigger: </span>${d.risk.trigger}</div>
+      </div>
+    </div>
+    <div class="op-grid full" style="margin-bottom:14px">
+      <div class="op-card">
+        <div class="op-label"><span class="dot" style="background:#3b82f6"></span>Say These</div>
+        ${d.phrases.map(p=>`<div class="phrase-item">${p}</div>`).join('')}
+      </div>
+    </div>
+    <div class="op-grid">
+      <div class="op-card">
+        <div class="op-label"><span class="dot" style="background:#f59e0b"></span>Intervention Triggers</div>
+        ${d.triggers.map(t=>`<div class="trigger-item">${t}</div>`).join('')}
+      </div>
+      <div class="op-card">
+        <div class="op-label"><span class="dot" style="background:#6b7280"></span>Schedule</div>
+        ${sH}
+      </div>
+    </div>
+    <div style="margin-top:14px"><div class="op-card">
+      <div class="op-label"><span class="dot" style="background:#8b5cf6"></span>Protocol Reminder</div>
+      <div class="protocol-badge"><span style="font-size:16px">${d.proto.icon}</span>${d.proto.name}</div>
+      <p style="margin-top:8px;font-size:11px;color:var(--light)">See Layer 2 for the full card.</p>
+    </div></div>`;
+}
+
+function buildProtocols(){
+  document.getElementById('protoGrid').innerHTML=PROTOCOLS.map(p=>`
+    <div class="proto-card">
+      <div class="proto-head"><span class="proto-icon">${p.icon}</span><h3>${p.name}</h3></div>
+      <div class="proto-body">
+        <div class="proto-use-when">Use when</div>
+        ${p.useWhen.map(w=>`<div class="proto-use-item">${w}</div>`).join('')}
+        <div class="proto-divider"></div>
+        ${p.steps.map((s,i)=>`<div class="proto-step">
+          <div class="step-num">${i+1}</div>
+          <div><div class="step-text">${s.text}</div>${s.note?`<span class="step-note">${s.note}</span>`:''}</div>
+        </div>`).join('')}
+        <div class="proto-avoid">
+          <div class="proto-avoid-label">Avoid</div>
+          ${p.avoid.map(a=>`<div class="proto-avoid-item">✕ ${a}</div>`).join('')}
+        </div>
+        ${p.calibration?`<div class="proto-calibration"><div class="proto-calibration-label">Calibration Note</div><div class="proto-calibration-text">${p.calibration}</div></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function buildSims(){
+  const c=document.getElementById('simContainer');
+  let html='',compH=false,faH=false;
+  SCENARIOS.forEach((s,i)=>{
+    if(s.compound&&!compH){
+      compH=true;
+      html+=`<div class="sim-section-head">
+        <div class="sh-label">⚡ Compound Scenarios</div>
+        <div class="sh-desc">Multiple simultaneous failures. Reality stacks them. These have a least-bad answer, not a clean one.</div>
+      </div>`;
+    }
+    if(s.fa&&!faH){
+      faH=true;
+      html+=`<div class="sim-section-head">
+        <div class="sh-label">🪞 Facilitator Self-Awareness</div>
+        <div class="sh-desc">You are often the unstable variable. These scenarios train you to recognize your own emotional state as a driver of bad decisions.</div>
+      </div>`;
+    }
+    html+=`<div class="sim-card">
+      <div class="sim-top">
+        <div class="sim-q-label">
+          <div class="sim-num">${i+1}</div>
+          Scenario ${i+1} of ${SCENARIOS.length}
+          ${s.compound?'<span class="compound-tag">Compound</span>':''}
+          ${s.fa?'<span class="fa-tag">Self-Awareness</span>':''}
+        </div>
+        <div class="sim-q">${s.q}</div>
+        <div class="sim-opts" id="opts-${i}">
+          ${s.opts.map(o=>`<div class="sim-opt" id="opt-${i}-${o.l}" onclick="pick(event,${i},'${o.l}')">
+            <span class="opt-l">${o.l}.</span><span>${o.t}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="sim-hint">Click an option to reveal ↓</div>
+      <div class="sim-reveal" id="rev-${i}">
+        <div class="rev-label">Correct: ${s.ok}</div>
+        <div class="rev-answer">${s.answer}</div>
+        <div class="rev-why">${s.why}</div>
+        <div class="rev-proto">Protocol: ${s.proto}</div>
+      </div>
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+function pick(e,i,l){
+  e.stopPropagation();
+  const s=SCENARIOS[i];
+  document.querySelectorAll(`[id^="opt-${i}-"]`).forEach(o=>{
+    o.classList.remove('sel-ok','sel-bad','rev-ok');
+  });
+  document.getElementById(`opt-${i}-${l}`).classList.add(l===s.ok?'sel-ok':'sel-bad');
+  if(l!==s.ok)document.getElementById(`opt-${i}-${s.ok}`).classList.add('rev-ok');
+  document.getElementById(`rev-${i}`).classList.add('open');
+}
+
+function showLayer(n,btn){
+  document.querySelectorAll('.layer-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.layer-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`layer${n}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+buildSidebar();
+showDay(1,document.getElementById('db-1'));
+buildProtocols();
+buildSims();
+</script>
+</body>
+</html>
