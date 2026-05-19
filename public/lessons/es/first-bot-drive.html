@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Día 1 — Primer manejo del bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d1b2a;
+  --surface:  #132033;
+  --card:     #1a2d45;
+  --border:   #2a4060;
+  --cyan:     #00e5ff;
+  --yellow:   #ffd600;
+  --green:    #00e676;
+  --red:      #ff5252;
+  --orange:   #ff9100;
+  --purple:   #ce93d8;
+  --text:     #e8f0fe;
+  --muted:    #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── ENCABEZADO ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #132d4a 100%);
+  border-bottom: 2px solid var(--cyan);
+  padding: 20px 24px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 860px; margin: 0 auto;
+}
+.day-badge {
+  background: var(--cyan); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+}
+.lesson-title { font-size: 20px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ── PROGRESO ────────────────────────────── */
+.progress-wrap { max-width: 860px; margin: 12px auto 0; }
+.progress-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--cyan); border-radius: 4px; transition: width 0.5s ease; width: 12.5%; }
+.progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.prog-tab {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color 0.2s;
+}
+.prog-tab.active { color: var(--cyan); }
+.prog-tab.done   { color: var(--green); }
+
+/* ── SECCIONES ────────────────────────────── */
+.section { display: none; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+.section.active { display: block; }
+
+/* ── TARJETAS ───────────────────────────────── */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 14px;
+}
+
+/* ── ENCABEZADO DE SECCIÓN ──────────────────────── */
+.sec-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.sec-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sec-icon.cyan   { background: rgba(0,229,255,.15); border: 2px solid var(--cyan); }
+.sec-icon.yellow { background: rgba(255,214,0,.12);  border: 2px solid var(--yellow); }
+.sec-icon.green  { background: rgba(0,230,118,.12);  border: 2px solid var(--green); }
+.sec-icon.orange { background: rgba(255,145,0,.12);  border: 2px solid var(--orange); }
+.sec-title    { font-size: 22px; font-weight: 800; }
+.sec-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+/* ── TABLERO DE FÓRMULA ───────────────────────── */
+.formula-board {
+  background: linear-gradient(135deg, #0a2540 0%, #0d3360 100%);
+  border: 2px solid var(--cyan); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-bottom: 20px;
+}
+.formula-label { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.formula-main  { font-size: 26px; font-weight: 800; color: #fff; line-height: 1.5; }
+.formula-eq    { color: var(--cyan); }
+.formula-note  { font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+/* ── VOCABULARIO ───────────────────────────────── */
+.vocab-box {
+  background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.3);
+  border-left: 4px solid var(--cyan); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 20px;
+}
+.vocab-title { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.vocab-row   { display: flex; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.vocab-word  { font-weight: 700; color: var(--yellow); min-width: 130px; font-size: 14px; }
+.vocab-def   { font-size: 13px; color: var(--text); }
+
+/* ── DESLIZADOR ──────────────────────────────── */
+.slider-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+.slider-label { font-size: 13px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+.slider-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.slider-row label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+input[type=range] {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 4px; background: var(--border); outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--cyan); cursor: pointer; box-shadow: 0 0 8px var(--cyan);
+}
+.slider-value { min-width: 40px; text-align: center; font-size: 22px; font-weight: 800; color: var(--yellow); }
+
+.power-display { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+.power-stat {
+  flex: 1; min-width: 100px; background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px; text-align: center;
+}
+.power-stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.power-stat-val   { font-size: 28px; font-weight: 800; }
+.power-stat.pts .power-stat-val { color: var(--yellow); }
+.power-stat.pct .power-stat-val { color: var(--cyan); }
+
+.power-bar-track { height: 18px; background: var(--border); border-radius: 10px; overflow: hidden; margin-top: 16px; }
+.power-bar-fill  {
+  height: 100%; background: linear-gradient(90deg, #0080c0, var(--cyan));
+  border-radius: 10px; transition: width 0.35s ease;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 0;
+}
+.power-bar-fill span { font-size: 11px; font-weight: 700; color: #000; }
+.slider-insight { font-size: 13px; color: var(--muted); margin-top: 12px; min-height: 20px; }
+
+/* ── PSEUDOCÓDIGO ─────────────────────────── */
+.pseudo-card {
+  background: #060f1a; border: 1px solid var(--border);
+  border-left: 4px solid var(--orange); border-radius: 10px;
+  padding: 16px 20px; font-family: monospace; font-size: 13px;
+  color: var(--text); margin-bottom: 16px; line-height: 2.1;
+}
+.pc { color: var(--muted); }
+.pk { color: var(--orange); }
+.pv { color: var(--yellow); }
+.pf { color: var(--cyan); }
+
+/* ── PASOS ───────────────────────────────────── */
+.step-list { list-style: none; }
+.step-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,229,255,.15); border: 2px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--cyan); flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+.step-text strong { color: var(--yellow); }
+.step-text code {
+  background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3);
+  padding: 1px 6px; border-radius: 4px; font-family: monospace;
+  color: var(--cyan); font-size: 13px;
+}
+
+/* ── TABLA DE DATOS ──────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.data-table th {
+  background: rgba(0,229,255,.1); border: 1px solid var(--border);
+  padding: 10px 12px; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--cyan); text-align: center;
+}
+.data-table td {
+  border: 1px solid var(--border); padding: 10px 12px;
+  font-size: 14px; text-align: center; vertical-align: middle;
+}
+.auto-cell { color: var(--cyan); font-weight: 700; background: rgba(0,229,255,.07) !important; }
+
+input[type=number] {
+  background: #0d1b2a; border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; color: var(--text); font-family: 'Inter',sans-serif;
+  font-size: 14px; width: 90px; outline: none; text-align: center; transition: border-color 0.2s;
+}
+input[type=number]:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,229,255,.15); }
+
+/* ── BARRAS DE COMPARACIÓN ────────────────────────── */
+.compare-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 20px;
+}
+.compare-title { font-size: 13px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+.compare-row { display: flex; gap: 12px; margin-bottom: 10px; align-items: center; }
+.compare-run { min-width: 54px; font-size: 13px; font-weight: 700; color: var(--yellow); }
+.compare-bar-wrap { flex: 1; }
+.compare-bar-track { height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; }
+.compare-bar-fill {
+  height: 100%; border-radius: 6px; transition: width 0.5s ease;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 0;
+}
+.r1 { background: linear-gradient(90deg, #005078, var(--cyan)); }
+.r2 { background: linear-gradient(90deg, #007800, var(--green)); }
+.compare-pct { font-size: 11px; font-weight: 700; color: #000; white-space: nowrap; }
+.compare-label { min-width: 54px; font-size: 13px; color: var(--text); font-weight: 600; text-align: right; }
+
+/* ── CUADRÍCULA DE RAZÓN ──────────────────────────── */
+.ratio-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;
+}
+.ratio-cell {
+  background: #0d1b2a; border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; text-align: center;
+}
+.ratio-cell-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.ratio-cell-val   { font-size: 26px; font-weight: 800; }
+.rc1 .ratio-cell-val { color: var(--cyan); }
+.rc2 .ratio-cell-val { color: var(--green); }
+.rct .ratio-cell-val { color: var(--yellow); }
+
+/* ── CUADRO DE AFIRMACIÓN ───────────────────────── */
+.claim-box {
+  background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.35);
+  border-left: 4px solid var(--yellow); border-radius: 10px;
+  padding: 16px 20px; margin-bottom: 20px;
+}
+.claim-label { font-size: 12px; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.claim-text  { font-size: 15px; color: var(--text); line-height: 1.8; }
+.claim-blank { color: var(--cyan); font-weight: 700; }
+
+/* ── OPCIONES ──────────────────────────────────────── */
+.choice-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.choice-btn {
+  flex: 1; min-width: 130px; padding: 12px 16px;
+  background: #0d1b2a; border: 2px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.choice-btn:hover       { border-color: var(--cyan); color: var(--cyan); }
+.choice-btn.sel-yes     { border-color: var(--green); background: rgba(0,230,118,.1); color: var(--green); }
+.choice-btn.sel-no      { border-color: var(--red);   background: rgba(255,82,82,.1);  color: var(--red); }
+.choice-btn.sel-close   { border-color: var(--orange); background: rgba(255,145,0,.1); color: var(--orange); }
+.choice-response {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; margin-top: 14px; font-size: 14px; line-height: 1.7; display: none;
+}
+.choice-response.show { display: block; }
+.choice-response.yes  { border-left: 4px solid var(--green); }
+.choice-response.no   { border-left: 4px solid var(--red); }
+.choice-response.close { border-left: 4px solid var(--orange); }
+
+/* ── REFLEXIÓN ─────────────────────────── */
+.reflect-q { margin-bottom: 24px; }
+.reflect-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+.reflect-frame {
+  font-size: 12px; color: var(--muted); font-style: italic;
+  background: rgba(255,255,255,.04); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px;
+}
+textarea {
+  width: 100%; background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px;
+  resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,229,255,.15); }
+
+/* ── AVISO / PISTA ───────────────────── */
+.notice {
+  background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.notice strong { color: var(--yellow); }
+.hint-pill {
+  display: inline-block; background: rgba(255,145,0,.12);
+  border: 1px solid rgba(255,145,0,.4); border-radius: 20px;
+  padding: 5px 14px; font-size: 12px; color: var(--orange);
+  font-weight: 600; margin-top: 10px; cursor: pointer;
+}
+.hint-text {
+  background: rgba(255,145,0,.08); border: 1px solid rgba(255,145,0,.3);
+  border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+  font-size: 13px; color: var(--text); display: none; line-height: 1.6;
+}
+.hint-text.show { display: block; }
+
+/* ── FELICITACIONES ────────────────────────────── */
+.congrats-box {
+  background: linear-gradient(135deg, #0a2e1a 0%, #0d3320 100%);
+  border: 2px solid var(--green); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-top: 24px; display: none;
+}
+.congrats-box.show { display: block; }
+.congrats-icon  { font-size: 40px; margin-bottom: 12px; }
+.congrats-title { font-size: 20px; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+.congrats-body  { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+/* ── BOTÓN SIGUIENTE ────────────────────────────── */
+.btn-next {
+  display: block; margin: 28px auto 0;
+  background: var(--cyan); color: #000;
+  font-family: 'Inter',sans-serif; font-weight: 800; font-size: 15px;
+  padding: 14px 36px; border: none; border-radius: 10px;
+  cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+}
+.btn-next:hover { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .power-display { flex-direction: column; }
+  .ratio-grid    { grid-template-columns: 1fr 1fr; }
+  .formula-main  { font-size: 18px; }
+}
+
+/* ── BLOQUES MAKECODE ─────────────────────────────── */
+.blocks-render-area {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  overflow-x: auto;
+  min-height: 80px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.blocks-render-area img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+.blocks-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+}
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid #ddd;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+pre.blocks { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ── ENCABEZADO ───────────────────────────────────────────────── -->
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <span class="day-badge">Día 1</span>
+      <div class="lesson-title" style="margin-top:6px;">Primer manejo del bot</div>
+      <div class="lesson-sub">Stat Speed → % de potencia del motor → Distancia</div>
+    </div>
+    <!-- Ícono de robot -->
+    <svg viewBox="0 0 52 52" width="52" height="52" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <rect width="52" height="52" rx="12" fill="rgba(0,229,255,0.08)"/>
+      <line x1="26" y1="6" x2="26" y2="12" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="26" cy="5" r="2" fill="#00e5ff"/>
+      <rect x="12" y="12" width="28" height="20" rx="5" fill="#0d2a3d" stroke="#00e5ff" stroke-width="1.8"/>
+      <rect x="17" y="18" width="6" height="6" rx="2" fill="#00e5ff" opacity="0.9"/>
+      <rect x="29" y="18" width="6" height="6" rx="2" fill="#00e5ff" opacity="0.9"/>
+      <rect x="19" y="27" width="14" height="2.5" rx="1.25" fill="#00e5ff" opacity="0.5"/>
+      <rect x="16" y="34" width="20" height="10" rx="4" fill="#0d2a3d" stroke="#00e5ff" stroke-width="1.8"/>
+      <circle cx="26" cy="39" r="2.5" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+      <rect x="7" y="35" width="7" height="4" rx="2" fill="#00e5ff" opacity="0.6"/>
+      <rect x="38" y="35" width="7" height="4" rx="2" fill="#00e5ff" opacity="0.6"/>
+      <rect x="17" y="45" width="6" height="4" rx="2" fill="#00e5ff" opacity="0.7"/>
+      <rect x="29" y="45" width="6" height="4" rx="2" fill="#00e5ff" opacity="0.7"/>
+    </svg>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progFill"></div>
+    </div>
+    <div class="progress-labels">
+      <span class="prog-tab active" id="pt0" onclick="goSection(0)">1 · Fórmula</span>
+      <span class="prog-tab"        id="pt1" onclick="goSection(1)">2 · Programa</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECCIÓN 1 — LA FÓRMULA
+══════════════════════════════════════════════════════════════ -->
+<section class="section active" id="sec0">
+
+  <div class="sec-header">
+    <div class="sec-icon cyan"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M9 7V4M12 7V4M15 7V4M9 17v3M12 17v3M15 17v3M7 9H4M7 12H4M7 15H4M17 9h3M17 12h3M17 15h3"/></svg></div>
+    <div>
+      <div class="sec-title">La fórmula de Speed</div>
+      <div class="sec-subtitle">Haz tu predicción antes de ver cualquier dato</div>
+    </div>
+  </div>
+
+  <!-- ── FASE 1: Bloqueo de predicción ─────────────────────────────── -->
+  <div id="p0-pred">
+    <div class="card" style="border:2px solid rgba(255,214,0,.5);">
+      <div class="card-title" style="color:var(--yellow);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+        Antes de la fórmula
+      </div>
+      <p style="font-size:14px; color:var(--text); line-height:1.7;">Un bot avanza en línea recta durante 2 segundos a <strong style="color:var(--cyan);">Speed = 4</strong>. Un bot idéntico en la misma superficie avanza durante 2 segundos a <strong style="color:var(--cyan);">Speed = 8</strong>.</p>
+      <p style="font-size:15px; font-weight:700; color:var(--text); margin-top:14px;">¿Qué pasará con la distancia?</p>
+      <div class="choice-row" style="margin-top:12px;">
+        <button class="choice-btn" id="pb-less"   onclick="selectPred('less',this)">Menos del doble</button>
+        <button class="choice-btn" id="pb-double" onclick="selectPred('double',this)">Exactamente el doble</button>
+        <button class="choice-btn" id="pb-more"   onclick="selectPred('more',this)">Más del doble</button>
+      </div>
+      <div style="margin-top:18px;">
+        <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px;">¿Por qué crees eso?</div>
+        <textarea id="pred-why" placeholder="Explica tu razonamiento antes de ver los datos…" oninput="checkPredReady()" style="min-height:80px;"></textarea>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="pred-why-count">0 / 15 caracteres necesarios para bloquear</div>
+      </div>
+      <button onclick="lockPred()" id="pred-lock-btn" disabled
+        style="display:block; margin-top:18px; background:var(--yellow); color:#000; font-family:'Inter',sans-serif; font-weight:800; font-size:14px; padding:11px 28px; border:none; border-radius:8px; cursor:pointer; opacity:.4; transition:opacity .2s;">
+        Bloquear mi predicción →
+      </button>
+    </div>
+  </div>
+
+  <!-- Cartel de predicción bloqueada -->
+  <div id="p0-pred-banner" style="display:none; background:rgba(255,214,0,.08); border:1px solid rgba(255,214,0,.35); border-radius:10px; padding:10px 16px; margin-bottom:4px; display:none; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+    <span style="font-size:13px; color:var(--text);">Tu predicción: <strong style="color:var(--yellow);" id="pred-banner-text">—</strong></span>
+    <span style="font-size:11px; font-weight:700; color:var(--yellow); letter-spacing:.05em;">🔒 BLOQUEADO</span>
+  </div>
+
+  <!-- ── FASE 2: Fórmula + simplificación ────────────────────── -->
+  <div id="p0-formula" style="display:none;">
+
+    <div class="formula-board">
+      <div class="formula-label">La fórmula</div>
+      <div class="formula-main">
+        % Potencia del motor <span class="formula-eq">=</span>
+        Speed <span class="formula-eq">&times;</span> 100 <span class="formula-eq">&divide;</span> 20
+      </div>
+    </div>
+
+    <div class="vocab-box">
+      <div class="vocab-title"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Palabras clave</div>
+      <div class="vocab-row">
+        <span class="vocab-word">% Potencia del motor</span>
+        <span class="vocab-def">Qué tan fuerte trabajan los motores — como un acelerador de 0% a 100%</span>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-word">Puntos de Speed</span>
+        <span class="vocab-def">El número que asignas al stat Speed de tu bot (0–20)</span>
+      </div>
+      <div class="vocab-row">
+        <span class="vocab-word">Variable</span>
+        <span class="vocab-def">Una caja con nombre que almacena un número — como escribir "SPEED = 8" en una nota adhesiva</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(0,230,118,.4);">
+      <div class="card-title" style="color:var(--green);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Simplifícala
+      </div>
+      <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:14px;">La fórmula <code style="background:rgba(0,229,255,.1);padding:2px 6px;border-radius:4px;color:var(--cyan);">Speed × 100 ÷ 20</code> se reduce a una forma más simple. Completa la ecuación:</p>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:16px; font-weight:700; color:var(--text);">% Potencia del motor = Speed ×</span>
+        <input type="number" id="simplify-input" placeholder="?" min="1" max="99"
+          style="width:72px; background:#0d1b2a; border:2px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:18px; font-weight:800; text-align:center; outline:none; transition:border-color .2s;"
+          oninput="checkSimplify()"/>
+        <span id="simplify-icon" style="font-size:1.1rem;"></span>
+      </div>
+      <div id="simplify-hint" style="margin-top:10px; font-size:13px; color:var(--muted);"></div>
+    </div>
+
+  </div>
+
+  <!-- ── FASE 3: Cálculo manual ──────────────────────────────── -->
+  <div id="p0-compute" style="display:none;">
+
+    <div class="card" style="border-color:rgba(255,145,0,.4);">
+      <div class="card-title" style="color:var(--orange);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/></svg>
+        Calcula sin herramientas
+      </div>
+      <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:18px;">Sin deslizador. Sin calculadora. Usa la fórmula que acabas de encontrar.</p>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:160px; background:#0d1b2a; border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center;">
+          <div style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Problema 1</div>
+          <div style="font-size:16px; font-weight:700; color:var(--cyan); margin-bottom:4px;">Speed = 7</div>
+          <div style="font-size:13px; color:var(--muted); margin-bottom:12px;">Potencia del motor = 7 × 5 = ?</div>
+          <input type="number" id="calc-7" placeholder="?" min="0" max="100"
+            style="width:80px; background:var(--card); border:2px solid var(--border); border-radius:8px; padding:8px; color:var(--text); font-size:20px; font-weight:800; text-align:center; outline:none; transition:border-color .2s;"
+            oninput="checkCalcs()"/>
+          <div style="font-size:11px; margin-top:6px; min-height:18px;" id="calc-7-fb"></div>
+        </div>
+        <div style="flex:1; min-width:160px; background:#0d1b2a; border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center;">
+          <div style="font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Problema 2</div>
+          <div style="font-size:16px; font-weight:700; color:var(--cyan); margin-bottom:4px;">Speed = 13</div>
+          <div style="font-size:13px; color:var(--muted); margin-bottom:12px;">Potencia del motor = 13 × 5 = ?</div>
+          <input type="number" id="calc-13" placeholder="?" min="0" max="100"
+            style="width:80px; background:var(--card); border:2px solid var(--border); border-radius:8px; padding:8px; color:var(--text); font-size:20px; font-weight:800; text-align:center; outline:none; transition:border-color .2s;"
+            oninput="checkCalcs()"/>
+          <div style="font-size:11px; margin-top:6px; min-height:18px;" id="calc-13-fb"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── FASE 4: Verificación con deslizador + gráfica ──────────────────── -->
+  <div id="p0-verify" style="display:none;">
+
+    <div class="slider-card">
+      <div class="slider-label">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="14" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="8" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="16" cy="18" r="2"/></svg>
+        Verifica la fórmula — primero una predicción
+      </div>
+
+      <!-- Puerta de predicción del deslizador -->
+      <div id="slider-pred-wrap" style="background:rgba(0,229,255,.05); border:1px solid rgba(0,229,255,.2); border-radius:10px; padding:14px 18px; margin-bottom:18px;">
+        <p style="font-size:14px; color:var(--text); font-weight:600; margin-bottom:10px;">Antes de activar el deslizador: Speed = 14. ¿Cuál es la potencia del motor?</p>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input type="number" id="slider-pred" placeholder="?" min="0" max="100"
+            style="width:80px; background:#0d1b2a; border:2px solid var(--border); border-radius:8px; padding:8px; color:var(--text); font-size:18px; font-weight:800; text-align:center; outline:none; transition:border-color .2s;"
+            oninput="checkSliderPred()"/>
+          <span style="font-size:16px; color:var(--muted);">%</span>
+          <span id="slider-pred-icon" style="font-size:1.1rem;"></span>
+        </div>
+        <div id="slider-pred-hint" style="font-size:12px; color:var(--muted); margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deslizador + gráfica + observación (se revelan al ingresar 70) -->
+  <div id="p0-verify-rest" style="display:none;">
+    <div style="display:flex; gap:20px; align-items:stretch; flex-wrap:wrap;">
+      <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+        <div class="slider-card" style="flex:1;">
+          <div id="slider-main" style="opacity:.25; pointer-events:none; transition:opacity .3s;">
+            <div class="power-display">
+              <div class="power-stat pts">
+                <div class="power-stat-label">Puntos de Speed</div>
+                <div class="power-stat-val" id="dispPts">10</div>
+              </div>
+              <div style="display:flex; align-items:center; padding:0 4px; font-size:20px; color:var(--muted);">× 5 =</div>
+              <div class="power-stat pct">
+                <div class="power-stat-label">Potencia del motor</div>
+                <div class="power-stat-val" id="dispPct">50%</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;">
+              <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">Potencia del motor</div>
+              <div class="power-bar-track">
+                <div class="power-bar-fill" id="powerBar" style="width:50%;"><span id="powerBarLabel">50%</span></div>
+              </div>
+              <div class="slider-row">
+                <label>Puntos de Speed:</label>
+                <input type="range" min="1" max="20" value="10" id="speedSlider" oninput="updateSlider()">
+                <div class="slider-value" id="sliderVal">10</div>
+              </div>
+            </div>
+            <div class="slider-insight" id="sliderInsight"></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1; min-width:280px; display:flex; flex-direction:column;">
+        <div class="card" style="flex:1;">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+            Puntos de Speed → % Potencia del motor
+          </div>
+          <div style="text-align:center; overflow-x:auto;">
+            <svg id="linearChart" viewBox="0 0 520 290" width="100%" style="max-width:520px; display:inline-block;">
+              <line x1="64" y1="20" x2="64" y2="250" stroke="#2a4060" stroke-width="2"/>
+              <line x1="64" y1="250" x2="496" y2="250" stroke="#2a4060" stroke-width="2"/>
+              <text x="56" y="254" fill="#7a9cc0" font-size="11" text-anchor="end">0%</text>
+              <text x="56" y="202" fill="#7a9cc0" font-size="11" text-anchor="end">25%</text>
+              <line x1="64" y1="198" x2="496" y2="198" stroke="#1e3050" stroke-width="1" stroke-dasharray="4,4"/>
+              <text x="56" y="150" fill="#7a9cc0" font-size="11" text-anchor="end">50%</text>
+              <line x1="64" y1="146" x2="496" y2="146" stroke="#1e3050" stroke-width="1" stroke-dasharray="4,4"/>
+              <text x="56" y="98" fill="#7a9cc0" font-size="11" text-anchor="end">75%</text>
+              <line x1="64" y1="94" x2="496" y2="94" stroke="#1e3050" stroke-width="1" stroke-dasharray="4,4"/>
+              <text x="56" y="46" fill="#7a9cc0" font-size="11" text-anchor="end">100%</text>
+              <line x1="64" y1="42" x2="496" y2="42" stroke="#1e3050" stroke-width="1" stroke-dasharray="4,4"/>
+              <text x="64"  y="266" fill="#7a9cc0" font-size="11" text-anchor="middle">0</text>
+              <text x="172" y="266" fill="#7a9cc0" font-size="11" text-anchor="middle">5</text>
+              <text x="280" y="266" fill="#7a9cc0" font-size="11" text-anchor="middle">10</text>
+              <text x="388" y="266" fill="#7a9cc0" font-size="11" text-anchor="middle">15</text>
+              <text x="496" y="266" fill="#7a9cc0" font-size="11" text-anchor="middle">20</text>
+              <text x="280" y="283" fill="#7a9cc0" font-size="12" text-anchor="middle">Puntos de Speed</text>
+              <text x="14"  y="146" fill="#7a9cc0" font-size="12" text-anchor="middle" transform="rotate(-90,14,146)">% Potencia del motor</text>
+              <line x1="64" y1="250" x2="496" y2="42" stroke="#00e5ff" stroke-width="3"/>
+              <circle cx="215" cy="177" r="7" fill="#ffd600" opacity="0.9"/>
+              <text x="215" y="169" fill="#ffd600" font-size="11" text-anchor="middle" font-weight="700">S=7 · 35%</text>
+              <line x1="215" y1="177" x2="215" y2="250" stroke="#ffd600" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+              <circle cx="345" cy="115" r="7" fill="#00e676" opacity="0.9"/>
+              <text x="345" y="107" fill="#00e676" font-size="11" text-anchor="middle" font-weight="700">S=13 · 65%</text>
+              <line x1="345" y1="115" x2="345" y2="250" stroke="#00e676" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+              <circle id="liveDot" cx="280" cy="146" r="9" fill="none" stroke="#00e5ff" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <div style="font-size:12px; color:var(--muted); text-align:center; font-style:italic; margin-top:8px;">Tus dos valores calculados están marcados. La línea es lo que predice la fórmula para cada Speed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Puerta de observación -->
+    <div class="card" style="border-color:rgba(0,230,118,.4);">
+      <div class="card-title" style="color:var(--green);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        ¿Qué observas?
+      </div>
+      <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:10px;">Mira tus dos puntos calculados y la gráfica. Describe en una oración la relación entre Speed y Potencia del motor.</p>
+      <textarea id="obs-text" placeholder="Describe lo que notas sobre el patrón…" oninput="checkObs()" style="min-height:80px;"></textarea>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="obs-count">0 / 15 caracteres necesarios</div>
+    </div>
+
+    <button class="btn-next" id="p0-next-btn" onclick="goSection(1)" style="opacity:.35; pointer-events:none;">
+      Siguiente — Diseña tu prueba &rarr;
+    </button>
+
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECCIÓN 2 — PROGRAMA Y EJECUTA TU PRUEBA
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec1">
+
+  <div class="sec-header">
+    <div class="sec-icon yellow"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffd600" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M3 18h18v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1z"/></svg></div>
+    <div>
+      <div class="sec-title">Programa y ejecuta tu prueba</div>
+      <div class="sec-subtitle">Usa el programa prefabricado, ejecuta la prueba y ve cómo está construido</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- RUTA PREFABRICADA                                              -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="premade-path" style="display:none;">
+
+    <!-- Video intro prefabricado -->
+    <div class="card" style="border-color:rgba(114,72,184,.5); padding:16px;">
+      <div class="card-title" style="color:#b48aff;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Mira el video — luego elige tus velocidades y descarga
+      </div>
+      <div style="position:relative; width:100%; padding-top:56.25%; border-radius:10px; overflow:hidden; background:#000;">
+        <iframe src="https://www.youtube.com/embed/nHRwuZSd6HQ" title="Tutorial del programa prefabricado" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:10px;">Este video muestra el programa prefabricado — cómo abrirlo, qué cambiar y cómo funciona el Botón B.</p>
+    </div>
+
+    <!-- Contenido MakeCode -->
+    <div id="premade-makecode-section" style="display:block;">
+
+      <!-- Enlace para abrir -->
+      <div class="card" style="border-color:rgba(114,72,184,.4);">
+        <div class="card-title" style="color:#b48aff;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Paso 2 — Abre el programa en MakeCode
+        </div>
+        <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:14px;">Haz clic abajo. Cuando se abra, haz clic en <strong>Editar</strong> si se te pide. Asegúrate de estar en la vista de <strong>Bloques</strong>, no en JavaScript.</p>
+        <div style="text-align:center;">
+          <a href="https://makecode.microbit.org/S57517-06163-23657-62024" target="_blank" rel="noopener"
+            style="display:inline-flex; align-items:center; gap:8px; background:#7248b8; color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:15px; padding:13px 26px; border-radius:10px; text-decoration:none;"
+            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Abrir prueba de Speed en MakeCode
+          </a>
+        </div>
+      </div>
+
+      <!-- Bloque on start — qué cambiar -->
+      <div class="card" style="border:2px solid rgba(220,20,60,.5);">
+        <div class="card-title" style="color:#dc143c;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Paso 3 — Encuentra el bloque on start y cambia dos números
+        </div>
+        <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:16px;">El bloque <strong style="color:#4C97FF;">on start</strong> está en el espacio de trabajo. Tiene dos <strong style="color:#dc143c;">0</strong>s — haz clic en cada uno y cámbialo.</p>
+        <div style="display:inline-block; background:#1a1a2e; border-radius:10px; padding:14px 18px; border:1px solid rgba(76,151,255,.3); margin-bottom:18px;">
+          <div style="background:#4C97FF; border-radius:8px 8px 0 0; padding:7px 14px; font-size:13px; font-weight:700; color:white; font-family:'Inter',sans-serif; min-width:280px;">on start</div>
+          <div style="background:#4C97FF99; padding:10px 10px 10px 18px; border-radius:0 0 8px 8px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; background:#4C97FF44; border-radius:6px; padding:7px 12px; flex-wrap:wrap;">
+              <span style="font-size:12px; color:white; font-weight:600;">set</span>
+              <span style="background:#dc143c; border-radius:12px; padding:4px 10px; font-size:12px; color:white; font-weight:700; font-family:monospace;">TEST_DURATION_MS</span>
+              <span style="font-size:12px; color:white;">to</span>
+              <span style="background:white; border-radius:12px; padding:4px 14px; font-size:14px; color:#c0392b; font-weight:900; border:2px solid #dc143c;">0</span>
+              <span style="background:rgba(255,214,0,.2); border:1px solid var(--yellow); border-radius:6px; padding:3px 8px; font-size:11px; color:var(--yellow); font-weight:700;">&#8592; cámbialo a 2000</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; background:#4C97FF44; border-radius:6px; padding:7px 12px; flex-wrap:wrap;">
+              <span style="font-size:12px; color:white; font-weight:600;">set</span>
+              <span style="background:#dc143c; border-radius:12px; padding:4px 10px; font-size:12px; color:white; font-weight:700; font-family:monospace;">SPEED</span>
+              <span style="font-size:12px; color:white;">to</span>
+              <span style="background:white; border-radius:12px; padding:4px 14px; font-size:14px; color:#c0392b; font-weight:900; border:2px solid #dc143c;">0</span>
+              <span style="background:rgba(255,214,0,.2); border:1px solid var(--yellow); border-radius:6px; padding:3px 8px; font-size:11px; color:var(--yellow); font-weight:700;">&#8592; cámbialo a 1</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:180px; background:#0d1b2a; border:2px solid rgba(0,230,118,.4); border-radius:10px; padding:12px 14px;">
+            <div style="font-size:11px; color:var(--green); font-weight:700; text-transform:uppercase; margin-bottom:6px;">TEST_DURATION_MS → 2000</div>
+            <div style="font-size:13px; color:var(--text); line-height:1.6;">2000 milisegundos = 2 segundos de manejo por carrera.</div>
+          </div>
+          <div style="flex:1; min-width:180px; background:#0d1b2a; border:2px solid rgba(0,229,255,.4); border-radius:10px; padding:12px 14px;">
+            <div style="font-size:11px; color:var(--cyan); font-weight:700; text-transform:uppercase; margin-bottom:6px;">SPEED → 1</div>
+            <div style="font-size:13px; color:var(--text); line-height:1.6;">Empieza en 1. Presiona el Botón B para subir hasta tus velocidades elegidas sin volver a cargar el programa.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recorrido por los bloques -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Paso 4 — Qué hacen los bloques (no los cambies)
+        </div>
+        <p style="font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px;">El resto del programa ya está construido. Esto es lo que hace cada grupo de bloques.</p>
+
+        <!-- on button A pressed -->
+        <div style="margin-bottom:28px;">
+          <div style="font-size:12px; font-weight:700; color:#c701c7; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">on button A pressed — Ejecutar un manejo cronometrado</div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let SPEED = 1
+let TEST_DURATION_MS = 2000
+let currentPower = 0
+let running = false
+let testStart = 0
+input.onButtonPressed(Button.A, function () {
+    currentPower = SPEED * 100 / 20
+    basic.showNumber(SPEED)
+    basic.pause(800)
+    basic.plotBarGraph(currentPower, 100)
+    basic.pause(800)
+    basic.clearScreen()
+    basic.pause(500)
+    running = true
+    testStart = input.runningTime()
+    CutebotPro.motorRun(CutebotProMotors.ALL, CutebotProDir.Forward, currentPower)
+    while (running && input.runningTime() - testStart < TEST_DURATION_MS) {
+        CutebotPro.motorRun(CutebotProMotors.ALL, CutebotProDir.Forward, currentPower)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    running = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; margin-top:10px;">
+            <div style="background:#0d1b2a; border-left:3px solid #dc143c; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#dc143c;">Fórmula.</strong> SPEED &times; 5 convierte tu stat en % de potencia del motor.</div>
+            <div style="background:#0d1b2a; border-left:3px solid #4C97FF; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#4C97FF;">Mostrar y previsualizar.</strong> Ves el número de SPEED desplazarse, luego una barra de potencia antes de que el bot se mueva.</div>
+            <div style="background:#0d1b2a; border-left:3px solid #5BA55B; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#5BA55B;">Bucle while.</strong> Mantiene los motores funcionando hasta que pasa TEST_DURATION_MS (2000ms). A+B lo interrumpe antes.</div>
+            <div style="background:#0d1b2a; border-left:3px solid #1d9f1d; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#1d9f1d;">Parar + X.</strong> Corta la potencia y muestra X. Esa X es tu señal para medir.</div>
+          </div>
+        </div>
+
+        <!-- on button B pressed -->
+        <div style="margin-bottom:28px;">
+          <div style="font-size:12px; font-weight:700; color:#c701c7; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">on button B pressed — Cambiar la velocidad sin recargar el programa</div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let SPEED = 1
+input.onButtonPressed(Button.B, function () {
+    if (SPEED >= 20) {
+        SPEED = 1
+    } else {
+        SPEED += 1
+    }
+    basic.showNumber(SPEED)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; margin-top:10px;">
+            <div style="background:#0d1b2a; border-left:3px solid #5cb1d6; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#5cb1d6;">Ciclo con reinicio.</strong> Suma 1 cada vez que se presiona. Al llegar a 20, vuelve a 1 — nunca sale del rango.</div>
+            <div style="background:#0d1b2a; border-left:3px solid #4C97FF; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#4C97FF;">Confirma la nueva velocidad.</strong> El número se desplaza en el LED antes de que presiones A.</div>
+            <div style="background:#0d1b2a; border-left:3px solid var(--yellow); border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:var(--yellow);">Sin recargar el programa.</strong> Prueba tus 3 velocidades en una sola sesión.</div>
+          </div>
+        </div>
+
+        <!-- A+B paro de emergencia -->
+        <div>
+          <div style="font-size:12px; font-weight:700; color:#c701c7; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">on button A+B pressed — Paro de emergencia</div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let running = false
+input.onButtonPressed(Button.AB, function () {
+    running = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; margin-top:10px;">
+            <div style="background:#0d1b2a; border-left:3px solid #e74c3c; border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;"><strong style="color:#e74c3c;">Corte inmediato.</strong> Pone running=false (rompe el bucle while) Y detiene las ruedas al mismo tiempo.</div>
+            <div style="background:#0d1b2a; border-left:3px solid var(--muted); border-radius:0 6px 6px 0; padding:8px 10px; line-height:1.5;">Presiona A+B si el bot se dirige a algún lugar donde no debería. Los dos botones a la vez.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descargar -->
+      <div class="card" style="border-color:rgba(114,72,184,.4);">
+        <div class="card-title" style="color:#b48aff;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M3 18h18v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1z"/></svg>
+          Paso 5 — Descarga al micro:bit
+        </div>
+        <ol class="step-list" style="padding:0;">
+          <li class="step-item"><div class="step-num">1</div><div class="step-text">Conecta el micro:bit a la computadora con el cable USB.</div></li>
+          <li class="step-item"><div class="step-num">2</div><div class="step-text">Haz clic en <span style="background:#7248b8; color:#fff; padding:2px 10px; border-radius:6px; font-size:12px; font-weight:700;">&#8595; Descargar</span> (arriba a la derecha). El LED naranja de la parte trasera parpadea mientras sube.</div></li>
+          <li class="step-item"><div class="step-num">3</div><div class="step-text">Espera a que deje de parpadear. Desconecta — tira recto, sin girar.</div></li>
+        </ol>
+      </div>
+
+      <!-- ── YA DESCARGUÉ ── -->
+      <div style="text-align:center; margin:28px 0 20px;">
+        <button onclick="revealSpeedPicker()"
+          style="background:linear-gradient(135deg,#4C97FF,#2a6edb); color:#fff; border:none; padding:16px 40px; border-radius:12px; font-size:17px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; box-shadow:0 4px 16px rgba(76,151,255,.4); letter-spacing:.5px;">
+          Ya descargué mi programa &rarr;
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ══ SELECTOR DE VELOCIDADES COMPARTIDO ══ -->
+  <div id="shared-speed-picker" style="display:none;">
+    <div class="card" style="border:2px solid rgba(255,214,0,.5);">
+      <div class="card-title" style="color:var(--yellow);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Paso 6 — Bloquea tus velocidades de prueba
+      </div>
+      <p style="font-size:14px; color:var(--text); line-height:1.7; margin-bottom:16px;">Elige 3 velocidades para probar. Distribúyelas por el rango — baja, media y alta te da más para analizar.</p>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+        <div style="flex:1; min-width:110px; background:#0d1b2a; border:1px solid var(--border); border-radius:12px; padding:14px; text-align:center;">
+          <div style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Speed 1</div>
+          <select id="sc-0" onchange="updateSpeedChoice(0)" style="background:#0d1b2a; border:2px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:16px; font-weight:700; outline:none; width:100%; cursor:pointer;">
+            <option value="">—</option>
+            <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+          </select>
+        </div>
+        <div style="flex:1; min-width:110px; background:#0d1b2a; border:1px solid var(--border); border-radius:12px; padding:14px; text-align:center;">
+          <div style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Speed 2</div>
+          <select id="sc-1" onchange="updateSpeedChoice(1)" style="background:#0d1b2a; border:2px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:16px; font-weight:700; outline:none; width:100%; cursor:pointer;">
+            <option value="">—</option>
+            <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+          </select>
+        </div>
+        <div style="flex:1; min-width:110px; background:#0d1b2a; border:1px solid var(--border); border-radius:12px; padding:14px; text-align:center;">
+          <div style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Speed 3</div>
+          <select id="sc-2" onchange="updateSpeedChoice(2)" style="background:#0d1b2a; border:2px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:16px; font-weight:700; outline:none; width:100%; cursor:pointer;">
+            <option value="">—</option>
+            <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+          </select>
+        </div>
+      </div>
+      <div id="sc-warn" style="font-size:13px; min-height:18px; margin-bottom:8px;"></div>
+      <button id="sc-confirm-btn" onclick="confirmSpeeds()" disabled
+        style="background:var(--yellow); color:#000; font-family:'Inter',sans-serif; font-weight:800; font-size:14px; padding:11px 28px; border:none; border-radius:8px; cursor:pointer; opacity:.4; transition:opacity .2s;">
+        Bloquear mis velocidades &rarr;
+      </button>
+    </div>
+    <div id="sc-locked-banner" style="display:none; background:rgba(255,214,0,.08); border:1px solid rgba(255,214,0,.35); border-radius:10px; padding:10px 16px; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <span id="sc-locked-text" style="font-size:13px; color:var(--text);">Velocidades bloqueadas.</span>
+      <span style="font-size:11px; font-weight:700; color:var(--yellow);">&#128274; BLOQUEADO</span>
+    </div>
+  </div>
+
+  <!-- ══ PASO 7 — EJECUTA CADA VELOCIDAD ══ -->
+  <div id="premade-step6" style="display:none;">
+    <div class="card" style="border-color:rgba(0,229,255,.4);">
+      <div class="card-title" style="color:var(--cyan);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Paso 7 — Ejecuta cada velocidad y mide
+      </div>
+      <ol class="step-list" style="padding:0;">
+        <li class="step-item"><div class="step-num">1</div><div class="step-text">Coloca el bot en la cinta de salida. Presiona <strong style="color:var(--cyan);">B</strong> hasta llegar a tu valor <strong>bajo</strong>. Si te pasas, sigue presionando B hasta que dé la vuelta después del 20. Una vez que tengas tu valor, presiona <strong style="color:var(--yellow);">A</strong>. El bot maneja 2 segundos a tu SPEED seleccionado y se detiene.</div></li>
+        <li class="step-item"><div class="step-num">2</div><div class="step-text">Coloca un trozo de cinta en la parte delantera del bot donde se detiene.</div></li>
+        <li class="step-item"><div class="step-num">3</div><div class="step-text">Mide la distancia desde la cinta de salida hasta donde se detuvo el bot. Registra los resultados de la <strong>Prueba A</strong> en tu hoja de trabajo (Speed, % Potencia del motor, Distancia). Luego presiona <strong style="color:var(--cyan);">B</strong> hasta llegar a tu <strong>valor medio</strong>.</div></li>
+        <li class="step-item"><div class="step-num">4</div><div class="step-text">Presiona <strong style="color:var(--yellow);">A</strong> de nuevo. Coloca cinta en la parte delantera del bot donde se detenga y mide desde la salida hasta la parada.</div></li>
+        <li class="step-item"><div class="step-num">5</div><div class="step-text">Presiona <strong style="color:var(--cyan);">B</strong> y <strong style="color:var(--yellow);">A</strong> para tu tercera carrera.</div></li>
+        <li class="step-item"><div class="step-num">6</div><div class="step-text">Después de las tres carreras, completa el resto de tu hoja de trabajo.</div></li>
+      </ol>
+      <div style="background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.3); border-radius:8px; padding:10px 14px; margin-top:10px; font-size:13px; color:var(--text);">
+        &#9940; <strong style="color:#e74c3c;">Paro de emergencia:</strong> Presiona <strong>A + B</strong> juntos para cortar los motores de inmediato.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GUÍA DE MEDICIÓN Y LEDs ══ -->
+  <div id="measure-led-guide" style="display:none;">
+    <div class="card" style="border-color:rgba(0,230,118,.3);">
+      <div class="card-title" style="color:var(--green);">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0z"/><path d="M7.5 10.5 10 8M10.5 13.5 13 11M13.5 16.5 16 14"/></svg>
+        Cómo medir y guía de LEDs
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; flex-wrap:wrap;">
+        <ol style="padding-left:20px; display:flex; flex-direction:column; gap:8px; margin:0;">
+          <li style="font-size:13px; color:var(--text); line-height:1.6;">Coloca el bot con el <strong>borde delantero</strong> en la cinta.</li>
+          <li style="font-size:13px; color:var(--text); line-height:1.6;">Cuando aparezca la <strong style="color:#e74c3c;">X</strong>, mide desde la cinta hasta la parte delantera del bot.</li>
+          <li style="font-size:13px; color:var(--text); line-height:1.6;">Registra en <strong>centímetros (cm)</strong> en la tabla de abajo.</li>
+        </ol>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; gap:10px; align-items:center;"><div style="background:rgba(0,229,255,.15); border:1px solid rgba(0,229,255,.3); border-radius:6px; padding:5px 10px; font-size:14px; font-weight:800; color:var(--cyan); min-width:48px; text-align:center; font-family:monospace;">8</div><div style="font-size:12px; color:var(--text);">Número desplazándose = SPEED actual</div></div>
+          <div style="display:flex; gap:10px; align-items:center;"><div style="background:rgba(0,229,255,.15); border:1px solid rgba(0,229,255,.3); border-radius:6px; padding:5px 10px; font-size:12px; font-weight:800; color:var(--cyan); min-width:48px; text-align:center;">&#9646;&#9646;&#9646;</div><div style="font-size:12px; color:var(--text);">Barra = potencia del motor</div></div>
+          <div style="display:flex; gap:10px; align-items:center;"><div style="background:rgba(255,82,82,.15); border:1px solid rgba(255,82,82,.3); border-radius:6px; padding:5px 10px; font-size:14px; font-weight:800; color:#e74c3c; min-width:48px; text-align:center;">&#10005;</div><div style="font-size:12px; color:var(--text);"><strong>X = carrera completa — mide ahora</strong></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REGISTRAR EN HOJA DE TRABAJO ─────────────────────────────────── -->
+  <div id="data-table-section" style="display:none;">
+    <div class="card" style="border:2px solid rgba(0,230,118,.5); text-align:center; padding:32px 24px;">
+      <div style="font-size:22px; font-weight:800; color:var(--green); margin-bottom:10px; font-family:'Inter',sans-serif;">Siguiente paso — Completa la hoja de trabajo</div>
+      <p style="font-size:15px; color:var(--text); line-height:1.7; max-width:460px; margin:0 auto 24px;">Corre el bot a cada una de tus 3 velocidades y registra la distancia (cm) en la tabla de tu hoja de trabajo.</p>
+    </div>
+    <div style="text-align:center; margin-top:28px;">
+      <button onclick="revealScratchContent()"
+        style="background:linear-gradient(135deg,#00e676,#00a854); color:#000; border:none; padding:16px 40px; border-radius:12px; font-size:17px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; box-shadow:0 4px 16px rgba(0,230,118,.35); letter-spacing:.5px;">
+        Haz clic aquí cuando hayas completado la hoja de trabajo &rarr;
+      </button>
+    </div>
+
+    <div id="scratch-path" style="display:none;">
+      <br /><br /><br /><br /><br /><br /><br /><br />
+
+      <!-- Pasos para construir la prueba de cm/segundo -->
+      <div class="card" style="border-color:rgba(0,229,255,.4); padding:16px;">
+        <div class="card-title">Construir la prueba de cm/segundo</div>
+        <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/><circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/></svg>
+          Paso a paso — Construye tu programa
+        </div>
+
+        <div style="text-align:center; margin-bottom:20px;">
+          <img src="images/speed/cm-per-sec.png" alt="Código de bloques terminado: on button B pressed, set left and right wheel speed 100%, pause 1000ms, set all wheel to stop immediately" style="max-width:100%; border-radius:10px; border:1px solid rgba(0,229,255,.2); box-shadow:0 4px 20px rgba(0,0,0,.4);">
+          <div style="font-size:11px; color:var(--muted); margin-top:8px; letter-spacing:.3px;">Tu programa terminado — constrúyelo paso a paso abajo</div>
+        </div>
+
+        <!-- Fase 1 -->
+        <div style="background:rgba(76,151,255,.07); border:1px solid rgba(76,151,255,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:700; color:#4C97FF; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 1 — Abre MakeCode y agrega la extensión</div>
+          <ol class="step-list" style="padding:0;">
+            <li class="step-item"><div class="step-num">1</div><div class="step-text">Ve a <strong>makecode.microbit.org</strong>. Haz clic en <strong>Nuevo proyecto</strong> y dale un nombre como "prueba cm por segundo". <span style="display:inline-block; margin-top:6px; background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.3); border-radius:6px; padding:4px 10px; font-size:12px; color:var(--cyan);">&#128161; Inicia sesión primero — guarda tu trabajo automáticamente.</span></div></li>
+            <li class="step-item"><div class="step-num">2</div><div class="step-text">Verás un bloque <strong style="color:#4C97FF;">on start</strong> y uno <strong>forever</strong>. <strong>Elimina ambos</strong> — arrástralos a la papelera de la izquierda o haz clic en cada uno y presiona <kbd style="background:#1a2d45; border:1px solid #2a4060; border-radius:4px; padding:1px 6px; font-size:12px;">Delete</kbd>. Necesitas un espacio de trabajo en blanco.</div></li>
+            <li class="step-item"><div class="step-num">3</div><div class="step-text">Baja en la lista de categorías de la izquierda y haz clic en <strong>Avanzado</strong>, luego en <strong>Extensiones</strong>. Busca <code>Cutebot Pro</code> y haz clic en ella. Aparece una nueva categoría <strong style="color:#1d9f1d;">Cutebot Pro</strong> en la lista.</div></li>
+          </ol>
+        </div>
+
+        <!-- Fase 2 -->
+        <div style="background:rgba(240,156,37,.07); border:1px solid rgba(240,156,37,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:700; color:#f09c25; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 2 — Construir el Botón B (Avanzar)</div>
+          <ol class="step-list" style="padding:0;">
+            <li class="step-item"><div class="step-num">4</div><div class="step-text">Haz clic en <strong style="color:#c701c7;">Input</strong> (magenta). Busca <code>on button B pressed</code> y arrástralo al espacio de trabajo.</div></li>
+            <li class="step-item"><div class="step-num">5</div><div class="step-text">Haz clic en <strong style="color:#1d9f1d;">Cutebot Pro</strong> (verde). Busca <code>set left wheel speed (50)%, right wheel speed (50)%</code>. Arrástralo dentro del bloque del botón B. Reemplaza ambos <code>50</code> con <code>100</code>.</div></li>
+            <li class="step-item"><div class="step-num">6</div><div class="step-text">Haz clic en <strong style="color:#4C97FF;">Basic</strong>. Arrastra <code>pause (ms) 100</code> dentro del botón B, debajo del bloque de velocidad de ruedas. Cambia <code>100</code> a <strong>1000</strong>. Eso es exactamente 1 segundo.</div></li>
+            <li class="step-item"><div class="step-num">7</div><div class="step-text">Desde <strong style="color:#1d9f1d;">Cutebot Pro</strong>, arrastra <code>set all wheel to stop immediately</code> dentro del botón B, debajo del bloque de pausa. Esto detiene el bot en cuanto pasa 1 segundo.</div></li>
+          </ol>
+        </div>
+
+        <!-- Fase 3 -->
+        <div style="background:rgba(0,229,118,.07); border:1px solid rgba(0,229,118,.3); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:700; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 3 — Revisa tu código</div>
+          <ol class="step-list" style="padding:0;">
+            <li class="step-item"><div class="step-num">8</div><div class="step-text">Mira dentro de tu bloque <strong style="color:#c701c7;">on button B pressed</strong>. Deberías tener exactamente tres bloques apilados en este orden:<br><br>
+              <span style="display:inline-block; background:#1a2d45; border-radius:8px; padding:8px 14px; font-size:12px; font-family:monospace; line-height:2;">
+                <span style="color:#1d9f1d;">set left wheel speed 100%, right wheel speed 100%</span><br>
+                &darr;<br>
+                <span style="color:#4C97FF;">pause (ms) 1000</span><br>
+                &darr;<br>
+                <span style="color:#1d9f1d;">set all wheel to stop immediately</span>
+              </span>
+            </div></li>
+            <li class="step-item"><div class="step-num">9</div><div class="step-text">Si algo está fuera de orden, arrastra el bloque a la posición correcta. Los bloques encajan cuando los acercas al lugar correcto.</div></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Fase 4: Descargar y probar -->
+      <div class="card">
+        <div style="background:rgba(114,72,184,.12); border:1px solid rgba(114,72,184,.4); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:700; color:#b48aff; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 4 — Descargar y probar</div>
+          <div style="display:flex; align-items:center; gap:12px; background:#111128; border-radius:10px; padding:10px 14px; margin-bottom:14px; flex-wrap:wrap;">
+            <span style="font-size:13px; color:var(--muted);">Haz clic en este botón (parte inferior izquierda de MakeCode):</span>
+            <div style="display:flex; border-radius:8px; overflow:hidden;">
+              <div style="background:#7248b8; padding:8px 18px; font-size:13px; font-weight:700; color:#fff;">&#8595; Descargar</div>
+              <div style="background:#5a3898; padding:8px 12px; font-size:13px; color:#fff;">&#183;&#183;&#183;</div>
+            </div>
+          </div>
+          <ol class="step-list" style="padding:0;">
+            <li class="step-item"><div class="step-num" style="font-size:11px;">1</div><div class="step-text">Conecta tu computadora al micro:bit v2 del Cutebot Pro con el cable USB.</div></li>
+            <li class="step-item"><div class="step-num" style="font-size:11px;">2</div><div class="step-text">Haz clic en el botón <strong style="color:#b48aff;">&#8595; Descargar</strong> (parte inferior izquierda, morado). También puedes guardar un archivo <code>.hex</code> en tu computadora como respaldo.</div></li>
+            <li class="step-item"><div class="step-num" style="font-size:11px;">3</div><div class="step-text"><strong>Desconecta de forma segura.</strong> Haz clic en los <strong>&#183;&#183;&#183;</strong> (tres puntos) junto al botón Descargar y selecciona <strong>Desconectar</strong>. Esto termina la sesión de emparejamiento antes de desenchufar.</div></li>
+            <li class="step-item"><div class="step-num" style="font-size:11px;">4</div><div class="step-text">Desconecta suavemente el cable USB del micro:bit v2. Sostén el micro:bit entre tus dedos y tira del cable recto hacia afuera — <strong style="color:var(--red);">no lo gires ni lo jales bruscamente.</strong> No quieres romper el conector de la placa.</div></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Tarjeta de medir y registrar -->
+      <div class="card" style="border-color:rgba(0,229,255,.4); padding:16px;">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Medir y registrar
+        </div>
+        <div style="background:rgba(0,229,255,.06); border:1px solid rgba(0,229,255,.25); border-radius:10px; padding:14px 16px; margin-bottom:14px;">
+          <div style="font-size:13px; color:var(--text); line-height:1.7;">
+            <strong>Ejecuta la prueba:</strong> Coloca tu Cutebot Pro en el suelo. Marca la posición de inicio con un trozo de cinta. Presiona el <strong style="color:#c701c7;">Botón B</strong>. El bot avanzará exactamente 1 segundo y luego se detendrá automáticamente.
+          </div>
+        </div>
+        <div style="background:rgba(255,214,0,.06); border:1px solid rgba(255,214,0,.25); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:12px; font-weight:700; color:#ffd600; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;margin-bottom:1px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Escribe en tu diario
+          </div>
+          <div style="font-size:13px; color:var(--text); line-height:1.8;">
+            Mide la distancia desde la cinta hasta donde se detuvo la parte delantera del bot. Usa una regla o cinta métrica y registra el resultado en centímetros.<br><br>
+            <strong>Registra este dato:</strong><br>
+            <span style="display:inline-block; background:#111128; border:1px solid rgba(0,229,255,.3); border-radius:8px; padding:8px 14px; margin-top:6px; font-size:13px; font-family:monospace; color:var(--cyan);">
+              Speed = 100%&nbsp;&nbsp;|&nbsp;&nbsp;Tiempo = 1 segundo&nbsp;&nbsp;|&nbsp;&nbsp;Distancia = _______ cm
+            </span><br><br>
+            <span style="font-size:12px; color:var(--muted);">Ejecuta la prueba 2&ndash;3 veces y registra cada resultado. ¿Son consistentes? Usarás este número más adelante.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opcional: construir desde cero -->
+      <div style="text-align:center; margin:32px 0 8px;">
+        <button onclick="revealScratchChallenge()"
+          style="background:transparent; color:var(--cyan); border:2px solid rgba(0,229,255,.5); padding:14px 36px; border-radius:12px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; letter-spacing:.4px; transition:background .2s,border-color .2s;">
+          Opcional: construir una prueba de Speed desde cero &rarr;
+        </button>
+        <div style="font-size:12px; color:var(--muted); margin-top:8px;">Solo haz esto si ya terminaste la prueba de arriba y quieres un desafío mayor.</div>
+      </div>
+
+      <!-- Desafío desde cero — oculto hasta que se haga clic -->
+      <div id="scratch-challenge" style="display:none;">
+
+        <div class="card" style="border-color:rgba(0,229,255,.4); padding:16px;">
+          <div class="card-title">Intenta construir código desde cero</div>
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Mira primero — luego sigue los pasos de abajo
+          </div>
+          <div style="position:relative; width:100%; padding-top:56.25%; border-radius:10px; overflow:hidden; background:#000;">
+            <iframe src="https://www.youtube.com/embed/myTFl_CflPk" title="Tutorial de MakeCode" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:0;"></iframe>
+          </div>
+          <p style="font-size:13px; color:var(--muted); margin-top:10px;">Mira el tutorial completo una vez antes de empezar. Pausa y rebobina cuando quieras — está aquí mientras trabajas.</p>
+        </div>
+
+        <!-- Vocabulario -->
+        <div class="vocab-box">
+          <div class="vocab-title">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            Palabras nuevas — Programación con bloques
+          </div>
+          <div class="vocab-row"><span class="vocab-word">MakeCode</span><span class="vocab-def">Un sitio web gratuito donde construyes programas uniendo bloques de colores — sin necesidad de escribir código</span></div>
+          <div class="vocab-row"><span class="vocab-word">Bloque</span><span class="vocab-def">Una instrucción que sigue la computadora. Los bloques encajan como piezas de un rompecabezas.</span></div>
+          <div class="vocab-row"><span class="vocab-word">Variable</span><span class="vocab-def">Una caja con nombre que almacena un número. Como escribir "SPEED = 6" en una nota adhesiva.</span></div>
+          <div class="vocab-row"><span class="vocab-word">Evento</span><span class="vocab-def">"Cuando algo pase, haz esto." Presionar el botón A es un evento.</span></div>
+          <div class="vocab-row"><span class="vocab-word">Descargar</span><span class="vocab-def">Enviar tu programa terminado desde el sitio web al chip micro:bit</span></div>
+        </div>
+
+        <!-- Mapa de la interfaz SVG -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            La pantalla de MakeCode — qué hay dónde
+          </div>
+          <div style="text-align:center; overflow-x:auto;">
+            <svg viewBox="0 0 680 400" width="100%" style="max-width:680px; display:inline-block;">
+              <rect width="680" height="400" rx="12" fill="#1a1a2e"/>
+              <rect x="0" y="0" width="680" height="38" rx="12" fill="#111128"/>
+              <rect x="0" y="26" width="680" height="12" fill="#111128"/>
+              <text x="20" y="24" fill="#aaa" font-size="13" font-weight="700" font-family="Inter, sans-serif">MakeCode para micro:bit</text>
+              <rect x="548" y="6" width="110" height="26" rx="13" fill="#7248b8"/>
+              <text x="592" y="23" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">&#8595; Descargar</text>
+              <rect x="654" y="6" width="24" height="26" rx="6" fill="#5a3898"/>
+              <text x="666" y="23" fill="#fff" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">&#183;&#183;&#183;</text>
+              <!-- Simulador -->
+              <rect x="8" y="46" width="118" height="240" rx="8" fill="#252545" stroke="#3a3a6a" stroke-width="1"/>
+              <rect x="22" y="56" width="84" height="64" rx="6" fill="#111128" stroke="#3a3a6a" stroke-width="1"/>
+              <circle cx="38" cy="70" r="3" fill="#333"/> <circle cx="50" cy="70" r="3" fill="#333"/> <circle cx="62" cy="70" r="3" fill="#333"/> <circle cx="74" cy="70" r="3" fill="#333"/> <circle cx="86" cy="70" r="3" fill="#333"/>
+              <circle cx="38" cy="82" r="3" fill="#333"/> <circle cx="50" cy="82" r="3" fill="#c701c7"/> <circle cx="62" cy="82" r="3" fill="#333"/> <circle cx="74" cy="82" r="3" fill="#c701c7"/> <circle cx="86" cy="82" r="3" fill="#333"/>
+              <circle cx="38" cy="94" r="3" fill="#333"/> <circle cx="50" cy="94" r="3" fill="#333"/> <circle cx="62" cy="94" r="3" fill="#c701c7"/> <circle cx="74" cy="94" r="3" fill="#333"/> <circle cx="86" cy="94" r="3" fill="#333"/>
+              <circle cx="38" cy="106" r="3" fill="#333"/> <circle cx="50" cy="106" r="3" fill="#c701c7"/> <circle cx="62" cy="106" r="3" fill="#333"/> <circle cx="74" cy="106" r="3" fill="#c701c7"/> <circle cx="86" cy="106" r="3" fill="#333"/>
+              <circle cx="38" cy="118" r="3" fill="#333"/> <circle cx="50" cy="118" r="3" fill="#333"/> <circle cx="62" cy="118" r="3" fill="#333"/> <circle cx="74" cy="118" r="3" fill="#333"/> <circle cx="86" cy="118" r="3" fill="#333"/>
+              <rect x="14" y="84" width="10" height="16" rx="3" fill="#3a3a6a"/>
+              <text x="19" y="95" fill="#aaa" font-size="8" text-anchor="middle" font-family="Inter, sans-serif">A</text>
+              <rect x="104" y="84" width="10" height="16" rx="3" fill="#3a3a6a"/>
+              <text x="109" y="95" fill="#aaa" font-size="8" text-anchor="middle" font-family="Inter, sans-serif">B</text>
+              <line x1="67" y1="286" x2="67" y2="306" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <rect x="8" y="306" width="118" height="36" rx="6" fill="rgba(0,229,255,.1)" stroke="#00e5ff" stroke-width="1"/>
+              <text x="67" y="321" fill="#00e5ff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">&#9312; Simulador</text>
+              <text x="67" y="334" fill="#7a9cc0" font-size="9" text-anchor="middle" font-family="Inter, sans-serif">Vista previa virtual</text>
+              <!-- Categorías -->
+              <rect x="134" y="46" width="94" height="240" rx="8" fill="#1e1e38" stroke="#3a3a6a" stroke-width="1"/>
+              <rect x="140" y="54"  width="82" height="18" rx="4" fill="#4C97FF"/>
+              <text x="181" y="67"  fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Basic</text>
+              <rect x="140" y="76"  width="82" height="18" rx="4" fill="#c701c7"/>
+              <text x="181" y="89"  fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Input</text>
+              <rect x="140" y="98"  width="82" height="18" rx="4" fill="#5BA55B"/>
+              <text x="181" y="111" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Loops</text>
+              <rect x="140" y="120" width="82" height="18" rx="4" fill="#dc143c"/>
+              <text x="181" y="133" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Variables</text>
+              <rect x="140" y="142" width="82" height="18" rx="4" fill="#9966FF"/>
+              <text x="181" y="155" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Math</text>
+              <rect x="140" y="164" width="82" height="18" rx="4" fill="#5c3566"/>
+              <text x="181" y="177" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Avanzado &#9658;</text>
+              <rect x="140" y="186" width="82" height="18" rx="4" fill="#1d9f1d"/>
+              <text x="181" y="199" fill="#fff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">Cutebot Pro</text>
+              <line x1="181" y1="286" x2="181" y2="306" stroke="#ffd600" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <rect x="134" y="306" width="94" height="36" rx="6" fill="rgba(255,214,0,.1)" stroke="#ffd600" stroke-width="1"/>
+              <text x="181" y="321" fill="#ffd600" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">&#9313; Categorías</text>
+              <text x="181" y="334" fill="#7a9cc0" font-size="9" text-anchor="middle" font-family="Inter, sans-serif">Elige el color, arrastra el bloque</text>
+              <!-- Espacio de trabajo -->
+              <rect x="236" y="46" width="436" height="240" rx="8" fill="#e8e8f0" stroke="#ccc" stroke-width="1"/>
+              <rect x="248" y="54" width="100" height="22" rx="5" fill="#4C97FF"/>
+              <text x="256" y="69" fill="#fff" font-size="10" font-weight="700" font-family="Inter, sans-serif">on start</text>
+              <rect x="260" y="78" width="120" height="20" rx="4" fill="#dc143c"/>
+              <text x="268" y="92" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">set SPEED to  6</text>
+              <rect x="260" y="100" width="190" height="20" rx="4" fill="#dc143c"/>
+              <text x="268" y="114" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">set motorPower to SPEED&#215;100&#247;20</text>
+              <rect x="248" y="132" width="152" height="22" rx="5" fill="#c701c7"/>
+              <text x="256" y="147" fill="#fff" font-size="10" font-weight="700" font-family="Inter, sans-serif">on button  A  pressed</text>
+              <rect x="260" y="156" width="108" height="20" rx="4" fill="#4C97FF"/>
+              <text x="268" y="170" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">show string "Go"</text>
+              <rect x="260" y="178" width="260" height="20" rx="4" fill="#1d9f1d"/>
+              <text x="268" y="192" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">set left wheel motorPower%, right wheel motorPower%</text>
+              <rect x="260" y="200" width="108" height="20" rx="4" fill="#4C97FF"/>
+              <text x="268" y="214" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">pause (ms) 5000</text>
+              <rect x="260" y="222" width="176" height="20" rx="4" fill="#1d9f1d"/>
+              <text x="268" y="236" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">set all wheel to stop immediately</text>
+              <rect x="460" y="132" width="152" height="22" rx="5" fill="#c701c7"/>
+              <text x="468" y="147" fill="#fff" font-size="10" font-weight="700" font-family="Inter, sans-serif">on button  B  pressed</text>
+              <rect x="472" y="156" width="132" height="20" rx="4" fill="#1d9f1d"/>
+              <text x="480" y="170" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">set all wheel to stop</text>
+              <rect x="472" y="178" width="80" height="20" rx="4" fill="#4C97FF"/>
+              <text x="480" y="192" fill="#fff" font-size="9" font-weight="700" font-family="Inter, sans-serif">show leds</text>
+              <text x="454" y="270" fill="#888" font-size="9" text-anchor="middle" font-family="Inter, sans-serif">Espacio de trabajo — arma los bloques aquí</text>
+              <line x1="454" y1="286" x2="454" y2="306" stroke="#00e676" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <rect x="370" y="306" width="168" height="36" rx="6" fill="rgba(0,230,118,.1)" stroke="#00e676" stroke-width="1"/>
+              <text x="454" y="321" fill="#00e676" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">&#9314; Espacio de trabajo</text>
+              <text x="454" y="334" fill="#7a9cc0" font-size="9" text-anchor="middle" font-family="Inter, sans-serif">Construye tu programa aquí</text>
+              <line x1="609" y1="32" x2="609" y2="350" stroke="#7248b8" stroke-width="1" stroke-dasharray="3,2"/>
+              <rect x="548" y="350" width="122" height="36" rx="6" fill="rgba(114,72,184,.15)" stroke="#7248b8" stroke-width="1"/>
+              <text x="609" y="365" fill="#b48aff" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">&#9315; Descargar</text>
+              <text x="609" y="378" fill="#7a9cc0" font-size="9" text-anchor="middle" font-family="Inter, sans-serif">Enviar al micro:bit</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Qué hace cada bloque -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Qué hace cada bloque
+          </div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#4C97FF; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">on start</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#4C97FF;">Basic (azul).</strong> Se ejecuta una vez cuando el micro:bit se enciende. Coloca aquí tus valores iniciales — SPEED y motorPower se configuran antes de presionar cualquier botón.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#c701c7; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">on button A pressed</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#c701c7;">Input (magenta).</strong> Todo lo de adentro se ejecuta cuando alguien presiona el botón A. Este es tu botón IR — inicia la secuencia de manejo.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#dc143c; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">set SPEED to 6</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#dc143c;">Variables (rojo).</strong> Crea una caja llamada SPEED y pone 6 dentro. Cámbialo a 12 para la Carrera 2 — es lo único que cambias entre carreras.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#dc143c; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">set motorPower to SPEED&times;100&divide;20</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#dc143c;">Variables (rojo).</strong> Tu fórmula en forma de bloque. El micro:bit calcula SPEED&times;100&divide;20 y guarda el resultado. SPEED=6 &rarr; 30. SPEED=12 &rarr; 60.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#4C97FF; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">show string &quot;Go&quot;</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#4C97FF;">Basic (azul).</strong> Desplaza la palabra "Go" en la pantalla LED del micro:bit — una señal visual de que el bot está a punto de moverse.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#1d9f1d; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">set left wheel speed motorPower %,<br>right wheel speed motorPower %</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#1d9f1d;">Cutebot Pro (verde).</strong> Gira ambas ruedas al motorPower %. Así es como el bot avanza — pones cada rueda al mismo valor para que vaya recto.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#4C97FF; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">pause (ms) 5000</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#4C97FF;">Basic (azul).</strong> Espera 5.000 milisegundos = 5 segundos. Las ruedas siguen girando durante esta pausa. Después de 5 segundos corre el siguiente bloque.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#1d9f1d; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">set all wheel to stop immediately</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#1d9f1d;">Cutebot Pro (verde).</strong> Corta la potencia a ambas ruedas de inmediato. Sin esto el bot seguiría rodando después de la pausa.</div>
+            </div>
+            <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+              <div style="background:#c701c7; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; color:#fff; min-width:210px; white-space:nowrap; flex-shrink:0;">on button B pressed</div>
+              <div style="flex:1; min-width:180px; font-size:13px; color:var(--text); line-height:1.6;"><strong style="color:#c701c7;">Input (magenta).</strong> Paro de emergencia. Si algo sale mal, presiona B. Detiene todas las ruedas y muestra una X en el LED.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Construcción paso a paso -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;margin-bottom:2px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/><circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/></svg>
+            Paso a paso — Construye tu programa
+          </div>
+          <div style="background:rgba(76,151,255,.07); border:1px solid rgba(76,151,255,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#4C97FF; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 1 — Abre MakeCode y agrega la extensión</div>
+            <ol class="step-list" style="padding:0;">
+              <li class="step-item"><div class="step-num">1</div><div class="step-text">Ve a <strong>makecode.microbit.org</strong>. Haz clic en <strong>Nuevo proyecto</strong> y dale un nombre como "Prueba de Speed desde cero". <span style="display:inline-block; margin-top:6px; background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.3); border-radius:6px; padding:4px 10px; font-size:12px; color:var(--cyan);">💡 Inicia sesión primero — guarda tu trabajo automáticamente.</span></div></li>
+              <li class="step-item"><div class="step-num">2</div><div class="step-text">Verás un bloque <strong style="color:#4C97FF;">on start</strong> y uno <strong>forever</strong>. <strong>Elimina el bloque forever</strong> — arrástralo a la papelera o presiona <kbd style="background:#1a2d45; border:1px solid #2a4060; border-radius:4px; padding:1px 6px; font-size:12px;">Delete</kbd>. Conserva <code>on start</code>.</div></li>
+              <li class="step-item"><div class="step-num">3</div><div class="step-text">Baja en las categorías y haz clic en <strong>Avanzado</strong>, luego en <strong>Extensiones</strong>. Busca <code>Cutebot Pro</code> y haz clic. Aparece una nueva categoría <strong style="color:#1d9f1d;">Cutebot Pro</strong>.</div></li>
+            </ol>
+          </div>
+          <div style="background:rgba(220,20,60,.07); border:1px solid rgba(220,20,60,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#dc143c; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 2 — Configura variables en "on start"</div>
+            <ol class="step-list" style="padding:0;">
+              <li class="step-item"><div class="step-num">4</div><div class="step-text">Haz clic en <strong style="color:#dc143c;">Variables</strong> (rojo). Haz clic en <strong>"Crear una variable"</strong>. Nómbrala <code>SPEED</code>. Haz clic en OK.</div></li>
+              <li class="step-item"><div class="step-num">5</div><div class="step-text">Desde <strong style="color:#dc143c;">Variables</strong>, arrastra <code>set SPEED to 0</code> <em>dentro</em> del bloque <strong style="color:#4C97FF;">on start</strong>. Haz clic en el 0 y escribe <strong>6</strong>.</div></li>
+              <li class="step-item"><div class="step-num">6</div><div class="step-text">De vuelta en <strong style="color:#dc143c;">Variables</strong>, haz clic en <strong>"Crear una variable"</strong> de nuevo. Nómbrala <code>motorPower</code>. Haz clic en OK.</div></li>
+              <li class="step-item"><div class="step-num">7</div><div class="step-text">Arrastra <code>set motorPower to 0</code> dentro de <strong style="color:#4C97FF;">on start</strong>, debajo del bloque SPEED.</div></li>
+              <li class="step-item"><div class="step-num">8</div><div class="step-text">Haz clic en <strong style="color:#9966FF;">Math</strong> (morado). Arrastra un bloque <code>0 &times; 0</code> al espacio de motorPower. Luego anida un bloque <code>0 &divide; 0</code> para que quede: <code>(SPEED &times; 100) &divide; 20</code>. Toma el óvalo <code>SPEED</code> de <strong style="color:#dc143c;">Variables</strong> y suéltalo como primer número.</div></li>
+            </ol>
+          </div>
+          <div style="background:rgba(240,156,37,.07); border:1px solid rgba(240,156,37,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#f09c25; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 3 — Construir el Botón A (Avanzar)</div>
+            <ol class="step-list" style="padding:0;">
+              <li class="step-item"><div class="step-num">9</div><div class="step-text">Haz clic en <strong style="color:#c701c7;">Input</strong> (magenta). Busca <code>on button A pressed</code> y arrástralo al espacio de trabajo — separado de <code>on start</code>.</div></li>
+              <li class="step-item"><div class="step-num">10</div><div class="step-text">Desde <strong style="color:#4C97FF;">Basic</strong> (azul), arrastra <code>show string ""</code> dentro del botón A. Haz clic en la cadena vacía y escribe <strong>Go</strong>.</div></li>
+              <li class="step-item"><div class="step-num">11</div><div class="step-text">Desde <strong style="color:#4C97FF;">Basic</strong>, arrastra <code>clear screen</code> dentro del botón A, debajo de <code>show string</code>.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">12</div><div class="step-text">Haz clic en <strong style="color:#1d9f1d;">Cutebot Pro</strong> (verde). Busca <code>set left wheel speed (50)%, right wheel speed (50)%</code>. Arrástralo dentro del botón A. Reemplaza ambos 50s con la variable <code>motorPower</code> de <strong style="color:#dc143c;">Variables</strong>.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">13</div><div class="step-text">Desde <strong style="color:#4C97FF;">Basic</strong>, arrastra <code>pause (ms) 100</code> dentro del botón A, después del bloque de ruedas. Cambia 100 a <strong>5000</strong>.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">14</div><div class="step-text">Desde <strong style="color:#1d9f1d;">Cutebot Pro</strong>, arrastra <code>set all wheel to stop immediately</code> dentro del botón A, debajo de la pausa.</div></li>
+            </ol>
+          </div>
+          <div style="background:rgba(29,159,29,.07); border:1px solid rgba(29,159,29,.3); border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#1d9f1d; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 4 — Construir el Botón B (Paro de emergencia)</div>
+            <ol class="step-list" style="padding:0;">
+              <li class="step-item"><div class="step-num" style="font-size:11px;">15</div><div class="step-text">Haz clic en <strong style="color:#c701c7;">Input</strong>. Arrastra otro bloque <code>on button A pressed</code>. Haz clic en el desplegable "A" y cámbialo a <strong>B</strong>.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">16</div><div class="step-text">Desde <strong style="color:#1d9f1d;">Cutebot Pro</strong>, arrastra <code>set all wheel to stop immediately</code> dentro del botón B.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">17</div><div class="step-text">Desde <strong style="color:#4C97FF;">Basic</strong>, arrastra <code>show leds</code> dentro del botón B. Haz clic en la cuadrícula para iluminar un <strong>patrón en X</strong> (esquinas + centro).</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">18</div><div class="step-text">Desde <strong style="color:#4C97FF;">Basic</strong>, arrastra <code>pause (ms) 100</code> dentro del botón B, después de show leds. Cámbialo a <strong>3000</strong>. Arrastra <code>clear screen</code> debajo.</div></li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Cómo funciona el código -->
+        <div class="card">
+          <div class="card-title">Cómo funciona el código</div>
+          <div class="pseudo-card">
+            <div><span class="pc">// ── on start — se ejecuta una vez al encender el micro:bit ──</span></div>
+            <div><span class="pk">on start</span>:</div>
+            <div>&nbsp;&nbsp;<span class="pf">set</span> SPEED = <span class="pv">6</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pc">// ← cámbialo a 12 para la Carrera 2</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">set</span> motorPower = SPEED &times; 100 &divide; 20 &nbsp;<span class="pc">// = 30% para Carrera 1</span></div>
+            <div style="margin-top:8px;"><span class="pc">// ── Botón A — IR ─────────────────────────────────</span></div>
+            <div><span class="pk">on</span> <span class="pf">button A pressed</span>:</div>
+            <div>&nbsp;&nbsp;<span class="pf">show string</span> <span class="pv">"Go"</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">clear screen</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">set left wheel</span> motorPower<span class="pv">%</span>, <span class="pf">right wheel</span> motorPower<span class="pv">%</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">pause</span> (<span class="pv">5000</span> ms) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pc">// las ruedas giran por 5 segundos</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">stop all wheels</span></div>
+            <div style="margin-top:8px;"><span class="pc">// ── Botón B — PARO DE EMERGENCIA ─────────────────</span></div>
+            <div><span class="pk">on</span> <span class="pf">button B pressed</span>:</div>
+            <div>&nbsp;&nbsp;<span class="pf">stop all wheels</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">show leds</span> &nbsp;<span class="pc">// patrón en X</span></div>
+            <div>&nbsp;&nbsp;<span class="pf">pause</span> (<span class="pv">3000</span> ms)</div>
+            <div>&nbsp;&nbsp;<span class="pf">clear screen</span></div>
+          </div>
+          <p style="font-size:13px; color:var(--muted); margin-top:8px;">Entre carreras, solo cambias una cosa: <strong style="color:var(--yellow);">SPEED = 6</strong> para la Carrera 1 &rarr; <strong style="color:var(--green);">SPEED = 12</strong> para la Carrera 2. Descarga de nuevo después de cambiarlo.</p>
+        </div>
+
+        <!-- Fase 5 — Descargar y ejecutar -->
+        <div class="card">
+          <div style="background:rgba(114,72,184,.12); border:1px solid rgba(114,72,184,.4); border-radius:10px; padding:14px 16px;">
+            <div style="font-size:12px; font-weight:700; color:#b48aff; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Fase 5 — Descargar y ejecutar ambas pruebas</div>
+            <div style="display:flex; align-items:center; gap:12px; background:#111128; border-radius:10px; padding:10px 14px; margin-bottom:14px; flex-wrap:wrap;">
+              <span style="font-size:13px; color:var(--muted);">Haz clic en este botón (parte inferior izquierda de MakeCode):</span>
+              <div style="display:flex; border-radius:8px; overflow:hidden;">
+                <div style="background:#7248b8; padding:8px 18px; font-size:13px; font-weight:700; color:#fff;">&#8595; Descargar</div>
+                <div style="background:#5a3898; padding:8px 12px; font-size:13px; color:#fff;">&#183;&#183;&#183;</div>
+              </div>
+            </div>
+            <ol class="step-list" style="padding:0;">
+              <li class="step-item"><div class="step-num" style="font-size:11px;">1</div><div class="step-text">Conecta tu computadora al micro:bit v2 del Cutebot Pro con el cable USB.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">2</div><div class="step-text">Haz clic en el botón <strong style="color:#b48aff;">&#8595; Descargar</strong> (parte inferior izquierda, morado). Puedes descargar un archivo <code>.hex</code> a tu computadora para guardar el archivo.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">3</div><div class="step-text"><strong>Empareja tu micro:bit v2.</strong> Haz clic en los <strong>&#183;&#183;&#183;</strong> (tres puntos) junto al botón Descargar y selecciona <strong>Desconectar</strong>. Esto termina la sesión de emparejamiento de forma segura antes de desenchufar.</div></li>
+              <li class="step-item"><div class="step-num" style="font-size:11px;">4</div><div class="step-text">Desconecta suavemente el cable USB del micro:bit v2. Sostén el micro:bit v2 entre tus dedos y tira del cable recto hacia afuera con cuidado — <strong style="color:var(--red);">no lo gires ni lo jales bruscamente.</strong> No quieres romper el conector de la placa.</div></li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Botón listo (desde cero) -->
+        <div style="text-align:center; margin-top:28px;">
+          <button onclick="revealSpeedPicker()"
+            style="background:linear-gradient(135deg,#4C97FF,#2a6edb); color:#fff; border:none; padding:16px 40px; border-radius:12px; font-size:17px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; box-shadow:0 4px 16px rgba(76,151,255,.4); letter-spacing:.5px;">
+            Ya descargué mi programa &rarr;
+          </button>
+        </div>
+
+      </div><!-- fin #scratch-challenge -->
+
+    </div><!-- fin #scratch-path -->
+  </div>
+
+</section>
+
+<!-- ── SECCIÓN ELIMINADA ───────────────────────────────────────────── -->
+<section class="section" id="sec2" style="display:none!important;">
+
+  <div class="sec-header">
+    <div class="sec-icon green">📏</div>
+    <div>
+      <div class="sec-title">Resultados de la prueba</div>
+      <div class="sec-subtitle">Ingresa tus distancias — la lección calcula el resto</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>📝 Mide desde la cinta de inicio</strong> hasta donde se detuvo el bot. Ingresa ambas distancias en cm abajo.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Registro de datos</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Carrera</th>
+          <th>Puntos de Speed</th>
+          <th>% Potencia del motor</th>
+          <th>Distancia (cm)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700; color:var(--cyan);">Carrera 1</td>
+          <td>6</td>
+          <td class="auto-cell">30%</td>
+          <td><input type="number" id="dist1" placeholder="ej. 45" min="0" max="999" oninput="updateResults()"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:var(--green);">Carrera 2</td>
+          <td>12</td>
+          <td class="auto-cell">60%</td>
+          <td><input type="number" id="dist2" placeholder="ej. 90" min="0" max="999" oninput="updateResults()"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:8px; text-align:center;">
+      <span class="hint-pill" onclick="toggleHint('hint-measure')">💡 ¿Cómo mido?</span>
+      <div class="hint-text" id="hint-measure">
+        Coloca un trozo de cinta en la línea de salida. Cuando el bot se detenga, pon un dedo en la parte delantera del bot. Mide desde la cinta hasta tu dedo con una cinta métrica. Registra en centímetros (cm).
+      </div>
+    </div>
+  </div>
+
+  <!-- Barras de comparación (ocultas hasta que se ingresen ambos valores) -->
+  <div id="compareCard" class="compare-card" style="display:none;">
+    <div class="compare-title">📊 Comparación de distancias</div>
+    <div class="compare-row">
+      <div class="compare-run">Carrera 1</div>
+      <div class="compare-bar-wrap">
+        <div class="compare-bar-track">
+          <div class="compare-bar-fill r1" id="bar1" style="width:0%;"><span class="compare-pct" id="barPct1"></span></div>
+        </div>
+      </div>
+      <div class="compare-label" id="barLabel1">—</div>
+    </div>
+    <div class="compare-row">
+      <div class="compare-run">Carrera 2</div>
+      <div class="compare-bar-wrap">
+        <div class="compare-bar-track">
+          <div class="compare-bar-fill r2" id="bar2" style="width:0%;"><span class="compare-pct" id="barPct2"></span></div>
+        </div>
+      </div>
+      <div class="compare-label" id="barLabel2">—</div>
+    </div>
+  </div>
+
+  <!-- Cuadrícula de razón -->
+  <div id="ratioCard" class="ratio-grid" style="display:none;">
+    <div class="ratio-cell rc1">
+      <div class="ratio-cell-label">Carrera 1</div>
+      <div class="ratio-cell-val" id="rc1">—</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:2px;">cm</div>
+    </div>
+    <div class="ratio-cell rc2">
+      <div class="ratio-cell-label">Carrera 2</div>
+      <div class="ratio-cell-val" id="rc2">—</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:2px;">cm</div>
+    </div>
+    <div class="ratio-cell rct">
+      <div class="ratio-cell-label">Razón (C2 &divide; C1)</div>
+      <div class="ratio-cell-val" id="rcRatio">—</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:2px;">veces más lejos</div>
+    </div>
+  </div>
+
+  <!-- Oración de afirmación automática -->
+  <div id="claimBox" class="claim-box" style="display:none;">
+    <div class="claim-label">📝 Tu oración de afirmación</div>
+    <div class="claim-text" id="claimText"></div>
+  </div>
+
+  <button class="btn-next" onclick="goSection(3)">Siguiente — Reflexión &rarr;</button>
+</section>
+
+<!-- ── SECCIÓN ELIMINADA ───────────────────────────────────────────── -->
+<section class="section" id="sec3" style="display:none!important;">
+
+  <div class="sec-header">
+    <div class="sec-icon orange">🧠</div>
+    <div>
+      <div class="sec-title">Reflexión</div>
+      <div class="sec-subtitle">Dale sentido a tus datos</div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(255,214,0,.3);">
+    <div class="card-title" style="color:var(--yellow);">La gran pregunta</div>
+    <p style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:16px; line-height:1.5;">
+      Cuando duplicaste Speed (6 &rarr; 12), ¿también se duplicó la distancia?
+    </p>
+    <div class="choice-row">
+      <button class="choice-btn" id="btnYes"   onclick="selectDouble('yes')">✅ Sí — se duplicó</button>
+      <button class="choice-btn" id="btnNo"    onclick="selectDouble('no')">❌ No — no se duplicó</button>
+      <button class="choice-btn" id="btnClose" onclick="selectDouble('close')">≈ Casi, pero no exacto</button>
+    </div>
+    <div class="choice-response yes" id="resp-yes">
+      <strong style="color:var(--green);">Exactamente correcto.</strong> Una razón limpia de 2× confirma la relación lineal. En Velocity Arena puedes predecir la distancia desde los puntos de Speed sin adivinar — la fórmula funciona.
+    </div>
+    <div class="choice-response no" id="resp-no">
+      <strong style="color:var(--red);">Revisa de nuevo.</strong> Speed se duplicó (6 &rarr; 12) y la potencia del motor se duplicó (30% &rarr; 60%), así que la distancia también debería duplicarse aproximadamente. Revisa tu razón en la Sección 3. Si está entre 1,8 y 2,2, la fórmula sigue siendo válida — los bots reales tienen pequeñas variaciones.
+    </div>
+    <div class="choice-response close" id="resp-close">
+      <strong style="color:var(--orange);">Buena observación.</strong> La fórmula predice un 2× perfecto, pero los robots reales tienen fricción, diferencias de batería y variaciones de tiempo. Una razón entre 1,8× y 2,2× confirma la relación lineal. La pequeña diferencia respecto a 2,0 es normal.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preguntas de reflexión</div>
+
+    <div class="reflect-q">
+      <div class="reflect-label">1. ¿Qué predijiste antes de la carrera — duplicar Speed duplicaría la distancia?</div>
+      <div class="reflect-frame">Marco de oración: "Antes de la prueba, predije que duplicar Speed _____ la distancia porque _____."</div>
+      <textarea id="r1" placeholder="Escribe tu predicción aquí…" oninput="checkReflect()"></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <div class="reflect-label">2. ¿Cómo se comparan tus resultados reales con tu predicción?</div>
+      <div class="reflect-frame">Marco de oración: "Mis resultados mostraron que _____, lo cual fue [similar a / diferente de] mi predicción porque _____."</div>
+      <textarea id="r2" placeholder="Compara tu predicción con tus datos…" oninput="checkReflect()"></textarea>
+    </div>
+
+    <div class="reflect-q" style="margin-bottom:0;">
+      <div class="reflect-label">3. Si agregaras 4 puntos más de Speed (de 12 a 16), ¿qué esperarías y por qué?</div>
+      <div class="reflect-frame">Marco de oración: "Agregar 4 puntos más de Speed cambiaría la potencia del motor en _____%. Creo que la distancia _____ porque _____."</div>
+      <textarea id="r3" placeholder="Usa la fórmula para hacer una predicción…" oninput="checkReflect()"></textarea>
+    </div>
+
+    <div style="text-align:center; margin-top:4px;">
+      <span class="hint-pill" onclick="toggleHint('hint-q3')">💡 Pista para la pregunta 3</span>
+      <div class="hint-text" id="hint-q3">
+        Usa la fórmula: motorPower = Speed &times; 100 &divide; 20.<br>
+        Speed 12 &rarr; 12 &times; 100 &divide; 20 = 60%.<br>
+        Speed 16 &rarr; 16 &times; 100 &divide; 20 = 80%.<br>
+        Eso es 20% más de potencia. Como la relación es lineal, espera aproximadamente un 20% más de distancia también.
+      </div>
+    </div>
+  </div>
+
+  <div class="congrats-box" id="congratsBox">
+    <div class="congrats-icon">🏆</div>
+    <div class="congrats-title">¡Primer manejo del bot completado!</div>
+    <div class="congrats-body">
+      Conectaste el stat Speed con la potencia del motor y lo probaste con un bot real.
+      La conclusión clave: <strong style="color:var(--green);">Speed es lineal.</strong>
+      Cada punto que agregas da el mismo impulso — sin sorpresas ni curvas.<br><br>
+      Vuelve aquí el Día 4 cuando lo compares con el stat Power.
+    </div>
+  </div>
+
+</section>
+
+<!-- ── JAVASCRIPT ────────────────────────────────────────────────── -->
+<script>
+let currentSection = 0;
+
+function goSection(n) {
+  document.getElementById('sec' + currentSection).classList.remove('active');
+  currentSection = n;
+  document.getElementById('sec' + currentSection).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 1 && !window._currentPath) { selectPath('premade'); }
+}
+
+function updateProgress() {
+  const pcts = [25, 100];
+  document.getElementById('progFill').style.width = pcts[currentSection] + '%';
+  for (let i = 0; i < 2; i++) {
+    const el = document.getElementById('pt' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'done');
+    if (i === currentSection) el.classList.add('active');
+    else if (i < currentSection) el.classList.add('done');
+  }
+}
+
+// ── SEC 0: BLOQUEO DE PREDICCIÓN ──────────────────────────────────────────
+window._predSelection = null;
+
+function selectPred(val, btn) {
+  window._predSelection = val;
+  ['pb-less','pb-double','pb-more'].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.style.background = '';
+    b.style.color = '';
+    b.style.borderColor = '';
+    b.style.fontWeight = '';
+  });
+  btn.style.background = 'var(--yellow)';
+  btn.style.color = '#000';
+  btn.style.borderColor = 'var(--yellow)';
+  btn.style.fontWeight = '800';
+  checkPredReady();
+}
+
+function checkPredReady() {
+  const why   = document.getElementById('pred-why');
+  const count = document.getElementById('pred-why-count');
+  if (!why || !count) return;
+  const len = why.value.trim().length;
+  count.textContent = len + ' / 15 caracteres necesarios para bloquear';
+  const btn   = document.getElementById('pred-lock-btn');
+  const ready = window._predSelection !== null && len >= 15;
+  btn.disabled = !ready;
+  btn.style.opacity = ready ? '1' : '.4';
+  btn.style.cursor  = ready ? 'pointer' : 'default';
+}
+
+function lockPred() {
+  const labels = {
+    less:   'Menos del doble',
+    double: 'Exactamente el doble',
+    more:   'Más del doble'
+  };
+  const label = labels[window._predSelection] || '—';
+
+  document.getElementById('p0-pred').style.display = 'none';
+
+  const banner = document.getElementById('p0-pred-banner');
+  banner.style.display = 'flex';
+  document.getElementById('pred-banner-text').textContent = label;
+
+  document.getElementById('p0-formula').style.display = 'block';
+}
+
+// ── SEC 0: SIMPLIFICAR ─────────────────────────────────────────────────
+function checkSimplify() {
+  const inp  = document.getElementById('simplify-input');
+  const icon = document.getElementById('simplify-icon');
+  const hint = document.getElementById('simplify-hint');
+  const val  = parseInt(inp.value);
+
+  if (val === 5) {
+    inp.style.borderColor  = 'var(--green)';
+    icon.textContent = '✓'; icon.style.color = 'var(--green)';
+    hint.textContent = 'Correcto — 100 ÷ 20 = 5. La fórmula se simplifica a Speed × 5.';
+    hint.style.color = 'var(--green)';
+    document.getElementById('p0-compute').style.display = 'block';
+  } else if (inp.value.length > 0) {
+    inp.style.borderColor  = 'var(--red)';
+    icon.textContent = '✕'; icon.style.color = 'var(--red)';
+    hint.textContent = 'Intenta de nuevo. ¿Cuánto es 100 ÷ 20?';
+    hint.style.color = 'var(--red)';
+  }
+}
+
+// ── SEC 0: CÁLCULO MANUAL ───────────────────────────────────────────
+function checkCalcs() {
+  const v7   = parseInt(document.getElementById('calc-7').value);
+  const v13  = parseInt(document.getElementById('calc-13').value);
+  const el7  = document.getElementById('calc-7');
+  const el13 = document.getElementById('calc-13');
+  const fb7  = document.getElementById('calc-7-fb');
+  const fb13 = document.getElementById('calc-13-fb');
+
+  if (el7.value.length > 0) {
+    if (v7 === 35) {
+      el7.style.borderColor = 'var(--green)';
+      fb7.textContent = '✓ Correcto'; fb7.style.color = 'var(--green)';
+    } else {
+      el7.style.borderColor = 'var(--red)';
+      fb7.textContent = '✕ Intenta de nuevo'; fb7.style.color = 'var(--red)';
+    }
+  }
+
+  if (el13.value.length > 0) {
+    if (v13 === 65) {
+      el13.style.borderColor = 'var(--green)';
+      fb13.textContent = '✓ Correcto'; fb13.style.color = 'var(--green)';
+    } else {
+      el13.style.borderColor = 'var(--red)';
+      fb13.textContent = '✕ Intenta de nuevo'; fb13.style.color = 'var(--red)';
+    }
+  }
+
+  if (v7 === 35 && v13 === 65) {
+    const pv = document.getElementById('p0-verify');
+    pv.style.display = 'block';
+    setTimeout(() => pv.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
+
+// ── SEC 0: PUERTA DE PREDICCIÓN DEL DESLIZADOR ──────────────────────────────────
+function checkSliderPred() {
+  const inp  = document.getElementById('slider-pred');
+  const icon = document.getElementById('slider-pred-icon');
+  const hint = document.getElementById('slider-pred-hint');
+  const val  = parseInt(inp.value);
+
+  if (val === 70) {
+    inp.style.borderColor  = 'var(--green)';
+    icon.textContent = '✓'; icon.style.color = 'var(--green)';
+    hint.textContent = '14 × 5 = 70. ¡Correcto!'; hint.style.color = 'var(--green)';
+    const m = document.getElementById('slider-main');
+    m.style.opacity = '1'; m.style.pointerEvents = 'auto';
+    document.getElementById('slider-pred-wrap').style.opacity = '.6';
+    const rest = document.getElementById('p0-verify-rest');
+    rest.style.display = 'block';
+    setTimeout(() => {
+      const sliderEl = document.getElementById('slider-main');
+      sliderEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  } else if (inp.value.length > 0) {
+    inp.style.borderColor  = 'var(--red)';
+    icon.textContent = '✕'; icon.style.color = 'var(--red)';
+    hint.textContent = 'Usa la fórmula: 14 × 5 = ?'; hint.style.color = 'var(--red)';
+  }
+}
+
+// ── SEC 0: PUERTA DE OBSERVACIÓN ─────────────────────────────────────────────
+function checkObs() {
+  const text  = document.getElementById('obs-text').value.trim();
+  const count = document.getElementById('obs-count');
+  count.textContent = text.length + ' / 15 caracteres necesarios';
+  if (text.length >= 15) {
+    count.style.color = 'var(--green)';
+    const btn = document.getElementById('p0-next-btn');
+    btn.style.opacity      = '1';
+    btn.style.pointerEvents = 'auto';
+  }
+}
+
+// ── DESLIZADOR ───────────────────────────────────────────────────────────────
+function updateSlider() {
+  const s   = parseInt(document.getElementById('speedSlider').value);
+  const pct = s * 5;
+
+  document.getElementById('sliderVal').textContent      = s;
+  document.getElementById('dispPts').textContent        = s;
+  document.getElementById('dispPct').textContent        = pct + '%';
+  document.getElementById('powerBar').style.width       = pct + '%';
+  document.getElementById('powerBarLabel').textContent  = pct + '%';
+
+  let insight = '';
+  if      (s === 7)  insight = 'Tu valor calculado — Speed 7 → 35% de potencia del motor';
+  else if (s === 13) insight = 'Tu valor calculado — Speed 13 → 65% de potencia del motor';
+  else if (s === 14) insight = 'Verificación de predicción — Speed 14 → 70% de potencia del motor';
+  else if (s <= 4)   insight = 'Speed bajo — el bot avanzará despacio.';
+  else if (s >= 18)  insight = '¡Casi al máximo — casi a plena potencia del motor!';
+  else               insight = 'Speed ' + s + ' → ' + pct + '% de potencia del motor';
+  document.getElementById('sliderInsight').textContent = insight;
+
+  const cx = 64 + (s / 20) * 432;
+  const cy = 250 - (pct / 100) * 208;
+  const dot = document.getElementById('liveDot');
+  if (dot) { dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); }
+}
+
+// ── SEC 1: ELECCIÓN DE VELOCIDAD ─────────────────────────────────────────────
+let _testSpeeds = [null, null, null];
+
+function updateSpeedChoice(i) {
+  const sel = document.getElementById('sc-' + i);
+  const val = sel && sel.value ? parseInt(sel.value) : null;
+  _testSpeeds[i] = val;
+  checkSpeedChoices();
+}
+
+function checkSpeedChoices() {
+  const btn  = document.getElementById('sc-confirm-btn');
+  const warn = document.getElementById('sc-warn');
+  const [s1, s2, s3] = _testSpeeds;
+
+  if (!s1 || !s2 || !s3) {
+    warn.textContent = '';
+    btn.disabled = true; btn.style.opacity = '.4';
+    return;
+  }
+  if (s1 === s2 || s2 === s3 || s1 === s3) {
+    warn.textContent = 'Elige tres velocidades diferentes.';
+    warn.style.color = 'var(--red)';
+    btn.disabled = true; btn.style.opacity = '.4';
+    return;
+  }
+  warn.textContent = '';
+  btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+}
+
+function confirmSpeeds() {
+  const [s1, s2, s3] = _testSpeeds;
+  if (!s1 || !s2 || !s3) return;
+
+  ['sc-0','sc-1','sc-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  const btn = document.getElementById('sc-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = '✓ Velocidades bloqueadas';
+  btn.style.opacity = '.7';
+
+  const banner = document.getElementById('sc-locked-banner');
+  banner.style.display = 'flex';
+  document.getElementById('sc-locked-text').textContent =
+    'Tus velocidades: ' + s1 + ', ' + s2 + ', ' + s3 + ' — bloqueadas.';
+
+  const s6 = document.getElementById('premade-step6');
+  const mg = document.getElementById('measure-led-guide');
+  const dt = document.getElementById('data-table-section');
+  if (s6) s6.style.display = 'block';
+  if (mg) mg.style.display = 'block';
+  if (dt) dt.style.display = 'block';
+  const scrollTarget = s6 || dt;
+  if (scrollTarget) setTimeout(() => scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+// ── SEC 1: PUERTA DE FRICCIÓN ────────────────────────────────────────────────
+function checkFriction() {
+  const text  = document.getElementById('friction-text').value.trim();
+  const count = document.getElementById('friction-count');
+  count.textContent = text.length + ' / 15 caracteres necesarios';
+  if (text.length >= 15) {
+    count.style.color = 'var(--green)';
+    const ps = document.getElementById('pattern-section');
+    ps.style.display = 'block';
+    ps.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// ── SEC 1: PATRÓN + REVELACIÓN LINEAL ─────────────────────────────────────────
+function checkPattern() {
+  const text  = document.getElementById('pattern-text').value.trim();
+  const count = document.getElementById('pattern-count');
+  count.textContent = text.length + ' / 15 caracteres necesarios';
+  if (text.length >= 15) {
+    count.style.color = 'var(--green)';
+    const lr = document.getElementById('linear-reveal');
+    lr.style.display = 'block';
+    lr.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const nb = document.getElementById('s1-next-btn');
+    nb.style.opacity = '1'; nb.style.pointerEvents = 'auto';
+  }
+}
+
+// ── INICIALIZACIÓN ─────────────────────────────────────────────────────────────
+updateSlider();
+updateProgress();
+
+// ── SELECCIÓN DE RUTA ───────────────────────────────────────────────────────────
+window._currentPath = null;
+
+function selectPath(path) {
+  window._currentPath = path;
+
+  document.getElementById('scratch-path').style.display  = 'none';
+  document.getElementById('premade-path').style.display  = 'none';
+
+  const target = document.getElementById(path + '-path');
+  target.style.display = 'block';
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
+
+function revealSpeedPicker() {
+  const sp = document.getElementById('shared-speed-picker');
+  if (sp) {
+    sp.style.display = 'block';
+    setTimeout(() => sp.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
+
+function revealScratchContent() {
+  const sc = document.getElementById('scratch-path');
+  if (sc) {
+    sc.style.display = 'block';
+    setTimeout(() => sc.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
+
+function revealScratchChallenge() {
+  const el = document.getElementById('scratch-challenge');
+  if (el) {
+    el.style.display = 'block';
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
+
+function showFriction() {
+  const fs = document.getElementById('friction-section');
+  if (fs) {
+    fs.style.display = 'block';
+    setTimeout(() => fs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
+
+// ── PISTA ────────────────────────────────────────────────────────────────────
+function toggleHint(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show');
+}
+
+// ── SEC 3: SELECCIÓN DE DOBLE ─────────────────────────────────────────────────
+function selectDouble(val) {
+  ['btnYes','btnNo','btnClose'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) { b.classList.remove('sel-yes','sel-no','sel-close'); }
+  });
+  ['resp-yes','resp-no','resp-close'].forEach(id => {
+    const r = document.getElementById(id);
+    if (r) r.classList.remove('show');
+  });
+
+  const map = { yes:'btnYes', no:'btnNo', close:'btnClose' };
+  const respMap = { yes:'resp-yes', no:'resp-no', close:'resp-close' };
+  const btn = document.getElementById(map[val]);
+  const resp = document.getElementById(respMap[val]);
+  if (btn)  btn.classList.add('sel-' + val);
+  if (resp) resp.classList.add('show');
+  checkReflect();
+}
+
+// ── SEC 3: VERIFICACIÓN DE REFLEXIÓN ─────────────────────────────────────────
+function checkReflect() {
+  const r1 = (document.getElementById('r1') || {}).value || '';
+  const r2 = (document.getElementById('r2') || {}).value || '';
+  const r3 = (document.getElementById('r3') || {}).value || '';
+  const choiceMade = !!document.querySelector('.choice-btn.sel-yes, .choice-btn.sel-no, .choice-btn.sel-close');
+  if (r1.trim().length >= 15 && r2.trim().length >= 15 && r3.trim().length >= 15 && choiceMade) {
+    const box = document.getElementById('congratsBox');
+    if (box) box.classList.add('show');
+  }
+}
+
+// ── SEC 2: RESULTADOS ────────────────────────────────────────────────────────
+function updateResults() {
+  const d1 = parseFloat(document.getElementById('dist1').value);
+  const d2 = parseFloat(document.getElementById('dist2').value);
+  if (isNaN(d1) || isNaN(d2)) return;
+
+  const compareCard = document.getElementById('compareCard');
+  const ratioCard   = document.getElementById('ratioCard');
+  const claimBox    = document.getElementById('claimBox');
+  if (compareCard) compareCard.style.display = 'block';
+  if (ratioCard)   ratioCard.style.display   = 'grid';
+  if (claimBox)    claimBox.style.display    = 'block';
+
+  const maxD = Math.max(d1, d2);
+  const pct1 = Math.round((d1 / maxD) * 100);
+  const pct2 = Math.round((d2 / maxD) * 100);
+
+  const b1 = document.getElementById('bar1');
+  const b2 = document.getElementById('bar2');
+  if (b1) { b1.style.width = pct1 + '%'; document.getElementById('barPct1').textContent = d1 + ' cm'; }
+  if (b2) { b2.style.width = pct2 + '%'; document.getElementById('barPct2').textContent = d2 + ' cm'; }
+
+  const lbl1 = document.getElementById('barLabel1');
+  const lbl2 = document.getElementById('barLabel2');
+  if (lbl1) lbl1.textContent = d1 + ' cm';
+  if (lbl2) lbl2.textContent = d2 + ' cm';
+
+  const rc1 = document.getElementById('rc1');
+  const rc2 = document.getElementById('rc2');
+  const rcR = document.getElementById('rcRatio');
+  if (rc1) rc1.textContent = d1;
+  if (rc2) rc2.textContent = d2;
+  if (rcR) rcR.textContent = (d2 / d1).toFixed(2) + '×';
+
+  const claimText = document.getElementById('claimText');
+  if (claimText) {
+    const ratio = (d2 / d1).toFixed(2);
+    claimText.textContent =
+      'Cuando Speed se duplicó de 6 a 12 (de 30% a 60% de potencia del motor), ' +
+      'la distancia cambió de ' + d1 + ' cm a ' + d2 + ' cm — una razón de ' + ratio + '×.';
+  }
+}
+</script>
+
+<!-- ── RENDERIZADOR DE BLOQUES MAKECODE ──────────────────────────────
+     Usa la API oficial de incrustación de bloques de MakeCode.
+     Docs: https://makecode.microbit.org/blocks-embed
+─────────────────────────────────────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL       = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE  = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId            = 0;
+
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE }
+    }, MAKECODE_URL);
+  }
+
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+
+    if (msg.type === "renderblocks") {
+      var pre  = document.getElementById(msg.id);
+      if (!pre) return;
+      var area   = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src    = msg.uri;
+        img.width  = msg.width;
+        img.height = msg.height;
+        img.alt    = "Bloques de MakeCode";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        if (loader) loader.innerHTML =
+          "<span style='font-size:12px;color:#888;'>Vista previa de bloques no disponible — <a href='https://makecode.microbit.org/' target='_blank' style='color:#00e5ff;'>abre en MakeCode</a> para verla.</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+</body>
+</html>
