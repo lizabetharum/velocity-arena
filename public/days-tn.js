@@ -139,7 +139,7 @@ const DAY_15_INLINE = {
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
       },
       {
-        "name": "Open Lab: Reflection + Pitch Refinement",
+        "name": "Open Lab: Reflection Time",
         "mins": 30,
         "block": "Open Lab",
         "description": "Rehearse your pitch one more time as a team. Add specific numbers to any claim that is still vague. Every claim in the pitch needs a number next to it before tomorrow.",
@@ -185,7 +185,10 @@ const DAY_16_INLINE = {
         "block": "Match-Build-Make",
         "description": "Visitors arrive. Teach each visitor to complete three mini-challenges: (1) calculate a unit rate from scouting data — Season 1 wins ÷ Speed stat, stated as wins per 1 Speed point; (2) plot two match coordinates on the arena grid and calculate the distance between them; (3) explain in your own words why your Speed stat and motor power scale proportionally. Goal: every visitor completes all three independently, without prompting after the initial explanation.",
         "facilitatorDescription": "Visitors arrive and circulate among team stations. Teams teach unit rate, coordinate distance, and proportional scaling. Visitors are the assessment: each must complete all three mini-challenges independently after initial explanation. Best Teacher voting open through the session.",
-        "script": "https://docs.google.com/document/d/1kPsmjmLJf6hZYdt6SSDuvMpwZoMSVShJtEGvzI37eJM/edit?usp=drive_link",
+        "script": "https://docs.google.com/document/d/1BxOpLcNK_m69kX2Iqw69IyCNfIs6PjZw2Bc4pw7eAhE/edit?usp=sharing",
+        "worksheet":[{url:"https://drive.google.com/file/d/11FHY_zkXLdeoaalC_FWDWygKerIXE6P-/view?usp=drive_link",label: "Day 16 Visitor Challenge Handout"},
+          {url:"https://docs.google.com/document/d/1u9hHevx2km9v_LSpe1lS-udOwx2DW2n3eaOy7Y8-8dY/edit?usp=drive_link",label: "Ballots"},
+        {url: "https://docs.google.com/document/d/1dJK2knM3Ck362snzQbzY5qf-IVG017cT58zHUXVgUnU/edit?usp=sharing", label: "Visitor Completion Tracker"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day19-02-community-exhibition-teaching.html"
       },
       {
