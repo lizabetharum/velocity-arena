@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motor &amp; Encoder Limits · Code Explainer · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0D0D1A;
+      --navy2:  #161A2E;
+      --navy3:  #1E2240;
+      --cyan:   #00E5FF;
+      --teal:   #007A99;
+      --slate:  #8899AA;
+      --border: #222840;
+      --card:   #161A2E;
+      --green:  #00C97A;
+      --red:    #FF4D6A;
+      --yellow: #FFD166;
+      --orange: #FF8C42;
+      --purple: #BD7AFF;
+      --text:   #E8EAF2;
+      --muted:  #9AA3B2;
+      --mono:   'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      display: flex; gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub {
+      font-size: .9375rem; color: var(--muted);
+      line-height: 1.6; max-width: 620px;
+    }
+
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .75rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Mode cards */
+    .mode-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .875rem;
+    }
+    .mode-badge.closed { background: rgba(0,229,255,.15); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .mode-badge.open   { background: rgba(255,140,66,.15); color: var(--orange); border: 1px solid rgba(255,140,66,.3); }
+    .mode-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: .5rem; }
+    .mode-card p  { font-size: .8375rem; color: var(--muted); line-height: 1.6; }
+
+    /* Button cards */
+    .btn-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .btn-badge {
+      display: inline-block;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .btn-badge.a { background: rgba(0,229,255,.15);   color: var(--cyan);   border: 1px solid rgba(0,229,255,.3); }
+    .btn-badge.b { background: rgba(255,209,102,.12); color: var(--yellow); border: 1px solid rgba(255,209,102,.25); }
+    .btn-card h3 { font-size: .9375rem; font-weight: 700; margin-bottom: .4rem; }
+    .btn-card p  { font-size: .8125rem; color: var(--muted); line-height: 1.55; }
+
+    /* Formula box */
+    .formula-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: .625rem;
+    }
+    .formula-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .4rem;
+    }
+    .formula-eq { font-family: var(--mono); font-size: .9375rem; color: var(--cyan); margin-bottom: .375rem; }
+    .formula-note { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .formula-note strong { color: var(--yellow); }
+
+    /* Callouts */
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: .75rem; font-size: .8125rem; line-height: 1.55;
+    }
+    .callout.info    { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: #c0e8f0; }
+    .callout.warn    { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.2); color: #f0e0b0; }
+    .callout.danger  { background: rgba(255,76,106,.07); border: 1px solid rgba(255,76,106,.2); color: #f0b8c0; }
+    .callout.success { background: rgba(0,201,122,.07); border: 1px solid rgba(0,201,122,.2); color: #a0e8c8; }
+    .callout-icon    { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout strong  { display: block; margin-bottom: .2rem; }
+
+    /* MakeCode blocks */
+    pre.blocks { display: none; }
+    .blocks-render-area {
+      min-height: 80px; display: flex; align-items: flex-start;
+      justify-content: flex-start; padding: .75rem 0;
+      flex-wrap: wrap; gap: .75rem;
+    }
+    .blocks-loading {
+      display: flex; align-items: center; gap: .75rem;
+      font-size: .8125rem; color: var(--muted); padding: .5rem 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border); border-top-color: var(--cyan);
+      border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .block-entry { margin-bottom: 1.5rem; }
+    .block-entry-header {
+      font-size: .6875rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .625rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .block-entry-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .block-entry-body {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1.25rem; align-items: start;
+    }
+    @media (max-width: 620px) { .block-entry-body { grid-template-columns: 1fr; } }
+    .block-entry-explain { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+    .block-entry-explain strong { color: var(--text); }
+
+    /* Comparison table */
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .5rem .875rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .comp-table td { padding: .6rem .875rem; border-bottom: 1px solid rgba(34,40,64,.5); font-size: .8125rem; vertical-align: top; }
+    .comp-table tbody tr:last-child td { border-bottom: none; }
+    .comp-table .type-closed td:first-child { border-left: 2px solid var(--cyan); }
+    .comp-table .type-open   td:first-child { border-left: 2px solid var(--orange); }
+    .tag-closed { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(0,229,255,.12); color: var(--cyan); border: 1px solid rgba(0,229,255,.25); padding: .15rem .45rem; border-radius: 3px; margin-bottom: .3rem; }
+    .tag-open   { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(255,140,66,.12); color: var(--orange); border: 1px solid rgba(255,140,66,.25); padding: .15rem .45rem; border-radius: 3px; margin-bottom: .3rem; }
+    .tag-a      { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid rgba(0,229,255,.2); padding: .1rem .35rem; border-radius: 3px; margin-right: .3rem; }
+    .tag-b      { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(255,209,102,.1); color: var(--yellow); border: 1px solid rgba(255,209,102,.2); padding: .1rem .35rem; border-radius: 3px; margin-right: .3rem; }
+    .dist       { font-family: var(--mono); font-weight: 700; color: var(--green); }
+    .dist.variable { color: var(--orange); }
+
+    /* Concept cards */
+    .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 580px) { .concept-grid { grid-template-columns: 1fr; } }
+    .concept-card {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.125rem 1.25rem;
+    }
+    .concept-icon  { font-size: 1.5rem; margin-bottom: .5rem; }
+    .concept-title { font-size: .8125rem; font-weight: 800; margin-bottom: .375rem; }
+    .concept-body  { font-size: .7875rem; color: var(--muted); line-height: 1.6; }
+
+    /* Interactive calculator */
+    .calc-wrap { background: var(--navy2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .calc-header {
+      background: var(--navy3); border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .calc-header-title { font-size: .9375rem; font-weight: 800; }
+    .calc-body { padding: 1.5rem; }
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .4rem; }
+    .slider-name { font-size: .8125rem; font-weight: 700; }
+    .slider-val  { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 3px; outline: none; cursor: pointer;
+      background: var(--navy3); accent-color: var(--cyan);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; border: 2px solid var(--navy2);
+      background: var(--cyan); cursor: pointer;
+    }
+    .slider-sub { font-size: .6875rem; color: var(--muted); margin-top: .25rem; }
+
+    .outputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1.25rem; }
+    @media (max-width: 520px) { .outputs-grid { grid-template-columns: 1fr 1fr; } }
+    .out-cell { background: var(--navy3); border: 1px solid var(--border); border-radius: 8px; padding: .875rem 1rem; text-align: center; }
+    .out-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .4rem; }
+    .out-val   { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+    .out-unit  { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* Constants table */
+    .const-table { width: 100%; border-collapse: collapse; }
+    .const-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .const-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .8125rem; }
+    .const-table tbody tr:last-child td { border-bottom: none; }
+    .const-name { font-family: var(--mono); color: var(--cyan); }
+    .const-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-note { color: var(--muted); font-size: .775rem; }
+
+    code {
+      font-family: var(--mono); font-size: .8em;
+      background: rgba(0,0,0,.35); padding: .1em .35em;
+      border-radius: 3px; color: var(--cyan);
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* Numbered steps */
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,229,255,.15); color: var(--cyan);
+      border: 1px solid rgba(0,229,255,.3); font-size: .6875rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: .1rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/lessons">← Lessons</a>
+  <a href="/lessons/motor-limits-explainer.html" style="color:var(--cyan)">Motor &amp; Encoder Limits</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">Code Explainer · BBC micro:bit v2 + Cutebot Pro</div>
+    <h1 class="page-title">Motor &amp; Encoder Limits</h1>
+    <p class="page-sub">You'll run two programs — one where the bot tracks its own speed, and one where it doesn't. Both drive for exactly 3 seconds. Compare the distances to see what the hardware can and can't control.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- THE BIG IDEA -->
+  <div class="section">
+    <div class="section-label">The Big Idea</div>
+    <div class="grid-2">
+      <div class="mode-card">
+        <div class="mode-badge closed">● Smart Mode</div>
+        <h3>Closed-Loop Program</h3>
+        <p>The bot reads its own wheel sensors to check its actual speed. If it's going too slow, it gives the motors more power. If it's going too fast, it pulls back. The result: a steady, predictable distance every time.</p>
+      </div>
+      <div class="mode-card">
+        <div class="mode-badge open">● Raw Mode</div>
+        <h3>Open-Loop Program</h3>
+        <p>The bot sends a fixed voltage to the motors and never checks whether it's actually moving at the right speed. Friction, low battery, and startup delay all affect the distance — and nothing corrects for them.</p>
+      </div>
+    </div>
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">⏱️</span>
+      <div>Both programs are locked at <strong>3000 milliseconds (3 seconds)</strong>. Keeping time the same is what makes this test fair — any difference in distance is caused by the program, not the clock.</div>
+    </div>
+  </div>
+
+  <!-- SMART MODE PROGRAM -->
+  <div class="section">
+    <div class="section-label">Smart Mode — Closed-Loop Program</div>
+
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">
+        This program uses a block called <code>cruise control</code>. That block turns on the bot's speed-correction system. Tiny sensors on each wheel count how fast the wheel is spinning. The controller compares that count to your target speed, then adjusts the motor power to close the gap — dozens of times per second.
+      </p>
+    </div>
+
+    <div class="formula-box" style="margin-top:.75rem;">
+      <div class="formula-label">Speed Calculator — How SPEED Becomes cm/s</div>
+      <div class="formula-eq">targetSpeed = 20 + ((SPEED − 1) × (50 − 20)) / (20 − 1)</div>
+      <div class="formula-note">
+        Your SPEED stat is a number from 1 to 20. This formula stretches that range across the bot's real speed limits (20–50 cm/s).<br>
+        <strong>SPEED 1 → 20 cm/s &nbsp;|&nbsp; SPEED 6 → 27.9 cm/s &nbsp;|&nbsp; SPEED 20 → 50 cm/s</strong>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top:.875rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>The sensor system has a hard floor at 20 cm/s.</strong> Below that speed, the wheel sensors can't count fast enough to keep up. The correction system loses track and the bot either stalls or moves unpredictably. That's a hardware limit — you can't fix it in code.</div>
+    </div>
+
+    <!-- BLOCK: Starting Values -->
+    <div class="block-entry" style="margin-top:1.5rem;">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Starting Values — Set These Before You Download
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let targetSpeed = 0
+let minSpeed = 20
+let maxSpeed = 50
+let SPEED = 6
+targetSpeed = minSpeed + ((SPEED - 1) * (maxSpeed - minSpeed)) / (20 - 1)
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          These four variables run at startup, before you press anything.<br><br>
+          <strong>minSpeed (20)</strong> and <strong>maxSpeed (50)</strong> are the physical limits of the speed-correction system — don't change them.<br><br>
+          <strong>SPEED (6)</strong> is your stat. Change this number (1–20) to match your bot's Speed stat before you download the program.<br><br>
+          The last line runs the formula and stores the result as <code>targetSpeed</code>, which Button B uses.
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button A Closed -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Button A — Full Speed (50 cm/s)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let maxSpeed = 50
+input.onButtonPressed(Button.A, function () {
+    CutebotPro.cruiseControl(maxSpeed, maxSpeed, CutebotProSpeedUnits.Cms)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>Cruise control</strong> turns on the speed-correction system and tells it to hold 50 cm/s on both wheels.<br><br>
+          <strong>Pause 3000</strong> keeps the program waiting for exactly 3 seconds. The correction system keeps working the whole time — it never takes a break.<br><br>
+          <strong>Stop immediately</strong> cuts both motors at once when the 3 seconds are up.<br><br>
+          Expected distance: <span style="color:var(--green);font-family:var(--mono);">~143 cm</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button B Closed -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Button B — Your SPEED Setting (27.9 cm/s at SPEED 6)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+let targetSpeed = 0
+input.onButtonPressed(Button.B, function () {
+    CutebotPro.cruiseControl(targetSpeed, targetSpeed, CutebotProSpeedUnits.Cms)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Same structure as Button A — but this time it uses <code>targetSpeed</code>, which was calculated from your SPEED stat when the program started.<br><br>
+          At SPEED 6, <code>targetSpeed</code> = 27.9 cm/s. The speed-correction system holds that value for the full 3 seconds.<br><br>
+          Expected distance: <span style="color:var(--green);font-family:var(--mono);">~77 cm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1rem;">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>50 cm/s · Max Speed</h3>
+        <p>The speed-correction system holds 50 cm/s the entire 3 seconds. The distance is consistent run after run because the system corrects for friction and battery changes automatically.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>27.9 cm/s · Your Stat</h3>
+        <p>The speed-correction system tracks your SPEED setting. It works well above 20 cm/s. Below that floor, the wheel sensors can't read fast enough and the bot stalls.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAW MODE PROGRAM -->
+  <div class="section">
+    <div class="section-label">Raw Mode — Open-Loop Program</div>
+
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">
+        This program uses a block called <code>PWM cruise control</code>. PWM stands for Pulse-Width Modulation — it's how the chip controls voltage to the motors. Think of it like a volume dial: 100% means full power, 30% means low power. The wheel sensors are completely ignored. Whatever physics happen, they happen uncorrected.
+      </p>
+    </div>
+
+    <!-- BLOCK: Button A Open -->
+    <div class="block-entry" style="margin-top:1.5rem;">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--orange)"></div>
+        Button A — 100% Power (Full Voltage)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+input.onButtonPressed(Button.A, function () {
+    CutebotPro.pwmCruiseControl(100, 100)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>PWM cruise control at 100</strong> sends full battery voltage to both motors. No speed target. No corrections. The bot goes as fast as the battery will allow.<br><br>
+          This is the fastest possible open-loop run — but run it ten times and you'll notice the distance slowly shrinks as the battery drains. That's the hardware showing its limits.<br><br>
+          Expected distance: <span style="color:var(--orange);font-family:var(--mono);">Maximum — drops as battery dies</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button B Open -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Button B — 30% Power (Low Voltage)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
+            <pre class="blocks">
+input.onButtonPressed(Button.B, function () {
+    CutebotPro.pwmCruiseControl(30, 30)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>PWM cruise control at 30</strong> sends only 30% of battery voltage to the motors. At this low level, the gears inside the motor resist moving from a dead stop — so the bot hesitates for a moment before it rolls.<br><br>
+          That startup delay eats into your 3-second window. You'll find the 30% distance is <em>more</em> than half the 100% distance — the ratio doesn't scale the way you'd expect.<br><br>
+          Expected distance: <span style="color:var(--orange);font-family:var(--mono);">More than half of the 100% run</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1rem;">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>100% PWM · Watch It Drop</h3>
+        <p>Full power, no corrections. Distance is the highest you'll see — but it's not guaranteed. Run it twice and measure whether the second run was shorter. If it is, that's battery drain.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>30% PWM · Startup Lag</h3>
+        <p>Low voltage fights gear friction at startup. The motors waste part of the 3-second window just getting moving. No correction system can help because this program doesn't use one.</p>
+      </div>
+    </div>
+
+    <div class="callout danger" style="margin-top:.875rem;">
+      <span class="callout-icon">🔋</span>
+      <div><strong>Battery state changes your distance.</strong> Open-loop sends a percentage of whatever voltage is left in the battery. A full battery at 30% and a half-dead battery at 30% will travel different distances. The Smart Mode program doesn't have this problem because it corrects for voltage changes automatically.</div>
+    </div>
+  </div>
+
+  <!-- COMPARISON MATRIX -->
+  <div class="section">
+    <div class="section-label">Side-by-Side Results</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Program</th>
+            <th>Button</th>
+            <th>Input</th>
+            <th>What the Bot Does</th>
+            <th>Expected Distance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="type-closed">
+            <td><span class="tag-closed">Smart Mode</span></td>
+            <td><span class="tag-a">A</span></td>
+            <td style="font-family:var(--mono);color:var(--cyan);">50 cm/s</td>
+            <td style="color:var(--muted);">Wheel sensors check speed constantly and adjust power to hold 50 cm/s.</td>
+            <td><span class="dist">~143 cm</span></td>
+          </tr>
+          <tr class="type-closed">
+            <td><span class="tag-closed">Smart Mode</span></td>
+            <td><span class="tag-b">B</span></td>
+            <td style="font-family:var(--mono);color:var(--cyan);">27.9 cm/s</td>
+            <td style="color:var(--muted);">Holds your SPEED stat speed closely. Stalls if target drops below 20 cm/s.</td>
+            <td><span class="dist">~77 cm</span></td>
+          </tr>
+          <tr class="type-open">
+            <td><span class="tag-open">Raw Mode</span></td>
+            <td><span class="tag-a">A</span></td>
+            <td style="font-family:var(--mono);color:var(--orange);">100% PWM</td>
+            <td style="color:var(--muted);">Full battery voltage to motors. No corrections. Distance shrinks as battery drains.</td>
+            <td><span class="dist variable">Max — drops each run</span></td>
+          </tr>
+          <tr class="type-open">
+            <td><span class="tag-open">Raw Mode</span></td>
+            <td><span class="tag-b">B</span></td>
+            <td style="font-family:var(--mono);color:var(--orange);">30% PWM</td>
+            <td style="color:var(--muted);">Low voltage + gear friction = startup delay. The 3-second window starts before the bot does.</td>
+            <td><span class="dist variable">More than ½ of 100% run</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">📐</span>
+      <div>Pay attention to the <strong>ratio</strong>, not just the numbers. In Smart Mode, the 50 cm/s run should be about 1.8× the 27.9 cm/s run. In Raw Mode, the 100% run will not be 3.3× the 30% run — startup lag breaks the ratio.</div>
+    </div>
+  </div>
+
+  <!-- WHY THIS HAPPENS -->
+  <div class="section">
+    <div class="section-label">Why This Happens</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">⚙️</div>
+        <div class="concept-title">Gear Friction at Low Power</div>
+        <div class="concept-body">The motor spins through a set of gears before reaching the wheel. At low PWM, the voltage isn't strong enough to get those gears moving from a standing stop. The bot hesitates — sometimes for 200–400 ms — before it starts rolling. You'll see this most at 30% PWM.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔋</div>
+        <div class="concept-title">Battery Drain Changes Speed</div>
+        <div class="concept-body">Open-loop sends a fixed <em>percentage</em> of battery voltage. If the battery is low, 100% of a weak battery is less power than 100% of a full battery. Smart Mode doesn't have this problem — the wheel sensors detect that the bot slowed down and increase motor power to compensate.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📡</div>
+        <div class="concept-title">How the Wheel Sensors Work</div>
+        <div class="concept-body">Each wheel has a small disk with slots cut into it. An optical sensor counts how fast those slots pass by. That count tells the correction system how fast the wheel is actually spinning. Below 20 cm/s, the slots pass too slowly for the sensor to get a reliable count — so the correction system gives up.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⚡</div>
+        <div class="concept-title">What PWM Actually Does</div>
+        <div class="concept-body">PWM (Pulse-Width Modulation) rapidly switches the motor on and off. 100% means it's on the whole time. 30% means it's on 30% of the time and off 70%. The motor averages that into a lower speed — but only if it can overcome friction. If it can't, those off-pulses kill the momentum the on-pulses just built.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED CALCULATOR -->
+  <div class="section">
+    <div class="section-label">Speed Calculator</div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <span class="calc-header-title">Try your SPEED setting</span>
+        <span style="font-size:.75rem;color:var(--muted);">Shows what Smart Mode will target when you press Button B</span>
+      </div>
+      <div class="calc-body">
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name">SPEED stat</span>
+            <span class="slider-val" id="c-speed-val">6</span>
+          </div>
+          <input type="range" id="c-speed" min="1" max="20" value="6" oninput="calcRecalc()" />
+          <div class="slider-sub">Set this to match your bot's Speed stat before downloading the Smart Mode program.</div>
+        </div>
+        <div class="outputs-grid">
+          <div class="out-cell">
+            <div class="out-label">Target Speed</div>
+            <div class="out-val" id="out-speed" style="color:var(--cyan)">27.9</div>
+            <div class="out-unit">cm/s</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Est. Distance</div>
+            <div class="out-val" id="out-dist" style="color:var(--green)">83.7</div>
+            <div class="out-unit">cm in 3 s</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">% of Speed Range</div>
+            <div class="out-val" id="out-pct" style="color:var(--yellow)">50%</div>
+            <div class="out-unit">of 20–50 cm/s</div>
+          </div>
+        </div>
+        <div id="floor-warning" class="callout danger" style="display:none;margin-top:1rem;">
+          <span class="callout-icon">⛔</span>
+          <div><strong>Too slow for the sensor system.</strong> SPEED <span id="warn-speed"></span> maps to <span id="warn-cms"></span> cm/s — below the 20 cm/s floor. The correction system will lose track and the bot will stall or move erratically.</div>
+        </div>
+        <div id="ok-note" class="callout success" style="display:none;margin-top:1rem;">
+          <span class="callout-icon">✓</span>
+          <div>This setting is within the safe range. Smart Mode will hold <span id="ok-cms"></span> cm/s reliably for the full 3 seconds.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIABLES TABLE -->
+  <div class="section">
+    <div class="section-label">Variables at a Glance</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="const-table">
+        <thead>
+          <tr><th>Variable Name</th><th>Starting Value</th><th>What It Does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="const-name">SPEED</td>
+            <td class="const-val">6</td>
+            <td class="const-note">Your Speed stat from the game. Change this to 1–20 before downloading. Only matters in Smart Mode.</td>
+          </tr>
+          <tr>
+            <td class="const-name">minSpeed</td>
+            <td class="const-val">20</td>
+            <td class="const-note">The slowest speed the correction system can hold. The sensor hardware cannot track reliably below this. Don't change it.</td>
+          </tr>
+          <tr>
+            <td class="const-name">maxSpeed</td>
+            <td class="const-val">50</td>
+            <td class="const-note">The fastest speed this gear ratio can hold with stable correction. Don't change it.</td>
+          </tr>
+          <tr>
+            <td class="const-name">targetSpeed</td>
+            <td class="const-note">calculated</td>
+            <td class="const-note">The result of the speed formula. Computed once at startup from your SPEED stat. Button B passes this to cruise control.</td>
+          </tr>
+          <tr>
+            <td class="const-name">basic.pause</td>
+            <td class="const-val">3000</td>
+            <td class="const-note">How long (in milliseconds) the program keeps the motors running. Locked at 3000 for this test — do not change it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HOW TO RUN -->
+  <div class="section">
+    <div class="section-label">How to Run the Test</div>
+    <div class="card">
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">1</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Download the Smart Mode program.</strong> Set SPEED to your bot's Speed stat before downloading. Put a piece of tape on the floor as your start line.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">2</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Press A. Mark where the bot stops.</strong> Press B. Mark where it stops. Write down both distances.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">3</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Download the Raw Mode program without charging the battery.</strong> Same start line. Press A, press B. Write down both distances.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">4</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Compare the ratios.</strong> In Smart Mode, the fast run should be about 1.8× the slower run. In Raw Mode, the 100% run will not be 3.3× the 30% run — the ratio breaks down because of gear friction at startup.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">5</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Run Raw Mode 10 more times at 100% without recharging.</strong> If the distance shrinks, you've measured battery drain in real time.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="callout warn" style="margin-top:.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Clear the path before every run.</strong> Both programs drive straight for 3 seconds with no obstacle avoidance. The bot will not stop for a wall or a table edge.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+  function calcRecalc() {
+    const spd    = parseInt(document.getElementById('c-speed').value);
+    const minS   = 20, maxS = 50;
+    const target = minS + ((spd - 1) * (maxS - minS)) / (20 - 1);
+    const dist   = target * 3;
+    const pct    = Math.round(((target - minS) / (maxS - minS)) * 100);
+
+    document.getElementById('c-speed-val').textContent = spd;
+    document.getElementById('out-speed').textContent   = target.toFixed(1);
+    document.getElementById('out-dist').textContent    = dist.toFixed(1);
+    document.getElementById('out-pct').textContent     = pct + '%';
+
+    const floorWarn = document.getElementById('floor-warning');
+    const okNote    = document.getElementById('ok-note');
+
+    if (target < 20) {
+      floorWarn.style.display = 'flex';
+      okNote.style.display    = 'none';
+      document.getElementById('warn-speed').textContent = spd;
+      document.getElementById('warn-cms').textContent   = target.toFixed(1);
+      document.getElementById('out-speed').style.color  = 'var(--red)';
+      document.getElementById('out-dist').style.color   = 'var(--red)';
+    } else {
+      floorWarn.style.display = 'none';
+      okNote.style.display    = 'flex';
+      document.getElementById('ok-cms').textContent     = target.toFixed(1);
+      document.getElementById('out-speed').style.color  = 'var(--cyan)';
+      document.getElementById('out-dist').style.color   = 'var(--green)';
+    }
+  }
+  calcRecalc();
+</script>
+
+<!-- ── MAKECODE BLOCKS RENDERER ─────────────────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL      = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId = 0;
+
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
+    }, MAKECODE_URL);
+  }
+
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area   = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src    = msg.uri;
+        img.width  = msg.width;
+        img.height = msg.height;
+        img.alt    = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Blocks preview unavailable</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+
+</body>
+</html>

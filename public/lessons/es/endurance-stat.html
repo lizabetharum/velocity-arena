@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafío del stat Endurance · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0D0D1A;
+      --navy2:      #161A2E;
+      --navy3:      #1E2240;
+      --cyan:       #00E5FF;
+      --teal:       #007A99;
+      --slate:      #8899AA;
+      --card-border:#222840;
+      --card-bg:    #161A2E;
+      --green:      #00C97A;
+      --red:        #FF4D6A;
+      --yellow:     #FFD166;
+      --purple:     #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter',sans-serif;
+      background: var(--navy);
+      color: #E8EAF2;
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--cyan);
+      transition: width .5s ease; z-index: 100;
+      width: 0%;
+    }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    .section-nav {
+      display: flex; gap: 0;
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      overflow-x: auto;
+    }
+    .section-nav button {
+      flex-shrink: 0;
+      font-family: 'Inter',sans-serif;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+      background: transparent; border: none;
+      padding: .75rem 1.25rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer; transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .section-nav button.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .section-nav button:hover:not(.active) { color: #E8EAF2; }
+
+    .section {
+      display: none; max-width: 720px; margin: 2rem auto 0;
+      padding: 0 1.25rem; animation: fadeUp .3s ease both;
+    }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .section-heading { font-size: 1.25rem; font-weight: 800; letter-spacing: .01em; margin-bottom: .5rem; }
+    .section-sub { font-size: .9375rem; color: #C8CDD8; line-height: 1.65; margin-bottom: 1.25rem; }
+    .label-tag {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .75rem;
+    }
+
+    .formula-board {
+      background: var(--navy3); border: 1.5px solid var(--cyan);
+      border-radius: 8px; padding: 1.75rem 1.5rem; text-align: center; margin: 1rem 0 1.5rem;
+    }
+    .formula-board .formula-text {
+      font-size: 1.375rem; font-weight: 800; color: var(--cyan);
+      letter-spacing: .02em; line-height: 1.3;
+    }
+    .formula-board .formula-sub {
+      font-size: .8125rem; color: var(--slate); margin-top: .5rem; font-weight: 500;
+    }
+
+    .floor-callout {
+      display: flex; align-items: flex-start; gap: .75rem;
+      background: rgba(255,77,106,.07); border: 1px solid rgba(255,77,106,.25);
+      border-radius: 8px; padding: .875rem 1rem; margin: .75rem 0 1rem;
+    }
+    .floor-callout .fc-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: .1rem; }
+    .floor-callout .fc-body { font-size: .875rem; color: #E8EAF2; line-height: 1.55; }
+    .floor-callout .fc-body strong { color: var(--yellow); }
+
+    .var-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .var-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .var-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .875rem; vertical-align: top;
+    }
+    .var-table tr:last-child td { border-bottom: none; }
+    .var-name { color: var(--cyan); font-weight: 800; font-size: .9375rem; }
+    .var-range { color: var(--yellow); font-size: .8125rem; font-weight: 500; }
+
+    .calc-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .calc-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .5rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .calc-table td {
+      padding: .625rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6);
+      font-size: .875rem; vertical-align: middle;
+    }
+    .calc-table tr:last-child td { border-bottom: none; }
+    .t-val { font-weight: 800; color: #E8EAF2; font-size: 1rem; }
+    .calc-expr { color: var(--slate); font-size: .8125rem; }
+    .p-val  { font-weight: 800; color: var(--cyan);   font-size: 1rem; }
+    .p-zero { color: var(--red);    font-weight: 800; font-size: 1rem; }
+    .p-floor { color: var(--yellow); font-weight: 800; font-size: 1rem; }
+
+    .work-input {
+      width: 90px; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .45rem .6rem;
+      font-family: 'Inter',sans-serif; font-size: .9375rem;
+      font-weight: 700; color: #E8EAF2; outline: none;
+      transition: border-color .15s; text-align: center;
+    }
+    .work-input:focus { border-color: var(--teal); }
+    .work-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .work-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    .hint-box {
+      background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25);
+      border-radius: 6px; padding: .625rem .875rem; margin-top: .375rem;
+      font-size: .8125rem; color: var(--yellow); line-height: 1.5; display: none;
+    }
+    .hint-box.visible { display: block; }
+
+    .row-check-btn {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-family: 'Inter',sans-serif; font-size: .75rem; font-weight: 700;
+      padding: .375rem .875rem; border-radius: 5px; border: 1px solid var(--teal);
+      background: transparent; color: var(--teal); cursor: pointer;
+      transition: background .15s, color .15s; white-space: nowrap;
+    }
+    .row-check-btn:hover { background: rgba(0,122,153,.12); color: var(--cyan); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'Inter',sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--cyan); color: var(--navy); }
+    .btn-primary:hover:not(.locked) { opacity: .88; }
+    .btn-primary.locked { opacity: .35; cursor: not-allowed; pointer-events: none; }
+    .btn-ghost {
+      background: transparent; color: var(--slate);
+      border: 1px solid var(--card-border);
+    }
+    .btn-ghost:hover { color: #E8EAF2; border-color: var(--slate); }
+    .btn-success { background: var(--green); color: var(--navy); }
+    .btn-success:hover { opacity: .88; }
+
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--card-border);
+    }
+
+    .section-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan);
+      background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    .scaffold-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--yellow);
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    .indep-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--purple);
+      background: rgba(155,138,255,.08); border: 1px solid rgba(155,138,255,.2);
+      border-radius: 4px; padding: .25em .75em; margin-bottom: .875rem;
+    }
+
+    .slider-wrap { margin: 1.25rem 0; }
+    .slider-label-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: .5rem;
+    }
+    .slider-label-row label { font-size: .875rem; font-weight: 700; color: #E8EAF2; }
+    .slider-value-display { font-size: 1.75rem; font-weight: 800; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; background: var(--navy3);
+      border-radius: 3px; outline: none; margin: .5rem 0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(0,229,255,.2);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cyan); cursor: pointer; border: none;
+    }
+    .slider-range-labels {
+      display: flex; justify-content: space-between;
+      font-size: .6875rem; color: var(--slate); font-weight: 500;
+    }
+
+    .stat-info-row {
+      display: flex; gap: 1.25rem; flex-wrap: wrap; margin: 1rem 0;
+    }
+    .stat-chip {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .625rem 1rem; flex: 1; min-width: 140px;
+    }
+    .stat-chip .sc-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .25rem;
+    }
+    .stat-chip .sc-value { font-size: 1.125rem; font-weight: 800; color: var(--cyan); }
+    .stat-chip .sc-value.warn { color: var(--yellow); }
+    .stat-chip .sc-value.inf { color: var(--green); }
+
+    .live-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .live-table th {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: left;
+      padding: .4rem .75rem; border-bottom: 1px solid var(--card-border);
+    }
+    .live-table td {
+      padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.5);
+      font-size: .875rem;
+    }
+    .live-table tr:last-child td { border-bottom: none; }
+    .live-p-bar { height: 6px; background: var(--navy3); border-radius: 3px; margin-top: .375rem; overflow: hidden; }
+    .live-p-fill { height: 100%; border-radius: 3px; transition: width .3s ease, background .3s ease; }
+
+    .graph-wrap {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.25rem; margin: 1rem 0;
+      overflow-x: auto;
+    }
+    .graph-wrap svg { display: block; max-width: 100%; }
+
+    .graph-legend {
+      display: flex; gap: 1.25rem; flex-wrap: wrap;
+      font-size: .75rem; color: var(--slate); margin-top: .5rem; padding: 0 .25rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: .375rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-line { width: 18px; height: 2px; flex-shrink: 0; }
+
+    .compare-panel {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+    }
+    .compare-panel .cp-card {
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1.125rem;
+    }
+    .cp-card .cp-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .5rem;
+    }
+    .cp-card .cp-val { font-size: 2rem; font-weight: 800; color: var(--cyan); margin-bottom: .25rem; }
+    .cp-card .cp-sub { font-size: .8125rem; color: var(--slate); }
+    .compare-result {
+      background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.2);
+      border-radius: 7px; padding: .875rem 1.125rem; margin-top: .5rem;
+      font-size: .9375rem; color: #C8CDD8; line-height: 1.5; min-height: 3rem;
+    }
+
+    .cp-input {
+      width: 70px; background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .4rem .5rem;
+      font-family: 'Inter',sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--cyan); outline: none; text-align: center;
+      transition: border-color .15s;
+    }
+    .cp-input:focus { border-color: var(--teal); }
+
+    .reflect-textarea {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 7px; padding: .875rem 1rem;
+      font-family: 'Inter',sans-serif; font-size: .9375rem;
+      color: #E8EAF2; resize: vertical; min-height: 90px;
+      outline: none; transition: border-color .15s; line-height: 1.55;
+    }
+    .reflect-textarea:focus { border-color: var(--teal); }
+    .reflect-textarea.ready { border-color: rgba(0,201,122,.4); }
+
+    .char-count { font-size: .75rem; color: var(--slate); text-align: right; margin-top: .25rem; }
+    .char-count.ready { color: var(--green); }
+
+    .sentence-frame {
+      background: rgba(0,229,255,.05); border-left: 3px solid rgba(0,229,255,.3);
+      border-radius: 0 6px 6px 0; padding: .625rem .875rem; margin-bottom: .75rem;
+      font-size: .8125rem; color: var(--slate); line-height: 1.5; font-style: italic;
+    }
+    .sentence-frame strong { color: var(--cyan); font-style: normal; }
+
+    .num-input {
+      width: 90px; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .5rem .6rem;
+      font-family: 'Inter',sans-serif; font-size: 1rem; font-weight: 700;
+      color: #E8EAF2; outline: none; text-align: center;
+      transition: border-color .15s;
+    }
+    .num-input:focus { border-color: var(--teal); }
+    .num-input.correct { border-color: var(--green); background: rgba(0,201,122,.07); }
+    .num-input.error { border-color: var(--red); background: rgba(255,77,106,.07); }
+
+    .auto-hint {
+      display: inline-flex; align-items: center; gap: .375rem;
+      font-size: .8125rem; color: var(--slate); margin-top: .375rem;
+    }
+    .auto-hint .ah-check { color: var(--green); font-size: 1rem; }
+    .auto-hint .ah-warn  { color: var(--yellow); font-size: 1rem; }
+
+    .done-banner {
+      background: rgba(0,201,122,.08); border: 1px solid rgba(0,201,122,.3);
+      border-radius: 10px; padding: 1.5rem; text-align: center;
+      margin-top: 1.5rem; display: none;
+    }
+    .done-banner.visible { display: block; }
+    .done-banner h3 { font-size: 1.125rem; font-weight: 800; color: var(--green); margin-bottom: .5rem; }
+    .done-banner p { font-size: .9375rem; color: #C8CDD8; }
+
+    .answer-reveal {
+      background: rgba(0,201,122,.06); border: 1px solid rgba(0,201,122,.2);
+      border-radius: 6px; padding: .5rem .875rem; margin-top: .25rem;
+      font-size: .875rem; color: var(--green); display: none; font-weight: 700;
+    }
+    .answer-reveal.visible { display: block; }
+    .answer-wrong-reveal {
+      background: rgba(255,77,106,.06); border: 1px solid rgba(255,77,106,.2);
+      border-radius: 6px; padding: .5rem .875rem; margin-top: .25rem;
+      font-size: .875rem; color: var(--red); display: none; font-weight: 700;
+    }
+    .answer-wrong-reveal.visible { display: block; }
+
+    .submit-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap; }
+
+    .section-divider { height: 1px; background: var(--card-border); margin: 1.75rem 0; }
+
+    .inline-result {
+      display: inline-block; font-size: .8125rem; font-weight: 700;
+      padding: .2em .6em; border-radius: 4px;
+    }
+    .inline-result.ok { background: rgba(0,201,122,.12); color: var(--green); border: 1px solid rgba(0,201,122,.25); }
+    .inline-result.ng { background: rgba(255,77,106,.12); color: var(--red); border: 1px solid rgba(255,77,106,.25); }
+
+    .stat-card-visual {
+      background: var(--navy3); border: 2px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin: 1rem 0;
+    }
+    .stat-card-visual .sc-title {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: 1rem;
+    }
+    .stat-card-visual .stat-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .625rem 0; border-bottom: 1px solid var(--card-border);
+    }
+    .stat-card-visual .stat-row:last-child { border-bottom: none; }
+    .stat-name {
+      font-size: .8125rem; font-weight: 700; color: var(--slate);
+      width: 80px; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .stat-name.active { color: var(--cyan); }
+    .stat-name.locked-row { color: var(--green); }
+    .stat-points-display { font-size: 1.25rem; font-weight: 800; color: #E8EAF2; min-width: 2rem; }
+    .stat-pct-display { font-size: .8125rem; color: var(--slate); }
+    .stat-locked {
+      margin-left: auto; font-size: .6875rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--slate);
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .2em .6em;
+    }
+    .stat-locked.endurance-locked {
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border-color: rgba(0,229,255,.3);
+    }
+    .stat-locked.prior-locked {
+      color: var(--green); background: rgba(0,201,122,.08);
+      border-color: rgba(0,201,122,.3);
+    }
+
+    .budget-bar-wrap { margin: 1rem 0; }
+    .budget-bar-label { font-size: .75rem; color: var(--slate); margin-bottom: .375rem; font-weight: 500; }
+    .budget-bar-track { height: 8px; background: var(--navy3); border-radius: 4px; overflow: hidden; display: flex; gap: 2px; }
+    .budget-bar-fill { height: 100%; background: var(--cyan); transition: width .25s ease; }
+    .budget-bar-fill.prior { background: var(--green); opacity: .7; }
+    .budget-note { font-size: .75rem; color: var(--slate); margin-top: .375rem; }
+    .budget-note.warning { color: var(--yellow); }
+    .budget-note.ok { color: var(--green); }
+
+    .name-input {
+      width: 100%; background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 5px; padding: .5rem .75rem;
+      font-family: 'Inter',sans-serif; font-size: .9375rem;
+      color: #E8EAF2; outline: none; transition: border-color .15s;
+    }
+    .name-input:focus { border-color: var(--teal); }
+
+    .btn-lock {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: 'Inter',sans-serif; font-size: .9375rem; font-weight: 700;
+      padding: .75rem 1.5rem; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: .01em;
+      background: var(--red); color: #fff;
+    }
+    .btn-lock:not(:disabled):hover { opacity: .88; }
+    .btn-lock:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-lock:active { transform: scale(.97); }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,13,26,.8); backdrop-filter: blur(4px);
+      z-index: 200; align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--navy2); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 2rem; max-width: 440px; width: 100%;
+      animation: fadeUp .25s ease both;
+    }
+    .modal-box h2 { font-size: 1.1875rem; font-weight: 800; margin-bottom: .75rem; }
+    .modal-box p { font-size: .9375rem; color: #C8CDD8; line-height: 1.6; margin-bottom: 1.5rem; }
+    .modal-box .modal-value {
+      font-size: 2.5rem; font-weight: 800; color: var(--cyan);
+      text-align: center; margin: 1rem 0;
+    }
+    .modal-box .modal-decay {
+      font-size: 1rem; color: var(--slate); text-align: center;
+      margin-top: -.5rem; margin-bottom: 1.25rem;
+    }
+    .modal-actions { display: flex; gap: .75rem; }
+    .modal-actions .btn, .modal-actions .btn-lock { flex: 1; justify-content: center; }
+
+    .locked-display { text-align: center; padding: 2rem 1rem; }
+    .locked-display .lock-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+    .locked-display h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: .375rem; }
+    .locked-display p { font-size: .875rem; color: var(--slate); line-height: 1.5; }
+    .locked-stat-chip {
+      display: inline-flex; align-items: baseline; gap: .375rem;
+      background: rgba(0,229,255,.08); border: 1.5px solid rgba(0,229,255,.3);
+      border-radius: 8px; padding: .625rem 1.25rem; margin: 1rem 0;
+    }
+    .locked-stat-chip .pts { font-size: 2rem; font-weight: 800; color: var(--cyan); }
+    .locked-stat-chip .label { font-size: .875rem; color: var(--slate); font-weight: 500; }
+
+    .lock-notice {
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.3);
+      border-radius: 8px; padding: .875rem 1.125rem; margin-bottom: 1.25rem;
+      color: var(--yellow); font-size: .875rem; line-height: 1.5;
+    }
+    .lock-notice strong { color: var(--yellow); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Calendario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos de matemáticas</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<div id="progress-bar"></div>
+
+<header class="page-header">
+  <a href="/index.html" class="back-link">← Hoy</a>
+  <span class="divider">|</span>
+  <h1>Desafío del stat Endurance</h1>
+  <span class="day-tag">DÍA 2</span>
+</header>
+
+<nav class="section-nav">
+  <button class="active" onclick="goSection(0)">La fórmula</button>
+  <button onclick="goSection(1)">Calcula tu decaimiento</button>
+  <button onclick="goSection(2)">Tu gráfica de decaimiento</button>
+  <button onclick="goSection(3)">Reflexión</button>
+  <button onclick="goSection(4)">Confirmar</button>
+</nav>
+
+<!-- ═══════════ SECCIÓN 1: La fórmula ═══════════ -->
+<section class="section active" id="sec-0">
+
+  <div class="section-badge">Sección 1 · La fórmula</div>
+  <h2 class="section-heading">¿Qué hace Endurance?</h2>
+  <p class="section-sub">Empieza con los datos. Este bot jugó un partido completo de 5 minutos. Sin fórmula todavía — solo observa lo que pasó.</p>
+
+  <div class="card" id="s1-observe-card">
+    <div class="card-title">Datos del partido — Bot desconocido</div>
+    <table class="calc-table">
+      <thead><tr><th>t (min)</th><th>Potencia</th></tr></thead>
+      <tbody>
+        <tr><td class="t-val">0</td><td class="p-val">100%</td></tr>
+        <tr><td class="t-val">1</td><td class="p-val">79%</td></tr>
+        <tr><td class="t-val">2</td><td class="p-val">58%</td></tr>
+        <tr><td class="t-val">3</td><td class="p-val">37%</td></tr>
+        <tr id="s1-row4" style="display:none;background:rgba(255,209,102,.04);"><td class="t-val">4</td><td class="p-floor" id="s1-val4">20%</td></tr>
+        <tr id="s1-row5" style="display:none;background:rgba(255,209,102,.04);"><td class="t-val">5</td><td class="p-floor">20%</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">¿Qué notas sobre cómo cambia la potencia con el tiempo?</p>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">Escribe al menos 2 observaciones. Una debe incluir un número específico.</p>
+      <textarea class="reflect-textarea" id="s1-obs-text" placeholder="Observación 1:&#10;Observación 2:" oninput="checkS1Obs()" style="min-height:90px;"></textarea>
+      <div class="char-count" id="s1-obs-count">0 / 40 mín</div>
+    </div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">¿La potencia llegará alguna vez al 0%?</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+          <input type="radio" name="reach-zero" value="yes" onchange="checkS1Obs()"> Sí
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+          <input type="radio" name="reach-zero" value="no" onchange="checkS1Obs()"> No
+        </label>
+      </div>
+    </div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Con base en este patrón, ¿cuál será P(4)?</p>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <input type="number" class="work-input" id="s1-pred-input" placeholder="?" oninput="checkS1Obs()">
+        <span style="font-size:.875rem;color:var(--slate);">%</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary locked" id="s1-reveal-btn" onclick="revealFloor()">Ver lo que realmente pasó en t=4 →</button>
+  </div>
+
+  <div id="s1-floor-card" style="display:none;" class="card">
+    <div class="card-title">Lo que realmente pasó</div>
+
+    <p id="s1-prediction-echo" style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.875rem;line-height:1.5;"></p>
+
+    <div id="s1-zero-reveal" style="font-size:.875rem;line-height:1.6;padding:.75rem 1rem;border-radius:7px;margin-bottom:.875rem;background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);"></div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Acaban de pasar dos cosas que no predijiste. Explica cada una en una oración. Usa matemáticas.</p>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">1) ¿Por qué dejó de caer la potencia?&nbsp;&nbsp;2) ¿Por qué nunca puede llegar al 0%?</p>
+      <textarea class="reflect-textarea" id="s1-floor-explain" placeholder="1) La potencia se detuvo porque...&#10;2) No puede llegar al 0% porque..." oninput="checkFloorExplain()" style="min-height:90px;"></textarea>
+      <div class="char-count" id="s1-floor-count">0 / 30 mín</div>
+    </div>
+
+    <button class="btn btn-primary locked" id="s1-formula-btn" onclick="revealFormula()">Ver la fórmula →</button>
+  </div>
+
+  <div id="formula-reveal" style="display:none;">
+
+    <div class="formula-board">
+      <div class="formula-text">P(t) = 100 − (20 − E) × 1.5 × t</div>
+      <div class="formula-sub">Potencia en el minuto t · mínimo 20%</div>
+    </div>
+
+    <p style="font-size:.8125rem;color:var(--slate);margin:.5rem 0 1rem;line-height:1.5;">El motor del juego aplica el mínimo que ya encontraste. Una vez que la fórmula cae por debajo de él, la potencia se queda ahí el resto del partido.</p>
+
+    <div class="card">
+      <div class="card-title">Definición de variables</div>
+      <table class="var-table">
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Significado</th>
+            <th>Rango</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="var-name">P(t)</span></td>
+            <td>Potencia del bot en el minuto t (% de potencia máxima)</td>
+            <td><span class="var-range">20% – 100%</span></td>
+          </tr>
+          <tr>
+            <td><span class="var-name">E</span></td>
+            <td>Asignación de Endurance — puntos de stat invertidos en resistencia</td>
+            <td><span class="var-range">1 – 20</span></td>
+          </tr>
+          <tr>
+            <td><span class="var-name">t</span></td>
+            <td>Minutos transcurridos desde el inicio del partido</td>
+            <td><span class="var-range">0 – 5 min</span></td>
+          </tr>
+          <tr>
+            <td><span class="var-name">1.5</span></td>
+            <td>Constante de decaimiento — qué tan rápido drena la potencia el entorno del juego</td>
+            <td><span class="var-range">fijo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Verifica la fórmula · E = 6</div>
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">Completa P(t) para E = 6, t = 0 hasta t = 3. Usa la fórmula. No se dan valores iniciales.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.625rem;margin-bottom:.75rem;">
+        <div style="text-align:center;">
+          <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 0</div>
+          <input type="number" class="work-input" id="verify-t0" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 1</div>
+          <input type="number" class="work-input" id="verify-t1" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 2</div>
+          <input type="number" class="work-input" id="verify-t2" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.375rem;">t = 3</div>
+          <input type="number" class="work-input" id="verify-t3" placeholder="?" oninput="checkVerify()" style="width:100%;text-align:center;">
+        </div>
+      </div>
+      <div id="verify-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;"></div>
+    </div>
+
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goSection(1)">Siguiente →</button>
+  </div>
+</section>
+
+<!-- ═══════════ SECCIÓN 2: Calcula tu decaimiento ═══════════ -->
+<section class="section" id="sec-1">
+
+  <div class="section-badge">Sección 2 · Calcula tu decaimiento</div>
+  <h2 class="section-heading">Un intento, sin pistas</h2>
+  <p class="section-sub">Sin andamios. Sin retroalimentación por fila. Tienes un solo envío por tabla.</p>
+
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);margin-bottom:1rem;">
+    <div class="card-title" style="color:var(--purple);">Antes de calcular</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">Si E se duplica de 5 a 10, el tiempo antes de que el bot llegue al mínimo de 20% también se duplica.</p>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Elige uno. No calcules todavía.</p>
+    <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:.875rem;">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="mc1" value="true" onchange="revealMC1(this)"> Verdadero
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="mc1" value="false" onchange="revealMC1(this)"> Falso
+      </label>
+    </div>
+    <div id="mc1-reveal" style="display:none;font-size:.875rem;line-height:1.6;padding:.75rem 1rem;border-radius:7px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">E = 4</div>
+
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:1rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Primero: ¿cuál es la tasa de decaimiento cuando E = 4?</p>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <input type="number" class="work-input" id="a-decay-ans" placeholder="?">
+        <span style="font-size:.875rem;color:var(--slate);">% por minuto</span>
+        <span id="a-decay-icon" style="font-size:1.1rem;"></span>
+      </div>
+      <div id="a-decay-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-top:.5rem;"></div>
+    </div>
+
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;">Ahora completa P(t) para cada minuto. Un solo envío.</p>
+    <table class="calc-table" id="scaffolded-table">
+      <thead>
+        <tr><th>t (min)</th><th>P(t)</th></tr>
+      </thead>
+      <tbody id="scaffolded-body"></tbody>
+    </table>
+    <div class="submit-row">
+      <button class="btn btn-primary" id="submit-a-btn" onclick="submitPartA()">Enviar</button>
+      <span id="submit-a-status" style="font-size:.8125rem;color:var(--slate);"></span>
+    </div>
+    <div id="part-a-results" style="margin-top:1rem;display:none;"></div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="card" id="s2-trap-card" style="background:rgba(255,77,106,.05);border-color:rgba(255,77,106,.25);">
+    <div class="card-title" style="color:var(--red);">Antes de la Parte B</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Con E = 2, ¿puede la potencia de tu bot llegar al 0%?</p>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Elige uno y explica tu razonamiento. Confirma antes de ver la Parte B.</p>
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:.875rem;">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="trap-q" value="yes" onchange="checkTrap()"> Sí
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="trap-q" value="no" onchange="checkTrap()"> No
+      </label>
+    </div>
+    <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Explica tu razonamiento:</p>
+      <textarea class="reflect-textarea" id="trap-reason" placeholder="Porque..." oninput="checkTrap()" style="min-height:60px;"></textarea>
+      <div class="char-count" id="trap-reason-count">0 / 5 mín</div>
+    </div>
+    <button class="btn btn-primary locked" id="trap-commit-btn" onclick="commitTrap()">Confirmar →</button>
+    <div id="trap-reveal" style="display:none;margin-top:.875rem;"></div>
+  </div>
+
+  <div class="card" id="s2-partb-card" style="display:none;">
+    <div class="card-title">E = 2</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">Igual que antes. Encuentra la tasa de decaimiento y luego calcula P(t) para cada minuto.</p>
+
+    <table class="calc-table" id="indep-table">
+      <thead>
+        <tr><th>t (min)</th><th>P(t)</th></tr>
+      </thead>
+      <tbody id="indep-body"></tbody>
+    </table>
+
+    <div class="submit-row">
+      <button class="btn btn-primary" id="submit-all-btn" onclick="submitIndep()">Enviar</button>
+      <span id="submit-status" style="font-size:.8125rem;color:var(--slate);"></span>
+    </div>
+    <div id="indep-results" style="margin-top:1rem;display:none;"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(0)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goSection(2)">Siguiente →</button>
+  </div>
+</section>
+
+<!-- ═══════════ SECCIÓN 3: Gráfica de decaimiento ═══════════ -->
+<section class="section" id="sec-2">
+
+  <div class="section-badge">Sección 3 · Tu gráfica de decaimiento</div>
+  <h2 class="section-heading">Predice, luego verifica</h2>
+  <p class="section-sub">Confirma dos predicciones antes de que el deslizador se active. No puedes cambiarlas después.</p>
+
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);">
+    <div class="card-title" style="color:var(--purple);">Haz tus predicciones</div>
+
+    <div style="margin-bottom:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Acabas de calcular la tabla de E=2 en la Parte B.</p>
+      <p style="font-size:.875rem;color:var(--slate);margin-bottom:.625rem;">¿Tu bot con E=2 llega al mínimo de 20% antes del minuto 3?</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-slope" value="yes" onchange="checkPredictions()"> Sí
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-slope" value="no" onchange="checkPredictions()"> No
+        </label>
+      </div>
+    </div>
+
+    <div style="margin-bottom:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Si E aumenta, el bot llega al mínimo de 20%:</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="sooner" onchange="checkPredictions()"> Antes
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="later" onchange="checkPredictions()"> Después
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;">
+          <input type="radio" name="pred-floor-timing" value="same" onchange="checkPredictions()"> Al mismo tiempo
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary locked" id="commit-predict-btn" onclick="commitPredictions()">Confirmar predicciones →</button>
+    <div id="predict-result" style="display:none;margin-top:.875rem;font-size:.8125rem;padding:.75rem 1rem;border-radius:6px;line-height:1.55;"></div>
+
+    <div id="pred-explain-card" style="display:none;margin-top:.875rem;">
+      <div style="padding:.875rem;background:var(--navy3);border-radius:8px;margin-bottom:.875rem;">
+        <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">¿Tuviste razón? Explica por qué — para cada predicción.</p>
+        <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.625rem;">Sin pistas. Usa la fórmula. Muestra el cálculo que demuestra tu punto.</p>
+        <textarea class="reflect-textarea" id="pred-explain-text" placeholder="Escribe tu explicación aquí." oninput="checkPredExplain()" style="min-height:80px;"></textarea>
+        <div class="char-count" id="pred-explain-count">0 / 50 mín</div>
+      </div>
+      <button class="btn btn-primary locked" id="unlock-slider-btn" onclick="unlockSliderGraph()">Ver la gráfica →</button>
+    </div>
+  </div>
+
+  <div id="slider-graph-section" style="display:none;">
+
+    <div class="card">
+      <div class="slider-wrap">
+        <div class="slider-label-row">
+          <label for="e-slider">Endurance (E)</label>
+          <div><span class="slider-value-display" id="e-display">10</span></div>
+        </div>
+        <input type="range" id="e-slider" min="1" max="20" value="10" oninput="updateGraph()">
+        <div class="slider-range-labels"><span>1</span><span>20</span></div>
+      </div>
+
+      <div class="stat-info-row">
+        <div class="stat-chip">
+          <div class="sc-label">Tasa de decaimiento</div>
+          <div class="sc-value" id="decay-rate-display">15%/min</div>
+        </div>
+        <div class="stat-chip">
+          <div class="sc-label">Llega al mínimo 20% en</div>
+          <div class="sc-value" id="hits-zero-display">t = 6.7 min</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(155,138,255,.08);border:1px solid rgba(155,138,255,.25);border-radius:8px;padding:.875rem 1rem;margin:.25rem 0 1rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.375rem;">Desafío</div>
+        <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Encuentra el Endurance MÁS BAJO donde tu bot se mantiene por encima del 50% en t = 3.</p>
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+          <span style="font-size:.8125rem;color:var(--slate);">E más bajo que mantiene P(3) por encima del 50%:</span>
+          <input type="number" class="work-input" id="challenge-e-ans" placeholder="?" style="width:70px;" oninput="checkChallenge()">
+          <span id="challenge-icon" style="font-size:1.1rem;"></span>
+        </div>
+        <div id="challenge-feedback" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-top:.5rem;"></div>
+      </div>
+
+      <table class="live-table" id="live-table">
+        <thead>
+          <tr>
+            <th>t (min)</th>
+            <th>P(t)</th>
+            <th>Barra de potencia</th>
+          </tr>
+        </thead>
+        <tbody id="live-table-body"></tbody>
+      </table>
+    </div>
+
+    <div class="graph-wrap">
+      <svg id="decay-svg" viewBox="0 0 520 265" width="520" height="265" xmlns="http://www.w3.org/2000/svg">
+        <line x1="60" y1="20" x2="60" y2="220" stroke="#222840" stroke-width="1"/>
+        <line x1="60" y1="220" x2="500" y2="220" stroke="#222840" stroke-width="1"/>
+        <line x1="60" y1="20"  x2="500" y2="20"  stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="70"  x2="500" y2="70"  stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="120" x2="500" y2="120" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="170" x2="500" y2="170" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="148" y1="20" x2="148" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="236" y1="20" x2="236" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="324" y1="20" x2="324" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="412" y1="20" x2="412" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="500" y1="20" x2="500" y2="220" stroke="#1E2240" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="60" y1="180" x2="500" y2="180" stroke="#FF4D6A" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.55"/>
+        <line x1="324" y1="20" x2="324" y2="220" stroke="#FFD166" stroke-width="2" stroke-dasharray="5,3" opacity="0.65"/>
+        <text x="324" y="14" text-anchor="middle" font-size="10" fill="#FFD166" font-family="Inter,sans-serif" font-weight="700">3 min</text>
+        <text x="50" y="24"  text-anchor="end" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">100%</text>
+        <text x="50" y="74"  text-anchor="end" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">75%</text>
+        <text x="50" y="124" text-anchor="end" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">50%</text>
+        <text x="50" y="174" text-anchor="end" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">25%</text>
+        <text x="50" y="184" text-anchor="end" font-size="10" fill="#FF4D6A" font-family="Inter,sans-serif" font-weight="700">20%</text>
+        <text x="50" y="224" text-anchor="end" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">0%</text>
+        <text x="60"  y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">0</text>
+        <text x="148" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">1</text>
+        <text x="236" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">2</text>
+        <text x="324" y="237" text-anchor="middle" font-size="11" fill="#FFD166" font-family="Inter,sans-serif" font-weight="700">3</text>
+        <text x="412" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">4</text>
+        <text x="500" y="237" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">5</text>
+        <text x="280" y="255" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif">Minutos transcurridos</text>
+        <text x="12" y="125" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif" transform="rotate(-90,12,125)">Potencia %</text>
+        <polyline id="decay-line" points="" fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <g id="decay-dots"></g>
+      </svg>
+      <div class="graph-legend">
+        <div class="legend-item">
+          <div class="legend-line" style="background:var(--cyan);height:2.5px;border-radius:2px;"></div>
+          <span>Curva de potencia</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:var(--red);opacity:0.6;border-radius:2px;"></div>
+          <span>Mínimo 20%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:var(--yellow);opacity:0.7;border-radius:2px;"></div>
+          <span>Fin del partido (3 min)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--red);"></div>
+          <span>⚡ Mínimo alcanzado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Compara dos bots en t = 3 min</div>
+      <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;">Ingresa dos valores de E para comparar la potencia a mitad del partido.</p>
+      <div class="compare-panel">
+        <div class="cp-card">
+          <div class="cp-label">E de nuestro bot</div>
+          <input type="number" class="cp-input" id="cp-our" min="1" max="20" value="10" oninput="updateCompare()">
+          <div class="cp-val" id="cp-our-val">55%</div>
+          <div class="cp-sub">potencia en t=3</div>
+        </div>
+        <div class="cp-card">
+          <div class="cp-label">E del bot rival</div>
+          <input type="number" class="cp-input" id="cp-their" min="1" max="20" value="6" oninput="updateCompare()">
+          <div class="cp-val" id="cp-their-val">37%</div>
+          <div class="cp-sub">potencia en t=3</div>
+        </div>
+      </div>
+      <div class="compare-result" id="compare-result">
+        Nuestro bot tiene <strong style="color:var(--cyan)">55%</strong> vs su <strong style="color:var(--cyan)">37%</strong> en t=3 — llevamos una ventaja de <strong style="color:var(--green)">+18%</strong> de potencia.
+      </div>
+
+      <div style="margin-top:.875rem;padding:.875rem;background:var(--navy3);border-radius:8px;">
+        <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">¿Qué bot pierde potencia más rápido? ¿Por qué?</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem;">
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.875rem;font-weight:700;">
+            <input type="radio" name="compare-faster" value="ours" onchange="checkCompareFaster()">
+            Nuestro bot (E = <span id="cq-our-e">10</span>)
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.875rem;font-weight:700;">
+            <input type="radio" name="compare-faster" value="theirs" onchange="checkCompareFaster()">
+            El bot rival (E = <span id="cq-their-e">6</span>)
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.875rem;font-weight:700;">
+            <input type="radio" name="compare-faster" value="same" onchange="checkCompareFaster()">
+            A la misma velocidad
+          </label>
+        </div>
+        <div id="compare-faster-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card" style="background:rgba(155,138,255,.05);border-color:rgba(155,138,255,.3);">
+    <div class="card-title" style="color:var(--purple);">¿Tuviste razón?</div>
+    <p id="s3-pred-recall" style="font-size:.875rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Revisa tus dos predicciones de arriba.</p>
+    <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;">Explica lo que muestra la gráfica y si cada predicción fue correcta. Usa números de la gráfica — no solo "sí" o "no".</p>
+    <textarea class="reflect-textarea" id="s3-accountability" placeholder="Mi primera predicción fue... La gráfica muestra... porque...&#10;Mi segunda predicción fue... La gráfica muestra... porque..." oninput="checkS3Accountability()" style="min-height:100px;"></textarea>
+    <div class="char-count" id="s3-acc-count">0 / 60 mín</div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(1)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goSection(3)">Siguiente →</button>
+  </div>
+</section>
+
+<!-- ═══════════ SECCIÓN 4: Reflexión ═══════════ -->
+<section class="section" id="sec-3">
+
+  <div class="section-badge">Sección 4 · Reflexión</div>
+  <h2 class="section-heading">Conéctalo con el partido</h2>
+  <p class="section-sub">Responde las tres preguntas. Usa los marcos de oración como punto de partida, luego hazlo tuyo.</p>
+
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem;">
+      <div class="card-title" style="margin-bottom:0;">Referencia de gráfica</div>
+      <div style="font-size:.75rem;color:var(--slate);">Tu E = <span id="ref-e-display" style="color:var(--cyan);font-weight:800;font-size:.9375rem;">10</span></div>
+    </div>
+    <input type="range" id="ref-e-slider" min="1" max="20" value="10" oninput="onRefSliderChange()" style="margin-bottom:.375rem;">
+    <div class="slider-range-labels" style="margin-bottom:.5rem;"><span>1</span><span>20</span></div>
+
+    <svg id="ref-svg" viewBox="0 0 360 160" width="100%" height="160" style="display:block;margin:.25rem 0;">
+      <line x1="32" y1="12" x2="32" y2="136" stroke="#222840" stroke-width="1"/>
+      <line x1="32" y1="136" x2="348" y2="136" stroke="#222840" stroke-width="1"/>
+      <line x1="32" y1="12" x2="348" y2="12" stroke="#1E2240" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="32" y1="74" x2="348" y2="74" stroke="#1E2240" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="32" y1="111" x2="348" y2="111" stroke="#FF4D6A" stroke-width="1" stroke-dasharray="4,2" opacity="0.55"/>
+      <line x1="221" y1="12" x2="221" y2="136" stroke="#FFD166" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.6"/>
+      <text x="28" y="16" text-anchor="end" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">100</text>
+      <text x="28" y="77" text-anchor="end" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">50</text>
+      <text x="28" y="114" text-anchor="end" font-size="9" fill="#FF4D6A" font-family="Inter,sans-serif" font-weight="700">20</text>
+      <text x="28" y="139" text-anchor="end" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">0</text>
+      <text x="32"  y="150" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">0</text>
+      <text x="221" y="150" text-anchor="middle" font-size="9" fill="#FFD166" font-family="Inter,sans-serif" font-weight="700">3</text>
+      <text x="348" y="150" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">5</text>
+      <polyline id="ref-line" points="" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <g id="ref-dots"></g>
+    </svg>
+
+    <table class="live-table" style="margin:.5rem 0;">
+      <thead>
+        <tr><th style="width:3.25rem;">t</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+      </thead>
+      <tbody id="ref-p-row"></tbody>
+    </table>
+    <div style="font-size:.75rem;color:var(--slate);margin-top:.375rem;line-height:1.6;">
+      Decaimiento: <span id="ref-decay" style="color:#E8EAF2;font-weight:700;">15/min</span>
+      · Llega al mínimo 20%: <span id="ref-floor" style="color:#E8EAF2;font-weight:700;">t &gt; 5 min</span>
+      · vs compañero E=10 en t=3: <span id="ref-vs" style="color:#E8EAF2;font-weight:700;">—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pregunta 1 de 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      Escribe la regla para cada fase usando notación matemática.
+    </p>
+    <div style="background:var(--navy3);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.875rem;font-size:.9375rem;color:var(--slate);line-height:2.4;letter-spacing:.01em;">
+      Fase 1 &nbsp;(t &le; ___): &nbsp;P(t) &nbsp;= &nbsp;___________________________<br>
+      Fase 2 &nbsp;(t &gt; ___): &nbsp;P(t) &nbsp;= &nbsp;___________________________
+    </div>
+    <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Completa los espacios con las fórmulas reales y el tiempo exacto de transición para tu valor de E actual. El tiempo de transición cambia con E — revisa la gráfica de referencia.</p>
+    <textarea class="reflect-textarea" id="q1-text" placeholder="Escribe las dos reglas aquí." oninput="checkReflect('q1-text','q1-count',40)"></textarea>
+    <div class="char-count" id="q1-count">0 / 40 mín</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pregunta 2 de 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      ¿En qué minuto cae tu bot por debajo del 50% de potencia? Muestra tu trabajo.
+    </p>
+
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem;">
+      <label style="font-size:.875rem;font-weight:700;">Usa E =</label>
+      <input type="number" class="num-input" id="q2-e" min="1" max="20" value="10" oninput="checkQ2()" style="width:70px;">
+      <span style="font-size:.875rem;color:var(--slate);">→ cae por debajo del 50% en t ≈</span>
+      <input type="number" step="0.1" class="num-input" id="q2-answer" placeholder="?">
+      <span style="font-size:.875rem;color:var(--slate);">min</span>
+      <span id="q2-icon" style="font-size:1rem;"></span>
+    </div>
+
+    <p style="font-size:.8125rem;color:var(--slate);margin:.75rem 0 .375rem;">Muestra tu trabajo:</p>
+    <textarea class="reflect-textarea" id="q2-work" placeholder="Resuelve 100 − (20 − E) × 1.5 × t = 50 ..." style="min-height:70px;" oninput="checkReflect('q2-work','q2-work-count',5)"></textarea>
+    <div class="char-count" id="q2-work-count">0 / 5 mín</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pregunta 3 de 3</div>
+    <p style="font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.75rem;">
+      Tienes 20 puntos en total. Tu compañero elige entre E = 8 y E = 14. ¿Cuál debería elegir?
+    </p>
+    <p style="font-size:.875rem;color:var(--slate);margin-bottom:.875rem;line-height:1.55;">Calcula lo que da cada opción en t = 3. Muestra tu trabajo. Luego haz una recomendación y defiéndela — incluyendo lo que cuesta cada opción en puntos restantes.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.875rem;">
+      <div style="background:var(--navy3);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">E = 8</div>
+        <div style="font-size:.875rem;color:#C8CDD8;margin-bottom:.25rem;">P(3) = ?</div>
+        <div style="font-size:.75rem;color:var(--slate);">Quedan 12 puntos</div>
+      </div>
+      <div style="background:var(--navy3);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">E = 14</div>
+        <div style="font-size:.875rem;color:#C8CDD8;margin-bottom:.25rem;">P(3) = ?</div>
+        <div style="font-size:.75rem;color:var(--slate);">Quedan 6 puntos</div>
+      </div>
+    </div>
+
+    <p style="font-size:.8125rem;font-weight:700;color:var(--slate);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em;">Elige uno y defiende tu posición:</p>
+    <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:.875rem;">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="q3-choice" value="e8"> E = 8
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.9375rem;font-weight:700;color:#E8EAF2;">
+        <input type="radio" name="q3-choice" value="e14"> E = 14
+      </label>
+    </div>
+    <textarea class="reflect-textarea" id="q3-text" placeholder="Muestra P(3) para ambos, luego defiende tu posición..." oninput="checkReflect('q3-text','q3-count',20)"></textarea>
+    <div class="char-count" id="q3-count">0 / 20 mín</div>
+  </div>
+
+  <div id="done-btn-wrap" style="text-align:center;margin-top:1.25rem;display:none;">
+    <button class="btn btn-success" onclick="goSection(4)">Continuar para confirmar →</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(2)">← Atrás</button>
+    <span></span>
+  </div>
+</section>
+
+<!-- ═══════════ SECCIÓN 5: Confirmar ═══════════ -->
+<section class="section" id="sec-4">
+
+  <div class="section-badge">Sección 5 · Confirmar</div>
+  <h2 class="section-heading">Resuelve las restricciones. Luego confirma.</h2>
+  <p class="section-sub">Dos requisitos: tu bot debe mantenerse por encima del 50% de potencia en t = 3, y debes guardar al menos 8 puntos para Turning y Power. Resuelve el rango válido de E — luego elige dentro de él.</p>
+
+  <div class="card" id="sec4-main">
+    <div class="stat-card-visual">
+      <div class="sc-title">Stat Card · Semana 1</div>
+      <div class="stat-row" id="sr-speed">
+        <div class="stat-name locked-row" id="sc-speed-name">Speed</div>
+        <div class="stat-points-display" id="sc-speed-pts">—</div>
+        <div class="stat-pct-display" id="sc-speed-sub">Día 1</div>
+        <div class="stat-locked prior-locked" id="sc-speed-tag" style="display:none;">Confirmado</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name active">Endurance</div>
+        <div class="stat-points-display" id="sc-endurance-pts">—</div>
+        <div class="stat-pct-display" id="sc-endurance-sub"></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Turning</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Día 3</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-name">Power</div>
+        <div class="stat-points-display" style="color:var(--slate)">?</div>
+        <div class="stat-pct-display">Día 4</div>
+      </div>
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-label-row">
+        <label>Puntos de Endurance</label>
+        <div>
+          <span class="slider-value-display" id="lock-slider-val">10</span>
+          <span class="slider-pct" id="lock-decay-display" style="font-size:.875rem;color:var(--slate);margin-left:.25rem;">decaimiento 15/min</span>
+        </div>
+      </div>
+      <input type="range" id="lock-slider" min="1" max="18" value="10" oninput="onLockSliderChange()" />
+      <div class="slider-range-labels">
+        <span id="lock-slider-min-lbl">1 pt</span>
+        <span id="lock-slider-max-lbl">18 pts</span>
+      </div>
+    </div>
+
+    <div class="budget-bar-wrap">
+      <div class="budget-bar-label" id="budget-label">Usando 10 de tu presupuesto de 20 puntos</div>
+      <div class="budget-bar-track">
+        <div class="budget-bar-fill prior" id="budget-fill-prior" style="width:0%"></div>
+        <div class="budget-bar-fill" id="budget-fill" style="width:50%"></div>
+      </div>
+      <div class="budget-note ok" id="budget-note">Quedan 10 puntos para Turning y Power (Días 3–4)</div>
+    </div>
+
+    <div style="background:rgba(155,138,255,.06);border:1px solid rgba(155,138,255,.3);border-radius:8px;padding:1rem 1.125rem;margin:1.25rem 0 1rem;">
+      <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.5rem;">Resuelve esto primero</div>
+      <p style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Dos restricciones — ambas deben cumplirse:</p>
+      <div style="background:var(--navy3);border-radius:6px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.875rem;color:#C8CDD8;line-height:1.8;">
+        1. P(3) &gt; <strong style="color:var(--yellow);">60%</strong> — tu bot debe mantenerse por encima del 60% de potencia en el minuto 3.<br>
+        2. Tasa de decaimiento &lt; <strong style="color:var(--yellow);">13%/min</strong> — mantén el decaimiento bajo para conservar potencia más tiempo.
+      </div>
+      <p style="font-size:.8125rem;color:var(--slate);margin-bottom:.875rem;">Plantea ambas desigualdades. Resuelve cada una para E. El E mínimo que satisface ambas es tu respuesta — adivinar falla cuando hay dos restricciones que cruzar.</p>
+
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.625rem;">
+        <span style="font-size:.875rem;font-weight:700;color:#E8EAF2;">E mínimo =</span>
+        <input type="number" id="constraint-ans" class="work-input" placeholder="?" min="1" max="20" oninput="checkConstraint()" style="width:80px;">
+        <span id="constraint-icon" style="font-size:1.1rem;"></span>
+      </div>
+
+      <div id="constraint-fb" style="display:none;font-size:.8125rem;padding:.5rem .75rem;border-radius:5px;margin-bottom:.625rem;line-height:1.55;"></div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.5rem;">
+        <span style="font-size:.8125rem;color:var(--slate);">Con tu valor actual del deslizador, P(3) =</span>
+        <span id="lock-p3-display" style="font-size:1.25rem;font-weight:800;color:var(--cyan);">55%</span>
+      </div>
+    </div>
+
+    <div id="name-input-wrap" style="margin-bottom:1rem;display:none;">
+      <label for="student-name" style="display:block;font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.375rem;">Tu nombre</label>
+      <input type="text" id="student-name" class="name-input" placeholder="Nombre, inicial del apellido — ej. Alex M." oninput="onNameInput()" autocomplete="off" />
+    </div>
+
+    <div>
+      <button class="btn-lock" id="lock-btn" onclick="openLockModal()" disabled>
+        🔒 Confirmar asignación de Endurance
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="sec4-locked" style="display:none;">
+    <div class="lock-notice" id="lock-notice" style="display:none;"></div>
+    <div class="locked-display">
+      <div class="lock-icon">🔒</div>
+      <h3>Endurance confirmado para la Semana 1</h3>
+      <div class="locked-stat-chip">
+        <span class="pts" id="locked-pts">—</span>
+        <span class="label" id="locked-decay-label">pts · decaimiento — /min</span>
+      </div>
+      <p id="locked-message"></p>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(3)">← Atrás</button>
+    <span></span>
+  </div>
+</section>
+
+<!-- Modal de confirmación -->
+<div class="modal-overlay" id="lock-modal">
+  <div class="modal-box">
+    <h2>¿Confirmar tu Endurance?</h2>
+    <p>Las asignaciones individuales son de sentido único para la Semana 1. Verás Turning el Día 3 y Power el Día 4, y el equipo elige una nueva configuración el viernes.</p>
+    <div class="modal-value" id="modal-val">—</div>
+    <div class="modal-decay" id="modal-decay">puntos · decaimiento — /min</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeLockModal()">Todavía no</button>
+      <button class="btn-lock" onclick="confirmLock()">🔒 Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAVE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzV0_UPT5vyy-PNRS9Vw4jvPT0Bcx22k0hHV62-fLFj7nKmp3Mem2Z1szmv_dJy4OJk/exec';
+
+function clampPower(v) { return Math.max(20, Math.round(v)); }
+function calcP(E, t) {
+  const raw = 100 - (20 - E) * 1.5 * t;
+  return Math.max(20, raw);
+}
+function powerColor(p) {
+  if (p >= 60) return '#00E5FF';
+  if (p >= 30) return '#FFD166';
+  return '#FF4D6A';
+}
+
+// ── Navegación de secciones ──────────────────────────────────────────────────
+const SECTION_COUNT = 5;
+function goSection(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.section-nav button').forEach((b,i) => b.classList.toggle('active', i===idx));
+  const pct = ((idx+1)/SECTION_COUNT*100).toFixed(0);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── Sección 1: Puerta de predicción ──────────────────────────────────────────
+function checkS1Obs() {
+  const text = document.getElementById('s1-obs-text').value.trim();
+  const pred = document.getElementById('s1-pred-input').value;
+  const reachZero = document.querySelector('input[name="reach-zero"]:checked');
+  const count = document.getElementById('s1-obs-count');
+  const btn = document.getElementById('s1-reveal-btn');
+  count.textContent = text.length + ' / 40 mín';
+  count.classList.toggle('ready', text.length >= 40);
+  const ready = text.length >= 40 && pred !== '' && !isNaN(parseFloat(pred)) && reachZero !== null;
+  btn.classList.toggle('locked', !ready);
+}
+
+function revealFloor() {
+  const predVal = parseFloat(document.getElementById('s1-pred-input').value);
+  const reachZeroVal = document.querySelector('input[name="reach-zero"]:checked')?.value;
+
+  document.getElementById('s1-row4').style.display = '';
+  document.getElementById('s1-row5').style.display = '';
+
+  const echo = document.getElementById('s1-prediction-echo');
+  if (!isNaN(predVal)) {
+    if (predVal === 20) {
+      echo.innerHTML = 'Predijiste P(4) = <strong style="color:var(--green)">' + predVal + '%</strong>. Real: <strong style="color:var(--yellow)">20%</strong>. Lo lograste — pero mira t=5. Se quedó en 20% de nuevo.';
+    } else {
+      echo.innerHTML = 'Predijiste P(4) = <strong style="color:var(--cyan)">' + predVal + '%</strong>. Real: <strong style="color:var(--yellow)">20%</strong>. La fórmula pura da ' + predVal + '%, pero el juego lo detuvo en 20%.';
+    }
+  }
+
+  const zeroReveal = document.getElementById('s1-zero-reveal');
+  if (reachZeroVal === 'yes') {
+    zeroReveal.innerHTML = 'Dijiste que sí. Mira t=4 y t=5. La potencia se detuvo en 20% y <em>se quedó ahí</em>. El motor del juego aplica un mínimo — la potencia nunca puede caer por debajo del 20%, sin importar cuántos minutos pasen. Estabas equivocado/a. Esa diferencia entre tu predicción y la realidad es de lo que trata esta lección.';
+  } else {
+    zeroReveal.innerHTML = 'Dijiste que no — correcto. ¿Pero puedes explicar por qué con los datos? La potencia llegó al 20% y se quedó ahí. El juego aplica un mínimo. Ese mínimo es lo que cambia todo sobre cómo funciona Endurance.';
+  }
+
+  const revealBtn = document.getElementById('s1-reveal-btn');
+  revealBtn.disabled = true; revealBtn.style.opacity = '.4';
+
+  const floorCard = document.getElementById('s1-floor-card');
+  floorCard.style.display = 'block';
+  floorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function checkFloorExplain() {
+  const text = document.getElementById('s1-floor-explain').value.trim();
+  const count = document.getElementById('s1-floor-count');
+  const btn = document.getElementById('s1-formula-btn');
+  count.textContent = text.length + ' / 30 mín';
+  count.classList.toggle('ready', text.length >= 30);
+  btn.classList.toggle('locked', text.length < 30);
+}
+
+function revealFormula() {
+  const el = document.getElementById('formula-reveal');
+  if (el) { el.style.display = 'block'; el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  const btn = document.getElementById('s1-formula-btn');
+  btn.disabled = true;
+  btn.style.opacity = '.4';
+}
+
+function checkVerify() {
+  const t0 = parseFloat(document.getElementById('verify-t0').value);
+  const t1 = parseFloat(document.getElementById('verify-t1').value);
+  const t2 = parseFloat(document.getElementById('verify-t2').value);
+  const t3 = parseFloat(document.getElementById('verify-t3').value);
+  const fb = document.getElementById('verify-fb');
+  const allFilled = !isNaN(t0) && !isNaN(t1) && !isNaN(t2) && !isNaN(t3);
+  if (!allFilled) { fb.style.display = 'none'; return; }
+  const ok0 = t0 === 100, ok1 = t1 === 79, ok2 = t2 === 58, ok3 = t3 === 37;
+  const setField = (id, ok) => {
+    document.getElementById(id).classList.toggle('correct', ok);
+    document.getElementById(id).classList.toggle('error', !ok);
+  };
+  setField('verify-t0', ok0); setField('verify-t1', ok1);
+  setField('verify-t2', ok2); setField('verify-t3', ok3);
+  fb.style.display = 'block';
+  if (ok0 && ok1 && ok2 && ok3) {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+    fb.textContent = '✓ Los cuatro son correctos. La fórmula reproduce los datos del bot desconocido. Avanza a la Sección 2.';
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+    const hints = [];
+    if (!ok0) hints.push('P(0): sustituye t=0 en la fórmula');
+    if (!ok1) hints.push('P(1): 100 − (20 − 6) × 1.5 × 1 = ?');
+    if (!ok2) hints.push('P(2): 100 − 14 × 1.5 × 2 = ?');
+    if (!ok3) hints.push('P(3): 100 − 14 × 1.5 × 3 = ?');
+    fb.textContent = hints.join(' · ');
+  }
+}
+
+// ── Sección 2: Tabla E=4 (un solo envío) ────────────────────────────────────
+const scaffData = [
+  { t:1, pt:76 },
+  { t:2, pt:52 },
+  { t:3, pt:28 },
+  { t:4, pt:20 },
+  { t:5, pt:20 },
+];
+
+function buildScaffolded() {
+  const tbody = document.getElementById('scaffolded-body');
+  scaffData.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="t-val">${row.t}</td>
+      <td><input type="number" class="work-input" id="spt-${row.t}" placeholder="?"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function checkADecay() {
+  const val = parseFloat(document.getElementById('a-decay-ans').value);
+  const icon = document.getElementById('a-decay-icon');
+  const fb = document.getElementById('a-decay-fb');
+  if (isNaN(val)) { icon.textContent = ''; fb.style.display = 'none'; return; }
+  const ok = val === 24;
+  icon.textContent = ok ? '✓' : '✗';
+  icon.style.color = ok ? 'var(--green)' : 'var(--red)';
+  fb.style.display = ok ? 'none' : 'block';
+  if (!ok) {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);margin-top:.5rem;';
+    fb.textContent = 'Usa (20 − E) × 1.5 con E = 4.';
+  }
+}
+
+function submitPartA() {
+  const btn = document.getElementById('submit-a-btn');
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
+  checkADecay();
+  let correct = 0;
+  let hitsBelowFloor = false;
+  const rawUnfloored = { 1: 76, 2: 52, 3: 28, 4: 4, 5: -20 };
+  scaffData.forEach(row => {
+    const el = document.getElementById('spt-' + row.t);
+    const val = parseFloat(el.value);
+    const ok = val === row.pt;
+    if (ok) correct++;
+    el.classList.toggle('correct', ok);
+    el.classList.toggle('error', !ok);
+    el.readOnly = true;
+    if (!isNaN(val) && val < 20 && row.pt === 20) hitsBelowFloor = true;
+  });
+  const results = document.getElementById('part-a-results');
+  results.style.display = 'block';
+  const wrong = scaffData.length - correct;
+  if (hitsBelowFloor) {
+    results.innerHTML = `<div style="background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--red);font-weight:700;line-height:1.6;">Tu matemática es correcta — pero el juego se detiene en 20%. La potencia no puede caer por debajo del mínimo. ¿Qué te dice eso sobre el rendimiento del bot en los últimos minutos?</div>`;
+  } else if (correct === scaffData.length) {
+    results.innerHTML = '<div style="background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--green);font-weight:700;">✓ Todos correctos.</div>';
+  } else {
+    results.innerHTML = `<div style="background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1.125rem;color:var(--yellow);font-weight:700;">${correct} de ${scaffData.length} correctos. ${wrong} marcados en rojo. Recalcula — no se dan respuestas.</div>`;
+  }
+}
+
+// ── Sección 2: Tabla independiente (E=2) ────────────────────────────────────
+const indepData = [
+  { t:1, pt:73 },
+  { t:2, pt:46 },
+  { t:3, pt:20 },
+  { t:4, pt:20 },
+  { t:5, pt:20 },
+];
+
+function buildIndep() {
+  const tbody = document.getElementById('indep-body');
+  indepData.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="t-val">${row.t}</td>
+      <td><input type="number" class="work-input" id="ipt-${row.t}" placeholder="?"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function submitIndep() {
+  const results = document.getElementById('indep-results');
+  results.style.display = 'block';
+  let correct = 0;
+  const total = indepData.length;
+
+  indepData.forEach(row => {
+    const ptv = parseFloat(document.getElementById('ipt-' + row.t).value);
+    const ptOk = ptv === row.pt;
+    if (ptOk) correct++;
+    const iptEl = document.getElementById('ipt-' + row.t);
+    iptEl.classList.toggle('correct', ptOk);
+    iptEl.classList.toggle('error', !ptOk);
+    iptEl.readOnly = true;
+  });
+
+  const btn = document.getElementById('submit-all-btn');
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
+
+  if (correct === total) {
+    results.innerHTML = '<div style="background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:8px;padding:.875rem 1.125rem;color:var(--green);font-weight:700;">✓ Todos correctos.</div>';
+  } else {
+    const wrong = total - correct;
+    results.innerHTML = `<div style="background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1.125rem;color:var(--yellow);font-weight:700;">${correct} de ${total} correctos. ${wrong} marcados en rojo. Recalcula — no se dan respuestas.</div>`;
+  }
+  document.getElementById('submit-status').textContent = '';
+}
+
+// ── Sección 2: Pregunta trampa ───────────────────────────────────────────────
+function checkTrap() {
+  const picked = document.querySelector('input[name="trap-q"]:checked');
+  const reason = document.getElementById('trap-reason').value.trim();
+  const count = document.getElementById('trap-reason-count');
+  const btn = document.getElementById('trap-commit-btn');
+  count.textContent = reason.length + ' / 5 mín';
+  count.classList.toggle('ready', reason.length >= 5);
+  btn.classList.toggle('locked', !picked || reason.length < 5);
+}
+
+function commitTrap() {
+  const val = document.querySelector('input[name="trap-q"]:checked')?.value;
+  const reason = document.getElementById('trap-reason').value.trim();
+  if (!val || reason.length < 5) return;
+
+  document.querySelectorAll('input[name="trap-q"]').forEach(r => r.disabled = true);
+  const commitBtn = document.getElementById('trap-commit-btn');
+  commitBtn.disabled = true;
+  commitBtn.style.opacity = '.4';
+
+  const reveal = document.getElementById('trap-reveal');
+  reveal.style.display = 'block';
+
+  if (val === 'no') {
+    reveal.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--green);line-height:1.6;';
+    reveal.innerHTML = '&#10003; Correcto. El mínimo del 20% se aplica a todos los bots en cualquier valor de E. La potencia está limitada por el motor del juego — no puede caer por debajo del 20%. E=2 tiene un decaimiento brutal (27%/min), pero el mínimo se mantiene. Ahora calcula la tabla.';
+  } else {
+    reveal.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--red);line-height:1.6;';
+    reveal.innerHTML = '&#10007; No — el mínimo del 20% se aplica a todos los bots sin importar E. Mira los datos del bot desconocido: la potencia llegó al 20% y se quedó ahí, aunque la fórmula pura la llevaría más abajo. El motor del juego aplica el mínimo. Tenlo en cuenta cuando llenes esta tabla.';
+  }
+
+  const partB = document.getElementById('s2-partb-card');
+  partB.style.display = 'block';
+  setTimeout(() => partB.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+}
+
+// ── Sección 3: Puerta de predicción ─────────────────────────────────────────
+function checkPredictions() {
+  const slope = document.querySelector('input[name="pred-slope"]:checked');
+  const floor = document.querySelector('input[name="pred-floor-timing"]:checked');
+  const btn = document.getElementById('commit-predict-btn');
+  if (slope && floor) btn.classList.remove('locked');
+}
+
+function commitPredictions() {
+  const slopeVal = document.querySelector('input[name="pred-slope"]:checked')?.value;
+  const floorVal = document.querySelector('input[name="pred-floor-timing"]:checked')?.value;
+  if (!slopeVal || !floorVal) return;
+
+  document.querySelectorAll('input[name="pred-slope"], input[name="pred-floor-timing"]').forEach(r => r.disabled = true);
+  document.getElementById('commit-predict-btn').disabled = true;
+  document.getElementById('commit-predict-btn').style.opacity = '.4';
+
+  const slopeCorrect = slopeVal === 'yes';
+  const floorCorrect = floorVal === 'later';
+
+  const resultEl = document.getElementById('predict-result');
+  resultEl.style.display = 'block';
+
+  let msg = '';
+  if (slopeCorrect && floorCorrect) {
+    resultEl.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:6px;padding:.75rem 1rem;font-size:.8125rem;color:var(--green);line-height:1.55;margin-top:.875rem;';
+    msg = '✓ Ambas correctas. E=2 decae a 27%/min — llega al mínimo en t = 80/27 ≈ 2.96 min, justo dentro del partido de 3 minutos. Ahora explica por qué usando la fórmula.';
+  } else {
+    resultEl.style.cssText = 'display:block;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:6px;padding:.75rem 1rem;font-size:.8125rem;color:var(--yellow);line-height:1.55;margin-top:.875rem;';
+    const slopeNote = slopeCorrect ? '' : 'E=2: decaimiento = (20−2)×1.5 = 27%/min. Mínimo en 80/27 = 2.96 min — justo antes de los 3 min. ';
+    const floorNote = floorCorrect ? '' : 'Mayor E = decaimiento más lento = mínimo alcanzado más tarde. ';
+    msg = slopeNote + floorNote + 'Ahora explica lo que te dice la fórmula.';
+  }
+  resultEl.textContent = msg;
+
+  document.getElementById('pred-explain-card').style.display = 'block';
+
+  const slopeLbl = slopeVal === 'yes' ? '"Sí"' : '"No"';
+  const floorLbl = floorVal === 'later' ? '"Después"' : floorVal === 'sooner' ? '"Antes"' : '"Al mismo tiempo"';
+  const recall = document.getElementById('s3-pred-recall');
+  if (recall) recall.textContent = 'Tus predicciones: (1) E=2 llega al mínimo antes de 3 min → ' + slopeLbl + ' · (2) Mayor E llega al mínimo → ' + floorLbl + '. Usa los números de la gráfica para verificar o contradecir cada una.';
+}
+
+// ── Sección 3: Rendición de cuentas post-gráfica ─────────────────────────────
+function checkS3Accountability() {
+  const text = document.getElementById('s3-accountability').value.trim();
+  const count = document.getElementById('s3-acc-count');
+  count.textContent = text.length + ' / 60 mín';
+  count.classList.toggle('ready', text.length >= 60);
+}
+
+function checkPredExplain() {
+  const text = document.getElementById('pred-explain-text').value.trim();
+  const count = document.getElementById('pred-explain-count');
+  const btn = document.getElementById('unlock-slider-btn');
+  count.textContent = text.length + ' / 50 mín';
+  count.classList.toggle('ready', text.length >= 50);
+  btn.classList.toggle('locked', text.length < 50);
+}
+
+function unlockSliderGraph() {
+  document.getElementById('slider-graph-section').style.display = 'block';
+  const btn = document.getElementById('unlock-slider-btn');
+  btn.disabled = true;
+  btn.style.opacity = '.4';
+  setTimeout(() => document.getElementById('slider-graph-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  updateGraph();
+}
+
+// ── Sección 3: Gráfica ───────────────────────────────────────────────────────
+function tToX(t) { return 60 + t * 88; }
+function pToY(p) { return 220 - p * 2; }
+
+function updateGraph() {
+  const E = parseInt(document.getElementById('e-slider').value);
+  document.getElementById('e-display').textContent = E;
+
+  const decayRate = (20 - E) * 1.5;
+  const infiniteMatch = E >= 20;
+
+  document.getElementById('decay-rate-display').textContent = infiniteMatch
+    ? '0%/min'
+    : decayRate.toFixed(1) + '%/min';
+
+  const hzEl = document.getElementById('hits-zero-display');
+  const tFloor = infiniteMatch ? Infinity : (80 / decayRate);
+  if (infiniteMatch) {
+    hzEl.textContent = '∞ (sin decaimiento)';
+    hzEl.className = 'sc-value inf';
+  } else if (tFloor <= 5) {
+    hzEl.textContent = 't = ' + tFloor.toFixed(1) + ' min';
+    hzEl.className = 'sc-value warn';
+  } else {
+    hzEl.textContent = 't > 5 min';
+    hzEl.className = 'sc-value';
+  }
+
+  const tbody = document.getElementById('live-table-body');
+  tbody.innerHTML = '';
+  for (let t = 0; t <= 5; t++) {
+    const p = calcP(E, t);
+    const barW = p + '%';
+    const barColor = powerColor(p);
+    const floorTag = (!infiniteMatch && t > 0 && p === 20 && tFloor <= t) ? ' <span style="color:var(--yellow);font-size:.75rem">⚡</span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${t}</td>
+      <td style="font-weight:800;color:${barColor}">${p}%${floorTag}</td>
+      <td style="min-width:80px;">
+        <div class="live-p-bar"><div class="live-p-fill" style="width:${barW};background:${barColor}"></div></div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  const svgPts = [];
+  svgPts.push([0, 100]);
+
+  if (!infiniteMatch) {
+    if (tFloor <= 5) {
+      svgPts.push([tFloor, 20]);
+      svgPts.push([5, 20]);
+    } else {
+      for (let t = 1; t <= 5; t++) {
+        svgPts.push([t, Math.max(20, 100 - decayRate * t)]);
+      }
+    }
+  }
+
+  const svgPointsStr = svgPts.map(([t, p]) => tToX(t) + ',' + pToY(p)).join(' ');
+  document.getElementById('decay-line').setAttribute('points', svgPointsStr);
+
+  const dotsG = document.getElementById('decay-dots');
+  dotsG.innerHTML = '';
+  for (let t = 0; t <= 5; t++) {
+    const p = calcP(E, t);
+    const cx = tToX(t), cy = pToY(p);
+    const col = powerColor(p);
+    dotsG.innerHTML += `<circle cx="${cx}" cy="${cy}" r="4" fill="${col}" stroke="#0D0D1A" stroke-width="2"/>`;
+  }
+
+  if (!infiniteMatch && tFloor > 0 && tFloor <= 5) {
+    const fx = tToX(tFloor);
+    const fy = pToY(20);
+    dotsG.innerHTML += `<circle cx="${fx}" cy="${fy}" r="5.5" fill="#FF4D6A" stroke="#0D0D1A" stroke-width="2"/>`;
+    const labelX = fx > 440 ? fx - 7 : fx + 7;
+    const anchor  = fx > 440 ? 'end' : 'start';
+    dotsG.innerHTML += `<text x="${labelX}" y="${fy - 8}" text-anchor="${anchor}" font-size="10" fill="#FF4D6A" font-family="Inter,sans-serif" font-weight="700">⚡ ${tFloor.toFixed(1)} min</text>`;
+  }
+
+  updateCompare();
+  renderRefPanel(E);
+}
+
+// ── Panel de referencia (Sección 4) ─────────────────────────────────────────
+function refTx(t) { return 32 + t * 63.2; }
+function refPy(p) { return 136 - p * 1.24; }
+
+function onRefSliderChange() {
+  const E = parseInt(document.getElementById('ref-e-slider').value);
+  const main = document.getElementById('e-slider');
+  if (main && parseInt(main.value) !== E) main.value = E;
+  updateGraph();
+}
+
+function renderRefPanel(E) {
+  const refSlider = document.getElementById('ref-e-slider');
+  if (refSlider && parseInt(refSlider.value) !== E) refSlider.value = E;
+
+  const displayEl = document.getElementById('ref-e-display');
+  if (displayEl) displayEl.textContent = E;
+
+  const decayEl = document.getElementById('ref-decay');
+  if (decayEl) decayEl.textContent = (20 - E) * 1.5 + '%/min';
+
+  const decayRate = (20 - E) * 1.5;
+  const floorEl = document.getElementById('ref-floor');
+  if (floorEl) {
+    if (decayRate === 0) floorEl.textContent = 'nunca (sin decaimiento)';
+    else {
+      const tFloor = 80 / decayRate;
+      floorEl.textContent = tFloor <= 5 ? 't = ' + tFloor.toFixed(1) + ' min' : 't > 5 min';
+    }
+  }
+
+  const vsEl = document.getElementById('ref-vs');
+  if (vsEl) {
+    const you      = Math.round(calcP(E,  3));
+    const teammate = Math.round(calcP(10, 3));
+    const diff = you - teammate;
+    if (diff === 0)    vsEl.innerHTML = 'empatados en ' + you + '%';
+    else if (diff > 0) vsEl.innerHTML = '+' + diff + '% adelante (' + you + '% vs ' + teammate + '%)';
+    else               vsEl.innerHTML = diff + '% atrás (' + you + '% vs ' + teammate + '%)';
+  }
+
+  const row = document.getElementById('ref-p-row');
+  if (row) {
+    let html = '<tr><td style="color:var(--slate);font-weight:700;">P(t)</td>';
+    for (let t = 0; t <= 5; t++) {
+      const p = calcP(E, t);
+      const col = powerColor(p);
+      const floorMark = (t > 0 && p === 20 && decayRate > 0 && (80 / decayRate) <= t) ? '<span style="color:var(--yellow);font-size:.7rem;margin-left:2px;">⚡</span>' : '';
+      html += '<td style="font-weight:800;color:' + col + ';">' + p + '%' + floorMark + '</td>';
+    }
+    html += '</tr>';
+    row.innerHTML = html;
+  }
+
+  const line = document.getElementById('ref-line');
+  if (line) {
+    const pts = [[0, 100]];
+    if (decayRate === 0) {
+      pts.push([5, 100]);
+    } else {
+      const tFloor = 80 / decayRate;
+      if (tFloor <= 5) { pts.push([tFloor, 20]); pts.push([5, 20]); }
+      else {
+        for (let t = 1; t <= 5; t++) pts.push([t, Math.max(20, 100 - decayRate * t)]);
+      }
+    }
+    line.setAttribute('points', pts.map(([t, p]) => refTx(t) + ',' + refPy(p)).join(' '));
+  }
+
+  const dots = document.getElementById('ref-dots');
+  if (dots) {
+    dots.innerHTML = '';
+    for (let t = 0; t <= 5; t++) {
+      const p = calcP(E, t);
+      dots.innerHTML += '<circle cx="' + refTx(t) + '" cy="' + refPy(p) + '" r="2.5" fill="' + powerColor(p) + '" stroke="#0D0D1A" stroke-width="1.5"/>';
+    }
+  }
+}
+
+function updateCompare() {
+  let ourE   = parseInt(document.getElementById('cp-our').value)   || 10;
+  let theirE = parseInt(document.getElementById('cp-their').value) || 6;
+  ourE   = Math.min(20, Math.max(1, ourE));
+  theirE = Math.min(20, Math.max(1, theirE));
+
+  const ourP   = Math.round(calcP(ourE,   3));
+  const theirP = Math.round(calcP(theirE, 3));
+
+  const ourEl   = document.getElementById('cp-our-val');
+  const theirEl = document.getElementById('cp-their-val');
+  ourEl.textContent   = ourP   + '%';
+  theirEl.textContent = theirP + '%';
+  ourEl.style.color   = powerColor(ourP);
+  theirEl.style.color = powerColor(theirP);
+
+  const diff = ourP - theirP;
+
+  const cqOur   = document.getElementById('cq-our-e');
+  const cqTheir = document.getElementById('cq-their-e');
+  if (cqOur)   cqOur.textContent   = ourE;
+  if (cqTheir) cqTheir.textContent = theirE;
+  document.querySelectorAll('input[name="compare-faster"]').forEach(r => r.checked = false);
+  const cfFb = document.getElementById('compare-faster-fb');
+  if (cfFb) cfFb.style.display = 'none';
+
+  const resultEl = document.getElementById('compare-result');
+  if (ourP === theirP) {
+    resultEl.innerHTML = `Ambos bots tienen <strong style="color:var(--cyan)">${ourP}%</strong> de potencia en t=3 — están empatados.`;
+  } else if (ourP > theirP) {
+    resultEl.innerHTML = `Nuestro bot tiene <strong style="color:var(--green)">${ourP}%</strong> vs su <strong style="color:var(--red)">${theirP}%</strong> en t=3 — llevamos una ventaja de <strong style="color:var(--green)">+${diff}%</strong> de potencia.`;
+  } else {
+    resultEl.innerHTML = `Nuestro bot tiene <strong style="color:var(--red)">${ourP}%</strong> vs su <strong style="color:var(--green)">${theirP}%</strong> en t=3 — ellos tienen una ventaja de <strong style="color:var(--yellow)">+${Math.abs(diff)}%</strong> de potencia.`;
+  }
+}
+
+// ── Sección 4: Reflexión ─────────────────────────────────────────────────────
+function checkReflect(textId, countId, minLen) {
+  const el   = document.getElementById(textId);
+  const cEl  = document.getElementById(countId);
+  const len  = el.value.trim().length;
+  const ready = len >= minLen;
+  cEl.textContent = len + ' / ' + minLen + ' mín';
+  cEl.classList.toggle('ready', ready);
+  el.classList.toggle('ready', ready);
+  checkAllReflect();
+}
+
+function checkQ2() {
+  const E = parseInt(document.getElementById('q2-e').value) || 10;
+  const eClamped = Math.min(20, Math.max(1, E));
+  const decayRate = (20 - eClamped) * 1.5;
+  if (eClamped >= 20) return;
+
+  const tExact = 50 / decayRate;
+  const userAns = parseFloat(document.getElementById('q2-answer').value);
+  const icon = document.getElementById('q2-icon');
+
+  if (isNaN(userAns)) { icon.textContent = ''; return; }
+  const within = Math.abs(userAns - tExact) < 0.15;
+  icon.textContent = within ? '✓' : '✗';
+  icon.style.color = within ? 'var(--green)' : 'var(--red)';
+  checkAllReflect();
+}
+
+function checkAllReflect() {
+  const q1ok = document.getElementById('q1-text').value.trim().length >= 40;
+  const q2ans = parseFloat(document.getElementById('q2-answer').value);
+  const q2workOk = document.getElementById('q2-work').value.trim().length >= 5;
+  const q3ok = document.getElementById('q3-text').value.trim().length >= 20;
+  const q3picked = document.querySelector('input[name="q3-choice"]:checked');
+
+  const E = parseInt(document.getElementById('q2-e').value) || 10;
+  const eClamped = Math.min(20, Math.max(1, E));
+  const decayRate = (20 - eClamped) * 1.5;
+  const tExact = eClamped >= 20 ? null : 50 / decayRate;
+  const q2numOk = tExact !== null ? (!isNaN(q2ans) && Math.abs(q2ans - tExact) < 0.15) : true;
+
+  const allDone = q1ok && q2numOk && q2workOk && q3ok && !!q3picked;
+  const doneBtnWrap = document.getElementById('done-btn-wrap');
+  doneBtnWrap.style.display = allDone ? 'block' : 'none';
+}
+
+// ── Sección 5: Confirmar Endurance ───────────────────────────────────────────
+function getPriorSpeed() {
+  const v = parseInt(localStorage.getItem('va_speed_locked'));
+  return isNaN(v) ? null : v;
+}
+
+function initLockSection() {
+  const priorSpeed = getPriorSpeed();
+  const speedPts = document.getElementById('sc-speed-pts');
+  const speedSub = document.getElementById('sc-speed-sub');
+  const speedTag = document.getElementById('sc-speed-tag');
+
+  if (priorSpeed !== null) {
+    speedPts.textContent = priorSpeed;
+    speedPts.style.color = 'var(--green)';
+    speedSub.textContent = (priorSpeed * 5) + '% potencia del motor';
+    speedTag.style.display = 'inline-block';
+  } else {
+    speedPts.textContent = '?';
+    speedSub.textContent = 'Día 1 (pendiente)';
+  }
+
+  const reserved = (priorSpeed || 0) + 2;
+  const maxE = Math.max(1, 20 - reserved);
+  const slider = document.getElementById('lock-slider');
+  slider.max = maxE;
+  if (parseInt(slider.value) > maxE) slider.value = maxE;
+  document.getElementById('lock-slider-max-lbl').textContent = maxE + ' pts';
+
+  const savedName = localStorage.getItem('va_student_name');
+  const nameInput = document.getElementById('student-name');
+  if (savedName && nameInput) { nameInput.value = savedName; onNameInput(); }
+
+  onLockSliderChange();
+}
+
+function onLockSliderChange() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  const decayRate = (20 - pts) * 1.5;
+  const priorSpeed = getPriorSpeed() || 0;
+  const totalUsed = priorSpeed + pts;
+  const remaining = 20 - totalUsed;
+
+  document.getElementById('lock-slider-val').textContent = pts;
+  document.getElementById('lock-decay-display').textContent = 'decaimiento ' + decayRate.toFixed(1) + '/min';
+  document.getElementById('sc-endurance-pts').textContent = pts;
+  document.getElementById('sc-endurance-sub').textContent = 'decaimiento ' + decayRate.toFixed(1) + '%/min';
+
+  const p3 = Math.round(calcP(pts, 3));
+  const p3El = document.getElementById('lock-p3-display');
+  if (p3El) { p3El.textContent = p3 + '%'; p3El.style.color = powerColor(p3); }
+  onNameInput();
+
+  document.getElementById('budget-fill-prior').style.width = (priorSpeed / 20 * 100) + '%';
+  document.getElementById('budget-fill').style.width = (pts / 20 * 100) + '%';
+  document.getElementById('budget-label').textContent = 'Usando ' + totalUsed + ' de tu presupuesto de 20 puntos';
+
+  const note = document.getElementById('budget-note');
+  if (remaining < 2) {
+    note.textContent = 'Solo queda' + (remaining !== 1 ? 'n' : '') + ' ' + remaining + ' punto' + (remaining !== 1 ? 's' : '') + ' — necesitas al menos 1 para cada uno: Turning y Power.';
+    note.className = 'budget-note warning';
+  } else {
+    note.textContent = remaining + ' puntos quedan para Turning y Power (Días 3–4)';
+    note.className = 'budget-note ok';
+  }
+}
+
+// ── Puerta de restricciones ───────────────────────────────────────────────────
+let constraintSolved = false;
+
+function checkConstraint() {
+  const ans = parseInt(document.getElementById('constraint-ans').value);
+  const icon = document.getElementById('constraint-icon');
+  const fb = document.getElementById('constraint-fb');
+  if (isNaN(ans) || ans < 1 || ans > 20) {
+    icon.textContent = ''; fb.style.display = 'none';
+    constraintSolved = false; onNameInput(); return;
+  }
+  const p3 = calcP(ans, 3);
+  const decay = (20 - ans) * 1.5;
+  icon.textContent = ans === 12 ? '✓' : '✗';
+  icon.style.color = ans === 12 ? 'var(--green)' : 'var(--red)';
+  fb.style.display = 'block';
+  if (ans === 12) {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);line-height:1.55;';
+    fb.innerHTML = '&#10003; Correcto. Ambas restricciones dan E &gt; 11.33 → el entero mínimo es 12.<br>E = 12: P(3) = 100 &minus; 8&times;4.5 = 64% &gt; 60% &#10003; &nbsp;&nbsp;Decaimiento = 8&times;1.5 = 12%/min &lt; 13% &#10003;<br>E = 11: P(3) = 59.5% ✗ &nbsp;E = 11 falla. Ahora elige tu E teniendo ese mínimo en mente.';
+    constraintSolved = true;
+    document.getElementById('name-input-wrap').style.display = 'block';
+  } else if (ans < 12) {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);line-height:1.55;';
+    fb.innerHTML = '&#10007; E = ' + ans + ': P(3) = ' + p3 + '%, decaimiento = ' + decay.toFixed(1) + '%/min. Al menos una restricción falla. Plantea ambas desigualdades: (1) 100&minus;(20&minus;E)&times;4.5 &gt; 60, (2) (20&minus;E)&times;1.5 &lt; 13. Despeja E.';
+    constraintSolved = false;
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--yellow);line-height:1.55;';
+    fb.innerHTML = '&#10007; E = ' + ans + ' satisface ambas, pero no es el mínimo. Resuelve las desigualdades — encuentra la frontera exacta, luego toma el entero más pequeño por encima de ella.';
+    constraintSolved = false;
+  }
+  onNameInput();
+}
+
+function onNameInput() {
+  const name = document.getElementById('student-name')?.value.trim() ?? '';
+  document.getElementById('lock-btn').disabled = name.length < 1 || !constraintSolved;
+}
+
+function openLockModal() {
+  const pts = parseInt(document.getElementById('lock-slider').value);
+  const decayRate = (20 - pts) * 1.5;
+  document.getElementById('modal-val').textContent = pts;
+  document.getElementById('modal-decay').textContent = 'puntos · decaimiento ' + decayRate.toFixed(1) + '/min';
+  document.getElementById('lock-modal').classList.add('open');
+}
+
+function closeLockModal() {
+  document.getElementById('lock-modal').classList.remove('open');
+}
+
+async function confirmLock() {
+  const pts  = parseInt(document.getElementById('lock-slider').value);
+  const name = document.getElementById('student-name').value.trim();
+  closeLockModal();
+  localStorage.setItem('va_student_name', name);
+
+  let lockedPts = pts;
+
+  if (SAVE_ENDPOINT) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          site: localStorage.getItem('va_selected_site') || '',
+          stat: 'endurance',
+          points: pts,
+          decayRate: (20 - pts) * 1.5,
+          lesson: 'endurance-stat',
+          ts: new Date().toISOString(),
+        }),
+      });
+      const result = await res.json().catch(() => null);
+      if (result && result.ok === false && result.error === 'already_locked') {
+        const existing = Number(result.existing);
+        if (!isNaN(existing)) {
+          lockedPts = existing;
+          showAlreadyLockedNotice(name, existing);
+        }
+      }
+    } catch (_e) {
+      // Error de red — continúa con la elección del estudiante.
+    }
+  }
+
+  localStorage.setItem('va_endurance_locked', lockedPts);
+  showLockedState(lockedPts);
+}
+
+function showAlreadyLockedNotice(name, existing) {
+  const el = document.getElementById('lock-notice');
+  if (!el) return;
+  const decayRate = ((20 - existing) * 1.5).toFixed(1);
+  el.innerHTML =
+    '<strong>Ya confirmado.</strong> ' +
+    'El Endurance de ' + name + ' fue fijado en <strong>' + existing + ' pts (decaimiento ' + decayRate + '/min)</strong> ' +
+    'anteriormente esta semana. Las asignaciones individuales de la Semana 1 son de sentido único — esta es tu decisión real.';
+  el.style.display = 'block';
+}
+
+function showLockedState(pts) {
+  const decayRate = (20 - pts) * 1.5;
+  document.getElementById('sec4-main').style.display   = 'none';
+  document.getElementById('sec4-locked').style.display = 'block';
+  document.getElementById('locked-pts').textContent    = pts;
+  document.getElementById('locked-decay-label').textContent = 'pts · decaimiento ' + decayRate.toFixed(1) + '/min';
+
+  let msg = '';
+  if (pts <= 3)       msg = 'Decaimiento rápido — tu bot se queda sin energía pronto. Guardaste presupuesto para otros stats.';
+  else if (pts <= 8)  msg = 'Decaimiento equilibrado. Te mantienes competitivo la mayor parte del partido.';
+  else if (pts <= 14) msg = 'Mucho Endurance. Tu bot conserva potencia más tiempo que la mayoría — sacrificaste otros stats para lograrlo.';
+  else                msg = 'Endurance máximo. Tu bot casi no pierde potencia. Los tres stats restantes te mostrarán lo que costó.';
+  document.getElementById('locked-message').textContent = msg;
+
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+// ── Preguntas de interpretación de la gráfica ─────────────────────────────────
+function checkGraphQ1() {
+  const val = document.querySelector('input[name="graph-linear"]:checked')?.value;
+  const fb  = document.getElementById('graph-q1-feedback');
+  if (!val || !fb) return;
+  fb.style.display = 'block';
+  if (val === 'yes') {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+    fb.textContent = '✓ Correcto. Antes del mínimo, la caída es igual cada minuto — esa sección en línea recta es una tasa constante.';
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+    fb.textContent = '✗ Mira de nuevo. La línea es recta antes de la parte plana — caídas iguales cada minuto. Eso es lo que la hace lineal.';
+  }
+}
+
+function checkGraphQ2() {
+  const E   = parseInt(document.getElementById('e-slider').value);
+  const expected = parseFloat(((20 - E) * 1.5).toFixed(1));
+  const ans  = parseFloat(document.getElementById('graph-decay-ans').value);
+  const icon = document.getElementById('graph-q2-icon');
+  const fb   = document.getElementById('graph-q2-feedback');
+  if (isNaN(ans)) { if (icon) icon.textContent = ''; if (fb) fb.style.display = 'none'; return; }
+  const ok = Math.abs(ans - expected) < 0.2;
+  if (icon) { icon.textContent = ok ? '✓' : '✗'; icon.style.color = ok ? 'var(--green)' : 'var(--red)'; }
+  if (fb) {
+    fb.style.display = 'block';
+    if (ok) {
+      fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+      fb.textContent = `✓ Sí — ${expected}% por minuto. Esa es la tasa de decaimiento para E = ${E}.`;
+    } else {
+      fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+      fb.textContent = `✗ Revisa la tasa de decaimiento mostrada en los chips de arriba. Para E = ${E}, la tasa es ${expected}%/min.`;
+    }
+  }
+}
+
+// ── Desafío del deslizador ────────────────────────────────────────────────────
+function checkChallenge() {
+  const ans  = parseInt(document.getElementById('challenge-e-ans').value);
+  const icon = document.getElementById('challenge-icon');
+  const fb   = document.getElementById('challenge-feedback');
+  if (isNaN(ans) || ans < 1 || ans > 20) { if (icon) icon.textContent = ''; if (fb) fb.style.display = 'none'; return; }
+
+  const p3      = calcP(ans, 3);
+  const p3below = ans > 1 ? calcP(ans - 1, 3) : 0;
+  const correct = p3 > 50 && (ans === 1 || p3below <= 50);
+
+  if (icon) { icon.textContent = correct ? '✓' : '✗'; icon.style.color = correct ? 'var(--green)' : 'var(--red)'; }
+  if (fb) {
+    fb.style.display = 'block';
+    if (correct) {
+      fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+      fb.textContent = `✓ Correcto. E = ${ans} da P(3) = ${p3}% — justo por encima del 50%. E = ${ans-1} da ${p3below}%, que cae al mínimo.`;
+    } else if (p3 <= 50) {
+      fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+      fb.textContent = `✗ Con E = ${ans}, P(3) = ${p3}% — eso está en el mínimo o por debajo del 50%. Prueba un valor más alto.`;
+    } else {
+      fb.style.cssText = 'display:block;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--yellow);';
+      fb.textContent = `✗ E = ${ans} te mantiene por encima del 50%, ¿pero es el MÁS BAJO? Comprueba E = ${ans - 1}: P(3) = ${p3below}%. ¿Sigue estando por encima del 50%?`;
+    }
+  }
+}
+
+// ── Comparación: pregunta de pendiente ───────────────────────────────────────
+function checkCompareFaster() {
+  let ourE   = parseInt(document.getElementById('cp-our').value)   || 10;
+  let theirE = parseInt(document.getElementById('cp-their').value) || 6;
+  ourE   = Math.min(20, Math.max(1, ourE));
+  theirE = Math.min(20, Math.max(1, theirE));
+
+  const ourDecay   = (20 - ourE)   * 1.5;
+  const theirDecay = (20 - theirE) * 1.5;
+  const val = document.querySelector('input[name="compare-faster"]:checked')?.value;
+  const fb  = document.getElementById('compare-faster-fb');
+  if (!val || !fb) return;
+
+  let correct;
+  if      (ourDecay > theirDecay) correct = val === 'ours';
+  else if (theirDecay > ourDecay) correct = val === 'theirs';
+  else                            correct = val === 'same';
+
+  fb.style.display = 'block';
+  if (correct) {
+    fb.style.cssText = 'display:block;background:rgba(0,201,122,.1);border:1px solid rgba(0,201,122,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--green);';
+    const winner = ourDecay > theirDecay
+      ? `Nuestro bot (E=${ourE}) decae a ${ourDecay}/min`
+      : theirDecay > ourDecay
+        ? `El bot rival (E=${theirE}) decae a ${theirDecay}/min`
+        : `Ambos bots decaen a la misma tasa`;
+    fb.textContent = `✓ Correcto. ${winner}. Menor E = decaimiento más rápido.`;
+  } else {
+    fb.style.cssText = 'display:block;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);border-radius:5px;padding:.5rem .75rem;font-size:.8125rem;color:var(--red);';
+    fb.textContent = `✗ Compara las tasas de decaimiento: Nuestro bot = ${ourDecay}/min (E=${ourE}), Bot rival = ${theirDecay}/min (E=${theirE}). Mayor tasa de decaimiento = pierde potencia más rápido.`;
+  }
+}
+
+// ── Sección 2: Revelación de concepto erróneo ────────────────────────────────
+function revealMC1(radioEl) {
+  document.querySelectorAll('input[name="mc1"]').forEach(r => r.disabled = true);
+  const reveal = document.getElementById('mc1-reveal');
+  reveal.style.display = 'block';
+  if (radioEl.value === 'false') {
+    reveal.style.cssText = 'display:block;background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--green);line-height:1.6;';
+    reveal.innerHTML = '✓ Correcto — pero no por la razón que esperabas. <br><br>Decaimiento E=5: (20−5)×1.5 = 22.5/min → mínimo en t = 80/22.5 = <strong>3.6 min</strong>.<br>Decaimiento E=10: (20−10)×1.5 = 15/min → mínimo en t = 80/15 = <strong>5.3 min</strong>.<br><br>5.3 ÷ 3.6 ≈ 1.47 — no 2. Duplicar E <strong>no</strong> duplica el tiempo. La relación no es lineal porque E desplaza la tasa de decaimiento, que ya está dentro de la fórmula. Verifícalo tú mismo cuando calcules la Parte A.';
+  } else {
+    reveal.style.cssText = 'display:block;background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.25);border-radius:7px;padding:.75rem 1rem;font-size:.875rem;color:var(--red);line-height:1.6;';
+    reveal.innerHTML = '✗ En realidad es falso — pero la razón importa. <br><br>Decaimiento E=5: (20−5)×1.5 = 22.5/min → mínimo en t = 80/22.5 = <strong>3.6 min</strong>.<br>Decaimiento E=10: (20−10)×1.5 = 15/min → mínimo en t = 80/15 = <strong>5.3 min</strong>.<br><br>5.3 ÷ 3.6 ≈ 1.47 — no 2. Duplicar E solo <em>reduce a la mitad la tasa de decaimiento</em> aproximadamente si empezaras en E=0. Como E desplaza (20−E), el multiplicador depende del punto de partida. Ahora calcula la Parte A y ve dónde aparece realmente el mínimo.';
+  }
+}
+
+// ── Inicialización ────────────────────────────────────────────────────────────
+buildScaffolded();
+buildIndep();
+updateGraph();
+initLockSection();
+document.getElementById('progress-bar').style.width = '20%';
+</script>
+</body>
+</html>

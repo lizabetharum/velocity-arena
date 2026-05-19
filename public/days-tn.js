@@ -210,7 +210,7 @@ const DAY_16_INLINE = {
         "mins": 60,
         "block": "Match-Build-Make",
         "description": "Best Teacher award announced. The facilitator names one specific mathematical moment for each team — a particular calculation, a dashboard decision, a Commissioner argument — not generic praise. Each student names one personal growth area and one specific camp moment that demonstrates that growth.",
-        "facilitatorDescription": "Best Teacher award announced first. Then per-team specific mathematical-moment recognition. Then student-led personal growth statements with one camp moment cited each. LO 9.2 verbal reflection runs here (Hello Insight post-survey).",
+        "facilitatorDescription": "Best Teacher award announced first. Then per-team specific mathematical-moment recognition. Then student-led personal growth statements with one camp moment cited each. ",
         "script": "https://docs.google.com/document/d/1FPkaluCh58L3kfr2E7mx8GKXUJpYzD9391KWC2kBKlQ/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-03-awards-ceremony.html"
       },
