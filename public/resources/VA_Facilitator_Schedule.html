@@ -261,15 +261,18 @@ function normUrl(u) {
   return String(u || '').replace(/^https?:\/\/[^/]+/, '').replace(/\/+$/, '');
 }
 
-// Compute weekday from camp start + day number, skipping weekends.
+// Compute weekday from camp start + day number. Camp days are Mon–Thu, and
+// the start date is the selected site's (falls back to CONFIG.startDate).
 function weekdayForDay(dayNum) {
   try {
-    const startISO = (window.CONFIG && CONFIG.startDate) || '2026-04-18';
+    const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+    const siteStart = code && window.CONFIG && CONFIG.siteStartDates && CONFIG.siteStartDates[code];
+    const startISO = siteStart || (window.CONFIG && CONFIG.startDate) || '2026-05-04';
     const d = new Date(startISO + 'T00:00:00');
     let weekdaysFound = 0;
     while (true) {
       const dow = d.getDay();
-      if (dow !== 0 && dow !== 6) {
+      if (dow >= 1 && dow <= 4) {   // Mon–Thu camp days
         weekdaysFound++;
         if (weekdaysFound === dayNum) return WEEKDAY_ABBREV[dow];
       }

@@ -56,18 +56,34 @@
     if (!el) return;
     var dayNum = null;
     try {
-      if (typeof CONFIG !== 'undefined' && CONFIG.startDate) {
-        var start = new Date(CONFIG.startDate + 'T00:00:00');
-        var today = new Date();
-        var calDays = Math.floor((today - start) / 86400000);
-        var wd = 0;
-        for (var i = 0; i <= calDays && wd < TOTAL_DAYS; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          var dow = d.getDay();
-          if (dow !== 0 && dow !== 6) wd++;
+      if (typeof CONFIG !== 'undefined') {
+        // Anchor to the selected site's start date (site.js stores the code
+        // under 'va_selected_site'); site.js isn't loaded on the guides, so
+        // resolve it here. Camp days are Mon–Thu, holidays skipped.
+        var code = null;
+        try { code = localStorage.getItem('va_selected_site'); } catch (e) {}
+        var startISO = (code && CONFIG.siteStartDates && CONFIG.siteStartDates[code]) || CONFIG.startDate;
+        if (startISO) {
+          var holidays = {};
+          (CONFIG.holidays || []).forEach(function (h) { holidays[h] = 1; });
+          var d = new Date(startISO + 'T00:00:00');
+          var now = new Date();
+          var count = 0;
+          for (var i = 0; i < 60 && count < TOTAL_DAYS; i++) {
+            var dow = d.getDay();
+            var iso = d.toISOString().slice(0, 10);
+            if (dow >= 1 && dow <= 4 && !holidays[iso]) {
+              count++;
+              if (d.getFullYear() === now.getFullYear() &&
+                  d.getMonth() === now.getMonth() &&
+                  d.getDate() === now.getDate()) {
+                dayNum = count;
+                break;
+              }
+            }
+            d.setDate(d.getDate() + 1);
+          }
         }
-        if (wd >= 1 && wd <= TOTAL_DAYS) dayNum = wd;
       }
     } catch (e) {}
     var total = (typeof DAYS !== 'undefined' && DAYS.length) || TOTAL_DAYS;

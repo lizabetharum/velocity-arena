@@ -24,8 +24,9 @@ function setSelectedSite(code) {
 }
 
 // ── Camp date helpers (shared across pages) ──────────────────────────────
-// Builds an array of 20 Date objects for camp days, skipping weekends and
-// any dates listed in CONFIG.holidays.  Requires config.js to be loaded first.
+// Builds an array of camp-day Date objects, Monday–Thursday only (all four
+// 2026 pilot sites run a Mon–Thu / 16-day arc), skipping any dates in
+// CONFIG.holidays. Requires config.js to be loaded first.
 //
 // siteCode ("NY1" | "NY2" | "NY3" | "TN") picks that site's start date from
 // CONFIG.siteStartDates. If omitted, falls back to the site saved in
@@ -41,12 +42,33 @@ function buildCampDates(siteCode) {
   while (dates.length < 20) {
     const dow = d.getDay();
     const iso = d.toISOString().slice(0, 10);
-    if (dow !== 0 && dow !== 6 && !holidaySet.has(iso)) {
+    // Mon(1)–Thu(4) are camp days; skip Fri/Sat/Sun and holidays.
+    if (dow >= 1 && dow <= 4 && !holidaySet.has(iso)) {
       dates.push(new Date(d));
     }
     d.setDate(d.getDate() + 1);
   }
   return dates;
+}
+
+// Today's 1-based camp-day number for the site (Mon–Thu, holidays skipped),
+// or null if today isn't a camp day within the arc. Capped at the loaded
+// schedule length (DAYS.length, 16 for the pilots). Used by the "DAY n / 16"
+// pills so each site's day count is anchored to ITS own start date.
+function currentCampDay(siteCode) {
+  if (typeof CONFIG === 'undefined') return null;
+  const total = (typeof DAYS !== 'undefined' && DAYS.length) ? DAYS.length : 16;
+  const dates = buildCampDates(siteCode).slice(0, total);
+  const now = new Date();
+  for (let i = 0; i < dates.length; i++) {
+    const d = dates[i];
+    if (d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()) {
+      return i + 1;
+    }
+  }
+  return null;
 }
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];

@@ -440,25 +440,11 @@ lockBtn.addEventListener('click', () => {
 function fillDayPill() {
   const el = document.getElementById('day-pill');
   if (!el) return;
-  // Use today's date relative to CONFIG.startDate, skipping weekends/holidays.
-  // If it's outside camp days, just say "FACILITATOR" with no day.
+  // Day count is anchored to the SELECTED site's start date (Mon–Thu),
+  // via currentCampDay() in site.js. Outside camp days → just "FACILITATOR".
   let dayNum = null;
   try {
-    if (typeof CONFIG !== 'undefined' && CONFIG.startDate) {
-      const start = new Date(CONFIG.startDate + 'T00:00:00');
-      const today = new Date();
-      const ms = today - start;
-      const calendarDays = Math.floor(ms / 86400000);
-      // Approximate weekday count (skip weekends)
-      let wd = 0;
-      for (let i = 0; i <= calendarDays && wd < 20; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const dow = d.getDay();
-        if (dow !== 0 && dow !== 6) wd++;
-      }
-      if (wd >= 1 && wd <= 20) dayNum = wd;
-    }
+    if (typeof currentCampDay === 'function') dayNum = currentCampDay();
   } catch (e) {}
   const total = (typeof DAYS !== 'undefined' && DAYS.length) || 16;
   el.innerHTML = dayNum

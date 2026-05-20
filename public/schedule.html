@@ -262,26 +262,26 @@ const MILESTONES = {
 // No CONFIG:             null
 function campDayContext() {
   try {
-    if (typeof CONFIG === 'undefined' || !CONFIG.startDate) return null;
-    const start = new Date(CONFIG.startDate + 'T00:00:00');
+    // Anchored to the selected site via campDates (buildCampDates → Mon–Thu,
+    // that site's start date, holidays skipped). Sliced to the arc length.
+    if (typeof CONFIG === 'undefined' || !campDates.length) return null;
+    const arc = campDates.slice(0, TOTAL_DAYS);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (today < start) return { status: 'before', day: null, lastDone: 0 };
-
-    const isWeekday = today.getDay() !== 0 && today.getDay() !== 6;
-
-    const calDays = Math.floor((today - start) / 86400000);
-    let wd = 0;
-    for (let i = 0; i <= calDays; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      const dow = d.getDay();
-      if (dow !== 0 && dow !== 6) wd++;
-      if (wd > TOTAL_DAYS) return { status: 'after', day: null, lastDone: TOTAL_DAYS };
+    const at = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+    const first = at(arc[0]);
+    const last = at(arc[arc.length - 1]);
+    if (today < first) return { status: 'before', day: null, lastDone: 0 };
+    if (today > last)  return { status: 'after',  day: null, lastDone: TOTAL_DAYS };
+    for (let i = 0; i < arc.length; i++) {
+      if (at(arc[i]).getTime() === today.getTime()) {
+        return { status: 'today', day: i + 1, lastDone: i };
+      }
     }
-
-    if (isWeekday) return { status: 'today', day: wd, lastDone: wd - 1 };
-    return { status: 'weekend', day: null, lastDone: wd };
+    // Mid-arc but not a camp day (Fri/weekend/holiday): count days already done.
+    let done = 0;
+    for (let i = 0; i < arc.length; i++) { if (at(arc[i]) < today) done++; }
+    return { status: 'weekend', day: null, lastDone: done };
   } catch (e) { return null; }
 }
 
