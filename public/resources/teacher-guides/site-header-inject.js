@@ -3,7 +3,7 @@
 // self-contained: it ships its own CSS (hardcoded VA palette, namespaced under
 // .va-topnav so it can't collide with a guide's existing .nav/.row/.util/.brand)
 // and injects its own markup at the top of <body>. Static (not sticky) so it
-// never fights a guide's own sticky bar (e.g. battlefield-cards' .topbar).
+// never fights a guide's own sticky bar (e.g. toolkit-battlefield-cards' .topbar).
 //
 // Drop-in: <script src="/resources/teacher-guides/site-header-inject.js"></script>
 // just before </body>. The DAY pill fills itself from CONFIG.startDate; if
