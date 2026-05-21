@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velocity Arena — Match Rules</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:101;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+
+    :root {
+      --bg: #0d0d14;
+      --surface: #16161f;
+      --card: #1e1e2a;
+      --border: #2a2a38;
+      --orange: #ff6b2b;
+      --orange-dim: rgba(255,107,43,0.12);
+      --green: #2ecc71;
+      --green-dim: rgba(46,204,113,0.12);
+      --blue: #4a9eff;
+      --blue-dim: rgba(74,158,255,0.12);
+      --yellow: #f7c948;
+      --yellow-dim: rgba(247,201,72,0.12);
+      --text: #f0f0f5;
+      --muted: #7a7a96;
+      --font: 'Montserrat', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0d0d14 0%, #1a1028 50%, #0d0d14 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,107,43,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--orange-dim);
+      border: 1px solid rgba(255,107,43,0.3);
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero p {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 48px 0 20px;
+    }
+
+    /* ARENA DIAGRAM */
+    .arena-wrap {
+      margin-top: 40px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+    }
+    .arena-wrap h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .arena-svg-container {
+      display: flex;
+      justify-content: center;
+    }
+    .arena-legend {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+
+    /* RULE GRID */
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .rule-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rule-card.accent-orange { border-top: 3px solid var(--orange); }
+    .rule-card.accent-green  { border-top: 3px solid var(--green); }
+    .rule-card.accent-blue   { border-top: 3px solid var(--blue); }
+    .rule-card.accent-yellow { border-top: 3px solid var(--yellow); }
+
+    .rule-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rule-icon.orange { background: var(--orange-dim); }
+    .rule-icon.green  { background: var(--green-dim); }
+    .rule-icon.blue   { background: var(--blue-dim); }
+    .rule-icon.yellow { background: var(--yellow-dim); }
+
+    .rule-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .rule-card p {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .rule-card .highlight {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    /* PILL TAG */
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-green { background: var(--green-dim); color: var(--green); }
+    .pill-orange { background: var(--orange-dim); color: var(--orange); }
+
+    /* STEPS */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+    }
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--orange-dim);
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .step-content p {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* DISPUTE */
+    .dispute-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .dispute-row {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .dispute-row:last-child { border-bottom: none; }
+    .dispute-type {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      min-width: 90px;
+      padding-top: 1px;
+      flex-shrink: 0;
+    }
+    .dispute-rule {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .dispute-rule strong {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    /* CLOCK BADGE */
+    .clock-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(74,158,255,0.08);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .rule-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="lang-toggle" aria-label="Change language">
+  <a href="/lessons/match-rules.html" class="active">EN</a>
+  <a href="/lessons/es/match-rules.html">ES</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Official Rules</div>
+  <h1>VELOCITY <span>ARENA</span></h1>
+  <p>Match Rules &amp; Referee Protocol</p>
+</div>
+
+<div class="container">
+
+  <!-- ARENA DIAGRAM -->
+  <div class="arena-wrap">
+    <h2>The Field</h2>
+    <div class="arena-svg-container">
+      <svg viewBox="0 0 520 280" width="100%" style="max-width:520px;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Field background -->
+        <rect x="40" y="20" width="440" height="240" rx="4" fill="#111120" stroke="#2a2a38" stroke-width="1.5"/>
+
+        <!-- Grid lines -->
+        <!-- Vertical lines x: 0–8 -->
+        <g stroke="#1e1e2e" stroke-width="1">
+          <line x1="95" y1="20" x2="95" y2="260"/>
+          <line x1="150" y1="20" x2="150" y2="260"/>
+          <line x1="205" y1="20" x2="205" y2="260"/>
+          <line x1="260" y1="20" x2="260" y2="260"/>
+          <line x1="315" y1="20" x2="315" y2="260"/>
+          <line x1="370" y1="20" x2="370" y2="260"/>
+          <line x1="425" y1="20" x2="425" y2="260"/>
+          <!-- Horizontal lines y: 0–4 -->
+          <line x1="40" y1="80" x2="480" y2="80"/>
+          <line x1="40" y1="140" x2="480" y2="140"/>
+          <line x1="40" y1="200" x2="480" y2="200"/>
+        </g>
+
+        <!-- Center line (bold) -->
+        <line x1="260" y1="20" x2="260" y2="260" stroke="#2a2a3e" stroke-width="2"/>
+
+        <!-- Center circle -->
+        <circle cx="260" cy="140" r="30" fill="none" stroke="#2a2a3e" stroke-width="1.5"/>
+        <circle cx="260" cy="140" r="4" fill="#2a2a3e"/>
+
+        <!-- GOAL LEFT (Team B scores here) — middle third of left wall -->
+        <rect x="32" y="93" width="12" height="94" rx="3" fill="none" stroke="#4a9eff" stroke-width="2.5"/>
+        <rect x="40" y="93" width="6" height="94" fill="rgba(74,158,255,0.15)"/>
+
+        <!-- GOAL RIGHT (Team A scores here) — middle third of right wall -->
+        <rect x="476" y="93" width="12" height="94" rx="3" fill="none" stroke="#ff6b2b" stroke-width="2.5"/>
+        <rect x="474" y="93" width="6" height="94" fill="rgba(255,107,43,0.15)"/>
+
+        <!-- Goal labels -->
+        <text x="19" y="144" font-family="Montserrat,sans-serif" font-size="8" font-weight="700" fill="#4a9eff" text-anchor="middle" transform="rotate(-90,19,144)">GOAL</text>
+        <text x="501" y="144" font-family="Montserrat,sans-serif" font-size="8" font-weight="700" fill="#ff6b2b" text-anchor="middle" transform="rotate(90,501,144)">GOAL</text>
+
+        <!-- Field border (thick) -->
+        <rect x="40" y="20" width="440" height="240" rx="4" fill="none" stroke="#3a3a50" stroke-width="2.5"/>
+
+        <!-- BALL at center -->
+        <circle cx="260" cy="140" r="9" fill="#fff" opacity="0.9"/>
+        <circle cx="260" cy="140" r="9" fill="none" stroke="#aaa" stroke-width="1"/>
+
+        <!-- Team A robot — (0,4) = top-left corner → x=40, y=20 -->
+        <!-- Arrow pointing toward center -->
+        <g transform="translate(40,20)">
+          <!-- Robot body -->
+          <rect x="-3" y="-3" width="22" height="18" rx="4" fill="#2ecc71" opacity="0.9"/>
+          <rect x="2" y="1" width="6" height="4" rx="1" fill="#111120" opacity="0.5"/>
+          <rect x="11" y="1" width="6" height="4" rx="1" fill="#111120" opacity="0.5"/>
+          <!-- Direction arrow -->
+          <line x1="9" y1="20" x2="18" y2="30" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.6"/>
+          <polygon points="18,30 13,27 20,24" fill="#2ecc71" opacity="0.6"/>
+          <!-- Label -->
+          <text x="9" y="-8" font-family="Montserrat,sans-serif" font-size="10" font-weight="800" fill="#2ecc71" text-anchor="middle">A</text>
+          <text x="9" y="-18" font-family="Montserrat,sans-serif" font-size="8" font-weight="600" fill="#7a7a96" text-anchor="middle">(0,4)</text>
+        </g>
+
+        <!-- Team B robot — (8,0) = bottom-right corner → x=480, y=260 -->
+        <g transform="translate(480,260)">
+          <rect x="-19" y="-15" width="22" height="18" rx="4" fill="#ff6b2b" opacity="0.9"/>
+          <rect x="-15" y="-12" width="6" height="4" rx="1" fill="#111120" opacity="0.5"/>
+          <rect x="-6" y="-12" width="6" height="4" rx="1" fill="#111120" opacity="0.5"/>
+          <!-- Direction arrow -->
+          <line x1="-8" y1="-17" x2="-18" y2="-28" stroke="#ff6b2b" stroke-width="1.5" stroke-dasharray="2,2" opacity="0.6"/>
+          <polygon points="-18,-28 -11,-26 -15,-20" fill="#ff6b2b" opacity="0.6"/>
+          <!-- Label -->
+          <text x="-8" y="-20" font-family="Montserrat,sans-serif" font-size="10" font-weight="800" fill="#ff6b2b" text-anchor="middle">B</text>
+          <text x="-8" y="-30" font-family="Montserrat,sans-serif" font-size="8" font-weight="600" fill="#7a7a96" text-anchor="middle">(8,0)</text>
+        </g>
+
+        <!-- Axis labels x -->
+        <g font-family="Montserrat,sans-serif" font-size="9" fill="#3a3a50" text-anchor="middle" font-weight="600">
+          <text x="40" y="275">0</text>
+          <text x="95" y="275">1</text>
+          <text x="150" y="275">2</text>
+          <text x="205" y="275">3</text>
+          <text x="260" y="275">4</text>
+          <text x="315" y="275">5</text>
+          <text x="370" y="275">6</text>
+          <text x="425" y="275">7</text>
+          <text x="480" y="275">8</text>
+        </g>
+        <!-- Axis labels y -->
+        <g font-family="Montserrat,sans-serif" font-size="9" fill="#3a3a50" text-anchor="middle" font-weight="600">
+          <text x="26" y="264">0</text>
+          <text x="26" y="204">1</text>
+          <text x="26" y="144">2</text>
+          <text x="26" y="84">3</text>
+          <text x="26" y="24">4</text>
+        </g>
+      </svg>
+    </div>
+    <div class="arena-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#2ecc71"></div>
+        <span>Team A — starts (0,4)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#ff6b2b"></div>
+        <span>Team B — starts (8,0)</span>
+      </div>
+      <div class="legend-item">
+        <svg width="14" height="14" viewBox="0 0 14 14"><rect x="0" y="3" width="14" height="8" rx="2" fill="none" stroke="#4a9eff" stroke-width="2"/></svg>
+        <span>Goal zones</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE RULES -->
+  <p class="section-label">Core Rules</p>
+  <div class="rule-grid">
+
+    <!-- Objective -->
+    <div class="rule-card accent-orange">
+      <div class="rule-icon orange">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff6b2b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <h3>Objective</h3>
+      <p>Push the ball across your opponent's goal line. The goal spans the middle section of each short end.</p>
+    </div>
+
+    <!-- Scoring -->
+    <div class="rule-card accent-green">
+      <div class="rule-icon green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3>Scoring</h3>
+      <p>Goal counts the moment the ball <strong>fully crosses</strong> the line — even if it bounces back.</p>
+      <p style="margin-top:6px; font-size:13px; color:#7a7a96;">After each goal: ball returns to center, robots keep running, clock keeps running.</p>
+    </div>
+
+    <!-- Match Length -->
+    <div class="rule-card accent-blue">
+      <div class="rule-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <h3>Match Length</h3>
+      <div class="highlight">3 min</div>
+      <p>Most goals wins. A tied score at 3 minutes is a draw.</p>
+    </div>
+
+    <!-- Starting the Match -->
+    <div class="rule-card accent-yellow">
+      <div class="rule-icon yellow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f7c948" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </div>
+      <h3>Starting the Match</h3>
+      <p>Press <strong>Button A</strong> once.</p>
+      <p style="margin-top:6px; font-size:13px; color:#7a7a96;">No touching your robot during the match unless the referee says so.</p>
+    </div>
+
+    <!-- Ball Out of Bounds -->
+    <div class="rule-card accent-blue">
+      <div class="rule-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+        </svg>
+      </div>
+      <h3>Ball Out of Bounds</h3>
+      <p>Referee returns ball to center.</p>
+      <div class="clock-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Clock keeps running
+      </div>
+    </div>
+
+    <!-- Robot Off Field -->
+    <div class="rule-card accent-orange">
+      <div class="rule-icon orange">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff6b2b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <line x1="12" y1="15" x2="12" y2="17"/>
+        </svg>
+      </div>
+      <h3>Robot Off the Field</h3>
+      <p>Referee places robot at nearest edge, facing outward. Robot <strong>must recover autonomously</strong>.</p>
+      <div class="clock-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Clock keeps running
+      </div>
+    </div>
+
+    <!-- Robot Contact -->
+    <div class="rule-card accent-green">
+      <div class="rule-icon green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+          <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+        </svg>
+      </div>
+      <h3>Robot Contact</h3>
+      <p>Robot-to-robot contact is <span class="pill pill-green">ALLOWED</span></p>
+    </div>
+
+  </div>
+
+  <!-- POST-MATCH PROTOCOL -->
+  <p class="section-label">Post-Match Protocol — Run After Every Match</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Record Result</h4>
+        <p>Write the final score in the bracket immediately. Announce the winning team and seed progression.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Acknowledgment</h4>
+        <p>Each team delivers one data acknowledgment sentence using the prompt card on their table. Winning team goes first. Not "good game" — one sentence with a stat or number.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Dispute Window — <span style="color:var(--orange)">30 seconds</span></h4>
+        <p>Any scoring concern must be raised now. Disputes require the scouting report or rules log as evidence. No evidence, no dispute. After 30 seconds, the result is locked.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Reset</h4>
+        <p>Both teams return bots to starting positions. Non-competing teams may go to the Skills Arena. Announce the next match.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPUTE RESOLUTION -->
+  <p class="section-label">Dispute Resolution</p>
+  <div class="dispute-box">
+    <div class="dispute-row">
+      <div class="dispute-type">Scoring</div>
+      <div class="dispute-rule">Point to the specific rule in the rules log. If the call contradicts it, the score is corrected. <strong>No rule cited → call stands.</strong></div>
+    </div>
+    <div class="dispute-row">
+      <div class="dispute-type">Data</div>
+      <div class="dispute-rule">Point to the specific section of your scouting report with a different number. If you can show it, it's investigated. <strong>Can't show it → call stands.</strong></div>
+    </div>
+    <div class="dispute-row">
+      <div class="dispute-type">Two Teams</div>
+      <div class="dispute-rule">Both teams write their calculation on paper. Read aloud. Find the first line that differs. The rules log or formula sheet is the authority. If unresolvable in 2 minutes: facilitator rules; result stands.</div>
+    </div>
+    <div class="dispute-row">
+      <div class="dispute-type">Late</div>
+      <div class="dispute-rule"><strong>Not accepted.</strong> The dispute window closed. The result stands.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
