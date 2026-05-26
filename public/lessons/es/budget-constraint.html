@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Día 5 — La Restricción de Presupuesto</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0d1b2a;
+  --surface: #132033;
+  --card:    #1a2d45;
+  --border:  #2a4060;
+  --green:   #00e676;
+  --yellow:  #ffd600;
+  --cyan:    #00e5ff;
+  --red:     #ff5252;
+  --orange:  #ff9100;
+  --purple:  #ce93d8;
+  --text:    #e8f0fe;
+  --muted:   #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #0d2a1a 100%);
+  border-bottom: 2px solid var(--green);
+  padding: 20px 24px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 860px; margin: 0 auto;
+}
+.day-badge {
+  background: var(--green); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+}
+.lesson-title { font-size: 20px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.progress-wrap  { max-width: 860px; margin: 12px auto 0; }
+.progress-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--green); border-radius: 4px; transition: width 0.5s ease; width: 33%; }
+.progress-labels{ display: flex; justify-content: space-between; margin-top: 6px; }
+.prog-tab {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color 0.2s;
+}
+.prog-tab.active { color: var(--green); }
+.prog-tab.done   { color: var(--cyan); }
+
+.section { display: none; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+.section.active { display: block; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--green); margin-bottom: 14px;
+}
+
+.sec-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.sec-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sec-icon.green  { background: rgba(0,230,118,.12); border: 2px solid var(--green); }
+.sec-icon.yellow { background: rgba(255,214,0,.10); border: 2px solid var(--yellow); }
+.sec-icon.cyan   { background: rgba(0,229,255,.12); border: 2px solid var(--cyan); }
+.sec-title    { font-size: 22px; font-weight: 800; }
+.sec-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+.rules-card {
+  background: rgba(0,230,118,.07); border: 1px solid rgba(0,230,118,.3);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
+.rules-title { font-size: 12px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.rules-card li { font-size: 14px; color: var(--text); margin-bottom: 5px; margin-left: 16px; }
+
+.notice {
+  background: rgba(255,82,82,.10); border: 1px solid rgba(255,82,82,.35);
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+  font-size: 14px; color: var(--text); line-height: 1.6;
+}
+.notice-title { font-weight: 800; color: var(--red); margin-bottom: 4px; }
+
+.key-idea {
+  background: rgba(0,229,255,.07); border-left: 4px solid var(--cyan);
+  border-radius: 0 10px 10px 0; padding: 14px 18px; margin-bottom: 20px;
+}
+.key-idea-label { font-size: 11px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.key-idea-text  { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+.ws-callout {
+  background: rgba(255,214,0,.08); border: 2px solid rgba(255,214,0,.5);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.ws-icon  { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.ws-label { font-size: 11px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.ws-text  { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+.loadout-grid {
+  display: grid;
+  grid-template-columns: 110px repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.lg-header {
+  background: #0d1b2a; padding: 10px 12px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.lg-header.stat-label { text-align: left; color: var(--muted); }
+.lg-cell {
+  background: var(--card); padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+.lg-cell.stat-name {
+  border-left: none; justify-content: flex-start;
+  font-size: 14px; font-weight: 700; color: var(--text);
+}
+.lg-total-label {
+  background: #0f2035; border-left: none;
+  padding: 10px 12px; display: flex; align-items: center;
+  font-size: 13px; font-weight: 800; color: var(--muted);
+  border-top: 2px solid var(--border);
+}
+.lg-total-cell {
+  background: #0f2035; padding: 8px 12px;
+  border-left: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.stat-input {
+  width: 64px; height: 36px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 16px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.stat-input:focus { border-color: var(--green); }
+.stat-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.budget-pill {
+  font-size: 14px; font-weight: 800;
+  padding: 4px 10px; border-radius: 20px;
+  transition: background 0.3s, color 0.3s;
+}
+.budget-ok   { background: rgba(0,230,118,.2); color: var(--green); }
+.budget-over { background: rgba(255,82,82,.2);  color: var(--red); }
+.budget-low  { background: rgba(255,145,0,.15); color: var(--orange); }
+
+.formula-ref {
+  background: linear-gradient(135deg, #0a1f10, #0d2a1a);
+  border: 1px solid rgba(0,230,118,.3); border-radius: 12px;
+  padding: 18px 20px; margin-bottom: 20px;
+}
+.formula-ref-title { font-size: 12px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.formula-row {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.formula-stat { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 70px; }
+.formula-expr { font-size: 14px; font-weight: 700; color: #fff; font-family: 'Courier New', monospace; }
+.formula-result { font-size: 12px; color: var(--muted); }
+
+.loadout-checker {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+}
+.lc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+}
+.lc-title { font-size: 16px; font-weight: 800; }
+.lc-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.lc-stat-chip {
+  background: rgba(255,255,255,.06); border: 1px solid var(--border);
+  border-radius: 8px; padding: 3px 10px;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+.lc-stat-chip span { color: var(--text); }
+
+.output-row {
+  display: grid; grid-template-columns: 1fr 130px 48px;
+  gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(42,64,96,.5);
+}
+.output-row:last-child { border-bottom: none; }
+.output-name { font-size: 13px; color: var(--text); font-weight: 600; }
+.output-formula { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: monospace; }
+.output-input {
+  width: 100%; height: 34px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.output-input:focus { border-color: var(--green); }
+.output-input.correct { border-color: var(--green); background: rgba(0,230,118,.08); }
+.output-input.wrong   { border-color: var(--red);   background: rgba(255,82,82,.08); }
+.output-status { font-size: 20px; text-align: center; }
+
+.check-btn {
+  display: block; width: 100%; margin-top: 14px;
+  padding: 10px; border-radius: 10px; border: 2px solid var(--green);
+  background: rgba(0,230,118,.1); color: var(--green);
+  font-family: 'Inter',sans-serif; font-weight: 800; font-size: 14px;
+  cursor: pointer; transition: background 0.2s;
+}
+.check-btn:hover { background: rgba(0,230,118,.2); }
+.check-btn:disabled { opacity: 0.4; cursor: default; }
+.check-feedback { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: center; display: none; }
+
+.compare-wrap { overflow-x: auto; }
+.compare-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-top: 4px;
+}
+.compare-table th {
+  background: #0f2035; padding: 8px 12px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 2px solid var(--border);
+}
+.compare-table th.output-col { text-align: left; }
+.compare-table td {
+  padding: 8px 12px; text-align: center;
+  border-bottom: 1px solid rgba(42,64,96,.5); font-weight: 600;
+}
+.compare-table td.output-col { text-align: left; color: var(--muted); font-weight: 400; }
+.compare-table tr:last-child td { border-bottom: none; }
+
+.tradeoff-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+}
+.tb-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.tb-badge {
+  padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+}
+
+.tradeoff-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid rgba(42,64,96,.5);
+  flex-wrap: wrap;
+}
+.tradeoff-row:last-child { border-bottom: none; }
+.tr-label { font-size: 13px; color: var(--muted); min-width: 140px; }
+.tr-value { font-size: 14px; font-weight: 700; color: var(--text); }
+.tr-input {
+  width: 60px; height: 32px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.tr-input:focus { border-color: var(--yellow); }
+.pte-total { font-size: 13px; font-weight: 700; margin-top: 10px; }
+
+.impact-panel {
+  margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;
+}
+.impact-placeholder {
+  background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.12);
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 13px; color: var(--muted); text-align: center;
+}
+.impact-content { display: none; }
+.impact-panel.visible .impact-placeholder { display: none; }
+.impact-panel.visible .impact-content { display: block; }
+.impact-header { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+
+.bb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bb-label { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 72px; text-align: right; }
+.bb-track {
+  flex: 1; height: 32px; display: flex; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.bb-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #000; overflow: hidden;
+  transition: width 0.4s ease; white-space: nowrap; padding: 0 4px;
+}
+.bb-seg.speed    { background: #00b8d4; }
+.bb-seg.power    { background: #ff9100; }
+.bb-seg.turning  { background: #ce93d8; }
+.bb-seg.endurance{ background: #00e676; }
+
+.out-impact {
+  display: grid; grid-template-columns: 1fr 80px 80px;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  margin-top: 14px;
+}
+.oi-head {
+  background: #0d1b2a; padding: 6px 10px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.oi-head.left { text-align: left; }
+.oi-cell {
+  padding: 7px 10px; font-size: 13px; font-weight: 600;
+  border-bottom: 1px solid rgba(42,64,96,.4);
+  text-align: center; border-left: 1px solid rgba(42,64,96,.4);
+}
+.oi-cell.left { text-align: left; border-left: none; font-size: 12px; color: var(--muted); font-weight: 400; }
+.oi-cell.up   { color: var(--green); }
+.oi-cell.down { color: var(--red); }
+.oi-cell.same { color: var(--muted); }
+.out-impact > *:nth-last-child(-n+3) .oi-cell,
+.out-impact > *:last-child { border-bottom: none; }
+.out-impact .oi-cell:nth-child(3n) { border-bottom: 1px solid rgba(42,64,96,.4); }
+.out-impact > div:nth-last-child(-n+3) { border-bottom: none; }
+
+.impact-summary {
+  background: rgba(255,214,0,.07); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 10px; padding: 11px 14px; font-size: 13px;
+  color: var(--text); line-height: 1.7; margin-top: 12px;
+}
+.impact-summary strong { color: var(--yellow); }
+
+.recalc-box {
+  background: #0a1a10; border: 1px solid rgba(0,230,118,.3);
+  border-radius: 12px; padding: 18px 20px; margin-top: 20px;
+}
+.recalc-title { font-size: 13px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+.recalc-row {
+  display: grid; grid-template-columns: 1fr 110px 44px;
+  gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(0,230,118,.15);
+}
+.recalc-row:last-child { border-bottom: none; }
+.recalc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.recalc-formula { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: monospace; }
+.recalc-input {
+  width: 100%; height: 34px;
+  background: #0d1b2a; border: 2px solid rgba(0,230,118,.4);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.recalc-input:focus  { border-color: var(--green); }
+.recalc-input.correct{ border-color: var(--green); background: rgba(0,230,118,.08); }
+.recalc-input.wrong  { border-color: var(--red);   background: rgba(255,82,82,.08); }
+
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 12px; border: none;
+  background: var(--green); color: #000;
+  font-family: 'Inter',sans-serif; font-size: 15px; font-weight: 800;
+  cursor: pointer; transition: opacity 0.2s; margin-top: 8px;
+}
+.nav-btn:hover { opacity: 0.85; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.loadout-chooser { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.choose-btn {
+  flex: 1; min-width: 120px; padding: 10px 16px;
+  border-radius: 10px; border: 2px solid var(--border);
+  background: var(--card); color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.choose-btn:hover { border-color: var(--green); }
+.choose-btn.selected { border-color: var(--green); background: rgba(0,230,118,.1); color: var(--green); }
+
+.sentence-starters {
+  background: rgba(255,214,0,.06); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
+.ss-title { font-size: 12px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.ss-line  { font-size: 13px; color: var(--text); line-height: 1.7; margin-bottom: 8px; font-style: italic; }
+
+code {
+  background: rgba(0,229,255,.1); color: var(--cyan);
+  padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace;
+}
+
+.gate-question {
+  background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.3);
+  border-radius: 12px; padding: 16px 20px; margin: 20px 0;
+}
+.gate-q-label { font-size: 11px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.gate-q-text { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.gate-q-opts { display: flex; gap: 10px; flex-wrap: wrap; }
+.gate-opt {
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); font-size: 14px; font-weight: 700; color: var(--text);
+  transition: border-color .2s, background .2s;
+}
+.gate-opt:hover { border-color: var(--cyan); }
+.gate-opt input { accent-color: var(--cyan); width: 15px; height: 15px; }
+.gate-fb { font-size: 13px; margin-top: 10px; display: none; }
+.gate-fb.visible { display: block; }
+
+.pause-card {
+  background: rgba(255,214,0,.06); border: 2px solid rgba(255,214,0,.4);
+  border-radius: 14px; padding: 18px 22px; margin: 12px 0 16px; display: none;
+}
+.pause-card.visible { display: block; }
+.pause-label { font-size: 11px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.pause-q { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.pause-textarea {
+  width: 100%; min-height: 75px; padding: 10px 14px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; line-height: 1.5;
+  resize: vertical; outline: none; transition: border-color .2s;
+}
+.pause-textarea:focus { border-color: var(--yellow); }
+.pause-char { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.pause-char.ready { color: var(--green); }
+
+.starters { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.starter-btn {
+  font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px;
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif;
+  transition:all .15s; text-align:left;
+}
+.starter-btn:hover { background:rgba(255,255,255,.12); color:var(--text); border-color:rgba(255,255,255,.2); }
+
+.precommit-block {
+  background: rgba(206,147,216,.07); border: 1px solid rgba(206,147,216,.3);
+  border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
+}
+.precommit-label { font-size: 11px; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.precommit-q { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.precommit-opts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.precommit-btn {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--muted);
+  font-family: 'Inter',sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.precommit-btn.selected { border-color: var(--purple); color: var(--purple); background: rgba(206,147,216,.1); }
+.precommit-why {
+  width: 100%; padding: 8px 12px; min-height: 58px;
+  background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 13px; line-height: 1.5;
+  resize: vertical; outline: none; transition: border-color .2s;
+}
+.precommit-why:focus { border-color: var(--purple); }
+.precommit-unlock { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+.impact-active-q {
+  background: rgba(0,230,118,.06); border: 1px solid rgba(0,230,118,.25);
+  border-radius: 10px; padding: 12px 16px; margin-top: 12px;
+}
+.iaq-label { font-size: 11px; font-weight: 800; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.iaq-q { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.iaq-opts { display: flex; gap: 7px; flex-wrap: wrap; }
+.iaq-opt {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.iaq-opt.selected { border-color: var(--green); color: var(--green); background: rgba(0,230,118,.1); }
+.iaq-fb { font-size: 12px; color: var(--green); margin-top: 8px; display: none; }
+.iaq-fb.visible { display: block; }
+
+.before-after {
+  background: rgba(0,229,255,.05); border: 1px solid rgba(0,229,255,.2);
+  border-radius: 10px; padding: 14px 18px; margin-top: 14px;
+}
+.ba-label { font-size: 11px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.ba-pick-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.ba-pick-row label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.ba-select {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: #0d1b2a; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 13px; font-weight: 700; outline: none;
+}
+.ba-vals { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 10px; }
+.ba-val-block { background: var(--card); border-radius: 8px; padding: 8px 14px; min-width: 110px; }
+.ba-val-key { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 3px; }
+.ba-val-num { font-size: 20px; font-weight: 800; color: var(--text); }
+.ba-diff { font-size: 14px; font-weight: 800; margin-top: 2px; }
+.ba-diff.up { color: var(--green); }
+.ba-diff.down { color: var(--red); }
+.ba-diff.same { color: var(--muted); }
+.ba-explain {
+  width: 100%; padding: 8px 12px; min-height: 58px;
+  background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 13px; line-height: 1.5;
+  resize: vertical; outline: none; transition: border-color .2s;
+}
+.ba-explain:focus { border-color: var(--cyan); }
+
+.sacrifice-card {
+  background: rgba(255,82,82,.07); border: 2px solid rgba(255,82,82,.3);
+  border-radius: 14px; padding: 18px 22px; margin-top: 16px; display: none;
+}
+.sacrifice-card.visible { display: block; }
+.sac-label { font-size: 11px; font-weight: 800; color: var(--red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.sac-q { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.sac-opts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.sac-opt {
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.sac-opt.selected { border-color: var(--red); color: var(--red); background: rgba(255,82,82,.1); }
+.sac-textarea {
+  width: 100%; min-height: 78px; padding: 10px 14px;
+  background: #0d1b2a; border: 1.5px solid rgba(255,82,82,.3);
+  border-radius: 8px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 14px; line-height: 1.5;
+  resize: vertical; outline: none; transition: border-color .2s;
+}
+.sac-textarea:focus { border-color: var(--red); }
+</style>
+</head>
+<body>
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <div class="day-badge">Día 5 · Bloque de Desafío</div>
+      <div class="lesson-title">La Restricción de Presupuesto</div>
+      <div class="lesson-sub">Comprende el intercambio · Diseña configuraciones · Calcula salidas · Ajusta para SPEED = 8</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-labels">
+      <span class="prog-tab active" id="pt0" onclick="goSection(0)">1 · Intercambio</span>
+      <span class="prog-tab"        id="pt1" onclick="goSection(1)">2 · Diseñar</span>
+      <span class="prog-tab"        id="pt2" onclick="goSection(2)">3 · Calcular</span>
+      <span class="prog-tab"        id="pt3" onclick="goSection(3)">4 · Ajustar</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 0 — EL INTERCAMBIO                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section active" id="sec0">
+
+  <div class="sec-header">
+    <div class="sec-icon cyan">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="4,10 13,5 22,10" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="4,16 13,21 22,16" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="13" y1="5" x2="13" y2="21" stroke="var(--cyan)" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+        <circle cx="5" cy="10" r="1.5" fill="var(--cyan)"/>
+        <circle cx="21" cy="16" r="1.5" fill="var(--cyan)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">El Intercambio</div>
+      <div class="sec-subtitle">Cada punto que sumas en un lado debe venir de otro lado</div>
+    </div>
+  </div>
+
+  <!-- Tablero de ecuación -->
+  <div style="background:linear-gradient(135deg,#061a0e,#0d2a1a); border:2px solid var(--green); border-radius:16px; padding:22px 24px; text-align:center; margin-bottom:24px;">
+    <div style="font-size:11px; font-weight:800; color:var(--green); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">La Restricción</div>
+    <div style="font-size:22px; font-weight:800; color:#fff;">SPEED + ENDURANCE + TURNING + POWER = 20</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:10px;">Si agregas 2 a SPEED → quita 2 de otro lado. Los dos lados siempre pesan igual.</div>
+  </div>
+
+  <!-- Tarjeta de predicción del equipo rival -->
+  <div class="card" style="padding:20px 18px; margin-bottom:16px;" id="rival-card">
+
+    <div style="font-size:11px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Predice Antes de Ver</div>
+    <div class="card-title" style="margin-bottom:8px; color:var(--cyan);">Dos Equipos, Los Mismos 20 Puntos</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:20px;">El Equipo Volt y el Equipo Blaze tienen 20 puntos cada uno. Tomaron decisiones opuestas. La Velocidad de Carga del Equipo Blaze está oculta — la predecirás antes de que se revele.</p>
+
+    <!-- Tabla de comparación de dos columnas -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:22px;">
+
+      <!-- Equipo Volt -->
+      <div style="background:rgba(255,214,0,.06); border:1px solid rgba(255,214,0,.3); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; font-weight:800; color:var(--yellow); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Equipo Volt</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:12px; font-family:monospace;">S=7 · E=5 · T=4 · P=4</div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Potencia del Motor %</span><strong style="color:var(--text);">35%</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Potencia en t=1</span><strong style="color:var(--text);">77.5%</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Segmentos de Arco</span><strong style="color:var(--text);">4</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Razón de Giro</span><strong style="color:var(--text);">0.28</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; padding-top:6px; border-top:1px solid rgba(255,255,255,.08);"><span style="color:var(--muted);">Velocidad de Carga</span><strong style="color:var(--yellow);">16</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Tiempo de Seguimiento</span><strong style="color:var(--text);">800</strong></div>
+        </div>
+      </div>
+
+      <!-- Equipo Blaze -->
+      <div style="background:rgba(255,110,64,.06); border:1px solid rgba(255,110,64,.3); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; font-weight:800; color:#ff6e40; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Equipo Blaze</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:12px; font-family:monospace;">S=8 · E=2 · T=2 · P=8</div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Potencia del Motor %</span><strong style="color:var(--text);">40%</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Potencia en t=1</span><strong style="color:var(--text);">73%</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Segmentos de Arco</span><strong style="color:var(--text);">2</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Razón de Giro</span><strong style="color:var(--text);">0.24</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; padding-top:6px; border-top:1px solid rgba(255,255,255,.08);"><span style="color:var(--muted);">Velocidad de Carga</span><strong id="blaze-cs-display" style="color:#ff6e40;">???</strong></div>
+          <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Tiempo de Seguimiento</span><strong style="color:var(--text);">1600</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pregunta de predicción -->
+    <div style="background:rgba(0,229,255,.06); border:1px solid rgba(0,229,255,.2); border-radius:10px; padding:16px 18px; margin-bottom:14px;">
+      <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:8px;">Haz tu predicción</div>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:12px; line-height:1.6;">
+        Equipo Volt: P=4 → Velocidad de Carga = <strong style="color:var(--yellow);">16</strong><br>
+        Equipo Blaze: P=8 → Velocidad de Carga = ?<br>
+        El Tiempo de Seguimiento se duplicó (320→640) porque FT = P×80 es lineal. La Velocidad de Carga usa una fórmula diferente.
+      </p>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div style="font-size:13px; font-weight:700; color:var(--text);">Velocidad de Carga del Equipo Blaze =</div>
+        <input type="number" id="blaze-cs-pred" placeholder="?" oninput="checkBlazePred()"
+          style="width:100px; height:38px; background:#0d1b2a; border:2px solid var(--border); border-radius:8px;
+                 color:var(--text); font-family:'Inter',sans-serif; font-size:16px; font-weight:700;
+                 text-align:center; outline:none;">
+        <button id="blaze-reveal-btn" onclick="revealBlaze()" style="display:none;
+          padding:8px 18px; background:var(--cyan); color:#000; border:none; border-radius:8px;
+          font-family:'Inter',sans-serif; font-size:13px; font-weight:800; cursor:pointer;">
+          Revelar →
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultado — se muestra tras revelar -->
+    <div id="blaze-result" style="display:none; border-radius:10px; padding:16px 18px; margin-top:4px;"></div>
+
+  </div>
+
+  <button class="nav-btn" id="s0-nav" onclick="goSection(1)" disabled>
+    Diseñar Configuraciones →
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 1 — DISEÑAR CONFIGURACIONES                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec1">
+
+  <div class="sec-header">
+    <div class="sec-icon green">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="13" y1="4" x2="13" y2="22" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="5" y1="8" x2="21" y2="8" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="5" y1="8" x2="5" y2="16" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="21" y1="8" x2="21" y2="16" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"/>
+        <rect x="2" y="16" width="6" height="3" rx="1.5" fill="var(--green)" opacity="0.7"/>
+        <rect x="18" y="16" width="6" height="3" rx="1.5" fill="var(--green)" opacity="0.7"/>
+        <circle cx="13" cy="4" r="1.8" fill="var(--green)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">Diseña Tus Configuraciones</div>
+      <div class="sec-subtitle">20 puntos, cuatro estadísticas — cada número que sumas en un lugar debe venir de otro</div>
+    </div>
+  </div>
+
+  <!-- Reglas -->
+  <div class="rules-card" style="margin-bottom:20px;">
+    <div class="rules-title">Reglas</div>
+    <ul>
+      <li>Cada configuración debe usar <strong>exactamente 20 puntos</strong> — ni más ni menos.</li>
+      <li>Cada estadística debe tener al menos <strong>1 punto</strong>.</li>
+      <li>Ninguna de tus tres configuraciones puede coincidir exactamente con tu tarjeta de estadísticas personal.</li>
+    </ul>
+  </div>
+
+  <!-- Constructor de configuraciones -->
+  <div class="card" style="padding:20px 16px;">
+    <div class="card-title">Parte 1 — Ingresa Tus Asignaciones de Estadísticas</div>
+
+    <div class="loadout-grid">
+      <!-- Encabezados de columna -->
+      <div class="lg-header stat-label">Estadística</div>
+      <div class="lg-header" style="color:var(--cyan);">Config. 1</div>
+      <div class="lg-header" style="color:var(--orange);">Config. 2</div>
+      <div class="lg-header" style="color:var(--purple);">Config. 3</div>
+
+      <!-- Fila SPEED -->
+      <div class="lg-cell stat-name">⚡ SPEED</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="s2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Fila ENDURANCE -->
+      <div class="lg-cell stat-name">⏱ ENDURANCE</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="e2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Fila TURNING -->
+      <div class="lg-cell stat-name">↩ TURNING</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="t2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Fila POWER -->
+      <div class="lg-cell stat-name">🔋 POWER</div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p0" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p1" oninput="updateBudget()" placeholder="—"></div>
+      <div class="lg-cell"><input class="stat-input" type="number" min="1" max="18" id="p2" oninput="updateBudget()" placeholder="—"></div>
+
+      <!-- Fila de totales -->
+      <div class="lg-total-label">Total</div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot0">0 / 20</span></div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot1">0 / 20</span></div>
+      <div class="lg-total-cell"><span class="budget-pill budget-low" id="tot2">0 / 20</span></div>
+    </div>
+
+    <p style="font-size:13px; color:var(--muted);">Los tres totales deben mostrar <strong style="color:var(--green);">20 / 20</strong> antes de continuar.</p>
+  </div>
+
+  <!-- Pregunta de control conceptual -->
+  <div class="gate-question" id="gateBlock" style="display:none;">
+    <div class="gate-q-label">Antes de continuar — reflexiona sobre esto</div>
+    <div class="gate-q-text">SPEED pasa de 5 a 10. ¿La Potencia del Motor % también se duplica?</div>
+    <div class="gate-q-opts">
+      <label class="gate-opt"><input type="radio" name="gate-q" value="yes" onchange="checkGate()"> Sí — se duplica exactamente</label>
+      <label class="gate-opt"><input type="radio" name="gate-q" value="more" onchange="checkGate()"> No — crece más del doble</label>
+      <label class="gate-opt"><input type="radio" name="gate-q" value="less" onchange="checkGate()"> No — crece más lentamente</label>
+    </div>
+    <div id="gateExplainWrap" style="display:none; margin-top:10px;">
+      <p style="font-size:13px; color:var(--text); margin-bottom:6px; font-weight:700;">Ahora explica cómo lo sabes. Usa la fórmula y números reales.</p>
+      <div class="starters">
+        <button class="starter-btn" onclick="applyStarter('gateExplain','Con S=5: ','checkGateExplain')">Con S=5:...</button>
+        <button class="starter-btn" onclick="applyStarter('gateExplain','La fórmula da: ','checkGateExplain')">La fórmula da:...</button>
+        <button class="starter-btn" onclick="applyStarter('gateExplain','Cuando S=10: ','checkGateExplain')">Cuando S=10:...</button>
+      </div>
+      <textarea id="gateExplain" class="pause-textarea" placeholder="ej. Potencia del Motor % = (S × 100) ÷ 20. Con S=5: (5×100)÷20 = 25%. Con S=10: (10×100)÷20 = 50%. Es exactamente el doble porque S escala de forma lineal..." style="min-height:68px;" oninput="checkGateExplain()"></textarea>
+      <div id="gateExplainCount" style="font-size:12px; color:var(--muted); margin-top:4px;">0 / 20 caracteres mínimo</div>
+    </div>
+    <div class="gate-fb" id="gateFb"></div>
+  </div>
+
+  <button class="nav-btn" id="toCalcBtn" onclick="goSection(2)" disabled>
+    Ver Todas las Salidas →
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 2 — CALCULAR SALIDAS                                         -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec2">
+
+  <div class="sec-header">
+    <div class="sec-icon yellow">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="18" height="18" rx="3" stroke="var(--yellow)" stroke-width="1.6" fill="none"/>
+        <line x1="4" y1="10" x2="22" y2="10" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="4" y1="16" x2="22" y2="16" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="10" y1="4" x2="10" y2="22" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <line x1="16" y1="4" x2="16" y2="22" stroke="var(--yellow)" stroke-width="1.2" opacity="0.4"/>
+        <circle cx="13" cy="13" r="2.5" fill="var(--yellow)" opacity="0.9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">Las Tres Configuraciones</div>
+      <div class="sec-subtitle">Compara las salidas una al lado de la otra antes del análisis de intercambio</div>
+    </div>
+  </div>
+
+  <!-- Referencia de fórmulas -->
+  <div class="formula-ref">
+    <div class="formula-ref-title">Referencia de Fórmulas</div>
+    <div class="formula-row">
+      <span class="formula-stat">SPEED →</span>
+      <span class="formula-expr">Potencia del Motor % = (S × 100) ÷ 20</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">ENDURANCE →</span>
+      <span class="formula-expr">Potencia en t=1 min = 100 − (20 − E) × 1.5</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">TURNING →</span>
+      <span class="formula-expr">Segmentos de Arco = T &nbsp;·&nbsp; Razón de Giro = 0.2 + (T × 0.02)</span>
+    </div>
+    <div class="formula-row">
+      <span class="formula-stat">POWER →</span>
+      <span class="formula-expr">Velocidad de Carga = P² &nbsp;·&nbsp; Tiempo de Seguimiento = P × 80</span>
+    </div>
+  </div>
+
+  <!-- Tabla de comparación -->
+  <div class="card" id="compareCard">
+    <div class="card-title">Las Tres Configuraciones — Lado a Lado</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">Observa cada fila. Cuando SPEED es el mismo en dos configuraciones pero las salidas difieren — ¿qué causó la diferencia?</p>
+    <div class="compare-wrap">
+      <table class="compare-table" id="compareTable">
+        <thead>
+          <tr>
+            <th class="output-col">Salida</th>
+            <th style="color:var(--cyan);">Config. 1</th>
+            <th style="color:var(--orange);">Config. 2</th>
+            <th style="color:var(--purple);">Config. 3</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <button class="nav-btn" id="toTradeoffBtn" onclick="goSection(3)">
+    Análisis de Intercambio →
+  </button>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 3 — INTERCAMBIO                                              -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec3">
+
+  <div class="sec-header">
+    <div class="sec-icon cyan">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="4,10 13,5 22,10" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="4,16 13,21 22,16" stroke="var(--cyan)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="13" y1="5" x2="13" y2="21" stroke="var(--cyan)" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+        <circle cx="5" cy="10" r="1.5" fill="var(--cyan)"/>
+        <circle cx="21" cy="16" r="1.5" fill="var(--cyan)"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sec-title">El Intercambio</div>
+      <div class="sec-subtitle">Si SPEED = 8, ¿a qué estás renunciando? Muestra cada número.</div>
+    </div>
+  </div>
+
+  <div class="key-idea">
+    <div class="key-idea-label">La Pregunta</div>
+    <div class="key-idea-text">SPEED = 8 usa 8 de tus 20 puntos. Eso deja <strong>12 puntos</strong> para POWER, TURNING y ENDURANCE combinados. Para cada configuración: redistribuye esos 12 puntos y luego recalcula todas las salidas. La respuesta no es "renunciamos a 12 puntos" — nombra qué estadística recibe la reducción y qué le pasa a esa salida.</div>
+  </div>
+
+  <!-- Bloques de intercambio — generados por JS -->
+  <div id="tradeoffBlocks"></div>
+
+  <!-- Tarjeta de conclusión final — se muestra cuando los 3 intercambios están completos -->
+  <div id="final-card" class="card" style="display:none; margin-top:8px;">
+    <div style="font-size:11px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Las Tres Configuraciones — SPEED = 8</div>
+    <div class="card-title" style="margin-bottom:6px;">Mismo SPEED. Salidas Distintas. ¿Por qué?</div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Ahora todas las configuraciones tienen SPEED = 8. Eso significa que la Potencia del Motor % es idéntica en las tres. Pero mira el resto.</p>
+
+    <!-- Tabla de comparación generada automáticamente -->
+    <div id="finalCompare" style="overflow-x:auto; margin-bottom:20px;"></div>
+
+    <!-- Pregunta de exploración -->
+    <div style="background:rgba(0,229,255,.07); border:1px solid rgba(0,229,255,.3); border-radius:10px; padding:14px 18px; margin-bottom:16px;">
+      <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:10px;">SPEED es 8 en todas las configuraciones — entonces, ¿cómo se comporta de forma diferente el bot en cada una?</div>
+      <div class="starters">
+        <button class="starter-btn" onclick="applyStarter('final-explain','En la Config. ___, el bot ','checkFinalExplain')">En la Config. ___, el bot...</button>
+        <button class="starter-btn" onclick="applyStarter('final-explain','La mayor diferencia entre configuraciones es ','checkFinalExplain')">La mayor diferencia entre configuraciones es...</button>
+        <button class="starter-btn" onclick="applyStarter('final-explain','Poner más puntos en ___ significa que el bot ','checkFinalExplain')">Poner más puntos en ___ significa que el bot...</button>
+      </div>
+      <textarea id="final-explain" style="width:100%; min-height:80px; padding:8px 12px; background:#0d1b2a; border:1.5px solid rgba(0,229,255,.3); border-radius:8px; color:var(--text); font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; resize:vertical; outline:none;" placeholder="ej. La Potencia del Motor solo depende de SPEED, y SPEED está fijo en 8 para las tres. Pero la Velocidad de Carga = P², así que cambia según cuántos de los 12 puntos puso cada configuración en POWER..." oninput="checkFinalExplain()"></textarea>
+      <div id="final-explain-count" style="font-size:12px; color:var(--muted); margin-top:5px;">0 / 30 caracteres mínimo</div>
+    </div>
+
+    <!-- Indicación de hoja de trabajo -->
+    <div id="worksheetCallout" style="display:none; background:rgba(255,214,0,.07); border:1px solid rgba(255,214,0,.3); border-radius:10px; padding:16px 20px;">
+      <div style="font-size:12px; font-weight:800; color:var(--yellow); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Completa Tu Hoja de Trabajo</div>
+      <div style="font-size:13px; color:var(--text); line-height:1.6;">Usa la tabla de arriba y tus configuraciones de intercambio para responder las preguntas de reflexión. Para cada respuesta, nombra una estadística específica, una salida específica y los números reales — no solo el concepto.</div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+// ── Ayudante de arranque de oraciones ────────────────────────────────────
+function applyStarter(taId, text, handlerFn, handlerArg) {
+  const ta = document.getElementById(taId);
+  if (!ta) return;
+  ta.value = text;
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = ta.value.length;
+  if (typeof handlerFn === 'function') {
+    handlerFn(handlerArg);
+  } else if (typeof handlerFn === 'string') {
+    handlerArg !== undefined ? window[handlerFn](handlerArg) : window[handlerFn]();
+  }
+}
+
+// ── Estado ─────────────────────────────────────────────────────────────
+const STATS = ['s','p','t','e'];
+const STAT_LABELS = ['SPEED','POWER','TURNING','ENDURANCE'];
+const L_COLORS = ['var(--cyan)','var(--orange)','var(--purple)'];
+const L_NAMES  = ['Config. 1','Config. 2','Config. 3'];
+
+let tradeoffFilled  = [false, false, false];
+
+// ── Predicción del equipo rival (sec0) ────────────────────────────────
+function checkBlazePred() {
+  const val = parseInt(document.getElementById('blaze-cs-pred').value);
+  document.getElementById('blaze-reveal-btn').style.display =
+    (!isNaN(val) && val > 0) ? 'inline-block' : 'none';
+}
+
+function revealBlaze() {
+  const val    = parseInt(document.getElementById('blaze-cs-pred').value);
+  const actual = 64;
+  const result = document.getElementById('blaze-result');
+  const csDisp = document.getElementById('blaze-cs-display');
+
+  csDisp.textContent = actual;
+  csDisp.style.color = 'var(--green)';
+
+  document.getElementById('blaze-reveal-btn').style.display = 'none';
+
+  let color, msg;
+  if (val === actual) {
+    color = 'var(--green)';
+    msg   = '✓ Correcto — P² = 8² = 64. Duplicar P cuadruplica la Velocidad de Carga. Pero mira a qué renunció el Equipo Blaze para lograrlo: la Potencia en t=1 bajó de 77.5% a 73%, los Segmentos de Arco de 4 a 2, la Razón de Giro de 0.28 a 0.24. ¿Vale la pena patear más fuerte? La fórmula no decide — lo decide tu estrategia.';
+  } else if (val === 32) {
+    color = 'var(--orange)';
+    msg   = 'Predijiste 32 — el doble del 16 del Equipo Volt. Esa es la suposición lineal. Pero la Velocidad de Carga = P², así que 4²=16 y 8²=64. Eso es 4× la salida por 2× los puntos. Ahora la pregunta más difícil: el Equipo Blaze sacrificó Segmentos de Arco, Razón de Giro y Potencia en t=1 para conseguir ese 64. ¿Valió la pena?';
+  } else {
+    color = 'var(--orange)';
+    msg   = 'Resultado: 8² = 64. Velocidad de Carga = P², así que duplicar P cuadruplica el resultado. El Tiempo de Seguimiento pasó de 320→640 (duplicado, lineal). La Velocidad de Carga pasó de 16→64 (cuadruplicado, cuadrática). Pero el Equipo Blaze lo pagó — los Segmentos de Arco bajaron de 4 a 2, la Razón de Giro de 0.28 a 0.24. Mayor Velocidad de Carga no gana automáticamente.';
+  }
+
+  result.style.cssText = `background:rgba(${val === actual ? '0,230,118' : '255,145,0'},.07);
+    border:1px solid rgba(${val === actual ? '0,230,118' : '255,145,0'},.3);
+    border-radius:10px; padding:14px 16px;`;
+  result.innerHTML = `
+    <div style="font-size:12px; color:${color}; line-height:1.7;">${msg}</div>`;
+  result.style.display = 'block';
+
+  document.getElementById('s0-nav').disabled = false;
+}
+
+// ── Seguimiento de intentos para verificadores de salida ─────────────
+let checkAttempts = [0, 0, 0];
+
+function checkExplain(li) {
+  const ta    = document.getElementById('explainTa' + li);
+  const count = document.getElementById('explainCount' + li);
+  if (!ta || !count) return;
+  const len = ta.value.trim().length;
+  count.textContent = len + ' / 20' + (len >= 20 ? ' ✓' : ' caracteres para habilitar reintento');
+  count.style.color = len >= 20 ? 'var(--green)' : 'var(--muted)';
+  if (len >= 20) {
+    const btn = document.getElementById('checkBtn' + li);
+    btn.disabled = false;
+    btn.textContent = 'Reintentar — Verificar Config. ' + (li + 1);
+    btn.style.borderColor = 'var(--orange)';
+    btn.style.color = 'var(--orange)';
+    btn.style.background = 'rgba(255,145,0,.08)';
+    checkAttempts[li] = 0;
+  }
+}
+
+// ── Verificación de explicación de control ────────────────────────────
+function checkGateExplain() {
+  const ta    = document.getElementById('gateExplain');
+  const count = document.getElementById('gateExplainCount');
+  const len   = ta.value.trim().length;
+  count.textContent = len + ' / 20' + (len >= 20 ? ' ✓' : ' caracteres');
+  count.style.color = len >= 20 ? 'var(--green)' : 'var(--muted)';
+}
+
+// ── Estado de clasificación para panel de impacto ─────────────────────
+window._rankState = {};
+
+function initRankUI(li, changedOuts) {
+  window._rankState[li] = { ranks: [], options: changedOuts };
+  renderRankStep(li);
+}
+
+function renderRankStep(li) {
+  const iaqEl = document.getElementById('iaq' + li);
+  if (!iaqEl) return;
+  iaqEl.style.display = 'block';
+  const state   = window._rankState[li];
+  const maxRanks = Math.min(3, state.options.length);
+  const step     = state.ranks.length;
+  const labels   = ['Más importante', '2.º más importante', '3.º más importante'];
+
+  if (step >= maxRanks) {
+    const ranksHtml = state.ranks.map((r, i) => `<strong>#${i+1}:</strong> ${r}`).join(' &nbsp;·&nbsp; ');
+    iaqEl.innerHTML = `
+      <div class="iaq-label">Clasifica el impacto</div>
+      <div style="margin-bottom:10px; font-size:12px; color:var(--muted);">Tu clasificación: ${ranksHtml}</div>
+      <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:5px;">Justifica tu #1 usando números específicos de la tabla de arriba:</div>
+      <div class="starters">
+        <button class="starter-btn" onclick="applyStarter('rankJustify${li}','Esta salida importó más porque ','checkRankJustify',${li})">Esta salida importó más porque...</button>
+        <button class="starter-btn" onclick="applyStarter('rankJustify${li}','Los números muestran que cambió ','checkRankJustify',${li})">Los números muestran que cambió...</button>
+        <button class="starter-btn" onclick="applyStarter('rankJustify${li}','Comparado con la configuración original, ','checkRankJustify',${li})">Comparado con la configuración original,...</button>
+      </div>
+      <textarea id="rankJustify${li}" style="width:100%; min-height:65px; padding:8px 12px; background:#0d1b2a; border:2px solid rgba(0,230,118,.3); border-radius:8px; color:var(--text); font-family:'Inter',sans-serif; font-size:13px; line-height:1.5; resize:vertical; outline:none;" placeholder="ej. El Tiempo de Seguimiento bajó de 640 a 160 — ese es el mayor cambio absoluto porque P pasó de 8 a 2. En un partido eso significa..." oninput="checkRankJustify(${li})"></textarea>
+      <div id="rankJustifyCount${li}" style="font-size:12px; color:var(--muted); margin-top:5px;">0 / 25 caracteres mínimo</div>`;
+    return;
+  }
+
+  const remaining = state.options.filter(o => !state.ranks.includes(o.name));
+  const ranksSoFar = step > 0
+    ? `<div style="font-size:11px; color:var(--muted); margin-bottom:8px;">${state.ranks.map((r,i) => '#'+(i+1)+': '+r).join(' · ')}</div>`
+    : '';
+  const btnHTML = remaining.map(o => {
+    const dir = o.diff > 0 ? `<span style="color:var(--green);">▲ +${o.absStr}</span>` : `<span style="color:var(--red);">▼ −${o.absStr}</span>`;
+    const safeName = o.name.replace(/'/g, "\\'");
+    return `<button class="iaq-opt" onclick="addRank(${li},'${safeName}',this)">${o.name} ${dir}</button>`;
+  }).join('');
+
+  iaqEl.innerHTML = `
+    <div class="iaq-label">Clasifica el impacto</div>
+    <div class="iaq-q">${ranksSoFar}¿Qué cambio — ganancia o pérdida — tiene el efecto <strong>${labels[step]}</strong> en el rendimiento real de este robot en un partido?</div>
+    <div class="iaq-opts">${btnHTML}</div>`;
+}
+
+function addRank(li, name) {
+  const state = window._rankState[li];
+  if (!state) return;
+  state.ranks.push(name);
+  renderRankStep(li);
+}
+
+function checkRankJustify(li) {
+  const ta    = document.getElementById('rankJustify' + li);
+  const count = document.getElementById('rankJustifyCount' + li);
+  if (!ta || !count) return;
+  const len = ta.value.trim().length;
+  count.textContent = len + ' / 25 ' + (len >= 25 ? '✓' : 'caracteres mínimo');
+  count.style.color = len >= 25 ? 'var(--green)' : 'var(--muted)';
+}
+
+// ── Leer entradas de estadísticas ──────────────────────────────────────
+function getStats(li) {
+  return {
+    S: parseInt(document.getElementById('s'+li).value) || 0,
+    P: parseInt(document.getElementById('p'+li).value) || 0,
+    T: parseInt(document.getElementById('t'+li).value) || 0,
+    E: parseInt(document.getElementById('e'+li).value) || 0,
+  };
+}
+
+function getTotal(li) {
+  const s = getStats(li);
+  return s.S + s.P + s.T + s.E;
+}
+
+// ── Cálculos de fórmulas ───────────────────────────────────────────────
+function calcOutputs(S, P, T, E) {
+  return [
+    { name: 'Potencia del Motor %',   formula: '(S × 100) ÷ 20',      value: S * 5,              unit: '%',  decimals: 0 },
+    { name: 'Potencia en t = 1',      formula: '100 − (20 − E) × 1.5',value: 100-(20-E)*1.5,     unit: '%',  decimals: 1 },
+    { name: 'Segmentos de Arco',      formula: 'T',                    value: T,                  unit: '',   decimals: 0 },
+    { name: 'Razón de Giro',          formula: '0.2 + (T × 0.02)',     value: 0.2 + T * 0.02,     unit: '',   decimals: 2 },
+    { name: 'Velocidad de Carga',     formula: 'P²',                   value: P * P,              unit: '',   decimals: 0 },
+    { name: 'Tiempo de Seguimiento',  formula: 'P × 80',              value: P * 80,            unit: '',   decimals: 0 },
+  ];
+}
+
+function withinTol(userVal, correct, decimals) {
+  const tol = decimals === 0 ? 0.5 : (decimals === 1 ? 0.6 : 0.015);
+  return Math.abs(userVal - correct) <= tol;
+}
+
+// ── Actualización en vivo del presupuesto ─────────────────────────────
+function updateBudget() {
+  let allReady = true;
+  for (let i = 0; i < 3; i++) {
+    const tot = getTotal(i);
+    const pill = document.getElementById('tot'+i);
+    pill.textContent = tot + ' / 20';
+    if (tot === 20) {
+      pill.className = 'budget-pill budget-ok';
+    } else if (tot > 20) {
+      pill.className = 'budget-pill budget-over';
+      allReady = false;
+    } else {
+      pill.className = 'budget-pill budget-low';
+      allReady = false;
+    }
+  }
+  const gate = document.getElementById('gateBlock');
+  if (allReady) {
+    gate.style.display = 'block';
+    checkGate();
+  } else {
+    gate.style.display = 'none';
+    document.getElementById('toCalcBtn').disabled = true;
+  }
+}
+
+// ── Verificación del control ───────────────────────────────────────────
+function checkGate() {
+  const sel = document.querySelector('input[name="gate-q"]:checked');
+  const fb  = document.getElementById('gateFb');
+  if (!sel) { document.getElementById('toCalcBtn').disabled = true; return; }
+
+  if (sel.value === 'yes') {
+    fb.className = 'gate-fb visible';
+    fb.style.color = 'var(--green)';
+    fb.textContent = '✓ Correcto. Potencia del Motor % = (S × 100) ÷ 20 es perfectamente lineal — duplicar S duplica la salida siempre. Opcional: explícalo con tus propias palabras abajo.';
+    document.getElementById('gateExplainWrap').style.display = 'block';
+    document.getElementById('toCalcBtn').disabled = false;
+  } else {
+    fb.className = 'gate-fb visible';
+    fb.style.color = 'var(--red)';
+    fb.textContent = '✗ Trabájalo en papel. Potencia del Motor % = (S × 100) ÷ 20. Calcula para S=5 y S=10 — ¿qué obtienes?';
+    document.getElementById('toCalcBtn').disabled = true;
+    document.getElementById('gateExplainWrap').style.display = 'none';
+  }
+}
+
+// ── Tabla de comparación ───────────────────────────────────────────────
+function buildCompareTable() {
+  const outputs0 = calcOutputs(...Object.values(getStats(0)));
+  const outputs1 = calcOutputs(...Object.values(getStats(1)));
+  const outputs2 = calcOutputs(...Object.values(getStats(2)));
+  const body = document.getElementById('compareBody');
+  body.innerHTML = '';
+
+  outputs0.forEach((out, oi) => {
+    const v0 = outputs0[oi].value;
+    const v1 = outputs1[oi].value;
+    const v2 = outputs2[oi].value;
+
+    function fmt(v, d) {
+      return d > 0 ? v.toFixed(d) : Math.round(v);
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="output-col">${out.name}</td>
+      <td style="color:var(--cyan);">${fmt(v0,out.decimals)}${out.unit}</td>
+      <td style="color:var(--orange);">${fmt(v1,out.decimals)}${out.unit}</td>
+      <td style="color:var(--purple);">${fmt(v2,out.decimals)}${out.unit}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+// ── Control de pausa ───────────────────────────────────────────────────
+function onPauseInput() {
+  const ans = document.getElementById('pauseAnswer').value.trim();
+  const charEl = document.getElementById('pauseChar');
+  const len = ans.length;
+  charEl.textContent = len + ' / 20 mín' + (len >= 20 ? ' ✓' : ' — responde para habilitar Config. 2');
+  charEl.className = len >= 20 ? 'pause-char ready' : 'pause-char';
+  const checkBtn2 = document.getElementById('checkBtn1');
+  if (checkBtn2) checkBtn2.disabled = len < 20;
+}
+
+// ── Construir bloques de intercambio ──────────────────────────────────
+function buildTradeoffBlocks() {
+  const container = document.getElementById('tradeoffBlocks');
+  container.innerHTML = '';
+
+  for (let li = 0; li < 3; li++) {
+    const {S,P,T,E} = getStats(li);
+    const origPTE = P + T + E;
+    const delta   = 8 - S;
+    const deltaStr = delta > 0 ? '+'+delta : delta === 0 ? '0' : ''+delta;
+    const color   = L_COLORS[li];
+
+    const block = document.createElement('div');
+    block.className = 'tradeoff-block';
+    block.innerHTML = `
+      <div class="tb-header">
+        <div class="tb-badge" style="background:${color}22; color:${color}; border:1px solid ${color}44;">${L_NAMES[li]}</div>
+        <div style="font-size:13px; color:var(--muted);">S=${S} · P=${P} · T=${T} · E=${E}</div>
+      </div>
+
+      <div class="tradeoff-row">
+        <div class="tr-label">SPEED cambia</div>
+        <div class="tr-value">${S} pts → <strong style="color:${color};">8 pts</strong> &nbsp;(${deltaStr === '0' ? 'sin cambio' : deltaStr + ' pts'})</div>
+      </div>
+      <div class="tradeoff-row">
+        <div class="tr-label">Restante para P + T + E</div>
+        <div class="tr-value">20 − 8 = <strong style="color:var(--green);">12 pts</strong> &nbsp;(era ${origPTE})</div>
+      </div>
+
+      <!-- Regla de restricción desigual -->
+      <div style="background:rgba(255,145,0,.07); border:1px solid rgba(255,145,0,.3); border-radius:8px; padding:10px 14px; margin:10px 0; font-size:13px; color:var(--text);">
+        <strong style="color:var(--orange);">Restricción — sin distribución uniforme:</strong>
+        <div style="margin-top:6px; line-height:1.6;">
+          SPEED subió <strong>${delta} pts</strong>, así que al menos uno de P, T, E debe absorber el golpe completo — bajar <strong style="color:var(--red);">${delta}+</strong> desde su valor original. Puedes poner los puntos liberados donde quieras, pero una estadística tiene que absorber el sacrificio.
+          ${delta === 0 ? '<span style="color:var(--muted); font-size:12px;">(SPEED no cambió, así que no se requiere sacrificio — redistribuye libremente.)</span>' : ''}
+        </div>
+        <div id="tradeConstraint${li}" style="font-size:12px; margin-top:7px; color:var(--muted);">Ingresa tus valores de P, T, E para verificar.</div>
+      </div>
+
+      <!-- Pre-compromiso antes de ingresar números -->
+      <div class="precommit-block">
+        <div class="precommit-label">Antes de ingresar números — comprométete primero</div>
+        <div class="precommit-q">¿Qué estadística reducirás MÁS en esta configuración?</div>
+        <div class="precommit-opts">
+          <button class="precommit-btn" onclick="selectPrecommit(${li},'POWER',this)">POWER</button>
+          <button class="precommit-btn" onclick="selectPrecommit(${li},'TURNING',this)">TURNING</button>
+          <button class="precommit-btn" onclick="selectPrecommit(${li},'ENDURANCE',this)">ENDURANCE</button>
+        </div>
+        <div class="starters">
+          <button class="starter-btn" onclick="applyStarter('pcWhy${li}','Estoy recortando esta porque ','checkPrecommit',${li})">Estoy recortando esta porque...</button>
+          <button class="starter-btn" onclick="applyStarter('pcWhy${li}','Reducir esta libera puntos para ','checkPrecommit',${li})">Reducir esta libera puntos para...</button>
+          <button class="starter-btn" onclick="applyStarter('pcWhy${li}','Esta salida importa menos porque ','checkPrecommit',${li})">Esta salida importa menos porque...</button>
+        </div>
+        <textarea class="precommit-why" id="pcWhy${li}" placeholder="¿Por qué? ¿Cuál es tu razonamiento?" oninput="checkPrecommit(${li})"></textarea>
+        <div class="precommit-unlock">Elige una estadística y explica para habilitar los campos de abajo.</div>
+      </div>
+
+      <div class="tradeoff-row">
+        <div class="tr-label">Tu nuevo P, T, E</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:13px; color:var(--muted);">P =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="tp${li}" oninput="updatePTE(${li})" placeholder="—" disabled>
+          <span style="font-size:13px; color:var(--muted);">T =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="tt${li}" oninput="updatePTE(${li})" placeholder="—" disabled>
+          <span style="font-size:13px; color:var(--muted);">E =</span>
+          <input class="tr-input" type="number" min="1" max="18" id="te${li}" oninput="updatePTE(${li})" placeholder="—" disabled>
+        </div>
+      </div>
+      <div class="pte-total" id="pteTotal${li}" style="color:var(--orange);">P + T + E = 0 / 12</div>
+
+      <div class="impact-panel" id="impact${li}">
+        <div class="impact-placeholder">↑ Ingresa tu nuevo P, T, E arriba — la redistribución del presupuesto aparecerá aquí cuando sumen 12.</div>
+        <div class="impact-content">
+          <div class="impact-header">Los mismos 20 puntos — distribución diferente</div>
+          <div id="budgetBars${li}"></div>
+          <div class="impact-header" style="margin-top:16px;">Qué le hace eso a tus salidas</div>
+          <div class="out-impact" id="outputGrid${li}"></div>
+          <div class="impact-summary" id="impactSummary${li}"></div>
+          <!-- Clasificación — construida dinámicamente por initRankUI() -->
+          <div class="impact-active-q" id="iaq${li}" style="display:none;"></div>
+        </div>
+      </div>`;
+
+    container.appendChild(block);
+  }
+}
+
+// ── Pre-compromiso ─────────────────────────────────────────────────────
+const precommitSel = {};
+
+function selectPrecommit(li, stat, el) {
+  precommitSel[li] = stat;
+  el.closest('.precommit-opts').querySelectorAll('.precommit-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  checkPrecommit(li);
+}
+
+function checkPrecommit(li) {
+  const hasStat = !!precommitSel[li];
+  const why = (document.getElementById('pcWhy'+li)?.value || '').trim();
+  const unlocked = hasStat && why.length >= 8;
+  ['tp','tt','te'].forEach(prefix => {
+    const inp = document.getElementById(prefix+li);
+    if (inp) inp.disabled = !unlocked;
+  });
+}
+
+function fmtDelta(d, decimals) {
+  if (d === 0) return { text: '—', cls: 'delta-zero' };
+  const abs = decimals > 0 ? Math.abs(d).toFixed(decimals) : Math.abs(Math.round(d));
+  return { text: (d > 0 ? '▲ +' : '▼ ') + abs, cls: d > 0 ? 'delta-up' : 'delta-down' };
+}
+
+function fmtVal(v, decimals, unit) {
+  return (decimals > 0 ? v.toFixed(decimals) : Math.round(v)) + (unit || '');
+}
+
+function updatePTE(li) {
+  const newP = parseInt(document.getElementById('tp'+li).value) || 0;
+  const newT = parseInt(document.getElementById('tt'+li).value) || 0;
+  const newE = parseInt(document.getElementById('te'+li).value) || 0;
+  const tot  = newP + newT + newE;
+  const el   = document.getElementById('pteTotal'+li);
+  el.textContent = 'P + T + E = ' + tot + ' / 12';
+  el.style.color = tot === 12 ? 'var(--green)' : tot > 12 ? 'var(--red)' : 'var(--orange)';
+
+  const panel = document.getElementById('impact'+li);
+
+  if (tot === 12 && newP >= 1 && newT >= 1 && newE >= 1) {
+    const orig = getStats(li);
+
+    const pChg   = newP - orig.P;
+    const tChg   = newT - orig.T;
+    const eChg   = newE - orig.E;
+    const maxDec = -Math.min(pChg, tChg, eChg);
+    const delta  = 8 - orig.S;
+    const constraintEl = document.getElementById('tradeConstraint' + li);
+    if (delta > 0 && maxDec < delta) {
+      if (constraintEl) {
+        constraintEl.style.color = 'var(--red)';
+        constraintEl.textContent = `⚠ Restricción no cumplida. SPEED subió ${delta} pts — al menos una estadística debe bajar ${delta}+ desde su valor original. Estás distribuyendo demasiado uniformemente.`;
+      }
+      document.getElementById('impact' + li).classList.remove('visible');
+      tradeoffFilled[li] = false;
+      return;
+    }
+    if (constraintEl) {
+      constraintEl.style.color = 'var(--green)';
+      constraintEl.textContent = '✓ Restricción cumplida.';
+    }
+
+    const before = { S: orig.S, P: orig.P, T: orig.T, E: orig.E };
+    const after  = { S: 8,      P: newP,   T: newT,   E: newE   };
+
+    function makeBudgetBar(label, S, P, T, E) {
+      const segs = [
+        { cls: 'speed',     val: S, name: 'S' },
+        { cls: 'power',     val: P, name: 'P' },
+        { cls: 'turning',   val: T, name: 'T' },
+        { cls: 'endurance', val: E, name: 'E' },
+      ];
+      const segsHTML = segs.map(seg => {
+        const pct = (seg.val / 20 * 100).toFixed(1);
+        const txt = seg.val >= 3 ? `${seg.name}=${seg.val}` : '';
+        return `<div class="bb-seg ${seg.cls}" style="width:${pct}%;">${txt}</div>`;
+      }).join('');
+      return `<div class="bb-row"><div class="bb-label">${label}</div><div class="bb-track">${segsHTML}</div></div>`;
+    }
+
+    document.getElementById('budgetBars'+li).innerHTML =
+      makeBudgetBar('Original', before.S, before.P, before.T, before.E) +
+      makeBudgetBar('SPEED = 8', after.S, after.P, after.T, after.E);
+
+    const outsBef = calcOutputs(before.S, before.P, before.T, before.E);
+    const outsAft = calcOutputs(after.S,  after.P,  after.T,  after.E);
+
+    let outHTML = `
+      <div class="oi-head left">Salida</div>
+      <div class="oi-head">Original</div>
+      <div class="oi-head">SPEED = 8</div>`;
+    outsBef.forEach((out, oi) => {
+      const bv   = out.value;
+      const av   = outsAft[oi].value;
+      const diff = av - bv;
+      const cls  = diff > 0.009 ? 'up' : diff < -0.009 ? 'down' : 'same';
+      outHTML += `
+        <div class="oi-cell left">${out.name}</div>
+        <div class="oi-cell same">${fmtVal(bv, out.decimals, out.unit)}</div>
+        <div class="oi-cell ${cls}">${fmtVal(av, out.decimals, out.unit)}</div>`;
+    });
+    document.getElementById('outputGrid'+li).innerHTML = outHTML;
+
+    const losses  = [];
+    const gains   = [];
+    const neutral = [];
+    outsBef.forEach((out, oi) => {
+      const diff = outsAft[oi].value - out.value;
+      const absDiff = Math.abs(diff);
+      const fmt = out.decimals > 0 ? absDiff.toFixed(out.decimals) : Math.round(absDiff);
+      if (diff < -0.009)      losses.push(`<strong>${out.name}</strong> ↓ ${fmt}${out.unit}`);
+      else if (diff > 0.009)  gains.push(`<strong>${out.name}</strong> ↑ ${fmt}${out.unit}`);
+      else                     neutral.push(`<strong>${out.name}</strong> sin cambio`);
+    });
+    let summary = '';
+    if (losses.length)  summary += `<span style="color:var(--red);">Bajó: ${losses.join(', ')}</span><br>`;
+    if (gains.length)   summary += `<span style="color:var(--green);">Subió: ${gains.join(', ')}</span><br>`;
+    if (neutral.length) summary += `<span style="color:var(--muted);">${neutral.join(' · ')}</span>`;
+    document.getElementById('impactSummary'+li).innerHTML = summary;
+
+    const changedOuts = outsBef.map((out, oi) => {
+      const diff = outsAft[oi].value - out.value;
+      if (Math.abs(diff) <= 0.009) return null;
+      const abs = out.decimals > 0 ? Math.abs(diff).toFixed(out.decimals) : Math.abs(Math.round(diff));
+      return { name: out.name, unit: out.unit, diff, absStr: abs + out.unit };
+    }).filter(Boolean);
+    if (changedOuts.length >= 2) {
+      initRankUI(li, changedOuts);
+    }
+
+    panel.classList.add('visible');
+    tradeoffFilled[li] = true;
+  } else {
+    panel.classList.remove('visible');
+    tradeoffFilled[li] = false;
+  }
+
+  if (tradeoffFilled.every(Boolean)) {
+    buildFinalInsightCard();
+    const fc = document.getElementById('final-card');
+    if (fc) { fc.style.display = 'block'; fc.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+}
+
+// ── Tarjeta de conclusión final ────────────────────────────────────────
+function buildFinalInsightCard() {
+  const container = document.getElementById('finalCompare');
+  if (!container) return;
+
+  const builds = [0, 1, 2].map(li => {
+    const newP = parseInt(document.getElementById('tp'+li).value) || 0;
+    const newT = parseInt(document.getElementById('tt'+li).value) || 0;
+    const newE = parseInt(document.getElementById('te'+li).value) || 0;
+    return { li, P: newP, T: newT, E: newE, outs: calcOutputs(8, newP, newT, newE) };
+  });
+
+  const headers = builds.map((b, i) => {
+    const color = L_COLORS[i];
+    return `<th style="color:${color}; font-size:12px; font-weight:800; padding:8px 12px; text-align:center; white-space:nowrap;">${L_NAMES[i]}<br><span style="font-weight:500; color:var(--muted);">S=8 · P=${b.P} · T=${b.T} · E=${b.E}</span></th>`;
+  }).join('');
+
+  const rows = builds[0].outs.map((out, oi) => {
+    const vals = builds.map(b => {
+      const v = b.outs[oi].value;
+      const fmt = out.decimals > 0 ? v.toFixed(out.decimals) : Math.round(v);
+      return fmt + (out.unit || '');
+    });
+    const allSame = vals.every(v => v === vals[0]);
+    const cellStyle = allSame
+      ? 'color:var(--muted); font-size:13px; padding:8px 12px; text-align:center;'
+      : 'color:var(--text); font-size:13px; font-weight:700; padding:8px 12px; text-align:center;';
+    const cells = vals.map(v => `<td style="${cellStyle}">${v}</td>`).join('');
+    const rowBg = allSame ? 'background:rgba(255,255,255,.02);' : 'background:rgba(0,229,255,.04);';
+    const nameCellExtra = allSame ? ' color:var(--muted);' : '';
+    return `<tr style="${rowBg}">
+      <td style="font-size:13px; font-weight:600; padding:8px 12px; color:var(--text);${nameCellExtra}">${out.name}${allSame ? ' <span style="font-size:11px; color:var(--muted);">(igual)</span>' : ''}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="font-size:12px; font-weight:700; color:var(--muted); padding:8px 12px; text-align:left;">Salida</th>
+          ${headers}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function checkFinalExplain() {
+  const ta = document.getElementById('final-explain');
+  const count = document.getElementById('final-explain-count');
+  if (!ta || !count) return;
+  const len = ta.value.trim().length;
+  count.textContent = len >= 30 ? '✓ Bien — ahora completa tu hoja de trabajo abajo.' : `${len} / 30 caracteres mínimo`;
+  count.style.color = len >= 30 ? 'var(--green)' : 'var(--muted)';
+  if (len >= 30) {
+    document.getElementById('worksheetCallout').style.display = 'block';
+  }
+}
+
+// ── Navegación entre secciones ────────────────────────────────────────
+const pcts = [25, 50, 75, 100];
+
+function goSection(n) {
+  document.querySelectorAll('.section').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.prog-tab').forEach((t,i) => {
+    t.classList.remove('active','done');
+    if (i === n) t.classList.add('active');
+    else if (i < n) t.classList.add('done');
+  });
+  document.getElementById('progressFill').style.width = pcts[n] + '%';
+
+  if (n === 2) {
+    buildCompareTable();
+  }
+  if (n === 3) buildTradeoffBlocks();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Inicializar ────────────────────────────────────────────────────────
+updateBudget();
+</script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Día 6 — Conjunto de Problemas Intercalados</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0d1b2a;
+  --surface: #132033;
+  --card:    #1a2d45;
+  --border:  #2a4060;
+  --yellow:  #ffd600;
+  --cyan:    #00b8d4;
+  --orange:  #ff9100;
+  --green:   #00e676;
+  --purple:  #ce93d8;
+  --blue:    #4fc3f7;
+  --red:     #ff5252;
+  --text:    #e8f0fe;
+  --muted:   #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a, #1a1600);
+  border-bottom: 2px solid var(--yellow);
+  padding: 18px 24px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 800px; margin: 0 auto; gap: 12px; flex-wrap: wrap;
+}
+.day-badge {
+  background: var(--yellow); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+  display: inline-block; margin-bottom: 4px;
+}
+.lesson-title { font-size: 19px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.progress-counter {
+  text-align: right; flex-shrink: 0;
+}
+.pc-main { font-size: 26px; font-weight: 800; color: var(--yellow); line-height: 1; }
+.pc-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pc-bar  { width: 120px; height: 5px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.pc-fill { height: 100%; background: var(--yellow); border-radius: 3px; transition: width 0.4s ease; }
+
+/* ── MAIN LAYOUT ─────────────────────────── */
+.container { max-width: 800px; margin: 0 auto; padding: 28px 20px 80px; }
+
+/* ── TAG LEGEND ──────────────────────────── */
+.legend {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px 20px; margin-bottom: 28px;
+}
+.legend-title { font-size: 12px; font-weight: 800; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.legend-instruction {
+  font-size: 13px; color: var(--text); margin-bottom: 14px; line-height: 1.6;
+  padding: 10px 14px; background: rgba(255,214,0,.07); border-radius: 8px;
+  border-left: 3px solid var(--yellow);
+}
+.legend-instruction strong { color: var(--yellow); }
+.legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 520px) { .legend-grid { grid-template-columns: 1fr; } }
+.legend-chip {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 12px; border-radius: 10px; border: 1px solid;
+}
+.lc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.lc-label { font-size: 13px; font-weight: 700; display: block; margin-bottom: 2px; }
+.lc-desc  { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ── PROBLEM CARD ────────────────────────── */
+.problem-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+.problem-card.checked-ok    { border-color: rgba(0,230,118,.4); }
+.problem-card.checked-mixed { border-color: rgba(255,145,0,.4); }
+.problem-card.checked-fail  { border-color: rgba(255,82,82,.4); }
+
+.problem-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+.prob-num {
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(255,214,0,.15); border: 2px solid var(--yellow);
+  font-size: 14px; font-weight: 800; color: var(--yellow);
+  display: flex; align-items: center; justify-content: center;
+}
+.prob-text { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.55; padding-top: 4px; }
+
+/* ── TAG CHIPS ───────────────────────────── */
+.tag-section-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); margin-bottom: 8px;
+}
+.tag-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+  margin-bottom: 14px;
+}
+@media (max-width: 500px) { .tag-grid { grid-template-columns: repeat(2,1fr); } }
+.tag-chip {
+  padding: 7px 10px; border-radius: 8px; border: 2px solid var(--border);
+  background: rgba(255,255,255,.03); color: var(--muted);
+  font-family: 'Inter',sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+  line-height: 1.3;
+}
+.tag-chip:hover:not(:disabled) { border-color: var(--muted); color: var(--text); }
+.tag-chip.selected {
+  color: #000; font-weight: 800;
+}
+.tag-chip:disabled { cursor: default; }
+.tag-chip.result-correct { color: #000; }
+.tag-chip.result-wrong   { border-color: var(--red) !important; background: rgba(255,82,82,.15) !important; color: var(--red) !important; }
+
+/* ── ANSWER ROW ──────────────────────────── */
+.answer-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.answer-label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.answer-input {
+  width: 120px; height: 38px;
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 9px; color: var(--text);
+  font-family: 'Inter',sans-serif; font-size: 15px; font-weight: 700;
+  text-align: center; outline: none; transition: border-color 0.2s;
+}
+.answer-input:focus { border-color: var(--yellow); }
+.answer-input.correct { border-color: var(--green);  background: rgba(0,230,118,.08); color: var(--green); }
+.answer-input.wrong   { border-color: var(--red);    background: rgba(255,82,82,.08);  color: var(--red); }
+.answer-input:disabled { opacity: 0.8; cursor: default; }
+
+.check-btn {
+  padding: 9px 20px; border-radius: 9px; border: 2px solid var(--yellow);
+  background: rgba(255,214,0,.1); color: var(--yellow);
+  font-family: 'Inter',sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: background 0.2s;
+}
+.check-btn:hover { background: rgba(255,214,0,.2); }
+.check-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── FEEDBACK ────────────────────────────── */
+.feedback {
+  border-radius: 10px; padding: 12px 14px; font-size: 13px;
+  line-height: 1.6; display: none;
+}
+.feedback.visible { display: block; }
+.feedback.both-ok {
+  background: rgba(0,230,118,.1); border: 1px solid rgba(0,230,118,.35);
+}
+.feedback.tag-wrong {
+  background: rgba(255,145,0,.1); border: 1px solid rgba(255,145,0,.4);
+}
+.feedback.answer-wrong {
+  background: rgba(255,82,82,.1); border: 1px solid rgba(255,82,82,.35);
+}
+.feedback.both-wrong {
+  background: rgba(255,82,82,.1); border: 1px solid rgba(255,82,82,.35);
+}
+.fb-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 5px; }
+.fb-row:last-child { margin-bottom: 0; }
+.fb-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.fb-text { font-size: 13px; line-height: 1.55; }
+.working { font-size: 12px; color: var(--muted); margin-top: 6px; font-family: monospace; }
+
+/* ── SCORE SUMMARY ───────────────────────── */
+.score-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 20px;
+  display: none;
+}
+.score-card.visible { display: block; }
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.score-box {
+  text-align: center; padding: 14px;
+  background: rgba(255,255,255,.03); border-radius: 10px; border: 1px solid var(--border);
+}
+.score-num   { font-size: 32px; font-weight: 800; }
+.score-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+</style>
+</head>
+<body>
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <div class="day-badge">Día 6 · Bloque de Desafío</div>
+      <div class="lesson-title">Conjunto de Problemas Intercalados</div>
+      <div class="lesson-sub">Clasifica la fórmula, luego calcula</div>
+    </div>
+    <div class="progress-counter">
+      <div class="pc-main"><span id="doneCount">0</span> / 12</div>
+      <div class="pc-sub">problemas verificados</div>
+      <div class="pc-bar"><div class="pc-fill" id="pcFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Tag Legend -->
+  <div class="legend">
+    <div class="legend-title">Etiquetas de Concepto</div>
+    <div class="legend-instruction">
+      <strong>Antes de cada cálculo, elige la etiqueta de concepto que corresponde.</strong>
+      Una etiqueta incorrecta en una respuesta correcta sigue siendo un error. La etiqueta es evidencia de que identificaste la estructura matemática, no solo que resolviste el problema.
+    </div>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <!-- Problems 1–12 -->
+  <div id="problemContainer"></div>
+
+  <!-- Score summary (appears when all 12 done) -->
+  <div class="score-card" id="scoreCard">
+    <div class="legend-title" style="margin-bottom:14px;">Resultados</div>
+    <div class="score-grid">
+      <div class="score-box">
+        <div class="score-num" id="scoreTagNum" style="color:var(--cyan);">—</div>
+        <div class="score-label">etiquetas de concepto correctas</div>
+      </div>
+      <div class="score-box">
+        <div class="score-num" id="scoreAnsNum" style="color:var(--green);">—</div>
+        <div class="score-label">respuestas correctas</div>
+      </div>
+    </div>
+    <div id="scoreSummaryText" style="font-size:13px; color:var(--muted); margin-top:14px; line-height:1.6;"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Tag definitions ───────────────────────────────────────────────────
+const TAGS = [
+  { id: 'unit-rate',            label: 'tasa unitaria',          color: '#00b8d4', desc: 'Una cantidad fija de salida por 1 unidad de entrada' },
+  { id: 'linear-decay',         label: 'decaimiento lineal',     color: '#ff9100', desc: 'Salida que disminuye a una tasa constante con el tiempo' },
+  { id: 'linear-function',      label: 'función lineal',         color: '#00e676', desc: 'Salida que aumenta a una tasa constante con un valor inicial distinto de cero' },
+  { id: 'nonlinear-function',   label: 'función no lineal',      color: '#ce93d8', desc: 'Salida que crece por una cantidad variable a medida que aumenta la entrada' },
+  { id: 'proportional-scaling', label: 'escala proporcional',    color: '#4fc3f7', desc: 'Salida que escala en proporción directa a la entrada desde cero' },
+  { id: 'ratio',                label: 'razón',                  color: '#ffd600', desc: 'Una relación parte a todo dentro de un total fijo' },
+];
+
+// ── Problem data ──────────────────────────────────────────────────────
+const PROBLEMS = [
+  {
+    n: 1,
+    text: 'Un bot tiene estadística SPEED S = 6. Calcula su porcentaje de rendimiento de velocidad.',
+    correctTag: 'unit-rate',
+    answer: 30, unit: '%', decimals: 0,
+    working: '(6 × 100) ÷ 20 = 30%',
+    tagWhy: 'SPEED% = (S × 100) ÷ 20 es una <strong>tasa unitaria</strong> — una razón fija de salida por unidad de entrada. Cada punto de SPEED añade exactamente un 5% de potencia del motor, sin valor inicial y sin variable de tiempo.',
+  },
+  {
+    n: 2,
+    text: 'Un bot tiene estadística ENDURANCE E = 8. El partido dura t = 3 minutos. ¿Cuál es la potencia de salida en el minuto 3?',
+    correctTag: 'linear-decay',
+    answer: 46, unit: '%', decimals: 0,
+    working: '100 − (20−8) × 1.5 × 3 = 100 − 54 = 46%',
+    tagWhy: 'P(t) = 100 − (20−E) × 1.5 × t es <strong>decaimiento lineal</strong> — la potencia comienza en 100% y cae una cantidad constante por minuto. La tasa de pérdida es fija; solo cambia la variable de tiempo.',
+  },
+  {
+    n: 3,
+    text: 'Un bot tiene estadística TURNING T = 6. Calcula su razón de giro.',
+    correctTag: 'linear-function',
+    answer: 0.32, unit: '', decimals: 2,
+    working: '0.2 + (6 × 0.02) = 0.32',
+    tagWhy: 'Razón de Giro = 0.2 + (T × 0.02) es una <strong>función lineal</strong> — aumenta a una tasa constante (0.02 por punto) pero comienza en 0.2, no en cero. Como no pasa por el origen, no es escala proporcional.',
+  },
+  {
+    n: 4,
+    text: 'Un bot tiene estadística POWER P = 4. Calcula su porcentaje de carga.',
+    correctTag: 'nonlinear-function',
+    answer: 16, unit: '%', decimals: 0,
+    working: '4² = 16%',
+    tagWhy: 'Carga% = P² es una <strong>función no lineal</strong> — cada punto extra de POWER añade más carga que el anterior. P=4→16%, P=5→25%, P=6→36%. Los incrementos son 9, luego 11 — no son constantes.',
+  },
+  {
+    n: 5,
+    text: 'Un bot tiene estadística SPEED S = 8. Calcula su porcentaje de rendimiento de velocidad.',
+    correctTag: 'unit-rate',
+    answer: 40, unit: '%', decimals: 0,
+    working: '(8 × 100) ÷ 20 = 40%',
+    tagWhy: 'SPEED% es una <strong>tasa unitaria</strong> — 5% de potencia del motor por punto de SPEED, siempre, sin otras variables.',
+  },
+  {
+    n: 6,
+    text: 'Estadísticas del equipo: SPEED = 4, ENDURANCE = 8, TURNING = 6. Presupuesto = 20. Encuentra la estadística POWER.',
+    correctTag: 'ratio',
+    answer: 2, unit: '', decimals: 0,
+    working: 'P = 20 − 4 − 8 − 6 = 2',
+    tagWhy: 'La restricción de presupuesto S + E + T + P = 20 es una <strong>razón</strong> — cada estadística es una parte de un total fijo. Cada punto que le das a una estadística es un punto que le quitas a las demás.',
+  },
+  {
+    n: 7,
+    text: 'Un bot tiene estadística ENDURANCE E = 6. El partido dura t = 4 minutos. ¿Cuál es la potencia de salida en el minuto 4?',
+    correctTag: 'linear-decay',
+    answer: 16, unit: '%', decimals: 0,
+    working: '100 − (20−6) × 1.5 × 4 = 100 − 84 = 16%',
+    tagWhy: 'P(t) es <strong>decaimiento lineal</strong> — la misma caída constante cada minuto. Con E = 6, el bot pierde 21% por minuto (14 × 1.5). Después de 4 minutos: 100 − 84 = 16%.',
+  },
+  {
+    n: 8,
+    text: 'Un bot tiene estadística POWER P = 2. Calcula su tiempo de seguimiento en milisegundos.',
+    correctTag: 'proportional-scaling',
+    answer: 400, unit: ' ms', decimals: 0,
+    working: '2 × 80 = 400 ms',
+    tagWhy: 'Tiempo de Seguimiento = P × 80 es <strong>escala proporcional</strong> — la salida es directamente proporcional a la entrada y comienza desde cero (P = 0 → 0 ms). Sin valor inicial, sin exponente.',
+  },
+  {
+    n: 9,
+    text: 'Un bot tiene estadística TURNING T = 2. Calcula su razón de giro.',
+    correctTag: 'linear-function',
+    answer: 0.24, unit: '', decimals: 2,
+    working: '0.2 + (2 × 0.02) = 0.24',
+    tagWhy: 'Razón de Giro = 0.2 + (T × 0.02) es una <strong>función lineal</strong>. Aumenta a una tasa constante, pero comienza en 0.2 — por lo tanto no es proporcional (T = 0 daría 0.2, no 0).',
+  },
+  {
+    n: 10,
+    text: 'Un bot tiene estadística SPEED S = 4. Calcula su porcentaje de rendimiento de velocidad.',
+    correctTag: 'unit-rate',
+    answer: 20, unit: '%', decimals: 0,
+    working: '(4 × 100) ÷ 20 = 20%',
+    tagWhy: 'SPEED% es una <strong>tasa unitaria</strong> — un 5% constante por punto de SPEED. Sin valor inicial, sin exponente, sin variable de tiempo.',
+  },
+  {
+    n: 11,
+    text: 'Un bot tiene estadística POWER P = 6. Calcula su porcentaje de carga.',
+    correctTag: 'nonlinear-function',
+    answer: 36, unit: '%', decimals: 0,
+    working: '6² = 36%',
+    tagWhy: 'Carga% = P² es <strong>no lineal</strong>. P=5→25%, P=6→36%, P=7→49%. Las diferencias entre salidas (11, 13) siguen creciendo — esa es la señal de una función no lineal.',
+  },
+  {
+    n: 12,
+    text: 'Estadísticas del equipo: SPEED = 8, ENDURANCE = 6, TURNING = 2. Presupuesto = 20. Encuentra la estadística POWER.',
+    correctTag: 'ratio',
+    answer: 4, unit: '', decimals: 0,
+    working: 'P = 20 − 8 − 6 − 2 = 4',
+    tagWhy: 'La restricción de presupuesto es un problema de <strong>razón</strong> — estás encontrando qué porción de 20 puntos queda después de que tres estadísticas ya reclamaron su parte.',
+  },
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+const state = {
+  selected: Array(12).fill(null),
+  checked:  Array(12).fill(false),
+  tagOk:    Array(12).fill(false),
+  ansOk:    Array(12).fill(false),
+};
+
+// ── Render legend ─────────────────────────────────────────────────────
+function renderLegend() {
+  const grid = document.getElementById('legendGrid');
+  grid.innerHTML = TAGS.map(tag => `
+    <div class="legend-chip" style="border-color:${tag.color}22; background:${tag.color}0d;">
+      <div class="lc-dot" style="background:${tag.color};"></div>
+      <div>
+        <span class="lc-label" style="color:${tag.color};">${tag.label}</span>
+        <span class="lc-desc">${tag.desc}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── Render problems ───────────────────────────────────────────────────
+function renderProblems() {
+  const container = document.getElementById('problemContainer');
+  container.innerHTML = PROBLEMS.map((p, i) => {
+    const chipsHTML = TAGS.map(tag => `
+      <button class="tag-chip" id="chip_${i}_${tag.id}"
+        onclick="selectTag(${i}, '${tag.id}')"
+        style="--tag-color:${tag.color};">
+        ${tag.label}
+      </button>`).join('');
+
+    return `
+      <div class="problem-card" id="card${i}">
+        <div class="problem-header">
+          <div class="prob-num">${p.n}</div>
+          <div class="prob-text">${p.text}</div>
+        </div>
+        <div class="tag-section-label">Paso 1 — Etiqueta de Concepto</div>
+        <div class="tag-grid">${chipsHTML}</div>
+        <div class="answer-row">
+          <span class="answer-label">Paso 2 — Respuesta:</span>
+          <input class="answer-input" type="number" step="any"
+            id="ans${i}" placeholder="tu respuesta"
+            onkeydown="if(event.key==='Enter') checkProblem(${i})">
+          <button class="check-btn" id="checkBtn${i}" onclick="checkProblem(${i})">Verificar</button>
+        </div>
+        <div class="feedback" id="fb${i}"></div>
+      </div>`;
+  }).join('');
+}
+
+// ── Select tag ────────────────────────────────────────────────────────
+function selectTag(pi, tagId) {
+  if (state.checked[pi]) return;
+  state.selected[pi] = tagId;
+  TAGS.forEach(tag => {
+    const chip = document.getElementById(`chip_${pi}_${tag.id}`);
+    if (tag.id === tagId) {
+      chip.classList.add('selected');
+      chip.style.background = tag.color + '28';
+      chip.style.borderColor = tag.color;
+      chip.style.color = tag.color;
+    } else {
+      chip.classList.remove('selected');
+      chip.style.background = '';
+      chip.style.borderColor = '';
+      chip.style.color = '';
+    }
+  });
+}
+
+// ── Check problem ─────────────────────────────────────────────────────
+function checkProblem(pi) {
+  PROBLEMS.forEach((_, i) => {
+    if (i !== pi) {
+      const fb = document.getElementById('fb'+i);
+      if (fb) fb.className = 'feedback';
+    }
+  });
+
+  const p = PROBLEMS[pi];
+  const selectedTag = state.selected[pi];
+  const ansVal = parseFloat(document.getElementById('ans'+pi).value);
+
+  if (!selectedTag) { showShake('card'+pi, 'Selecciona primero una etiqueta de concepto.'); return; }
+  if (isNaN(ansVal)) { showShake('card'+pi, 'Ingresa tu respuesta primero.'); return; }
+
+  const tol = p.decimals > 0 ? 0.005 : 0.5;
+  const tagOk = selectedTag === p.correctTag;
+  const ansOk = Math.abs(ansVal - p.answer) <= tol;
+
+  state.checked[pi]  = true;
+  state.tagOk[pi]    = tagOk;
+  state.ansOk[pi]    = ansOk;
+
+  document.getElementById('ans'+pi).disabled = true;
+  document.getElementById('checkBtn'+pi).disabled = true;
+  TAGS.forEach(tag => document.getElementById(`chip_${pi}_${tag.id}`).disabled = true);
+
+  const ainp = document.getElementById('ans'+pi);
+  ainp.classList.add(ansOk ? 'correct' : 'wrong');
+
+  const correctTagObj = TAGS.find(t => t.id === p.correctTag);
+  TAGS.forEach(tag => {
+    const chip = document.getElementById(`chip_${pi}_${tag.id}`);
+    chip.style.background = '';
+    chip.style.borderColor = '';
+    chip.style.color = '';
+    chip.classList.remove('selected');
+    if (tag.id === p.correctTag) {
+      chip.classList.add('result-correct');
+      chip.style.background = tag.color + '28';
+      chip.style.borderColor = tag.color;
+      chip.style.color = tag.color;
+    } else if (tag.id === selectedTag && !tagOk) {
+      chip.classList.add('result-wrong');
+    }
+  });
+
+  const fb = document.getElementById('fb'+pi);
+  fb.innerHTML = '';
+  fb.className = 'feedback visible';
+
+  if (tagOk && ansOk) {
+    fb.classList.add('both-ok');
+    fb.innerHTML = `
+      <div class="fb-row"><span class="fb-icon">✓</span><span class="fb-text"><strong style="color:var(--green);">Ambos correctos.</strong> Etiqueta: <strong>${p.correctTag}</strong> · ${p.working}</span></div>`;
+    document.getElementById('card'+pi).classList.add('checked-ok');
+
+  } else if (!tagOk && ansOk) {
+    const wrongTagObj = TAGS.find(t => t.id === selectedTag);
+    fb.classList.add('tag-wrong');
+    fb.innerHTML = `
+      <div class="fb-row"><span class="fb-icon">✓</span><span class="fb-text"><strong style="color:var(--green);">Cálculo correcto</strong> — ${p.working}</span></div>
+      <div class="fb-row" style="margin-top:8px;"><span class="fb-icon">✗</span><span class="fb-text"><strong style="color:var(--orange);">Etiqueta de concepto incorrecta.</strong> Elegiste <em>${wrongTagObj.label}</em>. ${p.tagWhy}</span></div>`;
+    document.getElementById('card'+pi).classList.add('checked-mixed');
+
+  } else if (tagOk && !ansOk) {
+    fb.classList.add('answer-wrong');
+    fb.innerHTML = `
+      <div class="fb-row"><span class="fb-icon">✓</span><span class="fb-text"><strong style="color:var(--green);">Etiqueta correcta: ${p.correctTag}</strong></span></div>
+      <div class="fb-row" style="margin-top:8px;"><span class="fb-icon">✗</span><span class="fb-text"><strong style="color:var(--red);">Respuesta incorrecta.</strong> Revisa tu aritmética.</span></div>
+      <div class="working">Procedimiento: ${p.working}</div>`;
+    document.getElementById('card'+pi).classList.add('checked-mixed');
+
+  } else {
+    const wrongTagObj = TAGS.find(t => t.id === selectedTag);
+    fb.classList.add('both-wrong');
+    fb.innerHTML = `
+      <div class="fb-row"><span class="fb-icon">✗</span><span class="fb-text"><strong style="color:var(--red);">Etiqueta incorrecta.</strong> ${p.tagWhy}</span></div>
+      <div class="fb-row" style="margin-top:8px;"><span class="fb-icon">✗</span><span class="fb-text"><strong style="color:var(--red);">Respuesta incorrecta.</strong></span></div>
+      <div class="working">Procedimiento: ${p.working}</div>`;
+    document.getElementById('card'+pi).classList.add('checked-fail');
+  }
+
+  updateProgress();
+}
+
+// ── Shake / alert helper ──────────────────────────────────────────────
+function showShake(id, msg) {
+  const el = document.getElementById(id);
+  el.style.borderColor = 'var(--red)';
+  setTimeout(() => el.style.borderColor = '', 800);
+}
+
+// ── Progress update ───────────────────────────────────────────────────
+function updateProgress() {
+  const done = state.checked.filter(Boolean).length;
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('pcFill').style.width = (done / 12 * 100) + '%';
+
+  if (done === 12) {
+    const tagScore = state.tagOk.filter(Boolean).length;
+    const ansScore = state.ansOk.filter(Boolean).length;
+    const card = document.getElementById('scoreCard');
+    card.classList.add('visible');
+    document.getElementById('scoreTagNum').textContent = tagScore + ' / 12';
+    document.getElementById('scoreAnsNum').textContent = ansScore + ' / 12';
+
+    let summary = '';
+    if (tagScore === 12 && ansScore === 12) {
+      summary = 'Las 12 etiquetas de concepto correctas y las 12 respuestas correctas. Estándar mínimo alcanzado — procede a Confirmar Asignación.';
+    } else if (tagScore < 12) {
+      const missed = PROBLEMS.filter((_, i) => !state.tagOk[i]).map(p => '#' + p.n).join(', ');
+      summary = `Errores de etiqueta en el problema${missed.includes(',') ? 's' : ''} ${missed}. Revisa esas definiciones de concepto antes de confirmar tu asignación.`;
+    }
+    document.getElementById('scoreSummaryText').textContent = summary;
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+renderLegend();
+renderProblems();
+</script>
+</body>
+</html>

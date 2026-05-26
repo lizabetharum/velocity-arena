@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloque de Análisis — Temporada 1</title>
+<link rel="icon" href="/images/first.ico">
+<link rel="stylesheet" href="/styles/va-tokens.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0d1b2a;
+  --surface: #132033;
+  --card:    #1a2d45;
+  --border:  #2a4060;
+  --cyan:    #00e5ff;
+  --cyan-bright: #3decff;
+  --cyan-deep:   #00b4c9;
+  --cyan-tint:   rgba(0,229,255,0.10);
+  --cyan-line:   rgba(0,229,255,0.32);
+  --yellow:  #ffd600;
+  --green:   #00e676;
+  --red:     #ff5252;
+  --orange:  #ff9100;
+  --text:    #e8f0fe;
+  --fg-1:    #b9c4d2;
+  --muted:   #7a9cc0;
+  --dim:     #455367;
+  --line:    rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.14);
+  --r: 10px;
+  --r-lg: 14px;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.va-label   { font: 600 15px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; }
+.va-mono    { font: 500 15px/1 var(--font-mono); }
+.va-mono-xl { font: 500 28px/1 var(--font-mono); }
+.va-h2      { font: 700 28px/1.15 var(--font-sans); letter-spacing: -.01em; }
+.va-h3      { font: 600 20px/1.4 var(--font-sans); }
+.va-body-s  { font: 400 15px/1.5 var(--font-sans); }
+
+.va-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+  border: none; border-radius: 8px; padding: 10px 20px;
+  cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+  letter-spacing: .01em; white-space: nowrap; line-height: 1;
+  text-decoration: none;
+}
+.va-btn--primary { background: var(--cyan); color: #0d1b2a; }
+.va-btn--primary:hover { background: var(--cyan-bright); }
+.va-btn--primary:active { background: var(--cyan-deep); }
+.va-btn--secondary {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line-strong);
+}
+.va-btn--secondary:hover { background: var(--card); border-color: rgba(255,255,255,.22); }
+.va-btn--ghost {
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--border);
+}
+.va-btn--ghost:hover { background: var(--surface); color: var(--text); }
+.va-btn--sm { font-size: 15px; padding: 7px 12px; }
+
+.va-input, input[type="number"], input[type="text"], textarea, select {
+  font-family: var(--font-sans); font-size: 15px; font-weight: 500;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  padding: 9px 12px; width: 100%; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.va-input:focus, input[type="number"]:focus, input[type="text"]:focus, textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px var(--cyan-tint);
+}
+input::placeholder, textarea::placeholder { color: var(--dim); }
+textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-strong);
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 0 12px;
+}
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; min-width: 0;
+}
+.header-badge {
+  background: var(--cyan); color: #0d1b2a;
+  font: 700 15px/1 var(--font-sans);
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 4px; flex-shrink: 0;
+}
+.header-text-title {
+  font: 700 16px/1 var(--font-sans);
+  letter-spacing: -.01em; color: var(--text);
+}
+.header-text-sub {
+  font: 500 15px/1 var(--font-mono);
+  color: var(--muted); margin-top: 3px;
+}
+.header-cyan-rule {
+  height: 1px; background: var(--cyan-line);
+}
+
+.timer-group {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.timer-wrap { text-align: right; }
+.timer-eyebrow { font: 600 15px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.timer-digits {
+  font: 500 30px/1 var(--font-mono);
+  color: var(--text); letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+}
+.timer-digits.warn  { color: var(--yellow); }
+.timer-digits.crit  { color: var(--red); animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.phase-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-strong);
+  display: flex; padding: 0 24px; gap: 0;
+}
+.phase-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 11px 18px; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font: 600 15px/1 var(--font-sans);
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); transition: color .15s, border-color .15s;
+  user-select: none;
+}
+.phase-tab:hover { color: var(--fg-1); }
+.phase-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.phase-tab.done   { color: var(--dim); }
+.phase-pip {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font: 700 15px/1 var(--font-sans); color: var(--muted);
+  flex-shrink: 0; transition: background .15s, border-color .15s;
+}
+.phase-tab.active .phase-pip {
+  background: var(--cyan); border-color: var(--cyan); color: #0d1b2a;
+}
+.phase-tab.done .phase-pip {
+  background: transparent; border-color: var(--green);
+}
+.phase-sep { color: var(--border); display: flex; align-items: center; padding: 0 2px; font-size: 15px; }
+
+.main { padding: 28px 24px 80px; max-width: 860px; margin: 0 auto; }
+
+.phase-panel { display: none; }
+.phase-panel.active { display: block; }
+
+.phase-header {
+  display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;
+}
+.phase-icon {
+  width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-cyan   { background: var(--cyan-tint); border: 1px solid var(--cyan-line); color: var(--cyan); }
+.icon-yellow { background: rgba(255,214,0,.10); border: 1px solid rgba(255,214,0,.30); color: var(--yellow); }
+.icon-green  { background: rgba(0,230,118,.10); border: 1px solid rgba(0,230,118,.30); color: var(--green); }
+
+.phase-head-text h1 {
+  font: 800 30px/1 var(--font-sans); letter-spacing: -.02em;
+  color: var(--text); margin-bottom: 4px;
+}
+.phase-head-text p { font: 400 15px/1.5 var(--font-sans); color: var(--muted); }
+.time-chip {
+  margin-left: auto; flex-shrink: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px;
+  font: 600 15px/1 var(--font-mono); color: var(--muted); white-space: nowrap;
+}
+
+.card {
+  background: var(--card); border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg); padding: 18px 20px; margin-bottom: 14px;
+}
+.card-title {
+  display: flex; align-items: center; gap: 7px;
+  font: 700 15px/1 var(--font-sans); letter-spacing: .14em;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 14px;
+}
+.card-title.yellow { color: var(--yellow); }
+.card-title.green  { color: var(--green); }
+.card-title svg { flex-shrink: 0; }
+
+.instruction {
+  background: var(--surface); border-left: 3px solid var(--cyan);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 13px 16px; margin-bottom: 14px;
+  font: 400 15px/1.7 var(--font-sans); color: var(--text);
+}
+.instruction.yellow { border-left-color: var(--yellow); }
+.instruction.green  { border-left-color: var(--green); }
+
+.error-grid { display: flex; flex-direction: column; gap: 8px; }
+.error-row {
+  display: grid;
+  grid-template-columns: 86px 80px;
+  gap: 8px; align-items: center;
+}
+.error-header {
+  font: 600 15px/1 var(--font-sans); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--dim); padding: 0 4px;
+}
+input.match-tag {
+  background: var(--surface); border-color: var(--border);
+  font: 600 15px/1 var(--font-mono); color: var(--muted);
+  text-align: center; pointer-events: none;
+}
+input.error-val { text-align: center; font: 600 15px/1 var(--font-mono); }
+
+.add-row-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 9px;
+  background: transparent; border: 1px dashed var(--border);
+  border-radius: 8px; color: var(--muted);
+  font: 600 15px/1 var(--font-sans); letter-spacing: .06em;
+  cursor: pointer; transition: all .15s; margin-top: 4px;
+}
+.add-row-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-tint); }
+
+.calc-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 14px; }
+.calc-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px; text-align: center;
+}
+.calc-box-label { font: 500 15px/1 var(--font-mono); color: var(--muted); margin-bottom: 8px; letter-spacing: .04em; }
+.calc-box-value {
+  font: 500 30px/1 var(--font-mono); color: var(--text);
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+  min-height: 32px; display: flex; align-items: center; justify-content: center;
+}
+.val-positive { color: var(--red); }
+.val-negative { color: var(--cyan); }
+.val-zero     { color: var(--green); }
+
+.tile-row { display: grid; gap: 10px; margin-top: 10px; }
+.tile-row-3 { grid-template-columns: repeat(3,1fr); }
+.tile-row-2 { grid-template-columns: repeat(2,1fr); }
+
+.tile {
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 14px 10px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s; user-select: none;
+  background: var(--surface);
+}
+.tile:hover { border-color: var(--line-strong); }
+.tile.selected { border-color: var(--cyan-line); background: var(--cyan-tint); }
+.tile-icon { margin-bottom: 6px; display: flex; justify-content: center; }
+.tile-icon svg { color: var(--muted); }
+.tile.selected .tile-icon svg { color: var(--cyan); }
+.tile-word { font: 700 15px/1 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tile.selected .tile-word { color: var(--cyan); }
+.tile-desc { font: 400 15px/1.4 var(--font-sans); color: var(--dim); margin-top: 4px; }
+
+.coach-box {
+  background: rgba(255,145,0,.07); border: 1px solid rgba(255,145,0,.25);
+  border-radius: var(--r); padding: 14px 16px; margin-top: 12px;
+}
+.coach-title {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  font: 700 15px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--orange);
+}
+.coach-box p { font: 400 15px/1.7 var(--font-sans); color: var(--muted); }
+.coach-box p + p { margin-top: 6px; }
+.coach-box strong { color: var(--text); }
+
+.quality-row {
+  display: flex; align-items: center; gap: 10px; margin-top: 16px;
+}
+.quality-label { font: 600 15px/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.quality-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.quality-fill { height: 100%; border-radius: 2px; width: 0%; transition: width .4s, background .4s; background: var(--red); }
+.quality-val { font: 500 15px/1 var(--font-mono); min-width: 72px; text-align: right; color: var(--muted); }
+
+.top3-grid { display: flex; flex-direction: column; gap: 10px; }
+.top3-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 14px;
+  display: grid; grid-template-columns: 26px 1fr 1fr; gap: 10px; align-items: center;
+}
+.rank-badge {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,82,82,.12); border: 1px solid rgba(255,82,82,.3);
+  color: var(--red); font: 700 15px/1 var(--font-sans);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.field-label { font: 600 15px/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+
+.sentence-builder {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 18px;
+}
+.sentence-line {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: 6px; font: 600 16px/1.9 var(--font-sans); color: var(--text);
+}
+.s-fixed { color: var(--muted); }
+.s-select {
+  font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text);
+  padding: 3px 22px 3px 8px; cursor: pointer; outline: none;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M4 5L0 0h8z' fill='%237a9cc0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+  transition: border-color .15s;
+}
+.s-select:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cyan-tint); }
+.s-fill {
+  font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text); padding: 3px 8px;
+  width: 180px; display: inline-block; outline: none;
+  transition: border-color .15s;
+}
+.s-fill:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cyan-tint); }
+
+.pattern-hint {
+  display: none; align-items: flex-start; gap: 8px; margin-top: 10px;
+  background: var(--cyan-tint); border: 1px solid var(--cyan-line);
+  border-radius: var(--r); padding: 10px 12px;
+  font: 400 15px/1.6 var(--font-sans); color: var(--text);
+}
+.pattern-hint svg { flex-shrink: 0; color: var(--cyan); margin-top: 1px; }
+
+.eq-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 18px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.eq-eyebrow { font: 600 15px/1 var(--font-mono); color: var(--muted); letter-spacing: .04em; flex-shrink: 0; }
+.eq-formula { font: 600 20px/1 var(--font-mono); color: var(--green); letter-spacing: .02em; flex-shrink: 0; }
+.eq-fields { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.eq-connector { font: 500 15px/1 var(--font-mono); color: var(--muted); }
+.eq-input { width: 68px; text-align: center; padding: 8px 6px; font: 600 15px/1 var(--font-mono) !important; }
+
+.result-strip {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+  margin-bottom: 14px;
+}
+
+.hypo-builder {
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.hypo-row {
+  display: grid; grid-template-columns: 28px 1fr; gap: 14px;
+  padding: 15px 18px; border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.hypo-row:last-child { border-bottom: none; }
+.hypo-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); font: 700 15px/1 var(--font-sans);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  transition: all .2s;
+}
+.hypo-num.filled {
+  background: var(--cyan-tint); border-color: var(--cyan-line); color: var(--cyan);
+}
+.hypo-field-label { font: 600 15px/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.hypo-auto {
+  font: 600 16px/1.5 var(--font-sans); color: var(--cyan);
+  font-variant-numeric: tabular-nums; padding: 4px 0; display: none;
+}
+.hypo-placeholder {
+  display: flex; align-items: center; gap: 6px;
+  font: 500 15px/1 var(--font-sans); color: var(--dim);
+}
+.hypo-placeholder svg { flex-shrink: 0; }
+
+.hypo-preview {
+  background: rgba(0,230,118,.07); border: 1px solid rgba(0,230,118,.3);
+  border-radius: var(--r-lg); padding: 20px 22px; margin-top: 16px; display: none;
+}
+.hypo-preview-title {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+  font: 700 15px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--green);
+}
+.hypo-preview-text {
+  font: 400 16px/1.8 var(--font-sans); color: var(--text);
+}
+.hypo-preview-text strong { color: var(--cyan); font-weight: 700; }
+
+.info-row {
+  display: flex; align-items: flex-start; gap: 7px; margin-top: 8px;
+  font: 400 15px/1.6 var(--font-sans); color: var(--muted);
+}
+.info-row svg { flex-shrink: 0; color: var(--muted); margin-top: 1px; }
+
+.phase-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+}
+.phase-footer > *:only-child { margin-left: auto; }
+
+hr.divider { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+.data-ref {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); margin-bottom: 16px; overflow: hidden;
+}
+.data-ref-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+}
+.data-ref-header-left {
+  display: flex; align-items: center; gap: 8px;
+  font: 700 15px/1 var(--font-sans); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted);
+}
+.data-ref-toggle {
+  font: 500 15px/1 var(--font-mono); color: var(--cyan);
+  transition: opacity .15s;
+}
+.data-ref-body { padding: 10px 14px 12px; }
+.data-ref-table { width: 100%; border-collapse: collapse; }
+.data-ref-table th {
+  font: 600 15px/1 var(--font-sans); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--dim); text-align: left;
+  padding: 0 8px 7px 0;
+}
+.data-ref-table td {
+  font: 500 15px/1 var(--font-mono); color: var(--fg-1);
+  padding: 4px 8px 4px 0; border-top: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.data-ref-table td:first-child { color: var(--muted); }
+.data-ref-table td.val-positive { color: var(--red); font-weight: 700; }
+.data-ref-table td.val-negative { color: var(--cyan); font-weight: 700; }
+.data-ref-table td.val-zero     { color: var(--green); font-weight: 700; }
+.data-ref-summary {
+  display: flex; gap: 16px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.data-ref-stat {
+  font: 500 15px/1 var(--font-mono); color: var(--muted);
+}
+.data-ref-stat strong { color: var(--text); font-weight: 700; }
+
+@media (max-width: 580px) {
+  .calc-strip, .result-strip { grid-template-columns: 1fr; }
+  .tile-row-3 { grid-template-columns: 1fr; }
+  .error-row { grid-template-columns: 70px 80px; }
+  .top3-row { grid-template-columns: 26px 1fr; }
+}
+
+.residual-strip { display:flex; flex-direction:column; gap:5px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line); }
+.residual-row { display:flex; align-items:center; gap:8px; }
+.residual-label { font:500 12px/1 var(--font-mono); color:var(--muted); width:76px; flex-shrink:0; text-align:right; }
+.residual-val   { font:600 12px/1 var(--font-mono); width:44px; flex-shrink:0; text-align:right; }
+.residual-track { flex:1; height:10px; background:var(--border); border-radius:3px; overflow:hidden; min-width:0; }
+.residual-bar   { height:100%; border-radius:3px; transition:width .3s; }
+
+.pred-btn {
+  font:700 14px/1 var(--font-sans); padding:10px 18px;
+  border:1px solid var(--border); border-radius:8px;
+  background:var(--surface); color:var(--muted); cursor:pointer;
+  transition:all .15s; letter-spacing:.04em;
+}
+.pred-btn:hover { border-color:var(--line-strong); color:var(--text); }
+.pred-btn.selected { border-color:var(--green); background:rgba(0,230,118,.10); color:var(--green); }
+
+.block-warn {
+  background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.3);
+  border-radius:var(--r); padding:10px 14px; margin-top:8px;
+  font:400 14px/1.6 var(--font-sans); color:var(--red);
+}
+
+.gated { opacity:.4; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<!-- ── SVG ICON DEFS (inline, zero-size) ── -->
+<svg width="0" height="0" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="ico-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="4" height="9" rx="1.5"/>
+      <rect x="10" y="6" width="4" height="14" rx="1.5"/>
+      <rect x="17" y="3" width="4" height="17" rx="1.5"/>
+    </symbol>
+    <symbol id="ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/>
+      <line x1="21" y1="21" x2="16" y2="16"/>
+    </symbol>
+    <symbol id="ico-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/>
+    </symbol>
+    <symbol id="ico-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <polyline points="12 7 12 12 15 14"/>
+    </symbol>
+    <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 7 9 18 4 13"/>
+    </symbol>
+    <symbol id="ico-pass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="4"/>
+      <polyline points="8 12 11 15 16 9"/>
+    </symbol>
+    <symbol id="ico-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="3 17 9 11 13 15 21 7"/>
+      <polyline points="15 7 21 7 21 13"/>
+    </symbol>
+    <symbol id="ico-run" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="6 4 20 12 6 20 6 4"/>
+    </symbol>
+    <symbol id="ico-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="5" width="4" height="14" rx="1.5"/>
+      <rect x="14" y="5" width="4" height="14" rx="1.5"/>
+    </symbol>
+    <symbol id="ico-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 6 15 12 9 18"/>
+    </symbol>
+    <symbol id="ico-levels" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 7l9-4 9 4-9 4-9-4z"/>
+      <path d="M3 12l9 4 9-4"/>
+      <path d="M3 17l9 4 9-4"/>
+    </symbol>
+    <symbol id="ico-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="3"/>
+      <line x1="3" y1="9" x2="21" y2="9"/>
+    </symbol>
+    <symbol id="ico-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/>
+    </symbol>
+    <symbol id="ico-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <line x1="12" y1="8" x2="12" y2="8"/>
+      <line x1="12" y1="12" x2="12" y2="16"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ── ENCABEZADO ── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-badge">Día 10</div>
+      <div>
+        <div class="header-text-title">Bloque de Análisis — Temporada 1</div>
+        <div class="header-text-sub">Temporada 1 · Bloque de Análisis · 25 min</div>
+      </div>
+    </div>
+
+    <div class="timer-group">
+      <div class="timer-wrap">
+        <div class="timer-eyebrow">Tiempo Restante</div>
+        <div class="timer-digits va-mono-xl" id="timerDisplay">25:00</div>
+      </div>
+      <button class="va-btn va-btn--ghost va-btn--sm" id="timerBtn" onclick="toggleTimer()">
+        <svg width="14" height="14"><use href="#ico-run"/></svg>
+        <span id="timerBtnLabel">Iniciar</span>
+      </button>
+      <button class="va-btn va-btn--ghost va-btn--sm" onclick="resetTimer()" title="Reiniciar temporizador">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="header-cyan-rule"></div>
+</header>
+
+<!-- ── NAV DE FASES ── -->
+<nav class="phase-nav" id="phaseNav">
+  <div class="phase-tab active" id="tab-a" onclick="goToPhase('a')">
+    <div class="phase-pip" id="pip-a">1</div>
+    Calcular
+  </div>
+  <div class="phase-sep">›</div>
+  <div class="phase-tab" id="tab-b" onclick="goToPhase('b')">
+    <div class="phase-pip" id="pip-b">2</div>
+    Identificar
+  </div>
+  <div class="phase-sep">›</div>
+  <div class="phase-tab" id="tab-c" onclick="goToPhase('c')">
+    <div class="phase-pip" id="pip-c">3</div>
+    Construir Hipótesis
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- ══════════════════════════════════
+       FASE A
+  ══════════════════════════════════ -->
+  <section class="phase-panel active" id="panel-a">
+
+    <div class="phase-header">
+      <div class="phase-icon icon-cyan">
+        <svg width="24" height="24"><use href="#ico-stats"/></svg>
+      </div>
+      <div class="phase-head-text">
+        <h1>Tus Datos de la Temporada 1</h1>
+        <p>Ingresa tus valores de Error y luego responde tres preguntas sobre el patrón.</p>
+      </div>
+      <div class="time-chip">
+        <svg width="12" height="12" style="vertical-align:-1px;margin-right:4px"><use href="#ico-timer"/></svg>
+        8–10 min
+      </div>
+    </div>
+
+    <div class="instruction">
+      Agrega los partidos de hoy a la auditoría del Ronda 1 anterior. Ahora tienes el campo de Error completo de la Temporada 1.<br><br>
+      <strong>Error = Goles Predichos − Goles Reales.</strong> Positivo = sobrepredicción. Negativo = subpredicción.
+    </div>
+
+    <!-- ELL GRAPHIC 1: Error concept visual -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:14px;">
+      <div style="font:600 13px/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">¿Qué es el Error?</div>
+      <svg viewBox="0 0 620 148" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:620px;display:block;margin:0 auto;" aria-label="Diagrama de Error: Predicho menos Real igual a Error">
+        <!-- ── IZQUIERDA: sobrepredicción ── -->
+        <text x="152" y="9" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#455367" letter-spacing=".08em">EJEMPLO 1 — PREDICCIÓN DEMASIADO ALTA</text>
+        <rect x="18" y="20" width="46" height="82" rx="5" fill="rgba(0,229,255,0.18)" stroke="#00e5ff" stroke-width="1.5"/>
+        <text x="41" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00e5ff" letter-spacing=".06em">PREDICHO</text>
+        <text x="41" y="66" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="600" fill="#00e5ff">7</text>
+        <text x="41" y="119" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">goles</text>
+        <text x="83" y="72" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="700" fill="#455367">−</text>
+        <rect x="102" y="38" width="46" height="64" rx="5" fill="rgba(0,230,118,0.15)" stroke="#00e676" stroke-width="1.5"/>
+        <text x="125" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00e676" letter-spacing=".06em">REAL</text>
+        <text x="125" y="75" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="600" fill="#00e676">5</text>
+        <text x="125" y="119" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">goles</text>
+        <text x="168" y="72" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="700" fill="#455367">=</text>
+        <rect x="186" y="28" width="88" height="64" rx="7" fill="rgba(255,82,82,0.12)" stroke="#ff5252" stroke-width="1.5"/>
+        <text x="230" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#ff5252" letter-spacing=".06em">ERROR</text>
+        <text x="230" y="67" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#ff5252">+2</text>
+        <text x="230" y="104" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#ff5252">sobrepredicción</text>
+        <text x="230" y="130" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">el bot anotó MENOS de lo esperado</text>
+
+        <!-- ── DIVISOR ── -->
+        <line x1="304" y1="8" x2="304" y2="138" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+        <!-- ── DERECHA: subpredicción ── -->
+        <text x="464" y="9" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#455367" letter-spacing=".08em">EJEMPLO 2 — PREDICCIÓN DEMASIADO BAJA</text>
+        <rect x="318" y="38" width="46" height="64" rx="5" fill="rgba(0,229,255,0.10)" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="341" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00e5ff" letter-spacing=".06em">PREDICHO</text>
+        <text x="341" y="75" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="600" fill="#00e5ff">3</text>
+        <text x="341" y="119" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">goles</text>
+        <text x="383" y="72" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="700" fill="#455367">−</text>
+        <rect x="402" y="20" width="46" height="82" rx="5" fill="rgba(0,230,118,0.12)" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="425" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00e676" letter-spacing=".06em">REAL</text>
+        <text x="425" y="66" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="22" font-weight="600" fill="#00e676">5</text>
+        <text x="425" y="119" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">goles</text>
+        <text x="468" y="72" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="700" fill="#455367">=</text>
+        <rect x="486" y="28" width="116" height="64" rx="7" fill="rgba(0,229,255,0.10)" stroke="#00e5ff" stroke-width="1.5"/>
+        <text x="544" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#00e5ff" letter-spacing=".06em">ERROR</text>
+        <text x="544" y="67" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="24" font-weight="700" fill="#00e5ff">−2</text>
+        <text x="544" y="96" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00e5ff">subpredicción</text>
+        <text x="544" y="109" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#00e5ff">(número negativo)</text>
+        <text x="544" y="130" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#7a9cc0">el bot anotó MÁS de lo esperado</text>
+      </svg>
+    </div>
+
+    <!-- Ingreso de errores -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="14" height="14"><use href="#ico-stats"/></svg>
+        Valores de Error — Temporada 1 — Todos los Partidos
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;">
+        <div style="flex:0 0 auto;">
+          <div class="error-grid" id="errorGrid">
+            <div class="error-row" style="margin-bottom:2px;">
+              <div class="error-header">Partido</div>
+              <div class="error-header">Error</div>
+            </div>
+          </div>
+          <button class="add-row-btn" id="addRowBtn" onclick="addExtraRow()" style="width:174px;margin-top:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Agregar partido
+          </button>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:8px;">
+          <img src="/images/cutebot/bot.png" alt="Bot de Velocity Arena" style="width:300px;opacity:0.92;display:block;margin:0 auto;filter:drop-shadow(0 4px 16px rgba(0,229,255,0.15));">
+        </div>
+      </div>
+      <div class="info-row" style="margin-top:10px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        Error = Predicho − Real. Mantén los negativos negativos. Predicho 5, anotó 7 → Error = −2. Deja en blanco las filas que no uses.
+      </div>
+      <!-- Franja de magnitud residual — ítem 3 -->
+      <div class="residual-strip" id="residualStrip" style="display:none;">
+        <div style="font:600 12px/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;">Magnitud del Error — Rojo = sobrepredicción · Cian = subpredicción</div>
+      </div>
+    </div>
+
+    <!-- Resultado del Paso 1 -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="14" height="14"><use href="#ico-stats"/></svg>
+        Paso 1 — Error Promedio de la Temporada
+      </div>
+      <div class="calc-strip">
+        <div class="calc-box">
+          <div class="calc-box-label">Suma de Errores</div>
+          <div class="calc-box-value va-mono-xl" id="sumDisplay">—</div>
+        </div>
+        <div class="calc-box">
+          <div class="calc-box-label">N.º de Partidos</div>
+          <div class="calc-box-value va-mono-xl" id="countDisplay">—</div>
+        </div>
+        <div class="calc-box">
+          <div class="calc-box-label">Error Promedio — Sesgo</div>
+          <div class="calc-box-value va-mono-xl" id="avgDisplay">—</div>
+          <div style="font:400 12px/1.4 var(--font-sans);color:var(--muted);margin-top:8px;">indica si tu modelo suele predecir de más o de menos. No lo llames "precisión."</div>
+        </div>
+      </div>
+      <div class="info-row" style="margin-top:12px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        <span><strong style="color:var(--red);">Mantén los negativos negativos.</strong> No conviertas todos los errores a positivos al calcular el promedio. El error promedio mide el sesgo — eliminar el signo destruye el significado.</span>
+      </div>
+      <div class="info-row" style="margin-top:6px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        <span><strong>Advertencia de cancelación:</strong> +4 y −4 promedian 0, pero ambos fueron errores grandes. Usa también la tendencia y los errores más grandes — el error promedio solo puede ocultar un modelo deficiente.</span>
+      </div>
+    </div>
+
+    <!-- Paso 2 — Signo -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="14" height="14"><use href="#ico-levels"/></svg>
+        Paso 2 — Signo del Error Promedio
+      </div>
+      <div class="instruction" style="margin-bottom:0;">
+        Basándote en el promedio anterior — elige uno.
+      </div>
+      <div class="tile-row tile-row-3" style="margin-top:12px;">
+        <div class="tile" id="sign-positive" onclick="selectSign('positive')">
+          <div class="tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+          </div>
+          <div class="tile-word">Positivo</div>
+          <div class="tile-desc">Sobrepredicción consistente</div>
+        </div>
+        <div class="tile" id="sign-negative" onclick="selectSign('negative')">
+          <div class="tile-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7 9 13 13 9 21 17"/><polyline points="15 17 21 17 21 11"/></svg>
+          </div>
+          <div class="tile-word">Negativo</div>
+          <div class="tile-desc">Subpredicción consistente</div>
+        </div>
+        <div class="tile" id="sign-zero" onclick="selectSign('zero')">
+          <div class="tile-icon">
+            <svg width="22" height="22"><use href="#ico-card"/></svg>
+          </div>
+          <div class="tile-word">Cerca de Cero</div>
+          <div class="tile-desc">La predicción estuvo balanceada</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 3 — Tendencia -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="14" height="14"><use href="#ico-trend"/></svg>
+        Paso 3 — Tendencia del Error en la Temporada
+      </div>
+      <div class="instruction" style="margin-bottom:12px;">
+        Compara el <strong>tamaño</strong> de tu primer Error del Día 7 con el <strong>tamaño</strong> de tu último Error de hoy. Ignora los signos + o − — solo importa la magnitud.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <div class="field-label">Tamaño del primer Error (Día 7 · R1) — sin signo negativo</div>
+          <input type="number" id="trend-first-abs" placeholder="ej. 3.5" step="0.1" min="0" oninput="updateTrendInputs()">
+        </div>
+        <div>
+          <div class="field-label">Tamaño del último Error (Hoy · R3) — sin signo negativo</div>
+          <input type="number" id="trend-last-abs" placeholder="ej. 1.2" step="0.1" min="0" oninput="updateTrendInputs()">
+        </div>
+      </div>
+      <div class="info-row" style="margin-bottom:10px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        Ingresa solo el tamaño — siempre positivo. Si tu error fue −3.5, escribe 3.5.
+      </div>
+      <div id="trendTilesWrap" style="display:none;">
+      <div style="font:600 14px/1 var(--font-sans);color:var(--muted);margin-bottom:10px;">¿El tamaño del error está disminuyendo, permanece igual o está aumentando?</div>
+      <div class="tile-row tile-row-3">
+        <div class="tile" id="trend-improving" onclick="selectTrend('improving')">
+          <div class="tile-icon">
+            <svg width="44" height="28" viewBox="0 0 44 28" xmlns="http://www.w3.org/2000/svg" aria-label="Barras que se acortan">
+              <rect x="2"  y="4"  width="6" height="22" rx="2" fill="currentColor" opacity=".9"/>
+              <rect x="11" y="9"  width="6" height="17" rx="2" fill="currentColor" opacity=".75"/>
+              <rect x="20" y="14" width="6" height="12" rx="2" fill="currentColor" opacity=".6"/>
+              <rect x="29" y="18" width="6" height="8"  rx="2" fill="currentColor" opacity=".45"/>
+              <rect x="38" y="22" width="6" height="4"  rx="2" fill="currentColor" opacity=".3"/>
+            </svg>
+          </div>
+          <div class="tile-word">Mejorando</div>
+          <div class="tile-desc">Los errores están disminuyendo</div>
+        </div>
+        <div class="tile" id="trend-flat" onclick="selectTrend('flat')">
+          <div class="tile-icon">
+            <svg width="44" height="28" viewBox="0 0 44 28" xmlns="http://www.w3.org/2000/svg" aria-label="Barras de igual altura">
+              <rect x="2"  y="9" width="6" height="17" rx="2" fill="currentColor" opacity=".9"/>
+              <rect x="11" y="9" width="6" height="17" rx="2" fill="currentColor" opacity=".75"/>
+              <rect x="20" y="9" width="6" height="17" rx="2" fill="currentColor" opacity=".6"/>
+              <rect x="29" y="9" width="6" height="17" rx="2" fill="currentColor" opacity=".75"/>
+              <rect x="38" y="9" width="6" height="17" rx="2" fill="currentColor" opacity=".9"/>
+            </svg>
+          </div>
+          <div class="tile-word">Plano</div>
+          <div class="tile-desc">El tamaño del error permaneció igual</div>
+        </div>
+        <div class="tile" id="trend-worsening" onclick="selectTrend('worsening')">
+          <div class="tile-icon">
+            <svg width="44" height="28" viewBox="0 0 44 28" xmlns="http://www.w3.org/2000/svg" aria-label="Barras que se alargan">
+              <rect x="2"  y="22" width="6" height="4"  rx="2" fill="currentColor" opacity=".3"/>
+              <rect x="11" y="18" width="6" height="8"  rx="2" fill="currentColor" opacity=".45"/>
+              <rect x="20" y="14" width="6" height="12" rx="2" fill="currentColor" opacity=".6"/>
+              <rect x="29" y="9"  width="6" height="17" rx="2" fill="currentColor" opacity=".75"/>
+              <rect x="38" y="4"  width="6" height="22" rx="2" fill="currentColor" opacity=".9"/>
+            </svg>
+          </div>
+          <div class="tile-word">Empeorando</div>
+          <div class="tile-desc">Los errores están aumentando</div>
+        </div>
+      </div>
+
+      <div class="coach-box" id="trendCoach" style="display:none; margin-top:12px;">
+        <div class="coach-title">
+          <svg width="14" height="14"><use href="#ico-bolt"/></svg>
+          Pregunta de Reflexión
+        </div>
+        <p id="trendCoachText"></p>
+      </div>
+      </div><!-- fin trendTilesWrap -->
+    </div>
+
+    <div class="quality-row">
+      <span class="quality-label">Paso 1</span>
+      <div class="quality-track"><div class="quality-fill" id="phaseAFill"></div></div>
+      <span class="quality-val va-mono" id="phaseAVal">0 / 3</span>
+    </div>
+
+    <div class="phase-footer">
+      <div></div>
+      <button class="va-btn va-btn--primary" onclick="goToPhase('b')">
+        Continuar
+        <svg width="16" height="16"><use href="#ico-next"/></svg>
+      </button>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       FASE B
+  ══════════════════════════════════ -->
+  <section class="phase-panel" id="panel-b">
+
+    <div class="phase-header">
+      <div class="phase-icon icon-yellow">
+        <svg width="24" height="24"><use href="#ico-search"/></svg>
+      </div>
+      <div class="phase-head-text">
+        <h1>Encuentra el Patrón</h1>
+        <p>Nombra la variable de entrada que tu modelo se equivoca sistemáticamente.</p>
+      </div>
+      <div class="time-chip">
+        <svg width="12" height="12" style="vertical-align:-1px;margin-right:4px"><use href="#ico-timer"/></svg>
+        6–8 min
+      </div>
+    </div>
+
+    <div class="instruction yellow">
+      Mira tus <strong>tres Errores más grandes</strong> — los partidos donde la predicción estuvo más lejos del resultado. Para cada uno, revisa tus notas de "Qué pasó". ¿Cuál era la estadística dominante del oponente?
+    </div>
+
+    <!-- Referencia de datos en vivo del Paso 1 -->
+    <div class="data-ref" id="dataRef">
+      <div class="data-ref-header" onclick="toggleDataRef()">
+        <div class="data-ref-header-left">
+          <svg width="14" height="14"><use href="#ico-stats"/></svg>
+          Tus Datos de Error — Temporada 1
+        </div>
+        <span class="data-ref-toggle" id="dataRefToggleLabel">Ocultar ▲</span>
+      </div>
+      <div class="data-ref-body" id="dataRefBody">
+        <table class="data-ref-table" id="dataRefTable">
+          <thead><tr>
+            <th>Partido</th>
+            <th>Error</th>
+          </tr></thead>
+          <tbody id="dataRefRows"></tbody>
+        </table>
+        <div class="data-ref-summary" id="dataRefSummary"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">
+        <svg width="14" height="14"><use href="#ico-search"/></svg>
+        Top 3 Errores Más Grandes — por Magnitud
+      </div>
+      <div class="instruction yellow" style="margin-bottom:14px;">
+        Mira la <strong>tabla de datos de error</strong> de arriba. Encuentra los 3 partidos donde tu número de error fue más grande — ignora los signos + o −, elige los números más grandes. Copia cada valor de error abajo, luego revisa tus notas del partido para responder: ¿en qué estadística del robot era especialmente fuerte ese oponente?
+      </div>
+      <div class="info-row" style="margin-bottom:12px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        Estadísticas del robot a buscar en tus notas: SPEED, TURNING, POWER, ENDURANCE, patada
+      </div>
+      <div class="top3-grid">
+        <div class="top3-row" style="display:block;padding:14px;">
+          <div style="display:grid;grid-template-columns:26px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;">
+            <div class="rank-badge">1</div>
+            <div>
+              <div class="field-label">¿En qué estadística era fuerte ese oponente?</div>
+              <input type="text" id="top3-stat-1" placeholder="ej. TURNING, POWER…" oninput="updatePhaseB()">
+            </div>
+            <div>
+              <div class="field-label">Tu error en ese partido</div>
+              <input type="number" class="error-val" id="top3-err-1" placeholder="copia de arriba" step="0.1" oninput="updatePhaseB()">
+            </div>
+          </div>
+          <div>
+            <div class="field-label">¿Qué pasó? (de tus notas del partido)</div>
+            <input type="text" id="top3-note-1" placeholder="ej. Su bot tomó ángulos que nuestra predicción no cubría" oninput="updatePhaseB()">
+          </div>
+        </div>
+        <div class="top3-row" style="display:block;padding:14px;">
+          <div style="display:grid;grid-template-columns:26px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;">
+            <div class="rank-badge">2</div>
+            <div>
+              <div class="field-label">¿En qué estadística era fuerte ese oponente?</div>
+              <input type="text" id="top3-stat-2" placeholder="ej. TURNING, POWER…" oninput="updatePhaseB()">
+            </div>
+            <div>
+              <div class="field-label">Tu error en ese partido</div>
+              <input type="number" class="error-val" id="top3-err-2" placeholder="copia de arriba" step="0.1" oninput="updatePhaseB()">
+            </div>
+          </div>
+          <div>
+            <div class="field-label">¿Qué pasó? (de tus notas del partido)</div>
+            <input type="text" id="top3-note-2" placeholder="ej. Su bot tomó ángulos que nuestra predicción no cubría" oninput="updatePhaseB()">
+          </div>
+        </div>
+        <div class="top3-row" style="display:block;padding:14px;">
+          <div style="display:grid;grid-template-columns:26px 1fr 1fr;gap:10px;align-items:center;margin-bottom:10px;">
+            <div class="rank-badge">3</div>
+            <div>
+              <div class="field-label">¿En qué estadística era fuerte ese oponente?</div>
+              <input type="text" id="top3-stat-3" placeholder="ej. TURNING, POWER…" oninput="updatePhaseB()">
+            </div>
+            <div>
+              <div class="field-label">Tu error en ese partido</div>
+              <input type="number" class="error-val" id="top3-err-3" placeholder="copia de arriba" step="0.1" oninput="updatePhaseB()">
+            </div>
+          </div>
+          <div>
+            <div class="field-label">¿Qué pasó? (de tus notas del partido)</div>
+            <input type="text" id="top3-note-3" placeholder="ej. Su bot tomó ángulos que nuestra predicción no cubría" oninput="updatePhaseB()">
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-hint" id="patternHint">
+        <svg width="16" height="16"><use href="#ico-search"/></svg>
+        <span id="patternHintText"></span>
+      </div>
+    </div>
+
+    <!-- Constructor de oraciones -->
+    <div class="card">
+      <div class="card-title yellow">
+        <svg width="14" height="14"><use href="#ico-levels"/></svg>
+        Escribe Tu Oración
+      </div>
+      <div class="instruction yellow" style="margin-bottom:14px;">
+        Debe nombrar una <strong>variable de ENTRADA</strong> — no un resultado. "Perdimos contra equipos rápidos" = resultado. "TURNING no está en nuestra ecuación" = entrada.
+      </div>
+      <div class="sentence-builder">
+        <div class="sentence-line">
+          <span class="s-fixed">Mi modelo consistentemente</span>
+          <select class="s-select" id="b-direction" onchange="updatePhaseB()">
+            <option value="">— elegir —</option>
+            <option>sobreestima</option>
+            <option>subestima</option>
+          </select>
+          <span class="s-fixed">porque</span>
+          <select class="s-select" id="b-reason" onchange="updatePhaseB()">
+            <option value="">— elegir —</option>
+            <option>no tiene en cuenta</option>
+            <option>subestima</option>
+            <option>sobreestima</option>
+          </select>
+          <input type="text" class="s-fill" id="b-variable" placeholder="nombre de variable de entrada" oninput="updatePhaseB()">
+          <span class="s-fixed">.</span>
+        </div>
+      </div>
+      <div class="block-warn" id="bVarWarn">
+        Eso parece un resultado, no una variable de entrada. Ejemplos de variables de entrada: SPEED, TURNING, POWER, ENDURANCE, distancia, ángulo de lanzamiento. No escribas: perdió, ganó, goles, puntuación, oponente, partido.
+      </div>
+      <div class="info-row" id="bPreviewRow" style="display:none;">
+        <svg width="14" height="14"><use href="#ico-check"/></svg>
+        <span id="bPreviewText" style="font-style:italic; color:var(--text); font-weight:600;"></span>
+      </div>
+    </div>
+
+    <!-- Advertencia de error común -->
+    <div class="coach-box">
+      <div class="coach-title">
+        <svg width="14" height="14"><use href="#ico-bolt"/></svg>
+        Error Más Común
+      </div>
+      <p><strong>Lo que podrías escribir:</strong> "Perdimos contra equipos rápidos." — Eso es un resultado.</p>
+      <p><strong>Lo que necesitas:</strong> "Nuestra ecuación usa solo SPEED, pero los oponentes con alto TURNING anotaron desde ángulos que nuestro bot no cubría — TURNING no está en el modelo."</p>
+      <p style="margin-top:8px;">Pregunta: <em>¿Qué variable que realmente afectó el partido NO está en y = mx + b?</em></p>
+    </div>
+
+    <div class="quality-row">
+      <span class="quality-label">Paso 2</span>
+      <div class="quality-track"><div class="quality-fill" id="phaseBFill"></div></div>
+      <span class="quality-val va-mono" id="phaseBVal">0 / 2</span>
+    </div>
+
+    <div class="phase-footer">
+      <button class="va-btn va-btn--ghost" onclick="goToPhase('a')">
+        <svg width="16" height="16" style="transform:scaleX(-1)"><use href="#ico-next"/></svg>
+        Atrás
+      </button>
+      <button class="va-btn va-btn--primary" onclick="goToPhase('c')">
+        Continuar
+        <svg width="16" height="16"><use href="#ico-next"/></svg>
+      </button>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       FASE C
+  ══════════════════════════════════ -->
+  <section class="phase-panel" id="panel-c">
+
+    <div class="phase-header">
+      <div class="phase-icon icon-green">
+        <svg width="24" height="24"><use href="#ico-bolt"/></svg>
+      </div>
+      <div class="phase-head-text">
+        <h1>Construye Tu Hipótesis</h1>
+        <p>Un cálculo, no una preferencia. Debe aparecer tu ecuación de diagrama de dispersión.</p>
+      </div>
+      <div class="time-chip">
+        <svg width="12" height="12" style="vertical-align:-1px;margin-right:4px"><use href="#ico-timer"/></svg>
+        6–7 min
+      </div>
+    </div>
+
+    <div class="instruction green">
+      Abre tu ecuación de diagrama de dispersión del Día 8 — <strong>y = mx + b</strong>, donde x = asignación de SPEED e y = goles predichos. Sustituye tu nuevo valor propuesto. Las matemáticas deben aparecer en tu hipótesis.
+    </div>
+
+    <!-- ELL GRAPHIC 3: desglose de la ecuación y = mx + b -->
+    <div style="background:var(--surface);border:1px solid rgba(0,230,118,0.25);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:14px;">
+      <div style="font:600 13px/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:14px;">Qué significa cada parte de y = mx + b</div>
+      <svg viewBox="0 0 540 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:540px;display:block;margin:0 auto;" aria-label="Desglose de ecuación: y igual a m por x más b">
+        <text x="270" y="62" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="36" font-weight="600" fill="#e8f0fe" letter-spacing="4">y = mx + b</text>
+        <line x1="238" y1="68" x2="248" y2="68" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="265" y1="68" x2="277" y2="68" stroke="#ffd600" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="287" y1="68" x2="297" y2="68" stroke="#ff9100" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="310" y1="68" x2="318" y2="68" stroke="#00e676" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="243" y1="68" x2="60" y2="120" stroke="rgba(0,229,255,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
+        <rect x="6" y="118" width="110" height="34" rx="6" fill="rgba(0,229,255,0.10)" stroke="rgba(0,229,255,0.35)" stroke-width="1"/>
+        <text x="61" y="131" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="#00e5ff">y</text>
+        <text x="61" y="144" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7a9cc0">Goles predichos</text>
+        <line x1="271" y1="68" x2="180" y2="120" stroke="rgba(255,214,0,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
+        <rect x="130" y="118" width="98" height="34" rx="6" fill="rgba(255,214,0,0.08)" stroke="rgba(255,214,0,0.35)" stroke-width="1"/>
+        <text x="179" y="131" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="#ffd600">m</text>
+        <text x="179" y="144" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7a9cc0">Pendiente (tasa)</text>
+        <line x1="292" y1="68" x2="310" y2="120" stroke="rgba(255,145,0,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
+        <rect x="258" y="118" width="106" height="34" rx="6" fill="rgba(255,145,0,0.08)" stroke="rgba(255,145,0,0.35)" stroke-width="1"/>
+        <text x="311" y="131" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="#ff9100">x</text>
+        <text x="311" y="144" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7a9cc0">Tu valor de SPEED</text>
+        <line x1="314" y1="68" x2="448" y2="120" stroke="rgba(0,230,118,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
+        <rect x="394" y="118" width="140" height="34" rx="6" fill="rgba(0,230,118,0.08)" stroke="rgba(0,230,118,0.35)" stroke-width="1"/>
+        <text x="464" y="131" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="#00e676">b</text>
+        <text x="464" y="144" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#7a9cc0">Intersección (punto de partida)</text>
+      </svg>
+    </div>
+
+    <!-- Verificación de conexión B→C (ítem 12) -->
+    <div class="card">
+      <div class="card-title yellow">
+        <svg width="14" height="14"><use href="#ico-levels"/></svg>
+        ¿Tu Cambio de Estadística Resuelve el Problema?
+      </div>
+      <div class="instruction yellow" style="margin-bottom:14px;">
+        Tu análisis del Paso 2 nombró una variable que le falta a tu modelo. Tu hipótesis debe cambiar una estadística que realmente aborde esa brecha — no cualquier estadística.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <div class="field-label">La variable que le falta a tu modelo (del Paso 2):</div>
+          <div id="bcVarDisplay" style="font:700 16px/1.5 var(--font-sans);color:var(--yellow);padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;min-height:42px;">—</div>
+        </div>
+        <div>
+          <div class="field-label">La estadística del robot que quieres cambiar para la Temporada 2:</div>
+          <input type="text" id="bc-stat-change" placeholder="ej. SPEED, TURNING…" oninput="checkBCConnection()">
+        </div>
+      </div>
+      <div>
+        <div class="field-label">Explica la conexión — ¿cómo cambiar esta estadística aborda el problema que encontraste?</div>
+        <textarea id="bc-connection" placeholder="ej. TURNING controla los ángulos que puede cubrir nuestro bot. Los oponentes con alto TURNING anotaron desde lugares que nuestro modelo basado en SPEED no predijo — así que cambiar TURNING debería cerrar esa brecha." rows="3" oninput="checkBCConnection()"></textarea>
+      </div>
+      <div class="block-warn" id="bcDisconnectWarn" style="display:none;">
+        La debilidad que identificaste y el cambio de estadística que propones parecen diferentes. Eso puede ser válido — pero explica la conexión arriba antes de continuar.
+      </div>
+    </div>
+
+    <!-- Ingreso de ecuación -->
+    <div class="card">
+      <div class="card-title green">
+        <svg width="14" height="14"><use href="#ico-stats"/></svg>
+        Ingresa Tu Ecuación del Diagrama de Dispersión del Día 8
+      </div>
+
+      <div class="eq-row">
+        <span class="eq-eyebrow">Ecuación:</span>
+        <span class="eq-formula">y =</span>
+        <div class="eq-fields">
+          <input type="number" class="eq-input" id="eq-m" placeholder="m" step="0.01" oninput="calcHypothesis()" title="Pendiente">
+          <span class="eq-connector">x  +</span>
+          <input type="number" class="eq-input" id="eq-b" placeholder="b" step="0.01" oninput="calcHypothesis()" title="Intersección">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <div class="field-label">Valor Actual de SPEED (x)</div>
+          <input type="number" id="eq-x-cur" placeholder="ej. 10" oninput="calcHypothesis()">
+        </div>
+        <div>
+          <div class="field-label">Nuevo Valor Propuesto de SPEED (x)</div>
+          <input type="number" id="eq-x-new" placeholder="ej. 14" oninput="calcHypothesis()">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <div class="field-label">Promedio Real de Goles / Partido — Temporada 1</div>
+          <input type="number" id="eq-actual" placeholder="ej. 4.2" step="0.1" oninput="calcHypothesis()">
+        </div>
+        <div>
+          <div class="field-label">Estadística que Estás Cambiando</div>
+          <input type="text" id="eq-stat" placeholder="ej. SPEED" oninput="calcHypothesis()">
+        </div>
+      </div>
+
+      <div class="info-row" style="margin-top:10px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        ¿No encuentras tu ecuación del Día 8? Usa la ecuación promedio de la clase en la pizarra. Ten en cuenta que es una aproximación.
+      </div>
+    </div>
+
+    <!-- Punto de control de predicción (ítem 1) — visible solo cuando los campos de la ecuación están llenos -->
+    <div class="card" id="predCheckCard" style="display:none;">
+      <div class="card-title green">
+        <svg width="14" height="14"><use href="#ico-bolt"/></svg>
+        Comprométete Antes de Calcular
+      </div>
+      <div class="instruction green" style="margin-bottom:14px;">
+        Antes de que la herramienta muestre los resultados — ¿crees que este cambio producirá una diferencia positiva, negativa o cercana a cero en los goles predichos? Comprométete ahora.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="pred-btn" id="pred-positive" onclick="selectPred('positive')">Mejora positiva</button>
+        <button class="pred-btn" id="pred-negative" onclick="selectPred('negative')">Impacto negativo</button>
+        <button class="pred-btn" id="pred-zero" onclick="selectPred('zero')">Cerca de cero</button>
+      </div>
+      <div>
+        <div class="field-label">Mi razón:</div>
+        <input type="text" id="pred-reason" placeholder="Creo esto porque…" oninput="checkPredCheckpoint()">
+      </div>
+      <div class="info-row" id="predCheckStatus" style="margin-top:8px;display:none;">
+        <svg width="14" height="14"><use href="#ico-check"/></svg>
+        <span style="color:var(--green);">Predicción confirmada. Los resultados del cálculo ahora son visibles abajo.</span>
+      </div>
+    </div>
+
+    <!-- Franja de resultados (ítem 2) — oculta hasta que el punto de control esté completo -->
+    <div class="card" id="calcResultCard" style="display:none;">
+      <div class="card-title green">
+        <svg width="14" height="14"><use href="#ico-stats"/></svg>
+        Resultados del Cálculo
+      </div>
+      <div class="result-strip">
+        <div class="calc-box">
+          <div class="calc-box-label">Goles Predichos Actuales</div>
+          <div class="calc-box-value va-mono-xl" id="c-cur-pred">—</div>
+        </div>
+        <div class="calc-box">
+          <div class="calc-box-label">Goles Predichos Propuestos</div>
+          <div class="calc-box-value va-mono-xl" id="c-new-pred">—</div>
+        </div>
+        <div class="calc-box">
+          <div class="calc-box-label">Diferencia Predicha por el Modelo</div>
+          <div class="calc-box-value va-mono-xl" id="c-diff">—</div>
+          <div style="font:400 11px/1.4 var(--font-sans);color:var(--muted);margin-top:6px;">predicción propuesta − promedio real de la Temporada 1</div>
+        </div>
+      </div>
+      <div class="info-row" style="margin-top:12px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        Esto es lo que predice la ecuación basada en SPEED. Puede no capturar la variable que falta que encontraste en el Paso 2.
+      </div>
+    </div>
+
+    <!-- Constructor de hipótesis -->
+    <div class="card">
+      <div class="card-title green">
+        <svg width="14" height="14"><use href="#ico-bolt"/></svg>
+        Constructor de Hipótesis — Temporada 2
+      </div>
+      <div class="hypo-builder">
+        <div class="hypo-row">
+          <div class="hypo-num" id="hn1">1</div>
+          <div>
+            <div class="hypo-field-label">Cambio de Estadística</div>
+            <div class="hypo-auto" id="ha1"></div>
+            <div class="hypo-placeholder" id="hp1">
+              <svg width="14" height="14"><use href="#ico-next"/></svg>
+              Completa los campos de la ecuación arriba para autocompletar.
+            </div>
+          </div>
+        </div>
+        <div class="hypo-row">
+          <div class="hypo-num" id="hn2">2</div>
+          <div>
+            <div class="hypo-field-label">Resultado de la Ecuación</div>
+            <div class="hypo-auto" id="ha2"></div>
+            <div class="hypo-placeholder" id="hp2">
+              <svg width="14" height="14"><use href="#ico-next"/></svg>
+              Completa los campos de la ecuación arriba para autocompletar.
+            </div>
+          </div>
+        </div>
+        <div class="hypo-row">
+          <div class="hypo-num" id="hn3">3</div>
+          <div>
+            <div class="hypo-field-label">Diferencia Predicha por el Modelo</div>
+            <div class="hypo-auto" id="ha3"></div>
+            <div class="hypo-placeholder" id="hp3">
+              <svg width="14" height="14"><use href="#ico-next"/></svg>
+              Completa los campos de la ecuación arriba para autocompletar.
+            </div>
+          </div>
+        </div>
+        <div class="hypo-row">
+          <div class="hypo-num" id="hn4">4</div>
+          <div>
+            <div class="hypo-field-label">¿Por qué este cambio de estadística resuelve el problema?</div>
+            <textarea id="hypo-connect" placeholder="ej. Aumentar TURNING significa que nuestro bot puede cubrir más ángulos — exactamente lo que causó nuestros mayores errores contra oponentes con alto TURNING." rows="2" oninput="updateHypoPreview()"></textarea>
+            <div class="info-row">
+              <svg width="14" height="14"><use href="#ico-levels"/></svg>
+              Tu cambio de estadística debe conectarse con la variable que falta que identificaste en el Paso 2.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Espectro de calidad -->
+    <div class="coach-box">
+      <div class="coach-title">
+        <svg width="14" height="14"><use href="#ico-stats"/></svg>
+        Espectro de Calidad de la Hipótesis
+      </div>
+      <p><strong>No aceptable:</strong> "Cambiaré SPEED de 10 a 14 y anotaré más goles." — no hay cálculo.</p>
+      <p><strong>Aceptable:</strong> "Si cambio SPEED de 10 a 14, mi ecuación y = 0.4x + 1.2 da y = 6.8. Promedio real Temporada 1: 4.2 goles. Diferencia predicha por el modelo: +2.6 goles/partido."</p>
+      <p><strong>Sólida:</strong> Cálculo presente Y aborda directamente la debilidad que identificaste en el Paso 2.</p>
+    </div>
+
+    <!-- Pregunta de falsificación (ítem 17) -->
+    <div class="card">
+      <div class="card-title green">
+        <svg width="14" height="14"><use href="#ico-search"/></svg>
+        ¿Qué Demostraría que Estás Equivocado/a?
+      </div>
+      <div class="instruction green" style="margin-bottom:10px;">
+        ¿Qué resultado de la Temporada 2 mostraría que tu hipótesis estaba equivocada?
+      </div>
+      <div class="info-row" style="margin-bottom:12px;">
+        <svg width="14" height="14"><use href="#ico-info"/></svg>
+        Ejemplo: "Si nuestro error contra equipos con alto TURNING sigue por encima de 3 goles/partido, el cambio de estadística no resolvió el problema."
+      </div>
+      <textarea id="falsification-answer" placeholder="Mi hipótesis estaría equivocada si…" rows="2" oninput="updateHypoPreview()"></textarea>
+    </div>
+
+    <!-- Vista previa final de hipótesis (ítem 16) -->
+    <div class="hypo-preview" id="hypoPreview">
+      <div class="hypo-preview-title">
+        <svg width="14" height="14"><use href="#ico-pass"/></svg>
+        Tu Hipótesis para la Temporada 2
+      </div>
+      <div class="hypo-preview-text" id="hypoPreviewText"></div>
+    </div>
+
+    <div class="quality-row">
+      <span class="quality-label">Hipótesis</span>
+      <div class="quality-track"><div class="quality-fill" id="phaseCFill"></div></div>
+      <span class="quality-val va-mono" id="phaseCVal">Incompleta</span>
+    </div>
+
+    <div class="phase-footer">
+      <button class="va-btn va-btn--ghost" onclick="goToPhase('b')">
+        <svg width="16" height="16" style="transform:scaleX(-1)"><use href="#ico-next"/></svg>
+        Atrás
+      </button>
+      <button class="va-btn va-btn--primary" onclick="finishBlock()" style="background:var(--green);color:#0d1b2a;">
+        <svg width="16" height="16"><use href="#ico-pass"/></svg>
+        Hipótesis Completa — Prueba de Pares
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── TEMPORIZADOR ──────────────────────────────────────
+let totalSec = 25 * 60, running = false, interval = null;
+
+function toggleTimer() {
+  if (running) {
+    clearInterval(interval); running = false;
+    document.getElementById('timerBtn').innerHTML = '<svg width="14" height="14"><use href="#ico-run"/></svg><span id="timerBtnLabel">Iniciar</span>';
+  } else {
+    interval = setInterval(tick, 1000); running = true;
+    document.getElementById('timerBtn').innerHTML = '<svg width="14" height="14"><use href="#ico-pause"/></svg><span id="timerBtnLabel">Pausar</span>';
+  }
+}
+function resetTimer() {
+  clearInterval(interval); running = false; totalSec = 25 * 60;
+  document.getElementById('timerBtn').innerHTML = '<svg width="14" height="14"><use href="#ico-run"/></svg><span id="timerBtnLabel">Iniciar</span>';
+  renderTimer();
+}
+function tick() { if (totalSec <= 0) { clearInterval(interval); running = false; return; } totalSec--; renderTimer(); }
+function renderTimer() {
+  const m = Math.floor(totalSec / 60), s = totalSec % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-digits va-mono-xl';
+  if (totalSec <= 120) el.classList.add('crit');
+  else if (totalSec <= 300) el.classList.add('warn');
+}
+
+// ── NAV DE FASES ──────────────────────────────────────
+const donePhases = new Set();
+const PHASE_NUM = { a: '1', b: '2', c: '3' };
+let dataRefOpen = true;
+
+function toggleDataRef() {
+  dataRefOpen = !dataRefOpen;
+  document.getElementById('dataRefBody').style.display = dataRefOpen ? 'block' : 'none';
+  document.getElementById('dataRefToggleLabel').textContent = dataRefOpen ? 'Ocultar ▲' : 'Mostrar ▼';
+}
+
+function populateDataRef() {
+  const tbody = document.getElementById('dataRefRows');
+  tbody.innerHTML = '';
+  const allLabels = [...MATCH_LABELS, ...Array.from({length: extraRows}, (_,i) => `Extra · ${i+1}`)];
+  let count = 0, sum = 0;
+  allLabels.forEach((label, i) => {
+    const n = i + 1;
+    const errEl = document.getElementById('err-' + n);
+    const errVal = errEl && errEl.value !== '' ? parseFloat(errEl.value) : null;
+    if (errVal === null) return;
+    count++; sum += errVal;
+    const cls = errVal > 0.05 ? 'val-positive' : errVal < -0.05 ? 'val-negative' : 'val-zero';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${label}</td><td class="${cls}">${errVal >= 0 ? '+' : ''}${errVal.toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  });
+  const avg = count ? sum / count : null;
+  const summary = document.getElementById('dataRefSummary');
+  summary.innerHTML = count
+    ? `<span class="data-ref-stat">Partidos ingresados: <strong>${count}</strong></span>
+       <span class="data-ref-stat">Suma: <strong>${sum.toFixed(2)}</strong></span>
+       <span class="data-ref-stat">Error Promedio: <strong>${avg.toFixed(2)}</strong></span>
+       <span class="data-ref-stat">Tendencia: <strong>${selectedTrend || '—'}</strong></span>`
+    : `<span class="data-ref-stat" style="color:var(--red)">No hay valores de error ingresados en el Paso 1 — regresa y complétalos primero.</span>`;
+  dataRefOpen = true;
+  document.getElementById('dataRefBody').style.display = 'block';
+  document.getElementById('dataRefToggleLabel').textContent = 'Ocultar ▲';
+  const vrb = document.getElementById('b-variable') ? document.getElementById('b-variable').value.trim() : '';
+  const bcDisp = document.getElementById('bcVarDisplay');
+  if (bcDisp) bcDisp.textContent = vrb || '—';
+}
+
+function goToPhase(p) {
+  ['a','b','c'].forEach(x => {
+    document.getElementById('panel-' + x).classList.remove('active');
+    const tab = document.getElementById('tab-' + x);
+    const pip = document.getElementById('pip-' + x);
+    tab.className = 'phase-tab' + (donePhases.has(x) ? ' done' : '');
+    pip[donePhases.has(x) ? 'innerHTML' : 'textContent'] = donePhases.has(x)
+      ? '<svg width="12" height="12" style="color:var(--green)"><use href="#ico-check"/></svg>'
+      : PHASE_NUM[x];
+  });
+  document.getElementById('panel-' + p).classList.add('active');
+  document.getElementById('tab-' + p).classList.add('active');
+  document.getElementById('pip-' + p).textContent = PHASE_NUM[p];
+  if (p === 'b') populateDataRef();
+  if (p === 'c') {
+    const vrb = document.getElementById('b-variable') ? document.getElementById('b-variable').value.trim() : '';
+    const bcDisp = document.getElementById('bcVarDisplay');
+    if (bcDisp) bcDisp.textContent = vrb || '—';
+    checkBCConnection();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── FILAS DE PARTIDOS ─────────────────────────────────
+const MATCH_LABELS = [
+  'Día 7 · R1','Día 7 · R2','Día 7 · R3',
+  'Día 8 · R1','Día 8 · R2','Día 8 · R3',
+  'Día 9 · R1','Día 9 · R2','Día 9 · R3',
+  'Hoy · R1','Hoy · R2','Hoy · R3',
+];
+
+(function buildRows() {
+  const grid = document.getElementById('errorGrid');
+  MATCH_LABELS.forEach((label, i) => {
+    const n = i + 1;
+    const row = document.createElement('div');
+    row.className = 'error-row';
+    row.innerHTML = `
+      <input type="text" class="match-tag" value="${label}" readonly>
+      <input type="number" class="error-val" id="err-${n}" placeholder="—" step="0.1" oninput="recalcA()">
+    `;
+    grid.appendChild(row);
+  });
+})();
+
+let extraRows = 0;
+function addExtraRow() {
+  extraRows++;
+  const n = MATCH_LABELS.length + extraRows;
+  const grid = document.getElementById('errorGrid');
+  const row = document.createElement('div');
+  row.className = 'error-row';
+  row.innerHTML = `
+    <input type="text" class="match-tag" value="Extra · ${extraRows}" readonly>
+    <input type="number" class="error-val" id="err-${n}" placeholder="—" step="0.1" oninput="recalcA()">
+  `;
+  grid.appendChild(row);
+  recalcA();
+}
+function totalRows() { return MATCH_LABELS.length + extraRows; }
+
+// ── FASE A ────────────────────────────────────────────
+let selectedSign = null, selectedTrend = null;
+
+function recalcA() {
+  const allLabels = [...MATCH_LABELS, ...Array.from({length: extraRows}, (_,i) => `Extra · ${i+1}`)];
+  const vals = [];
+  for (let i = 1; i <= totalRows(); i++) {
+    const el = document.getElementById('err-' + i);
+    if (el && el.value !== '') { const v = parseFloat(el.value); if (!isNaN(v)) vals.push({v, label: allLabels[i-1] || `Fila ${i}`}); }
+  }
+  const sumEl = document.getElementById('sumDisplay');
+  const cntEl = document.getElementById('countDisplay');
+  const avgEl = document.getElementById('avgDisplay');
+  if (!vals.length) {
+    sumEl.textContent = cntEl.textContent = avgEl.textContent = '—';
+    sumEl.className = avgEl.className = 'calc-box-value va-mono-xl';
+    updateResidualStrip([]);
+    updatePhaseAQuality(); return;
+  }
+  const s = vals.reduce((a,b)=>a+b.v,0), a = s/vals.length;
+  sumEl.textContent = s.toFixed(2); cntEl.textContent = vals.length;
+  avgEl.textContent = a.toFixed(2);
+  avgEl.className = 'calc-box-value va-mono-xl ' +
+    (a > 0.05 ? 'val-positive' : a < -0.05 ? 'val-negative' : 'val-zero');
+  updateResidualStrip(vals);
+  updatePhaseAQuality();
+}
+
+function updateResidualStrip(vals) {
+  const strip = document.getElementById('residualStrip');
+  if (!vals.length) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+  while (strip.children.length > 1) strip.removeChild(strip.lastChild);
+  const maxAbs = Math.max(...vals.map(d => Math.abs(d.v)));
+  vals.forEach(({v, label}) => {
+    const abs = Math.abs(v);
+    const pct = maxAbs > 0 ? (abs / maxAbs * 100) : 0;
+    const color = v > 0.05 ? 'var(--red)' : v < -0.05 ? 'var(--cyan)' : 'var(--green)';
+    const sign  = v > 0.05 ? '+' : '';
+    const row = document.createElement('div');
+    row.className = 'residual-row';
+    row.innerHTML = `
+      <span class="residual-label">${label}</span>
+      <span class="residual-val" style="color:${color}">${sign}${v.toFixed(1)}</span>
+      <div class="residual-track"><div class="residual-bar" style="width:${pct}%;background:${color};"></div></div>
+    `;
+    strip.appendChild(row);
+  });
+}
+
+function selectSign(s) {
+  selectedSign = s;
+  ['positive','negative','zero'].forEach(x =>
+    document.getElementById('sign-' + x).classList.toggle('selected', x === s));
+  updatePhaseAQuality();
+}
+
+function updateTrendInputs() {
+  const f = document.getElementById('trend-first-abs').value;
+  const l = document.getElementById('trend-last-abs').value;
+  const wrap = document.getElementById('trendTilesWrap');
+  wrap.style.display = (f !== '' && l !== '') ? 'block' : 'none';
+  updatePhaseAQuality();
+}
+
+function selectTrend(t) {
+  selectedTrend = t;
+  ['improving','flat','worsening'].forEach(x =>
+    document.getElementById('trend-' + x).classList.toggle('selected', x === t));
+  const msgs = {
+    improving: 'Tu modelo está mejorando. ¿Qué cambió específicamente entre tu primera predicción y la más reciente? Nómbralo — ese cambio es evidencia de que tu modelo responde a la revisión de entradas.',
+    flat: 'Tu modelo no ha cambiado en toda la temporada. ¿Qué variable de entrada no revisaste entre el Día 7 y hoy? Una tendencia plana significa que la misma variable está generando el mismo error en cada partido.',
+    worsening: 'Tus residuos están creciendo. ¿Qué cambió en los partidos a medida que avanzó la temporada — estadísticas de oponentes? ¿Formato del partido? Revisa la columna "Qué pasó" para encontrar patrones.'
+  };
+  const box = document.getElementById('trendCoach');
+  box.style.display = 'block';
+  document.getElementById('trendCoachText').textContent = msgs[t];
+  updatePhaseAQuality();
+}
+
+function updatePhaseAQuality() {
+  let score = 0;
+  let filledCount = 0;
+  for (let i = 1; i <= totalRows(); i++) {
+    const el = document.getElementById('err-' + i);
+    if (el && el.value !== '') filledCount++;
+  }
+  if (filledCount >= 3) score++;
+  if (selectedSign) score++;
+  const f = document.getElementById('trend-first-abs').value;
+  const l = document.getElementById('trend-last-abs').value;
+  if (selectedTrend && f !== '' && l !== '') score++;
+  const pct = Math.round(score/3*100);
+  const fill = document.getElementById('phaseAFill');
+  fill.style.width = pct + '%';
+  fill.style.background = score===3 ? 'var(--green)' : score===2 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('phaseAVal').textContent = `${score} / 3`;
+  if (score===3) { donePhases.add('a'); document.getElementById('phaseAVal').style.color='var(--green)'; }
+}
+
+// ── FASE B ────────────────────────────────────────────
+const RESULT_WORDS = ['perdió','ganó','goles','puntuación','anotó','oponente','partido','partidos','juego','juegos','ganar','perder','lost','won','goals','score','scored','opponent','match','matches','game','games','win','lose'];
+
+function updatePhaseB() {
+  const s = [1,2,3].map(i => document.getElementById('top3-stat-'+i).value.trim().toLowerCase());
+  const hint = document.getElementById('patternHint');
+  const hintText = document.getElementById('patternHintText');
+  if (s[0] && s[1] && s[2]) {
+    hint.style.display = 'flex';
+    const uniq = [...new Set(s)];
+    if (uniq.length === 1) {
+      hintText.innerHTML = `<strong>Patrón claro:</strong> La misma estadística — <strong>${s[0]}</strong> — aparece en los tres errores más grandes. Esa es tu debilidad sistemática.`;
+    } else {
+      const freq = s.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{});
+      const top = Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0];
+      hintText.innerHTML = freq[top]>=2
+        ? `<strong>Patrón probable:</strong> <strong>${top}</strong> aparece con más frecuencia. Probablemente esa sea tu debilidad sistemática.`
+        : `Estadísticas distintas en los tres partidos. Busca qué tienen en común las configuraciones de los oponentes aunque los nombres difieran.`;
+    }
+  } else { hint.style.display = 'none'; }
+
+  const dir = document.getElementById('b-direction').value;
+  const rsn = document.getElementById('b-reason').value;
+  const vrb = document.getElementById('b-variable').value.trim();
+  const warn = document.getElementById('bVarWarn');
+  const prevRow = document.getElementById('bPreviewRow');
+
+  const isResultWord = vrb && RESULT_WORDS.some(w => vrb.toLowerCase().includes(w));
+  warn.style.display = (vrb && isResultWord) ? 'block' : 'none';
+
+  const sentenceOk = dir && rsn && vrb && !isResultWord;
+  if (sentenceOk) {
+    prevRow.style.display = 'flex';
+    document.getElementById('bPreviewText').textContent = `"Mi modelo consistentemente ${dir} porque ${rsn} ${vrb}."`;
+  } else {
+    prevRow.style.display = 'none';
+  }
+
+  const bcDisp = document.getElementById('bcVarDisplay');
+  if (bcDisp) bcDisp.textContent = vrb || '—';
+
+  updatePhaseBQuality();
+}
+
+function updatePhaseBQuality() {
+  const s1 = document.getElementById('top3-stat-1').value.trim();
+  const s2 = document.getElementById('top3-stat-2').value.trim();
+  const n1 = document.getElementById('top3-note-1').value.trim();
+  const dir = document.getElementById('b-direction').value;
+  const rsn = document.getElementById('b-reason').value;
+  const vrb = document.getElementById('b-variable').value.trim();
+  const isResultWord = vrb && RESULT_WORDS.some(w => vrb.toLowerCase().includes(w));
+  let score = ((s1 && s2 && n1) ? 1 : 0) + ((dir && rsn && vrb && !isResultWord) ? 1 : 0);
+  const fill = document.getElementById('phaseBFill');
+  fill.style.width = (score/2*100) + '%';
+  fill.style.background = score===2 ? 'var(--green)' : score===1 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('phaseBVal').textContent = `${score} / 2`;
+  if (score===2) { donePhases.add('b'); document.getElementById('phaseBVal').style.color='var(--green)'; }
+}
+
+// ── FASE C — Conexión B→C ─────────────────────────────
+function checkBCConnection() {
+  const bVar = (document.getElementById('b-variable') ? document.getElementById('b-variable').value.trim() : '').toLowerCase();
+  const cStat = (document.getElementById('bc-stat-change').value.trim()).toLowerCase();
+  const conn = document.getElementById('bc-connection').value.trim();
+  const warn = document.getElementById('bcDisconnectWarn');
+  if (bVar && cStat && conn) {
+    const bWords = bVar.split(/\s+/);
+    const cWords = cStat.split(/\s+/);
+    const overlap = bWords.some(w => cWords.includes(w));
+    warn.style.display = (!overlap) ? 'block' : 'none';
+  } else {
+    warn.style.display = 'none';
+  }
+  const eqStat = document.getElementById('eq-stat');
+  if (eqStat && document.getElementById('bc-stat-change').value.trim()) {
+    eqStat.placeholder = document.getElementById('bc-stat-change').value.trim();
+  }
+  updateHypoPreview();
+}
+
+// ── FASE C — Punto de Control de Predicción ───────────
+let selectedPred = null;
+let predCheckDone = false;
+
+function selectPred(p) {
+  selectedPred = p;
+  ['positive','negative','zero'].forEach(x =>
+    document.getElementById('pred-' + x).classList.toggle('selected', x === p));
+  checkPredCheckpoint();
+}
+
+function checkPredCheckpoint() {
+  const reason = document.getElementById('pred-reason').value.trim();
+  const statusEl = document.getElementById('predCheckStatus');
+  predCheckDone = !!(selectedPred && reason.length >= 4);
+  statusEl.style.display = predCheckDone ? 'flex' : 'none';
+  const m   = parseFloat(document.getElementById('eq-m').value);
+  const b   = parseFloat(document.getElementById('eq-b').value);
+  const xC  = parseFloat(document.getElementById('eq-x-cur').value);
+  const xN  = parseFloat(document.getElementById('eq-x-new').value);
+  const act = parseFloat(document.getElementById('eq-actual').value);
+  const eqFilled = ![m,b,xC,xN,act].some(isNaN);
+  const card = document.getElementById('calcResultCard');
+  card.style.display = (predCheckDone && eqFilled) ? 'block' : 'none';
+  updateHypoPreview();
+}
+
+// ── FASE C — Calcular ─────────────────────────────────
+function calcHypothesis() {
+  const m   = parseFloat(document.getElementById('eq-m').value);
+  const b   = parseFloat(document.getElementById('eq-b').value);
+  const xC  = parseFloat(document.getElementById('eq-x-cur').value);
+  const xN  = parseFloat(document.getElementById('eq-x-new').value);
+  const act = parseFloat(document.getElementById('eq-actual').value);
+  const stat = document.getElementById('eq-stat').value.trim() || document.getElementById('bc-stat-change').value.trim() || 'Speed';
+  const eqFilled = ![m,b,xC,xN,act].some(isNaN);
+
+  document.getElementById('predCheckCard').style.display = eqFilled ? 'block' : 'none';
+
+  const card = document.getElementById('calcResultCard');
+  if (eqFilled && predCheckDone) {
+    const curPred = m*xC + b;
+    const newPred = m*xN + b;
+    const diff    = newPred - act;
+    card.style.display = 'block';
+    document.getElementById('c-cur-pred').textContent = curPred.toFixed(2);
+    document.getElementById('c-new-pred').textContent = newPred.toFixed(2);
+    const dEl = document.getElementById('c-diff');
+    dEl.textContent = (diff>=0?'+':'') + diff.toFixed(2);
+    dEl.className = 'calc-box-value va-mono-xl ' + (diff>0.05 ? 'val-zero' : diff<-0.05 ? 'val-positive' : '');
+
+    ['ha1','ha2','ha3'].forEach((id,i) => {
+      document.getElementById(id).style.display = 'block';
+      document.getElementById('hp'+(i+1)).style.display = 'none';
+      document.getElementById('hn'+(i+1)).className = 'hypo-num filled';
+    });
+    document.getElementById('ha1').textContent = `Si cambio ${stat} de ${xC} a ${xN}…`;
+    document.getElementById('ha2').textContent = `…mi ecuación y = ${m}x + ${b} da y = ${newPred.toFixed(2)} goles/partido.`;
+    document.getElementById('ha3').textContent = `Promedio real Temporada 1: ${act} goles/partido. Diferencia predicha por el modelo: ${diff>=0?'+':''}${diff.toFixed(2)} goles/partido.`;
+    updateHypoPreview();
+  } else {
+    card.style.display = 'none';
+    ['ha1','ha2','ha3'].forEach((id,i) => {
+      document.getElementById(id).style.display = 'none';
+      document.getElementById('hp'+(i+1)).style.display = 'flex';
+      document.getElementById('hn'+(i+1)).className = 'hypo-num';
+    });
+  }
+}
+
+// ── FASE C — Vista Previa de Hipótesis ────────────────
+function updateHypoPreview() {
+  const m   = parseFloat(document.getElementById('eq-m').value);
+  const b   = parseFloat(document.getElementById('eq-b').value);
+  const xN  = parseFloat(document.getElementById('eq-x-new').value);
+  const xC  = parseFloat(document.getElementById('eq-x-cur').value);
+  const act = parseFloat(document.getElementById('eq-actual').value);
+  const stat = document.getElementById('eq-stat').value.trim() || document.getElementById('bc-stat-change').value.trim() || 'Speed';
+  const conn = document.getElementById('hypo-connect').value.trim();
+  const fals = document.getElementById('falsification-answer').value.trim();
+  const prev = document.getElementById('hypoPreview');
+  const fill = document.getElementById('phaseCFill');
+  const val  = document.getElementById('phaseCVal');
+
+  if (![m,b,xN,xC,act].some(isNaN) && predCheckDone) {
+    const newPred = m*xN + b;
+    const diff    = newPred - act;
+    const diffStr = (diff>=0?'+':'') + diff.toFixed(2);
+
+    const hasConn = !!conn;
+    const hasFals = fals.length >= 10;
+    const isStrong = hasConn && hasFals;
+
+    prev.style.display = 'block';
+    document.getElementById('hypoPreviewText').innerHTML =
+      `Si cambio <strong>${stat}</strong> de <strong>${xC}</strong> a <strong>${xN}</strong>, ` +
+      `mi ecuación del diagrama de dispersión y = ${m}x + ${b} predice <strong>${newPred.toFixed(2)} goles/partido</strong>. ` +
+      `Mi promedio real de la Temporada 1 fue de <strong>${act} goles/partido</strong>. ` +
+      `La ecuación predice una diferencia de <strong>${diffStr} goles/partido</strong>. ` +
+      `<em>Esto es una hipótesis, no una prueba.</em>` +
+      (hasConn ? `<br><br><strong>Conexión del Paso 2:</strong> ${conn}` : '') +
+      (hasFals ? `<br><br><strong>Prueba de falsificación:</strong> ${fals}` : '');
+
+    donePhases.add('c');
+    if (isStrong) {
+      fill.style.width = '100%'; fill.style.background = 'var(--green)';
+      val.textContent = 'Sólida ✓'; val.style.color = 'var(--green)';
+    } else if (hasConn || hasFals) {
+      fill.style.width = '75%'; fill.style.background = 'var(--yellow)';
+      val.textContent = hasConn ? 'Agrega prueba de falsificación' : 'Agrega conexión del Paso 2';
+      val.style.color = 'var(--yellow)';
+    } else {
+      fill.style.width = '50%'; fill.style.background = 'var(--yellow)';
+      val.textContent = 'Agrega conexión del Paso 2 + falsificación';
+      val.style.color = 'var(--yellow)';
+    }
+  } else {
+    prev.style.display = 'none';
+    fill.style.width = '8%'; fill.style.background = 'var(--red)';
+    val.textContent = 'Incompleta'; val.style.color = 'var(--muted)';
+  }
+}
+
+// ── FINALIZAR ─────────────────────────────────────────
+function finishBlock() {
+  const fals = document.getElementById('falsification-answer').value.trim();
+  if (!predCheckDone) {
+    alert('Completa el punto de control de predicción antes de finalizar — debes comprometerte con una predicción antes de ver los resultados.');
+    return;
+  }
+  if (fals.length < 10) {
+    alert('Responde primero la pregunta de falsificación: ¿qué resultado de la Temporada 2 demostraría que tu hipótesis está equivocada?');
+    return;
+  }
+  alert('Hipótesis confirmada. Tu equipo de pares debe encontrar ahora una objeción matemática: ¿el cambio de estadística realmente aborda la variable que falta que identificaste en el Paso 2?');
+}
+</script>
+</body>
+</html>

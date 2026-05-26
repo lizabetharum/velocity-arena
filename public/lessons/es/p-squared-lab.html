@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio P² — Velocity Arena Día 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1b2a; --surface: #132033; --card: #1a2d45; --border: #2a4060;
+  --yellow: #ffd600; --cyan: #00b8d4; --orange: #ff9100;
+  --green: #00e676; --red: #ff5252; --text: #e8f0fe; --muted: #7a9cc0;
+  --purple: #ce93d8; --purple-dim: #21173a; --purple-border: #9c4fba;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter',sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; line-height: 1.5;
+}
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a, #1a0d2a);
+  border-bottom: 2px solid var(--purple);
+  padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 680px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); }
+.header-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.header-sub { font-size: 12px; color: var(--muted); }
+.main { max-width: 680px; margin: 0 auto; padding: 32px 20px 80px; }
+.step-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.step-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.build-section { margin-bottom: 32px; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--card); border-radius: 12px;
+  padding: 14px 10px 10px; text-align: center;
+  border: 2px solid var(--border); transition: border-color 0.2s; cursor: pointer;
+}
+.stat-card.p-card { border-color: var(--purple-border); background: var(--purple-dim); }
+.stat-card:hover { border-color: var(--muted); }
+.stat-abbr { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.stat-card.p-card .stat-abbr { color: var(--purple); }
+.stat-input {
+  width: 100%; background: transparent; border: none;
+  border-bottom: 2px solid var(--border);
+  color: var(--text); font-family: 'Inter',sans-serif;
+  font-size: 30px; font-weight: 800; text-align: center;
+  outline: none; padding: 2px 0; -moz-appearance: textfield;
+}
+.stat-input::-webkit-inner-spin-button, .stat-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.stat-card.p-card .stat-input { border-bottom-color: var(--purple-border); color: var(--purple); }
+.stat-name { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.stat-card.p-card .stat-name { color: var(--purple); }
+.budget-row {
+  background: var(--surface); border-radius: 10px; padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.budget-label { font-size: 13px; color: var(--muted); }
+.budget-count { font-size: 18px; font-weight: 800; transition: color 0.3s; }
+.budget-count.ok { color: var(--green); }
+.budget-count.over { color: var(--red); }
+.budget-count.under { color: var(--yellow); }
+.budget-hint { font-size: 11px; color: var(--muted); }
+.outputs-section { margin-bottom: 32px; }
+.output-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.output-card { background: var(--card); border-radius: 12px; padding: 14px 16px; border: 2px solid var(--border); transition: all 0.3s; }
+.output-card.p-card { border-color: var(--purple-border); background: var(--purple-dim); }
+.output-name { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.output-card.p-card .output-name { color: var(--purple); }
+.output-val { font-size: 26px; font-weight: 800; color: var(--text); }
+.output-card.p-card .output-val { color: var(--purple); }
+.output-formula { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.lab-card { background: var(--purple-dim); border: 2px solid var(--purple-border); border-radius: 16px; padding: 28px 24px 32px; }
+.charge-display { text-align: center; margin-bottom: 28px; }
+.charge-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); margin-bottom: 4px; }
+.charge-number { font-size: 88px; font-weight: 800; line-height: 1; color: var(--purple); transition: color 0.4s, transform 0.15s; display: inline-block; }
+.charge-number.over-100 { color: var(--orange); }
+.charge-number.boom { transform: scale(1.08); }
+.charge-unit { font-size: 36px; }
+.charge-equation { font-size: 14px; color: var(--muted); margin-top: 8px; }
+.charge-equation strong { color: var(--text); }
+.over-callout {
+  background: linear-gradient(135deg, #2a1400, #1a0d2a);
+  border: 1.5px solid var(--orange); border-radius: 10px;
+  padding: 12px 16px; margin-top: 12px;
+  font-size: 13px; color: var(--orange); display: none; text-align: center;
+}
+.over-callout.visible { display: block; }
+.slider-section { margin-bottom: 28px; }
+.slider-label-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.slider-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--purple); }
+.slider-subtitle { font-size: 12px; color: var(--muted); }
+.slider-track-row { display: flex; align-items: center; gap: 14px; }
+.p-min-label { font-size: 12px; color: var(--muted); }
+.p-max-label { font-size: 12px; color: var(--orange); }
+input[type=range].p-slider {
+  flex: 1; -webkit-appearance: none; height: 8px; border-radius: 4px;
+  background: linear-gradient(to right, var(--purple) 0%, var(--purple) 25%, var(--border) 25%);
+  outline: none; cursor: pointer;
+}
+input[type=range].p-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 26px; height: 26px;
+  border-radius: 50%; background: var(--purple);
+  border: 3px solid var(--bg); cursor: pointer; box-shadow: 0 0 12px rgba(206,147,216,0.5);
+}
+input[type=range].p-slider::-moz-range-thumb {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--purple); border: 3px solid var(--bg); cursor: pointer;
+}
+.p-val-badge { font-size: 22px; font-weight: 800; color: var(--purple); background: rgba(206,147,216,0.15); border-radius: 8px; padding: 4px 12px; min-width: 52px; text-align: center; }
+.compare-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin-top: 16px; }
+.compare-pill { background: var(--surface); border-radius: 10px; padding: 12px 14px; text-align: center; }
+.compare-pill.actual { border: 1.5px solid var(--purple-border); }
+.compare-pill-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.compare-pill.actual .compare-pill-label { color: var(--purple); }
+.compare-pill-val { font-size: 22px; font-weight: 800; color: var(--muted); }
+.compare-pill.actual .compare-pill-val { color: var(--purple); }
+.compare-vs { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); text-align: center; }
+.delta-box { background: rgba(206,147,216,0.08); border-radius: 10px; padding: 12px 16px; margin-top: 14px; font-size: 13px; color: var(--muted); text-align: center; min-height: 44px; transition: all 0.3s; }
+.delta-box strong { color: var(--purple); }
+.delta-box .gain { color: var(--green); }
+.delta-box .loss { color: var(--red); }
+.move-note { font-size: 12px; color: var(--muted); margin-top: 10px; text-align: center; }
+.move-note strong { color: var(--yellow); }
+.chart-section { margin-top: 28px; }
+.chart-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.chart-wrap { position: relative; padding-bottom: 30px; }
+.bars-row { display: flex; align-items: flex-end; gap: 3px; height: 180px; position: relative; }
+.ref-line-100 { position: absolute; left: 0; right: 0; border-top: 1.5px dashed rgba(255,145,0,0.5); pointer-events: none; z-index: 2; }
+.ref-line-label { position: absolute; right: 0; font-size: 9px; font-weight: 700; color: var(--orange); background: var(--purple-dim); padding: 0 3px; transform: translateY(-9px); }
+.bar-wrap { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; position: relative; }
+.bar-fill { width: 100%; border-radius: 3px 3px 0 0; background: var(--border); transition: all 0.3s; position: relative; }
+.bar-fill.is-build { background: var(--yellow); }
+.bar-fill.is-lab { background: var(--purple); box-shadow: 0 0 10px rgba(206,147,216,0.4); }
+.bar-fill.is-both { background: linear-gradient(to top, var(--yellow), var(--purple)); box-shadow: 0 0 12px rgba(206,147,216,0.5); }
+.bar-x { position: absolute; bottom: -22px; font-size: 9px; text-align: center; width: 100%; color: var(--muted); }
+.bar-x.is-lab { color: var(--purple); font-weight: 700; }
+.bar-x.is-build { color: var(--yellow); font-weight: 700; }
+.bar-x.is-both { color: var(--text); font-weight: 700; }
+.chart-legend { display: flex; gap: 16px; justify-content: center; font-size: 11px; color: var(--muted); margin-top: 8px; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.shock-section { margin-top: 24px; background: linear-gradient(135deg, #1a0700, #1a0d2a); border: 2px solid var(--orange); border-radius: 12px; padding: 20px 20px 16px; text-align: center; display: none; }
+.shock-section.visible { display: block; }
+.shock-heading { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+.shock-compare { display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 12px; }
+.shock-stat { background: rgba(255,145,0,0.1); border-radius: 10px; padding: 10px 18px; text-align: center; }
+.shock-stat-label { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.shock-stat-val { font-size: 28px; font-weight: 800; color: var(--orange); }
+.shock-divider { font-size: 20px; color: var(--muted); font-weight: 700; }
+.shock-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.shock-text strong { color: var(--text); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matem\u00e1ticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <div>
+      <div class="header-label">Velocity Arena · D\u00eda 6</div>
+      <div class="header-title">Laboratorio P\u00b2</div>
+    </div>
+    <div class="header-sub">\u00bfQu\u00e9 hace <em>realmente</em> POWER?</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- PASO 1: TU CONFIGURACI\u00d3N -->
+  <div class="build-section">
+    <div class="step-label">Paso 1 — Ingresa tu configuraci\u00f3n</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-abbr">S</div>
+        <input type="number" class="stat-input" id="inp-s" min="0" max="20" value="5">
+        <div class="stat-name">SPEED</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-abbr">E</div>
+        <input type="number" class="stat-input" id="inp-e" min="0" max="20" value="5">
+        <div class="stat-name">ENDURANCE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-abbr">T</div>
+        <input type="number" class="stat-input" id="inp-t" min="0" max="20" value="5">
+        <div class="stat-name">TURNING</div>
+      </div>
+      <div class="stat-card p-card">
+        <div class="stat-abbr">P</div>
+        <input type="number" class="stat-input" id="inp-p" min="0" max="20" value="5">
+        <div class="stat-name">POWER</div>
+      </div>
+    </div>
+    <div class="budget-row">
+      <div class="budget-label">Presupuesto usado</div>
+      <div class="budget-count ok" id="budget-count">20 / 20</div>
+      <div class="budget-hint">Debe ser igual a 20</div>
+    </div>
+  </div>
+
+  <!-- PASO 2: TUS SALIDAS -->
+  <div class="outputs-section">
+    <div class="step-label">Paso 2 — Tus salidas de f\u00f3rmula</div>
+    <div class="output-grid">
+      <div class="output-card">
+        <div class="output-name">Potencia del Motor</div>
+        <div class="output-val" id="out-motor">25%</div>
+        <div class="output-formula">S × 5</div>
+      </div>
+      <div class="output-card">
+        <div class="output-name">ENDURANCE en t=3</div>
+        <div class="output-val" id="out-endurance">77.5%</div>
+        <div class="output-formula">100 − (20 − E) × 4.5</div>
+      </div>
+      <div class="output-card">
+        <div class="output-name">Raz\u00f3n de Giro</div>
+        <div class="output-val" id="out-turn">0.30</div>
+        <div class="output-formula">0.2 + (T × 0.02)</div>
+      </div>
+      <div class="output-card p-card">
+        <div class="output-name">\u26a1 Velocidad de Carga</div>
+        <div class="output-val" id="out-charge">25%</div>
+        <div class="output-formula">P\u00b2</div>
+      </div>
+      <div class="output-card p-card">
+        <div class="output-name">\u26a1 Follow-Through</div>
+        <div class="output-val" id="out-follow">1000 ms</div>
+        <div class="output-formula">P × 80</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 3: EL LABORATORIO -->
+  <div class="step-label">Paso 3 — El Laboratorio P\u00b2</div>
+  <div class="lab-card">
+
+    <div class="charge-display">
+      <div class="charge-eyebrow">Velocidad de Carga</div>
+      <div class="charge-number" id="lab-charge-num">25<span class="charge-unit">%</span></div>
+      <div class="charge-equation" id="lab-equation">P = <strong>5</strong> → 5\u00b2 = 25%</div>
+      <div class="over-callout" id="over-callout">
+        \u26a0\ufe0f M\u00e1s del 100% — este n\u00famero describe qu\u00e9 tan r\u00e1pido se llena la carga en relaci\u00f3n con la l\u00ednea base.<br>
+        Un bot con P=14 carga m\u00e1s del doble de r\u00e1pido que uno con P=10.
+      </div>
+    </div>
+
+    <div class="slider-section">
+      <div class="slider-label-row">
+        <div class="slider-title">Arrastra P</div>
+        <div class="slider-subtitle">— las reglas de presupuesto no aplican aqu\u00ed. Solo explora.</div>
+      </div>
+      <div class="slider-track-row">
+        <div class="p-min-label">1</div>
+        <input type="range" class="p-slider" id="lab-slider" min="1" max="17" value="5">
+        <div class="p-max-label">17 \u26a1</div>
+        <div class="p-val-badge" id="lab-p-badge">5</div>
+      </div>
+
+      <div class="compare-row">
+        <div class="compare-pill">
+          <div class="compare-pill-label">Si fuera lineal (como Potencia del Motor)</div>
+          <div class="compare-pill-val" id="linear-val">25%</div>
+        </div>
+        <div class="compare-vs">vs<br>real</div>
+        <div class="compare-pill actual">
+          <div class="compare-pill-label">P\u00b2 (f\u00f3rmula real)</div>
+          <div class="compare-pill-val" id="actual-val">25%</div>
+        </div>
+      </div>
+
+      <div class="delta-box" id="delta-box">
+        Este es tu P actual. Velocidad de carga = <strong>25%</strong>.
+      </div>
+      <div class="move-note" id="move-note"></div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-title">Velocidad de carga para cada P posible — toca cualquier barra</div>
+      <div class="chart-wrap">
+        <div class="bars-row" id="bars-row"></div>
+        <div class="ref-line-100" id="ref-line" style="bottom:28px;">
+          <span class="ref-line-label">100%</span>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:var(--yellow)"></span> Tu configuraci\u00f3n</span>
+        <span><span class="legend-dot" style="background:var(--purple)"></span> Selecci\u00f3n del laboratorio</span>
+      </div>
+    </div>
+
+    <div class="shock-section" id="shock-section">
+      <div class="shock-heading">\u26a1 La brecha no es lo que crees</div>
+      <div class="shock-compare">
+        <div class="shock-stat">
+          <div class="shock-stat-label">P = 2</div>
+          <div class="shock-stat-val">4%</div>
+        </div>
+        <div class="shock-divider">\u2192</div>
+        <div class="shock-stat">
+          <div class="shock-stat-label" id="shock-p-label">P = 12</div>
+          <div class="shock-stat-val" id="shock-val">144%</div>
+        </div>
+      </div>
+      <div class="shock-text" id="shock-text">
+        Esa es una diferencia de <strong>36×</strong> — con un cambio de 10 puntos.<br>
+        Si fuera lineal, la brecha ser\u00eda de 5×.
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const MAX_CHART_P = 17;
+const CHART_BAR_HEIGHT = 160;
+
+let build = { s: 5, e: 5, t: 5, p: 5 };
+let labP = 5;
+
+buildChart();
+updateAll();
+
+['s','e','t','p'].forEach(k => {
+  document.getElementById('inp-'+k).addEventListener('input', () => {
+    readBuild();
+    updateOutputs();
+    updateBudget();
+    updateChart();
+    updateDelta();
+  });
+});
+
+document.getElementById('lab-slider').addEventListener('input', e => {
+  labP = parseInt(e.target.value);
+  document.getElementById('lab-p-badge').textContent = labP;
+  updateSliderTrack(e.target);
+  updateLab();
+  updateChart();
+});
+
+function readBuild() {
+  build.s = parseInt(document.getElementById('inp-s').value) || 0;
+  build.e = parseInt(document.getElementById('inp-e').value) || 0;
+  build.t = parseInt(document.getElementById('inp-t').value) || 0;
+  build.p = parseInt(document.getElementById('inp-p').value) || 0;
+}
+
+function updateBudget() {
+  const total = build.s + build.e + build.t + build.p;
+  const el = document.getElementById('budget-count');
+  el.textContent = `${total} / 20`;
+  el.className = 'budget-count ' + (total === 20 ? 'ok' : total > 20 ? 'over' : 'under');
+}
+
+function updateOutputs() {
+  document.getElementById('out-motor').textContent = `${build.s * 5}%`;
+  const end = 100 - (20 - build.e) * 4.5;
+  document.getElementById('out-endurance').textContent = `${end % 1 === 0 ? end : end.toFixed(1)}%`;
+  document.getElementById('out-turn').textContent = (0.2 + build.t * 0.02).toFixed(2);
+  document.getElementById('out-charge').textContent = `${build.p * build.p}%`;
+  document.getElementById('out-follow').textContent = `${build.p * 80} ms`;
+}
+
+function updateLab() {
+  const p = labP;
+  const charge = p * p;
+  const linear = p * 5;
+
+  const numEl = document.getElementById('lab-charge-num');
+  numEl.innerHTML = `${charge}<span class="charge-unit">%</span>`;
+
+  if (charge > 100) {
+    numEl.classList.add('over-100');
+    document.getElementById('over-callout').classList.add('visible');
+  } else {
+    numEl.classList.remove('over-100');
+    document.getElementById('over-callout').classList.remove('visible');
+  }
+
+  numEl.classList.add('boom');
+  setTimeout(() => numEl.classList.remove('boom'), 150);
+
+  document.getElementById('lab-equation').innerHTML =
+    `P = <strong>${p}</strong> \u2192 ${p}\u00b2 = ${charge}%`;
+
+  document.getElementById('linear-val').textContent = `${linear}%`;
+  document.getElementById('actual-val').textContent = `${charge}%`;
+
+  updateDelta();
+
+  const shockEl = document.getElementById('shock-section');
+  if (p >= 11) {
+    shockEl.classList.add('visible');
+    document.getElementById('shock-p-label').textContent = `P = ${p}`;
+    document.getElementById('shock-val').textContent = `${charge}%`;
+    const ratio = (charge / 4).toFixed(0);
+    const linearRatio = (linear / 10).toFixed(1);
+    document.getElementById('shock-text').innerHTML =
+      `Esa es una diferencia de <strong>${ratio}\u00d7</strong> respecto a P=2 — con un cambio de ${p - 2} puntos.<br>
+       Si fuera lineal, la brecha ser\u00eda de ${linearRatio}\u00d7.`;
+  } else {
+    shockEl.classList.remove('visible');
+  }
+
+  const slider = document.getElementById('lab-slider');
+  updateSliderTrack(slider);
+}
+
+function updateDelta() {
+  const bp = build.p;
+  const bCharge = bp * bp;
+  const lCharge = labP * labP;
+  const diff = lCharge - bCharge;
+  const pDiff = labP - bp;
+
+  const el = document.getElementById('delta-box');
+  const moveEl = document.getElementById('move-note');
+
+  if (pDiff === 0) {
+    el.innerHTML = `Este es tu P actual. Velocidad de carga = <strong>${lCharge}%</strong>.`;
+    moveEl.innerHTML = '';
+  } else if (pDiff > 0) {
+    el.innerHTML = `Agrega <strong>${pDiff}</strong> a P: la carga pasa de <strong>${bCharge}%</strong>
+      \u2192 <strong class="gain">${lCharge}%</strong>
+      &nbsp;(+<span class="gain">${diff}%</span>)`;
+    moveEl.innerHTML = `<strong>Para llegar aqu\u00ed:</strong> toma ${pDiff} punto${pDiff > 1 ? 's' : ''} de SPEED, ENDURANCE o TURNING.`;
+  } else {
+    el.innerHTML = `Quita <strong>${Math.abs(pDiff)}</strong> de P: la carga baja de <strong>${bCharge}%</strong>
+      \u2192 <strong class="loss">${lCharge}%</strong>
+      &nbsp;(<span class="loss">${diff}%</span>)`;
+    moveEl.innerHTML = `<strong>Para llegar aqu\u00ed:</strong> mueve ${Math.abs(pDiff)} punto${Math.abs(pDiff) > 1 ? 's' : ''} a otra estad\u00edstica.`;
+  }
+}
+
+function buildChart() {
+  const container = document.getElementById('bars-row');
+  container.innerHTML = '';
+  const maxCharge = MAX_CHART_P * MAX_CHART_P;
+
+  for (let p = 1; p <= MAX_CHART_P; p++) {
+    const charge = p * p;
+    const heightPx = Math.round((charge / maxCharge) * CHART_BAR_HEIGHT);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    wrap.dataset.p = p;
+
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill';
+    fill.style.height = heightPx + 'px';
+    fill.id = 'bar-' + p;
+    fill.title = `P=${p}: ${charge}%`;
+
+    const xLabel = document.createElement('div');
+    xLabel.className = 'bar-x';
+    xLabel.id = 'bar-x-' + p;
+    xLabel.textContent = (p % 2 === 1) ? p : '';
+
+    wrap.addEventListener('click', () => {
+      labP = p;
+      document.getElementById('lab-slider').value = p;
+      document.getElementById('lab-p-badge').textContent = p;
+      updateSliderTrack(document.getElementById('lab-slider'));
+      updateLab();
+      updateChart();
+    });
+
+    wrap.appendChild(fill);
+    wrap.appendChild(xLabel);
+    container.appendChild(wrap);
+  }
+
+  const refPercent = (100 / 289);
+  const refPx = Math.round(refPercent * CHART_BAR_HEIGHT);
+  const refLine = document.getElementById('ref-line');
+  refLine.style.bottom = (28 + refPx) + 'px';
+}
+
+function updateChart() {
+  const maxCharge = MAX_CHART_P * MAX_CHART_P;
+  for (let p = 1; p <= MAX_CHART_P; p++) {
+    const fill = document.getElementById('bar-' + p);
+    const xLabel = document.getElementById('bar-x-' + p);
+    const isBuild = (p === build.p);
+    const isLab = (p === labP);
+
+    fill.className = 'bar-fill' + (isBuild && isLab ? ' is-both' : isBuild ? ' is-build' : isLab ? ' is-lab' : '');
+    xLabel.className = 'bar-x' + (isBuild && isLab ? ' is-both' : isBuild ? ' is-build' : isLab ? ' is-lab' : '');
+    xLabel.textContent = (isBuild || isLab || p % 2 === 1) ? p : '';
+  }
+}
+
+function updateSliderTrack(slider) {
+  const pct = ((labP - 1) / (MAX_CHART_P - 1)) * 100;
+  slider.style.background = `linear-gradient(to right, var(--purple) 0%, var(--purple) ${pct}%, var(--border) ${pct}%)`;
+}
+
+function updateAll() {
+  readBuild();
+  updateBudget();
+  updateOutputs();
+  updateLab();
+  updateChart();
+}
+</script>
+</body>
+</html>

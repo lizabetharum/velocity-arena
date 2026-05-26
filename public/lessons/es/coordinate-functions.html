@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funciones de Coordenadas — Programa Tu Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d1b2a;
+  --surface:  #132033;
+  --card:     #1a2d45;
+  --border:   #2a4060;
+  --cyan:     #00e5ff;
+  --yellow:   #ffd600;
+  --green:    #00e676;
+  --red:      #ff5252;
+  --orange:   #ff9100;
+  --purple:   #ce93d8;
+  --text:     #e8f0fe;
+  --muted:    #7a9cc0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.lesson-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #132d4a 100%);
+  border-bottom: 2px solid var(--cyan);
+  padding: 20px 24px 16px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 860px; margin: 0 auto;
+}
+.day-badge {
+  background: var(--cyan); color: #000;
+  font-weight: 800; font-size: 11px; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+}
+.lesson-title { font-size: 20px; font-weight: 800; color: #fff; }
+.lesson-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.progress-wrap { max-width: 860px; margin: 12px auto 0; }
+.progress-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--cyan); border-radius: 4px; transition: width 0.5s ease; width: 20%; }
+.progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.prog-tab {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color 0.2s;
+}
+.prog-tab.active { color: var(--cyan); }
+.prog-tab.done   { color: var(--green); }
+
+.section { display: none; max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+.section.active { display: block; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 14px;
+}
+
+.sec-header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.sec-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sec-icon.cyan   { background: rgba(0,229,255,.15); border: 2px solid var(--cyan);   color: var(--cyan); }
+.sec-icon.yellow { background: rgba(255,214,0,.12);  border: 2px solid var(--yellow); color: var(--yellow); }
+.sec-icon.green  { background: rgba(0,230,118,.12);  border: 2px solid var(--green);  color: var(--green); }
+.sec-icon.orange { background: rgba(255,145,0,.12);  border: 2px solid var(--orange); color: var(--orange); }
+.sec-icon.purple { background: rgba(206,147,216,.12); border: 2px solid var(--purple); color: var(--purple); }
+.sec-title    { font-size: 22px; font-weight: 800; }
+.sec-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+.formula-board {
+  background: linear-gradient(135deg, #0a2540 0%, #0d3360 100%);
+  border: 2px solid var(--cyan); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-bottom: 20px;
+}
+.formula-label { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.formula-main  { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.8; }
+.formula-eq    { color: var(--cyan); }
+.formula-note  { font-size: 13px; color: var(--muted); margin-top: 12px; }
+
+.vocab-box {
+  background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.3);
+  border-left: 4px solid var(--cyan); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 20px;
+}
+.vocab-title { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+.vocab-row   { display: flex; gap: 8px; align-items: baseline; margin-bottom: 8px; }
+.vocab-word  { font-weight: 700; color: var(--yellow); min-width: 150px; font-size: 14px; }
+.vocab-def   { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+.step-list { list-style: none; }
+.step-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,229,255,.15); border: 2px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--cyan); flex-shrink: 0; margin-top: 1px;
+}
+.step-num.yellow-num {
+  background: rgba(255,214,0,.15); border-color: var(--yellow); color: var(--yellow);
+}
+.step-num.green-num {
+  background: rgba(0,230,118,.15); border-color: var(--green); color: var(--green);
+}
+.step-text { font-size: 14px; color: var(--text); line-height: 1.7; }
+.step-text strong { color: var(--yellow); }
+.step-text a { color: var(--cyan); text-decoration: none; }
+.step-text a:hover { text-decoration: underline; }
+.step-text code {
+  background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.3);
+  padding: 1px 6px; border-radius: 4px; font-family: monospace;
+  color: var(--cyan); font-size: 13px;
+}
+
+.code-block {
+  background: #060f1a; border: 1px solid var(--border);
+  border-left: 4px solid var(--purple); border-radius: 10px;
+  padding: 18px 20px; font-family: monospace; font-size: 13px;
+  color: var(--text); margin-bottom: 18px; line-height: 2.0;
+  overflow-x: auto;
+}
+.ck { color: var(--cyan); font-weight: 700; }
+.ckw { color: var(--orange); }
+.ckv { color: var(--yellow); }
+.ckn { color: var(--purple); }
+.ckc { color: var(--muted); font-style: italic; }
+
+.concept-box {
+  background: rgba(206,147,216,.07); border: 1px solid rgba(206,147,216,.3);
+  border-left: 4px solid var(--purple); border-radius: 10px;
+  padding: 16px 20px; margin-bottom: 20px;
+}
+.concept-label { font-size: 12px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.concept-text  { font-size: 14px; color: var(--text); line-height: 1.8; }
+
+.challenge-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.challenge-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px;
+}
+.challenge-card.a-card  { border-top: 3px solid var(--cyan); }
+.challenge-card.b-card  { border-top: 3px solid var(--green); }
+.challenge-card.ab-card { border-top: 3px solid var(--yellow); }
+.challenge-badge {
+  display: inline-block; font-size: 11px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+}
+.badge-a  { background: rgba(0,229,255,.15);  color: var(--cyan);   border: 1px solid var(--cyan); }
+.badge-b  { background: rgba(0,230,118,.15);  color: var(--green);  border: 1px solid var(--green); }
+.badge-ab { background: rgba(255,214,0,.15);  color: var(--yellow); border: 1px solid var(--yellow); }
+.challenge-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.challenge-desc  { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+
+.path-steps { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.coord-node {
+  background: #0d1b2a; border: 2px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 14px; font-weight: 700; font-family: monospace;
+  color: var(--text);
+}
+.coord-node.start { border-color: var(--muted); color: var(--muted); }
+.coord-node.stop  { border-color: var(--cyan);  color: var(--cyan);  }
+.coord-node.stop.green  { border-color: var(--green); color: var(--green); }
+.coord-node.stop.yellow { border-color: var(--yellow); color: var(--yellow); }
+.path-arrow { color: var(--muted); font-size: 18px; }
+
+.call-preview {
+  background: #060f1a; border: 1px solid var(--border);
+  border-left: 4px solid var(--orange); border-radius: 10px;
+  padding: 12px 18px; font-family: monospace; font-size: 14px;
+  color: var(--text); margin-top: 10px;
+}
+
+.notice {
+  background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.3);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.notice strong { color: var(--yellow); }
+.hint-pill {
+  display: inline-block; background: rgba(255,145,0,.12);
+  border: 1px solid rgba(255,145,0,.4); border-radius: 20px;
+  padding: 5px 14px; font-size: 12px; color: var(--orange);
+  font-weight: 600; margin-top: 10px; cursor: pointer;
+}
+.hint-text {
+  background: rgba(255,145,0,.08); border: 1px solid rgba(255,145,0,.3);
+  border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+  font-size: 13px; color: var(--text); display: none; line-height: 1.6;
+}
+.hint-text.show { display: block; }
+
+.check-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.check-btn {
+  flex: 1; min-width: 120px; padding: 11px 16px;
+  background: #0d1b2a; border: 2px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.check-btn:hover       { border-color: var(--cyan); color: var(--cyan); }
+.check-btn.sel-correct { border-color: var(--green); background: rgba(0,230,118,.1); color: var(--green); }
+.check-btn.sel-wrong   { border-color: var(--red);   background: rgba(255,82,82,.1);  color: var(--red); }
+.check-response {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px; margin-top: 14px; font-size: 14px; line-height: 1.7; display: none;
+}
+.check-response.show    { display: block; }
+.check-response.correct { border-left: 4px solid var(--green); }
+.check-response.wrong   { border-left: 4px solid var(--red); }
+
+.reflect-q { margin-bottom: 24px; }
+.reflect-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+.reflect-frame {
+  font-size: 12px; color: var(--muted); font-style: italic;
+  background: rgba(255,255,255,.04); border-radius: 6px; padding: 8px 12px; margin-bottom: 8px;
+}
+textarea {
+  width: 100%; background: #0d1b2a; border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; color: var(--text);
+  font-family: 'Montserrat', sans-serif; font-size: 14px;
+  resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,229,255,.15); }
+
+.grid-visual-wrap { text-align: center; margin-bottom: 20px; }
+.grid-visual {
+  display: inline-block;
+  background: #0a1e35; border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; overflow-x: auto;
+}
+.grid-svg { display: block; }
+
+.congrats-box {
+  background: linear-gradient(135deg, #0a2e1a 0%, #0d3320 100%);
+  border: 2px solid var(--green); border-radius: 16px;
+  padding: 28px 24px; text-align: center; margin-top: 24px;
+}
+.congrats-icon  { font-size: 40px; margin-bottom: 12px; }
+.congrats-title { font-size: 20px; font-weight: 800; color: var(--green); margin-bottom: 8px; }
+.congrats-body  { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+.btn-next {
+  display: block; margin: 28px auto 0;
+  background: var(--cyan); color: #000;
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px;
+  padding: 14px 36px; border: none; border-radius: 10px;
+  cursor: pointer; transition: opacity 0.2s; letter-spacing: 0.3px;
+}
+.btn-next:hover { opacity: 0.88; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+@media (max-width: 620px) {
+  .two-col { grid-template-columns: 1fr; }
+  .formula-main { font-size: 17px; }
+}
+
+.block-wrap {
+  background: #f0f0f0; border-radius: 10px; padding: 16px;
+  text-align: center; overflow-x: auto; margin-bottom: 18px;
+}
+.block-wrap img { max-width: 100%; height: auto; border-radius: 6px; }
+
+.mc-wrap {
+  background: #040d18;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.mc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: max-content;
+  min-width: 100%;
+}
+.mc-b {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+  width: max-content;
+}
+.mc-hat { border-radius: 14px 14px 4px 4px !important; }
+
+.mc-c-event  { background: #1565c8; }
+.mc-c-btn    { background: #c62f3e; }
+.mc-c-fn     { background: #1b3680; }
+.mc-c-bot    { background: #1e7a68; }
+.mc-c-varset { background: #9e3030; }
+.mc-c-call   { background: #5240a8; }
+
+.mc-pill {
+  border-radius: 10px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.mc-p-var  { background: #c62f3e; color: #fff; }
+.mc-p-num  { background: rgba(255,255,255,.22); color: #fff; }
+.mc-p-neg  { background: rgba(255,82,82,.35); color: #ffaaaa; }
+.mc-p-math { background: #6830b8; color: #fff; }
+.mc-p-drop { background: rgba(255,255,255,.16); color: rgba(255,255,255,.8); }
+.mc-p-unit { background: rgba(255,255,255,.12); color: rgba(255,255,255,.65); font-size: 10px; }
+
+.mc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 22px;
+  padding: 3px 0 5px 10px;
+  border-left: 3px solid rgba(255,255,255,.16);
+}
+.mc-else {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  background: #1e7a68;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  width: max-content;
+}
+.mc-note {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  padding: 2px 0 2px 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- ENCABEZADO -->
+<header class="lesson-header">
+  <div class="header-row">
+    <div>
+      <div class="day-badge">Funciones y Coordenadas</div>
+      <div class="lesson-title">Programa Tu Bot para Navegar la Cuadrícula</div>
+      <div class="lesson-sub">MakeCode · Cutebot Pro · Geometría de Coordenadas</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="progress-labels">
+      <span class="prog-tab active" id="tab0" onclick="goTo(0)">Intro</span>
+      <span class="prog-tab" id="tab1" onclick="goTo(1)">Preparar</span>
+      <span class="prog-tab" id="tab2" onclick="goTo(2)">Construir</span>
+      <span class="prog-tab" id="tab3" onclick="goTo(3)">Desafíos</span>
+      <span class="prog-tab" id="tab4" onclick="goTo(4)">Reflexión</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════
+     SECCIÓN 0 — INTRO
+═══════════════════════════════════════════ -->
+<section class="section active" id="sec0">
+  <div class="sec-header">
+    <div class="sec-icon cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 4v3"/><circle cx="9" cy="13" r="1.2"/><circle cx="15" cy="13" r="1.2"/><path d="M9 17h6"/></svg></div>
+    <div>
+      <div class="sec-title">Funciones y Geometría de Coordenadas</div>
+      <div class="sec-subtitle">Enseña a tu bot a navegar hasta cualquier punto de la cuadrícula</div>
+    </div>
+  </div>
+
+  <div class="concept-box">
+    <div class="concept-label">Idea Principal</div>
+    <div class="concept-text">
+      Una <strong style="color:var(--purple)">función</strong> es un mini-programa con nombre que agrupa pasos que quieres reutilizar. En lugar de reconstruir la misma secuencia de bloques cada vez, defines la lógica una sola vez, le das un nombre y la llamas con diferentes entradas. Hoy construirás <code style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--purple);font-size:13px">moveToCoordinate(x, y)</code> — una función que le dice a tu bot a qué cuadro debe dirigirse en la cuadrícula de la arena.
+    </div>
+  </div>
+
+  <div class="vocab-box">
+    <div class="vocab-title">Vocabulario Clave</div>
+    <div class="vocab-row">
+      <span class="vocab-word">Función</span>
+      <span class="vocab-def">Un bloque de pasos con nombre que puedes llamar una y otra vez con diferentes entradas.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Parámetro</span>
+      <span class="vocab-def">Una ranura de entrada en una función — como <em>x</em> o <em>y</em> — que cambia cada vez que la llamas.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Constante (UNIT)</span>
+      <span class="vocab-def">Un número que nunca cambia. Aquí, 1 UNIT = 27 cm = el ancho de un cuadro de la cuadrícula.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Valor Absoluto</span>
+      <span class="vocab-def">La distancia desde cero — siempre positiva. |−3| = 3. Los bots recorren distancias positivas aunque vayan hacia la izquierda o hacia abajo.</span>
+    </div>
+    <div class="vocab-row">
+      <span class="vocab-word">Coordenada</span>
+      <span class="vocab-def">Un par ordenado (x, y) que nombra un cuadro específico en la cuadrícula. x se mueve izquierda/derecha; y se mueve arriba/abajo.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">¿Por Qué Funciones?</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:12px">
+      Imagina que necesitas enviar tu bot a cinco cuadros diferentes en un partido. Sin una función, copiarías los mismos 10+ bloques cinco veces. Un error en cualquier lugar rompe todo.
+    </p>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:12px">
+      Con una función, escribes la lógica <em>una sola vez</em>. Para enviar el bot al cuadro (3, 2) simplemente escribes:
+    </p>
+    <div class="call-preview">
+      <span class="ckw">call</span> <span class="ck">moveTo</span>(<span class="ckv">3</span>, <span class="ckv">2</span>)
+    </div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:12px">
+      Cambia los números y el bot va a otro lugar — misma lógica, cero reescritura. Así es exactamente como funciona el software profesional de robótica.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">La Cuadrícula</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Tu arena es una cuadrícula de coordenadas. El bot comienza en <strong style="color:var(--cyan)">(0, 0)</strong>. Cada cuadro mide <strong style="color:var(--yellow)">27 cm × 27 cm</strong> — esa es tu UNIT. x positivo va a la derecha, x negativo va a la izquierda. y positivo va hacia adelante, y negativo va hacia atrás.
+    </p>
+    <div class="grid-visual-wrap">
+      <div class="grid-visual">
+        <svg class="grid-svg" width="280" height="280" viewBox="0 0 280 280">
+          <defs>
+            <pattern id="smallGrid" width="56" height="56" patternUnits="userSpaceOnUse">
+              <path d="M 56 0 L 0 0 0 56" fill="none" stroke="#2a4060" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="280" height="280" fill="url(#smallGrid)"/>
+          <line x1="0" y1="140" x2="280" y2="140" stroke="#00e5ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="140" y1="0" x2="140" y2="280" stroke="#00e5ff" stroke-width="1.5" opacity="0.5"/>
+          <text x="268" y="136" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">x</text>
+          <text x="144" y="14" fill="#00e5ff" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">y</text>
+          <text x="145" y="155" fill="#7a9cc0" font-size="10" font-family="monospace">(0,0)</text>
+          <text x="189" y="100" fill="#ffd600" font-size="10" font-family="monospace">(1,1)</text>
+          <text x="189" y="212" fill="#ff9100" font-size="10" font-family="monospace">(1,−1)</text>
+          <text x="77" y="100" fill="#ce93d8" font-size="10" font-family="monospace">(−1,1)</text>
+          <circle cx="140" cy="140" r="5" fill="#00e5ff"/>
+          <circle cx="308" cy="28" r="6" fill="#ffd600" opacity="0"/>
+          <circle cx="196" cy="84" r="5" fill="#ffd600"/>
+          <circle cx="196" cy="196" r="5" fill="#ff9100"/>
+          <circle cx="84" cy="84" r="5" fill="#ce93d8"/>
+        </svg>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.5">
+      El bot comienza en (0, 0). Cada cuadro que avanza a la derecha suma 1 a x. Cada cuadro hacia adelante suma 1 a y.
+    </p>
+  </div>
+
+  <!-- Verificación rápida -->
+  <div class="card">
+    <div class="card-title">Verificación Rápida</div>
+    <p style="font-size:14px;color:var(--text);margin-bottom:14px">Si tu bot está en (0, 0) y llamas <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveTo(3, 2)</code>, ¿en qué dirección se mueve el bot primero?</p>
+    <div class="check-row">
+      <button class="check-btn" onclick="checkAns(this,'wrong','qc1')">Hacia adelante (y primero)</button>
+      <button class="check-btn" onclick="checkAns(this,'correct','qc1')">Derecha (x primero)</button>
+      <button class="check-btn" onclick="checkAns(this,'wrong','qc1')">Izquierda luego adelante</button>
+    </div>
+    <div class="check-response" id="qc1"></div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(1)">Siguiente: Preparar →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECCIÓN 1 — PREPARAR
+═══════════════════════════════════════════ -->
+<section class="section" id="sec1">
+  <div class="sec-header">
+    <div class="sec-icon yellow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+    <div>
+      <div class="sec-title">Preparar el Proyecto</div>
+      <div class="sec-subtitle">Prepara MakeCode y define tu constante UNIT</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Antes de empezar:</strong> Necesitas un robot Cutebot Pro y un micro:bit v2.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pasos 1–7: Abre MakeCode y Configura Tu Proyecto</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">Abre tu computadora y ve a <strong><a href="https://makecode.microbit.org/" target="_blank">makecode.microbit.org</a></strong></div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">Inicia sesión en tu cuenta.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">Haz clic en <strong>Nuevo Proyecto</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text">Nombra el proyecto <code>coordinates</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-text">Haz clic en <strong>Extensiones</strong> y agrega <strong>Cutebot Pro</strong> para poder enviar comandos al robot.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-text">
+          Crea una variable llamada <code>UNIT</code> (todo en mayúsculas). En el bloque <strong>on start</strong>, establece <code>UNIT</code> en <strong style="color:var(--yellow)">27</strong>.
+          <div style="margin-top:8px;font-size:13px;color:var(--muted)">Esto le indica al programa que un cuadro de la cuadrícula = 27 cm. Cambia este número si los cuadros de tu arena tienen un tamaño diferente.</div>
+          <span class="hint-pill" onclick="toggleHint('h6')">¿Por qué 27?</span>
+          <div class="hint-text" id="h6">27 cm es el ancho físico de un cuadro en tu tapete de arena. El bot usa este valor para saber cuánto recorrer. Si cambias el tamaño del tapete, actualiza UNIT y la función seguirá funcionando perfectamente — sin necesidad de editar nada más.</div>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-text">También en <strong>on start</strong>, agrega el bloque <code>set length of the squares as UNIT cm</code>. Esto registra el tamaño del cuadro con la extensión Cutebot.</div>
+      </li>
+    </ul>
+    <div class="mc-wrap" style="margin-top:16px">
+      <div class="mc-stack">
+        <div class="mc-b mc-c-event mc-hat">on start</div>
+        <div class="mc-body">
+          <div class="mc-b mc-c-varset">set <span class="mc-pill mc-p-var">UNIT</span> to <span class="mc-pill mc-p-num">27</span></div>
+          <div class="mc-b mc-c-bot">set length of squares as <span class="mc-pill mc-p-var">UNIT</span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-board">
+    <div class="formula-label">Tu Constante UNIT</div>
+    <div class="formula-main">
+      <span class="formula-eq">UNIT</span> = 27 cm &nbsp;=&nbsp; 1 cuadro de la cuadrícula
+    </div>
+    <div class="formula-note">Una llamada a <span style="color:var(--cyan);font-weight:700">moveTo(x, y)</span> mueve el bot exactamente |x| × 27 cm hacia el lado, luego |y| × 27 cm hacia adelante.</div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(2)">Siguiente: Construir la Función →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECCIÓN 2 — CONSTRUIR
+═══════════════════════════════════════════ -->
+<section class="section" id="sec2">
+  <div class="sec-header">
+    <div class="sec-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/></svg></div>
+    <div>
+      <div class="sec-title">Construir <code style="font-size:18px">moveTo(x, y)</code></div>
+      <div class="sec-subtitle">Pasos 8–25: Define la función y conecta los botones</div>
+    </div>
+  </div>
+
+  <!-- Crear la función -->
+  <div class="card">
+    <div class="card-title">Parte A — Crea la Función</div>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">8</div>
+        <div class="step-text">Haz clic en <strong>Avanzado</strong> en el panel de herramientas, luego selecciona <strong>Funciones</strong>. Haz clic en <strong>Crear una Función</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">9</div>
+        <div class="step-text">Nombra la función <code>moveTo</code>. Agrega <strong>dos entradas numéricas</strong> y renómbralas <code>x</code> e <code>y</code>. Presiona <strong>Listo</strong>.
+          <div style="margin-top:8px;font-size:13px;color:var(--muted)">Estos dos parámetros son la coordenada a la que debe dirigirse el bot. Cada vez que llamas a <code>moveTo</code>, introduces números diferentes.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Dirección x -->
+  <div class="card">
+    <div class="card-title">Parte B — Muévete en la Dirección X Primero</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      El bot siempre maneja x (izquierda/derecha) antes que y (adelante/atrás). Necesita decidir <em>hacia dónde</em> girar según si x es positivo o negativo.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">10</div>
+        <div class="step-text">Dentro de <code>moveTo</code>, agrega un bloque <strong>if/else</strong> de la sección Lógica.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">11</div>
+        <div class="step-text">Establece la condición como <code>x &lt; 0</code>. Si x es negativo, el bot necesita orientarse hacia la <strong>izquierda</strong>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">12</div>
+        <div class="step-text">En la rama <strong>then</strong>: agrega <code>set car turn left at place for angle 90</code> (sección Cutebot Pro).</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">13</div>
+        <div class="step-text">En la rama <strong>else</strong>: agrega <code>set car turn right at place for angle 90</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">14</div>
+        <div class="step-text">
+          Debajo del if/else, agrega un bloque <strong>go forward</strong> (sección PID Control). Para la distancia, usa:
+          <div class="mc-wrap" style="margin-top:10px;margin-bottom:0">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-bot">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">x</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+            </div>
+          </div>
+          <span class="hint-pill" onclick="toggleHint('habs')">¿Por qué valor absoluto?</span>
+          <div class="hint-text" id="habs">La distancia siempre es positiva — no puedes recorrer −3 cm. Si x = −2, |−2| = 2, así que el bot avanza 2 cuadros. La dirección ya fue establecida por el giro, así que la distancia de avance es solo la magnitud.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Dirección y -->
+  <div class="card">
+    <div class="card-title">Parte C — Muévete en la Dirección Y Después</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Después de completar el movimiento en x, el bot ahora necesita orientarse en la dirección correcta para y. El giro depende de x e y: si el bot ya giró a la derecha por x (x &gt; 0), necesita girar a la izquierda para quedar de frente. Si giró a la izquierda por x (x &lt; 0), necesita girar a la derecha para quedar de frente.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num yellow-num">15</div>
+        <div class="step-text">Agrega otro bloque <strong>if/else</strong> debajo del bloque go forward.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">16</div>
+        <div class="step-text">Establece la condición como <code>x &lt; 0</code>. Si x fue negativo (el bot giró a la izquierda), ahora gira a la <strong>derecha</strong> para quedar de frente para el movimiento en y.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">17</div>
+        <div class="step-text">En la rama <strong>then</strong>: <code>set car turn right at place for angle 90</code>.</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">18</div>
+        <div class="step-text">En la rama <strong>else</strong>: <code>set car turn left at place for angle 90</code>. (Si x fue positivo, el bot giró a la derecha al inicio, así que ahora gira a la izquierda para quedar de frente.)</div>
+      </li>
+      <li class="step-item">
+        <div class="step-num yellow-num">19</div>
+        <div class="step-text">
+          Agrega un último bloque <strong>go forward</strong> con:
+          <div class="mc-wrap" style="margin-top:10px;margin-bottom:0">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-bot">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">y</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Cómo luce tu función -->
+  <div class="concept-box">
+    <div class="concept-label">Así Luce Tu Función</div>
+    <div class="mc-wrap" style="margin-top:12px;margin-bottom:0">
+      <div class="mc-stack">
+        <div class="mc-b mc-c-fn">function <strong style="color:#7eb8ff;margin:0 2px">moveTo</strong> <span class="mc-pill mc-p-var">x</span> <span class="mc-pill mc-p-var">y</span></div>
+        <div class="mc-body">
+          <div class="mc-b mc-c-bot">if <span class="mc-pill mc-p-var">x</span> &lt; <span class="mc-pill mc-p-num">0</span> then</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">left ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-else">else</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">right ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-b mc-c-bot" style="margin-top:4px">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">x</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+          <div class="mc-b mc-c-bot" style="margin-top:6px">if <span class="mc-pill mc-p-var">x</span> &lt; <span class="mc-pill mc-p-num">0</span> then</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">right ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-else">else</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-bot">set car turn <span class="mc-pill mc-p-drop">left ▾</span> at place <span class="mc-pill mc-p-drop">▾</span> for angle <span class="mc-pill mc-p-num">90</span></div>
+          </div>
+          <div class="mc-b mc-c-bot" style="margin-top:4px">go forward <span class="mc-pill mc-p-drop">▾</span> <span class="mc-pill mc-p-math">absolute of <span class="mc-pill mc-p-var">y</span> × <span class="mc-pill mc-p-var">UNIT</span></span> <span class="mc-pill mc-p-unit">cm ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conectar botones -->
+  <div class="card">
+    <div class="card-title">Parte D — Conecta los Botones</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px">
+      Ahora crea manejadores de eventos para poder activar el bot desde los botones del micro:bit. Construirás tres: <strong>Botón A</strong>, <strong>Botón B</strong> y <strong>Botón A+B</strong>.
+    </p>
+    <ul class="step-list">
+      <li class="step-item">
+        <div class="step-num green-num">20</div>
+        <div class="step-text">
+          <strong>Botón A</strong> — envía el bot de (0,0) a <strong style="color:var(--cyan)">(1, 1)</strong>.
+          <div class="mc-wrap" style="margin-top:10px">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">A ▾</span> pressed</div>
+              <div class="mc-body">
+                <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">1</span> <span class="mc-pill mc-p-num">1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num green-num">21</div>
+        <div class="step-text">
+          <strong>Botón B</strong> — envía el bot de (0,0) a <strong style="color:var(--cyan)">(1, 3)</strong>.
+          <div class="mc-wrap" style="margin-top:10px">
+            <div class="mc-stack">
+              <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">B ▾</span> pressed</div>
+              <div class="mc-body">
+                <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">1</span> <span class="mc-pill mc-p-num">3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="notice" style="margin-top:16px;margin-bottom:0">
+      <strong>Prueba después de cada botón.</strong> Carga tu código, coloca el bot en (0,0) y presiona el botón. ¿Llega al cuadro correcto? Si no, verifica las direcciones de giro y los bloques de valor absoluto antes de continuar.
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(3)">Siguiente: Desafíos →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECCIÓN 3 — DESAFÍOS
+═══════════════════════════════════════════ -->
+<section class="section" id="sec3">
+  <div class="sec-header">
+    <div class="sec-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="4" height="9" rx="1.5"/><rect x="10" y="6" width="4" height="14" rx="1.5"/><rect x="17" y="3" width="4" height="17" rx="1.5"/></svg></div>
+    <div>
+      <div class="sec-title">Desafíos de Navegación del Bot</div>
+      <div class="sec-subtitle">Usa tu función para navegar rutas de múltiples puntos</div>
+    </div>
+  </div>
+
+  <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+    Para cada desafío, coloca tu bot en (0, 0) y programa el botón correcto. Cada llamada a <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveTo</code> mueve el bot <em>desde su posición actual</em> — así que las coordenadas son relativas a la última parada.
+  </p>
+
+  <div class="challenge-grid">
+
+    <!-- BOTÓN A -->
+    <div class="challenge-card a-card">
+      <div class="challenge-badge badge-a">Botón A</div>
+      <div class="challenge-title">Movimiento Único</div>
+      <div class="challenge-desc">Lleva el bot de (0, 0) al cuadro (3, 2). Una llamada, un destino.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+      </div>
+      <div class="mc-wrap">
+        <div class="mc-stack">
+          <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">A ▾</span> pressed</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">3</span> <span class="mc-pill mc-p-num">2</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        El bot gira 3 cuadros a la derecha, luego 2 cuadros hacia adelante. Distancia total: 3 × 27 + 2 × 27 = <strong style="color:var(--cyan)">135 cm</strong>.
+      </div>
+    </div>
+
+    <!-- BOTÓN B -->
+    <div class="challenge-card b-card">
+      <div class="challenge-badge badge-b">Botón B</div>
+      <div class="challenge-title">Ruta de Dos Paradas</div>
+      <div class="challenge-desc">Viaja de (0, 0) → (3, 2) → (5, 4). Dos llamadas en secuencia.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop green">(5, 4)</span>
+      </div>
+      <div class="mc-wrap">
+        <div class="mc-stack">
+          <div class="mc-b mc-c-btn mc-hat">on button <span class="mc-pill mc-p-drop">B ▾</span> pressed</div>
+          <div class="mc-body">
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">3</span> <span class="mc-pill mc-p-num">2</span></div>
+            <div class="mc-b mc-c-call">call moveTo <span class="mc-pill mc-p-num">2</span> <span class="mc-pill mc-p-num">2</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        La segunda llamada usa <strong style="color:var(--green)">(2, 2)</strong> — no (5, 4) — porque el bot ya está en (3, 2). Le estás diciendo cuánto debe moverse desde donde está ahora.
+      </div>
+      <span class="hint-pill" onclick="toggleHint('hb')">¿Por qué (2, 2) y no (5, 4)?</span>
+      <div class="hint-text" id="hb">La función mueve el bot según el número que le pasas, partiendo de su posición actual. Si el bot está en (3, 2) y quieres llevarlo a (5, 4), necesita moverse 2 cuadros más a la derecha y 2 cuadros más hacia adelante. Por eso pasas (2, 2).</div>
+    </div>
+
+    <!-- BOTÓN A+B -->
+    <div class="challenge-card ab-card">
+      <div class="challenge-badge badge-ab">Botón A+B</div>
+      <div class="challenge-title">Ruta de Tres Paradas</div>
+      <div class="challenge-desc">Viaja de (0, 0) → (3, 2) → (5, 4) → (2, 4). Tres llamadas en secuencia.</div>
+      <div class="path-steps">
+        <span class="coord-node start">(0, 0)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop">(3, 2)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop green">(5, 4)</span>
+        <span class="path-arrow">→</span>
+        <span class="coord-node stop yellow">(2, 4)</span>
+      </div>
+      <span class="hint-pill" onclick="toggleHint('hab')">Calcula el tercer movimiento</span>
+      <div class="hint-text" id="hab">El bot está en (5, 4). El destino es (2, 4). Diferencia: x = 2 − 5 = −3, y = 4 − 4 = 0. Así que la tercera llamada es moveTo(−3, 0). x negativo = girar a la izquierda.</div>
+    </div>
+  </div>
+
+  <!-- Conexión matemática -->
+  <div class="concept-box">
+    <div class="concept-label">Conexión Matemática: Coordenadas Relativas vs. Absolutas</div>
+    <div class="concept-text">
+      Tu función usa <strong style="color:var(--purple)">coordenadas relativas</strong> — cada llamada describe cuánto moverse desde la posición actual, no desde el origen. Para encontrar la entrada de un movimiento, resta la posición actual del destino:<br><br>
+      <code style="background:rgba(206,147,216,.1);border:1px solid rgba(206,147,216,.3);padding:4px 10px;border-radius:6px;font-family:monospace;font-size:14px;color:var(--purple)">
+        Δx = x_destino − x_actual &nbsp;&nbsp; Δy = y_destino − y_actual
+      </code><br><br>
+      Si estuvieras construyendo una función estilo GPS que siempre parte de (0, 0), usarías coordenadas absolutas y pasarías el destino directamente. Ambos enfoques son válidos — solo requieren lógica diferente dentro de la función.
+    </div>
+  </div>
+
+  <button class="btn-next" onclick="goTo(4)">Siguiente: Reflexión →</button>
+</section>
+
+<!-- ════════════════════════════════════════
+     SECCIÓN 4 — REFLEXIÓN
+═══════════════════════════════════════════ -->
+<section class="section" id="sec4">
+  <div class="sec-header">
+    <div class="sec-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg></div>
+    <div>
+      <div class="sec-title">Reflexión</div>
+      <div class="sec-subtitle">¿Qué hizo realmente tu función?</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preguntas de Discusión</div>
+    <div class="reflect-q">
+      <div class="reflect-label">1. ¿Cuál es la diferencia entre una función y una secuencia de bloques normal?</div>
+      <div class="reflect-frame">Piensa en qué pasa cuando necesitas reutilizar la misma lógica 5 veces en un programa.</div>
+      <textarea placeholder="Escribe tu respuesta..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">2. ¿Por qué usamos el valor absoluto para la distancia en el bloque go forward?</div>
+      <div class="reflect-frame">¿Qué pasaría si x = −3 y lo pasaras directamente al bloque de distancia?</div>
+      <textarea placeholder="Escribe tu respuesta..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">3. En el desafío A+B, la tercera llamada a moveTo usa x = −3. ¿Qué le indica el signo negativo a la función?</div>
+      <div class="reflect-frame">Sigue la lógica if/else dentro de moveTo con x = −3.</div>
+      <textarea placeholder="Escribe tu respuesta..."></textarea>
+    </div>
+    <div class="reflect-q">
+      <div class="reflect-label">4. UNIT está establecido en 27. Si los cuadros de tu arena fueran de 30 cm, ¿qué cambiarías?</div>
+      <div class="reflect-frame">¿Cuántos bloques necesitarías actualizar?</div>
+      <textarea placeholder="Escribe tu respuesta..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Desafío de Extensión</div>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:14px">
+      ¿Puedes construir una segunda función llamada <code style="background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--cyan);font-size:13px">moveToAbsolute(x, y)</code> que <em>siempre</em> navegue desde (0, 0)?
+    </p>
+    <p style="font-size:14px;color:var(--text);line-height:1.8;margin-bottom:0">
+      Necesitarías dos variables para rastrear la posición actual del bot y luego calcular el movimiento relativo dentro de la función. Así es como funciona la navegación real de robots — el bot mantiene un estado y calcula los movimientos relativos automáticamente.
+    </p>
+  </div>
+
+  <div class="congrats-box">
+    <div class="congrats-icon">🎯</div>
+    <div class="congrats-title">Función Construida. Bot Navegando.</div>
+    <div class="congrats-body">
+      Definiste una función reutilizable con dos parámetros, usaste el valor absoluto para manejar la dirección sin romper la distancia, y navegaste una ruta de tres paradas — todo con los mismos 20 bloques de lógica. Eso es la esencia del diseño de software.
+    </div>
+  </div>
+</section>
+
+<!-- ════ SCRIPT ════ -->
+<script>
+  let current = 0;
+  const TOTAL = 5;
+
+  function goTo(n) {
+    document.getElementById('sec' + current).classList.remove('active');
+    document.getElementById('tab' + current).classList.remove('active');
+    document.getElementById('tab' + current).classList.add('done');
+    current = n;
+    document.getElementById('sec' + current).classList.add('active');
+    document.querySelectorAll('.prog-tab').forEach((t, i) => {
+      if (i < n) t.classList.add('done');
+      if (i === n) { t.classList.add('active'); t.classList.remove('done'); }
+    });
+    document.getElementById('progFill').style.width = ((n + 1) / TOTAL * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleHint(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('show');
+  }
+
+  function checkAns(btn, type, responseId) {
+    const resp = document.getElementById(responseId);
+    document.querySelectorAll('.check-btn').forEach(b => {
+      b.classList.remove('sel-correct', 'sel-wrong');
+    });
+    btn.classList.add(type === 'correct' ? 'sel-correct' : 'sel-wrong');
+    resp.className = 'check-response show ' + (type === 'correct' ? 'correct' : 'wrong');
+    if (type === 'correct') {
+      resp.innerHTML = '✅ <strong style="color:var(--green)">Correcto.</strong> La función maneja x primero — gira el bot 90° a la izquierda o la derecha, avanza |x| cuadros y luego se reorienta para el movimiento en y. X siempre va primero.';
+    } else {
+      resp.innerHTML = '❌ <strong style="color:var(--red)">No del todo.</strong> La función está diseñada para moverse primero en x (izquierda o derecha), luego en y (adelante o atrás). Observa el orden de los bloques go forward dentro de <code style="font-family:monospace;color:var(--cyan)">moveTo</code>.';
+    }
+  }
+</script>
+</body>
+</html>

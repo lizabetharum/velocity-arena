@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Persecución del Marcador — Juego de Tarjetas</title>
+<style>
+/* ── PRINT SETUP ──────────────────────────────── */
+@page { size: letter portrait; margin: 0.45in; }
+@media print {
+  .no-print { display: none; }
+  .page-break { page-break-after: always; }
+  body { background: white; }
+}
+
+/* ── BASE ─────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f0f0f0;
+  color: #111;
+}
+
+/* ── SCREEN WRAPPER ───────────────────────────── */
+.page-header {
+  background: #0d1b2a; color: #ffd600;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  padding: 18px 32px; font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.page-header span { color: #7a9cc0; font-weight: 400; margin-left: 12px; }
+
+/* ── INSTRUCTIONS (screen only) ──────────────── */
+.instructions {
+  max-width: 760px; margin: 24px auto 0; padding: 0 24px;
+  font-size: 13px; color: #333; line-height: 1.6;
+}
+.instructions h2 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #0d1b2a; }
+.instructions ul { padding-left: 20px; margin-bottom: 12px; }
+.placeholder-note {
+  background: #fff3cd; border: 1.5px solid #f0a500;
+  border-radius: 6px; padding: 10px 14px; font-size: 12px;
+  margin-top: 8px;
+}
+.placeholder-note strong { color: #c05000; }
+
+/* ── SECTION TITLE ────────────────────────────── */
+.section-title {
+  max-width: 760px; margin: 32px auto 8px; padding: 0 24px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #555;
+  border-bottom: 2px solid #ccc; padding-bottom: 6px;
+}
+
+/* ── CARDS GRID ───────────────────────────────── */
+.cards-page {
+  max-width: 760px; margin: 0 auto 40px; padding: 0 24px;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── PROBLEM CARD ─────────────────────────────── */
+.problem-card {
+  border: 2.5px solid #1a4a7a; border-radius: 10px;
+  overflow: hidden; background: white;
+  page-break-inside: avoid; break-inside: avoid;
+}
+.problem-card .card-header {
+  background: #1a4a7a; color: white;
+  padding: 7px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-type-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; opacity: 0.85;
+}
+.card-number {
+  font-size: 11px; font-weight: 800; color: #ffd600;
+}
+
+.card-front {
+  padding: 10px 12px 8px;
+  border-bottom: 1.5px dashed #bbb;
+}
+.front-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #1a4a7a; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.front-label::after { content: '▸ VISIBLE AL PUBLICARSE'; font-weight: 400; color: #999; }
+
+.team-name {
+  font-size: 15px; font-weight: 800; color: #1a4a7a;
+  margin-bottom: 4px;
+}
+.stat-line {
+  font-size: 13px; color: #333; line-height: 1.5;
+}
+.location-tag {
+  display: inline-block; margin-top: 5px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: #888;
+  border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px;
+}
+
+.card-back {
+  padding: 10px 12px 11px;
+  background: #f7f9fb;
+}
+.back-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #999; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.back-label::after { content: '▸ VOLTEAR PARA REVELAR'; font-weight: 400; }
+
+.question-text {
+  font-size: 12px; color: #222; font-weight: 600;
+  line-height: 1.4; margin-bottom: 6px;
+}
+.formula-hint {
+  font-size: 11px; color: #555; font-style: italic;
+}
+.answer-key {
+  font-size: 10px; margin-top: 7px;
+  background: #eef3f8; border-left: 3px solid #1a4a7a;
+  padding: 4px 8px; border-radius: 0 4px 4px 0;
+  color: #333;
+}
+.answer-key strong { color: #1a4a7a; }
+
+/* ── ANSWER CARD ──────────────────────────────── */
+.answer-card {
+  border: 2.5px solid #8b5000; border-radius: 10px;
+  overflow: hidden; background: white;
+  page-break-inside: avoid; break-inside: avoid;
+}
+.answer-card .card-header {
+  background: #8b5000; color: white;
+  padding: 7px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.answer-face {
+  padding: 12px 12px 8px;
+  border-bottom: 1.5px dashed #bbb;
+}
+.answer-face-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #8b5000; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.answer-face-label::after { content: '▸ CARA ABAJO EN LA MESA'; font-weight: 400; color: #999; }
+
+.answer-value {
+  font-size: 28px; font-weight: 800; color: #8b5000;
+  line-height: 1; margin-bottom: 2px;
+}
+.answer-formula-ref {
+  font-size: 10px; color: #888;
+}
+
+.answer-back {
+  padding: 10px 12px 11px; background: #fdf7ef;
+}
+.answer-back-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #999; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.answer-back-label::after { content: '▸ EL ESTUDIANTE VE DESPUÉS DEL PARTIDO'; font-weight: 400; }
+
+.next-pointer {
+  font-size: 13px; font-weight: 700; color: #222; margin-bottom: 4px;
+}
+.next-pointer .next-team { color: #8b5000; }
+.confirm-text {
+  font-size: 11px; color: #555; line-height: 1.4;
+}
+
+/* ── PLACEHOLDER STYLING ──────────────────────── */
+.ph {
+  color: #c05000; font-weight: 800;
+  background: #fff3cd; border-radius: 3px;
+  padding: 0 3px; font-style: normal;
+}
+
+/* ── CUT LINE ─────────────────────────────────── */
+.cut-line {
+  text-align: center; font-size: 9px; color: #aaa;
+  letter-spacing: 2px; margin: 4px 0;
+  border-top: 1px dashed #ccc; padding-top: 4px;
+}
+
+/* ── FORMULA REFERENCE ────────────────────────── */
+.formula-ref-box {
+  max-width: 760px; margin: 0 auto 16px; padding: 0 24px;
+}
+.formula-ref-inner {
+  background: #0d1b2a; color: #e8f0fe;
+  border-radius: 10px; padding: 14px 18px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  font-size: 11px;
+}
+.fref { border-right: 1px solid #2a4060; padding-right: 10px; }
+.fref:last-child { border-right: none; }
+.fref-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #7a9cc0; margin-bottom: 3px; }
+.fref-formula { font-weight: 700; color: #ffd600; }
+</style>
+</head>
+<body>
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<!-- SCREEN HEADER -->
+<div class="page-header no-print">
+  Velocity Arena · Día 8 — Persecución del Marcador
+  <span>Imprimir páginas por separado: Tarjetas de Problema · Tarjetas de Respuesta</span>
+</div>
+
+<div class="instructions no-print">
+  <h2>Antes de imprimir</h2>
+  <ul>
+    <li>Reemplaza todos los <strong style="color:#c05000">marcadores de posición en naranja</strong> con los datos reales del marcador del Día 7.</li>
+    <li>Actualiza las etiquetas de ubicación en cada Tarjeta de Problema para que coincidan con el diseño real de tu salón.</li>
+    <li>Imprime las Tarjetas de Problema y las Tarjetas de Respuesta en páginas separadas. Córtalas. Publica las tarjetas de problema por el salón. Coloca las tarjetas de respuesta cara abajo en la mesa central, ordenadas por valor de respuesta.</li>
+    <li>El reverso de cada Tarjeta de Respuesta indica a los estudiantes qué Tarjeta de Problema buscar a continuación — la cadena forma un bucle después de la Tarjeta 8.</li>
+  </ul>
+  <div class="placeholder-note">
+    <strong>Los valores de marcador de posición están marcados en naranja.</strong> Cada valor naranja es un dato de ejemplo — reemplázalo con números reales antes de ejecutar la actividad. Verifica la matemática de la cadena antes de imprimir.
+  </div>
+</div>
+
+<!-- FORMULA REFERENCE -->
+<div class="formula-ref-box no-print">
+  <div class="formula-ref-inner">
+    <div class="fref"><div class="fref-label">Potencia del Motor</div><div class="fref-formula">S × 5</div></div>
+    <div class="fref"><div class="fref-label">Velocidad de Carga</div><div class="fref-formula">P²</div></div>
+    <div class="fref"><div class="fref-label">Potencia en t=3</div><div class="fref-formula">100 − (20 − E) × 4.5</div></div>
+    <div class="fref"><div class="fref-label">Presupuesto</div><div class="fref-formula">S + E + T + P = 20</div></div>
+    <div class="fref"><div class="fref-label">Tasa de Decaimiento</div><div class="fref-formula">(20 − E) × 1.5</div></div>
+    <div class="fref"><div class="fref-label">Razón de Giro</div><div class="fref-formula">0.2 + T × 0.02</div></div>
+    <div class="fref"><div class="fref-label">Tiempo de Seguimiento</div><div class="fref-formula">P × 80</div></div>
+    <div class="fref"><div class="fref-label">SPEED % del Presupuesto</div><div class="fref-formula">S ÷ 20 × 100</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TARJETAS DE PROBLEMA — PÁGINA 1
+═══════════════════════════════════════════════════════════ -->
+
+<div class="section-title">Tarjetas de Problema (publicar por el salón)</div>
+
+<div class="cards-page">
+<div class="cards-grid">
+
+  <!-- PROBLEM CARD 1 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#1</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">A</span></div>
+      <div class="stat-line">Asignación de SPEED: <strong><span class="ph">6</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">3</span> goles, <span class="ph">V</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">PIZARRÓN</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Qué porcentaje del presupuesto de 20 puntos destinó el Equipo <span class="ph">A</span> a SPEED? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: S ÷ 20 × 100</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> <span class="ph">6</span> ÷ 20 × 100 = <span class="ph">30</span>%</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 2 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#2</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">B</span></div>
+      <div class="stat-line">Asignación de POWER: <strong><span class="ph">7</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">2</span> goles, <span class="ph">D</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">PUERTA</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es el porcentaje de velocidad de carga del Equipo <span class="ph">B</span>? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: P²</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> <span class="ph">7</span>² = <span class="ph">49</span>%</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 3 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#3</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">C</span></div>
+      <div class="stat-line">Asignación de ENDURANCE: <strong><span class="ph">8</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">4</span> goles, <span class="ph">V</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">VENTANAS</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es la potencia de salida del Equipo <span class="ph">C</span> exactamente en el minuto 3? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: P(3) = 100 − (20 − E) × 4.5</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> 100 − (20 − <span class="ph">8</span>) × 4.5 = 100 − <span class="ph">54</span> = <span class="ph">46</span>%</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 4 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#4</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">D</span></div>
+      <div class="stat-line">SPEED = <span class="ph">5</span> &nbsp;·&nbsp; POWER = <span class="ph">4</span> &nbsp;·&nbsp; TURNING = <span class="ph">3</span></div>
+      <div class="stat-line">Presupuesto total: 20 puntos</div>
+      <div class="location-tag">Publicado en: <span class="ph">PARED DEL FONDO</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuántos puntos destinó el Equipo <span class="ph">D</span> a ENDURANCE? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: E = 20 − S − P − T</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> 20 − <span class="ph">5</span> − <span class="ph">4</span> − <span class="ph">3</span> = <span class="ph">8</span></div>
+    </div>
+  </div>
+
+</div><!-- end grid row 1 -->
+
+<div class="cut-line">✂ &nbsp; cortar &nbsp; ✂ &nbsp; cortar &nbsp; ✂</div>
+
+<div class="cards-grid">
+
+  <!-- PROBLEM CARD 5 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#5</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">E</span></div>
+      <div class="stat-line">Asignación de SPEED: <strong><span class="ph">9</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">5</span> goles, <span class="ph">V</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">MESA DE MATERIALES</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es el porcentaje de potencia del motor del Equipo <span class="ph">E</span>? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: S × 5</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> <span class="ph">9</span> × 5 = <span class="ph">45</span>%</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 6 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#6</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">F</span></div>
+      <div class="stat-line">Asignación de TURNING: <strong><span class="ph">6</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">2</span> goles, <span class="ph">E</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">PARED DEL RELOJ</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es la razón de giro del Equipo <span class="ph">F</span>? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: 0.2 + T × 0.02</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> 0.2 + <span class="ph">6</span> × 0.02 = 0.2 + <span class="ph">0.12</span> = <span class="ph">0.32</span></div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 7 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#7</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">G</span></div>
+      <div class="stat-line">Asignación de POWER: <strong><span class="ph">5</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">1</span> gol, <span class="ph">D</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">PROYECTOR</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es el tiempo de seguimiento del Equipo <span class="ph">G</span> en milisegundos? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: P × 80</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> <span class="ph">5</span> × 80 = <span class="ph">1,000</span> ms</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM CARD 8 -->
+  <div class="problem-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Problema</div>
+      <div class="card-number">#8</div>
+    </div>
+    <div class="card-front">
+      <div class="front-label">Frente</div>
+      <div class="team-name">Equipo <span class="ph">H</span></div>
+      <div class="stat-line">Asignación de ENDURANCE: <strong><span class="ph">5</span> puntos</strong></div>
+      <div class="stat-line">Resultado del partido: <span class="ph">3</span> goles, <span class="ph">V</span></div>
+      <div class="location-tag">Publicado en: <span class="ph">ENTRADA</span></div>
+    </div>
+    <div class="card-back">
+      <div class="back-label">Reverso</div>
+      <div class="question-text">¿Cuál es la tasa de decaimiento de potencia (r) del Equipo <span class="ph">H</span>? Muestra el cálculo.</div>
+      <div class="formula-hint">Fórmula: r = (20 − E) × 1.5</div>
+      <div class="answer-key"><strong>Clave de respuesta:</strong> (20 − <span class="ph">5</span>) × 1.5 = <span class="ph">15</span> × 1.5 = <span class="ph">22.5</span></div>
+    </div>
+  </div>
+
+</div><!-- end grid row 2 -->
+</div><!-- end cards-page -->
+
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TARJETAS DE RESPUESTA — PÁGINA 2
+═══════════════════════════════════════════════════════════ -->
+
+<div class="section-title">Tarjetas de Respuesta (mesa central, cara abajo, ordenadas por valor de respuesta)</div>
+
+<div class="cards-page">
+<div class="cards-grid">
+
+  <!-- ANSWER CARD 1 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#1</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">30</span>%</div>
+      <div class="answer-formula-ref">SPEED % del presupuesto &nbsp;·&nbsp; S ÷ 20 × 100</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">30</span>%. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">B</span></span> cerca de la <span class="ph">PUERTA</span>.</div>
+      <div class="confirm-text">Si no obtuviste <span class="ph">30</span>%, regresa a la tarjeta del Equipo <span class="ph">A</span> y revisa tu división.</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 2 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#2</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">49</span>%</div>
+      <div class="answer-formula-ref">Velocidad de carga &nbsp;·&nbsp; P²</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">49</span>%. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">C</span></span> cerca de las <span class="ph">VENTANAS</span>.</div>
+      <div class="confirm-text">Si obtuviste <span class="ph">14</span>%, multiplicaste en lugar de elevar al cuadrado. P² significa P × P, no P × 2.</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 3 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#3</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">46</span>%</div>
+      <div class="answer-formula-ref">Potencia en t = 3 &nbsp;·&nbsp; 100 − (20 − E) × 4.5</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">46</span>%. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">D</span></span> cerca de la <span class="ph">PARED DEL FONDO</span>.</div>
+      <div class="confirm-text">Si obtuviste <span class="ph">64</span>%, usaste E en lugar de (20 − E). ENDURANCE frena el decaimiento — un E alto significa una r menor.</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 4 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#4</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">8</span></div>
+      <div class="answer-formula-ref">ENDURANCE del presupuesto &nbsp;·&nbsp; 20 − S − P − T</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">8</span>. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">E</span></span> cerca de la <span class="ph">MESA DE MATERIALES</span>.</div>
+      <div class="confirm-text">Restricción de presupuesto: las cuatro estadísticas deben sumar 20. Si tu respuesta es negativa, revisa tu resta.</div>
+    </div>
+  </div>
+
+</div><!-- end grid row 1 -->
+
+<div class="cut-line">✂ &nbsp; cortar &nbsp; ✂ &nbsp; cortar &nbsp; ✂</div>
+
+<div class="cards-grid">
+
+  <!-- ANSWER CARD 5 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#5</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">45</span>%</div>
+      <div class="answer-formula-ref">Potencia del motor &nbsp;·&nbsp; S × 5</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">45</span>%. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">F</span></span> cerca de la <span class="ph">PARED DEL RELOJ</span>.</div>
+      <div class="confirm-text">La potencia del motor escala de forma lineal — cada punto de SPEED es exactamente +5%. Compara eso con lo que ocurre con P².</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 6 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#6</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">0.32</span></div>
+      <div class="answer-formula-ref">Razón de giro &nbsp;·&nbsp; 0.2 + T × 0.02</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">0.32</span>. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">G</span></span> cerca del <span class="ph">PROYECTOR</span>.</div>
+      <div class="confirm-text">La razón de giro tiene un mínimo de 0.20 — un bot con T=0 sigue girando al mínimo. El 0.2 es la intersección con el eje y de esta función lineal.</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 7 -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#7</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">1,000</span> ms</div>
+      <div class="answer-formula-ref">Tiempo de seguimiento &nbsp;·&nbsp; P × 80</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">1,000 ms</span>. Ahora busca la <span class="next-team">tarjeta del Equipo <span class="ph">H</span></span> cerca de la <span class="ph">ENTRADA</span>.</div>
+      <div class="confirm-text">El tiempo de seguimiento escala proporcionalmente con P — es una tasa unitaria. Cada punto de POWER añade exactamente 200 ms.</div>
+    </div>
+  </div>
+
+  <!-- ANSWER CARD 8 — LOOPS BACK -->
+  <div class="answer-card">
+    <div class="card-header">
+      <div class="card-type-label">Tarjeta de Respuesta</div>
+      <div class="card-number">#8 — Regreso al Inicio</div>
+    </div>
+    <div class="answer-face">
+      <div class="answer-face-label">Cara (abajo en la mesa)</div>
+      <div class="answer-value"><span class="ph">22.5</span></div>
+      <div class="answer-formula-ref">Tasa de decaimiento &nbsp;·&nbsp; (20 − E) × 1.5</div>
+    </div>
+    <div class="answer-back">
+      <div class="answer-back-label">Reverso</div>
+      <div class="next-pointer">✓ Tu respuesta es <span class="ph">22.5</span>. Cadena completa — regresa a la <span class="next-team">tarjeta del Equipo <span class="ph">A</span></span> cerca del <span class="ph">PIZARRÓN</span>.</div>
+      <div class="confirm-text">Completaste el bucle. Compara tu hoja de respuestas con un compañero — encuentra un cálculo donde hayan obtenido números diferentes y determinen quién tiene razón.</div>
+    </div>
+  </div>
+
+</div><!-- end grid row 2 -->
+</div><!-- end cards-page -->
+
+<!-- PERSONAL ANSWER SHEET (bonus, screen only) -->
+<div class="section-title no-print">Hoja de Respuestas Personal — imprimir una por estudiante</div>
+<div class="cards-page no-print" style="font-size:13px; background:white; border:1.5px solid #ccc; border-radius:10px; padding:20px; max-width:760px; margin:0 auto 40px;">
+  <strong>Nombre: _______________________&nbsp;&nbsp;&nbsp; Equipo: _______________________</strong>
+  <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#1 Equipo <span class="ph">A</span></strong> — SPEED % del presupuesto<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#2 Equipo <span class="ph">B</span></strong> — Velocidad de carga<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#3 Equipo <span class="ph">C</span></strong> — Potencia en t=3<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#4 Equipo <span class="ph">D</span></strong> — Encontrar ENDURANCE<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#5 Equipo <span class="ph">E</span></strong> — Potencia del motor<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#6 Equipo <span class="ph">F</span></strong> — Razón de giro<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#7 Equipo <span class="ph">G</span></strong> — Tiempo de seguimiento<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+    <div style="border:1px solid #ccc; border-radius:6px; padding:10px;">
+      <strong>#8 Equipo <span class="ph">H</span></strong> — Tasa de decaimiento<br>
+      <div style="margin-top:6px; min-height:32px; border-bottom:1px solid #ddd;"></div>
+      Respuesta: ______
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

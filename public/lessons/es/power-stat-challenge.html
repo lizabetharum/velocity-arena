@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafío de la Estadística POWER · Día 4 · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:#0D0D1A;--navy2:#161A2E;--navy3:#1E2240;--navy4:#252A4A;
+      --cyan:#00E5FF;--teal:#007A99;--slate:#8899AA;--card-border:#222840;--card-bg:#161A2E;
+      --green:#00C97A;--red:#FF4D6A;--yellow:#FFD166;--purple:#9B8AFF;--orange:#FF9F43;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--navy);color:#E8EAF2;min-height:100vh;padding-bottom:5rem;}
+    #progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .5s ease;z-index:100;width:0%;}
+    .page-header{background:var(--navy2);border-bottom:1px solid var(--card-border);padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+    .page-header .back-link{color:var(--slate);text-decoration:none;font-size:.8125rem;font-weight:500;}
+    .page-header .back-link:hover{color:var(--cyan);}
+    .page-header .divider{color:var(--card-border);}
+    .page-header h1{font-size:.9375rem;font-weight:700;}
+    .page-header .day-tag{margin-left:auto;font-size:.75rem;font-weight:700;color:var(--orange);background:rgba(255,159,67,.1);border:1px solid rgba(255,159,67,.3);border-radius:4px;padding:.2em .6em;letter-spacing:.06em;text-transform:uppercase;}
+    .section-nav{display:flex;background:var(--navy2);border-bottom:1px solid var(--card-border);overflow-x:auto;}
+    .section-nav button{flex-shrink:0;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);background:transparent;border:none;padding:.75rem 1.25rem;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;}
+    .section-nav button.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+    .section-nav button:hover:not(.active){color:#E8EAF2;}
+    .section{display:none;max-width:740px;margin:2rem auto 0;padding:0 1.25rem;animation:fadeUp .3s ease both;}
+    .section.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+    .section-heading{font-size:1.375rem;font-weight:800;margin-bottom:.4rem;}
+    .section-sub{font-size:.9375rem;color:#C8CDD8;line-height:1.65;margin-bottom:1.25rem;}
+    .section-badge{display:inline-flex;align-items:center;gap:.5rem;font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:4px;padding:.25em .75em;margin-bottom:.875rem;}
+    .badge-orange{color:var(--orange);background:rgba(255,159,67,.08);border-color:rgba(255,159,67,.25);}
+    .badge-purple{color:var(--purple);background:rgba(155,138,255,.08);border-color:rgba(155,138,255,.25);}
+    .badge-green{color:var(--green);background:rgba(0,201,122,.08);border-color:rgba(0,201,122,.25);}
+    .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:1.5rem;margin-bottom:1rem;}
+    .card-title{font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:.875rem;}
+    .formula-board{background:var(--navy3);border:2px solid var(--orange);border-radius:10px;padding:2rem 1.5rem;text-align:center;margin:1rem 0 1.25rem;position:relative;overflow:hidden;}
+    .formula-board::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,159,67,.08) 0%,transparent 70%);}
+    .formula-board .fml-label{font-size:.6875rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:.625rem;}
+    .formula-board .fml-text{font-size:2.25rem;font-weight:800;color:var(--orange);line-height:1.2;}
+    .formula-board .fml-text sup{font-size:1.25rem;}
+    .formula-board .fml-note{font-size:.875rem;color:var(--slate);margin-top:.625rem;}
+    .formula-board .fml-note strong{color:#E8EAF2;}
+    .vocab-box{display:flex;gap:.875rem;align-items:flex-start;background:rgba(155,138,255,.07);border:1px solid rgba(155,138,255,.2);border-radius:8px;padding:.875rem 1rem;margin:.75rem 0 1.25rem;}
+    .vocab-box .vb-icon{font-size:1.375rem;flex-shrink:0;}
+    .vocab-box .vb-body{font-size:.875rem;color:#C8CDD8;line-height:1.6;}
+    .vocab-box .vb-body strong{color:var(--purple);}
+    .key-callout{display:flex;gap:.75rem;align-items:flex-start;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:8px;padding:.875rem 1rem;margin:.875rem 0;}
+    .key-callout .kc-icon{font-size:1.25rem;flex-shrink:0;margin-top:.1rem;}
+    .key-callout .kc-body{font-size:.875rem;color:#E8EAF2;line-height:1.55;}
+    .key-callout .kc-body strong{color:var(--yellow);}
+    .info-callout{display:flex;gap:.75rem;align-items:flex-start;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.18);border-radius:8px;padding:.875rem 1rem;margin:.875rem 0;}
+    .info-callout .ic-icon{font-size:1.25rem;flex-shrink:0;margin-top:.1rem;}
+    .info-callout .ic-body{font-size:.875rem;color:#C8CDD8;line-height:1.55;}
+    .info-callout .ic-body strong{color:var(--cyan);}
+    .alert-callout{display:flex;gap:.75rem;align-items:flex-start;background:rgba(255,77,106,.06);border:1px solid rgba(255,77,106,.22);border-radius:8px;padding:.875rem 1rem;margin:.875rem 0;}
+    .alert-callout .ac-icon{font-size:1.25rem;flex-shrink:0;margin-top:.1rem;}
+    .alert-callout .ac-body{font-size:.875rem;color:#E8EAF2;line-height:1.55;}
+    .alert-callout .ac-body strong{color:var(--red);}
+    .power-selector{display:flex;gap:.625rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+    .pwr-btn{flex:1;min-width:80px;font-family:'Inter',sans-serif;font-size:1rem;font-weight:800;padding:.75rem .5rem;border-radius:8px;border:2px solid var(--card-border);background:var(--navy3);color:var(--slate);cursor:pointer;transition:all .15s;text-align:center;}
+    .pwr-btn:hover{border-color:var(--orange);color:var(--orange);}
+    .pwr-btn.active{border-color:var(--orange);background:rgba(255,159,67,.1);color:var(--orange);}
+    .pwr-btn .pwr-label{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);display:block;margin-bottom:.2rem;}
+    .pwr-btn.active .pwr-label{color:rgba(255,159,67,.7);}
+    .sq-demo{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;padding:1.25rem;background:var(--navy3);border-radius:8px;margin-bottom:1rem;}
+    .sq-left{text-align:center;}
+    .sq-left .sq-title{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;}
+    .sq-visual-wrap{display:flex;justify-content:center;align-items:center;height:100px;}
+    .sq-square{background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.875rem;color:var(--navy);transition:width .4s ease,height .4s ease,background .3s ease;min-width:12px;min-height:12px;}
+    .sq-arrow{font-size:1.75rem;color:var(--slate);text-align:center;}
+    .sq-right{text-align:center;}
+    .sq-right .sq-title{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;}
+    .sq-calc{font-size:1.75rem;font-weight:800;color:var(--orange);margin-bottom:.5rem;}
+    .sq-speed-label{font-size:.8125rem;color:var(--slate);margin-bottom:.375rem;}
+    .sq-speed-bar-wrap{background:var(--navy);border-radius:4px;height:10px;overflow:hidden;}
+    .sq-speed-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--yellow));border-radius:4px;transition:width .5s ease;}
+    .sq-speed-pct{font-size:1.25rem;font-weight:800;color:var(--yellow);margin-top:.375rem;}
+    .compare-chart-wrap{background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:1rem 1rem .5rem;margin-bottom:1rem;}
+    .compare-chart-title{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.625rem;text-align:center;}
+    .calc-table{width:100%;border-collapse:collapse;}
+    .calc-table th{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--card-border);}
+    .calc-table td{padding:.625rem .75rem;border-bottom:1px solid rgba(34,40,64,.6);font-size:.9375rem;vertical-align:middle;}
+    .calc-table tr:last-child td{border-bottom:none;}
+    .cell-big{font-weight:800;color:#E8EAF2;font-size:1.125rem;}
+    .table-input{width:80px;background:var(--navy3);border:1.5px solid var(--card-border);border-radius:6px;padding:.4rem .5rem;font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:700;color:#E8EAF2;outline:none;text-align:center;transition:border-color .15s;}
+    .table-input:focus{border-color:var(--teal);}
+    .table-input.correct{border-color:var(--green);background:rgba(0,201,122,.07);}
+    .table-input.error{border-color:var(--red);background:rgba(255,77,106,.07);}
+    .bar-chart{display:flex;align-items:flex-end;gap:.75rem;height:140px;padding:0 .5rem;margin:1rem 0 .25rem;}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:.375rem;}
+    .bar-fill{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--orange),rgba(255,159,67,.5));transition:height .6s cubic-bezier(.34,1.56,.64,1);}
+    .bar-fill.lit{box-shadow:0 0 12px rgba(255,159,67,.4);}
+    .bar-label-top{font-size:.8125rem;font-weight:800;color:var(--orange);}
+    .bar-label-bot{font-size:.75rem;font-weight:700;color:var(--slate);}
+    .bar-chart-axis{height:1px;background:var(--card-border);margin:0 .5rem .25rem;}
+    .ratio-grid{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin:1rem 0;}
+    .ratio-card{background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:1rem;}
+    .ratio-card .rc-label{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;}
+    .ratio-display{display:flex;align-items:center;gap:.5rem;font-size:1rem;font-weight:700;margin-bottom:.625rem;}
+    .ratio-display .rd-num{font-size:1.5rem;font-weight:800;color:var(--cyan);}
+    .ratio-display .rd-sep{color:var(--slate);}
+    .ratio-input{width:60px;background:var(--navy2);border:1.5px solid var(--card-border);border-radius:6px;padding:.375rem .5rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:800;color:var(--cyan);outline:none;text-align:center;transition:border-color .15s;}
+    .ratio-input:focus{border-color:var(--teal);}
+    .ratio-input.correct{border-color:var(--green);background:rgba(0,201,122,.07);}
+    .ratio-input.error{border-color:var(--red);background:rgba(255,77,106,.07);}
+    .ratio-note{font-size:.8125rem;color:var(--slate);line-height:1.4;}
+    .reveal-banner{background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.25);border-radius:8px;padding:.875rem 1rem;margin-top:.875rem;font-size:.9375rem;color:var(--green);display:none;line-height:1.5;}
+    .reveal-banner.visible{display:block;}
+    .makecode-wrap{background:#1A1A2E;border:1px solid #3A3A6A;border-radius:10px;padding:1.25rem;margin:.875rem 0;font-family:'Inter',monospace;}
+    .mc-env-badge{display:inline-block;font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7B7BCC;margin-bottom:.875rem;}
+    .mc-block{background:#5C2D91;border-radius:6px;padding:.5rem .875rem;margin-bottom:.375rem;font-size:.875rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.5rem;}
+    .mc-block.event{background:#D01279;border-radius:6px 6px 0 0;}
+    .mc-block .mc-change{background:rgba(255,255,255,.15);border:2px dashed rgba(255,255,255,.5);border-radius:4px;padding:.1em .5em;font-size:1rem;font-weight:800;color:var(--yellow);letter-spacing:.02em;}
+    .setup-diagram{background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:1.25rem;margin:.875rem 0;}
+    .setup-diagram .sd-title{font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:1rem;}
+    .tape-row{display:flex;align-items:center;gap:0;margin-bottom:.875rem;}
+    .tape-mark{display:flex;flex-direction:column;align-items:center;gap:.375rem;}
+    .tape-strip{width:4px;height:60px;border-radius:2px;}
+    .tape-strip.t1{background:var(--cyan);}
+    .tape-strip.t2{background:var(--orange);}
+    .tape-label{font-size:.6875rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+    .tape-label.t1{color:var(--cyan);}
+    .tape-label.t2{color:var(--orange);}
+    .tape-connector{flex:1;height:2px;background:var(--card-border);display:flex;align-items:center;justify-content:center;}
+    .tape-dist{background:var(--navy3);padding:.2em .5em;font-size:.8125rem;font-weight:800;color:var(--yellow);border:1px solid rgba(255,209,102,.25);border-radius:4px;}
+    .expected-range{display:inline-flex;align-items:center;gap:.375rem;font-size:.75rem;font-weight:700;color:var(--green);background:rgba(0,201,122,.07);border:1px solid rgba(0,201,122,.2);border-radius:4px;padding:.2em .6em;margin-left:.5rem;}
+    .data-log-row{background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:1.125rem;margin-bottom:.75rem;}
+    .dlr-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem;}
+    .dlr-badge{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25em .75em;border-radius:4px;white-space:nowrap;}
+    .dlr-badge.p4{color:var(--cyan);background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);}
+    .dlr-badge.p8{color:var(--orange);background:rgba(255,159,67,.1);border:1px solid rgba(255,159,67,.25);}
+    .dlr-speed{font-size:.875rem;color:var(--slate);}
+    .dlr-speed strong{color:#E8EAF2;}
+    .dlr-inputs{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;}
+    .dlr-inputs label{font-size:.875rem;font-weight:700;color:#C8CDD8;}
+    .cm-input{width:90px;background:var(--navy2);border:1.5px solid var(--card-border);border-radius:6px;padding:.45rem .6rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;color:#E8EAF2;outline:none;text-align:center;transition:border-color .15s;}
+    .cm-input:focus{border-color:var(--teal);}
+    .cm-input.in-range{border-color:rgba(0,201,122,.5);}
+    .cm-input.out-range{border-color:rgba(255,209,102,.5);}
+    .gap-calc{background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:1.25rem;margin:1rem 0;}
+    .gap-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:.875rem;}
+    .gap-cell{text-align:center;}
+    .gap-cell .gc-label{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.375rem;}
+    .gap-cell .gc-value{font-size:1.625rem;font-weight:800;color:var(--cyan);}
+    .gap-cell .gc-value.predicted{color:var(--purple);}
+    .gap-cell .gc-value.actual{color:var(--orange);}
+    .gap-cell .gc-note{font-size:.75rem;color:var(--slate);margin-top:.2rem;}
+    .gap-math{font-size:.8125rem;color:var(--slate);text-align:center;padding-top:.625rem;border-top:1px solid var(--card-border);}
+    .ratio-result-wrap{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;background:var(--navy3);border-radius:8px;padding:1rem;margin:.875rem 0;}
+    .rr-item{text-align:center;flex:1;min-width:100px;}
+    .rr-item .rr-label{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);}
+    .rr-item .rr-val{font-size:1.5rem;font-weight:800;margin-top:.25rem;}
+    .rr-item .rr-sub{font-size:.75rem;color:var(--slate);margin-top:.2rem;}
+    .sentence-builder{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:8px;padding:1.125rem;margin:.875rem 0;}
+    .sb-title{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:.75rem;}
+    .sentence-output{font-size:.9375rem;line-height:1.7;color:#E8EAF2;min-height:2.5rem;}
+    .sentence-output .so-fill{color:var(--cyan);font-weight:700;}
+    .verdict-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.25rem 0;}
+    .verdict-btn{font-family:'Inter',sans-serif;font-size:1rem;font-weight:800;padding:1.25rem 1rem;border-radius:10px;border:2px solid var(--card-border);background:var(--navy3);color:var(--slate);cursor:pointer;transition:all .2s;text-align:center;line-height:1.4;}
+    .verdict-btn .vb-emoji{font-size:2rem;display:block;margin-bottom:.5rem;}
+    .verdict-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+    .verdict-btn.selected-problem{border-color:var(--red);background:rgba(255,77,106,.08);color:var(--red);}
+    .verdict-btn.selected-info{border-color:var(--green);background:rgba(0,201,122,.08);color:var(--green);}
+    .verdict-response{background:var(--navy3);border-radius:8px;padding:1rem;margin-top:.5rem;font-size:.9375rem;color:#C8CDD8;line-height:1.6;display:none;}
+    .verdict-response.visible{display:block;}
+    .physics-details{background:rgba(155,138,255,.05);border:1px solid rgba(155,138,255,.18);border-radius:8px;margin:.875rem 0;overflow:hidden;}
+    .physics-summary{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;cursor:pointer;font-size:.875rem;font-weight:700;color:var(--purple);user-select:none;list-style:none;}
+    .physics-summary::-webkit-details-marker{display:none;}
+    .physics-summary::after{content:'\25b8';margin-left:auto;font-size:.75rem;transition:transform .2s;}
+    details[open] .physics-summary::after{transform:rotate(90deg);}
+    .physics-body{padding:0 1rem 1rem;font-size:.875rem;color:#C8CDD8;line-height:1.65;}
+    .physics-body strong{color:var(--purple);}
+    .trouble-details{background:rgba(255,209,102,.04);border:1px solid rgba(255,209,102,.18);border-radius:8px;margin:.875rem 0;overflow:hidden;}
+    .trouble-summary{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;cursor:pointer;font-size:.875rem;font-weight:700;color:var(--yellow);user-select:none;list-style:none;}
+    .trouble-summary::-webkit-details-marker{display:none;}
+    .trouble-summary::after{content:'\25b8';margin-left:auto;font-size:.75rem;transition:transform .2s;}
+    details[open] .trouble-summary::after{transform:rotate(90deg);}
+    .trouble-body{padding:0 1rem 1rem;font-size:.875rem;color:#C8CDD8;line-height:1.65;}
+    .trouble-item{border-top:1px solid rgba(255,209,102,.1);padding:.625rem 0;}
+    .trouble-item:first-child{border-top:none;padding-top:0;}
+    .trouble-item strong{color:var(--yellow);display:block;margin-bottom:.25rem;}
+    .starter-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:.625rem 0 .75rem;}
+    .starter-label{width:100%;font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.125rem;display:flex;align-items:center;gap:.375rem;}
+    .starter-chip{font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:500;line-height:1.4;padding:.375rem .75rem;border-radius:20px;border:1.5px solid rgba(0,229,255,.2);background:rgba(0,229,255,.05);color:#C8CDD8;cursor:pointer;transition:all .15s;text-align:left;}
+    .starter-chip:hover{border-color:var(--cyan);background:rgba(0,229,255,.1);color:#fff;}
+    .starter-chip.used{border-color:rgba(0,201,122,.4);background:rgba(0,201,122,.08);color:var(--green);}
+    .reflect-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:1.25rem;margin-bottom:.875rem;}
+    .reflect-q{font-size:.9375rem;font-weight:700;color:#E8EAF2;margin-bottom:.625rem;line-height:1.5;}
+    .sentence-frame{background:rgba(0,229,255,.05);border-left:3px solid rgba(0,229,255,.3);border-radius:0 6px 6px 0;padding:.625rem .875rem;margin-bottom:.625rem;font-size:.8125rem;color:var(--slate);line-height:1.55;font-style:italic;}
+    .sentence-frame strong{color:var(--cyan);font-style:normal;}
+    .reflect-textarea{width:100%;background:var(--navy3);border:1px solid var(--card-border);border-radius:7px;padding:.875rem 1rem;font-family:'Inter',sans-serif;font-size:.9375rem;color:#E8EAF2;resize:vertical;min-height:80px;outline:none;transition:border-color .15s;line-height:1.55;}
+    .reflect-textarea:focus{border-color:var(--teal);}
+    .reflect-textarea.ready{border-color:rgba(0,201,122,.4);}
+    .char-count{font-size:.75rem;color:var(--slate);text-align:right;margin-top:.25rem;}
+    .char-count.ready{color:var(--green);}
+    .check-btn{display:inline-flex;align-items:center;gap:.375rem;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;padding:.375rem .875rem;border-radius:5px;border:1px solid var(--teal);background:transparent;color:var(--teal);cursor:pointer;transition:background .15s,color .15s;}
+    .check-btn:hover{background:rgba(0,122,153,.12);color:var(--cyan);}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:700;padding:.75rem 1.5rem;border-radius:7px;border:none;cursor:pointer;transition:opacity .15s,transform .1s;}
+    .btn:active{transform:scale(.97);}
+    .btn-primary{background:var(--cyan);color:var(--navy);}
+    .btn-primary:hover{opacity:.88;}
+    .btn-ghost{background:transparent;color:var(--slate);border:1px solid var(--card-border);}
+    .btn-ghost:hover{color:#E8EAF2;border-color:var(--slate);}
+    .btn-success{background:var(--green);color:var(--navy);}
+    .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--card-border);}
+    .stat-card{background:linear-gradient(135deg,rgba(255,159,67,.1) 0%,rgba(0,229,255,.05) 100%);border:2px solid rgba(255,159,67,.4);border-radius:10px;padding:1.5rem;margin-top:1.25rem;text-align:center;}
+    .stat-card h3{font-size:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--orange);margin-bottom:1rem;}
+    .sc-row{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;}
+    .sc-item .sc-label{font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.25rem;}
+    .sc-item .sc-val{font-size:2rem;font-weight:800;color:var(--orange);}
+    .sc-num-input{width:90px;background:var(--navy3);border:2px solid rgba(255,159,67,.4);border-radius:6px;padding:.5rem;font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;color:var(--orange);text-align:center;outline:none;}
+    .sc-num-input:focus{border-color:var(--orange);}
+    .done-banner{background:rgba(0,201,122,.08);border:1px solid rgba(0,201,122,.3);border-radius:10px;padding:1.5rem;text-align:center;margin-top:1.5rem;display:none;}
+    .done-banner.visible{display:block;}
+    .done-banner h3{font-size:1.125rem;font-weight:800;color:var(--green);margin-bottom:.5rem;}
+    .done-banner p{font-size:.9375rem;color:#C8CDD8;}
+    .s-divider{height:1px;background:var(--card-border);margin:1.5rem 0;}
+    .ico{display:inline-block;width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.15em;flex-shrink:0;overflow:visible;}
+    .ico-sm{width:16px;height:16px;}
+    .ico-md{width:20px;height:20px;}
+    .kc-icon .ico,.ic-icon .ico,.ac-icon .ico,.vb-icon .ico{width:22px;height:22px;}
+    .step-label{display:flex;align-items:center;gap:.625rem;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.75rem;}
+    .step-label .step-num{width:22px;height:22px;border-radius:50%;background:var(--navy4);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:var(--cyan);flex-shrink:0;}
+    .commit-card{background:rgba(255,77,106,.06);border:2px solid rgba(255,77,106,.35);border-radius:10px;padding:1.125rem 1.5rem;margin:.875rem 0 1rem;}
+    .commit-label{font-size:.6875rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.625rem;display:flex;align-items:center;gap:.5rem;}
+    .commit-q{font-size:1.0625rem;font-weight:800;color:#E8EAF2;line-height:1.35;margin-bottom:.875rem;}
+    .choice-row{display:flex;gap:.5rem;flex-wrap:wrap;}
+    .choice-btn{font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:800;padding:.5rem 1.125rem;border-radius:7px;border:2px solid var(--card-border);background:var(--navy3);color:var(--slate);cursor:pointer;transition:all .15s;}
+    .choice-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+    .choice-btn.selected{border-color:var(--cyan);background:rgba(0,229,255,.1);color:var(--cyan);}
+    .choice-reveal{display:none;margin-top:.875rem;padding:.75rem 1rem;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);border-radius:8px;font-size:.875rem;color:#C8CDD8;line-height:1.5;}
+    .choice-reveal.visible{display:block;}
+  </style>
+</head>
+<body>
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<div id="progress-bar"></div>
+
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Hoy</a>
+  <span class="divider">|</span>
+  <h1>Desafío de la Estadística POWER</h1>
+  <span class="day-tag">DÍA 4</span>
+</header>
+
+<nav class="section-nav">
+  <button class="active" onclick="goSection(0)"><svg class="ico ico-sm" viewBox="0 0 20 20"><polyline points="12,2 7,11 11,11 8,18"/></svg> La Fórmula</button>
+  <button onclick="goSection(1)"><svg class="ico ico-sm" viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2"/><line x1="3" y1="8.5" x2="17" y2="8.5"/><line x1="10.5" y1="8.5" x2="10.5" y2="17"/></svg> Calcular</button>
+  <button onclick="goSection(2)"><svg class="ico ico-sm" viewBox="0 0 20 20"><rect x="4" y="8" width="12" height="8" rx="1.5"/><rect x="7" y="4" width="6" height="4" rx="1"/><circle cx="7.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg> Programar y Probar</button>
+  <button onclick="goSection(3)"><svg class="ico ico-sm" viewBox="0 0 20 20"><path d="M4 4h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-4 3v-3H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg> Reflexión</button>
+</nav>
+
+<!-- SECCIÓN 1: LA FÓRMULA -->
+<section class="section active" id="sec-0">
+  <div class="section-badge">Sección 1 · La Fórmula</div>
+  <h2 class="section-heading">Velocidad de Carga = POWER²</h2>
+  <p class="section-sub">POWER controla tu velocidad de carga. Antes de leer la fórmula — responde esto.</p>
+
+  <div class="commit-card">
+    <div class="commit-label">✋ Comprométete ahora — sin marcha atrás</div>
+    <div class="commit-q">Si duplicas POWER, ¿qué pasa con la velocidad de carga?<br><span style="font-size:.875rem;font-weight:400;color:var(--slate);">Debes elegir A o B. No está permitido decir "depende".</span></div>
+    <div class="choice-row">
+      <button class="choice-btn" onclick="pickChoice(this,'c1','doubles')">A. Se duplica (2× más)</button>
+      <button class="choice-btn" onclick="pickChoice(this,'c1','more')">B. Más del doble</button>
+    </div>
+    <div class="choice-reveal" id="c1-reveal"><strong style="color:var(--cyan);">B es correcto — y la diferencia es mayor de lo que la mayoría espera.</strong> Duplicar POWER no duplica la velocidad de carga. La cuadruplica. POWER 4 → 16%. POWER 8 → 64%. Eso es 4×, no 2×. La mayoría elige A. Descubre por qué más abajo.</div>
+  </div>
+
+  <div class="card" style="border-color:rgba(0,229,255,.3);">
+    <div class="card-title" style="color:var(--cyan);">Encuentra el Patrón Antes de Ver la Fórmula</div>
+    <p style="font-size:.9375rem;color:#C8CDD8;line-height:1.6;margin-bottom:1rem;">
+      POWER 1 da velocidad de carga 1. POWER 4 da 16. POWER 8 da 64.<br>
+      <strong style="color:#E8EAF2;">¿Qué operación única te lleva de POWER a velocidad de carga?</strong>
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1rem;">
+      <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">POWER 1</div>
+        <div style="font-size:.75rem;color:var(--slate);">1 + 1 = 2 ✗</div>
+        <div style="font-size:.75rem;color:var(--slate);">1 × 2 = 2 ✗</div>
+        <div style="font-size:.875rem;font-weight:800;color:var(--green);margin-top:.25rem;">1 × 1 = <strong>1</strong> ✓</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">POWER 4</div>
+        <div style="font-size:.75rem;color:var(--slate);">4 + 4 = 8 ✗</div>
+        <div style="font-size:.75rem;color:var(--slate);">4 × 2 = 8 ✗</div>
+        <div style="font-size:.875rem;font-weight:800;color:var(--green);margin-top:.25rem;">4 × 4 = <strong>16</strong> ✓</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;text-align:center;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">POWER 8</div>
+        <div style="font-size:.75rem;color:var(--slate);">8 + 8 = 16 ✗</div>
+        <div style="font-size:.75rem;color:var(--slate);">8 × 2 = 16 ✗</div>
+        <div style="font-size:.875rem;font-weight:800;color:var(--green);margin-top:.25rem;">8 × 8 = <strong>64</strong> ✓</div>
+      </div>
+    </div>
+    <div class="commit-card" style="margin:0;">
+      <div class="commit-label">✋ Enuncia la regla — luego desplázate</div>
+      <div class="commit-q">La operación es: POWER _____ POWER = velocidad de carga. ¿Qué va en el espacio en blanco?</div>
+      <div class="choice-row">
+        <button class="choice-btn" onclick="pickChoice(this,'c-disc','plus')">A. + sí mismo</button>
+        <button class="choice-btn" onclick="pickChoice(this,'c-disc','times2')">B. × 2</button>
+        <button class="choice-btn" onclick="pickChoice(this,'c-disc','self')">C. × sí mismo</button>
+      </div>
+      <div class="choice-reveal" id="c-disc-reveal"><strong style="color:var(--cyan);">C. Multiplicar por sí mismo.</strong> POWER × POWER. Eso es elevar al cuadrado. 4 × 4 = 16. 8 × 8 = 64. Sumar y duplicar fallan ambos. Ahora mira la fórmula — la acabas de descubrir.</div>
+    </div>
+  </div>
+
+  <div class="formula-board">
+    <div class="fml-label">La Regla</div>
+    <div class="fml-text">Velocidad de Carga = POWER<sup>2</sup></div>
+    <div class="fml-note">Si POWER = 4 → cargaPotencia = 4 × 4 = <strong>16%</strong> &nbsp;|&nbsp; Si POWER = 8 → cargaPotencia = 8 × 8 = <strong>64%</strong></div>
+  </div>
+
+  <div class="vocab-box">
+    <div class="vb-icon">📖</div>
+    <div class="vb-body"><strong>Elevado al cuadrado (²)</strong> = multiplicar por sí mismo. 4² = 4 × 4 = 16. No es lo mismo que duplicar (4 × 2 = 8). Elevar al cuadrado da un número mayor.</div>
+  </div>
+
+  <div class="commit-card">
+    <div class="commit-label">✋ Un número exacto — sin rangos</div>
+    <div class="commit-q">Velocidad de carga con POWER 8 = ___%. Escribe el número exacto antes de tocar el selector.<br><span style="font-size:.875rem;font-weight:400;color:var(--slate);">No "alrededor de 60." No "más de 50." Un número.</span></div>
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.625rem;">
+      <input type="number" id="c2-predict-input" placeholder="?" min="1" max="100"
+        style="width:80px;background:var(--navy3);border:2px solid rgba(255,77,106,.4);border-radius:7px;padding:.5rem;font-family:'Inter',sans-serif;font-size:1.375rem;font-weight:800;color:#E8EAF2;outline:none;text-align:center;transition:border-color .2s;"
+        oninput="document.getElementById('c2-predict-input').style.borderColor='rgba(0,229,255,.5)'">
+      <span style="font-size:1rem;font-weight:700;color:var(--slate);">%</span>
+      <button class="choice-btn" onclick="lockPowerPredict()">Confirmar →</button>
+    </div>
+    <div class="choice-reveal" id="c2-reveal"><strong style="color:var(--cyan);">La respuesta es 64%.</strong> POWER 8 × POWER 8 = 64. Si escribiste 32 (el doble de 16), caíste en la trampa del cuadrado — duplicar POWER no duplica la velocidad de carga, la cuadruplica. Ahora mueve el selector a 8 y verifica.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Verifica tu predicción — elige una estadística de POWER</div>
+    <div class="power-selector">
+      <button class="pwr-btn" onclick="selectPower(1)"><span class="pwr-label">POWER</span>1</button>
+      <button class="pwr-btn" onclick="selectPower(2)"><span class="pwr-label">POWER</span>2</button>
+      <button class="pwr-btn active" onclick="selectPower(4)"><span class="pwr-label">POWER</span>4</button>
+      <button class="pwr-btn" onclick="selectPower(8)"><span class="pwr-label">POWER</span>8</button>
+    </div>
+    <div class="sq-demo">
+      <div class="sq-left">
+        <div class="sq-title">El Cuadrado</div>
+        <div class="sq-visual-wrap"><div class="sq-square" id="sq-square" style="width:64px;height:64px;"></div></div>
+        <div style="font-size:.75rem;color:var(--slate);margin-top:.375rem;text-align:center;" id="sq-dim-label">4 × 4 unidades</div>
+      </div>
+      <div class="sq-arrow">→</div>
+      <div class="sq-right">
+        <div class="sq-title">Velocidad de Carga</div>
+        <div class="sq-calc" id="sq-calc">4 × 4 = 16</div>
+        <div class="sq-speed-label">Velocidad del motor</div>
+        <div class="sq-speed-bar-wrap"><div class="sq-speed-fill" id="sq-fill" style="width:16%;"></div></div>
+        <div class="sq-speed-pct" id="sq-pct">16%</div>
+      </div>
+    </div>
+    <div id="pwr-insight" class="key-callout" style="display:none;">
+      <div class="kc-icon">💡</div>
+      <div class="kc-body" id="pwr-insight-text"></div>
+    </div>
+  </div>
+
+  <div class="commit-card">
+    <div class="commit-label">✋ Mira solo el gráfico correcto</div>
+    <div class="commit-q">Mira el gráfico de POWER. Cuando POWER se duplica, esa barra se vuelve: ¿2× más alta / 4× más alta / igual?</div>
+    <div class="choice-row">
+      <button class="choice-btn" onclick="pickChoice(this,'c3','2x')">2× más alta</button>
+      <button class="choice-btn" onclick="pickChoice(this,'c3','4x')">4× más alta</button>
+      <button class="choice-btn" onclick="pickChoice(this,'c3','same')">Igual</button>
+    </div>
+    <div class="choice-reveal" id="c3-reveal">4× más alta cada vez. Eso es lo que hace que POWER sea diferente de SPEED — duplicar la estadística cuadruplica la salida.</div>
+  </div>
+
+  <div class="compare-chart-wrap">
+    <div class="compare-chart-title">SPEED (lineal) vs POWER (cuadrático) — mismos números, resultados totalmente distintos</div>
+    <svg viewBox="0 0 520 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="10" width="220" height="170" rx="6" fill="#1E2240" opacity="0.7"/>
+      <rect x="280" y="10" width="220" height="170" rx="6" fill="#1E2240" opacity="0.7"/>
+      <text x="150" y="28" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif" font-weight="700" letter-spacing="1">ESTADÍSTICA SPEED (LINEAL)</text>
+      <text x="390" y="28" text-anchor="middle" font-size="11" fill="#8899AA" font-family="Inter,sans-serif" font-weight="700" letter-spacing="1">ESTADÍSTICA POWER (CUADRÁTICA)</text>
+      <rect x="68" y="154.25" width="28" height="5.75" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="100" y="148.5" width="28" height="11.5" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="132" y="137" width="28" height="23" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <rect x="164" y="114" width="28" height="46" fill="#00E5FF" opacity="0.8" rx="2"/>
+      <text x="82" y="151" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="Inter,sans-serif">5%</text>
+      <text x="114" y="145" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="Inter,sans-serif">10%</text>
+      <text x="146" y="133" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="Inter,sans-serif">20%</text>
+      <text x="178" y="110" text-anchor="middle" font-size="9" fill="#00E5FF" font-family="Inter,sans-serif">40%</text>
+      <text x="82" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Spd 1</text>
+      <text x="114" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Spd 2</text>
+      <text x="146" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Spd 4</text>
+      <text x="178" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Spd 8</text>
+      <text x="150" y="185" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Duplicar stat → duplicar salida ✓</text>
+      <line x1="55" y1="160" x2="205" y2="160" stroke="#222840" stroke-width="1"/>
+      <rect x="308" y="158.85" width="28" height="1.15" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="340" y="155.4" width="28" height="4.6" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="372" y="141.6" width="28" height="18.4" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <rect x="404" y="86.4" width="28" height="73.6" fill="#FF9F43" opacity="0.9" rx="2"/>
+      <text x="322" y="155" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="Inter,sans-serif">1%</text>
+      <text x="354" y="151" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="Inter,sans-serif">4%</text>
+      <text x="386" y="137" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="Inter,sans-serif">16%</text>
+      <text x="418" y="82" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="Inter,sans-serif">64%</text>
+      <text x="322" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Pwr 1</text>
+      <text x="354" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Pwr 2</text>
+      <text x="386" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Pwr 4</text>
+      <text x="418" y="172" text-anchor="middle" font-size="9" fill="#8899AA" font-family="Inter,sans-serif">Pwr 8</text>
+      <text x="390" y="185" text-anchor="middle" font-size="9" fill="#FF9F43" font-family="Inter,sans-serif">Duplicar stat → CUADRUPLICAR salida ⚡</text>
+      <line x1="295" y1="160" x2="445" y2="160" stroke="#222840" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="key-callout">
+    <div class="kc-icon">⚡</div>
+    <div class="kc-body"><strong>Duplicar POWER → velocidad de carga ×4.</strong> No ×2. No ×3. Cuatro veces. Eso es elevar al cuadrado.</div>
+  </div>
+
+  <div class="card" style="border-color:rgba(0,229,255,.3);">
+    <div class="card-title" style="color:var(--cyan);">Cómo Sabe el Cutebot Pro Cuándo Cargar</div>
+    <p style="font-size:.9375rem;color:#C8CDD8;line-height:1.65;margin-bottom:1rem;">
+      En un partido, el bot usa su <strong style="color:var(--cyan);">sensor ultrasónico</strong> para detectar el balón. Balón a menos de <strong style="color:var(--yellow);">70 cm</strong> → la carga se dispara automáticamente.
+    </p>
+    <div style="background:var(--navy3);border-radius:8px;padding:1.25rem;margin-bottom:1rem;">
+      <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:.875rem;">Cómo el sensor activa la carga</div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+        <div style="text-align:center;flex:1;min-width:80px;">
+          <div style="font-size:.75rem;color:var(--slate);margin-top:.25rem;">Cutebot Pro</div>
+          <div style="font-size:.6875rem;color:var(--cyan);font-weight:700;margin-top:.2rem;">Sensor activo</div>
+        </div>
+        <div style="flex:2;min-width:120px;text-align:center;">
+          <div style="font-size:.75rem;font-weight:800;color:var(--yellow);">≤ 70 cm → ¡cargar!</div>
+          <div style="font-size:.6875rem;color:var(--slate);margin-top:.25rem;">Pulso ultrasónico de distancia</div>
+        </div>
+        <div style="text-align:center;flex:1;min-width:80px;">
+          <div style="font-size:2rem;">⚽</div>
+          <div style="font-size:.75rem;color:var(--slate);margin-top:.25rem;">El balón</div>
+          <div style="font-size:.6875rem;color:var(--orange);font-weight:700;margin-top:.2rem;">Objetivo</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div style="background:rgba(255,77,106,.06);border:1px solid rgba(255,77,106,.2);border-radius:8px;padding:.875rem;text-align:center;">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--red);margin-bottom:.375rem;">Distancia &gt; 70 cm</div>
+        <div style="font-size:1.125rem;font-weight:800;color:#E8EAF2;margin-bottom:.25rem;">Conduciendo</div>
+        <div style="font-size:.8125rem;color:var(--slate);">Navegando la arena. Sensor escaneando continuamente.</div>
+      </div>
+      <div style="background:rgba(255,159,67,.06);border:1px solid rgba(255,159,67,.25);border-radius:8px;padding:.875rem;text-align:center;">
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--orange);margin-bottom:.375rem;">Distancia ≤ 70 cm</div>
+        <div style="font-size:1.125rem;font-weight:800;color:#E8EAF2;margin-bottom:.25rem;">Cargando ⚡</div>
+        <div style="font-size:.8125rem;color:var(--slate);">Dispara al cargaPotencia% (= POWER²). Luego follow-through a velocidad base.</div>
+      </div>
+    </div>
+    <div style="margin-top:.875rem;background:rgba(155,138,255,.06);border:1px solid rgba(155,138,255,.18);border-radius:8px;padding:.875rem 1rem;font-size:.8125rem;color:#C8CDD8;line-height:1.6;">
+      <strong style="color:var(--purple);">Carga en dos fases (Parte 2):</strong> Golpea a cargaPotencia%, luego follow-through a potenciaMotor% durante POWER × 80 ms. POWER 4 → 320 ms. POWER 8 → 640 ms. SPEED = 0 → el follow-through no hace nada.
+    </div>
+    <div class="vocab-box" style="margin-top:.875rem;margin-bottom:0;">
+      <div class="vb-icon">📡</div>
+      <div class="vb-body"><strong>Sensor ultrasónico</strong> — emite un pulso de sonido y mide el eco. Eco más corto = objeto más cercano. Lee en centímetros.</div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goSection(1)">Siguiente → Calcular</button>
+  </div>
+</section>
+
+<!-- SECCIÓN 2: CALCULAR -->
+<section class="section" id="sec-1">
+  <div class="section-badge badge-orange">Sección 2 · Calcular</div>
+  <h2 class="section-heading">Completa la Tabla</h2>
+  <p class="section-sub">Fórmula: <strong style="color:var(--orange)">Velocidad = POWER × POWER</strong>. Calcula cada fila.</p>
+
+  <div class="commit-card">
+    <div class="commit-label">✋ Predice antes de calcular</div>
+    <div class="commit-q">Escribe ambas predicciones antes de tocar la tabla.<br><span style="font-size:.875rem;font-weight:400;color:var(--slate);">Sin fórmulas aún. Un número cada una. Luego verifica.</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:.75rem 0;">
+      <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:.5rem;">Velocidad de carga con POWER 4</div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <input type="number" id="pre-p4" placeholder="?" min="1" max="100" style="width:70px;background:var(--navy2);border:1.5px solid var(--card-border);border-radius:6px;padding:.4rem .5rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:800;color:#E8EAF2;outline:none;text-align:center;transition:border-color .15s;" oninput="document.getElementById('pre-p4').style.borderColor='rgba(0,229,255,.4)'">
+          <span style="color:var(--slate);font-weight:700;">%</span>
+        </div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:.5rem;">Velocidad de carga con POWER 8</div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <input type="number" id="pre-p8" placeholder="?" min="1" max="100" style="width:70px;background:var(--navy2);border:1.5px solid var(--card-border);border-radius:6px;padding:.4rem .5rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:800;color:#E8EAF2;outline:none;text-align:center;transition:border-color .15s;" oninput="document.getElementById('pre-p8').style.borderColor='rgba(255,159,67,.4)'">
+          <span style="color:var(--slate);font-weight:700;">%</span>
+        </div>
+      </div>
+    </div>
+    <button class="choice-btn" onclick="checkPreTable()">Verificar predicciones →</button>
+    <div class="choice-reveal" id="c4-reveal"><strong>POWER 4 → 16%. POWER 8 → 64%.</strong> Si escribiste 32 para POWER 8 (el doble de 16), sigues pensando de forma lineal. Duplicar POWER = cuadruplicar la velocidad de carga. Ahora completa la tabla completa y confirma el patrón también para POWER 1 y POWER 2.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parte 1 — Tabla de POWER²</div>
+    <table class="calc-table" style="margin-bottom:.5rem;">
+      <thead>
+        <tr>
+          <th>Puntos de POWER</th>
+          <th>POWER × POWER = ?</th>
+          <th>Velocidad de Carga %</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="row-1"><td><span class="cell-big">1</span></td><td><input type="number" class="table-input" id="calc-sq-1" placeholder="?" aria-label="1 al cuadrado"></td><td><input type="number" class="table-input" id="calc-sp-1" placeholder="?%" aria-label="Velocidad 1"></td><td><button class="check-btn" onclick="checkCalcRow(1)">Verificar</button><span class="row-icon" id="ri-1"></span></td></tr>
+        <tr id="row-2"><td><span class="cell-big">2</span></td><td><input type="number" class="table-input" id="calc-sq-2" placeholder="?" aria-label="2 al cuadrado"></td><td><input type="number" class="table-input" id="calc-sp-2" placeholder="?%" aria-label="Velocidad 2"></td><td><button class="check-btn" onclick="checkCalcRow(2)">Verificar</button><span class="row-icon" id="ri-2"></span></td></tr>
+        <tr id="row-4"><td><span class="cell-big">4</span></td><td><input type="number" class="table-input" id="calc-sq-4" placeholder="?" aria-label="4 al cuadrado"></td><td><input type="number" class="table-input" id="calc-sp-4" placeholder="?%" aria-label="Velocidad 4"></td><td><button class="check-btn" onclick="checkCalcRow(4)">Verificar</button><span class="row-icon" id="ri-4"></span></td></tr>
+        <tr id="row-8"><td><span class="cell-big">8</span></td><td><input type="number" class="table-input" id="calc-sq-8" placeholder="?" aria-label="8 al cuadrado"></td><td><input type="number" class="table-input" id="calc-sp-8" placeholder="?%" aria-label="Velocidad 8"></td><td><button class="check-btn" onclick="checkCalcRow(8)">Verificar</button><span class="row-icon" id="ri-8"></span></td></tr>
+      </tbody>
+    </table>
+    <div id="bar-chart-section" style="display:none;">
+      <div class="s-divider"></div>
+      <div class="card-title">Tus resultados — ¡mira el salto en POWER 8!</div>
+      <div class="bar-chart" id="bar-chart">
+        <div class="bar-col"><div class="bar-label-top" id="bl-1">1%</div><div class="bar-fill" id="bf-1" style="height:2px;"></div><div class="bar-label-bot">POWER 1</div></div>
+        <div class="bar-col"><div class="bar-label-top" id="bl-2">4%</div><div class="bar-fill" id="bf-2" style="height:2px;"></div><div class="bar-label-bot">POWER 2</div></div>
+        <div class="bar-col"><div class="bar-label-top" id="bl-4">16%</div><div class="bar-fill" id="bf-4" style="height:2px;"></div><div class="bar-label-bot">POWER 4</div></div>
+        <div class="bar-col"><div class="bar-label-top" id="bl-8">64%</div><div class="bar-fill" id="bf-8" style="height:2px;"></div><div class="bar-label-bot">POWER 8</div></div>
+      </div>
+      <div class="bar-chart-axis"></div>
+      <p style="font-size:.8125rem;color:var(--slate);text-align:center;">Cada barra = velocidad de carga. El último salto NO es el doble — es 4× mayor que POWER 4.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parte 2 — Encuentra las Razones</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin-bottom:.875rem;line-height:1.55;">Duplicaste POWER. La velocidad pasó de 4% → 16%, luego 16% → 64%. ¿Cuál es la razón cada vez? Escribe "1 : ___"</p>
+    <div class="ratio-grid">
+      <div class="ratio-card">
+        <div class="rc-label">POWER 2 → POWER 4</div>
+        <div class="ratio-display"><span class="rd-num">4%</span><span class="rd-sep">a</span><span class="rd-num">16%</span></div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+          <span style="font-size:.875rem;color:var(--slate);">Razón: 1 :</span>
+          <input type="number" class="ratio-input" id="ratio-a" placeholder="?" aria-label="Razón A">
+          <button class="check-btn" onclick="checkRatioA()">Verificar</button>
+        </div>
+        <div class="ratio-note" id="ratio-a-note"></div>
+      </div>
+      <div class="ratio-card">
+        <div class="rc-label">POWER 4 → POWER 8</div>
+        <div class="ratio-display"><span class="rd-num">16%</span><span class="rd-sep">a</span><span class="rd-num">64%</span></div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+          <span style="font-size:.875rem;color:var(--slate);">Razón: 1 :</span>
+          <input type="number" class="ratio-input" id="ratio-b" placeholder="?" aria-label="Razón B">
+          <button class="check-btn" onclick="checkRatioB()">Verificar</button>
+        </div>
+        <div class="ratio-note" id="ratio-b-note"></div>
+      </div>
+    </div>
+    <div class="reveal-banner" id="ratio-reveal"><strong>Ambas razones son 1:4.</strong> Cada vez que duplicas los puntos de POWER, la velocidad de carga se multiplica por <strong>4</strong> — no por 2. Eso es lo que hace elevar al cuadrado.</div>
+  </div>
+
+  <div class="card" style="border-color:rgba(255,77,106,.35);">
+    <div class="card-title" style="color:var(--red);">La Pregunta Más Difícil de Esta Lección</div>
+    <div class="alert-callout">
+      <div class="ac-icon">⚡</div>
+      <div class="ac-body">
+        <strong>POWER 1 → POWER 2:</strong> velocidad de carga pasa de 1% → 4% &nbsp;(ganancia: +3 puntos)<br>
+        <strong>POWER 4 → POWER 5:</strong> velocidad de carga pasa de 16% → 25% (ganancia: +9 puntos)<br>
+        <strong>POWER 7 → POWER 8:</strong> velocidad de carga pasa de 49% → 64% (ganancia: +15 puntos)
+      </div>
+    </div>
+    <div class="commit-card" style="margin:.75rem 0 0;">
+      <div class="commit-label">✋ Elige A o B. No está permitido decir "depende".</div>
+      <div class="commit-q">¿Cada punto extra de POWER te da el mismo impulso de velocidad de carga?</div>
+      <div class="choice-row">
+        <button class="choice-btn" onclick="pickChoice(this,'c-rate','yes')">A. Sí — el mismo impulso cada vez</button>
+        <button class="choice-btn" onclick="pickChoice(this,'c-rate','no')">B. No — el impulso sigue creciendo</button>
+      </div>
+      <div class="choice-reveal" id="c-rate-reveal"><strong style="color:var(--red);">B — y este es el concepto completo.</strong> El impulso es 3, luego 9, luego 15. Sigue creciendo porque estás elevando al cuadrado. Agregar 1 punto con POWER bajo te da casi nada. Agregar 1 punto con POWER alto te da un salto masivo. La <em>tasa</em> de aumento no es lo mismo que el <em>valor</em> aumentando. Si dijiste A, mira los tres ejemplos de nuevo — las ganancias son 3, 9 y 15.</div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(0)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goSection(2)">Siguiente → Programar y Probar</button>
+  </div>
+</section>
+
+<!-- SECCIÓN 3: PROGRAMAR Y PROBAR -->
+<section class="section" id="sec-2">
+  <div class="section-badge badge-purple">Sección 3 · Programar y Probar</div>
+  <h2 class="section-heading">Programa Tu Bot, Corre la Prueba</h2>
+  <p class="section-sub">Calculaste. Ahora programa y mide.</p>
+
+  <div class="card">
+    <div class="step-label"><span class="step-num">1</span> Preparación del Suelo — Haz Esto Antes de Cada Prueba</div>
+    <div class="setup-diagram">
+      <div class="sd-title">Vista desde arriba de tu carril de prueba</div>
+      <div class="tape-row">
+        <div class="tape-mark"><div class="tape-strip t1"></div><div class="tape-label t1">CINTA 1<br><span style="font-weight:400;font-size:.6rem;">Nariz del bot aquí</span></div></div>
+        <div class="tape-connector"><div class="tape-dist">40 cm</div></div>
+        <div class="tape-mark"><div class="tape-strip t2"></div><div class="tape-label t2">CINTA 2<br><span style="font-weight:400;font-size:.6rem;">Balón empieza aquí</span></div></div>
+        <div class="tape-connector" style="flex:0.6;"></div>
+        <div class="tape-mark"><div style="font-size:1.5rem;margin-bottom:.375rem;">⚽</div><div class="tape-label" style="color:var(--slate);">Balón<br><span style="font-weight:400;font-size:.6rem;">Mide desde aquí</span></div></div>
+      </div>
+      <p style="font-size:.8125rem;color:var(--slate);line-height:1.55;margin-top:.25rem;">Mide desde <strong style="color:var(--orange);">CINTA 2</strong> hasta donde se detiene el balón. Ese es el número que registras — no desde CINTA 1.</p>
+    </div>
+    <div class="alert-callout">
+      <div class="ac-icon">🚫</div>
+      <div class="ac-body"><strong>Reinicio obligatorio entre pruebas.</strong> Nariz del bot de vuelta a CINTA 1. Balón de vuelta a CINTA 2. Si el balón o el bot se desplazan aunque sea unos pocos centímetros, no estás probando POWER — estás probando la colocación de la cinta.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-label"><span class="step-num">2</span> Abre MakeCode — Establece Tu Estadística de POWER</div>
+    <div style="margin-bottom:1rem;">
+      <a href="https://makecode.microbit.org/S22168-97257-26692-28283" target="_blank" style="display:inline-flex;align-items:center;gap:.5rem;font-family:'Inter',sans-serif;font-size:.9375rem;font-weight:700;padding:.625rem 1.25rem;border-radius:7px;background:var(--cyan);color:var(--navy);text-decoration:none;">Abrir Programa de MakeCode ↗</a>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:0;border-radius:8px 8px 0 0;overflow:hidden;border:1px solid #3A3A6A;border-bottom:none;">
+      <button id="mc-tab-test" onclick="switchMcTab('test')" style="flex:1;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.625rem 1rem;background:#1A1A2E;color:var(--cyan);border:none;border-right:1px solid #3A3A6A;cursor:pointer;border-bottom:2px solid var(--cyan);">Tu Tarea</button>
+      <button id="mc-tab-match" onclick="switchMcTab('match')" style="flex:1;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.625rem 1rem;background:#111124;color:var(--slate);border:none;cursor:pointer;border-bottom:2px solid transparent;">Bajo el Capó</button>
+    </div>
+    <div class="makecode-wrap" id="mc-panel-test" style="border-radius:0 0 10px 10px;border-top:none;">
+      <div class="mc-env-badge">MakeCode · Cutebot Pro · micro:bit</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:.375rem;margin-bottom:1.125rem;">
+        <div style="background:var(--navy3);border:1px solid var(--card-border);border-radius:8px;padding:.875rem;text-align:center;"><div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.25rem;">Paso 1</div><div style="font-size:.875rem;font-weight:700;color:#E8EAF2;">Actualiza tus<br>variables de estadística</div><div style="font-size:.75rem;color:var(--slate);margin-top:.25rem;">Tus estadísticas</div></div>
+        <div style="font-size:1.25rem;color:var(--slate);text-align:center;">→</div>
+        <div style="background:rgba(255,215,0,.07);border:2px solid rgba(255,215,0,.4);border-radius:8px;padding:.875rem;text-align:center;"><div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:.25rem;">Paso 2</div><div style="font-size:.875rem;font-weight:700;color:#E8EAF2;">Establece POWER<br>en <span style="color:var(--yellow);">4</span></div><div style="font-size:.75rem;color:var(--slate);margin-top:.25rem;">Primero la Prueba 1</div></div>
+        <div style="font-size:1.25rem;color:var(--slate);text-align:center;">→</div>
+        <div style="background:rgba(155,138,255,.08);border:1px solid rgba(155,138,255,.3);border-radius:8px;padding:.875rem;text-align:center;"><div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:.25rem;">Paso 3</div><div style="font-size:.875rem;font-weight:700;color:#E8EAF2;">Haz clic en<br>Descargar</div><div style="font-size:.75rem;color:var(--slate);margin-top:.25rem;">Luego presiona A</div></div>
+      </div>
+      <div style="background:#FFFFF0;border:1px solid #CCCC88;border-radius:6px;padding:1rem 1.25rem;color:#333;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#777;margin-bottom:.625rem;">Actualiza tus variables de estadística</div>
+        <div style="font-family:monospace;font-size:.9375rem;line-height:2.1;">
+          <span style="color:#888;">set</span> <span style="color:#C00;font-weight:700;">SPEED</span> <span style="color:#888;">▾ to</span> <span style="background:#FFE4B5;border:1px solid #CCA;border-radius:3px;padding:.1em .4em;font-weight:700;">tu stat</span><br>
+          <span style="color:#888;">set</span> <span style="color:#C00;font-weight:700;">ENDURANCE</span> <span style="color:#888;">▾ to</span> <span style="background:#FFE4B5;border:1px solid #CCA;border-radius:3px;padding:.1em .4em;font-weight:700;">tu stat</span><br>
+          <span style="color:#888;">set</span> <span style="color:#C00;font-weight:700;">TURNING</span> <span style="color:#888;">▾ to</span> <span style="background:#FFE4B5;border:1px solid #CCA;border-radius:3px;padding:.1em .4em;font-weight:700;">tu stat</span><br>
+          <span style="color:#888;">set</span> <span style="color:#C00;font-weight:700;">POWER</span> <span style="color:#888;">▾ to</span> <span style="background:#FFE4B5;border:1px solid #CCA;border-radius:3px;padding:.1em .4em;font-weight:700;color:#666;">0</span>
+          <span style="color:#B8860B;font-weight:800;margin:0 .25rem;">→</span>
+          <span class="mc-change" id="mc-speed-display" style="background:#FFD700;border:2px dashed #B8860B;border-radius:4px;padding:.1em .5em;font-weight:800;color:#333;font-size:1.125rem;">4</span>
+        </div>
+      </div>
+    </div>
+    <div class="makecode-wrap" id="mc-panel-match" style="display:none;border-radius:0 0 10px 10px;border-top:none;">
+      <div class="mc-env-badge">Lo que hace el programa realmente</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.625rem;margin-bottom:1rem;">
+        <div style="border:1px solid #3A3A6A;border-radius:8px;overflow:hidden;">
+          <div class="mc-block event" style="border-radius:0;margin:0;padding:.5rem .875rem;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(255,255,255,.2);font-size:.75rem;font-weight:900;margin-right:.375rem;flex-shrink:0;">A</span> Botón A</div>
+          <div style="padding:.5rem .625rem;display:flex;flex-direction:column;gap:2px;">
+            <div class="mc-block" style="background:#5C2D91;margin:0;font-size:.8rem;">call computeStats</div>
+            <div class="mc-block" style="background:#5C2D91;margin:0;font-size:.8rem;">call waitForBall</div>
+            <div class="mc-block" style="background:#1473B0;margin:0;font-size:.8rem;">pause 500 ms</div>
+            <div class="mc-block" style="background:#5C2D91;margin:0;font-size:.8rem;">call chargeAndFollowThrough</div>
+          </div>
+        </div>
+        <div style="border:1px solid #3A3A6A;border-radius:8px;overflow:hidden;">
+          <div class="mc-block event" style="border-radius:0;margin:0;padding:.5rem .875rem;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(255,255,255,.2);font-size:.75rem;font-weight:900;margin-right:.375rem;flex-shrink:0;">B</span> Botón B</div>
+          <div style="padding:.5rem .625rem;font-size:.8125rem;color:#C8CDD8;line-height:1.6;">Cicla el tiempo simulado del partido:<br><span style="color:var(--cyan);font-weight:700;">0s → 60s → 120s → 180s → 0s</span><br><span style="color:var(--slate);font-size:.75rem;">Afecta la reducción de ENDURANCE. Ignora esto para la prueba de hoy.</span></div>
+        </div>
+      </div>
+      <div style="background:rgba(255,159,67,.08);border:2px solid rgba(255,159,67,.4);border-radius:8px;padding:.875rem 1rem;margin-bottom:1rem;">
+        <div style="font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:.375rem;">La fórmula que ejecuta este programa</div>
+        <div style="font-size:1rem;font-weight:800;color:#E8EAF2;font-family:monospace;margin-bottom:.25rem;">chargePower = min( POWER × POWER, 100 )</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.5rem;font-size:.8125rem;color:#C8CDD8;"><span>POWER 4 → <strong style="color:var(--orange);">16%</strong></span><span>POWER 8 → <strong style="color:var(--orange);">64%</strong></span><span style="color:var(--slate);">con tope en 100</span></div>
+      </div>
+      <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.5rem;">Qué hace cada función</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <div style="border:1px solid #3A3A6A;border-radius:8px;overflow:hidden;"><div class="mc-block" style="background:#1473B0;margin:0;border-radius:0;font-size:.8rem;">⚙ computeStats</div><div style="padding:.5rem .875rem;font-size:.8125rem;color:#C8CDD8;line-height:1.7;background:rgba(20,115,176,.06);"><code style="color:var(--orange);">chargePower = POWER²</code> (con tope en 100)<br><code style="color:var(--cyan);">currentPower = SPEED × 5</code> (para follow-through)<br><code style="color:var(--purple);">FOLLOW_THROUGH_MS = POWER × 80</code></div></div>
+        <div style="border:1px solid #3A3A6A;border-radius:8px;overflow:hidden;"><div class="mc-block" style="background:#1473B0;margin:0;border-radius:0;font-size:.8rem;">📡 waitForBall</div><div style="padding:.5rem .875rem;font-size:.8125rem;color:#C8CDD8;line-height:1.7;background:rgba(20,115,176,.06);">Muestra · (escaneando) en la pantalla LED<br>Cicla hasta que el sonar lee <strong style="color:var(--yellow);">0 &lt; dist &lt; 70 cm</strong><br>Muestra ○ (balón detectado) → regresa a cargar</div></div>
+        <div style="border:1px solid #3A3A6A;border-radius:8px;overflow:hidden;"><div class="mc-block" style="background:#1473B0;margin:0;border-radius:0;font-size:.8rem;">⚡ chargeAndFollowThrough</div><div style="padding:.5rem .875rem;font-size:.8125rem;color:#C8CDD8;line-height:1.7;background:rgba(20,115,176,.06);">Conduce al <strong style="color:var(--orange);">chargePower%</strong> — sin distancia fija<br>Se detiene cuando: <span style="color:var(--red);font-weight:700;">sensor de borde activa</span> (muestra B) o <span style="color:var(--green);font-weight:700;">sonar ≤ 5 cm</span> (contacto)<br>Después del contacto: empuje de follow-through, luego reversa corta (muestra R)<br>Muestra <strong style="color:var(--green);">OK</strong> cuando termina</div></div>
+      </div>
+    </div>
+
+    <div class="commit-card" style="margin-top:1rem;">
+      <div class="commit-label">✋ Estima primero — aún no está permitido el bot</div>
+      <div class="commit-q">La velocidad de carga pasa de 16% (POWER 4) a 64% (POWER 8). El balón viajará ___ × más lejos.<br><span style="font-size:.875rem;font-weight:400;color:var(--slate);">Escribe un número. Sin rangos. Luego corre. Si tu estimación está lejos, debes explicar por qué en el Paso 3.</span></div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;">
+        <input type="number" id="est-mult" placeholder="?" min="1" max="20" step="0.5" style="width:84px;background:var(--navy3);border:2px solid rgba(255,77,106,.4);border-radius:7px;padding:.5rem;font-family:'Inter',sans-serif;font-size:1.375rem;font-weight:800;color:#E8EAF2;outline:none;text-align:center;transition:border-color .2s;" oninput="document.getElementById('est-mult').style.borderColor='rgba(0,229,255,.5)'">
+        <span style="font-size:1rem;font-weight:700;color:var(--slate);">× más lejos</span>
+        <button class="choice-btn" onclick="lockEstimate()">Confirmar →</button>
+      </div>
+      <div class="choice-reveal" id="c5-reveal">Estimación confirmada. Ahora corre ambas pruebas. Cuando registres los resultados abajo, calcula el multiplicador real (distancia con POWER 8 ÷ distancia con POWER 4) y compáralo con lo que escribiste. Si no coinciden — esa diferencia es tu pregunta de reflexión. El bot no puede darte esta respuesta. Tu cerebro tuvo que ir primero.</div>
+      <p style="font-size:.75rem;color:var(--slate);margin-top:.5rem;">Deslizar el bot hasta que "se vea bien" no es razonamiento. Escribe el número primero.</p>
+    </div>
+  </div>
+
+  <div class="s-divider"></div>
+  <div style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Prueba 1 — POWER = <strong style="color:var(--cyan);">4</strong>, SPEED = <strong style="color:var(--slate);">0</strong> &nbsp;<span style="font-weight:400;color:var(--slate);">→ cargaPotencia = 16%</span></div>
+  <div class="info-callout"><div class="ic-icon">📏</div><div class="ic-body"><strong>Esperado:</strong> 8–15 cm. Menos de 3 cm o más de 70 cm → verifica la colocación, una nueva prueba.</div></div>
+
+  <div class="s-divider"></div>
+  <div style="font-size:.875rem;font-weight:700;color:#E8EAF2;margin-bottom:.5rem;">Prueba 2 — POWER = <strong style="color:var(--orange);">8</strong>, SPEED = <strong style="color:var(--slate);">4</strong> &nbsp;<span style="font-weight:400;color:var(--slate);">→ cargaPotencia = 84%</span></div>
+  <div class="info-callout"><div class="ic-icon">📏</div><div class="ic-body"><strong>Esperado:</strong> 35–65 cm. El código dice 5× más. La distancia física es 2–4× más. Esa diferencia es el punto.</div></div>
+
+  <details class="trouble-details">
+    <summary class="trouble-summary">🔧 Solución de Problemas — ¿El bot no funciona bien?</summary>
+    <div class="trouble-body">
+      <div class="trouble-item"><strong>El bot no se mueve con POWER = 4 (cargaPotencia 16% se detiene)</strong>Algunas unidades de Cutebot Pro se detienen a velocidades muy bajas. Prueba POWER = 5 (cargaPotencia = 25%) y nota el ajuste. La matemática de razones sigue siendo válida.</div>
+      <div class="trouble-item"><strong>El sensor lee 0 o "sin carga" al presionar el botón A</strong>El sonar devuelve 0 cuando no detecta nada. Asegúrate de que el balón esté en CINTA 2 (dentro de 40 cm de la nariz del bot) antes de presionar A.</div>
+      <div class="trouble-item"><strong>El balón rueda de lado en vez de recto</strong>El ángulo de acercamiento del bot está desalineado. Centra el bot exactamente en CINTA 1. Mide la distancia en línea recta desde CINTA 2.</div>
+      <div class="trouble-item"><strong>El resultado con POWER 8 es más de 4× el resultado con POWER 4</strong>Algo se desplazó en tu configuración. Reinicia ambas marcas de cinta, vuelve a correr una vez y documenta qué cambió. Solo tienes una nueva prueba.</div>
+      <div class="trouble-item"><strong>¿Terminaste ambas pruebas en menos de 8 minutos en total?</strong>Extensión: establece POWER = 2 (cargaPotencia = 4%). ¿La razón se mantiene entre las distancias del balón con POWER 2 y POWER 4? Ahora tienes tres puntos de datos.</div>
+    </div>
+  </details>
+
+  <div class="card">
+    <div class="step-label"><span class="step-num">3</span> Registra Tus Resultados</div>
+    <div class="data-log-row">
+      <div class="dlr-header"><span class="dlr-badge p4">POWER 4</span><span class="dlr-speed">Velocidad de carga: <strong>16%</strong></span><span class="expected-range">esperado 5–12 cm</span></div>
+      <div class="dlr-inputs"><label>El balón viajó:</label><input type="number" class="cm-input" id="p4-actual" placeholder="?" oninput="updateCalcs()" min="0" max="500" step="0.5"><span style="font-size:.875rem;color:var(--slate);">cm</span></div>
+      <div id="p4-range-note" style="font-size:.75rem;color:var(--slate);margin-top:.5rem;display:none;"></div>
+    </div>
+    <div class="data-log-row">
+      <div class="dlr-header"><span class="dlr-badge p8">POWER 8</span><span class="dlr-speed">Velocidad de carga: <strong>84%</strong></span><span class="expected-range">esperado 35–65 cm</span></div>
+      <div class="dlr-inputs"><label>El balón viajó:</label><input type="number" class="cm-input" id="p8-actual" placeholder="?" oninput="updateCalcs()" min="0" max="500" step="0.5"><span style="font-size:.875rem;color:var(--slate);">cm</span></div>
+      <div id="p8-range-note" style="font-size:.75rem;color:var(--slate);margin-top:.5rem;display:none;"></div>
+    </div>
+  </div>
+
+  <div class="gap-calc" id="gap-calc" style="display:none;">
+    <div class="card-title" style="margin-bottom:.875rem;">Tus Números</div>
+    <div class="gap-row">
+      <div class="gap-cell"><div class="gc-label">Real con POWER 4</div><div class="gc-value actual" id="gc-p4">—</div><div class="gc-note">cm</div></div>
+      <div class="gap-cell"><div class="gc-label">Predicción de la fórmula</div><div class="gc-value predicted" id="gc-pred">—</div><div class="gc-note">cm (= P4 × 4)</div></div>
+      <div class="gap-cell"><div class="gc-label">Real con POWER 8</div><div class="gc-value actual" id="gc-p8">—</div><div class="gc-note">cm</div></div>
+    </div>
+    <div class="ratio-result-wrap">
+      <div class="rr-item"><div class="rr-label">Razón de la fórmula</div><div class="rr-val" style="color:var(--purple);">1 : 4</div><div class="rr-sub">lo que dice la matemática</div></div>
+      <div style="font-size:1.5rem;color:var(--slate);">vs</div>
+      <div class="rr-item"><div class="rr-label">Razón real</div><div class="rr-val" id="rr-actual" style="color:var(--orange);">1 : —</div><div class="rr-sub">lo que mediste</div></div>
+      <div style="font-size:1.5rem;color:var(--slate);">→</div>
+      <div class="rr-item"><div class="rr-label">Diferencia</div><div class="rr-val" id="rr-gap" style="color:var(--yellow);">— cm</div><div class="rr-sub">predicción − real</div></div>
+    </div>
+    <div class="gap-math" id="gap-math"></div>
+  </div>
+
+  <div class="sentence-builder" id="sentence-section" style="display:none;">
+    <div class="sb-title">Tu Oración — Solo Una Oración</div>
+    <div class="sentence-output" id="sentence-out"></div>
+    <p style="font-size:.75rem;color:var(--slate);margin-top:.625rem;">Escribe esta oración exacta en tu registro de datos antes de continuar.</p>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(1)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goSection(3)">Siguiente → Reflexión</button>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: REFLEXIÓN -->
+<section class="section" id="sec-3">
+  <div class="section-badge badge-green">Sección 4 · Reflexión</div>
+  <h2 class="section-heading">Conecta la Matemática con el Partido</h2>
+  <p class="section-sub">La fórmula decía X. El bot hizo Y. ¿Qué significa la diferencia?</p>
+
+  <div style="background:rgba(255,209,102,.08);border:2px solid rgba(255,209,102,.4);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+    <div style="font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:.375rem;">📋 Hoja de Trabajo — Parte 4: Reflexión</div>
+    <p style="font-size:.875rem;color:#C8CDD8;margin:0;line-height:1.5;">Responde las Preguntas 1–3 de tu hoja de trabajo mientras trabajas en esta sección. Usa los iniciadores de oraciones de abajo para empezar.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">La Pregunta Clave</div>
+    <p style="font-size:1.125rem;font-weight:700;color:#E8EAF2;margin-bottom:1rem;line-height:1.4;">La fórmula predijo un número. El bot hizo otro.<br><span style="color:var(--yellow);">Esa diferencia es: ¿un <em>problema</em> — o <em>información</em>?</span></p>
+    <div class="verdict-wrap">
+      <button class="verdict-btn" id="vb-problem" onclick="selectVerdict('problem')"><span class="vb-emoji">❌</span><strong>Es un problema.</strong><br><span style="font-size:.875rem;font-weight:400;">Hicimos algo mal.</span></button>
+      <button class="verdict-btn" id="vb-info" onclick="selectVerdict('info')"><span class="vb-emoji">🔬</span><strong>Es información.</strong><br><span style="font-size:.875rem;font-weight:400;">La fórmula tiene límites.</span></button>
+    </div>
+    <div class="verdict-response" id="vr-problem"><strong style="color:var(--yellow);">Piénsalo de nuevo →</strong> ¿Seguiste la configuración exactamente — mismas marcas de cinta, mismo reinicio en cada prueba? Si es así, la diferencia no vino de tu error. Vino de algo que la fórmula no conoce. ¿Qué podría estar perdiendo la fórmula?</div>
+    <div class="verdict-response" id="vr-info"><strong style="color:var(--green);">Exactamente correcto.</strong> La fórmula modela el código del motor — no dice nada sobre física del mundo real. Fricción, tiempo de aceleración, peso del balón — eso no está en la fórmula. La diferencia es evidencia. Los ingenieros usan diferencias para encontrar lo que sus modelos aún no contemplan.</div>
+  </div>
+
+  <details class="physics-details">
+    <summary class="physics-summary">¿Por qué la razón física no coincide con la razón del código?</summary>
+    <div class="physics-body" style="padding:.875rem 1rem 1rem;">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.5rem;margin-bottom:1rem;">
+        <div style="background:rgba(155,138,255,.08);border:1px solid rgba(155,138,255,.25);border-radius:8px;padding:.875rem;text-align:center;"><div style="font-size:.6875rem;font-weight:700;text-transform:uppercase;color:var(--purple);margin-bottom:.5rem;">El código dice</div><div style="font-size:1.125rem;font-weight:800;color:#E8EAF2;">16% → 64%</div><div style="font-size:.8125rem;color:var(--purple);margin-top:.25rem;">4× potencia de carga</div></div>
+        <div style="font-size:1.5rem;color:var(--slate);">≠</div>
+        <div style="background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.3);border-radius:8px;padding:.875rem;text-align:center;"><div style="font-size:.6875rem;font-weight:700;text-transform:uppercase;color:var(--orange);margin-bottom:.5rem;">El balón hace</div><div style="font-size:1.125rem;font-weight:800;color:#E8EAF2;">~2–4× más lejos</div><div style="font-size:.8125rem;color:var(--orange);margin-top:.25rem;">no 4×</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <div style="display:flex;gap:.75rem;align-items:flex-start;background:var(--navy3);border-radius:7px;padding:.75rem;"><div style="font-size:1.25rem;flex-shrink:0;">🏎</div><div><div style="font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.2rem;">16% ≠ 16% de velocidad máxima</div><div style="font-size:.8125rem;color:#8899AA;line-height:1.5;">El bot parte del reposo. Todavía está acelerando cuando golpea el balón. La velocidad de contacto es mucho menor de lo que implica el % del código.</div></div></div>
+        <div style="display:flex;gap:.75rem;align-items:flex-start;background:var(--navy3);border-radius:7px;padding:.75rem;"><div style="font-size:1.25rem;flex-shrink:0;">⚽</div><div><div style="font-size:.8125rem;font-weight:700;color:#E8EAF2;margin-bottom:.2rem;">Golpe más fuerte ≠ rodado proporcionalmente más lejos</div><div style="font-size:.8125rem;color:#8899AA;line-height:1.5;">La fricción absorbe más energía a mayor velocidad. El doble del impacto no mueve el balón el doble de lejos.</div></div></div>
+      </div>
+      <div style="margin-top:.75rem;font-size:.8125rem;color:var(--purple);font-weight:700;text-align:center;">La diferencia entre el código y la física es el dato. Ese es el punto.</div>
+    </div>
+  </details>
+
+  <div class="s-divider"></div>
+
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Pregunta 1 de 3</div>
+    <div class="reflect-q">POWER se duplicó. La distancia del balón fue: ¿exactamente 4× / aproximadamente 4× / mucho menos de 4×?<br><span style="font-size:.875rem;font-weight:400;color:#C8CDD8;">Encierra uno en un círculo. Luego explica.</span></div>
+    <div class="sentence-frame"><strong>Iniciador:</strong> "Cuando dupliqué POWER, la velocidad de carga pasó de ___% a ___%. El balón se movió ___ veces más lejos, no 4×, porque…"</div>
+    <div class="starter-row">
+      <div class="starter-label">Toca un iniciador para empezar</div>
+      <button class="starter-chip" onclick="insertStarter('q1-text','Cuando dupliqué POWER de 4 a 8, el balón se movió ',this)">Cuando dupliqué POWER de 4 a 8, el balón se movió…</button>
+      <button class="starter-chip" onclick="insertStarter('q1-text','La velocidad de carga pasó de 16% a 84%, que es ',this)">La velocidad de carga pasó de 16% a 84%, que es…</button>
+      <button class="starter-chip" onclick="insertStarter('q1-text','Mi razón real fue de 1 a ___, no de 1 a 4, porque ',this)">Mi razón real fue de 1 a ___, no de 1 a 4, porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q1-text','Elevar al cuadrado significa multiplicar por sí mismo, así que duplicar POWER ',this)">Elevar al cuadrado significa multiplicar por sí mismo, así que duplicar POWER…</button>
+      <button class="starter-chip" onclick="insertStarter('q1-text','La fórmula predijo ___ cm, pero el bot hizo ___ cm. La diferencia es ',this)">La fórmula predijo ___ cm, pero el bot hizo ___ cm…</button>
+    </div>
+    <textarea class="reflect-textarea" id="q1-text" placeholder="Escribe tu respuesta aquí..." oninput="checkChar('q1-text','q1-count',15)"></textarea>
+    <div class="char-count" id="q1-count">0 / 15 mín</div>
+  </div>
+
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Pregunta 2 de 3</div>
+    <div class="reflect-q">Tu diferencia es: un problema / información. Elige uno — luego nombra UNA cosa que la fórmula pasó por alto.</div>
+    <div class="sentence-frame"><strong>Elige uno:</strong> fricción / aceleración / peso del balón / superficie del suelo. Luego explica por qué importa.</div>
+    <div class="starter-row">
+      <div class="starter-label">Toca un iniciador para empezar</div>
+      <button class="starter-chip" onclick="insertStarter('q2-text','Creo que la diferencia es información porque ',this)">Creo que la diferencia es información porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q2-text','La fórmula no tomó en cuenta la fricción. La fricción frena el balón porque ',this)">La fórmula no tomó en cuenta la fricción…</button>
+      <button class="starter-chip" onclick="insertStarter('q2-text','La fórmula no tomó en cuenta la aceleración. El bot todavía estaba acelerando cuando golpeó el balón, así que ',this)">La fórmula no tomó en cuenta la aceleración…</button>
+      <button class="starter-chip" onclick="insertStarter('q2-text','El balón no rodó tan lejos como se predijo porque ',this)">El balón no rodó tan lejos como se predijo porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q2-text','Una cosa que le falta a la fórmula es ',this)">Una cosa que le falta a la fórmula es…</button>
+    </div>
+    <textarea class="reflect-textarea" id="q2-text" placeholder="Escribe tu respuesta aquí..." oninput="checkChar('q2-text','q2-count',10)"></textarea>
+    <div class="char-count" id="q2-count">0 / 10 mín</div>
+  </div>
+
+  <div class="reflect-card">
+    <div class="card-title" style="margin-bottom:.625rem;">Pregunta 3 de 3</div>
+    <div class="reflect-q">SPEED: el doble de puntos = el doble de salida. POWER: el doble de puntos = 4× de salida.<br>¿Más puntos en SPEED o en POWER? Elige uno. Luego di por qué.</div>
+    <div class="sentence-frame"><strong>Tu respuesta debe incluir los tres:</strong><br>1. La estadística que elegiste (SPEED o POWER)<br>2. El % exacto de velocidad de carga que da tu valor de POWER<br>3. Por qué puntos iguales de POWER dan impulsos de velocidad de carga <em>desiguales</em></div>
+    <div class="alert-callout" style="margin-bottom:.625rem;"><div class="ac-icon">⚠</div><div class="ac-body"><strong style="color:var(--yellow);">No se acepta:</strong> "POWER porque da más velocidad de carga." Esa es una conclusión sin razonamiento. Necesitas los tres componentes anteriores para obtener crédito.</div></div>
+    <div class="starter-row">
+      <div class="starter-label">Toca un iniciador para empezar</div>
+      <button class="starter-chip" onclick="insertStarter('q3-text','Pondría más puntos en POWER porque cada punto extra ',this)">Pondría más puntos en POWER porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q3-text','Pondría más puntos en SPEED porque cada punto extra ',this)">Pondría más puntos en SPEED porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q3-text','Cada punto en POWER da mucha más velocidad de carga porque está al cuadrado. Eso significa ',this)">Cada punto en POWER da mucha más velocidad de carga porque…</button>
+      <button class="starter-chip" onclick="insertStarter('q3-text','En un partido, más POWER significa que mi bot golpea el balón más fuerte, así que ',this)">En un partido, más POWER significa que mi bot golpea más fuerte, así que…</button>
+      <button class="starter-chip" onclick="insertStarter('q3-text','En un partido, más SPEED significa que mi bot llega al balón más rápido, así que ',this)">En un partido, más SPEED significa que mi bot llega más rápido, así que…</button>
+      <button class="starter-chip" onclick="insertStarter('q3-text','Necesito balancear POWER y SPEED porque ',this)">Necesito balancear POWER y SPEED porque…</button>
+    </div>
+    <textarea class="reflect-textarea" id="q3-text" placeholder="Escribe tu respuesta aquí..." oninput="checkChar('q3-text','q3-count',15)"></textarea>
+    <div class="char-count" id="q3-count">0 / 15 mín</div>
+  </div>
+
+  <div class="stat-card">
+    <h3>⚡ Tarjeta de Estadística — Registra Tu Elección de POWER</h3>
+    <div class="sc-row">
+      <div class="sc-item"><div class="sc-label">Puntos de POWER Elegidos</div><input type="number" class="sc-num-input" id="sc-power" min="1" max="8" placeholder="?" oninput="updateStatCard()"></div>
+      <div class="sc-item"><div class="sc-label">Velocidad de Carga</div><div class="sc-val" id="sc-speed">?%</div></div>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="sc-label" style="text-align:center;font-size:.6875rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:.375rem;">Tu nombre</div>
+      <input type="text" id="sc-name" placeholder="Nombre + apellido" autocomplete="off" style="width:100%;max-width:18rem;display:block;margin:0 auto;background:var(--navy3);border:2px solid rgba(255,159,67,.4);border-radius:6px;padding:.5rem .75rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;color:#E8EAF2;text-align:center;outline:none;">
+    </div>
+    <p style="font-size:.8125rem;color:var(--slate);margin-top:.875rem;">Registra esto en tu tarjeta de estadística individual antes de irte de la mesa.</p>
+    <div id="lock-notice" style="display:none;margin-top:.875rem;padding:.75rem 1rem;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);border-radius:6px;font-size:.8125rem;color:#E8EAF2;line-height:1.5;text-align:left;"></div>
+  </div>
+
+  <div class="done-banner" id="done-banner">
+    <h3>¡Desafío Completado! ⚡</h3>
+    <p>Encontraste la fórmula, programaste el Cutebot Pro, corriste la prueba, mediste la diferencia y decidiste qué significa. Eso es pensamiento de ingeniería.</p>
+  </div>
+  <div id="done-btn-wrap" style="text-align:center;margin-top:1.25rem;display:none;">
+    <button class="btn btn-success" onclick="finishLesson()">Listo ✓</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goSection(2)">← Atrás</button>
+    <span></span>
+  </div>
+</section>
+
+<script>
+const SAVE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzV0_UPT5vyy-PNRS9Vw4jvPT0Bcx22k0hHV62-fLFj7nKmp3Mem2Z1szmv_dJy4OJk/exec';
+const POWER_VALS = { 1:1, 2:4, 4:16, 8:64 };
+const SQ_SIZES   = { 1:18, 2:36, 4:72, 8:144 };
+const COLORS     = { 1:'#8899AA', 2:'#00E5FF', 4:'#FF9F43', 8:'#FF4D6A' };
+const INSIGHTS   = {
+  1: 'POWER 1 → cargaPotencia = <strong style="color:var(--yellow)">1%</strong> (cuando SPEED = 0). El Cutebot Pro apenas se mueve. Follow-through (Parte 2) = 80 ms.',
+  2: 'POWER 2 → cargaPotencia = <strong style="color:var(--yellow)">4%</strong> (cuando SPEED = 0). El doble de POWER, 4× la salida — ya cuadrática. Follow-through = 160 ms.',
+  4: 'POWER 4 → cargaPotencia = <strong style="color:var(--yellow)">16%</strong> (cuando SPEED = 0). Prueba 1 en tu test. Follow-through (Parte 2) = 320 ms.',
+  8: 'POWER 8 → cargaPotencia = <strong style="color:var(--yellow)">64%</strong> (cuando SPEED = 0). 4× la velocidad de carga de POWER 4. Follow-through = 640 ms. El balón no viajará 4× más lejos — corre la prueba para descubrir por qué.'
+};
+
+function goSection(idx){
+  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i===idx));
+  document.querySelectorAll('.section-nav button').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.getElementById('progress-bar').style.width=((idx+1)/4*100).toFixed(0)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selectPower(p){
+  document.querySelectorAll('.pwr-btn').forEach(b=>b.classList.remove('active'));
+  const btn=[...document.querySelectorAll('.pwr-btn')].find(b=>parseInt(b.textContent)===p);
+  if(btn) btn.classList.add('active');
+  const speed=POWER_VALS[p], sz=SQ_SIZES[p], col=COLORS[p];
+  const sq=document.getElementById('sq-square');
+  sq.style.width=sz+'px'; sq.style.height=sz+'px'; sq.style.background=col;
+  sq.textContent=sz<30?'':p+'×'+p;
+  document.getElementById('sq-dim-label').textContent=p+' × '+p+' unidades';
+  document.getElementById('sq-calc').textContent=p+' × '+p+' = '+speed;
+  document.getElementById('sq-fill').style.width=speed+'%';
+  document.getElementById('sq-pct').textContent=speed+'%';
+  document.getElementById('sq-pct').style.color=col;
+  document.getElementById('pwr-insight').style.display='flex';
+  document.getElementById('pwr-insight-text').innerHTML=INSIGHTS[p];
+  const mc=document.getElementById('mc-speed-display');
+  if(mc) mc.textContent=speed;
+}
+
+let rowsCorrect={1:false,2:false,4:false,8:false};
+function checkCalcRow(p){
+  const sq=parseFloat(document.getElementById('calc-sq-'+p).value);
+  const sp=parseFloat(document.getElementById('calc-sp-'+p).value);
+  const sqEl=document.getElementById('calc-sq-'+p);
+  const spEl=document.getElementById('calc-sp-'+p);
+  const icon=document.getElementById('ri-'+p);
+  const correct=p*p;
+  const sqOk=sq===correct, spOk=sp===correct;
+  sqEl.classList.toggle('correct',sqOk); sqEl.classList.toggle('error',!sqOk);
+  spEl.classList.toggle('correct',spOk); spEl.classList.toggle('error',!spOk);
+  if(sqOk&&spOk){icon.textContent='✓';icon.style.color='var(--green)';rowsCorrect[p]=true;}
+  else{icon.textContent='✗';icon.style.color='var(--red)';rowsCorrect[p]=false;}
+  if(Object.values(rowsCorrect).every(Boolean)) animateBars();
+}
+function animateBars(){
+  document.getElementById('bar-chart-section').style.display='block';
+  const maxH=110, pcts={1:1/64,2:4/64,4:16/64,8:64/64}, vals={1:'1%',2:'4%',4:'16%',8:'64%'};
+  setTimeout(()=>{
+    [1,2,4,8].forEach(p=>{
+      document.getElementById('bf-'+p).style.height=Math.max(4,Math.round(pcts[p]*maxH))+'px';
+      document.getElementById('bf-'+p).classList.add('lit');
+      document.getElementById('bl-'+p).textContent=vals[p];
+    });
+  },100);
+}
+
+let ratioAok=false,ratioBok=false;
+function checkRatioA(){
+  const v=parseFloat(document.getElementById('ratio-a').value);
+  const el=document.getElementById('ratio-a'), note=document.getElementById('ratio-a-note');
+  ratioAok=(v===4);
+  el.classList.toggle('correct',ratioAok); el.classList.toggle('error',!ratioAok);
+  note.textContent=ratioAok?'✓ 4% → 16% es 1:4. ¡La velocidad se cuadruplicó!':'✗ Pista: 16 ÷ 4 = ?';
+  note.style.color=ratioAok?'var(--green)':'var(--yellow)';
+  if(ratioAok&&ratioBok) document.getElementById('ratio-reveal').classList.add('visible');
+}
+function checkRatioB(){
+  const v=parseFloat(document.getElementById('ratio-b').value);
+  const el=document.getElementById('ratio-b'), note=document.getElementById('ratio-b-note');
+  ratioBok=(v===4);
+  el.classList.toggle('correct',ratioBok); el.classList.toggle('error',!ratioBok);
+  note.textContent=ratioBok?'✓ 16% → 64% es 1:4. ¡Se cuadruplica de nuevo!':'✗ Pista: 64 ÷ 16 = ?';
+  note.style.color=ratioBok?'var(--green)':'var(--yellow)';
+  if(ratioAok&&ratioBok) document.getElementById('ratio-reveal').classList.add('visible');
+}
+
+function updateCalcs(){
+  const p4=parseFloat(document.getElementById('p4-actual').value);
+  const p8=parseFloat(document.getElementById('p8-actual').value);
+  const p4Input=document.getElementById('p4-actual'), p4Note=document.getElementById('p4-range-note');
+  if(!isNaN(p4)&&p4>0){
+    if(p4>=3&&p4<=30){p4Input.classList.add('in-range');p4Input.classList.remove('out-range');p4Note.style.display='none';}
+    else{p4Input.classList.remove('in-range');p4Input.classList.add('out-range');p4Note.textContent=p4<3?'⚠ Menos de 3 cm — verifica la posición del bot y vuelve a correr.':'⚠ Más de 30 cm — verifica la configuración del suelo y vuelve a correr.';p4Note.style.display='block';p4Note.style.color='var(--yellow)';}
+  }
+  const p8Input=document.getElementById('p8-actual'), p8Note=document.getElementById('p8-range-note');
+  if(!isNaN(p8)&&p8>0){
+    if(p8>=8&&p8<=60){p8Input.classList.add('in-range');p8Input.classList.remove('out-range');p8Note.style.display='none';}
+    else{p8Input.classList.remove('in-range');p8Input.classList.add('out-range');p8Note.textContent=p8<8?'⚠ Menos de 8 cm — verifica la configuración, o el balón puede no estar en CINTA 2.':'⚠ Más de 60 cm — verifica tu medición.';p8Note.style.display='block';p8Note.style.color='var(--yellow)';}
+  }
+  if(!isNaN(p4)&&p4>0){
+    const predicted=parseFloat((p4*4).toFixed(1));
+    document.getElementById('gc-p4').textContent=p4+' cm';
+    document.getElementById('gc-pred').textContent=predicted+' cm';
+    document.getElementById('gap-calc').style.display='block';
+    if(!isNaN(p8)&&p8>0){
+      const gap=parseFloat((predicted-p8).toFixed(1)), ratio=parseFloat((p8/p4).toFixed(2));
+      document.getElementById('gc-p8').textContent=p8+' cm';
+      document.getElementById('rr-actual').textContent='1 : '+ratio;
+      document.getElementById('rr-gap').textContent=gap+' cm';
+      document.getElementById('gap-math').textContent='Predicción: '+p4+' × 4 = '+predicted+' cm  |  Real: '+p8+' cm  |  Diferencia: '+predicted+' − '+p8+' = '+gap+' cm';
+      document.getElementById('sentence-section').style.display='block';
+      document.getElementById('sentence-out').innerHTML='"La razón predijo <span class="so-fill">'+predicted+'</span> cm. El bot hizo <span class="so-fill">'+p8+'</span> cm. La diferencia es <span class="so-fill">'+gap+'</span> cm."';
+    }
+  }
+}
+
+function selectVerdict(v){
+  document.getElementById('vb-problem').className='verdict-btn'+(v==='problem'?' selected-problem':'');
+  document.getElementById('vb-info').className='verdict-btn'+(v==='info'?' selected-info':'');
+  document.getElementById('vr-problem').classList.toggle('visible',v==='problem');
+  document.getElementById('vr-info').classList.toggle('visible',v==='info');
+  checkDone();
+}
+
+function checkChar(textId,countId,minLen){
+  const el=document.getElementById(textId), cEl=document.getElementById(countId);
+  const len=el.value.trim().length, ready=len>=minLen;
+  cEl.textContent=len+' / '+minLen+' mín';
+  cEl.classList.toggle('ready',ready); el.classList.toggle('ready',ready);
+  checkDone();
+}
+function checkDone(){
+  const q1ok=document.getElementById('q1-text').value.trim().length>=15;
+  const q2ok=document.getElementById('q2-text').value.trim().length>=10;
+  const q3ok=document.getElementById('q3-text').value.trim().length>=15;
+  const verdictOk=document.getElementById('vb-info').classList.contains('selected-info')||document.getElementById('vb-problem').classList.contains('selected-problem');
+  document.getElementById('done-btn-wrap').style.display=(q1ok&&q2ok&&q3ok&&verdictOk)?'block':'none';
+}
+function updateStatCard(){
+  const p=parseInt(document.getElementById('sc-power').value);
+  if(!isNaN(p)&&p>0){document.getElementById('sc-speed').textContent=(p*p)+'%';document.getElementById('sc-speed').style.color=COLORS[p]||'var(--orange)';}
+  else{document.getElementById('sc-speed').textContent='?%';document.getElementById('sc-speed').style.color='var(--orange)';}
+}
+async function finishLesson(){
+  const pts=parseInt(document.getElementById('sc-power').value);
+  const nameEl=document.getElementById('sc-name'), name=(nameEl?nameEl.value:'').trim();
+  if(isNaN(pts)||pts<1||pts>8){alert('Elige tus puntos de POWER (1–8) en la tarjeta de estadística antes de terminar.');document.getElementById('sc-power').focus();return;}
+  if(!name){alert('Escribe tu nombre en la tarjeta de estadística antes de terminar.');nameEl&&nameEl.focus();return;}
+  let lockedPts=pts;
+  if(SAVE_ENDPOINT){
+    try{
+      const res=await fetch(SAVE_ENDPOINT,{method:'POST',body:JSON.stringify({name,site:localStorage.getItem('va_selected_site')||'',stat:'power',points:pts,charge:pts*pts,followThrough:pts*80,lesson:'power-stat-challenge',ts:new Date().toISOString()})});
+      const result=await res.json().catch(()=>null);
+      if(result&&result.ok===false&&result.error==='already_locked'){
+        const existing=Number(result.existing);
+        if(!isNaN(existing)){lockedPts=existing;const notice=document.getElementById('lock-notice');if(notice){notice.innerHTML='<strong style="color:#FFD166;">Ya confirmado:</strong> '+name+' anteriormente confirmó POWER = '+existing+' (carga '+(existing*existing)+', follow-through '+(existing*80)+'ms). Usando ese valor.';notice.style.display='block';}}
+      }
+    }catch(_e){}
+  }
+  localStorage.setItem('va_student_name',name);
+  localStorage.setItem('va_power_locked',lockedPts);
+  document.getElementById('done-banner').classList.add('visible');
+  document.getElementById('done-btn-wrap').style.display='none';
+  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+(function preFillName(){
+  const saved=localStorage.getItem('va_student_name');
+  if(!saved) return;
+  document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('sc-name');if(el&&!el.value) el.value=saved;});
+})();
+function insertStarter(textareaId,text,chipEl){
+  const ta=document.getElementById(textareaId);
+  const current=ta.value.trim();
+  ta.value=current?current+'\n'+text:text;
+  ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length);
+  const row=chipEl.closest('.starter-row');
+  row.querySelectorAll('.starter-chip').forEach(c=>c.classList.remove('used'));
+  chipEl.classList.add('used');
+  const countId=textareaId.replace('text','count');
+  const minLen=textareaId==='q2-text'?10:15;
+  checkChar(textareaId,countId,minLen);
+}
+function lockPowerPredict(){
+  const input=document.getElementById('c2-predict-input'), val=parseFloat(input.value);
+  const reveal=document.getElementById('c2-reveal');
+  if(isNaN(val)||val<1){input.style.borderColor='rgba(255,77,106,.8)';input.focus();return;}
+  input.style.borderColor=val===64?'rgba(0,201,122,.8)':'rgba(255,77,106,.8)';
+  if(reveal) setTimeout(()=>reveal.classList.add('visible'),280);
+}
+function checkPreTable(){
+  const p4val=parseFloat(document.getElementById('pre-p4').value);
+  const p8val=parseFloat(document.getElementById('pre-p8').value);
+  const p4el=document.getElementById('pre-p4'), p8el=document.getElementById('pre-p8');
+  if(isNaN(p4val)||isNaN(p8val)){if(isNaN(p4val)){p4el.style.borderColor='rgba(255,77,106,.8)';p4el.focus();}if(isNaN(p8val)){p8el.style.borderColor='rgba(255,77,106,.8)';}return;}
+  p4el.style.borderColor=p4val===16?'rgba(0,201,122,.8)':'rgba(255,77,106,.8)';
+  p8el.style.borderColor=p8val===64?'rgba(0,201,122,.8)':'rgba(255,77,106,.8)';
+  const reveal=document.getElementById('c4-reveal');
+  if(reveal) setTimeout(()=>reveal.classList.add('visible'),280);
+}
+function lockEstimate(){
+  const input=document.getElementById('est-mult'), val=parseFloat(input.value);
+  const reveal=document.getElementById('c5-reveal');
+  if(isNaN(val)||val<1){input.style.borderColor='rgba(255,77,106,.8)';input.focus();return;}
+  window._estMult=val;
+  input.style.borderColor='rgba(0,201,122,.8)'; input.setAttribute('readonly',true);
+  if(reveal) setTimeout(()=>reveal.classList.add('visible'),280);
+}
+function pickChoice(btnEl,groupId,value){
+  const row=btnEl.closest('.choice-row');
+  row.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  const reveal=document.getElementById(groupId+'-reveal');
+  if(reveal) setTimeout(()=>reveal.classList.add('visible'),280);
+}
+function switchMcTab(tab){
+  const testPanel=document.getElementById('mc-panel-test'), matchPanel=document.getElementById('mc-panel-match');
+  const testBtn=document.getElementById('mc-tab-test'), matchBtn=document.getElementById('mc-tab-match');
+  if(tab==='test'){
+    testPanel.style.display='block';matchPanel.style.display='none';
+    testBtn.style.color='var(--cyan)';testBtn.style.background='#1A1A2E';testBtn.style.borderBottom='2px solid var(--cyan)';
+    matchBtn.style.color='var(--slate)';matchBtn.style.background='#111124';matchBtn.style.borderBottom='2px solid transparent';
+  } else {
+    testPanel.style.display='none';matchPanel.style.display='block';
+    matchBtn.style.color='var(--orange)';matchBtn.style.background='#1A1A2E';matchBtn.style.borderBottom='2px solid var(--orange)';
+    testBtn.style.color='var(--slate)';testBtn.style.background='#111124';testBtn.style.borderBottom='2px solid transparent';
+  }
+}
+function initIcons(){
+  const ICO={
+    bolt:`<svg class="ico" viewBox="0 0 20 20"><polyline points="12,2 7,11 11,11 8,18"/></svg>`,
+    sensor:`<svg class="ico" viewBox="0 0 20 20"><circle cx="10" cy="12.5" r="1.5" fill="currentColor" stroke="none"/><path d="M6.5 9.5a5 5 0 0 1 7 0"/><path d="M3.5 7a9.5 9.5 0 0 1 13 0"/></svg>`,
+    book:`<svg class="ico" viewBox="0 0 20 20"><path d="M3 5a2 2 0 0 1 2-2h5v14H5a2 2 0 0 1-2-2V5z"/><path d="M17 5a2 2 0 0 0-2-2h-5v14h5a2 2 0 0 0 2-2V5z"/></svg>`,
+    bulb:`<svg class="ico" viewBox="0 0 20 20"><path d="M10 2a5 5 0 0 1 3.5 8.5l-1 2H7.5l-1-2A5 5 0 0 1 10 2z"/></svg>`,
+    ruler:`<svg class="ico" viewBox="0 0 20 20"><rect x="2" y="7" width="16" height="6" rx="1.5"/></svg>`,
+    block:`<svg class="ico" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><line x1="4.7" y1="4.7" x2="15.3" y2="15.3"/></svg>`,
+    warn:`<svg class="ico" viewBox="0 0 20 20"><path d="M10 2.5 L2 17.5 h16 z"/><line x1="10" y1="9" x2="10" y2="13"/></svg>`,
+    wrench:`<svg class="ico" viewBox="0 0 20 20"><path d="M15.5 2.5a3 3 0 0 0-3.5 4L3.5 15a1.5 1.5 0 1 0 2 2L14 8.5a3 3 0 0 0 1.5.5 3 3 0 0 0 0-6z"/></svg>`,
+  };
+  const MAP={'📖':ICO.book,'💡':ICO.bulb,'⚡':ICO.bolt,'📡':ICO.sensor,'📏':ICO.ruler,'🚫':ICO.block,'⚠':ICO.warn,'🔧':ICO.wrench};
+  document.querySelectorAll('.kc-icon,.ic-icon,.ac-icon,.vb-icon').forEach(el=>{
+    const txt=el.textContent.trim(), ico=MAP[txt]||MAP[txt.charAt(0)];
+    if(ico) el.innerHTML=ico;
+  });
+}
+selectPower(4);
+document.getElementById('progress-bar').style.width='25%';
+initIcons();
+</script>
+</body>
+</html>
