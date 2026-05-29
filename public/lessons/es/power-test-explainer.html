@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programa de Prueba de Power · Explicador de Código · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0D0D1A;
+      --navy2:  #161A2E;
+      --navy3:  #1E2240;
+      --cyan:   #00E5FF;
+      --teal:   #007A99;
+      --slate:  #8899AA;
+      --border: #222840;
+      --card:   #161A2E;
+      --green:  #00C97A;
+      --red:    #FF4D6A;
+      --yellow: #FFD166;
+      --orange: #FF8C42;
+      --purple: #BD7AFF;
+      --text:   #E8EAF2;
+      --muted:  #9AA3B2;
+      --mono:   'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter',sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      display: flex;
+      gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--orange); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub { font-size: .9375rem; color: var(--muted); line-height: 1.6; max-width: 620px; }
+
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .75rem; }
+    .card-title {
+      font-size: .75rem; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: .75rem;
+    }
+
+    /* Grid layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+    @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* Button control cards */
+    .btn-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .btn-badge {
+      display: inline-block;
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem;
+      border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .btn-badge.a  { background: rgba(0,229,255,.15); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .btn-badge.b  { background: rgba(255,209,102,.12); color: var(--yellow); border: 1px solid rgba(255,209,102,.25); }
+    .btn-badge.ab { background: rgba(255,76,106,.12); color: var(--red); border: 1px solid rgba(255,76,106,.25); }
+
+    .btn-card h3 { font-size: .9375rem; font-weight: 700; margin-bottom: .4rem; }
+    .btn-card p  { font-size: .8125rem; color: var(--muted); line-height: 1.55; }
+
+    /* LED display */
+    .led-grid {
+      display: flex; flex-wrap: wrap; gap: .75rem;
+    }
+    .led-item {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .875rem 1rem;
+      display: flex; align-items: center; gap: .875rem;
+      min-width: 180px; flex: 1;
+    }
+    .led-char {
+      font-family: var(--mono);
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--cyan);
+      width: 2rem; text-align: center;
+      flex-shrink: 0;
+    }
+    .led-char.dot  { font-size: 1rem; color: var(--slate); }
+    .led-char.ring { font-size: 1.125rem; color: var(--green); }
+    .led-desc { font-size: .8125rem; color: var(--muted); line-height: 1.45; }
+    .led-desc strong { color: var(--text); }
+
+    /* Formula boxes */
+    .formula-box {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: .625rem;
+    }
+    .formula-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .4rem;
+    }
+    .formula-eq {
+      font-family: var(--mono);
+      font-size: .9375rem; color: var(--cyan);
+      margin-bottom: .375rem;
+    }
+    .formula-note { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .formula-note strong { color: var(--yellow); }
+
+    /* Callouts */
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: .75rem; font-size: .8125rem; line-height: 1.55;
+    }
+    .callout.info    { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: #c0e8f0; }
+    .callout.warn    { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.2); color: #f0e0b0; }
+    .callout.danger  { background: rgba(255,76,106,.07); border: 1px solid rgba(255,76,106,.2); color: #f0b8c0; }
+    .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout strong { display: block; margin-bottom: .2rem; }
+
+    /* Sensor map */
+    .sensor-strip {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1rem;
+    }
+    .bot-top {
+      width: 160px; height: 50px;
+      border: 2px solid var(--border);
+      border-radius: 8px 8px 0 0;
+      background: var(--navy2);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .625rem; color: var(--slate); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .sensor-row {
+      display: flex; gap: 6px; width: 160px;
+    }
+    .sensor-dot {
+      flex: 1; height: 22px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: .6875rem; font-weight: 700;
+    }
+    .sensor-dot.s1 { background: rgba(0,229,255,.18); color: var(--cyan); border: 1px solid rgba(0,229,255,.4); }
+    .sensor-dot.s2 { background: rgba(189,122,255,.18); color: var(--purple); border: 1px solid rgba(189,122,255,.4); }
+    .sensor-dot.s3 { background: rgba(189,122,255,.18); color: var(--purple); border: 1px solid rgba(189,122,255,.4); }
+    .sensor-dot.s4 { background: rgba(255,140,66,.18); color: var(--orange); border: 1px solid rgba(255,140,66,.4); }
+    .sensor-legend { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+    .sleg {
+      font-size: .6875rem; font-weight: 700;
+      padding: .2rem .6rem; border-radius: 20px;
+    }
+    .sleg.s1 { background: rgba(0,229,255,.12); color: var(--cyan); }
+    .sleg.s2 { background: rgba(189,122,255,.12); color: var(--purple); }
+    .sleg.s3 { background: rgba(189,122,255,.12); color: var(--purple); }
+    .sleg.s4 { background: rgba(255,140,66,.12); color: var(--orange); }
+    .sensor-return-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    .sensor-return-table th {
+      text-align: left; font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); padding: .4rem .6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sensor-return-table td { padding: .5rem .6rem; border-bottom: 1px solid rgba(34,40,64,.6); }
+    .ret-badge {
+      font-family: var(--mono); font-size: .75rem; font-weight: 700;
+      padding: .15rem .4rem; border-radius: 4px;
+    }
+    .ret-0 { background: rgba(0,201,122,.15); color: var(--green); }
+    .ret-1 { background: rgba(0,229,255,.15); color: var(--cyan); }
+    .ret-2 { background: rgba(255,140,66,.15); color: var(--orange); }
+    .ret-3 { background: rgba(255,76,106,.15); color: var(--red); }
+
+    /* Sequence flow */
+    .flow {
+      display: flex; align-items: stretch; gap: 0;
+      overflow-x: auto; padding-bottom: .5rem;
+    }
+    .flow-step {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .875rem 1rem;
+      min-width: 110px;
+      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: .4rem;
+    }
+    .flow-icon { font-size: 1.375rem; }
+    .flow-name { font-size: .6875rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text); }
+    .flow-desc { font-size: .6625rem; color: var(--muted); line-height: 1.4; }
+    .flow-arrow {
+      display: flex; align-items: center;
+      color: var(--slate); font-size: 1rem; padding: 0 .25rem;
+      flex-shrink: 0;
+    }
+    .flow-branch {
+      display: flex; flex-direction: column; gap: .375rem;
+    }
+    .branch-label {
+      font-size: .6rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate); text-align: center;
+    }
+
+    /* Calculator */
+    .calc-wrap {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .calc-header {
+      background: var(--navy3);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .calc-header-title { font-size: .9375rem; font-weight: 800; }
+    .budget-pill {
+      font-family: var(--mono); font-size: .8125rem; font-weight: 700;
+      padding: .3rem .9rem; border-radius: 20px;
+      background: rgba(0,229,255,.1); color: var(--cyan);
+      border: 1px solid rgba(0,229,255,.25);
+      transition: all .2s;
+    }
+    .budget-pill.over { background: rgba(255,76,106,.15); color: var(--red); border-color: rgba(255,76,106,.3); }
+    .budget-pill.ok   { background: rgba(0,201,122,.12); color: var(--green); border-color: rgba(0,201,122,.3); }
+    .calc-body { padding: 1.5rem; }
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-top {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: .4rem;
+    }
+    .slider-name { font-size: .8125rem; font-weight: 700; }
+    .slider-val {
+      font-family: var(--mono); font-size: 1rem; font-weight: 700;
+    }
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 3px; outline: none; cursor: pointer;
+      background: var(--navy3);
+    }
+    input[type=range].s-speed  { accent-color: var(--cyan); }
+    input[type=range].s-end    { accent-color: var(--green); }
+    input[type=range].s-power  { accent-color: var(--orange); }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; border: 2px solid var(--navy2);
+      background: currentColor; cursor: pointer;
+    }
+    .slider-sub { font-size: .6875rem; color: var(--muted); margin-top: .25rem; }
+
+    /* Outputs */
+    .outputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1.25rem; }
+    @media (max-width: 540px) { .outputs-grid { grid-template-columns: 1fr 1fr; } }
+    .out-cell {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .875rem 1rem;
+      text-align: center;
+    }
+    .out-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .4rem; }
+    .out-val { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+    .out-unit { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* Endurance decay table */
+    .decay-table-wrap { margin-top: 1.5rem; }
+    .decay-table-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .625rem;
+    }
+    .decay-table { width: 100%; border-collapse: collapse; }
+    .decay-table th {
+      font-size: .6375rem; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .45rem .75rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .decay-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .875rem; }
+    .decay-table td:first-child { color: var(--muted); font-size: .8rem; }
+    .pwr-bar-wrap { display: flex; align-items: center; gap: .5rem; }
+    .pwr-bar-bg {
+      flex: 1; height: 8px; background: var(--navy3);
+      border-radius: 4px; overflow: hidden;
+    }
+    .pwr-bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+    .pwr-val { font-family: var(--mono); font-size: .8125rem; font-weight: 700; min-width: 2.5rem; text-align: right; }
+
+    /* Constants table */
+    .const-table { width: 100%; border-collapse: collapse; }
+    .const-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); padding: .4rem .75rem;
+      border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .const-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .8125rem; }
+    .const-name { font-family: var(--mono); color: var(--cyan); }
+    .const-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-note { color: var(--muted); font-size: .775rem; }
+
+    /* Contact detection */
+    .contact-steps { display: flex; flex-direction: column; gap: .5rem; margin-top: .75rem; }
+    .contact-step {
+      display: flex; gap: .875rem; align-items: flex-start;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .8rem 1rem;
+    }
+    .contact-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,140,66,.18); color: var(--orange);
+      border: 1px solid rgba(255,140,66,.3);
+      font-size: .6875rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: .05rem;
+    }
+    .contact-text { font-size: .8125rem; color: var(--muted); line-height: 1.5; }
+    .contact-text strong { color: var(--text); }
+
+    /* Power POWER note */
+    .power-quad-note {
+      background: rgba(255,140,66,.08);
+      border: 1px solid rgba(255,140,66,.25);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-top: .75rem;
+    }
+    .power-quad-note p { font-size: .8125rem; color: #f0d0b0; line-height: 1.6; }
+    .power-quad-note code {
+      font-family: var(--mono); font-size: .8rem;
+      background: rgba(0,0,0,.3); padding: .1em .35em; border-radius: 3px;
+    }
+
+    /* MakeCode blocks rendering */
+    pre.blocks { display: none; }
+    .blocks-render-area {
+      min-height: 80px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: .75rem 0;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+    .blocks-loading {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .8125rem;
+      color: var(--muted);
+      padding: .5rem 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Block section layout */
+    .block-entry { margin-bottom: 1.25rem; }
+    .block-entry:last-child { margin-bottom: 0; }
+    .block-entry-header {
+      font-size: .6875rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .625rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .block-entry-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .block-entry-body {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 640px) { .block-entry-body { grid-template-columns: 1fr; } }
+    .block-entry-explain { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+    .block-entry-explain strong { color: var(--text); }
+    .block-entry-explain code {
+      font-family: var(--mono); font-size: .775rem;
+      background: rgba(0,0,0,.3); padding: .1em .35em; border-radius: 3px;
+      color: var(--cyan);
+    }
+
+    /* Phase boxes */
+    .phase-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 560px) { .phase-row { grid-template-columns: 1fr; } }
+    .phase-box {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.125rem;
+    }
+    .phase-box-title {
+      font-size: .6875rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .625rem;
+    }
+    .phase-box-title.charge    { color: var(--orange); }
+    .phase-box-title.followthru { color: var(--cyan); }
+    .phase-box ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+    .phase-box li { font-size: .8125rem; color: var(--muted); line-height: 1.45; display: flex; gap: .5rem; }
+    .phase-box li::before { content: '→'; color: var(--slate); flex-shrink: 0; }
+  </style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/power-test-explainer.html">EN</a>
+  <a href="/lessons/es/power-test-explainer.html" class="active">ES</a>
+</nav>
+
+
+<nav class="site-nav">
+  <a href="/lessons">← Lecciones</a>
+  <a href="/lessons/power-test-explainer.html" style="color:var(--orange)">Prueba de Power</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">Explicador de Código · BBC micro:bit + Cutebot Pro</div>
+    <h1 class="page-title">Programa de Prueba de Power</h1>
+    <p class="page-sub">Este programa prueba el comportamiento de carga y empuje de tu robot. Tú posicionas el robot, presionas A para armarlo, y espera a que un balón entre en el rango — luego carga a potencia máxima, hace contacto y avanza durante una duración fija antes de retroceder.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- BUTTON CONTROLS -->
+  <div class="section">
+    <div class="section-label">Controles de Botones</div>
+    <div class="grid-2">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>Armar + Cargar</h3>
+        <p>Calcula las estadísticas, luego espera un balón dentro de 70 cm. Cuando se detecta, pausa brevemente y ejecuta la secuencia de carga.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>Ciclar tiempo del partido</h3>
+        <p>Avanza por 0 → 60 → 120 → 180 segundos de tiempo de partido simulado. Valores más altos aplican un decaimiento de endurance más fuerte a cada carga.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LED DISPLAY -->
+  <div class="section">
+    <div class="section-label">Decodificador de la Pantalla LED</div>
+    <div class="led-grid">
+      <div class="led-item">
+        <div class="led-char dot">·</div>
+        <div class="led-desc"><strong>Punto simple</strong><br>Escaneando — esperando que el balón entre en el rango</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char ring">○</div>
+        <div class="led-desc"><strong>Círculo</strong><br>Balón detectado — la carga está por comenzar</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char">C</div>
+        <div class="led-desc"><strong>C</strong><br>Cargando a la potencia de carga efectiva</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char">F</div>
+        <div class="led-desc"><strong>F</strong><br>Seguimiento — empuje sostenido después del contacto</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char" style="color:var(--red)">B</div>
+        <div class="led-desc"><strong>B</strong><br>Borde alcanzado — carga o seguimiento detenidos</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char" style="color:var(--yellow)">R</div>
+        <div class="led-desc"><strong>R</strong><br>Retrocediendo — retirada de 300 ms después del seguimiento</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char" style="color:var(--green);font-size:1rem;">OK</div>
+        <div class="led-desc"><strong>OK</strong><br>Secuencia completa — listo para ejecutar de nuevo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEQUENCE FLOW -->
+  <div class="section">
+    <div class="section-label">Secuencia de Carga</div>
+    <div class="flow" style="gap:.25rem;">
+      <div class="flow-step">
+        <div class="flow-icon">🔘</div>
+        <div class="flow-name">Presionar A</div>
+        <div class="flow-desc">Calcular estadísticas de la asignación actual</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🔍</div>
+        <div class="flow-name">Escanear</div>
+        <div class="flow-desc">Sondear ultrasónico cada 50 ms, mostrar punto</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,229,255,.3)">
+        <div class="flow-icon">⚽</div>
+        <div class="flow-name">Balón dentro</div>
+        <div class="flow-desc">Distancia &lt; 70 cm — mostrar círculo, pausar 500 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(255,140,66,.4)">
+        <div class="flow-icon">⚡</div>
+        <div class="flow-name">Cargar</div>
+        <div class="flow-desc">chargePower completo hasta borde o contacto (2× sonar ≤ 5 cm)</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-branch">
+        <div class="branch-label" style="color:var(--red)">Borde alcanzado</div>
+        <div class="flow-step" style="min-width:90px;border-color:rgba(255,76,106,.3)">
+          <div class="flow-icon">🛑</div>
+          <div class="flow-name">Detener</div>
+          <div class="flow-desc">Mostrar B · listo</div>
+        </div>
+        <div class="branch-label" style="color:var(--cyan)">Contacto</div>
+        <div class="flow-step" style="min-width:90px;border-color:rgba(0,229,255,.3)">
+          <div class="flow-icon">💥</div>
+          <div class="flow-name">Seguimiento</div>
+          <div class="flow-desc">Empujar a currentPower durante FOLLOW_THROUGH_MS</div>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(255,209,102,.3)">
+        <div class="flow-icon">↩️</div>
+        <div class="flow-name">Retroceder</div>
+        <div class="flow-desc">Retirada de 300 ms · mostrar R</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,201,122,.3)">
+        <div class="flow-icon">✅</div>
+        <div class="flow-name">OK</div>
+        <div class="flow-desc">Secuencia completa</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;">
+      <div class="phase-row">
+        <div class="phase-box">
+          <div class="phase-box-title charge">Fase de Carga</div>
+          <ul>
+            <li>Se ejecuta a <strong style="color:var(--orange)">effectiveCharge</strong> (chargePower reducido por endurance)</li>
+            <li>Sondea sensores de borde + sonar cada 20 ms</li>
+            <li>Termina al alcanzar el borde O al confirmar contacto</li>
+            <li>Dos lecturas consecutivas de sonar ≤ 5 cm = contacto</li>
+          </ul>
+        </div>
+        <div class="phase-box">
+          <div class="phase-box-title followthru">Fase de Seguimiento</div>
+          <ul>
+            <li>Solo se ejecuta si se hizo contacto (no borde alcanzado)</li>
+            <li>Cambia a <strong style="color:var(--cyan)">currentPower</strong> (velocidad crucero)</li>
+            <li>Duración = POWER × 80 ms</li>
+            <li>Aún verifica el borde — se detiene de inmediato si lo alcanza</li>
+            <li>Retrocede 300 ms y luego se detiene</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK BY BLOCK -->
+  <div class="section">
+    <div class="section-label">Bloque por Bloque</div>
+
+    <div class="card">
+
+      <!-- ON START -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--yellow);"></div>
+          <span style="color:var(--yellow);">on start — Asignación de Estadísticas</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let SPEED = 0
+let ENDURANCE = 0
+let TURNING = 0
+let POWER = 0
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Los cuatro números que editas antes de cada prueba.</strong> Deben sumar 20. Ingresa tu valor real de <code>TURNING</code> — cuenta hacia el total — pero la prueba de power no lo usa. Solo <code>SPEED</code>, <code>ENDURANCE</code> y <code>POWER</code> afectan lo que sucede en el campo.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- BUTTON A -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--cyan);"></div>
+          <span style="color:var(--cyan);">on button A pressed — Armar y Cargar</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+function computeStats() {}
+function waitForBall() {}
+function chargeAndFollowThrough() {}
+input.onButtonPressed(Button.A, function () {
+    computeStats()
+    waitForBall()
+    basic.pause(500)
+    chargeAndFollowThrough()
+})
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Tres pasos en secuencia.</strong> Primero, <code>computeStats()</code> convierte tus estadísticas en valores de motor funcionales. Luego <code>waitForBall()</code> mantiene el robot en su lugar hasta que algo entra en el rango. Después de una pausa de 500 ms (para que puedas alejarte), <code>chargeAndFollowThrough()</code> ejecuta la secuencia de carga completa.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- BUTTON B -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--yellow);"></div>
+          <span style="color:var(--yellow);">on button B pressed — Ciclar Tiempo del Partido</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let simulatedMatchTime = 0
+input.onButtonPressed(Button.B, function () {
+    if (simulatedMatchTime == 0) {
+        simulatedMatchTime = 60
+        basic.showString("60s")
+    } else if (simulatedMatchTime == 60) {
+        simulatedMatchTime = 120
+        basic.showString("120s")
+    } else if (simulatedMatchTime == 120) {
+        simulatedMatchTime = 180
+        basic.showString("180s")
+    } else {
+        simulatedMatchTime = 0
+        basic.showString("0s")
+    }
+    basic.pause(500)
+    basic.clearScreen()
+})
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Simula qué tan cansado está el robot.</strong> Presiona B antes de A para probar cómo se ve una carga al final del partido. A 180 s, las altas tasas de decaimiento reducen significativamente tanto <code>currentPower</code> como <code>effectiveCharge</code>. Presiona antes de armar — no tiene efecto en medio de la carga.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- COMPUTE STATS -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--orange);"></div>
+          <span style="color:var(--orange);">computeStats — Convertir Estadísticas en Valores del Motor</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let SPEED = 0
+let ENDURANCE = 0
+let POWER = 0
+let simulatedMatchTime = 0
+let currentPower = 0
+let chargePower = 0
+let FOLLOW_THROUGH_MS = 0
+let DECAY_RATE = 0
+let endurancePercent = 0
+let enduranceFactor = 0
+function computeStats () {
+    currentPower = SPEED * 100 / 20
+    chargePower = Math.min(POWER * POWER, 100)
+    FOLLOW_THROUGH_MS = POWER * 80
+    DECAY_RATE = 20 - ENDURANCE
+    endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
+    endurancePercent = Math.max(endurancePercent, 20)
+    enduranceFactor = endurancePercent / 100
+    currentPower = Math.round(currentPower * enduranceFactor)
+    currentPower = Math.max(currentPower, 15)
+}
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Todo lo derivado de tus cuatro estadísticas sucede aquí.</strong> <code>currentPower</code> es tu velocidad crucero — usada durante el seguimiento. <code>chargePower</code> es POWER al cuadrado, limitado en 100. <code>FOLLOW_THROUGH_MS</code> es POWER × 80 ms. Luego el decaimiento de endurance reduce todos los valores de potencia según qué tan avanzado esté el partido. Ambos tienen un piso mínimo de 15%.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- WAIT FOR BALL -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--green);"></div>
+          <span style="color:var(--green);">waitForBall — Escanear Hasta que Algo Entre en el Rango</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let dist = 0
+let BALL_DETECT_CM = 0
+function waitForBall () {
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . # . .
+        . . . . .
+        . . . . .
+        `)
+    while (true) {
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist > 0 && dist < BALL_DETECT_CM) {
+            basic.showLeds(`
+                . . . . .
+                . # # # .
+                # . . . #
+                # . . . #
+                . # # # .
+                `)
+            basic.pause(300)
+            basic.clearScreen()
+            return
+        }
+        basic.pause(50)
+    }
+}
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Sondea el sensor ultrasónico cada 50 ms.</strong> El punto en el LED significa que está escaneando. Cuando algo entra en el rango (<code>dist &lt; BALL_DETECT_CM</code>, por defecto 70 cm), muestra el círculo y regresa — devolviendo el control al Botón A, que luego espera 500 ms y ejecuta la carga. La verificación <code>dist &gt; 0</code> filtra las lecturas de ruido de 0 cm que obtienes cuando el sensor está demasiado cerca para obtener un ping limpio.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- CHARGE AND FOLLOW THROUGH -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--red);"></div>
+          <span style="color:var(--red);">chargeAndFollowThrough — La Secuencia de Carga Completa</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let chargeHitBorder = false
+let chargePower = 0
+let enduranceFactor = 0
+let effectiveCharge = 0
+let borderSide = 0
+let dist = 0
+let contactCount = 0
+let contactMade = false
+let currentPower = 0
+let followStart = 0
+let FOLLOW_THROUGH_MS = 0
+let CHARGE_CHECK_MS = 0
+function checkBorder() { return 0 }
+function chargeAndFollowThrough () {
+    chargeHitBorder = false
+    effectiveCharge = Math.round(chargePower * enduranceFactor)
+    effectiveCharge = Math.max(effectiveCharge, 15)
+    basic.showString("C")
+    CutebotPro.pwmCruiseControl(effectiveCharge, effectiveCharge)
+    while (!(chargeHitBorder) && !(contactMade)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            chargeHitBorder = true
+            basic.showString("B")
+            break
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist <= 5) {
+            contactCount += 1
+            if (contactCount >= 2) {
+                contactMade = true
+            }
+        } else {
+            contactCount = 0
+        }
+        basic.pause(CHARGE_CHECK_MS)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    if (!(chargeHitBorder)) {
+        basic.showString("F")
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        followStart = input.runningTime()
+        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
+            borderSide = checkBorder()
+            if (borderSide > 0) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                basic.showString("B")
+                break
+            }
+            basic.pause(CHARGE_CHECK_MS)
+        }
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.showString("R")
+        CutebotPro.pwmCruiseControl(-1 * currentPower, -1 * currentPower)
+        basic.pause(300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    }
+    basic.showString("OK")
+    basic.pause(500)
+    basic.clearScreen()
+}
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Dos fases seguidas.</strong> La fase de carga conduce a <code>effectiveCharge</code> (chargePower reducido por endurance) y verifica los sensores cada 20 ms. Sale al alcanzar el borde O con dos lecturas de sonar consecutivas ≤ 5 cm. Si se hizo contacto y no se alcanzó el borde, se ejecuta la fase de seguimiento — empujando a <code>currentPower</code> durante <code>FOLLOW_THROUGH_MS</code>. Luego retrocede 300 ms y muestra OK.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+      <!-- CHECK BORDER -->
+      <div class="block-entry">
+        <div class="block-entry-header">
+          <div class="block-entry-dot" style="background:var(--slate);"></div>
+          <span style="color:var(--slate);">checkBorder — Leer los Sensores de Línea</span>
+        </div>
+        <div class="block-entry-body">
+          <div>
+            <div class="blocks-render-area">
+              <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+              <pre class="blocks">
+let sensor1State = 0
+let sensor2State = 0
+let sensor3State = 0
+let sensor4State = 0
+let BORDER_THRESHOLD = 0
+function checkBorder () {
+    CutebotPro.trackbitStateValue()
+    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+              </pre>
+            </div>
+          </div>
+          <div class="block-entry-explain">
+            <strong>Lee los cuatro sensores y devuelve un código de dirección.</strong> Se llama dentro de los bucles de carga y seguimiento cada 20 ms. Devuelve 0 si todos los sensores están despejados. Devuelve 1 (izquierda), 2 (derecha) o 3 (directo) cuando se detecta el borde blanco. El código llamador detiene los motores de inmediato ante cualquier retorno distinto de cero.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BORDER SENSOR MAP -->
+  <div class="section">
+    <div class="section-label">Sensores de Borde</div>
+    <div class="grid-2">
+      <div class="sensor-strip">
+        <div style="font-size:.6875rem;color:var(--slate);text-transform:uppercase;letter-spacing:.08em;font-weight:700;">Frente del robot (dirección de desplazamiento)</div>
+        <div class="sensor-row">
+          <div class="sensor-dot s1">S1</div>
+          <div class="sensor-dot s2">S2</div>
+          <div class="sensor-dot s3">S3</div>
+          <div class="sensor-dot s4">S4</div>
+        </div>
+        <div class="sensor-legend">
+          <span class="sleg s1">S1 = extremo izquierdo</span>
+          <span class="sleg s2">S2 = centro izquierdo</span>
+          <span class="sleg s3">S3 = centro derecho</span>
+          <span class="sleg s4">S4 = extremo derecho</span>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="sensor-return-table">
+          <thead>
+            <tr>
+              <th>Retorno</th>
+              <th>Significado</th>
+              <th>Activado por</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="ret-badge ret-0">0</span></td>
+              <td>Despejado</td>
+              <td>Ningún sensor sobre el umbral</td>
+            </tr>
+            <tr>
+              <td><span class="ret-badge ret-1">1</span></td>
+              <td>Borde izquierdo</td>
+              <td>S1 &gt; 200</td>
+            </tr>
+            <tr>
+              <td><span class="ret-badge ret-2">2</span></td>
+              <td>Borde derecho</td>
+              <td>S4 &gt; 200</td>
+            </tr>
+            <tr>
+              <td><span class="ret-badge ret-3">3</span></td>
+              <td>Directo</td>
+              <td>S2 or S3 &gt; 200</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout info" style="margin-top:.75rem;">
+      <span class="callout-icon">ℹ️</span>
+      <div>La verificación del borde durante la carga detiene el robot independientemente del lado que active. No esquiva los bordes — simplemente se detiene y muestra "B".</div>
+    </div>
+  </div>
+
+  <!-- CONTACT DETECTION -->
+  <div class="section">
+    <div class="section-label">Detección de Contacto</div>
+    <p style="font-size:.8875rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem;">El sensor ultrasónico puede dar una lectura de 0 cuando está demasiado cerca para obtener un ping limpio — pero un solo 0 puede ser ruido. El programa confirma el contacto con dos lecturas bajas consecutivas.</p>
+    <div class="contact-steps">
+      <div class="contact-step">
+        <div class="contact-num">1</div>
+        <div class="contact-text">El ultrasónico lee ≤ 5 cm — <strong>contactCount se incrementa a 1</strong>. Aún no confirmado.</div>
+      </div>
+      <div class="contact-step">
+        <div class="contact-num">2</div>
+        <div class="contact-text">La siguiente lectura (20 ms después) sigue siendo ≤ 5 cm — <strong>contactCount = 2</strong>. Contacto confirmado, el bucle de carga sale.</div>
+      </div>
+      <div class="contact-step">
+        <div class="contact-num">✕</div>
+        <div class="contact-text">Si alguna lectura es &gt; 5 cm, <strong>contactCount se reinicia a 0</strong>. La secuencia lo trata como ruido y sigue cargando.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS + FORMULAS -->
+  <div class="section">
+    <div class="section-label">Estadísticas &amp; Fórmulas</div>
+
+    <div class="formula-box">
+      <div class="formula-label">Potencia Actual (velocidad crucero)</div>
+      <div class="formula-eq">currentPower = SPEED × 5  (% motor power)</div>
+      <div class="formula-note">Luego escalada por endurance: <strong>currentPower × enduranceFactor</strong>. Mínimo 15%.</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Potencia de Carga</div>
+      <div class="formula-eq">chargePower = min(POWER², 100)</div>
+      <div class="formula-note"><strong>POWER al cuadrado</strong> — los pequeños incrementos en valores altos tienen un gran efecto. POWER=5→25%, POWER=8→64%, POWER=10→100%. Luego escalado por enduranceFactor durante la carga.</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Duración del Seguimiento</div>
+      <div class="formula-eq">FOLLOW_THROUGH_MS = POWER × 80 ms</div>
+      <div class="formula-note">POWER más alto da tanto un golpe inicial más fuerte <em>como</em> un empuje sostenido más largo después del contacto.</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Decaimiento de Endurance</div>
+      <div class="formula-eq">decayRate = 20 − ENDURANCE</div>
+      <div class="formula-eq">endurancePercent = max(100 − decayRate × time / 40,  20)</div>
+      <div class="formula-note">
+        ENDURANCE menor = decayRate mayor = pérdida de potencia más rápida con el tiempo. El piso es 20% — el robot nunca se queda completamente sin potencia.
+        <strong>ENDURANCE=20 significa decayRate=0 — sin decaimiento en absoluto.</strong>
+      </div>
+    </div>
+
+    <div class="power-quad-note">
+      <p>⚡ <strong>POWER es cuadrático.</strong> Pasar de POWER=5 a POWER=6 agrega 11 puntos porcentuales de potencia de carga (<code>36−25=11</code>). Pasar de POWER=9 a POWER=10 agrega 19 puntos (<code>100−81=19</code>). Cada punto de POWER que agregas vale más que el anterior. Invertir fuertemente en POWER tiene retornos crecientes marcados — pero consume presupuesto de estadísticas que no puede ir a SPEED o ENDURANCE.</p>
+    </div>
+
+    <div class="callout warn" style="margin-top:.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>TURNING está declarado pero no se usa.</strong> Ingresa tu valor real de TURNING para que las cuatro estadísticas sigan sumando 20 — pero no tiene ningún efecto en esta prueba. No es necesario establecerlo en 0 ni ajustar tu configuración alrededor de él.</div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE CALCULATOR -->
+  <div class="section">
+    <div class="section-label">Calculadora Interactiva</div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <span class="calc-header-title">Asignación de Estadísticas</span>
+        <span class="budget-pill" id="budget-pill">Presupuesto: 20 / 20</span>
+      </div>
+      <div class="calc-body">
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name" style="color:var(--cyan)">SPEED</span>
+            <span class="slider-val" style="color:var(--cyan)" id="val-speed">8</span>
+          </div>
+          <input type="range" class="s-speed" id="sl-speed" min="0" max="20" value="8" oninput="recalc()" />
+          <div class="slider-sub">Potencia de motor crucero = SPEED × 5%</div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name" style="color:var(--green)">ENDURANCE</span>
+            <span class="slider-val" style="color:var(--green)" id="val-end">7</span>
+          </div>
+          <input type="range" class="s-end" id="sl-end" min="0" max="20" value="7" oninput="recalc()" />
+          <div class="slider-sub">Tasa de decaimiento = 20 − ENDURANCE  (0 = sin decaimiento)</div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name" style="color:var(--orange)">POWER</span>
+            <span class="slider-val" style="color:var(--orange)" id="val-power">5</span>
+          </div>
+          <input type="range" class="s-power" id="sl-power" min="0" max="20" value="5" oninput="recalc()" />
+          <div class="slider-sub">Potencia de carga = POWER² (limitado al 100%) · Seguimiento = POWER × 80 ms</div>
+        </div>
+
+        <!-- Match time selector -->
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+          <div style="font-size:.75rem;font-weight:700;color:var(--slate);align-self:center;margin-right:.25rem;">Tiempo de partido simulado:</div>
+          <button class="time-btn active" onclick="setTime(0,this)">0 s</button>
+          <button class="time-btn" onclick="setTime(60,this)">60 s</button>
+          <button class="time-btn" onclick="setTime(120,this)">120 s</button>
+          <button class="time-btn" onclick="setTime(180,this)">180 s</button>
+        </div>
+
+        <div class="outputs-grid">
+          <div class="out-cell">
+            <div class="out-label">Potencia Crucero</div>
+            <div class="out-val" id="out-cruise" style="color:var(--cyan)">—</div>
+            <div class="out-unit">% (después de endurance)</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Charge Power</div>
+            <div class="out-val" id="out-charge" style="color:var(--orange)">—</div>
+            <div class="out-unit">% (después de endurance)</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Follow-Through</div>
+            <div class="out-val" id="out-follow" style="color:var(--purple)">—</div>
+            <div class="out-unit">ms</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Endurance Restante</div>
+            <div class="out-val" id="out-endpct" style="color:var(--green)">—</div>
+            <div class="out-unit">% de la potencia base</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Carga Base</div>
+            <div class="out-val" id="out-basecharge" style="color:var(--yellow)">—</div>
+            <div class="out-unit">% (POWER², antes del decaimiento)</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Tasa de Decaimiento</div>
+            <div class="out-val" id="out-decay" style="color:var(--red)">—</div>
+            <div class="out-unit">pts / 40 s</div>
+          </div>
+        </div>
+
+        <div class="decay-table-wrap">
+          <div class="decay-table-label">Potencia de Carga Efectiva en Cada Momento del Partido</div>
+          <table class="decay-table" id="decay-table">
+            <thead>
+              <tr>
+                <th>Tiempo del Partido</th>
+                <th>Endurance %</th>
+                <th>Carga Efectiva (mín 15%)</th>
+              </tr>
+            </thead>
+            <tbody id="decay-tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="budget-warn" class="callout danger" style="margin-top:1rem;display:none;">
+          <span class="callout-icon">⛔</span>
+          <div><strong>Presupuesto excedido.</strong> SPEED + ENDURANCE + POWER deben sumar 20 o menos. Reduce una estadística antes de programar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTANTS -->
+  <div class="section">
+    <div class="section-label">Constantes</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="const-table">
+        <thead>
+          <tr>
+            <th>Constante</th>
+            <th>Valor</th>
+            <th>Propósito</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="const-name">BORDER_THRESHOLD</td>
+            <td class="const-val">200</td>
+            <td class="const-note">Valor en escala de grises por encima del cual un sensor reporta "borde blanco"</td>
+          </tr>
+          <tr>
+            <td class="const-name">BALL_DETECT_CM</td>
+            <td class="const-val">70</td>
+            <td class="const-note">Distancia máxima (cm) para la detección de balón durante la fase de escaneo</td>
+          </tr>
+          <tr>
+            <td class="const-name">CHARGE_CHECK_MS</td>
+            <td class="const-val">20</td>
+            <td class="const-note">Intervalo de sondeo durante los bucles de carga y seguimiento</td>
+          </tr>
+          <tr>
+            <td class="const-name">CHARGE_DURATION_MS</td>
+            <td class="const-val">800</td>
+            <td class="const-note">Declarado pero no usado — constante heredada de una versión anterior</td>
+          </tr>
+          <tr>
+            <td class="const-name">Contact confirm count</td>
+            <td class="const-val">2</td>
+            <td class="const-note">Lecturas consecutivas de sonar ≤ 5 cm requeridas para confirmar el contacto</td>
+          </tr>
+          <tr>
+            <td class="const-name">Min motor power</td>
+            <td class="const-val">15%</td>
+            <td class="const-note">Piso para currentPower y effectiveCharge</td>
+          </tr>
+          <tr>
+            <td class="const-name">Endurance floor</td>
+            <td class="const-val">20%</td>
+            <td class="const-note">endurancePercent nunca cae por debajo del 20% independientemente del tiempo o el valor de ENDURANCE</td>
+          </tr>
+          <tr>
+            <td class="const-name">Post-scan pause</td>
+            <td class="const-val">500 ms</td>
+            <td class="const-note">Retraso entre la detección del balón y el inicio de la carga</td>
+          </tr>
+          <tr>
+            <td class="const-name">Reverse duration</td>
+            <td class="const-val">300 ms</td>
+            <td class="const-note">Cuánto tiempo retrocede el robot después de completar el seguimiento</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="section">
+    <div class="section-label">Cómo Usar Este Programa</div>
+    <div class="card">
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">1</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Configura tus estadísticas en el código.</strong> Edita SPEED, ENDURANCE, POWER y TURNING al final del archivo. Los cuatro deben sumar 20 — ingresa tu valor real de TURNING aunque esta prueba no lo use. Vuelve a programar el micro:bit.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">2</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Presiona B para configurar el tiempo del partido.</strong> Si quieres probar el comportamiento al final del partido, presiona B para ir a 120 s o 180 s antes de armar.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">3</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Posiciona el robot en el campo, mirando la zona objetivo.</strong> Deja espacio libre adelante — cargará directo hacia adelante.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">4</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Presiona A para armar.</strong> Aparece el punto. Rueda el balón hacia el robot desde adelante hasta que esté dentro de 70 cm.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,201,122,.15);color:var(--green);border:1px solid rgba(0,201,122,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">5</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Observa la secuencia.</strong> Círculo → C → F (o B) → R → OK. Verifica cuánto se movió el balón y si el robot se detuvo limpiamente.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="callout danger" style="margin-top:.75rem;">
+      <span class="callout-icon">⛔</span>
+      <div><strong>Este programa carga al detectar.</strong> Una vez que presionas A y un balón (o cualquier objeto) entra en el rango de 70 cm, el robot avanzará a plena potencia de carga. Mantén manos y pies alejados de su trayectoria.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<style>
+  .time-btn {
+    font-family: 'Inter',sans-serif;
+    font-size: .6875rem; font-weight: 700;
+    padding: .3rem .75rem; border-radius: 20px;
+    background: var(--navy3); color: var(--muted);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all .15s;
+  }
+  .time-btn:hover { border-color: var(--slate); color: var(--text); }
+  .time-btn.active { background: rgba(255,140,66,.15); color: var(--orange); border-color: rgba(255,140,66,.4); }
+</style>
+
+<script>
+  let simTime = 0;
+
+  function setTime(t, btn) {
+    simTime = t;
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    recalc();
+  }
+
+  function recalc() {
+    const SPEED     = parseInt(document.getElementById('sl-speed').value);
+    const ENDURANCE = parseInt(document.getElementById('sl-end').value);
+    const POWER     = parseInt(document.getElementById('sl-power').value);
+    const total     = SPEED + ENDURANCE + POWER;
+
+    document.getElementById('val-speed').textContent = SPEED;
+    document.getElementById('val-end').textContent   = ENDURANCE;
+    document.getElementById('val-power').textContent = POWER;
+
+    const pill = document.getElementById('budget-pill');
+    const warn = document.getElementById('budget-warn');
+    pill.textContent = `Presupuesto: ${total} / 20`;
+    if (total > 20) {
+      pill.className = 'budget-pill over';
+      warn.style.display = 'flex';
+    } else {
+      pill.className = total === 20 ? 'budget-pill ok' : 'budget-pill';
+      warn.style.display = 'none';
+    }
+
+    // Compute base stats
+    const basePower    = SPEED * 5;
+    const baseCharge   = Math.min(POWER * POWER, 100);
+    const followMs     = POWER * 80;
+    const decayRate    = 20 - ENDURANCE;
+
+    document.getElementById('out-basecharge').textContent = baseCharge + '%';
+    document.getElementById('out-follow').textContent     = followMs;
+    document.getElementById('out-decay').textContent      = decayRate;
+
+    // Endurance at selected time
+    let endPct = 100 - decayRate * simTime / 40;
+    endPct = Math.max(endPct, 20);
+    const endFactor = endPct / 100;
+
+    let cruise = Math.round(basePower * endFactor);
+    cruise = Math.max(cruise, 15);
+    let effectiveCharge = Math.round(baseCharge * endFactor);
+    effectiveCharge = Math.max(effectiveCharge, 15);
+
+    document.getElementById('out-cruise').textContent  = cruise + '%';
+    document.getElementById('out-charge').textContent  = effectiveCharge + '%';
+    document.getElementById('out-endpct').textContent  = Math.round(endPct) + '%';
+
+    // Decay table
+    const tbody = document.getElementById('decay-tbody');
+    tbody.innerHTML = '';
+    [0, 60, 120, 180].forEach(t => {
+      let ep = 100 - decayRate * t / 40;
+      ep = Math.max(ep, 20);
+      const ef = ep / 100;
+      let ec = Math.round(baseCharge * ef);
+      ec = Math.max(ec, 15);
+
+      const pct = ec;
+      let barColor = pct >= 70 ? '#00C97A' : pct >= 40 ? '#FFD166' : '#FF4D6A';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${t}s</td>
+        <td style="font-family:var(--mono);font-size:.8125rem;color:${Math.round(ep) < 60 ? '#FF4D6A' : Math.round(ep) < 85 ? '#FFD166' : '#00C97A'}">${Math.round(ep)}%</td>
+        <td>
+          <div class="pwr-bar-wrap">
+            <div class="pwr-bar-bg">
+              <div class="pwr-bar-fill" style="width:${pct}%;background:${barColor};"></div>
+            </div>
+            <span class="pwr-val" style="color:${barColor}">${pct}%</span>
+          </div>
+        </td>`;
+      if (t === simTime) tr.style.background = 'rgba(255,140,66,.06)';
+      tbody.appendChild(tr);
+    });
+  }
+
+  recalc();
+</script>
+
+<!-- ── MAKECODE BLOCKS RENDERER ───────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId = 0;
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
+    }, MAKECODE_URL);
+  }
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src = msg.uri; img.width = msg.width; img.height = msg.height;
+        img.alt = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        console.log("[MakeCode render error] id=" + msg.id + " error=" + msg.error);
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Vista previa de bloques no disponible</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+
+</body>
+</html>

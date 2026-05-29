@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Límites de Motor y Encoder · Explicador de Código · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0D0D1A;
+      --navy2:  #161A2E;
+      --navy3:  #1E2240;
+      --cyan:   #00E5FF;
+      --teal:   #007A99;
+      --slate:  #8899AA;
+      --border: #222840;
+      --card:   #161A2E;
+      --green:  #00C97A;
+      --red:    #FF4D6A;
+      --yellow: #FFD166;
+      --orange: #FF8C42;
+      --purple: #BD7AFF;
+      --text:   #E8EAF2;
+      --muted:  #9AA3B2;
+      --mono:   'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      display: flex; gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub {
+      font-size: .9375rem; color: var(--muted);
+      line-height: 1.6; max-width: 620px;
+    }
+
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .75rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Mode cards */
+    .mode-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .875rem;
+    }
+    .mode-badge.closed { background: rgba(0,229,255,.15); color: var(--cyan); border: 1px solid rgba(0,229,255,.3); }
+    .mode-badge.open   { background: rgba(255,140,66,.15); color: var(--orange); border: 1px solid rgba(255,140,66,.3); }
+    .mode-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: .5rem; }
+    .mode-card p  { font-size: .8375rem; color: var(--muted); line-height: 1.6; }
+
+    /* Button cards */
+    .btn-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .btn-badge {
+      display: inline-block;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .btn-badge.a { background: rgba(0,229,255,.15);   color: var(--cyan);   border: 1px solid rgba(0,229,255,.3); }
+    .btn-badge.b { background: rgba(255,209,102,.12); color: var(--yellow); border: 1px solid rgba(255,209,102,.25); }
+    .btn-card h3 { font-size: .9375rem; font-weight: 700; margin-bottom: .4rem; }
+    .btn-card p  { font-size: .8125rem; color: var(--muted); line-height: 1.55; }
+
+    /* Formula box */
+    .formula-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: .625rem;
+    }
+    .formula-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .4rem;
+    }
+    .formula-eq { font-family: var(--mono); font-size: .9375rem; color: var(--cyan); margin-bottom: .375rem; }
+    .formula-note { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .formula-note strong { color: var(--yellow); }
+
+    /* Callouts */
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: .75rem; font-size: .8125rem; line-height: 1.55;
+    }
+    .callout.info    { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: #c0e8f0; }
+    .callout.warn    { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.2); color: #f0e0b0; }
+    .callout.danger  { background: rgba(255,76,106,.07); border: 1px solid rgba(255,76,106,.2); color: #f0b8c0; }
+    .callout.success { background: rgba(0,201,122,.07); border: 1px solid rgba(0,201,122,.2); color: #a0e8c8; }
+    .callout-icon    { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout strong  { display: block; margin-bottom: .2rem; }
+
+    /* MakeCode blocks */
+    pre.blocks { display: none; }
+    .blocks-render-area {
+      min-height: 80px; display: flex; align-items: flex-start;
+      justify-content: flex-start; padding: .75rem 0;
+      flex-wrap: wrap; gap: .75rem;
+    }
+    .blocks-loading {
+      display: flex; align-items: center; gap: .75rem;
+      font-size: .8125rem; color: var(--muted); padding: .5rem 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border); border-top-color: var(--cyan);
+      border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .block-entry { margin-bottom: 1.5rem; }
+    .block-entry-header {
+      font-size: .6875rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .625rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .block-entry-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .block-entry-body {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1.25rem; align-items: start;
+    }
+    @media (max-width: 620px) { .block-entry-body { grid-template-columns: 1fr; } }
+    .block-entry-explain { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+    .block-entry-explain strong { color: var(--text); }
+
+    /* Comparison table */
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .5rem .875rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .comp-table td { padding: .6rem .875rem; border-bottom: 1px solid rgba(34,40,64,.5); font-size: .8125rem; vertical-align: top; }
+    .comp-table tbody tr:last-child td { border-bottom: none; }
+    .comp-table .type-closed td:first-child { border-left: 2px solid var(--cyan); }
+    .comp-table .type-open   td:first-child { border-left: 2px solid var(--orange); }
+    .tag-closed { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(0,229,255,.12); color: var(--cyan); border: 1px solid rgba(0,229,255,.25); padding: .15rem .45rem; border-radius: 3px; margin-bottom: .3rem; }
+    .tag-open   { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(255,140,66,.12); color: var(--orange); border: 1px solid rgba(255,140,66,.25); padding: .15rem .45rem; border-radius: 3px; margin-bottom: .3rem; }
+    .tag-a      { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,229,255,.1); color: var(--cyan); border: 1px solid rgba(0,229,255,.2); padding: .1rem .35rem; border-radius: 3px; margin-right: .3rem; }
+    .tag-b      { display: inline-block; font-size: .55rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: rgba(255,209,102,.1); color: var(--yellow); border: 1px solid rgba(255,209,102,.2); padding: .1rem .35rem; border-radius: 3px; margin-right: .3rem; }
+    .dist       { font-family: var(--mono); font-weight: 700; color: var(--green); }
+    .dist.variable { color: var(--orange); }
+
+    /* Concept cards */
+    .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 580px) { .concept-grid { grid-template-columns: 1fr; } }
+    .concept-card {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.125rem 1.25rem;
+    }
+    .concept-icon  { font-size: 1.5rem; margin-bottom: .5rem; }
+    .concept-title { font-size: .8125rem; font-weight: 800; margin-bottom: .375rem; }
+    .concept-body  { font-size: .7875rem; color: var(--muted); line-height: 1.6; }
+
+    /* Interactive calculator */
+    .calc-wrap { background: var(--navy2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .calc-header {
+      background: var(--navy3); border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .calc-header-title { font-size: .9375rem; font-weight: 800; }
+    .calc-body { padding: 1.5rem; }
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .4rem; }
+    .slider-name { font-size: .8125rem; font-weight: 700; }
+    .slider-val  { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 3px; outline: none; cursor: pointer;
+      background: var(--navy3); accent-color: var(--cyan);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; border: 2px solid var(--navy2);
+      background: var(--cyan); cursor: pointer;
+    }
+    .slider-sub { font-size: .6875rem; color: var(--muted); margin-top: .25rem; }
+
+    .outputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1.25rem; }
+    @media (max-width: 520px) { .outputs-grid { grid-template-columns: 1fr 1fr; } }
+    .out-cell { background: var(--navy3); border: 1px solid var(--border); border-radius: 8px; padding: .875rem 1rem; text-align: center; }
+    .out-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .4rem; }
+    .out-val   { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+    .out-unit  { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* Constants table */
+    .const-table { width: 100%; border-collapse: collapse; }
+    .const-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .const-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .8125rem; }
+    .const-table tbody tr:last-child td { border-bottom: none; }
+    .const-name { font-family: var(--mono); color: var(--cyan); }
+    .const-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-note { color: var(--muted); font-size: .775rem; }
+
+    code {
+      font-family: var(--mono); font-size: .8em;
+      background: rgba(0,0,0,.35); padding: .1em .35em;
+      border-radius: 3px; color: var(--cyan);
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* Numbered steps */
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,229,255,.15); color: var(--cyan);
+      border: 1px solid rgba(0,229,255,.3); font-size: .6875rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: .1rem;
+    }
+  </style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/motor-limits-explainer.html">EN</a>
+  <a href="/lessons/es/motor-limits-explainer.html" class="active">ES</a>
+</nav>
+
+
+<nav class="site-nav">
+  <a href="/lessons">← Lecciones</a>
+  <a href="/lessons/motor-limits-explainer.html" style="color:var(--cyan)">Límites de Motor y Encoder</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">Explicador de Código · BBC micro:bit v2 + Cutebot Pro</div>
+    <h1 class="page-title">Límites de Motor y Encoder</h1>
+    <p class="page-sub">Ejecutarás dos programas — uno donde el robot monitorea su propia velocidad, y otro donde no lo hace. Ambos conducen durante exactamente 3 segundos. Compara las distancias para ver qué puede y qué no puede controlar el hardware.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- THE BIG IDEA -->
+  <div class="section">
+    <div class="section-label">La Idea Principal</div>
+    <div class="grid-2">
+      <div class="mode-card">
+        <div class="mode-badge closed">● Smart Mode</div>
+        <h3>Programa de Bucle Cerrado</h3>
+        <p>El robot lee sus propios sensores de rueda para verificar su velocidad real. Si va demasiado lento, da más potencia a los motores. Si va demasiado rápido, retrocede. El resultado: una distancia constante y predecible cada vez.</p>
+      </div>
+      <div class="mode-card">
+        <div class="mode-badge open">● Raw Mode</div>
+        <h3>Programa de Bucle Abierto</h3>
+        <p>El robot envía un voltaje fijo a los motores y nunca verifica si se está moviendo a la velocidad correcta. La fricción, la batería baja y el retraso de arranque afectan la distancia — y nada los corrige.</p>
+      </div>
+    </div>
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">⏱️</span>
+      <div>Ambos programas están bloqueados a <strong>3000 milisegundos (3 segundos)</strong>. Mantener el mismo tiempo es lo que hace que esta prueba sea justa — cualquier diferencia en la distancia es causada por el programa, no por el reloj.</div>
+    </div>
+  </div>
+
+  <!-- SMART MODE PROGRAM -->
+  <div class="section">
+    <div class="section-label">Modo Inteligente — Programa de Bucle Cerrado</div>
+
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">
+        Este programa usa un bloque llamado <code>cruise control</code>. Ese bloque activa el sistema de corrección de velocidad del robot. Pequeños sensores en cada rueda cuentan qué tan rápido gira la rueda. El controlador compara ese conteo con tu velocidad objetivo, luego ajusta la potencia del motor para cerrar la brecha — docenas de veces por segundo.
+      </p>
+    </div>
+
+    <div class="formula-box" style="margin-top:.75rem;">
+      <div class="formula-label">Calculadora de Velocidad — Cómo SPEED se Convierte en cm/s</div>
+      <div class="formula-eq">targetSpeed = 20 + ((SPEED − 1) × (50 − 20)) / (20 − 1)</div>
+      <div class="formula-note">
+        Tu estadística SPEED es un número del 1 al 20. Esta fórmula extiende ese rango a través de los límites de velocidad reales del robot (20–50 cm/s).<br>
+        <strong>SPEED 1 → 20 cm/s &nbsp;|&nbsp; SPEED 6 → 27.9 cm/s &nbsp;|&nbsp; SPEED 20 → 50 cm/s</strong>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top:.875rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>El sistema de sensores tiene un piso estricto en 20 cm/s.</strong> Por debajo de esa velocidad, los sensores de rueda no pueden contar lo suficientemente rápido. El sistema de corrección pierde el rastro y el robot se detiene o se mueve de forma impredecible. Ese es un límite de hardware — no puedes solucionarlo en el código.</div>
+    </div>
+
+    <!-- BLOCK: Starting Values -->
+    <div class="block-entry" style="margin-top:1.5rem;">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Valores Iniciales — Configura Estos Antes de Descargar
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let targetSpeed = 0
+let minSpeed = 20
+let maxSpeed = 50
+let SPEED = 6
+targetSpeed = minSpeed + ((SPEED - 1) * (maxSpeed - minSpeed)) / (20 - 1)
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Estas cuatro variables se ejecutan al inicio, antes de que presiones nada.<br><br>
+          <strong>minSpeed (20)</strong> y <strong>maxSpeed (50)</strong> son los límites físicos del sistema de corrección de velocidad — no los cambies.<br><br>
+          <strong>SPEED (6)</strong> es tu estadística. Cambia este número (1–20) para que coincida con la estadística de Speed de tu robot antes de descargar el programa.<br><br>
+          La última línea ejecuta la fórmula y almacena el resultado como <code>targetSpeed</code>, que usa el Botón B.
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button A Closed -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Botón A — Velocidad Máxima (50 cm/s)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let maxSpeed = 50
+input.onButtonPressed(Button.A, function () {
+    CutebotPro.cruiseControl(maxSpeed, maxSpeed, CutebotProSpeedUnits.Cms)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>Cruise control</strong> activa el sistema de corrección de velocidad y le dice que mantenga 50 cm/s en ambas ruedas.<br><br>
+          <strong>Pause 3000</strong> mantiene el programa esperando exactamente 3 segundos. El sistema de corrección sigue trabajando todo el tiempo — nunca descansa.<br><br>
+          <strong>Stop immediately</strong> corta ambos motores a la vez cuando se acaban los 3 segundos.<br><br>
+          Distancia esperada: <span style="color:var(--green);font-family:var(--mono);">~143 cm</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button B Closed -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Botón B — Tu Configuración de SPEED (27.9 cm/s con SPEED 6)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let targetSpeed = 0
+input.onButtonPressed(Button.B, function () {
+    CutebotPro.cruiseControl(targetSpeed, targetSpeed, CutebotProSpeedUnits.Cms)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Misma estructura que el Botón A — pero esta vez usa <code>targetSpeed</code>, que se calculó a partir de tu estadística SPEED cuando el programa arrancó.<br><br>
+          Con SPEED 6, <code>targetSpeed</code> = 27.9 cm/s. El sistema de corrección de velocidad mantiene ese valor durante los 3 segundos completos.<br><br>
+          Distancia esperada: <span style="color:var(--green);font-family:var(--mono);">~77 cm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1rem;">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>50 cm/s · Velocidad Máxima</h3>
+        <p>El sistema de corrección de velocidad mantiene 50 cm/s durante los 3 segundos completos. La distancia es consistente ejecución tras ejecución porque el sistema corrige automáticamente la fricción y los cambios de batería.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>27.9 cm/s · Tu Estadística</h3>
+        <p>El sistema de corrección de velocidad rastrea tu configuración de SPEED. Funciona bien por encima de 20 cm/s. Por debajo de ese piso, los sensores de rueda no pueden leer lo suficientemente rápido y el robot se detiene.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAW MODE PROGRAM -->
+  <div class="section">
+    <div class="section-label">Modo Crudo — Programa de Bucle Abierto</div>
+
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;">
+        Este programa usa un bloque llamado <code>PWM cruise control</code>. PWM significa Modulación por Ancho de Pulso — así es como el chip controla el voltaje a los motores. Piénsalo como un dial de volumen: 100% significa potencia total, 30% significa potencia baja. Los sensores de rueda se ignoran por completo. Cualquier física que ocurra, ocurre sin corrección.
+      </p>
+    </div>
+
+    <!-- BLOCK: Button A Open -->
+    <div class="block-entry" style="margin-top:1.5rem;">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--orange)"></div>
+        Botón A — 100% de Potencia (Voltaje Completo)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+input.onButtonPressed(Button.A, function () {
+    CutebotPro.pwmCruiseControl(100, 100)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>PWM cruise control al 100</strong> envía voltaje total de la batería a ambos motores. Sin objetivo de velocidad. Sin correcciones. El robot va tan rápido como lo permita la batería.<br><br>
+          Esta es la ejecución de bucle abierto más rápida posible — pero ejécutala diez veces y notarás que la distancia se reduce lentamente a medida que se agota la batería. Eso es el hardware mostrando sus límites.<br><br>
+          Distancia esperada: <span style="color:var(--orange);font-family:var(--mono);">Máxima — disminuye al agotarse la batería</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- BLOCK: Button B Open -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Botón B — 30% de Potencia (Voltaje Bajo)
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+input.onButtonPressed(Button.B, function () {
+    CutebotPro.pwmCruiseControl(30, 30)
+    basic.pause(3000)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          <strong>PWM cruise control al 30</strong> envía solo el 30% del voltaje de la batería a los motores. A este nivel bajo, los engranajes dentro del motor resisten moverse desde una parada completa — así que el robot duda un momento antes de rodar.<br><br>
+          Ese retraso de arranque consume tu ventana de 3 segundos. Encontrarás que la distancia al 30% es <em>más</em> que la mitad de la distancia al 100% — la razón no escala como esperarías.<br><br>
+          Distancia esperada: <span style="color:var(--orange);font-family:var(--mono);">Más que la mitad de la ejecución al 100%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1rem;">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>100% PWM · Obsérvalo Caer</h3>
+        <p>Potencia total, sin correcciones. La distancia es la más alta que verás — pero no está garantizada. Ejécutalo dos veces y mide si la segunda ejecución fue más corta. Si lo es, eso es consumo de batería.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>30% PWM · Retraso de Arranque</h3>
+        <p>El voltaje bajo lucha contra la fricción de los engranajes al arrancar. Los motores desperdician parte de la ventana de 3 segundos solo para ponerse en movimiento. Ningún sistema de corrección puede ayudar porque este programa no usa uno.</p>
+      </div>
+    </div>
+
+    <div class="callout danger" style="margin-top:.875rem;">
+      <span class="callout-icon">🔋</span>
+      <div><strong>El estado de la batería cambia tu distancia.</strong> El bucle abierto envía un porcentaje de cualquier voltaje que quede en la batería. Una batería llena al 30% y una batería a medio agotar al 30% recorrerán distancias diferentes. El programa Modo Inteligente no tiene este problema porque corrige los cambios de voltaje automáticamente.</div>
+    </div>
+  </div>
+
+  <!-- COMPARISON MATRIX -->
+  <div class="section">
+    <div class="section-label">Resultados Lado a Lado</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Programa</th>
+            <th>Botón</th>
+            <th>Entrada</th>
+            <th>¿Qué Hace el Robot?</th>
+            <th>Distancia Esperada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="type-closed">
+            <td><span class="tag-closed">Modo Inteligente</span></td>
+            <td><span class="tag-a">A</span></td>
+            <td style="font-family:var(--mono);color:var(--cyan);">50 cm/s</td>
+            <td style="color:var(--muted);">Los sensores de rueda verifican la velocidad constantemente y ajustan la potencia para mantener 50 cm/s.</td>
+            <td><span class="dist">~143 cm</span></td>
+          </tr>
+          <tr class="type-closed">
+            <td><span class="tag-closed">Smart Mode</span></td>
+            <td><span class="tag-b">B</span></td>
+            <td style="font-family:var(--mono);color:var(--cyan);">27.9 cm/s</td>
+            <td style="color:var(--muted);">Mantiene de cerca la velocidad de tu estadística SPEED. Se detiene si el objetivo cae por debajo de 20 cm/s.</td>
+            <td><span class="dist">~77 cm</span></td>
+          </tr>
+          <tr class="type-open">
+            <td><span class="tag-open">Modo Crudo</span></td>
+            <td><span class="tag-a">A</span></td>
+            <td style="font-family:var(--mono);color:var(--orange);">100% PWM</td>
+            <td style="color:var(--muted);">Voltaje total de la batería a los motores. Sin correcciones. La distancia se reduce al agotarse la batería.</td>
+            <td><span class="dist variable">Máx — disminuye por ejecución</span></td>
+          </tr>
+          <tr class="type-open">
+            <td><span class="tag-open">Raw Mode</span></td>
+            <td><span class="tag-b">B</span></td>
+            <td style="font-family:var(--mono);color:var(--orange);">30% PWM</td>
+            <td style="color:var(--muted);">Voltaje bajo + fricción de engranajes = retraso de arranque. La ventana de 3 segundos comienza antes que el robot.</td>
+            <td><span class="dist variable">Más que ½ de la ejecución al 100%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">📐</span>
+      <div>Presta atención a la <strong>razón</strong>, no solo a los números. En Modo Inteligente, la ejecución a 50 cm/s debería ser aproximadamente 1.8× la de 27.9 cm/s. En Modo Crudo, la ejecución al 100% no será 3.3× la del 30% — el retraso de arranque rompe la razón.</div>
+    </div>
+  </div>
+
+  <!-- WHY THIS HAPPENS -->
+  <div class="section">
+    <div class="section-label">¿Por Qué Ocurre Esto?</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">⚙️</div>
+        <div class="concept-title">Fricción de Engranajes a Baja Potencia</div>
+        <div class="concept-body">El motor gira a través de un conjunto de engranajes antes de llegar a la rueda. Con PWM bajo, el voltaje no es suficientemente fuerte para poner esos engranajes en movimiento desde una parada. El robot duda — a veces durante 200–400 ms — antes de empezar a rodar. Verás esto más en el 30% de PWM.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔋</div>
+        <div class="concept-title">El Consumo de Batería Cambia la Velocidad</div>
+        <div class="concept-body">El bucle abierto envía un <em>porcentaje</em> fijo del voltaje de la batería. Si la batería está baja, el 100% de una batería débil es menos potencia que el 100% de una batería llena. El Modo Inteligente no tiene este problema — los sensores de rueda detectan que el robot se ralentizó y aumentan la potencia del motor para compensar.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📡</div>
+        <div class="concept-title">¿Cómo Funcionan los Sensores de Rueda?</div>
+        <div class="concept-body">Cada rueda tiene un pequeño disco con ranuras cortadas. Un sensor óptico cuenta qué tan rápido pasan esas ranuras. Ese conteo le dice al sistema de corrección qué tan rápido está girando realmente la rueda. Por debajo de 20 cm/s, las ranuras pasan demasiado lentamente para que el sensor obtenga un conteo confiable — así que el sistema de corrección se rinde.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⚡</div>
+        <div class="concept-title">¿Qué Hace Realmente el PWM?</div>
+        <div class="concept-body">PWM (Modulación por Ancho de Pulso) enciende y apaga rápidamente el motor. 100% significa que está encendido todo el tiempo. 30% significa que está encendido el 30% del tiempo y apagado el 70%. El motor promedia eso en una velocidad más baja — pero solo si puede superar la fricción. Si no puede, esos pulsos apagados destruyen el impulso que acababan de construir los pulsos encendidos.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED CALCULATOR -->
+  <div class="section">
+    <div class="section-label">Calculadora de Velocidad</div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <span class="calc-header-title">Prueba tu configuración de SPEED</span>
+        <span style="font-size:.75rem;color:var(--muted);">Muestra qué objetivo tendrá el Modo Inteligente cuando presiones el Botón B</span>
+      </div>
+      <div class="calc-body">
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name">Estadística SPEED</span>
+            <span class="slider-val" id="c-speed-val">6</span>
+          </div>
+          <input type="range" id="c-speed" min="1" max="20" value="6" oninput="calcRecalc()" />
+          <div class="slider-sub">Configura esto para que coincida con la estadística de Speed de tu robot antes de descargar el programa Modo Inteligente.</div>
+        </div>
+        <div class="outputs-grid">
+          <div class="out-cell">
+            <div class="out-label">Velocidad Objetivo</div>
+            <div class="out-val" id="out-speed" style="color:var(--cyan)">27.9</div>
+            <div class="out-unit">cm/s</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Dist. Estimada</div>
+            <div class="out-val" id="out-dist" style="color:var(--green)">83.7</div>
+            <div class="out-unit">cm en 3 s</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">% del Rango de Velocidad</div>
+            <div class="out-val" id="out-pct" style="color:var(--yellow)">50%</div>
+            <div class="out-unit">de 20–50 cm/s</div>
+          </div>
+        </div>
+        <div id="floor-warning" class="callout danger" style="display:none;margin-top:1rem;">
+          <span class="callout-icon">⛔</span>
+          <div><strong>Demasiado lento para el sistema de sensores.</strong> SPEED <span id="warn-speed"></span> equivale a <span id="warn-cms"></span> cm/s — por debajo del piso de 20 cm/s. El sistema de corrección perderá el rastro y el robot se detendrá o se moverá de forma errática.</div>
+        </div>
+        <div id="ok-note" class="callout success" style="display:none;margin-top:1rem;">
+          <span class="callout-icon">✓</span>
+          <div>Esta configuración está dentro del rango seguro. El Modo Inteligente mantendrá <span id="ok-cms"></span> cm/s de forma confiable durante los 3 segundos completos.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIABLES TABLE -->
+  <div class="section">
+    <div class="section-label">Variables de un Vistazo</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="const-table">
+        <thead>
+          <tr><th>Nombre de Variable</th><th>Valor Inicial</th><th>¿Qué Hace?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="const-name">SPEED</td>
+            <td class="const-val">6</td>
+            <td class="const-note">Tu estadística de Speed del juego. Cámbiala a 1–20 antes de descargar. Solo importa en Modo Inteligente.</td>
+          </tr>
+          <tr>
+            <td class="const-name">minSpeed</td>
+            <td class="const-val">20</td>
+            <td class="const-note">La velocidad más lenta que puede mantener el sistema de corrección. El hardware del sensor no puede rastrear de forma confiable por debajo de esto. No lo cambies.</td>
+          </tr>
+          <tr>
+            <td class="const-name">maxSpeed</td>
+            <td class="const-val">50</td>
+            <td class="const-note">La velocidad más rápida que esta relación de engranajes puede mantener con corrección estable. No lo cambies.</td>
+          </tr>
+          <tr>
+            <td class="const-name">targetSpeed</td>
+            <td class="const-note">calculado</td>
+            <td class="const-note">El resultado de la fórmula de velocidad. Se calcula una vez al inicio a partir de tu estadística SPEED. El Botón B pasa esto al cruise control.</td>
+          </tr>
+          <tr>
+            <td class="const-name">basic.pause</td>
+            <td class="const-val">3000</td>
+            <td class="const-note">Cuánto tiempo (en milisegundos) el programa mantiene los motores en marcha. Bloqueado en 3000 para esta prueba — no lo cambies.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HOW TO RUN -->
+  <div class="section">
+    <div class="section-label">Cómo Ejecutar la Prueba</div>
+    <div class="card">
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">1</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Descarga el programa Modo Inteligente.</strong> Configura SPEED con la estadística de Speed de tu robot antes de descargar. Pon un trozo de cinta en el suelo como línea de inicio.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">2</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Presiona A. Marca dónde se detiene el robot.</strong> Presiona B. Marca dónde se detiene. Anota ambas distancias.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">3</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Descarga el programa Modo Crudo sin cargar la batería.</strong> Misma línea de inicio. Presiona A, presiona B. Anota ambas distancias.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">4</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Compara las razones.</strong> En Modo Inteligente, la ejecución rápida debería ser aproximadamente 1.8× la ejecución lenta. En Modo Crudo, la ejecución al 100% no será 3.3× la del 30% — la razón se rompe debido a la fricción de los engranajes al arrancar.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span class="step-num">5</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Ejecuta el Modo Crudo 10 veces más al 100% sin recargar.</strong> Si la distancia se reduce, has medido el consumo de batería en tiempo real.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="callout warn" style="margin-top:.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Despeja el camino antes de cada ejecución.</strong> Ambos programas conducen recto durante 3 segundos sin evasión de obstáculos. El robot no se detendrá por una pared o un borde de mesa.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+  function calcRecalc() {
+    const spd    = parseInt(document.getElementById('c-speed').value);
+    const minS   = 20, maxS = 50;
+    const target = minS + ((spd - 1) * (maxS - minS)) / (20 - 1);
+    const dist   = target * 3;
+    const pct    = Math.round(((target - minS) / (maxS - minS)) * 100);
+
+    document.getElementById('c-speed-val').textContent = spd;
+    document.getElementById('out-speed').textContent   = target.toFixed(1);
+    document.getElementById('out-dist').textContent    = dist.toFixed(1);
+    document.getElementById('out-pct').textContent     = pct + '%';
+
+    const floorWarn = document.getElementById('floor-warning');
+    const okNote    = document.getElementById('ok-note');
+
+    if (target < 20) {
+      floorWarn.style.display = 'flex';
+      okNote.style.display    = 'none';
+      document.getElementById('warn-speed').textContent = spd;
+      document.getElementById('warn-cms').textContent   = target.toFixed(1);
+      document.getElementById('out-speed').style.color  = 'var(--red)';
+      document.getElementById('out-dist').style.color   = 'var(--red)';
+    } else {
+      floorWarn.style.display = 'none';
+      okNote.style.display    = 'flex';
+      document.getElementById('ok-cms').textContent     = target.toFixed(1);
+      document.getElementById('out-speed').style.color  = 'var(--cyan)';
+      document.getElementById('out-dist').style.color   = 'var(--green)';
+    }
+  }
+  calcRecalc();
+</script>
+
+<!-- ── MAKECODE BLOCKS RENDERER ─────────────────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL      = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId = 0;
+
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
+    }, MAKECODE_URL);
+  }
+
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area   = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src    = msg.uri;
+        img.width  = msg.width;
+        img.height = msg.height;
+        img.alt    = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Vista previa de bloques no disponible</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+
+</body>
+</html>

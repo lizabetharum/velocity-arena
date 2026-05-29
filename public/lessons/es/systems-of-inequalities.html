@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas de Desigualdades — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── BASE ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1b2a;
+  --card: #1a2d45;
+  --card2: #132033;
+  --border: #2a4060;
+  --yellow: #ffd600;
+  --green: #00c97a;
+  --red: #ff4d6d;
+  --blue: #4a90e2;
+  --purple: #9c6fde;
+  --orange: #ff9100;
+  --text: #e8f0f8;
+  --muted: #7a9cc0;
+  --radius: 12px;
+}
+
+body {
+  font-family: 'Inter',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ─── HEADER ─────────────────────────────────────── */
+.header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #132033 100%);
+  border-bottom: 2px solid var(--border);
+  padding: 20px 24px;
+}
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.header-badge {
+  background: var(--yellow); color: var(--bg);
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+}
+.header h1 {
+  font-size: 22px; font-weight: 900; color: white; margin-top: 6px; line-height: 1.15;
+}
+.header p {
+  font-size: 13px; color: var(--muted); margin-top: 3px;
+}
+
+/* ─── CONSTRAINTS HUD ────────────────────────────── */
+.hud {
+  background: var(--card2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  margin: 16px 20px;
+  padding: 14px 18px;
+}
+.hud-label {
+  font-size: 9px; font-weight: 900; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.hud-constraints {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.hud-pill {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 8px 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.hud-pill-icon { font-size: 16px; }
+.hud-pill-text { font-size: 13px; font-weight: 700; color: var(--text); }
+.hud-pill-detail { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.hud-and {
+  display: flex; align-items: center;
+  font-size: 11px; font-weight: 900; color: var(--yellow);
+  letter-spacing: 1px;
+}
+
+/* ─── SECTION ────────────────────────────────────── */
+.section {
+  margin: 20px; background: var(--card);
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.section-header {
+  background: var(--card2); padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1.5px solid var(--border);
+}
+.section-title {
+  font-size: 11px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--yellow);
+}
+.section-sub { font-size: 11px; color: var(--muted); }
+.section-body { padding: 18px; }
+
+/* ─── VALID COUNTER ──────────────────────────────── */
+.valid-counter {
+  display: flex; align-items: center; gap: 10px;
+}
+.valid-count {
+  font-size: 28px; font-weight: 900; color: var(--green); line-height: 1;
+}
+.valid-denom { font-size: 16px; color: var(--muted); font-weight: 700; }
+.valid-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ─── LOADOUT TABLE ──────────────────────────────── */
+.table-wrapper { overflow-x: auto; }
+table.loadout-table {
+  width: 100%; border-collapse: separate; border-spacing: 0 6px;
+}
+table.loadout-table thead th {
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 0 6px 6px; text-align: center;
+}
+table.loadout-table thead th.left { text-align: left; }
+table.loadout-table tbody tr {
+  background: var(--card2);
+}
+table.loadout-table tbody td {
+  padding: 0; vertical-align: middle;
+}
+table.loadout-table tbody td:first-child { border-radius: 8px 0 0 8px; padding-left: 12px; }
+table.loadout-table tbody td:last-child { border-radius: 0 8px 8px 0; padding-right: 10px; }
+
+.row-num {
+  font-size: 11px; font-weight: 900; color: var(--muted);
+  width: 28px; text-align: left;
+}
+
+.stat-input {
+  width: 58px; background: var(--card);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  color: var(--text); font-family: 'Inter',sans-serif;
+  font-size: 15px; font-weight: 700; text-align: center;
+  padding: 10px 4px; margin: 4px;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+}
+.stat-input::-webkit-inner-spin-button, .stat-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.stat-input:focus { outline: none; border-color: var(--yellow); }
+
+/* Status column */
+.row-status-cell { width: 200px; padding: 0 6px !important; }
+.row-status { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; }
+.status-bar {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card); border-radius: 6px;
+  padding: 4px 8px; font-size: 11px; font-weight: 700;
+}
+.status-icon { font-size: 12px; width: 14px; text-align: center; flex-shrink: 0; }
+.status-text { flex: 1; }
+.status-ok { color: var(--green); }
+.status-fail { color: var(--red); }
+.status-neutral { color: var(--muted); }
+
+/* valid badge */
+.valid-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 6px; padding: 3px 10px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+}
+.valid-badge.pass { background: rgba(0,201,122,0.15); color: var(--green); border: 1px solid rgba(0,201,122,0.3); }
+.valid-badge.fail { background: rgba(255,77,109,0.12); color: var(--red); border: 1px solid rgba(255,77,109,0.2); }
+.valid-badge.empty { background: rgba(122,156,192,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+/* ─── DISCOVERY PANEL ────────────────────────────── */
+.discovery-panel {
+  background: rgba(255,214,0,0.08);
+  border: 1.5px solid rgba(255,214,0,0.3);
+  border-radius: var(--radius); padding: 16px 18px;
+  margin-top: 16px;
+  display: none;
+}
+.discovery-panel.visible { display: block; }
+.discovery-label {
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--yellow); margin-bottom: 8px;
+}
+.discovery-text {
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.discovery-text strong { color: var(--yellow); }
+
+/* ─── REFLECTION ─────────────────────────────────── */
+.reflection-q {
+  margin-bottom: 20px;
+}
+.q-label {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 10px; line-height: 1.5;
+}
+.q-label span.qnum {
+  background: var(--yellow); color: var(--bg);
+  font-size: 10px; font-weight: 900; padding: 2px 7px;
+  border-radius: 4px; margin-right: 6px;
+}
+.sentence-starter {
+  background: var(--card2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+.starter-label {
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.starter-text {
+  font-size: 13px; color: var(--text); line-height: 2;
+}
+.fill-blank {
+  display: inline-block;
+  border-bottom: 1.5px solid var(--yellow);
+  min-width: 60px; padding: 0 4px;
+  background: transparent; color: var(--yellow);
+  font-family: 'Inter',sans-serif; font-size: 13px; font-weight: 700;
+  outline: none; vertical-align: baseline;
+}
+.fill-blank:focus { background: rgba(255,214,0,0.08); border-radius: 3px; }
+.fill-blank.wide { min-width: 140px; }
+.fill-blank.xwide { min-width: 200px; }
+
+/* ─── PROGRESS BAR ───────────────────────────────── */
+.progress-wrap {
+  background: var(--card2); border-radius: 20px;
+  height: 6px; overflow: hidden; margin-top: 6px;
+}
+.progress-fill {
+  height: 100%; background: var(--green);
+  border-radius: 20px; transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ─── PART 2 NOTE ────────────────────────────────── */
+.part2-note {
+  margin: 20px; background: var(--card2);
+  border: 1.5px dashed var(--border); border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.part2-note-label {
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.part2-note h3 {
+  font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px;
+}
+.part2-note p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ─── TEAM BAR ───────────────────────────────────── */
+.team-bar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  background: var(--card2); border-bottom: 1.5px solid var(--border);
+}
+.team-label { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.team-input {
+  background: transparent; border: none; border-bottom: 1.5px solid var(--border);
+  color: var(--text); font-family: 'Inter',sans-serif; font-size: 14px; font-weight: 700;
+  outline: none; padding: 2px 6px; min-width: 180px;
+}
+.team-input:focus { border-bottom-color: var(--yellow); }
+
+/* ─── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 640px) {
+  .hud-constraints { flex-direction: column; }
+  .hud-and { display: none; }
+  .stat-input { width: 48px; font-size: 14px; padding: 8px 2px; }
+  .row-status-cell { display: none; }
+}
+</style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/systems-of-inequalities.html">EN</a>
+  <a href="/lessons/es/systems-of-inequalities.html" class="active">ES</a>
+</nav>
+
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <span class="header-badge">Velocity Arena · Día 11</span>
+  </div>
+  <h1>Sistemas de Desigualdades</h1>
+  <p>Encuentra cargas válidas que satisfagan las tres condiciones al mismo tiempo</p>
+</div>
+
+<!-- TEAM BAR -->
+<div class="team-bar">
+  <span class="team-label">Equipo</span>
+  <input class="team-input" type="text" placeholder="Escribe el nombre de tu equipo…" id="team-name">
+</div>
+
+<!-- CONSTRAINTS HUD -->
+<div class="hud">
+  <div class="hud-label">Las tres condiciones deben satisfacerse al mismo tiempo</div>
+  <div class="hud-constraints">
+    <div class="hud-pill">
+      <span class="hud-pill-icon">💨</span>
+      <div>
+        <div class="hud-pill-text">Speed &gt; 5</div>
+        <div class="hud-pill-detail">Speed ≥ 6 (como mínimo)</div>
+      </div>
+    </div>
+    <div class="hud-and">Y</div>
+    <div class="hud-pill">
+      <span class="hud-pill-icon">🛡️</span>
+      <div>
+        <div class="hud-pill-text">Endurance &gt; 3</div>
+        <div class="hud-pill-detail">Endurance ≥ 4 (como mínimo)</div>
+      </div>
+    </div>
+    <div class="hud-and">AND</div>
+    <div class="hud-pill">
+      <span class="hud-pill-icon">📊</span>
+      <div>
+        <div class="hud-pill-text">S + E + T + P + B = 20</div>
+        <div class="hud-pill-detail">El presupuesto debe ser exactamente 20</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADOUT TABLE -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title">Tus Cargas</span>
+    <div class="valid-counter">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:2px">
+          <span class="valid-count" id="valid-count">0</span>
+          <span class="valid-denom">&nbsp;/ 5</span>
+        </div>
+        <div class="valid-label">cargas válidas encontradas</div>
+        <div class="progress-wrap" style="width:80px">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="table-wrapper">
+      <table class="loadout-table" id="loadout-table">
+        <thead>
+          <tr>
+            <th class="left" style="width:28px">#</th>
+            <th>Speed (S)</th>
+            <th>Endurance (E)</th>
+            <th>Turning (T)</th>
+            <th>Power (P)</th>
+            <th>Budget (B)</th>
+            <th>Suma</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Discovery panel (appears after 2 valid loadouts) -->
+    <div class="discovery-panel" id="discovery-panel">
+      <div class="discovery-label">💡 ¿Notas algo?</div>
+      <div class="discovery-text">
+        Encontraste cargas válidas. Mira Speed + Endurance en cada una.<br>
+        <strong>¿Cuál es el mínimo que puede ser ese total?</strong> Piensa por qué — las restricciones lo obligan.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REFLECTION -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title">Reflexión</span>
+    <span class="section-sub">Responde en los espacios en blanco</span>
+  </div>
+  <div class="section-body">
+
+    <div class="reflection-q">
+      <div class="q-label">
+        <span class="qnum">Q1</span>
+        ¿Cuál es el valor mínimo posible de Speed + Endurance en cualquier carga válida? Muestra por qué.
+      </div>
+      <div class="sentence-starter">
+        <div class="starter-label">Inicio de Oración</div>
+        <div class="starter-text">
+          El valor mínimo de Speed + Endurance es <input class="fill-blank" type="text" size="4" placeholder="___">.
+          Lo sé porque Speed &gt; 5 significa Speed ≥ <input class="fill-blank" type="text" size="4" placeholder="___">
+          y Endurance &gt; 3 significa Endurance ≥ <input class="fill-blank" type="text" size="4" placeholder="___">,
+          por lo tanto juntos usan al menos <input class="fill-blank" type="text" size="4" placeholder="___"> de los 20 puntos.
+        </div>
+      </div>
+    </div>
+
+    <div class="reflection-q">
+      <div class="q-label">
+        <span class="qnum">Q2</span>
+        WhCuál de tus cargas válidas se acerca más a tu configuración de Temporada 1? ¿Qué necesitarías cambiar para llegar ahí?
+      </div>
+      <div class="sentence-starter">
+        <div class="starter-label">Sentence Starter</div>
+        <div class="starter-text">
+          La Carga # <input class="fill-blank" type="text" size="3" placeholder="__"> es la más cercana porque mis estadísticas de Temporada 1 fueron
+          <input class="fill-blank wide" type="text" size="20" placeholder="S=__, E=__, T=__, P=__, B=__">
+          y esta carga cambia solo
+          <input class="fill-blank wide" type="text" size="16" placeholder="nombre de estadística">
+          en <input class="fill-blank" type="text" size="4" placeholder="__"> puntos.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PART 2 NOTE -->
+<div class="part2-note">
+  <div class="part2-note-label">Siguiente — Parte 2</div>
+  <h3>Preparación de la Propuesta del Comisionado</h3>
+  <p>Continúa en tu hoja de trabajo impresa. Necesitarás tu tablero de Temporada 1. Tu propuesta debe incluir: un cambio de regla específico, exactamente dos números de tus datos de Temporada 1, y una declaración que nombre al equipo en último lugar y explique cómo el cambio lo afecta.</p>
+</div>
+
+<script>
+// ─── ROWS ─────────────────────────────────────────────
+const ROWS = 5;
+const STATS = ['s','e','t','p','b'];
+const STAT_LABELS = { s:'Speed', e:'Endurance', t:'Turning', p:'Power', b:'Budget' };
+
+let rowData = Array.from({length: ROWS}, () => ({s:'',e:'',t:'',p:'',b:''}));
+
+function buildTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  for (let r = 0; r < ROWS; r++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="row-num">${r+1}</td>
+      ${STATS.map(st => `
+        <td style="text-align:center">
+          <input class="stat-input" type="number" min="0" max="20"
+            data-row="${r}" data-stat="${st}"
+            value="${rowData[r][st]}"
+            placeholder="—"
+            inputmode="numeric">
+        </td>`).join('')}
+      <td id="sum-${r}" style="text-align:center;font-size:15px;font-weight:800;color:var(--muted);width:44px">—</td>
+      <td class="row-status-cell">
+        <div class="row-status" id="status-${r}">
+          <span class="valid-badge empty">Ingresa estadísticas</span>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+  // Attach listeners
+  document.querySelectorAll('.stat-input').forEach(inp => {
+    inp.addEventListener('input', onInput);
+  });
+}
+
+function onInput(e) {
+  const r = +e.target.dataset.row;
+  const st = e.target.dataset.stat;
+  const raw = e.target.value.trim();
+  rowData[r][st] = raw === '' ? '' : Math.max(0, Math.min(20, +raw));
+  e.target.value = raw === '' ? '' : rowData[r][st];
+  updateRow(r);
+  updateCounter();
+}
+
+function updateRow(r) {
+  const d = rowData[r];
+  const vals = STATS.map(st => d[st]);
+  const allFilled = vals.every(v => v !== '');
+
+  const sumCell = document.getElementById('sum-' + r);
+  const statusDiv = document.getElementById('status-' + r);
+
+  if (!allFilled) {
+    sumCell.textContent = '—';
+    sumCell.style.color = 'var(--muted)';
+    statusDiv.innerHTML = `<span class="valid-badge empty">Ingresa todas las estadísticas</span>`;
+    return;
+  }
+
+  const s = +d.s, e = +d.e, t = +d.t, p = +d.p, b = +d.b;
+  const sum = s + e + t + p + b;
+  sumCell.textContent = sum;
+
+  const okSpeed = s > 5;
+  const okEnd = e > 3;
+  const okSum = sum === 20;
+  const valid = okSpeed && okEnd && okSum;
+
+  // Color the sum
+  sumCell.style.color = okSum ? 'var(--green)' : 'var(--red)';
+
+  // Status bars
+  const bars = [
+    { ok: okSpeed, msg: okSpeed ? `Speed ${s} > 5 ✓` : `Speed ${s} — necesita ≥ 6` },
+    { ok: okEnd,   msg: okEnd   ? `Endurance ${e} > 3 ✓` : `Endurance ${e} — necesita ≥ 4` },
+    { ok: okSum,   msg: okSum   ? `Suma = 20 ✓` : `Suma = ${sum} — debe ser igual a 20` },
+  ];
+
+  statusDiv.innerHTML = bars.map(bar => `
+    <div class="status-bar">
+      <span class="status-icon">${bar.ok ? '✓' : '✗'}</span>
+      <span class="status-text ${bar.ok ? 'status-ok' : 'status-fail'}">${bar.msg}</span>
+    </div>`).join('') + `<div style="margin-top:4px">
+      <span class="valid-badge ${valid ? 'pass' : 'fail'}">
+        ${valid ? '✓ Carga válida' : '✗ No válida'}
+      </span></div>`;
+}
+
+function updateCounter() {
+  let count = 0;
+  for (let r = 0; r < ROWS; r++) {
+    const d = rowData[r];
+    const allFilled = STATS.every(st => d[st] !== '');
+    if (!allFilled) continue;
+    const s=+d.s, e=+d.e, t=+d.t, p=+d.p, b=+d.b;
+    if (s>5 && e>3 && (s+e+t+p+b)===20) count++;
+  }
+  document.getElementById('valid-count').textContent = count;
+  document.getElementById('progress-fill').style.width = (count/5*100) + '%';
+
+  // Discovery panel: show after 2 valid loadouts
+  const panel = document.getElementById('discovery-panel');
+  if (count >= 2) {
+    panel.classList.add('visible');
+  }
+
+  // Color the counter
+  const countEl = document.getElementById('valid-count');
+  countEl.style.color = count >= 5 ? 'var(--yellow)' : count > 0 ? 'var(--green)' : 'var(--muted)';
+}
+
+buildTable();
+</script>
+</body>
+</html>

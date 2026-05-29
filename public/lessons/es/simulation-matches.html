@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partidos de Simulación · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter',sans-serif;
+      background: var(--navy); color: #E8EAF2;
+      min-height: 100vh; padding-bottom: 5rem;
+    }
+
+    /* Header */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    main {
+      max-width: 820px; margin: 2rem auto 0; padding: 0 1.25rem;
+    }
+
+    .hero {
+      border-left: 4px solid var(--cyan);
+      padding: 0 0 1.25rem 1.25rem; margin-bottom: 2rem;
+    }
+    .hero .eyebrow {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .hero h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -.01em; margin-bottom: .5rem; }
+    .hero p { font-size: 1rem; color: #C8CDD8; line-height: 1.65; max-width: 60ch; }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .section-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem;
+    }
+    .section-heading {
+      font-size: 1.125rem; font-weight: 800; margin-bottom: .75rem;
+    }
+    .muted {
+      font-size: .875rem; color: var(--slate); line-height: 1.65;
+    }
+
+    /* Step list — style only DIRECT children, so nested <ol> inside a
+       step body falls back to normal list rendering. */
+    .step-list { counter-reset: step; list-style: none; padding: 0; }
+    .step-list > li {
+      counter-increment: step;
+      display: grid; grid-template-columns: 2.75rem 1fr;
+      gap: 1rem; align-items: flex-start;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .step-list > li:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-list > li::before {
+      content: counter(step);
+      width: 2.25rem; height: 2.25rem;
+      border-radius: 50%;
+      background: rgba(0,229,255,.1);
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .step-list .step-title {
+      font-size: 1rem; font-weight: 700; margin-bottom: .25rem;
+    }
+    .step-list .step-body { font-size: .9rem; color: #C8CDD8; line-height: 1.6; }
+    .step-list .step-body a {
+      color: var(--cyan); text-decoration: none; font-weight: 700; border-bottom: 1px dashed var(--cyan);
+    }
+    .step-list .step-body a:hover { border-bottom-style: solid; }
+    /* Nested <ol> inside a step body: regular list, lettered for clarity. */
+    .step-list .step-body ol {
+      list-style: lower-alpha; padding-left: 1.5rem;
+      margin: .5rem 0; font-size: .875rem; color: #C8CDD8; line-height: 1.65;
+    }
+    .step-list .step-body ol li { margin-bottom: .375rem; }
+    .step-list code {
+      font-family: 'JetBrains Mono', monospace; font-size: .8125rem;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .15em .4em;
+    }
+    .step-list kbd {
+      font-family: inherit; font-size: .75rem; font-weight: 700;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-bottom-width: 2px; border-radius: 4px;
+      padding: .15em .5em; color: #E8EAF2;
+    }
+
+    /* Code block */
+    .code-wrap {
+      background: #0A0A14; border: 1px solid var(--card-border);
+      border-radius: 10px; overflow: hidden; margin-top: 1rem;
+    }
+    .code-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .625rem 1rem;
+      background: var(--navy2); border-bottom: 1px solid var(--card-border);
+      gap: .75rem; flex-wrap: wrap;
+    }
+    .code-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .copy-group { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'Inter',sans-serif; font-size: .8125rem; font-weight: 700;
+      padding: .45rem .9rem; border-radius: 6px; border: 1px solid var(--teal);
+      background: transparent; color: var(--cyan); cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s, transform .1s;
+    }
+    .btn-copy:hover { background: rgba(0,229,255,.08); }
+    .btn-copy:active { transform: scale(.97); }
+    .btn-copy.primary {
+      background: var(--cyan); color: var(--navy); border-color: var(--cyan);
+    }
+    .btn-copy.primary:hover { opacity: .88; }
+    .btn-copy.copied {
+      background: var(--green); color: var(--navy); border-color: var(--green);
+    }
+    pre.code-block {
+      margin: 0; padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .75rem; line-height: 1.6; color: #D4D8E0;
+      background: #0A0A14;
+      max-height: 560px; overflow: auto;
+      white-space: pre;
+    }
+    pre.code-block::-webkit-scrollbar { width: 10px; height: 10px; }
+    pre.code-block::-webkit-scrollbar-track { background: #0A0A14; }
+    pre.code-block::-webkit-scrollbar-thumb {
+      background: var(--card-border); border-radius: 10px;
+    }
+
+    /* Student Zone callouts */
+    .zone-callout {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1rem; align-items: start;
+      background: rgba(255,209,102,.06);
+      border: 1px solid rgba(255,209,102,.25);
+      border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+    }
+    .zone-callout .zc-badge {
+      font-size: 1.75rem; line-height: 1; padding-top: .15rem;
+    }
+    .zone-callout h4 {
+      font-size: 1rem; font-weight: 800; color: var(--yellow);
+      margin-bottom: .375rem;
+    }
+    .zone-callout p { font-size: .875rem; color: #C8CDD8; line-height: 1.6; }
+    .zone-callout p + p { margin-top: .5rem; }
+    .zone-callout strong { color: var(--yellow); }
+
+    /* Reminder row */
+    .reminder {
+      background: rgba(255,77,106,.05);
+      border: 1px solid rgba(255,77,106,.2);
+      border-radius: 8px; padding: .875rem 1.125rem;
+      font-size: .875rem; color: #C8CDD8; line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+    .reminder strong { color: var(--red); }
+
+    @media (max-width: 540px) {
+      .loadout-row { grid-template-columns: 1fr 1fr; }
+      pre.code-block { font-size: .7rem; padding: 1rem; }
+    }
+  </style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/simulation-matches.html">EN</a>
+  <a href="/lessons/es/simulation-matches.html" class="active">ES</a>
+</nav>
+
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Hoy</a>
+  <span class="divider">|</span>
+  <h1>Partidos de Simulación</h1>
+  <span class="day-tag">DÍA 5</span>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="eyebrow">Partidos de simulación · Día 5</div>
+    <h2>Sube tu carga a tu robot.</h2>
+    <p>
+      Esta mañana diseñaste tres cargas. Ahora es el momento de poner una carga en el campo.
+      Sigue los cinco pasos a continuación para abrir MakeCode, agregar la extensión de Cutebot Pro, cambiar a
+      modo JavaScript, y pegar la plantilla del partido. Luego cambiarás exactamente dos cosas:
+      tus cuatro estadísticas y tu secuencia de lanzamiento.
+    </p>
+  </section>
+
+  <!-- Setup steps -->
+  <div class="card">
+    <div class="section-label">Configuración</div>
+    <h3 class="section-heading">Abre MakeCode y prepara el proyecto</h3>
+    <ol class="step-list">
+      <li>
+        <div>
+          <div class="step-title">Abre MakeCode para micro:bit</div>
+          <div class="step-body">
+            Ve a <a href="https://makecode.microbit.org" target="_blank" rel="noopener">makecode.microbit.org</a>.
+            No necesitas iniciar sesión.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Crea un proyecto nuevo</div>
+          <div class="step-body">
+            Haz clic en <strong>New Project</strong>, nómbralo <code>velocity-match</code>, y presiona Create.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Agrega la extensión Cutebot Pro</div>
+          <div class="step-body">
+            Haz clic en el ícono del engranaje (arriba a la derecha) → <strong>Extensions</strong>.
+            Busca <code>cutebot pro</code> y haz clic en el mosaico para agregarlo.
+            Nuevas categorías de bloques aparecerán en la barra lateral cuando esté instalado.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Cambia de Blocks a JavaScript</div>
+          <div class="step-body">
+            En la parte superior del editor, verás un interruptor con <kbd>Blocks</kbd> y <kbd>JavaScript</kbd>.
+            Haz clic en <kbd>JavaScript</kbd>. El espacio de trabajo basado en bloques cambia a un editor de texto.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Reemplaza todo con la plantilla del partido</div>
+          <div class="step-body">
+            Selecciona todo el código predeterminado (<kbd>⌘ A</kbd> en Mac, <kbd>Ctrl A</kbd> en Windows/ChromeOS)
+            y elimínalo. Luego pega el código del bloque de abajo usando <strong>Copiar plantilla</strong>.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Trae tu secuencia de lanzamiento de tu proyecto anterior</div>
+          <div class="step-body">
+            Ya escribiste una secuencia de lanzamiento en el proyecto <strong>First Bot Drive</strong>. Tráela a este:
+            <ol>
+              <li>Abre tu proyecto anterior de MakeCode en una pestaña nueva (Home → tus proyectos → el que tiene tu secuencia de lanzamiento).</li>
+              <li>En la parte superior, haz clic en <kbd>Blocks</kbd> para ver tu secuencia de lanzamiento como bloques — esta es la forma más rápida de confirmar que estás viendo la función correcta.</li>
+              <li>Haz clic en <kbd>JavaScript</kbd> para poder leer y copiar el texto.</li>
+              <li>Encuentra las líneas <strong>entre</strong> <code>launchActive = true</code> y <code>launchActive = false</code> dentro de <code>launchSequence()</code>. Ese es tu código de movimiento inicial. Selecciona solo esas líneas y copia (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>).</li>
+              <li>Vuelve a <code>velocity-match</code>. En el nuevo código, encuentra el mismo lugar — justo donde dice <code>// ← YOUR CODE HERE</code>. Pega tus líneas ahí.</li>
+            </ol>
+            Deja las dos líneas <code>launchActive = true</code> / <code>launchActive = false</code> tal como están — ya están en su lugar y no deben duplicarse.
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Code block -->
+  <div class="card">
+    <div class="section-label">Plantilla del partido</div>
+    <h3 class="section-heading">El código</h3>
+    <div class="muted" style="margin-bottom:.5rem;">
+      Lee los comentarios. Te dicen qué líneas nunca eliminar. Busca (<kbd>⌘ F</kbd>)
+      <code>STUDENT ZONE</code> para saltar entre los dos lugares que necesitas editar.
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-toolbar">
+        <span class="code-title">match-template.ts</span>
+        <div class="copy-group">
+          <button class="btn-copy primary" id="copy-raw-btn" onclick="copyTemplate()">Copiar plantilla</button>
+        </div>
+      </div>
+      <pre class="code-block" id="code-display"></pre>
+    </div>
+  </div>
+
+  <!-- Student zones explanation -->
+  <div class="card">
+    <div class="section-label">Qué cambias</div>
+    <h3 class="section-heading">Dos zonas de estudiantes</h3>
+
+    <div class="zone-callout">
+      <div class="zc-badge">★</div>
+      <div>
+        <h4>Zona A — Asignación de Estadísticas</h4>
+        <p>
+          Cerca del final del código, encuentra las líneas que comienzan con <code>SPEED =</code>,
+          <code>ENDURANCE =</code>, <code>TURNING =</code>, <code>POWER =</code>. Reemplaza
+          los 0 de marcador de posición con <strong>tus valores bloqueados de los Días 1–4</strong>.
+          Deben sumar exactamente <strong>20</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="zone-callout">
+      <div class="zc-badge">★</div>
+      <div>
+        <h4>Zona B — Secuencia de Lanzamiento</h4>
+        <p>
+          Cerca del principio del código, dentro de la función <code>launchSequence()</code>, hay una
+          línea de comentario que dice <code>// ← YOUR CODE HERE</code>. Esto se ejecuta <strong>una vez</strong>
+          cuando el partido comienza (Botón A). Programa el movimiento inicial de tu robot — un desplazamiento corto,
+          un giro, lo que la estrategia de tu equipo requiera.
+        </p>
+        <p>
+          <strong>Reutiliza tu código de lanzamiento de First Bot Drive.</strong> El Paso 6 anterior te guía
+          para abrir tu proyecto anterior, hacer clic en <kbd>Blocks</kbd> para confirmar, cambiar a JavaScript,
+          y copiar las líneas entre <code>launchActive = true</code> y <code>launchActive = false</code>
+          en este nuevo proyecto.
+        </p>
+        <p>
+          <strong>No</strong> elimines las líneas <code>launchActive = true</code> y <code>launchActive = false</code>
+          en el nuevo código — ya están en su lugar y protegen a tu robot de falsos
+          disparos de borde mientras giras.
+        </p>
+      </div>
+    </div>
+
+    <div class="reminder">
+      <strong>No cambies nada fuera de las dos zonas.</strong> El resto del código controla
+      el tiempo del partido, la detección del balón, el manejo del borde y la carga/followThrough. Si algo
+      parece "incorrecto" fuera de las zonas, levanta la mano — no lo edites.
+    </div>
+  </div>
+
+  <!-- Run it -->
+  <div class="card">
+    <div class="section-label">Ejecuta el partido</div>
+    <h3 class="section-heading">Lanza y observa</h3>
+    <div class="muted">
+      Descarga el programa a tu micro:bit. Coloca el robot en tu línea de gol mirando el campo.
+      Presiona <kbd>A</kbd> para iniciar el partido. Presiona <kbd>A + B</kbd> juntos en cualquier momento para
+      detención de emergencia. El partido termina automáticamente después de 3 minutos (180 segundos).
+    </div>
+    <div class="muted" style="margin-top:.75rem;">
+      Registra lo que observas en tu registro de partido: ¿cuánto tiempo aguantó Endurance? ¿Tu lanzamiento te puso
+      en una buena posición? ¿El valor 5 de Turning hizo que tus arcos se sintieran demasiado cerrados o demasiado abiertos?
+      Ajustarás para los partidos de mañana — pero tu carga de la Semana 1 ya está bloqueada.
+    </div>
+  </div>
+
+</main>
+
+<!-- Code source (hidden; read by the copy buttons). The textContent below is
+     the single source of truth for both the display and the clipboard. -->
+<script id="code-source" type="text/plain">
+/**
+ * ══════════════════════════════════════════════════════════════════════
+ *  VELOCITY ARENA — MATCH CODE TEMPLATE
+ * ══════════════════════════════════════════════════════════════════════
+ *
+ *  HOW TO USE THIS FILE
+ *  ─────────────────────
+ *  1. Find the sections marked  ★ STUDENT ZONE ★
+ *  2. Read the instructions in each zone carefully
+ *  3. Add your team's code where it says  // ← YOUR CODE HERE
+ *  4. Leave everything else exactly as-is — it controls match timing,
+ *     border detection, and ball tracking
+ *
+ *  There are TWO student zones in this file:
+ *    A. Stat Allocation  (bottom of file, easy to find)
+ *    B. Launch Sequence  (your bot's opening move)
+ *
+ * ══════════════════════════════════════════════════════════════════════
+ */
+
+
+// ── Launch sequence ───────────────────────────────────────────────────
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE B — LAUNCH SEQUENCE ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  This function runs once when the match starts (Button A).        ║
+ * ║  Program your bot's opening move here.                            ║
+ * ║                                                                   ║
+ * ║  RULES:                                                           ║
+ * ║  • Do NOT delete the launchActive lines — they protect your       ║
+ * ║    bot from false border triggers during turns.                   ║
+ * ║  • Your bot starts at your goal line facing the field.            ║
+ * ║  • Ball detection turns ON automatically after this function ends.║
+ * ║                                                                   ║
+ * ║  USEFUL COMMANDS (copy exactly as shown):                         ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 90)    ║
+ * ║    → spins left 90° in place                                      ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)   ║
+ * ║    → spins right 90° in place                                     ║
+ * ║  • CutebotPro.pwmCruiseControl(currentPower, currentPower)        ║
+ * ║    → drives forward at your bot's roam speed                      ║
+ * ║  • CutebotPro.runBlockCnt(2)                                      ║
+ * ║    → drives exactly 2 units (27 cm each), then stops             ║
+ * ║  • CutebotPro.stopImmediately(CutebotProMotors.ALL)               ║
+ * ║    → stops all motors                                             ║
+ * ║  • basic.pause(500)                                               ║
+ * ║    → waits 500 milliseconds (0.5 seconds)                        ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+function launchSequence() {
+    launchActive = true   // ← DO NOT DELETE — disables border check during turns
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES BELOW THIS LINE ───────────────
+
+    // ← YOUR CODE HERE
+
+
+
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES ABOVE THIS LINE ───────────────
+
+    launchActive = false  // ← DO NOT DELETE — re-enables border check after turns
+    lastTurnWasLeft = false
+}
+
+
+// ── Start match ───────────────────────────────────────────────────────
+input.onButtonPressed(Button.A, function () {
+    if (!(matchRunning)) {
+        if (SPEED + ENDURANCE + TURNING + POWER != 20) {
+            basic.showString("ERR")
+            basic.pause(1000)
+            basic.clearScreen()
+            return
+        }
+        computeStats()
+        matchTime = 0
+        matchStartTime = input.runningTime()
+        matchRunning = true
+        ballDetected = false
+        consecutiveBorderHits = 0
+        basic.showString("Go")
+        launchSequence()
+        isRoaming = true
+        matchLoop()
+    }
+})
+
+
+// ── Endurance bar on LED ──────────────────────────────────────────────
+function showEnduranceBar(num: number) {
+    rows = Math.round(num * 5)
+    basic.clearScreen()
+    for (let index = 0; index <= 4; index++) {
+        if (index >= 5 - rows) {
+            led.plot(2, index)
+        }
+    }
+}
+
+
+// ── Border detection ──────────────────────────────────────────────────
+function checkBorder() {
+    CutebotPro.trackbitStateValue()
+    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+
+
+// ── Main match loop ───────────────────────────────────────────────────
+function matchLoop() {
+    while (matchRunning) {
+        matchTime = (input.runningTime() - matchStartTime) / 1000
+        if (matchTime >= 180) {
+            endMatch()
+            break;
+        }
+        // ── 30s warning flash ──
+        if (matchTime >= 150 && matchTime < 151) {
+            basic.showLeds(`
+                # # # # #
+                # . . . #
+                # . # . #
+                # . . . #
+                # # # # #
+                `)
+            basic.pause(400)
+            basic.clearScreen()
+        }
+        if (ballDetected) {
+            isRoaming = false
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(200)
+            if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+            } else {
+                CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+            }
+            basic.pause(150)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(300)
+            basic.showLeds(`
+                . . # . .
+                . # # # .
+                # # # # #
+                . # # # .
+                . . # . .
+                `)
+            chargeAndFollowThrough()
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(500)
+            dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+            if (dist <= CONTACT_CM || dist > BALL_DETECT_CM) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+                basic.pause(200)
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            }
+            ballDetected = false
+            consecutiveBorderHits = 0
+            isRoaming = true
+            continue;
+        }
+        motorPower = SPEED * 100 / 20
+        endurancePercent = 100 - DECAY_RATE * matchTime / 40
+        endurancePercent = Math.max(endurancePercent, 20)
+        enduranceFactor = endurancePercent / 100
+        currentPower = Math.round(motorPower * enduranceFactor)
+        let powerFloor = Math.max(Math.round(motorPower * 0.20), 10)
+        currentPower = Math.max(currentPower, powerFloor)
+        effectiveDuration = thisDuration
+        lastTurnWasLeft = !(lastTurnWasLeft)
+        for (let index = 0; index < TURNING; index++) {
+            if (TURNING == 1) {
+                CutebotPro.pwmCruiseControl(currentPower, currentPower)
+            } else if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(currentPower * (1 - turnRatio), currentPower * (1 + turnRatio))
+            } else {
+                CutebotPro.pwmCruiseControl(currentPower * (1 + turnRatio), currentPower * (1 - turnRatio))
+            }
+            driveAndWatch(effectiveDuration)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            if (watchResult == 1) {
+                consecutiveBorderHits += 1
+                if (consecutiveBorderHits >= 2) {
+                    lastTurnWasLeft = !(lastTurnWasLeft)
+                    consecutiveBorderHits = 0
+                }
+                handleBorder()
+                break;
+            }
+            if (watchResult == 2) {
+                ballDetected = true
+                consecutiveBorderHits = 0
+                break;
+            }
+            if (watchResult == 3) {
+                consecutiveBorderHits = 0
+                handleStuck()
+                break;
+            }
+        }
+        if (!(ballDetected)) {
+            showEnduranceBar(enduranceFactor)
+        }
+    }
+}
+
+
+// ── Charge + Follow-Through ───────────────────────────────────────────
+function chargeAndFollowThrough() {
+    chargeHitBorder = false
+    let effectiveCharge = Math.round(chargePower * enduranceFactor)
+    effectiveCharge = Math.max(effectiveCharge, 15)
+    basic.showString("C")
+    CutebotPro.pwmCruiseControl(effectiveCharge, effectiveCharge)
+    let contactCount = 0
+    let contactMade = false
+    while (!(chargeHitBorder) && !(contactMade)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            chargeHitBorder = true
+            basic.showString("B")
+            break;
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist <= CONTACT_CM) {
+            contactCount += 1
+            if (contactCount >= 2) {
+                contactMade = true
+            }
+        } else {
+            contactCount = 0
+        }
+        basic.pause(CHARGE_CHECK_MS)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    if (!(chargeHitBorder)) {
+        basic.showString("F")
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        followStart = input.runningTime()
+        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
+            borderSide = checkBorder()
+            if (borderSide > 0) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                handleBorder()
+                break;
+            }
+            basic.pause(CHARGE_CHECK_MS)
+        }
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        CutebotPro.pwmCruiseControl(-1 * currentPower, -1 * currentPower)
+        basic.pause(300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    }
+}
+
+
+// ── Drive + watch for border, ball, and stuck ─────────────────────────
+function driveAndWatch(ms: number) {
+    watchResult = 0
+    elapsed = 0
+    stuckCount = 0
+    while (elapsed < ms) {
+        halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(halfChunk)
+        elapsed += halfChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        if (elapsed >= ms) {
+            return
+        }
+        remainChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(remainChunk)
+        elapsed += remainChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist > CONTACT_CM && dist < BALL_DETECT_CM) {
+            stuckCount = 0
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 2
+            return
+        } else if (dist <= CONTACT_CM) {
+            stuckCount += 1
+            if (stuckCount >= STUCK_HITS) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                watchResult = 3
+                return
+            }
+        } else {
+            stuckCount = 0
+        }
+    }
+}
+
+
+// ── Stuck recovery ────────────────────────────────────────────────────
+function handleStuck() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (lastTurnWasLeft) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        lastTurnWasLeft = false
+    } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        lastTurnWasLeft = true
+    }
+    basic.pause(STUCK_PIVOT_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    isRoaming = true
+}
+
+
+// ── Emergency stop ────────────────────────────────────────────────────
+input.onButtonPressed(Button.AB, function () {
+    matchRunning = false
+    isRoaming = false
+    ballDetected = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+
+
+// ── Compute stats from 20-point budget ───────────────────────────────
+function computeStats() {
+    currentPower = SPEED * 100 / 20
+    chargePower = Math.min(POWER * POWER, 100)
+    FOLLOW_THROUGH_MS = POWER * 80
+    totalArcTime = BASE_SEGMENT_MS * 12
+    thisDuration = Math.round(totalArcTime / TURNING)
+    turnRatio = 0.2 + TURNING * 0.02
+    turnRatio = Math.min(turnRatio, 0.4)
+    DECAY_RATE = 20 - ENDURANCE
+}
+
+
+// ── Handle border ─────────────────────────────────────────────────────
+function handleBorder() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (borderSide == 1) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = false
+    } else if (borderSide == 2) {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = true
+    } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS + 300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS * 2)
+        lastTurnWasLeft = false
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    recheck = checkBorder()
+    if (recheck > 0) {
+        borderSide = recheck
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+    }
+    isRoaming = true
+}
+
+
+// ── Show phase label ──────────────────────────────────────────────────
+function showPhase(text: string) {
+    basic.showString(text)
+    basic.pause(300)
+    basic.clearScreen()
+}
+
+
+// ── End match ─────────────────────────────────────────────────────────
+function endMatch() {
+    matchRunning = false
+    isRoaming = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+
+// ── Variable declarations ─────────────────────────────────────────────
+let recheck = 0
+let totalArcTime = 0
+let dist = 0
+let remainChunk = 0
+let halfChunk = 0
+let elapsed = 0
+let FOLLOW_THROUGH_MS = 0
+let followStart = 0
+let chargePower = 0
+let chargeHitBorder = false
+let turnRatio = 0
+let lastTurnWasLeft = false
+let thisDuration = 0
+let effectiveDuration = 0
+let enduranceFactor = 0
+let endurancePercent = 0
+let motorPower = 0
+let currentPower = 0
+let borderSide = 0
+let sensor4State = 0
+let sensor3State = 0
+let sensor2State = 0
+let sensor1State = 0
+let rows = 0
+let ballDetected = false
+let matchStartTime = 0
+let matchTime = 0
+let isRoaming = false
+let matchRunning = false
+let watchResult = 0
+let msPerUnit = 0
+let launchActive = false
+let DECAY_RATE = 0
+let stuckCount = 0
+let consecutiveBorderHits = 0
+let POWER = 0
+let TURNING = 0
+let ENDURANCE = 0
+let SPEED = 0
+
+
+// ── System constants (do not change) ─────────────────────────────────
+let BORDER_CHECK_MS = 60
+let CHARGE_CHECK_MS = 20
+let BORDER_PIVOT_MS = 400
+let BORDER_PIVOT_POWER = 50
+let BACKUP_MS = 600
+let BALL_DETECT_CM = 40
+let BASE_SEGMENT_MS = 1800
+let BORDER_THRESHOLD = 200
+let UNIT_CM = 27
+let LAUNCH_RIGHT_TURN = 85
+let CONTACT_CM = 5
+let STUCK_HITS = 3
+let STUCK_PIVOT_MS = 600
+
+
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE A — STAT ALLOCATION ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  Set your four stats below. They MUST add up to exactly 20.       ║
+ * ║  Each stat must be between 1 and 17 (you need at least 1 in each).║
+ * ║                                                                   ║
+ * ║  SPEED     → how fast your bot roams the field                    ║
+ * ║  ENDURANCE → how well your bot maintains speed late in the match  ║
+ * ║  TURNING   → how tightly your bot arcs when searching             ║
+ * ║  POWER     → how hard your bot charges when it sees the ball      ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+SPEED = 0        // ← YOUR VALUE HERE  (current total: 20)
+ENDURANCE = 0    // ← YOUR VALUE HERE
+TURNING = 0      // ← YOUR VALUE HERE
+POWER = 0        // ← YOUR VALUE HERE
+// ─────────────────────────────────────────────────────────────────────
+
+
+// ── Init ──────────────────────────────────────────────────────────────
+DECAY_RATE = 20 - ENDURANCE
+
+
+// ── Forever loop: safety-net border check during roaming ──────────────
+basic.forever(function () {
+    if (matchRunning && isRoaming && !(launchActive)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            handleBorder()
+        }
+        basic.pause(30)
+    }
+})
+</script>
+
+<script>
+// ── Render the code block to the page ────────────────────────────────
+document.getElementById('code-display').textContent = document.getElementById('code-source').textContent;
+
+// ── Copy handler ─────────────────────────────────────────────────────
+async function copyTemplate() {
+  const src = document.getElementById('code-source').textContent;
+  const btn = document.getElementById('copy-raw-btn');
+  try {
+    await navigator.clipboard.writeText(src);
+  } catch (_e) {
+    const ta = document.createElement('textarea');
+    ta.value = src;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (_ignored) {}
+    document.body.removeChild(ta);
+  }
+  const originalText = btn.textContent;
+  btn.textContent = '✓ Copiado';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.classList.remove('copied');
+  }, 1600);
+}
+</script>
+
+</body>
+</html>

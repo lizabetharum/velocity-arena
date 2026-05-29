@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba de Speed & Endurance — Guía MakeCode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:        #0b0f1a;
+    --surface:   #111827;
+    --card:      #1a2235;
+    --border:    #1f2d45;
+    --text:      #e2e8f0;
+    --muted:     #8899b0;
+
+    --cyan:      #00d4ff;
+    --green:     #22c55e;
+    --gold:      #f59e0b;
+    --red:       #f43f5e;
+    --purple:    #a78bfa;
+    --orange:    #fb923c;
+    --teal:      #14b8a6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter',sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* ─── HERO ─────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px 24px 60px;
+    text-align: center;
+    background: radial-gradient(ellipse 120% 80% at 50% -20%, #0e2a4a 0%, transparent 70%), var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0px, transparent 59px, rgba(0,212,255,0.03) 59px, rgba(0,212,255,0.03) 60px),
+                repeating-linear-gradient(0deg,  transparent 0px, transparent 59px, rgba(0,212,255,0.03) 59px, rgba(0,212,255,0.03) 60px);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    border: 1px solid rgba(0,212,255,0.3);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    background: rgba(0,212,255,0.07);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    max-width: 620px;
+    margin: 0 auto 32px;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .hero-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cyan);
+    text-decoration: none;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .hero-link:hover { background: rgba(0,212,255,0.15); }
+
+  /* ─── LAYOUT ────────────────────────────────────────────── */
+  .content { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+  section  { margin-top: 64px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  h3 { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  p  { color: var(--text); margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ─── BUTTON CARDS ──────────────────────────────────────── */
+  .btn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .btn-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .btn-card:hover { transform: translateY(-2px); }
+  .btn-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .btn-card.a::before  { background: var(--gold); }
+  .btn-card.b::before  { background: var(--green); }
+  .btn-card.ab::before { background: var(--red); }
+  .btn-card.a:hover  { border-color: rgba(245,158,11,0.4); }
+  .btn-card.b:hover  { border-color: rgba(34,197,94,0.4); }
+  .btn-card.ab:hover { border-color: rgba(244,63,94,0.4); }
+
+  .btn-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  .btn-badge.a  { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .btn-badge.b  { background: rgba(34,197,94,0.15);  color: var(--green); }
+  .btn-badge.ab { background: rgba(244,63,94,0.15);  color: var(--red); }
+  .btn-card p   { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* ─── BLOCKS SECTION ────────────────────────────────────── */
+  .block-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .block-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .block-body { padding: 0; }
+
+  /* Rendered blocks area */
+  .blocks-render-area {
+    background: #f5f5f5;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    min-height: 80px;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .blocks-render-area img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    display: block;
+  }
+
+  /* Loading placeholder */
+  .blocks-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #ddd;
+    border-top-color: #888;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Hidden pre elements (before rendering) */
+  pre.blocks {
+    display: none;
+  }
+
+  /* Explanation area */
+  .block-explain {
+    padding: 20px;
+  }
+  .block-explain p { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step  { display: flex; gap: 14px; align-items: flex-start; }
+  .step-num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    background: rgba(0,212,255,0.1);
+    color: var(--cyan);
+    border: 1px solid rgba(0,212,255,0.25);
+    margin-top: 2px;
+  }
+  .step-text { font-size: 13.5px; color: var(--text); line-height: 1.6; flex: 1; }
+
+  /* ─── VARIABLE NAME INLINE ──────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(251,146,60,0.12);
+    color: var(--orange);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  code.cyan { background: rgba(0,212,255,0.1); color: var(--cyan); }
+  code.gold { background: rgba(245,158,11,0.12); color: var(--gold); }
+  code.purple { background: rgba(167,139,250,0.12); color: var(--purple); }
+  code.green  { background: rgba(34,197,94,0.12); color: var(--green); }
+  code.red    { background: rgba(244,63,94,0.12); color: var(--red); }
+
+  /* ─── VARIABLES TABLE ───────────────────────────────────── */
+  .var-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .var-row {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .var-row:hover { border-color: rgba(0,212,255,0.25); }
+  .var-name {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .var-name.you-set { color: var(--gold); background: rgba(245,158,11,0.06); }
+  .var-name.computed{ color: var(--cyan); background: rgba(0,212,255,0.04); }
+  .var-name.constant{ color: var(--purple); background: rgba(167,139,250,0.05); }
+  .var-desc {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+  }
+  .var-desc strong { font-size: 13px; font-weight: 600; color: var(--text); display: block; }
+  .tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .tag.you-set  { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .tag.auto     { background: rgba(0,212,255,0.12);  color: var(--cyan); }
+  .tag.constant { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+  /* ─── CALLOUTS ──────────────────────────────────────────── */
+  .callout {
+    display: flex;
+    gap: 14px;
+    background: var(--card);
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    align-items: flex-start;
+  }
+  .callout-icon  { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .callout-text  { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .callout-text strong { color: var(--text); font-weight: 600; }
+  .callout.tip   { border-left: 3px solid var(--green); }
+  .callout.warn  { border-left: 3px solid var(--gold); }
+  .callout.info  { border-left: 3px solid var(--cyan); }
+
+  /* ─── FORMULA BOX ───────────────────────────────────────── */
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 20px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    line-height: 2;
+  }
+  .formula-box .comment { color: var(--muted); font-style: italic; }
+
+  /* ─── SENSOR DIAGRAM ────────────────────────────────────── */
+  .sensor-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+  }
+  .sensor-row { display: flex; gap: 8px; align-items: center; }
+  .sensor-box {
+    width: 62px; height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    flex-direction: column;
+    gap: 1px;
+  }
+  .sensor-box .snum { font-size: 13px; }
+  .sensor-box .slabel { font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sensor-box.left  { border-color: var(--gold);   color: var(--gold);   background: rgba(245,158,11,0.07); }
+  .sensor-box.right { border-color: var(--red);    color: var(--red);    background: rgba(244,63,94,0.07); }
+  .sensor-box.mid   { border-color: var(--purple);  color: var(--purple); background: rgba(167,139,250,0.07); }
+  .bot-body {
+    width: 110px; height: 72px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 2px solid var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cyan);
+    margin: 10px 0;
+    letter-spacing: 0.05em;
+  }
+  .sensor-label { font-size: 11px; color: var(--muted); font-weight: 600; margin: 4px 0; }
+  .sensor-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .legend-dot  { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ─── LED GRID ──────────────────────────────────────────── */
+  .led-wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .led-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .led-caption { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .led-grid {
+    display: inline-grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    padding: 10px;
+    background: #0a0a0a;
+    border-radius: 10px;
+    border: 2px solid #222;
+  }
+  .led { width: 14px; height: 14px; border-radius: 3px; background: #1a1a1a; }
+  .led.on { background: #ff3a3a; box-shadow: 0 0 5px #ff1111; }
+  .led.on.g { background: #33ee33; box-shadow: 0 0 5px #22cc22; }
+
+  /* ─── SPEED DEMO ────────────────────────────────────────── */
+  .speed-demo {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .speed-demo h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .match-bar {
+    display: grid;
+    grid-template-columns: 100px 1fr 60px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .match-bar .label {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    text-align: right;
+  }
+  .bar-track {
+    height: 14px;
+    background: var(--surface);
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .bar-fill { height: 100%; border-radius: 7px; }
+  .bar-pct  { font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── TIPS ──────────────────────────────────────────────── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .tip-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .tip-card:hover { border-color: rgba(0,212,255,0.2); transform: translateY(-2px); }
+  .tip-number {
+    font-size: 28px;
+    font-weight: 900;
+    color: rgba(0,212,255,0.15);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .tip-card h3 { font-size: 14px; margin-bottom: 6px; }
+  .tip-card p  { font-size: 12.5px; color: var(--muted); }
+
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .var-row     { grid-template-columns: 1fr; }
+    .var-name    { border-right: none; border-bottom: 1px solid var(--border); }
+    .match-bar   { grid-template-columns: 70px 1fr 48px; gap: 8px; }
+    .sensor-row  { gap: 5px; }
+    .sensor-box  { width: 52px; height: 38px; }
+  }
+</style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/endurance-test-explainer.html">EN</a>
+  <a href="/lessons/es/endurance-test-explainer.html" class="active">ES</a>
+</nav>
+
+
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-tag">MakeCode Blocks · Guía para Principiantes</div>
+  <h1>Programa de Prueba de<br>Speed &amp; Endurance</h1>
+  <p>Aprende cómo este programa MakeCode prueba la potencia del motor de tu robot y registra cómo la velocidad cambia a lo largo de un partido simulado.</p>
+  <a class="hero-link" href="https://makecode.microbit.org/S47582-44774-29551-96874" target="_blank">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    Abrir en MakeCode
+  </a>
+</div>
+
+<!-- ── CONTENT ────────────────────────────────────────────── -->
+<div class="content">
+
+  <!-- ── WHAT IT DOES ─────────────────────────────── -->
+  <section>
+    <div class="section-label">Resumen</div>
+    <h2>¿Qué hace este programa?</h2>
+    <p>Este programa ejecuta una <strong>prueba de conducción corta</strong> para medir qué tan rápido se mueve tu robot según dos estadísticas que eliges: <strong>SPEED</strong> y <strong>ENDURANCE</strong>. También simula cómo cambia la potencia del motor a medida que avanza un partido — para que puedas sentir cómo es conducir al inicio vs. al final de un juego.</p>
+    <p>Mientras conduce, vigila constantemente los sensores de la pista y reacciona si tu robot llega al borde. Piénsalo como un bucle de prueba más inteligente: no solo "ve rápido," sino "ve rápido como lo haría un robot en un partido real."</p>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-text">
+        <strong>Antes de ejecutar:</strong> Encuentra las líneas <code>SPEED = 0</code> y <code>ENDURANCE = 0</code> en el bloque <strong>on start</strong> y cónfiguralas con los valores reales de las estadísticas de tu personaje. Si las dejas en cero, el robot no se moverá.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── THREE BUTTONS ──────────────────────────────── -->
+  <section>
+    <div class="section-label">Controles</div>
+    <h2>Tres botones. Eso es todo.</h2>
+    <p>Todo el programa se controla con los botones del micro:bit. Esto es lo que hace cada uno:</p>
+    <div class="btn-grid">
+      <div class="btn-card a">
+        <div class="btn-badge a">A</div>
+        <h3>Ejecutar la Prueba</h3>
+        <p>Calcula la potencia a partir de tus estadísticas, luego conduce recto durante la duración de la prueba. Observa la ralentización según la configuración de tiempo del partido.</p>
+      </div>
+      <div class="btn-card b">
+        <div class="btn-badge b">B</div>
+        <h3>Configurar Tiempo del Partido</h3>
+        <p>Cicla entre 0 → 60 → 120 → 180 segundos. Configura esto <em>antes</em> de presionar A para simular cuán cansado está el robot en ese punto.</p>
+      </div>
+      <div class="btn-card ab">
+        <div class="btn-badge ab">A+B</div>
+        <h3>Parada de Emergencia</h3>
+        <p>Corta todos los motores de inmediato. Úsalo si tu robot se dirige a un lugar donde no debería. Muestra una ✕ en la pantalla LED.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BLOCK BY BLOCK ─────────────────────────────── -->
+  <section>
+    <div class="section-label">Bloque por Bloque</div>
+    <h2>¿Cómo funciona cada sección?</h2>
+
+    <!-- ── ON START ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #cf6033;">
+        <div class="block-dot" style="background: #cf6033;"></div>
+        on start — Configuración de Variables
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-onstart">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let TEST_DURATION_MS = 5000
+let BORDER_CHECK_MS = 60
+let BORDER_PIVOT_MS = 400
+let BORDER_PIVOT_POWER = 50
+let BACKUP_MS = 600
+let BORDER_THRESHOLD = 200
+let SPEED = 0
+let ENDURANCE = 0
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Este bloque se ejecuta una vez en el momento en que el micro:bit se enciende. Llena todas las configuraciones que necesita tu programa antes de que se presione cualquier botón. Piénsalo como escribir valores en una hoja de configuración.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><code class="gold">TEST_DURATION_MS = 5000</code> — Cada ejecución de prueba dura 5.000 milisegundos (5 segundos). Puedes cambiar este número para hacer las pruebas más largas o cortas.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><code class="gold">BORDER_CHECK_MS = 60</code> — Mientras conduce, el robot verifica sus sensores cada 60ms. Cuanto menor sea este número, más rápido reacciona al borde.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><code class="gold">SPEED = 0</code> y <code class="gold">ENDURANCE = 0</code> — <strong style="color:#f59e0b;">Estos son para que tú los llenes.</strong> Reemplaza los ceros con los valores de estadísticas de tu personaje antes de subir al micro:bit.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BUTTON A ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #e6b222;">
+        <div class="block-dot" style="background: #e6b222;"></div>
+        on button A pressed — Ejecutar la Prueba
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-buttonA">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let running = false
+let testStart = 0
+let BORDER_CHECK_MS = 0
+let borderSide = 0
+function computeStats() {}
+function checkBorder() { return 0 }
+function handleBorder() {}
+input.onButtonPressed(Button.A, function () {
+    computeStats()
+    running = true
+    testStart = input.runningTime()
+    basic.pause(BORDER_CHECK_MS)
+    while (running) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            handleBorder()
+        }
+        basic.pause(BORDER_CHECK_MS)
+    }
+    running = false
+    basic.showString("DONE")
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Presionar A ejecuta la secuencia completa de prueba. Los pasos ocurren en orden, de arriba hacia abajo:</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>llamar a computeStats</strong> — calcula la potencia del motor del robot según SPEED, ENDURANCE y el tiempo simulado actual del partido. Se ejecuta antes de que los motores se enciendan.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><code>running = true</code> y registra el tiempo de inicio — esto "enciende" el bucle de abajo e inicia el reloj.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">Ambas ruedas se configuran a <code>currentPower</code> — potencia igual izquierda y derecha significa que el robot conduce recto sin girar.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>bucle while</strong> — sigue ejecutándose hasta que se acabe el tiempo. Cada 60ms verifica: ¿algún sensor tocó el borde? Si es sí, llama a <strong>handleBorder</strong> para recuperarse, luego retoma la conducción.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text">Cuando el tiempo expire: detiene todas las ruedas, muestra <strong>"DONE"</strong> en pantalla, luego la borra.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BUTTON B ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #388a34;">
+        <div class="block-dot" style="background: #388a34;"></div>
+        on button B pressed — Configurar Tiempo del Partido
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-buttonB">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let simulatedMatchTime = 0
+input.onButtonPressed(Button.B, function () {
+    if (simulatedMatchTime == 0) {
+        simulatedMatchTime = 60
+        basic.showLeds(`
+            # . . . .
+            # . . . .
+            # . . . .
+            # . . . .
+            # . . . .
+            `)
+    } else if (simulatedMatchTime == 60) {
+        simulatedMatchTime = 120
+        basic.showLeds(`
+            # # . . .
+            # # . . .
+            # # . . .
+            # # . . .
+            # # . . .
+            `)
+    } else if (simulatedMatchTime == 120) {
+        simulatedMatchTime = 180
+        basic.showLeds(`
+            # # # . .
+            # # # . .
+            # # # . .
+            # # # . .
+            # # # . .
+            `)
+    } else {
+        simulatedMatchTime = 0
+        basic.showLeds(`
+            . . . . .
+            . . . . .
+            . . # . .
+            . . . . .
+            . . . . .
+            `)
+    }
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Cada pulsación de B cicla <code>simulatedMatchTime</code> entre cuatro valores: 0 → 60 → 120 → 180 → 0. La pantalla LED te muestra exactamente dónde estás en el ciclo para que siempre sepas tu configuración.</p>
+          <div class="led-wrap">
+            <div class="led-item">
+              <div class="led-grid">
+                <div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led"></div><div class="led"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+                <div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+              </div>
+              <div class="led-caption">0s · inicio</div>
+            </div>
+            <div class="led-item">
+              <div class="led-grid">
+                <div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+              </div>
+              <div class="led-caption">60s · 1 min</div>
+            </div>
+            <div class="led-item">
+              <div class="led-grid">
+                <div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div><div class="led"></div>
+              </div>
+              <div class="led-caption">120s · 2 min</div>
+            </div>
+            <div class="led-item">
+              <div class="led-grid">
+                <div class="led on g"></div><div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+                <div class="led on g"></div><div class="led on g"></div><div class="led on g"></div><div class="led"></div><div class="led"></div>
+              </div>
+              <div class="led-caption">180s · final</div>
+            </div>
+          </div>
+          <div class="callout tip" style="margin-top:0;">
+            <div class="callout-icon">✅</div>
+            <div class="callout-text">
+              <strong>Usa el Botón B antes del Botón A.</strong> Configura primero el tiempo del partido, luego presiona A para ejecutar la prueba en ese punto. Compara 0s vs. 180s para sentir la diferencia que hace ENDURANCE.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BUTTON A+B ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #f43f5e;">
+        <div class="block-dot" style="background: #f43f5e;"></div>
+        on button A+B pressed — Parada de Emergencia
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-buttonAB">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let running = false
+input.onButtonPressed(Button.AB, function () {
+    running = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Mantén A y B al mismo tiempo. El programa corta la potencia y sale del bucle de inmediato — sin ralentización gradual. Suceden tres cosas:</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><code>running = false</code> — esto sale del bucle while de conducción en la próxima verificación (dentro de 60ms).</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">Ambos motores se detienen de inmediato — sin reducción gradual, corte instantáneo a cero potencia.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">La pantalla LED muestra un patrón ✕ para que sepas que la parada fue confirmada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPUTE STATS ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #7b5ea7;">
+        <div class="block-dot" style="background: #7b5ea7;"></div>
+        function computeStats — Calcular la Potencia
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-computeStats">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let SPEED = 0
+let ENDURANCE = 0
+let simulatedMatchTime = 0
+let basePower = 0
+let DECAY_RATE = 0
+let endurancePercent = 0
+let enduranceFactor = 0
+let currentPower = 0
+function computeStats () {
+    basePower = SPEED * 100 / 20
+    DECAY_RATE = 20 - ENDURANCE
+    endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
+    endurancePercent = Math.max(endurancePercent, 20)
+    enduranceFactor = endurancePercent / 100
+    currentPower = Math.round(basePower * enduranceFactor)
+    currentPower = Math.max(currentPower, Math.max(Math.round(basePower * 0.2), 10))
+}
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Esta función se llama cada vez que presionas A. Ejecuta los cálculos para determinar qué potencia del motor usar ahora, según tus estadísticas y dónde estás en el partido.</p>
+          <div class="formula-box">
+            basePower = SPEED × 100 ÷ 20 <span class="comment">← convierte tu estadística en un % del motor</span><br>
+            DECAY_RATE = 20 − ENDURANCE   <span class="comment">← menor endurance = decaimiento más rápido</span><br>
+            endurancePercent = 100 − (DECAY_RATE × matchTime ÷ 40) <span class="comment">← disminuye con el tiempo</span><br>
+            currentPower = basePower × enduranceFactor <span class="comment">← número final enviado a los motores</span>
+          </div>
+          <div class="callout info">
+            <div class="callout-icon">🧮</div>
+            <div class="callout-text">
+              <strong>En palabras simples:</strong> SPEED establece qué tan fuertes arrancan los motores. ENDURANCE controla qué tan lentamente se desvanece esa fuerza. Endurance alto = la potencia se mantiene alta durante todo el partido. Endurance bajo = ralentización notoria al final. El robot nunca puede bajar del 20% de potencia — ese es un piso de seguridad incorporado en la matemática.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHECK BORDER ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #14b8a6;">
+        <div class="block-dot" style="background: #14b8a6;"></div>
+        function checkBorder — Leer los Sensores
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-checkBorder">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let sensor1State = 0
+let sensor2State = 0
+let sensor3State = 0
+let sensor4State = 0
+let BORDER_THRESHOLD = 0
+function checkBorder () {
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Tu Cutebot Pro tiene cuatro sensores de seguimiento de línea en su parte inferior. Esta función lee los cuatro y devuelve un número que le dice al bucle principal de qué dirección viene el problema. El borde blanco refleja más luz — eso es lo que el sensor "ve".</p>
+
+          <div class="sensor-diagram">
+            <div class="sensor-label">↑ Frente del robot</div>
+            <div class="sensor-row">
+              <div class="sensor-box left"><span class="snum">S1</span><span class="slabel">left</span></div>
+              <div class="sensor-box mid"><span class="snum">S2</span><span class="slabel">mid</span></div>
+              <div class="sensor-box mid"><span class="snum">S3</span><span class="slabel">mid</span></div>
+              <div class="sensor-box right"><span class="snum">S4</span><span class="slabel">right</span></div>
+            </div>
+            <div class="bot-body">CUERPO DEL ROBOT</div>
+            <div class="sensor-label">↓ Parte trasera del robot</div>
+            <div class="sensor-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>S1 activa → devuelve 1 (peligro izquierda)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>S4 activa → devuelve 2 (peligro derecha)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>S2 o S3 → devuelve 3 (directo)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>Todo despejado → devuelve 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HANDLE BORDER ── -->
+    <div class="block-section">
+      <div class="block-header" style="color: #fb923c;">
+        <div class="block-dot" style="background: #fb923c;"></div>
+        function handleBorder — Recuperarse del Borde
+      </div>
+      <div class="block-body">
+
+        <div class="blocks-render-area" id="render-handleBorder">
+          <div class="blocks-loading">
+            <div class="spinner"></div>
+            Cargando bloques desde MakeCode…
+          </div>
+          <pre class="blocks">
+let BACKUP_MS = 0
+let BORDER_PIVOT_MS = 0
+let borderSide = 0
+let recheck = 0
+function checkBorder() { return 0 }
+function handleBorder () {
+    basic.pause(50)
+    basic.pause(BACKUP_MS)
+    basic.pause(100)
+    if (borderSide == 1) {
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+    } else if (borderSide == 2) {
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+    } else {
+        basic.pause(BACKUP_MS + 300)
+        basic.pause(100)
+        basic.pause(BORDER_PIVOT_MS * 2)
+    }
+    basic.pause(100)
+    recheck = checkBorder()
+    if (recheck > 0) {
+        basic.pause(BACKUP_MS)
+        basic.pause(100)
+        basic.pause(BORDER_PIVOT_MS)
+        basic.pause(100)
+    }
+}
+          </pre>
+        </div>
+
+        <div class="block-explain">
+          <p>Cuando un sensor detecta el borde, esta función toma el control para dirigir el robot de regreso al ring. El movimiento exacto depende de <em>cuál</em> sensor se activó.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Detener y retroceder</strong> — todos los motores se cortan, luego retroceden durante <code>BACKUP_MS</code> (600ms) para crear espacio para un giro.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <strong>Girar según borderSide:</strong><br>
+                <code class="gold">1 (peligro izquierda)</code> → girar a la derecha — una rueda adelante, una atrás<br>
+                <code class="red">2 (peligro derecha)</code> → girar a la izquierda<br>
+                <code class="purple">3 (directo)</code> → retroceder extra, luego hacer un giro más amplio
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Reverificar</strong> — llama a <code>checkBorder</code> de nuevo. Si aún está en blanco, hace un retroceso y giro más antes de retomar la conducción normal.</div>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top:16px;">
+            <div class="callout-icon">🎲</div>
+            <div class="callout-text">
+              <strong>¿Por qué el rango aleatorio?</strong> <code>Math.randomRange(-80, 80)</code> agrega una pequeña variación aleatoria a cada tiempo de giro. Esto evita que el robot quede atrapado en el mismo bucle exacto si toca el mismo lugar dos veces.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── VARIABLES ─────────────────────────────────────── -->
+  <section>
+    <div class="section-label">Variables</div>
+    <h2>¿Qué significa cada variable?</h2>
+    <p>Dorado = tú lo configuras antes de subir. Cian = el programa lo calcula automáticamente. Púrpura = una constante fija que controla el comportamiento.</p>
+
+    <div class="var-grid">
+      <div class="var-row">
+        <div class="var-name you-set">SPEED <span class="tag you-set">Tú configuras</span></div>
+        <div class="var-desc"><strong>Estadística de velocidad de tu personaje</strong>Establece la potencia base del motor. SPEED mayor = base más rápida. Se usa para calcular basePower.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name you-set">ENDURANCE <span class="tag you-set">Tú configuras</span></div>
+        <div class="var-desc"><strong>Estadística de resistencia de tu personaje</strong>Controla qué tan lentamente se desvanece la velocidad a lo largo de un partido. Mayor = curva más plana. Menor = caída notoria al final.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">TEST_DURATION_MS <span class="tag constant">Constante</span></div>
+        <div class="var-desc"><strong>Cuánto dura cada ejecución de prueba (milisegundos)</strong>Predeterminado 5000 (5 segundos). Auéntalo si quieres más tiempo para observar las reacciones al borde.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">simulatedMatchTime <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Tiempo "simulado en el partido" para pruebas</strong>Se configura con el Botón B. 0 = inicio del partido, 180 = cerca del final. No es un reloj real en funcionamiento.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">currentPower <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Potencia real del motor enviada a las ruedas (0–100)</strong>Calculado nuevamente cada vez que presionas A. Este es el número que va directamente a ambos motores.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">basePower <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Potencia bruta antes de aplicar el decaimiento de endurance</strong>Derivado de SPEED. Representa a qué velocidad correría el robot con endurance perfecto.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">endurancePercent <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Cuánto de la potencia base queda en este punto</strong>Va de 100% (potencia plena) hasta un mínimo de 20%. Cae más rápido con ENDURANCE bajo.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BORDER_THRESHOLD <span class="tag constant">Constante</span></div>
+        <div class="var-desc"><strong>Umbral de brillo para detección del borde</strong>Configurado en 200. Las lecturas del sensor por encima de este valor se tratan como "borde blanco detectado".</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BORDER_PIVOT_POWER <span class="tag constant">Constante</span></div>
+        <div class="var-desc"><strong>Potencia del motor durante los giros de recuperación del borde</strong>Configurado en 50 (50%). Menor = giros más suaves. Mayor = giros más cerrados.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BACKUP_MS <span class="tag constant">Constante</span></div>
+        <div class="var-desc"><strong>Cuánto tiempo el robot retrocede al tocar el borde</strong>Predeterminado 600ms — espacio suficiente para girar sin volver a caerse de inmediato.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SPEED DECAY ────────────────────────────────────── -->
+  <section>
+    <div class="section-label">Cómo Funciona</div>
+    <h2>Viendo el decaimiento de velocidad en acción</h2>
+    <p>Así se ve <code class="cyan">currentPower</code> para un robot con <strong>SPEED = 10, ENDURANCE = 5</strong> en diferentes momentos del partido. ENDURANCE bajo = caída pronunciada. ENDURANCE alto = línea plana.</p>
+
+    <div class="speed-demo">
+      <h4>Potencia del motor en cada punto del partido · SPEED 10 · ENDURANCE 5</h4>
+      <div class="match-bar">
+        <div class="label">0s · inicio</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%; background: linear-gradient(90deg, var(--cyan), var(--green));"></div></div>
+        <div class="bar-pct" style="color:var(--green);">50%</div>
+      </div>
+      <div class="match-bar">
+        <div class="label">60s · 1 min</div>
+        <div class="bar-track"><div class="bar-fill" style="width:76%; background: linear-gradient(90deg, var(--cyan), var(--gold));"></div></div>
+        <div class="bar-pct" style="color:var(--gold);">38%</div>
+      </div>
+      <div class="match-bar">
+        <div class="label">120s · 2 min</div>
+        <div class="bar-track"><div class="bar-fill" style="width:50%; background: linear-gradient(90deg, var(--gold), var(--orange));"></div></div>
+        <div class="bar-pct" style="color:var(--orange);">25%</div>
+      </div>
+      <div class="match-bar">
+        <div class="label">180s · final</div>
+        <div class="bar-track"><div class="bar-fill" style="width:40%; background: linear-gradient(90deg, var(--orange), var(--red));"></div></div>
+        <div class="bar-pct" style="color:var(--red);">20%</div>
+      </div>
+      <p style="font-size:12px; color:var(--muted); margin-top:14px; margin-bottom:0;">Este robot llega al piso del 20% de potencia antes de que termine el partido. Invierte más en ENDURANCE para aplanar esta curva.</p>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-text">
+        <strong>Verificación estratégica:</strong> Presiona B para ir a 180s, presiona A, luego compáralo con 0s. Si la diferencia se siente enorme, considera poner más puntos en ENDURANCE antes de tu próximo partido.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TIPS ──────────────────────────────────────────── -->
+  <section>
+    <div class="section-label">Siguientes Pasos</div>
+    <h2>Consejos para usar este programa</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-number">01</div>
+        <h3>Configura tus estadísticas primero</h3>
+        <p>Encuentra las líneas <code style="font-size:11px;">SPEED = 0</code> y <code style="font-size:11px;">ENDURANCE = 0</code> en on start. Escribe los valores reales de tu personaje antes de subir al micro:bit.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">02</div>
+        <h3>Prueba los 4 momentos de tiempo</h3>
+        <p>Ejecuta a 0s, 60s, 120s y 180s. Observa si el robot <em>se siente</em> diferente. Si no, tu ENDURANCE es fuerte. Si arrastra a 180s, es bajo.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">03</div>
+        <h3>Ajusta TEST_DURATION_MS</h3>
+        <p>5 segundos es rápido. Prueba 10000 (10s) para ver más reacciones al borde — especialmente útil si quieres observar la lógica de recuperación trabajar varias veces.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">04</div>
+        <h3>Ten A+B a mano</h3>
+        <p>Si el robot empieza a dirigirse a un lugar malo, presiona A+B de inmediato. Siempre es seguro hacer una parada de emergencia y volver a empezar desde el inicio.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">05</div>
+        <h3>Compara diferentes configuraciones</h3>
+        <p>Prueba SPEED alto / ENDURANCE bajo vs. SPEED bajo / ENDURANCE alto. Ejecuta ambos a 180s. Los resultados podrían sorprenderte.</p>
+      </div>
+      <div class="tip-card">
+        <div class="tip-number">06</div>
+        <h3>Lee la pantalla LED</h3>
+        <p>Una columna de LEDs = 60s. Dos columnas = 120s. Tres = 180s. Úsalo como una verificación visual rápida antes de presionar A para siempre saber tu configuración actual.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Prueba de Speed &amp; Endurance · <a href="https://makecode.microbit.org/S47582-44774-29551-96874" target="_blank">Abrir en MakeCode</a> · Velocity Arena</p>
+</footer>
+
+<!-- ── MAKECODE BLOCKS RENDERER ───────────────────────────── -->
+<!--
+  Uses the official MakeCode blocks embedding API.
+  Docs: https://makecode.microbit.org/blocks-embed
+
+  The hidden iframe loads the rendering engine from makecode.microbit.org.
+  Each <pre class="blocks"> element gets its JS code compiled into a block image
+  and replaced with an <img> tag showing the real MakeCode blocks.
+
+  The CutebotPro extension is included via options.package so that
+  CutebotPro-specific blocks render with correct colors and shapes.
+-->
+<script>
+(function () {
+  var MAKECODE_URL = "https://makecode.microbit.org/";
+  // ElecFreaks Cutebot Pro extension — provides correct block rendering
+  // for CutebotPro.pwmCruiseControl, CutebotPro.stopImmediately, etc.
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+
+  var blockId = 0;
+  var rendererReady = false;
+  var queue = []; // snippets waiting for renderer
+
+  // Inject the hidden renderer iframe
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+
+  // Send one snippet to the renderer
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: {
+        package: EXTENSION_PACKAGE
+      }
+    }, MAKECODE_URL);
+  }
+
+  // Handle messages from the renderer
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+
+    if (msg.type === "renderready") {
+      rendererReady = true;
+      // Gather all block snippets and send them
+      var snippets = document.querySelectorAll("pre.blocks");
+      snippets.forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+
+      // Find the parent render area (the light-grey div)
+      var area = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+
+      if (msg.uri) {
+        // Success — swap loading placeholder + pre with the rendered image
+        var img = document.createElement("img");
+        img.src = msg.uri;
+        img.width = msg.width;
+        img.height = msg.height;
+        img.alt = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+
+        // Remove the loading spinner
+        var loader = area ? area.querySelector(".blocks-loading") : null;
+        if (loader) loader.remove();
+
+        // Remove the hidden pre
+        pre.remove();
+
+        // Add image to the render area
+        if (area) {
+          area.appendChild(img);
+        }
+      } else {
+        // Render failed (e.g. unknown extension block) — show fallback
+        var loader2 = area ? area.querySelector(".blocks-loading") : null;
+        if (loader2) {
+          loader2.innerHTML = "<span style='font-size:12px;color:#888;'>Vista previa de bloques no disponible — <a href=\"https://makecode.microbit.org/S47582-44774-29551-96874\" target=\"_blank\" style=\"color:var(--cyan);\">abrir en MakeCode</a> para verlos.</span>";
+        }
+        pre.remove();
+      }
+    }
+  }, false);
+
+  // Kick it off once the DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+
+})();
+</script>
+
+</body>
+</html>

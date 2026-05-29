@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programa de Prueba de Speed · Explicador de Código · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:   #0D0D1A;
+      --navy2:  #161A2E;
+      --navy3:  #1E2240;
+      --cyan:   #00E5FF;
+      --teal:   #007A99;
+      --slate:  #8899AA;
+      --border: #222840;
+      --card:   #161A2E;
+      --green:  #00C97A;
+      --red:    #FF4D6A;
+      --yellow: #FFD166;
+      --orange: #FF8C42;
+      --purple: #BD7AFF;
+      --text:   #E8EAF2;
+      --muted:  #9AA3B2;
+      --mono:   'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter',sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+    }
+
+    .site-nav {
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      display: flex; gap: 18px;
+    }
+    .site-nav a { color: var(--slate); text-decoration: none; }
+    .site-nav a:hover { color: var(--cyan); }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1.5rem 1.75rem;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; }
+    .eyebrow {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .page-title {
+      font-size: 1.625rem; font-weight: 900; letter-spacing: -.01em;
+      line-height: 1.2; margin-bottom: .625rem;
+    }
+    .page-sub {
+      font-size: .9375rem; color: var(--muted);
+      line-height: 1.6; max-width: 600px;
+    }
+
+    .section { margin-top: 2.75rem; }
+    .section-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--slate);
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .card {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card + .card { margin-top: .75rem; }
+
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+    @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    /* Button cards */
+    .btn-card {
+      background: var(--navy3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .btn-badge {
+      display: inline-block;
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .6rem; border-radius: 4px;
+      margin-bottom: .75rem;
+    }
+    .btn-badge.a  { background: rgba(0,229,255,.15);  color: var(--cyan);   border: 1px solid rgba(0,229,255,.3); }
+    .btn-badge.b  { background: rgba(255,209,102,.12); color: var(--yellow); border: 1px solid rgba(255,209,102,.25); }
+    .btn-badge.ab { background: rgba(255,76,106,.12);  color: var(--red);    border: 1px solid rgba(255,76,106,.25); }
+    .btn-card h3  { font-size: .9375rem; font-weight: 700; margin-bottom: .4rem; }
+    .btn-card p   { font-size: .8125rem; color: var(--muted); line-height: 1.55; }
+
+    /* LED display */
+    .led-grid { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .led-item {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem 1rem;
+      display: flex; align-items: center; gap: .875rem;
+      min-width: 200px; flex: 1;
+    }
+    .led-visual {
+      flex-shrink: 0; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .led-number {
+      font-family: var(--mono); font-size: 1.625rem; font-weight: 700; color: var(--cyan);
+    }
+    .led-desc { font-size: .8125rem; color: var(--muted); line-height: 1.45; }
+    .led-desc strong { color: var(--text); }
+
+    /* LED dot grid for X pattern */
+    .led-dots {
+      display: grid; grid-template-columns: repeat(5, 7px); gap: 2px;
+    }
+    .ld { width: 7px; height: 7px; border-radius: 50%; }
+    .ld.on  { background: #FF4D6A; }
+    .ld.off { background: rgba(255,255,255,.08); }
+
+    /* Bar graph preview */
+    .bar-preview {
+      display: grid; grid-template-columns: repeat(5, 7px); gap: 2px;
+      align-items: end; height: 44px;
+    }
+    .bp-col { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+    .bp-dot { width: 7px; height: 7px; border-radius: 1px; }
+    .bp-dot.on  { background: var(--cyan); }
+    .bp-dot.off { background: rgba(255,255,255,.08); }
+
+    /* Formula box */
+    .formula-box {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: .625rem;
+    }
+    .formula-label {
+      font-size: .625rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .4rem;
+    }
+    .formula-eq { font-family: var(--mono); font-size: .9375rem; color: var(--cyan); margin-bottom: .375rem; }
+    .formula-note { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+    .formula-note strong { color: var(--yellow); }
+
+    /* Callouts */
+    .callout {
+      border-radius: 8px; padding: .875rem 1.125rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: .75rem; font-size: .8125rem; line-height: 1.55;
+    }
+    .callout.info   { background: rgba(0,229,255,.07);  border: 1px solid rgba(0,229,255,.2);  color: #c0e8f0; }
+    .callout.warn   { background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.2); color: #f0e0b0; }
+    .callout.danger { background: rgba(255,76,106,.07); border: 1px solid rgba(255,76,106,.2); color: #f0b8c0; }
+    .callout-icon   { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .callout strong { display: block; margin-bottom: .2rem; }
+
+    /* Sequence flow */
+    .flow { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: .5rem; }
+    .flow-step {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem .875rem;
+      min-width: 100px; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: .35rem;
+    }
+    .flow-icon { font-size: 1.25rem; }
+    .flow-name { font-size: .6375rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text); }
+    .flow-desc { font-size: .6125rem; color: var(--muted); line-height: 1.4; }
+    .flow-arrow { color: var(--slate); font-size: 1rem; padding: 0 .2rem; flex-shrink: 0; }
+
+    /* Speed × Power table */
+    .sp-table { width: 100%; border-collapse: collapse; }
+    .sp-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .sp-table td { padding: .45rem .75rem; border-bottom: 1px solid rgba(34,40,64,.5); font-size: .8125rem; }
+    .sp-table tr.highlight td { background: rgba(0,229,255,.05); }
+    .bar-wrap { display: flex; align-items: center; gap: .5rem; }
+    .bar-bg   { flex: 1; height: 7px; background: var(--navy3); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .bar-pct  { font-family: var(--mono); font-size: .75rem; font-weight: 700; min-width: 2.75rem; text-align: right; }
+
+    /* Interactive calculator */
+    .calc-wrap {
+      background: var(--navy2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .calc-header {
+      background: var(--navy3); border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .calc-header-title { font-size: .9375rem; font-weight: 800; }
+    .calc-body { padding: 1.5rem; }
+
+    .slider-group { margin-bottom: 1.25rem; }
+    .slider-top {
+      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .4rem;
+    }
+    .slider-name { font-size: .8125rem; font-weight: 700; }
+    .slider-val  { font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--cyan); }
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 3px; outline: none; cursor: pointer;
+      background: var(--navy3); accent-color: var(--cyan);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; border: 2px solid var(--navy2);
+      background: var(--cyan); cursor: pointer;
+    }
+    .slider-sub { font-size: .6875rem; color: var(--muted); margin-top: .25rem; }
+
+    .outputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1.25rem; }
+    @media (max-width: 520px) { .outputs-grid { grid-template-columns: 1fr 1fr; } }
+    .out-cell {
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: .875rem 1rem; text-align: center;
+    }
+    .out-label { font-size: .6rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--slate); margin-bottom: .4rem; }
+    .out-val   { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+    .out-unit  { font-size: .6875rem; color: var(--muted); margin-top: .2rem; }
+
+    /* Power meter */
+    .power-meter {
+      margin-top: 1.5rem;
+      background: var(--navy3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+    }
+    .pm-label {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: .75rem;
+    }
+    .pm-track {
+      width: 100%; height: 18px; background: rgba(255,255,255,.06);
+      border-radius: 9px; overflow: hidden; position: relative;
+    }
+    .pm-fill {
+      height: 100%; border-radius: 9px;
+      background: linear-gradient(90deg, var(--teal), var(--cyan));
+      transition: width .25s;
+    }
+    .pm-markers {
+      display: flex; justify-content: space-between;
+      margin-top: .4rem; font-family: var(--mono);
+      font-size: .6375rem; color: var(--slate);
+    }
+    .pm-markers span:not(:first-child):not(:last-child) { color: rgba(136,153,170,.5); }
+
+    /* Constants table */
+    .const-table { width: 100%; border-collapse: collapse; }
+    .const-table th {
+      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--slate);
+      padding: .4rem .75rem; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .const-table td { padding: .5rem .75rem; border-bottom: 1px solid rgba(34,40,64,.6); font-size: .8125rem; }
+    .const-name { font-family: var(--mono); color: var(--cyan); }
+    .const-val  { font-family: var(--mono); color: var(--yellow); }
+    .const-note { color: var(--muted); font-size: .775rem; }
+
+    /* MakeCode blocks */
+    pre.blocks { display: none; }
+    .blocks-render-area { min-height: 80px; display: flex; align-items: flex-start; justify-content: flex-start; padding: .75rem 0; flex-wrap: wrap; gap: .75rem; }
+    .blocks-loading { display: flex; align-items: center; gap: .75rem; font-size: .8125rem; color: var(--muted); padding: .5rem 0; }
+    .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .block-entry { margin-bottom: 1.25rem; }
+    .block-entry-header { font-size: .6875rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .625rem; display: flex; align-items: center; gap: .5rem; }
+    .block-entry-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .block-entry-body { display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; align-items: start; }
+    .block-entry-explain { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+  </style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/speed-test-explainer.html">EN</a>
+  <a href="/lessons/es/speed-test-explainer.html" class="active">ES</a>
+</nav>
+
+
+<nav class="site-nav">
+  <a href="/lessons">← Lecciones</a>
+  <a href="/lessons/speed-test-explainer.html" style="color:var(--cyan)">Prueba de Speed</a>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="eyebrow">Explicador de Código · BBC micro:bit v2 + Cutebot Pro</div>
+    <h1 class="page-title">Programa de Prueba de Speed</h1>
+    <p class="page-sub">Este programa conduce el robot recto durante 2 segundos al valor de SPEED que hayas configurado — para que puedas ver cuánto recorre a diferentes valores de motorPower. Presiona B para ciclar entre los valores de SPEED sin volver a programar.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- BUTTON CONTROLS -->
+  <div class="section">
+    <div class="section-label">Controles de Botones</div>
+    <div class="grid-3">
+      <div class="btn-card">
+        <div class="btn-badge a">Button A</div>
+        <h3>Ejecutar la prueba</h3>
+        <p>Muestra la estadística SPEED y la barra de potencia, luego conduce recto durante 2 segundos y se detiene.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge b">Button B</div>
+        <h3>Ciclar SPEED</h3>
+        <p>Avanza SPEED de 1 → 2 → … → 20 → de vuelta a 1 sin volver a programar. Muestra el nuevo valor en el LED.</p>
+      </div>
+      <div class="btn-card">
+        <div class="btn-badge ab">A + B</div>
+        <h3>Parada de emergencia</h3>
+        <p>Corta ambos motores de inmediato durante una ejecución. Muestra X en el LED y limpia después de 500 ms.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEQUENCE -->
+  <div class="section">
+    <div class="section-label">¿Qué sucede cuando presionas A?</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">💡</div>
+        <div class="flow-name">Mostrar SPEED</div>
+        <div class="flow-desc">Desplaza el valor de SPEED en el LED — 800 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">⚡</div>
+        <div class="flow-name">Barra de potencia</div>
+        <div class="flow-desc">La barra muestra el % del motor — 800 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">⏸️</div>
+        <div class="flow-name">Pausa</div>
+        <div class="flow-desc">Pantalla se borra — 500 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,229,255,.35)">
+        <div class="flow-icon">🤖</div>
+        <div class="flow-name">Conducir</div>
+        <div class="flow-desc">Ambos motores a currentPower durante 2 000 ms</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">✋</div>
+        <div class="flow-name">Detener</div>
+        <div class="flow-desc">Ambos motores cortados de inmediato</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,201,122,.3)">
+        <div class="flow-icon">🏁</div>
+        <div class="flow-name">Listo</div>
+        <div class="flow-desc">Patrón X 500 ms y luego borra</div>
+      </div>
+    </div>
+
+    <div class="callout info" style="margin-top:.875rem;">
+      <span class="callout-icon">ℹ️</span>
+      <div>La fase de vista previa (desplazamiento SPEED + barra de potencia) tarda aproximadamente 2.1 segundos antes de que el robot se mueva. El temporizador de conducción de 2 segundos comienza en el momento en que las ruedas empiezan a girar.</div>
+    </div>
+  </div>
+
+  <!-- LED DISPLAY -->
+  <div class="section">
+    <div class="section-label">Decodificador de la Pantalla LED</div>
+    <div class="led-grid">
+
+      <div class="led-item">
+        <div class="led-visual">
+          <div class="led-number">8</div>
+        </div>
+        <div class="led-desc"><strong>Número desplazándose</strong><br>Estadística SPEED actual — mostrada durante 800 ms antes de cada ejecución, y al ciclar con el Botón B</div>
+      </div>
+
+      <div class="led-item">
+        <div class="led-visual" style="align-items:flex-end;">
+          <!-- bar graph preview: 5 columns, filling from bottom, ~50% -->
+          <div class="bar-preview" id="led-bar-preview">
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot off"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+            <div class="bp-col">
+              <div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div><div class="bp-dot on"></div>
+            </div>
+          </div>
+        </div>
+        <div class="led-desc"><strong>Barra de progreso</strong><br>La altura muestra la potencia del motor (0–100%). Más alta = más potencia. Mostrada durante 800 ms después del número SPEED</div>
+      </div>
+
+      <div class="led-item">
+        <div class="led-visual">
+          <div class="led-dots">
+            <div class="ld on"></div><div class="ld off"></div><div class="ld off"></div><div class="ld off"></div><div class="ld on"></div>
+            <div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div>
+            <div class="ld off"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld off"></div>
+            <div class="ld off"></div><div class="ld on"></div><div class="ld off"></div><div class="ld on"></div><div class="ld off"></div>
+            <div class="ld on"></div><div class="ld off"></div><div class="ld off"></div><div class="ld off"></div><div class="ld on"></div>
+          </div>
+        </div>
+        <div class="led-desc"><strong>Patrón X</strong><br>Ejecución completa o parada de emergencia activada. Mostrado durante 500 ms y luego borra</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FORMULA -->
+  <div class="section">
+    <div class="section-label">Fórmula</div>
+    <div class="formula-box">
+      <div class="formula-label">Potencia del Motor</div>
+      <div class="formula-eq">currentPower = (SPEED × 100) / 20 (%)</div>
+      <div class="formula-note">
+        
+        Ambos motores izquierdo y derecho reciben el mismo valor, por lo que el robot conduce recto.
+      </div>
+    </div>
+    
+  </div>
+
+
+  <!-- BLOCK BY BLOCK -->
+  <div class="section">
+    <div class="section-label">Bloque por Bloque</div>
+
+    <!-- STARTING VALUES -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Valores Iniciales
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let testStart = 0
+let running = false
+let currentPower = 0
+let SPEED = 1
+let TEST_DURATION_MS = 2000
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Configura <code>TEST_DURATION_MS</code> en <strong>2000</strong> y <code>SPEED</code> en <strong>1</strong> antes de descargar. Todo lo demás comienza en 0 y se calcula cuando presionas A.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON A -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--cyan)"></div>
+        Button A — Ejecutar la prueba
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let currentPower = 0
+let SPEED = 0
+let running = false
+let testStart = 0
+let TEST_DURATION_MS = 0
+input.onButtonPressed(Button.A, function () {
+    currentPower = SPEED * 100 / 20
+    basic.showString("" + (SPEED))
+    basic.pause(800)
+    led.plotBarGraph(
+    currentPower,
+    100
+    )
+    basic.pause(800)
+    basic.clearScreen()
+    basic.pause(500)
+    running = true
+    testStart = input.runningTime()
+    CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    while (running && input.runningTime() - testStart < TEST_DURATION_MS) {
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    running = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Calcula <code>currentPower</code> a partir de tu estadística SPEED, muestra el número y luego la barra de potencia, luego conduce recto durante <code>TEST_DURATION_MS</code> milisegundos. El bucle <code>while</code> sigue verificando el tiempo transcurrido para que una pulsación A+B pueda salir antes. El patrón X en el LED confirma que la ejecución terminó.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON B -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--yellow)"></div>
+        Button B — Ciclar SPEED
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let SPEED = 0
+input.onButtonPressed(Button.B, function () {
+    if (SPEED >= 20) {
+        SPEED = 1
+    } else {
+        SPEED += 1
+    }
+    basic.showString("" + (SPEED))
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Aumenta SPEED en 1 con cada pulsación — vuelve a 1 después de 20. El número desplazándose te permite confirmar el valor antes de presionar A. No es necesario volver a programar.
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
+
+    <!-- BUTTON A+B -->
+    <div class="block-entry">
+      <div class="block-entry-header">
+        <div class="block-entry-dot" style="background:var(--red)"></div>
+        Button A+B — Parada de Emergencia
+      </div>
+      <div class="block-entry-body">
+        <div>
+          <div class="blocks-render-area">
+            <div class="blocks-loading"><div class="spinner"></div>Cargando bloques…</div>
+            <pre class="blocks">
+let running = false
+input.onButtonPressed(Button.AB, function () {
+    running = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+            </pre>
+          </div>
+        </div>
+        <div class="block-entry-explain">
+          Establece <code>running = false</code> para que el bucle del Botón A salga en su próxima verificación, luego corta ambos motores de inmediato. Úsalo si el robot se dirige a un lugar donde no debería.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INTERACTIVE CALCULATOR -->
+  <div class="section">
+    <div class="section-label">Vista Previa Interactiva</div>
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <span class="calc-header-title">Prueba un valor de SPEED</span>
+        <span style="font-size:.75rem;color:var(--muted);">Refleja lo que el robot calcula al presionar el Botón A</span>
+      </div>
+      <div class="calc-body">
+        <div class="slider-group">
+          <div class="slider-top">
+            <span class="slider-name">SPEED</span>
+            <span class="slider-val" id="c-speed-val">10</span>
+          </div>
+          <input type="range" id="c-speed" min="1" max="20" value="10" oninput="calcRecalc()" />
+          <div class="slider-sub">Presiona B en el micro:bit v2 para ciclar este mismo rango en vivo sin volver a programar</div>
+        </div>
+
+        <div class="outputs-grid">
+          <div class="out-cell">
+            <div class="out-label">Potencia del Motor</div>
+            <div class="out-val" id="out-pwr" style="color:var(--cyan)">50%</div>
+            <div class="out-unit">ambos motores</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Duración de Conducción</div>
+            <div class="out-val" style="color:var(--yellow)">2.0</div>
+            <div class="out-unit">segundos</div>
+          </div>
+          <div class="out-cell">
+            <div class="out-label">Tiempo de Vista Previa</div>
+            <div class="out-val" style="color:var(--slate)">~2.1</div>
+            <div class="out-unit">seg (desplazamiento + barra)</div>
+          </div>
+        </div>
+
+        <div class="power-meter">
+          <div class="pm-label">Potencia del motor — <span id="pm-label-pct">50%</span></div>
+          <div class="pm-track">
+            <div class="pm-fill" id="pm-fill" style="width:50%"></div>
+          </div>
+          <div class="pm-markers">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW BUTTON B WORKS -->
+  <div class="section">
+    <div class="section-label">¿Cómo Funciona el Ciclo del Botón B?</div>
+    <div class="card">
+      <p style="font-size:.875rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">El Botón B cambia SPEED en memoria sin tocar el programa grabado. Cada pulsación agrega 1 a SPEED. Cuando SPEED llega a 20, la siguiente pulsación lo devuelve a 1.</p>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-family:var(--mono);font-size:.8rem;">
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">1</span>
+        <span style="color:var(--slate)">→</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">2</span>
+        <span style="color:var(--slate)">→ · · · →</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">20</span>
+        <span style="color:var(--slate)">→</span>
+        <span style="background:var(--navy3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:4px;color:var(--cyan)">1</span>
+        <span style="color:var(--slate)">→ · · ·</span>
+      </div>
+      <div class="callout info" style="margin-top:.875rem;">
+        <span class="callout-icon">ℹ️</span>
+        <div>El nuevo SPEED solo surte efecto la próxima vez que presiones A. Presionar B a mitad de una ejecución cambia el valor en memoria pero no afecta la conducción actual — <code style="font-family:var(--mono);font-size:.8rem;background:rgba(0,0,0,.3);padding:.1em .3em;border-radius:3px;">currentPower</code> ya fue calculado cuando presionaste A.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSTANTS -->
+  <div class="section">
+    <div class="section-label">Variables y Constantes</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="const-table">
+        <thead>
+          <tr><th>Nombre</th><th>Valor</th><th>Propósito</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="const-name">SPEED</td>
+            <td class="const-val">1</td>
+            <td class="const-note">Estadística de velocidad inicial — configura en 1 en el código antes de descargar, luego cicla con el Botón B</td>
+          </tr>
+          <tr>
+            <td class="const-name">TEST_DURATION_MS</td>
+            <td class="const-val">2000</td>
+            <td class="const-note">Cuánto tiempo conduce el robot en cada pulsación de A (milisegundos). Configura esto en 2000 en el código antes de descargar</td>
+          </tr>
+          <tr>
+            <td class="const-name">currentPower</td>
+            <td class="const-note">calculado</td>
+            <td class="const-note">(SPEED × 100)/20 — el valor PWM real enviado a ambos motores</td>
+          </tr>
+          <tr>
+            <td class="const-name">running</td>
+            <td class="const-val">false</td>
+            <td class="const-note">Bandera que la parada de emergencia A+B establece en false, causando que el bucle de conducción salga</td>
+          </tr>
+          <tr>
+            <td class="const-name">testStart</td>
+            <td class="const-note">computed</td>
+            <td class="const-note">Marca de tiempo (ms) cuando comienza el bucle de conducción — usada para medir el tiempo transcurrido</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="section">
+    <div class="section-label">Cómo Usar Este Programa</div>
+    <div class="card">
+      <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">1</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Configura TEST_DURATION_MS en 2000 y SPEED en 1 en el código. Luego descarga el programa.</strong></span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">2</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Configura un SPEED con el Botón B.</strong> Cada pulsación agrega 1. El número desplazándose confirma el valor actual. Deténte cuando llegues a la estadística que quieres probar.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">3</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Coloca el robot en una trayectoria recta y despejada.</strong> Conduce durante 2 segundos y luego se detiene. Marca dónde comienza y dónde termina.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">4</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Presiona A para ejecutar.</strong> Observa la vista previa (número → barra), luego conduce. Presiona A+B en cualquier momento para detener antes.</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">5</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Compara velocidades.</strong> Presiona B para subir SPEED, reposiciona el robot en la misma línea de inicio, presiona A de nuevo. Compara cuánto recorre.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="callout warn" style="margin-top:.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>El robot no tiene sensores activos durante esta prueba.</strong> Conduce a ciegas durante 2 segundos. Asegúrate de que la trayectoria esté despejada — se saldrá de una mesa o chocará contra una pared sin detenerse.</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+  // ── Speed reference table ────────────────────────────────────────────
+  (function buildTable() {
+    const tbody = document.getElementById('sp-tbody');
+    for (let spd = 1; spd <= 20; spd++) {
+      const pwr = spd * 5;
+      const color = pwr >= 75 ? '#00C97A' : pwr >= 40 ? '#FFD166' : '#9AA3B2';
+      const tr = document.createElement('tr');
+      if (spd === 10) tr.className = 'highlight';
+      tr.innerHTML = `
+        <td style="font-family:var(--mono);font-weight:700;color:var(--cyan)">${spd}</td>
+        <td style="font-family:var(--mono);font-weight:700;color:${color}">${pwr}%</td>
+        <td>
+          <div class="bar-wrap">
+            <div class="bar-bg">
+              <div class="bar-fill" style="width:${pwr}%;background:${color};"></div>
+            </div>
+            <span class="bar-pct" style="color:${color}">${pwr}%</span>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    }
+  })();
+
+  // ── Interactive calculator ───────────────────────────────────────────
+  function calcRecalc() {
+    const spd = parseInt(document.getElementById('c-speed').value);
+    const pwr = spd * 5;
+    const color = pwr >= 75 ? '#00C97A' : pwr >= 40 ? '#FFD166' : '#9AA3B2';
+
+    document.getElementById('c-speed-val').textContent = spd;
+    document.getElementById('out-pwr').textContent = pwr + '%';
+    document.getElementById('out-pwr').style.color  = color;
+    document.getElementById('pm-fill').style.width   = pwr + '%';
+    document.getElementById('pm-fill').style.background = `linear-gradient(90deg, #007A99, ${color})`;
+    document.getElementById('pm-label-pct').textContent = pwr + '%';
+  }
+
+  calcRecalc();
+</script>
+
+<!-- ── MAKECODE BLOCKS RENDERER ───────────────────────────── -->
+<script>
+(function () {
+  var MAKECODE_URL = "https://makecode.microbit.org/";
+  var EXTENSION_PACKAGE = "pxt-cutebotpro=github:elecfreaks/pxt-Cutebot-Pro";
+  var blockId = 0;
+  function injectRenderer() {
+    var f = document.createElement("iframe");
+    f.id = "makecoderenderer";
+    f.style.cssText = "position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;";
+    f.src = MAKECODE_URL + "--docs?render=1&lang=en";
+    document.body.appendChild(f);
+  }
+  function renderPre(pre) {
+    var f = document.getElementById("makecoderenderer");
+    if (!f) return;
+    f.contentWindow.postMessage({
+      type: "renderblocks",
+      id: pre.id,
+      code: pre.textContent.trim(),
+      options: { package: EXTENSION_PACKAGE, snippetMode: true }
+    }, MAKECODE_URL);
+  }
+  window.addEventListener("message", function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== "makecode") return;
+    if (msg.type === "renderready") {
+      document.querySelectorAll("pre.blocks").forEach(function (pre) {
+        pre.id = "pxt-block-" + (blockId++);
+        renderPre(pre);
+      });
+    }
+    if (msg.type === "renderblocks") {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var area = pre.closest ? pre.closest(".blocks-render-area") : pre.parentNode;
+      var loader = area ? area.querySelector(".blocks-loading") : null;
+      if (msg.uri) {
+        var img = document.createElement("img");
+        img.src = msg.uri; img.width = msg.width; img.height = msg.height;
+        img.alt = "MakeCode blocks";
+        img.style.cssText = "max-width:100%;height:auto;display:block;border-radius:6px;";
+        if (loader) loader.remove();
+        pre.remove();
+        if (area) area.appendChild(img);
+      } else {
+        console.log("[MakeCode render error] id=" + msg.id + " error=" + msg.error);
+        if (loader) loader.innerHTML = "<span style='font-size:12px;color:#888;'>Vista previa de bloques no disponible</span>";
+        pre.remove();
+      }
+    }
+  }, false);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectRenderer);
+  } else {
+    injectRenderer();
+  }
+})();
+</script>
+
+</body>
+</html>
