@@ -83,6 +83,8 @@ const DAYS_DEFAULT = [
         "description": "You get your BBC micro:bit and Cutebot Pro. Program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record the distance. Then program Speed = 6 (30%) and repeat. Enter both rows in your dashboard and answer: did doubling Speed points double your distance?",
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware.",
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
+        "makecode":"https://makecode.microbit.org/S57517-06163-23657-62024",
+      
         "worksheet": "https://drive.google.com/file/d/1B9ZoQrgAhE6vG3juLvuBR4xoRz5K6jHJ/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
@@ -159,7 +161,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams open MakeCode and write code that reduces the bot's motor power over time based on their Endurance allocation. They test by running the bot for 2 minutes, recording distance in the first 30 seconds vs. the last 30 seconds. Each team writes one sentence about the gap between what the formula predicted and what actually happened -- that gap is the productive noticing.",
         "script": "https://docs.google.com/document/d/1DC_OoLC1Cz_QbwkvVGKaorM9pTOcouWny7Sw4qrqLaw/edit?usp=drivesdk",
         "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html",
+        "makecode": "https://makecode.microbit.org/S47582-44774-29551-96874"
       },
       {
         "name": "Break",
@@ -268,8 +271,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S65859-48740-99528-19122",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
+       "makecode":"https://makecode.microbit.org/S65859-48740-99528-19122",
+         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -845,8 +848,8 @@ const DAYS_DEFAULT = [
         "name": "Distance Formula: How Far Did the Ball Travel",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Three coordinate positions anchor the whole activity: A = (4,2) tip-off, G = (8,2) goal center, B = your team's estimated ball-landing point from a Season 1 match. Using d = sqrt((x2-x1)^2 + (y2-y1)^2), calculate three distances: A to G (set up the formula, then confirm the horizontal shortcut gives the same answer), A to B (full formula), B to G (estimate first, then calculate). Then: write a one-sentence comparison of movement vs. useful progress, calculate your efficiency ratio (useful progress divided by total movement), use it to estimate the minimum number of charges needed to score from A, and write one sentence naming which stat allocation drove that number. Exit ticket is non-optional -- two problems, collected before dismissal.",
-        "facilitatorDescription": "Three positions are fixed for the whole class: A = (4,2) tip-off, G = (8,2) goal, B = each team's own Season 1 ball-landing estimate. Every team runs the same formula but gets different numbers because B is team-specific -- that variation is the point. Watch for three errors: (1) sum-then-square mistake -- students add first then square instead of squaring each difference separately; (2) skipping the square root entirely; (3) efficiency ratio inverted -- total divided by useful instead of useful divided by total. For any B that is farther from G than A is, do not correct the geometry -- ask the team what it says about that match. The exit ticket is non-optional: collect before dismissal. The efficiency ratio and minimum-charges calculation set up the Season 2 reallocation argument on Day 11 -- teams with a low ratio leave with a specific number to argue against.",
+        "description": "Three coordinate positions anchor the whole activity: A = (4,2) tip-off, G = (8,2) goal center, B = your team's estimated ball-landing point from a Season 1 match. Using d = sqrt((x2-x1)^2 + (y2-y1)^2), calculate three distances: A to G (set up the formula, then confirm the horizontal shortcut gives the same answer), A to B (full formula), B to G (estimate first, then calculate). Then: write a one-sentence comparison of movement vs. useful progress, calculate your efficiency ratio (useful progress divided by total movement), use it to estimate the minimum number of charges needed to score from A, and write one sentence naming which stat allocation drove that number.",
+        "facilitatorDescription": "Three positions are fixed for the whole class: A = (4,2) tip-off, G = (8,2) goal, B = each team's own Season 1 ball-landing estimate. Every team runs the same formula but gets different numbers because B is team-specific -- that variation is the point.  ",
          "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1reQoXFXaUQ-FidUnysXkSfSf9mAlaiz0/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html",
