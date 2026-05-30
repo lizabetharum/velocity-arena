@@ -87,7 +87,7 @@ const DAY_15_INLINE = {
     "day": 15,
     "week": 4,
     "weekName": "Showcase Week",
-    "theme": "Creative Expression: Bot Identity + Scouting Begins + Season 3 Begins",
+    "theme": "Creative Expression: Bot Identity + Match 3",
     "bigMathIdea": "Verbal explanation of mathematical reasoning. Every claim in a pitch needs a number next to it. Scouting reports cite opponent stats as percentages and decay equations.",
     "vocabulary": "PITCH, SCOUTING REPORT. A pitch is a 2-minute mathematical argument: claim, evidence, calculation. Scouting reports turn a rival's stat allocation into percentages and equations you can plan against.",
     "activities": [
