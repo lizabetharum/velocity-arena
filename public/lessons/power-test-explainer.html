@@ -616,7 +616,7 @@
           <ul>
             <li>Only runs if contact was made (not border hit)</li>
             <li>Switches to <strong style="color:var(--cyan)">currentPower</strong> (cruise speed)</li>
-            <li>Duration = POWER × 80 ms</li>
+            <li>Duration = 120 + (POWER × 35) ms</li>
             <li>Still checks border — stops immediately if hit</li>
             <li>Reverses 300 ms then stops</li>
           </ul>
@@ -752,7 +752,7 @@ let enduranceFactor = 0
 function computeStats () {
     currentPower = SPEED * 100 / 20
     chargePower = Math.min(POWER * POWER, 100)
-    FOLLOW_THROUGH_MS = POWER * 80
+    FOLLOW_THROUGH_MS = 120 + POWER * 35
     DECAY_RATE = 20 - ENDURANCE
     endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
     endurancePercent = Math.max(endurancePercent, 20)
@@ -764,7 +764,7 @@ function computeStats () {
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>Everything derived from your four stats happens here.</strong> <code>currentPower</code> is your cruise speed — used during follow-through. <code>chargePower</code> is POWER squared, capped at 100. <code>FOLLOW_THROUGH_MS</code> is POWER × 80 ms. Then endurance decay shrinks all power values based on how far into the match you are. Both floors out at 15% minimum.
+            <strong>Everything derived from your four stats happens here.</strong> <code>currentPower</code> is your cruise speed — used during follow-through. <code>chargePower</code> is POWER squared, capped at 100. <code>FOLLOW_THROUGH_MS</code> is 120 + (POWER × 35) ms. Then endurance decay shrinks all power values based on how far into the match you are. Both floors out at 15% minimum.
           </div>
         </div>
       </div>
@@ -1044,7 +1044,7 @@ function checkBorder () {
 
     <div class="formula-box">
       <div class="formula-label">Follow-Through Duration</div>
-      <div class="formula-eq">FOLLOW_THROUGH_MS = POWER × 80 ms</div>
+      <div class="formula-eq">FOLLOW_THROUGH_MS = 120 + POWER × 35 ms</div>
       <div class="formula-note">Higher POWER gives both a harder initial hit <em>and</em> a longer sustained push after contact.</div>
     </div>
 
@@ -1060,7 +1060,7 @@ function checkBorder () {
 
     <div class="power-quad-note">
       <p>⚡ <strong>POWER is quadratic.</strong> Going from POWER=5 to POWER=6 adds 11 percentage points of charge power (<code>36−25=11</code>). Going from POWER=9 to POWER=10 adds 19 points (<code>100−81=19</code>). Every POWER point you add is worth more than the last. Investing heavily in POWER has sharply increasing returns — but costs stat budget that can't go to SPEED or ENDURANCE.</p>
-      <p><strong>One limit:</strong> Season 1 data shows P9 outscores P10. The quadratic growth is real — but follow-through that's too long drives the bot past the ball rather than through it. There's a sweet spot, and it's P9, not P10.</p>
+      <p><strong>One open question:</strong> the previous follow-through formula made the bot overshoot at high POWER, capping the practical sweet spot at P9. The new formula, <code>120 + (POWER × 35)</code>, produces much shorter follow-throughs at every P (P9 → 435 ms, P10 → 470 ms). Whether overshoot still bites at the top of the range — or whether the sweet spot has moved — is a Season 1 question. Compare your kick distances at each POWER value and let the match data decide.</p>
     </div>
 
     <div class="callout warn" style="margin-top:.75rem;">
@@ -1100,7 +1100,7 @@ function checkBorder () {
             <span class="slider-val" style="color:var(--orange)" id="val-power">5</span>
           </div>
           <input type="range" class="s-power" id="sl-power" min="0" max="20" value="5" oninput="recalc()" />
-          <div class="slider-sub">Charge power = POWER² (capped at 100%) · Follow-through = POWER × 80 ms</div>
+          <div class="slider-sub">Charge power = POWER² (capped at 100%) · Follow-through = 120 + (POWER × 35) ms</div>
         </div>
 
         <!-- Match time selector -->
@@ -1312,7 +1312,7 @@ function checkBorder () {
     // Compute base stats
     const basePower    = SPEED * 5;
     const baseCharge   = Math.min(POWER * POWER, 100);
-    const followMs     = POWER * 80;
+    const followMs     = 120 + POWER * 35;
     const decayRate    = 20 - ENDURANCE;
 
     document.getElementById('out-basecharge').textContent = baseCharge + '%';

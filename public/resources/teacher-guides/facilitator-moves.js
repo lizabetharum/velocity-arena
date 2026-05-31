@@ -1,10 +1,10 @@
 // Velocity Arena — Facilitator Activity Guide data.
 // One entry per activity per day (what the facilitator does), keyed by
 // camp day. Loaded by toolkit-facilitator-guide.html and rendered in its
-// daily one-pager. Follow-Through uses P × 80 (current formula).
+// daily one-pager. Follow-Through uses 120 + (P × 35) (current formula).
 // What the facilitator does, one entry per activity per day (from the
 // Facilitator Activity Guide). Keyed by day id; rendered in showDay().
-// Note: Follow-Through uses P × 80 (current formula), not the doc's P × 200.
+// Note: Follow-Through uses 120 + (P × 35) (current formula), not the doc's P × 200.
 const FAC_MOVES = {
   1: [
     {a:"Hook — Circle Pass and Mirror Pairs", t:"Open Day 1 with two back-to-back trust games. In Circle Pass, someone makes a sound and a movement — any sound, any movement. The person to the left copies exactly what the first person did, then immediately adds their own. It travels around the ring. There is no correct version of this. If someone blanks, copy the person before and change one small thing, keeping energy light and low-stakes. In Mirror Pairs, face your partner. One of you leads. One of you mirrors. The leader moves slowly and deliberately — arms, head, body, whatever. The mirror copies exactly, in real time. Move slowly enough that your partner can stay with you.No talking. No judging. No winner. Round 2 is the Swap. The mirror becomes the leader. Round 3 has no leader. Just move together. The goal is building physical presence and group trust before any math or bot work begins — not explaining the purpose of the games, just running them."},

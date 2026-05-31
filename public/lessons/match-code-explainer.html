@@ -350,7 +350,7 @@
       <span class="comment">// What each stat controls (all computed in computeStats)</span><br>
       currentPower &nbsp;= SPEED × 100 / 20 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// starting cruise speed (SPEED 4 → 20%, SPEED 10 → 50%)</span><br>
       chargePower &nbsp;&nbsp;= min(POWER², 100) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// POWER 3 → 9, POWER 7 → 49, POWER 10 → 100 — exponential!</span><br>
-      FOLLOW_THROUGH_MS = POWER × 80 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// how long to push after contact (POWER 3 → 240ms)</span><br>
+      FOLLOW_THROUGH_MS = 120 + POWER × 35 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// how long to push after contact (POWER 3 → 225ms, POWER 10 → 470ms)</span><br>
       thisDuration &nbsp;= (BASE_SEGMENT_MS × 12) / TURNING &nbsp;<span class="comment">// each arc segment's duration</span><br>
       turnRatio &nbsp;&nbsp;&nbsp;&nbsp;= 0.2 + TURNING × 0.02 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// arc tightness (cap: 0.4)</span><br>
       DECAY_RATE &nbsp;&nbsp;&nbsp;= 20 − ENDURANCE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// how fast currentPower drops during the match</span>
@@ -466,7 +466,7 @@ let POWER = 3
           </div>
           <div class="step">
             <div class="step-num">4</div>
-            <div class="step-text"><code class="gold">POWER</code> — Charge power (POWER²) and follow-through duration (POWER × 80ms). Scales exponentially — a point at POWER 9 is far more impactful than a point at POWER 3.</div>
+            <div class="step-text"><code class="gold">POWER</code> — Charge power (POWER²) and follow-through duration (120 + (POWER × 35) ms). Scales exponentially — a point at POWER 9 is far more impactful than a point at POWER 3.</div>
           </div>
         </div>
       </div>
@@ -585,7 +585,7 @@ let DECAY_RATE = 0
 function computeStats () {
     currentPower = SPEED * 100 / 20
     chargePower = Math.min(POWER * POWER, 100)
-    FOLLOW_THROUGH_MS = POWER * 80
+    FOLLOW_THROUGH_MS = 120 + POWER * 35
     totalArcTime = BASE_SEGMENT_MS * 12
     thisDuration = Math.round(totalArcTime / TURNING)
     turnRatio = 0.2 + TURNING * 0.02
@@ -599,7 +599,7 @@ function computeStats () {
         <div class="steps">
           <div class="step"><div class="step-num">1</div><div class="step-text"><code>currentPower = SPEED × 100 / 20</code> — Starting motor speed as a percentage. This value decays during the match based on DECAY_RATE.</div></div>
           <div class="step"><div class="step-num">2</div><div class="step-text"><code>chargePower = min(POWER², 100)</code> — Exponential scaling. POWER 3 → 9. POWER 7 → 49. POWER 10 → 100. Capped so it can't exceed 100% PWM.</div></div>
-          <div class="step"><div class="step-num">3</div><div class="step-text"><code>FOLLOW_THROUGH_MS = POWER × 80</code> — Duration of the follow-through push after making contact. POWER 3 → 240ms. POWER 7 → 560ms.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><code>FOLLOW_THROUGH_MS = 120 + POWER × 35</code> — Duration of the follow-through push after making contact. Linear, but with a 120ms floor — even POWER 0 still gets a baseline push. POWER 3 → 225ms. POWER 7 → 365ms.</div></div>
           <div class="step"><div class="step-num">4</div><div class="step-text"><code>thisDuration = (BASE_SEGMENT_MS × 12) / TURNING</code> — Each arc segment's duration. BASE_SEGMENT_MS is 1800ms, so totalArcTime = 21600ms. TURNING 7 → ~3086ms per segment.</div></div>
           <div class="step"><div class="step-num">5</div><div class="step-text"><code>turnRatio = 0.2 + TURNING × 0.02</code> (cap 0.4) — How much one motor's power is boosted vs the other during an arc. Higher TURNING = sharper arcs.</div></div>
           <div class="step"><div class="step-num">6</div><div class="step-text"><code>DECAY_RATE = 20 − ENDURANCE</code> — Plugged into the decay formula every loop iteration. Higher ENDURANCE = lower decay rate = bot stays faster longer.</div></div>
@@ -894,7 +894,7 @@ function chargeAndFollowThrough () {
         </pre>
       </div>
       <div class="block-explain">
-        <p>Runs when <code>ballDetected = true</code>. Charges at full power, follows through for POWER × 80ms, then backs up. Border-aware throughout — if the bot hits the wall during the charge, it stops and skips the follow-through.</p>
+        <p>Runs when <code>ballDetected = true</code>. Charges at full power, follows through for 120 + (POWER × 35) ms, then backs up. Border-aware throughout — if the bot hits the wall during the charge, it stops and skips the follow-through.</p>
         <div class="steps">
           <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Effective charge power is scaled by enduranceFactor.</strong> If the bot is at 40% endurance late in the match, charge power drops proportionally. Floored at 15 to prevent stall.</div></div>
           <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Charge loop runs until border or confirmed contact.</strong> Two consecutive ultrasonic reads ≤ 5 cm = contact confirmed. Requires 2 reads to filter sensor noise.</div></div>
@@ -1163,7 +1163,7 @@ basic.forever(function () {
       </div>
       <div class="var-row">
         <div class="var-name you-set">POWER<br><span class="tag you-set">You Set</span></div>
-        <div class="var-desc"><strong>Charge force and follow-through</strong>chargePower = min(POWER², 100). FOLLOW_THROUGH_MS = POWER × 80. Scales exponentially — the top end delivers far more impact.</div>
+        <div class="var-desc"><strong>Charge force and follow-through</strong>chargePower = min(POWER², 100). FOLLOW_THROUGH_MS = 120 + POWER × 35. Scales exponentially — the top end delivers far more impact.</div>
       </div>
     </div>
 

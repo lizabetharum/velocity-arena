@@ -84,7 +84,6 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Distribute BBC micro:bits and Cutebot Pros. Teams program Speed = 3 (15% motor power), drive on the coordinate grid for 30 seconds, and record distance. Then program Speed = 6 (30%) and repeat. Both runs go in the dashboard. The hinge question: did doubling Speed points double the distance? First hands-on bot time of the program -- protect novelty, let teams fumble with the hardware.",
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
         "makecode":"https://makecode.microbit.org/S57517-06163-23657-62024",
-      
         "worksheet": "https://drive.google.com/file/d/1B9ZoQrgAhE6vG3juLvuBR4xoRz5K6jHJ/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
@@ -162,7 +161,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1DC_OoLC1Cz_QbwkvVGKaorM9pTOcouWny7Sw4qrqLaw/edit?usp=drivesdk",
         "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html",
-        "makecode": "https://makecode.microbit.org/S47582-44774-29551-96874"
+        "makecode": "https://makecode.microbit.org/S45510-32034-77170-26887"
       },
       {
         "name": "Break",
@@ -271,7 +270,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
-       "makecode":"https://makecode.microbit.org/S65859-48740-99528-19122",
+       "makecode":"https://makecode.microbit.org/S91173-59122-99436-97223",
          "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {
@@ -319,7 +318,6 @@ const DAYS_DEFAULT = [
         "mins": 3,
         "block": "Transition",
         "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
-    
         "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
       },
@@ -327,11 +325,11 @@ const DAYS_DEFAULT = [
         "name": "Power Stat Challenge: Ratio and Motor Speed",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "Two rules go on the board: charge speed = Power², and follow through = POWER x 80. Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you.",
-        "facilitatorDescription": "Two rules on the board: charge speed = Power², follow through = POWER x 80. Teams calculate charge speed for Power = 1, 2, 4, 8 (0.5, 2, 8, 32) and the ratios between them. Side-by-side with Day 1's Speed formula: Speed is proportional (double the stat, double the output); Power is not (double the stat, quadruple the output). That contrast is the mathematical core of today. Test physically: teams program Power 4 (charge speed 8), place the bot exactly 40 cm from the ball, kick, measure. Repeat with Power 8 (charge speed 32). Both results should surprise them.",
+        "description": "Two rules go on the board: charge speed = Power², and follow through = 120 + (POWER × 35). Calculate charge speed for Power = 1, 2, 4, and 8 (giving 0.5, 2, 8, and 32). Before running the physical test, look at your Speed formula from Day 1: motor speed = (Speed / 20) x 100 -- proportional, double the stat and double the output. Power is not proportional: double the stat and you quadruple the output. Both formulas live on the same stat card. That contrast is the mathematical core of today. Then test it physically: program Power 4 (charge speed 8) into MakeCode, place your bot exactly 40 cm from the ball, drive, and measure how far the ball travels. Repeat with Power 8 (charge speed 32). Did doubling the points double kick distance? Both answers should surprise you.",
+        "facilitatorDescription": "Two rules on the board: charge speed = Power², follow through = 120 + (POWER × 35). Teams calculate charge speed for Power = 1, 2, 4, 8 (0.5, 2, 8, 32) and the ratios between them. Side-by-side with Day 1's Speed formula: Speed is proportional (double the stat, double the output); Power is not (double the stat, quadruple the output). That contrast is the mathematical core of today. Test physically: teams program Power 4 (charge speed 8), place the bot exactly 40 cm from the ball, kick, measure. Repeat with Power 8 (charge speed 32). Both results should surprise them.",
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1VYv53hKADZFrZ6SdqIb_1KwrQ6NnYTm8/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S50384-96547-11729-75922",
+        "makecode":"https://makecode.microbit.org/S25978-40655-36880-19976",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
       {
@@ -349,7 +347,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams build a cardboard front scoop for the Cutebot. One rule: it must make clean contact with the ball. Teams test at three Power settings (charge speed = Power²), run 3 shots at each from the 40 cm start line, and record kick distances in the dashboard. Each team writes: 'Quadrupling charge speed did / did not quadruple kick distance, because...' Keep the build loose -- iteration is the point, not a perfect first scoop.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S22168-97257-26692-28283",
+        "makecode":"https://makecode.microbit.org/S63963-81221-45609-58211",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
@@ -361,7 +359,7 @@ const DAYS_DEFAULT = [
       }
     ],
     "produce": [
-      "Power Stat Challenge worksheet — charge speed (P²) and follow-through (P × 80\) for P \= 1, 2, 4, 8; ratios; two ball travel distances",  
+      "Power Stat Challenge worksheet — charge speed (P²) and follow-through (120 + (P × 35)\) for P \= 1, 2, 4, 8; ratios; two ball travel distances",  
       "Cardboard scoop — built and attached to Cutebot",  
       "Scoop testing worksheet — kick distances at three Power settings, 3 shots each",  
       "Written sentence — whether quadrupling charge speed quadrupled kick distance, with reasoning",  
@@ -406,8 +404,8 @@ const DAYS_DEFAULT = [
         "name": "The Budget Constraint: Speed + Power + Turning + Endurance = 20",
         "mins": 50,
         "block": "Challenge Block",
-        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power², follow through = POWER x 80, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
-        "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power², follow through = POWER x 80, Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
+        "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power², follow through = 120 + (POWER × 35), Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
+        "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power², follow through = 120 + (POWER × 35), Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
         "script": "https://docs.google.com/document/d/1qtE-c80NIwHmAZBYp-aFF3alFVtrdfwHuow5CL9zKFg/edit?usp=drive_link",
         "worksheet":[
           {url: "https://drive.google.com/file/d/144kRGshFNWApDR3r4ZPojoxgUCethU0C/view?usp=drive_link", label: "Questions"},
