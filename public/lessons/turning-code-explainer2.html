@@ -419,14 +419,14 @@
     <div class="callout warn">
       <div class="callout-icon">⚠️</div>
       <div class="callout-text">
-        <strong>Before running:</strong> Set <code>SPEED</code> and <code>ENDURANCE</code> in the <strong>on start</strong> block to your character's actual stats. Both start at zero — leave them there and the bot won't move.
+        <strong>Before running:</strong> Set <code>SPEED</code>, <code>ENDURANCE</code>, and <code>TURNING</code> in the <strong>on start</strong> block to your character's actual stats. All three start at zero — leave them there and the bot won't move.
       </div>
     </div>
 
     <div class="callout alert">
       <div class="callout-icon">🔄</div>
       <div class="callout-text">
-        <strong>Button roles changed from the Endurance Test.</strong> Button B now cycles the TURNING value. Button A+B now cycles the simulated match time. There is no dedicated emergency stop button in this program — press A again to let the test time out, or power down the micro:bit.
+        <strong>Button roles changed from the Endurance Test.</strong> Button B now cycles the simulated match time (0 → 60 → 120 → 180 → 0s). Button A+B is the emergency stop — press both buttons together to cut motors immediately. Set the TURNING value in the on start block before uploading.
       </div>
     </div>
   </section>
@@ -443,13 +443,13 @@
       </div>
       <div class="btn-card b">
         <div class="btn-badge b">B</div>
-        <h3>Cycle TURNING Value</h3>
-        <p>Switches between 2 → 5 → 10 → 2. Each value changes the arc segment count and sharpness. Set this <em>before</em> pressing A to try a different pattern.</p>
+        <h3>Cycle Simulated Match Time</h3>
+        <p>Cycles through 0 → 60 → 120 → 180 → 0 seconds. Shows the time as text on the LED screen. Use this to simulate how endurance decay affects the arc at different points in a match.</p>
       </div>
       <div class="btn-card ab">
         <div class="btn-badge ab">A+B</div>
-        <h3>Cycle Match Time</h3>
-        <p>Cycles through 0 → 60 → 120 → 180 seconds. Shows the time as text on the LED screen. Use this to simulate how endurance decay affects the arc at different points in a match.</p>
+        <h3>Emergency Stop</h3>
+        <p>Press both buttons together to cut motors immediately and show an X on the LED screen. Use this whenever the bot heads somewhere it shouldn't.</p>
       </div>
     </div>
   </section>
@@ -559,8 +559,8 @@
         <div class="blocks-render-area" id="render-onstart">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-let TURNING = 2
-let TEST_DURATION_MS = 15000
+let TURNING = 0
+let TEST_DURATION_MS = 20000
 let BORDER_CHECK_MS = 60
 let BORDER_PIVOT_MS = 400
 let BORDER_PIVOT_POWER = 50
@@ -576,11 +576,11 @@ let ENDURANCE = 0
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-text"><code class="gold">TURNING = 2</code> — Start with the gentle 2-arc pattern. Change with Button B before running.</div>
+              <div class="step-text"><code class="gold">TURNING = 0</code> — <strong style="color:#f59e0b;">Fill this in</strong> with your character's actual stat before uploading. Try 2 for a gentle arc pattern, 5 for medium, or 10 for the sharpest possible.</div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-text"><code class="gold">TEST_DURATION_MS = 15000</code> — Each test runs for 15 seconds (15,000ms). Increase this for longer observation time.</div>
+              <div class="step-text"><code class="gold">TEST_DURATION_MS = 20000</code> — Each test runs for 20 seconds (20,000ms). Increase this for longer observation time.</div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
@@ -588,7 +588,7 @@ let ENDURANCE = 0
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-text"><code class="gold">SPEED = 0</code> and <code class="gold">ENDURANCE = 0</code> — <strong style="color:#f59e0b;">Fill these in</strong> with your character's actual stats before uploading.</div>
+              <div class="step-text"><code class="gold">SPEED = 0</code>, <code class="gold">ENDURANCE = 0</code>, and <code class="gold">TURNING = 0</code> — <strong style="color:#f59e0b;">Fill these in</strong> with your character's actual stats before uploading. All three start at zero — leave them and the bot won't move.</div>
             </div>
           </div>
         </div>
@@ -681,51 +681,13 @@ input.onButtonPressed(Button.A, function () {
     <div class="block-section">
       <div class="block-header" style="color: #7b5ea7;">
         <div class="block-dot" style="background: #7b5ea7;"></div>
-        on button B pressed — Cycle TURNING Value
+        on button B pressed — Cycle Simulated Match Time
       </div>
       <div class="block-body">
         <div class="blocks-render-area" id="render-buttonB">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
 input.onButtonPressed(Button.B, function () {
-    if (TURNING == 2) {
-        TURNING = 5
-        basic.showString("5")
-    } else if (TURNING == 5) {
-        TURNING = 10
-        basic.showString("10")
-    } else {
-        TURNING = 2
-        basic.showString("2")
-    }
-    basic.pause(500)
-    basic.clearScreen()
-})
-          </pre>
-        </div>
-        <div class="block-explain">
-          <p>Each press cycles TURNING through three values: <strong>2 → 5 → 10 → 2</strong>. The current value flashes on the LED screen so you always know what's set. Press B before pressing A to choose your arc pattern.</p>
-          <div class="callout tip" style="margin-top: 12px;">
-            <div class="callout-icon">✅</div>
-            <div class="callout-text">
-              <strong>Try all three in sequence.</strong> Run at TURNING = 2, watch the path. Press B, run at TURNING = 5. Press B again, run at TURNING = 10. The bot should trace a visibly different pattern each time.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BUTTON A+B -->
-    <div class="block-section">
-      <div class="block-header" style="color: #14b8a6;">
-        <div class="block-dot" style="background: #14b8a6;"></div>
-        on button A+B pressed — Cycle Simulated Match Time
-      </div>
-      <div class="block-body">
-        <div class="blocks-render-area" id="render-buttonAB">
-          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
-          <pre class="blocks">
-input.onButtonPressed(Button.AB, function () {
     if (simulatedMatchTime == 0) {
         simulatedMatchTime = 60
         basic.showString("60s")
@@ -745,11 +707,48 @@ input.onButtonPressed(Button.AB, function () {
           </pre>
         </div>
         <div class="block-explain">
-          <p>Cycles the simulated match time: 0 → 60 → 120 → 180 → 0. The current time shows as text on the LED screen (e.g. "60s"). This feeds into <code>computeStats</code> to apply endurance decay — so you can feel how a tired bot arcs differently at the end of a match.</p>
-          <div class="callout alert" style="margin-top: 12px;">
-            <div class="callout-icon">⚡</div>
+          <p>Cycles the simulated match time: <strong>0 → 60 → 120 → 180 → 0</strong>. The current time shows as text on the LED screen (e.g. "60s"). This feeds into <code>computeStats</code> to apply endurance decay — so you can feel how a tired bot arcs differently at the end of a match.</p>
+          <div class="callout tip" style="margin-top: 12px;">
+            <div class="callout-icon">✅</div>
             <div class="callout-text">
-              <strong>This is not an emergency stop.</strong> If you need to stop the bot urgently, let the test time out or power down the micro:bit. There is no emergency stop button in this program.
+              <strong>Set time before pressing A.</strong> Press B to advance the simulated match time, then press A to run with that decay applied. Compare 0s vs. 180s with the same TURNING value to see how a tired bot's arc shape changes.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUTTON A+B -->
+    <div class="block-section">
+      <div class="block-header" style="color: #14b8a6;">
+        <div class="block-dot" style="background: #14b8a6;"></div>
+        on button A+B pressed — Emergency Stop
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-buttonAB">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+input.onButtonPressed(Button.AB, function () {
+    running = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Press both buttons together to cut motors immediately. Sets <code>running = false</code> so any in-progress test loop exits, calls <code>stopImmediately</code> to kill power to both wheels, and flashes an <strong>X</strong> on the LED screen to confirm the stop.</p>
+          <div class="callout tip" style="margin-top: 12px;">
+            <div class="callout-icon">🛑</div>
+            <div class="callout-text">
+              <strong>Use A+B whenever the bot heads somewhere it shouldn't.</strong> The X is your signal that motors are off. After a stop, press A to start a new test from the beginning.
             </div>
           </div>
         </div>
@@ -999,8 +998,8 @@ function handleBorder () {
         <div class="var-desc"><strong>Your character's endurance stat</strong>Controls how much motor power fades over simulated match time. Low ENDURANCE = noticeable slowdown at 180s.</div>
       </div>
       <div class="var-row">
-        <div class="var-name you-set">TURNING <span class="tag you-set">You Set (via B)</span></div>
-        <div class="var-desc"><strong>Number of arc segments per driving cycle</strong>Set by pressing Button B. Options: 2, 5, or 10. Controls both the segment count and the arc sharpness (via turnRatio).</div>
+        <div class="var-name you-set">TURNING <span class="tag you-set">You Set</span></div>
+        <div class="var-desc"><strong>Number of arc segments per driving cycle</strong>Set in the on start block before uploading. Try 2, 5, or 10. Controls both the segment count and the arc sharpness (via turnRatio).</div>
       </div>
       <div class="var-row">
         <div class="var-name new">turnRatio <span class="tag new-tag">New</span></div>
@@ -1028,7 +1027,7 @@ function handleBorder () {
       </div>
       <div class="var-row">
         <div class="var-name computed">simulatedMatchTime <span class="tag auto">Auto</span></div>
-        <div class="var-desc"><strong>Fake "time into the match" for endurance testing</strong>Set by pressing A+B. 0 = start, 180 = near the end. Passed to computeStats to apply decay.</div>
+        <div class="var-desc"><strong>Fake "time into the match" for endurance testing</strong>Set by pressing Button B. 0 = start, 180 = near the end. Passed to computeStats to apply decay.</div>
       </div>
       <div class="var-row">
         <div class="var-name constant">BASE_SEGMENT_MS <span class="tag constant">Constant</span></div>
@@ -1049,7 +1048,7 @@ function handleBorder () {
       <div class="tip-card">
         <div class="tip-number">01</div>
         <h3>Set stats before uploading</h3>
-        <p>Find <code style="font-size:11px;">SPEED = 0</code> and <code style="font-size:11px;">ENDURANCE = 0</code> in the on start block. Replace zeros with your character's actual values or nothing will move.</p>
+        <p>Find <code style="font-size:11px;">SPEED = 0</code>, <code style="font-size:11px;">ENDURANCE = 0</code>, and <code style="font-size:11px;">TURNING = 0</code> in the on start block. Replace all three zeros with your character's actual values — leave any at zero and nothing will move.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">02</div>
@@ -1059,12 +1058,12 @@ function handleBorder () {
       <div class="tip-card">
         <div class="tip-number">03</div>
         <h3>Combine TURNING + match time</h3>
-        <p>Set match time to 180s with A+B, then run your chosen TURNING value. Compare to 0s. If the arcs are noticeably tighter or slower, ENDURANCE is affecting your arc style.</p>
+        <p>Set match time to 180s with Button B, then run your chosen TURNING value. Compare to 0s. If the arcs are noticeably tighter or slower, ENDURANCE is affecting your arc style.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">04</div>
         <h3>Watch the border recovery</h3>
-        <p>Use a longer TEST_DURATION_MS (e.g. 20000 = 20s) to give the bot more time to hit the border and recover. See how handleBorder adjusts the arc direction after each incident.</p>
+        <p>Use a longer TEST_DURATION_MS (e.g. 30000 = 30s) to give the bot more time to hit the border and recover. See how handleBorder adjusts the arc direction after each incident.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">05</div>
@@ -1073,8 +1072,8 @@ function handleBorder () {
       </div>
       <div class="tip-card">
         <div class="tip-number">06</div>
-        <h3>No emergency stop — plan ahead</h3>
-        <p>A+B is not a stop button here. Place the bot in a safe area before testing, stay close to the power switch, and use a shorter TEST_DURATION_MS if you're worried about runaway behavior.</p>
+        <h3>Keep A+B within reach</h3>
+        <p>A+B is the emergency stop. Stay close to the bot, and press both buttons together the moment it heads somewhere it shouldn't. The X on the LED screen confirms motors are off.</p>
       </div>
     </div>
   </section>
