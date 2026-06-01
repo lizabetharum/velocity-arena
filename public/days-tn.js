@@ -99,7 +99,8 @@ const DAY_15_INLINE = {
         "facilitatorDescription": "Teams walk the room and re-read every bot origin story from Day 2. Each team writes one new sentence to add to their bot's lore — something that only makes sense because they played Seasons 1 and 2. Posts go back on the wall.",
         "script": "https://docs.google.com/document/d/1a7VLmihhAGvqVlVV43-5ZNT9fgtdltZcUdYa1JFT18g/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1LfW7zfZQbsOkv5RPL6MsJdMhu60F8KWZ/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-01-bot-lore-gallery-walk.html"
+       "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D15-bot-lore-gallery-walk-exemplars.html",
+       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-01-bot-lore-gallery-walk.html"
       },
       {
         "name": "Teach the Math",
@@ -109,7 +110,8 @@ const DAY_15_INLINE = {
         "facilitatorDescription": "Teach the Math round: 3 minutes per team to explain one calculation in plain terms (no bot jargon). Room asks one follow-up per team: 'How did you get that specific number?' If the answer requires a calculation, do it on the board in real time.",
         "script": "https://docs.google.com/document/d/1BUI5_XlppNhAiimv8aDCcuHaWTYVaPKSX_4rOGvZ1yU/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1YxCKCOr07VSMC8RnMHKfDmvni1-6dBP4/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-02-pitch-rehearsal-teach-math.html"
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D15-pitchcard-exemplars.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-02-teach-math.html"
       },
       {
         "name": "Lunch / Snack Break",

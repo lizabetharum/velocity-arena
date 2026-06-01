@@ -164,6 +164,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1DC_OoLC1Cz_QbwkvVGKaorM9pTOcouWny7Sw4qrqLaw/edit?usp=drivesdk",
         "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D2-endurance-exemplars.html",
         "makecode": "https://makecode.microbit.org/S45510-32034-77170-26887"
       },
       {
@@ -187,7 +188,7 @@ const DAYS_DEFAULT = [
         "mins": 40,
         "block": "Match-Build-Make",
         "description": "Your team names your bot. Then you write exactly one sentence explaining what it is fighting for. The name and sentence go on the wall right now and stay there for all four weeks.",
-        "facilitatorDescription": "Teams name their bot and write exactly one sentence explaining what it is fighting for. Name and sentence go on the wall at the end of the session and stay there for all four weeks. First permanent artifact of the program -- treat the ceremony with some weight. Do not skip the wall posting.",
+        "facilitatorDescription": "Teams name their bot and write exactly one sentence explaining what it is fighting for. Name and sentence go on the wall at the end of the session and stay there for all four weeks. First permanent artifact of the program -- treat the ceremony with some weight. Do not skip the wall posting. <br />x = letters in first name, <br />y = birth month,<br />z = team number.",
         "link": "/activities/robot-names/index.html",
         "script": "https://docs.google.com/document/d/1Ki8OW7XWCVaRnMMvXk0Guxgh3DN2GZP4NRWGJ4UyoWU/edit?usp=drivesdk",
         "webpage": "https://velocity-arena-bsowh3els-nycfirsts-projects.vercel.app/activities/robot-names/index.html",
@@ -355,6 +356,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
         "makecode":"https://makecode.microbit.org/S63963-81221-45609-58211",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D5-scoop-build-ratio-testing-exemplars.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
@@ -448,7 +450,7 @@ const DAYS_DEFAULT = [
         "description": "Teams enter their 20-point stat loadout into the dashboard and learn the Simulation Lab. The dashboard is in pre-trial mode this week — only two sections are visible: Stat Loadout, where teams type in their four stat values and confirm the total equals exactly 20, and Simulation Lab, where teams log a gap sentence for every simulation round. A gap sentence has three parts: what the formula predicted, what the bot actually did, and the gap stated as a number. Every gap sentence logged this week feeds the Friday reflection question: for one simulation round, what was the gap between formula and reality?",
         "facilitatorDescription": "Open the dashboard at /activities/dashboard/velocity-arena-dashboard.html on the projector before students arrive. Confirm it is in Auto mode and shows only Stat Loadout and Simulation Lab — if the Match Log is visible, the View is wrong. Do not walk through Match Log columns. Students cannot see them and you will confuse them. Take verbal confirmation of each team's four stats and total before anyone opens their device. Run the loadout entry first, then the Simulation Lab. Model a complete gap sentence live: state the formula prediction, state what the bot did, state the gap as a number. The gap sentence format is non-negotiable — vague entries with no number are not accepted. Confirm each team's Data Owner before the session ends. Every team must pass the exit check: loadout total equals 20, gap sentence has three parts, Data Owner is named.",
         "script": "https://docs.google.com/document/d/1HZHM4CU6kodt298jeO6lzRn6O2o0x_n89aCiptxY0xY/edit?usp=sharing",
-        "worksheet":"https://docs.google.com/document/d/1PF0aj4YsLBO4HhphJ2yq1g42oZlClQpwL_v2JjEty5I/edit?usp=sharing",
+        "worksheet":"https://drive.google.com/file/d/1HFMssvjVCafi8mMZP6bqUBooFbcEue1c/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-dashboard-introduction.html"
       },
       
@@ -517,6 +519,7 @@ const DAYS_DEFAULT = [
           { url: "https://drive.google.com/file/d/1vpbdrqpAyFEU8Rth55wJor90qT1f0SGg/view?usp=drive_link", label: "Questions" },
           { url: "https://drive.google.com/file/d/1HTKprechKjPNoACQ-fWBMvjIPoCIACLS/view?usp=drive_link", label: "Answer Key" }
         ],
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6-interleaved-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-02-interleaved-problem-set.html"
       },
       {
@@ -533,7 +536,8 @@ const DAYS_DEFAULT = [
         "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
         "facilitatorDescription": "Teams plot three coordinate points -- starting position, tip-off at (4, 2), and goal at (8, 2) -- then calculate approach distance and use the Speed formula to predict travel time. The sentence justification is a quality gate: vague reasoning gets sent back once, no repeat explanations. Common issue: teams conflate straight-line distance with actual bot path. Don't correct the geometry -- let the testing block surface it. The prediction they write here is the number they'll check against real bot behavior in the next block.",
         "script": "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link",
-        "worksheet":"https://docs.google.com/document/d/1IrUQu-agjptsiOYcyiwMrs5T8pa7gWwwHhzM9b5FRFk/edit?usp=sharing",
+        "worksheet":"https://drive.google.com/file/d/12wQ4G8t6jRv9rQ-ArWou8l2Ety60gRwc/view?usp=drive_link",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Field_Geometry_Worksheet_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-03-field-geometry-approach.html"
       },
       {
@@ -712,7 +716,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1_NMcPHteA9cyqcFjleHkZkEdTaw29GxEtwPibEvCvU4/edit?usp=drive_link",
         "worksheet": [{url: "https://drive.google.com/file/d/1Dz4v-rCu0t16ssPUBvY1s4SBUafiwud6/view?usp=drive_link", label: "Worksheet"},
           {url:"https://docs.google.com/document/d/1_tLR5byNHvxL2uZcr1Qtv-Ys1TbSgIOlfSmxtn2TvX0/edit?tab=t.0", label: "Cards"}],
-        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D8-matching-exemplars.html",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D8-matching-situations-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-02-matching-situations.html"
       },
       {
@@ -1042,6 +1046,7 @@ const DAYS_DEFAULT = [
         "worksheet": [
           {url: "https://drive.google.com/file/d/1qo0mU3TaRm6FtdbtVPcP91hABGDTF0R-/view", label: "Final Proposal Verificatio"}
         ],
+        "exemplar":[{url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Commissioner_Proposal.html", label: "Commissioner Proposal Exemplar"}],
       
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-02-final-proposal-verification.html"
       },
@@ -1063,8 +1068,7 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
         ],
-       "exemplar":[{url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Commissioner_Proposal.html", label: "Commissioner Proposal Exemplar"},
-       {url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Final_Proposal_Verification.html", label: "Final Proposal Verification Exemplar"}],
+       "exemplar":[{url:"VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
       },
      
@@ -1110,8 +1114,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Each team writes a Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Cards post publicly; every team's prediction is visible. Revisit on Day 15. Creates public stakes for the whole week and makes prediction accuracy socially real.",
         "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link",
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html",
-        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13-linear-equations-exemplars.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
+         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
       },
       
       
@@ -1122,8 +1125,8 @@ const DAYS_DEFAULT = [
         "description": "Part 1: Using your Season 1 + early Season 2 data, write the equation that predicts your win probability. Choose two past data points. Calculate the rate of change (slope). Calculate y-intercept. Write the equation in slope-intercept form. This is student-generated, not formula-imposed. Part 2: Test your equation against two past matches. Calculate the residual (predicted minus actual) for each. Third question: calculate wins per Speed point (Season 1 total wins / Speed stat) as a unit rate. Report your two residuals and unit rate to the class. No two teams have the same equation. That is the point.",
         "facilitatorDescription": "Part 1: using Season 1 and early Season 2 data, teams write the equation that predicts their win probability. Two past data points, slope calculated, y-intercept solved, equation in slope-intercept form. Student-generated, not formula-imposed. Part 2: teams test the equation against two past matches and calculate residuals (predicted minus actual). Teams also calculate wins per Speed point (Season 1 wins / Speed stat) as a unit rate. Each team reports two residuals and the unit rate to the class. Every team's equation is different -- that is the point. Before releasing to afternoon: each team's equation must be on the whiteboard with slope, y-intercept, and source data points labeled.",
         "script": "https://docs.google.com/document/d/1F-g0L6Z_d2klUamK6SFWQSTv7J6Zg4SPUqTAzzHDibc/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1YDfUjSl0OVNG0vXNUMXGFsmKiLngEjb9/view?usp=drive_link",
-        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13_LinearEquations_Exemplars.html",
+         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13-linear-equations-exemplars.html",
+      "worksheet": "https://drive.google.com/file/d/1YDfUjSl0OVNG0vXNUMXGFsmKiLngEjb9/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-02-linear-equations.html"
       },
     
@@ -1142,6 +1145,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "First matches under the new Commissioner-approved rules. Before each match, teams log their equation-based prediction. After each match, actual result is recorded. Loss-recovery runs for every losing team. Teams compare today's residuals to Season 1 residuals -- is the model improving? The rule change means fresh start energy for every team.",
         "script": "https://docs.google.com/document/d/18HoVS51dmWMg0yHU5rjWg6EY7Uz4MAjbJ-cPaOmZavU/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1cGFkZDRtoV8mLz6rQKcN1fHR2zSfHnl7/view?usp=drive_link",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13_LinearEquations_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-03-s2-match-day-1.html"
       },
     
