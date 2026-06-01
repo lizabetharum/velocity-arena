@@ -67,6 +67,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/12wViKxrKPix59HkDOGzY5YdpanDO5o_j6hbpYZlg3MM/edit?usp=drivesdk",
         "worksheet": "https://drive.google.com/file/d/1K51qc8WHn95uEqbp0sOxFxXN9cgcjm7W/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-06-speed-stat-challenge.html",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D1_Speed_Stat_Challenge.html",
         'webpage': 'https://velocity-arena-gold.vercel.app/lessons/speed-stat.html' 
       },
       {
@@ -85,7 +86,8 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1o2YHcYLuogG5VlQlsGa2mR-HvhYQEvRMuTxHLj9uoVU/edit?usp=drivesdk",
         "makecode":"https://makecode.microbit.org/S57517-06163-23657-62024",
         "worksheet": "https://drive.google.com/file/d/1B9ZoQrgAhE6vG3juLvuBR4xoRz5K6jHJ/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D1_BotDrive_StatCard.html",
+       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-07-first-bot-drive.html"
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -143,6 +145,7 @@ const DAYS_DEFAULT = [
         "description": "The formula goes on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Your facilitator works one full example and names the rate of change out loud -- this number is the slope of the decay line, how fast your bot loses power per minute. Then you calculate for different Endurance values with less and less help. Plot your results on paper. What shape do you get? Compare with the team next to you.",
         "facilitatorDescription": "Formula on the board: P(t) = 100 - (20 - Endurance) x 1.5 x t. Step 1 (5 min): work one full example on the board -- Endurance = 6, decay rate = 21% per minute, P(1) = 79%, P(2) = 58%, P(3) = 37%, P(4) = 16%, P(5) capped at 0%. Every number shown, no steps skipped. Name the rate of change explicitly as the slope. Step 2 (10 min): teams calculate for Endurance = 4 using a scaffolded worksheet. Step 3 (10 min): teams calculate for Endurance = 2 with no scaffolding. Step 4 (10 min): teams plot their own Endurance allocation over five t-values. Step 5 (5 min): two teams with different allocations read their t=3 values aloud -- that comparison is where the formula becomes strategic.",
         "script": "https://docs.google.com/document/d/1sYI4n2zRgr-a98835xcq0P6UdhhoHvJjBZjFPbl2fbg/edit?usp=drivesdk",
+       "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D2_Endurance_Stat_Challenge.html",
        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-04-endurance-stat-challenge.html"
       },
       {
@@ -245,6 +248,8 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/1RHggdduPeGWT5enQ7ePXKJczlZ16xtZ8qMMPLIvswCE/edit?tab=t.0", label: "Card A"},
            {url: "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0", label: "Card B"}
     ],
+    "exemplar": [{url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time Graphs_DataCard_A.html", label: "Card A"},
+           {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time Graphs_DataCard_B.html", label: "Card B"}],
    "exit": "https://docs.google.com/document/d/1DSFwsS2V4d9_GwrPjsxGdlth_IQ9DIk_kwdp7nFq9nI/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
       },
@@ -270,8 +275,9 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams keep programming the bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). Target: three consecutive successful navigations by end of Day 4. Every attempt gets logged -- coordinate called, coordinate reached, error distance. Error distance is the data, not a failure.",
         "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
-       "makecode":"https://makecode.microbit.org/S91173-59122-99436-97223",
-         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
+       "makecode":"https://makecode.microbit.org/S79542-10060-01167-82601",
+         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Arc_Approximation_Turning.html",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
       },
       {
         "name": "Open Lab: Free Code Time",
@@ -330,6 +336,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1VYv53hKADZFrZ6SdqIb_1KwrQ6NnYTm8/view?usp=drive_link",
         "makecode":"https://makecode.microbit.org/S25978-40655-36880-19976",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4_Power_Stat_Challenge.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
       {
@@ -407,9 +414,10 @@ const DAYS_DEFAULT = [
         "description": "One equation goes on the board: Speed + Power + Turning + Endurance = 20. Your team designs 3 different stat loadouts, each using exactly 20 points. For each one, calculate all four formula outputs -- Speed linear (motor power), charge speed = Power², follow through = 120 + (POWER × 35), Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay -- and record them. Then answer: if you want Speed = 8, what are you giving up? Show every calculation.",
         "facilitatorDescription": "Write one equation on the board: Speed + Power + Turning + Endurance = 20. Launch in under 5 minutes. Teams design 3 different stat loadouts, each using exactly 20 points, and calculate all four formula outputs for each: Speed motor power, charge speed = Power², follow through = 120 + (POWER × 35), Arc Segments = TURNING, Turn Ratio = 0.2 + (TURNING x 0.02), and Endurance decay. Teams answer: if Speed = 8, what are they giving up? Every calculation shown. After launching, walk to the back of the room and stay out -- talking reinforces the idea that there is one right answer.",
         "script": "https://docs.google.com/document/d/1qtE-c80NIwHmAZBYp-aFF3alFVtrdfwHuow5CL9zKFg/edit?usp=drive_link",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D5_Budget_Constraint.html",
         "worksheet":[
-          {url: "https://drive.google.com/file/d/144kRGshFNWApDR3r4ZPojoxgUCethU0C/view?usp=drive_link", label: "Questions"},
-          {url: "https://docs.google.com/document/d/16C_9YMX6Szv5DiSE_71MBRQAclnXx0yRoyBLDajxnfw/edit?usp=sharing", label: "Answers"}
+          {url: "https://drive.google.com/file/d/144kRGshFNWApDR3r4ZPojoxgUCethU0C/view?usp=drive_link", label: "Worksheet"},
+         
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-03-budget-constraint.html",
         "exit": "https://docs.google.com/document/d/1uVOCL4yHuHIx7_7xe-JrsE93CYdqSgKfK0p_Zrg4HhU/edit?usp=sharing"
@@ -428,7 +436,9 @@ const DAYS_DEFAULT = [
         "description": "Five questions, 10 minutes, by yourself, no notes. General math -- slopes, recipes, percentages, distances. No grade. This is just a check on what is sticking after four days.",
         "facilitatorDescription": "Five questions, 10 minutes, individual, no notes. General math contexts -- slopes, recipes, percentages, distances. No grade. Diagnostic for what is sticking after four days. Frame explicitly as not a grade; use results to inform Week 2 reteach priorities.",
         "script": "https://docs.google.com/document/d/1TuqKRSipwR2pC5txnlN7Eh3y-p1Rh2dCIVb8uFO9iKA/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1t3KadS_ovd8PpUfEzQcN4bXOmzFi8GDn/view?usp=drive_link",
+        "worksheet": [{url: "https://drive.google.com/file/d/1t3KadS_ovd8PpUfEzQcN4bXOmzFi8GDn/view?usp=drive_link", label: "Questions"},
+           {url: "https://docs.google.com/document/d/16C_9YMX6Szv5DiSE_71MBRQAclnXx0yRoyBLDajxnfw/edit?usp=sharing", label: "Answers"}
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-04-cold-recall.html"
       },
       {
@@ -534,6 +544,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams program the launch sequence as a routine separate from the stat loadout coded in the morning. Two test runs, both timed, both logged. The comparison to the Speed prediction is the math moment: a mismatch is not a failure, it is data. If a team's times are off, ask one question only: 'What did your formula predict, and what did you observe?' Then let them work. Some teams will have approach angles that add distance not captured in their straight-line calculation -- that is the right kind of confusion to carry into Season 1. Do not resolve it for them.",
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
         "script":"https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Launch_Sequence_Design.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"
       },
       {
@@ -544,7 +555,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Enforce the 2-minute commitment window before the showcase starts. Teams that haven't committed will stall the room. During each team's run, prompt observers writing vague notes: 'What number would make that observation useful?' The 10-minute adjustment window after all sequences have run is the highest-value moment in the block -- teams are adjusting based on what they saw, not just what they predicted. Let that happen without interruption. Sequences lock at the end of the 10 minutes with no exceptions. Season 1 begins tomorrow.",
         "script": "https://docs.google.com/document/d/1u_t-Lcszhvz9VXyqGYMtgyzN6tI948pUgw-okpP7xBA/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1LhwiwjTChaUP8ThP3QIU7IYpBHiy5B7_/view?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-05-launch-showcase.html"
+       "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Launch_Showcase.html",
+       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-05-launch-showcase.html"
       },
     
       {
@@ -555,7 +567,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Two tracks available, self-selected. Track A (Data Dive): teams check each stat value in the dashboard against formula output and fix any mismatches before Season 1 begins tomorrow. Track B (Bot Lab): teams test a loadout they would never use competitively (e.g., Speed = 2 with Power = 15) to build intuition for edge behavior. Both are legitimate uses of the time.",
         "script": "https://docs.google.com/document/d/1tfwcohDC_tUJ700pCwIWLIa4j31qdFJoUgcJdhvyd1A/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-06-open-lab-verification.html",
-         "worksheet":"https://docs.google.com/document/d/1qAIWuumIOSJ18bQEGq2PDC8lpjbU0ChAsQtj-ks77jY/edit?usp=sharing"
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6-pre-match-checklist-exemplars.html",
+       "worksheet":"https://docs.google.com/document/d/1qAIWuumIOSJ18bQEGq2PDC8lpjbU0ChAsQtj-ks77jY/edit?usp=sharing"
     
       }
     ],
@@ -605,6 +618,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1dP6KVB-fWDv-ulZJRhvX-apJJddyM98OY2hAy0Tu7Mk/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/11UkVVv6an0sm_UbK0StSpWWE3NcogS4z/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-02-endurance-decay.html",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D7-endurance-decay-exemplars.html",
         "exit": "https://docs.google.com/document/d/1QpcTTJ8aDJbZCcCkHCmmJKpGEO6zOHugmBK_CDauYKk/edit?usp=sharing"
       },
       {
@@ -698,6 +712,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1_NMcPHteA9cyqcFjleHkZkEdTaw29GxEtwPibEvCvU4/edit?usp=drive_link",
         "worksheet": [{url: "https://drive.google.com/file/d/1Dz4v-rCu0t16ssPUBvY1s4SBUafiwud6/view?usp=drive_link", label: "Worksheet"},
           {url:"https://docs.google.com/document/d/1_tLR5byNHvxL2uZcr1Qtv-Ys1TbSgIOlfSmxtn2TvX0/edit?tab=t.0", label: "Cards"}],
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D8-matching-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-02-matching-situations.html"
       },
       {
@@ -851,6 +866,7 @@ const DAYS_DEFAULT = [
          "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1reQoXFXaUQ-FidUnysXkSfSf9mAlaiz0/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D10_Distance_Formula_Shortest_Path.html",
         "exit":"https://docs.google.com/document/d/1_7vn0APALILJ1_RhcentRcNefrvXIhIMttt3RKbMQZg/edit?usp=sharing"
       },
       
@@ -955,6 +971,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Announce publicly: the current last-place team gets one free stat reallocation before Season 2, no Commissioner approval required. Public announcement is essential -- it creates the comeback narrative and keeps the last-place team mathematically engaged. The underdog team reworks their allocation sheet now. All teams begin planning Season 2 loadouts under the rules that will pass tomorrow.",
         "script": "https://docs.google.com/document/d/1uub9UpMbQF4he0B55d5SCFc8Jg7RbYljg-A5i_nHo9E/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1uUZX29Zj8tEQ64mf7fKm0PYlzEpkn-2LqDcZBG8Vg4k/edit?usp=sharing",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D11_Reallocation.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-03-underdog-mechanic-reallocation.html"
     
       },
@@ -967,6 +984,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "No formal scoring. Teams program and test adjusted loadout ideas and record observations as 'hypothesis' entries, clearly labeled so they can later compare to Season 2 actuals. Low-stakes iteration before the Commissioner's Meeting locks in new rules.",
         "script": "https://docs.google.com/document/d/1QK0sXYtio3-xe9AvlD6CAjnb8aiU7-ySLg4f0y5ZYp8/edit?usp=drive_link",
         "worksheet": "https://docs.google.com/document/d/1pItb3fZdZ8cUOn0rbo2xBQuszboddc8JLooLeVEJMgU/edit?usp=sharing",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D11_PracticeMatches_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-04-practice-matches.html"
       },
     
@@ -1045,7 +1063,9 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
         ],
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
+       "exemplar":[{url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Commissioner_Proposal.html", label: "Commissioner Proposal Exemplar"},
+       {url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Final_Proposal_Verification.html", label: "Final Proposal Verification Exemplar"}],
+       "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
       },
      
       {
@@ -1090,6 +1110,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Each team writes a Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Cards post publicly; every team's prediction is visible. Revisit on Day 15. Creates public stakes for the whole week and makes prediction accuracy socially real.",
         "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link",
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13-linear-equations-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
       },
       
@@ -1102,6 +1123,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Part 1: using Season 1 and early Season 2 data, teams write the equation that predicts their win probability. Two past data points, slope calculated, y-intercept solved, equation in slope-intercept form. Student-generated, not formula-imposed. Part 2: teams test the equation against two past matches and calculate residuals (predicted minus actual). Teams also calculate wins per Speed point (Season 1 wins / Speed stat) as a unit rate. Each team reports two residuals and the unit rate to the class. Every team's equation is different -- that is the point. Before releasing to afternoon: each team's equation must be on the whiteboard with slope, y-intercept, and source data points labeled.",
         "script": "https://docs.google.com/document/d/1F-g0L6Z_d2klUamK6SFWQSTv7J6Zg4SPUqTAzzHDibc/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1YDfUjSl0OVNG0vXNUMXGFsmKiLngEjb9/view?usp=drive_link",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13_LinearEquations_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-02-linear-equations.html"
       },
     
