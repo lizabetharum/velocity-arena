@@ -1072,7 +1072,7 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
         ],
-       "exemplar":[{url:"ttps://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
+       "exemplar":[{url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
       },
      
@@ -1118,7 +1118,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Each team writes a Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Cards post publicly; every team's prediction is visible. Revisit on Day 15. Creates public stakes for the whole week and makes prediction accuracy socially real.",
         "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link",
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html",
-         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D13-prediction-market-exemplars.html",
+         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13-prediction-market-exemplars.html",
          "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
       },
       
@@ -1224,7 +1224,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Three matches. Pre-match equation-based prediction. Post-match actual recorded. 20% rule: teams write one sentence identifying the missing variable when prediction and actual differ by more than 20%. Loss-recovery for every losing team. Dashboard fully updated before end of session.",
         "script": "https://docs.google.com/document/d/1DQPG1E04HP4KRVyCSgc4COQUwtcYzSF2MvvQz3GXAGM/edit?usp=sharing",
         "worksheet": "https://docs.google.com/document/d/1BDDPR3_KtBbqVmK3XSt3HgHBHNcMujno8whS0izoUoo/edit?usp=sharing",
-        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D14-prediction-tracker.html",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D14_PredictionTracker_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day14-03-s2-match-day-2.html"
       },
     

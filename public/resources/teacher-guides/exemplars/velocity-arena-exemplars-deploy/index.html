@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Student Work Exemplars</title>
+<style>
+:root {
+  --teal: #1a5f7a;
+  --teal-dark: #0d3b4f;
+  --teal-light: #e8f4f8;
+  --approaching: #c0392b;
+  --approaching-bg: #fdf2f2;
+  --approaching-border: #e74c3c;
+  --meets: #27ae60;
+  --meets-bg: #f2fdf6;
+  --meets-border: #2ecc71;
+  --exceeds: #2980b9;
+  --exceeds-bg: #f2f6fd;
+  --exceeds-border: #3498db;
+  --grey: #f5f6fa;
+  --border: #dee2e6;
+  --text: #212529;
+  --muted: #6c757d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; font-size: 14px; color: var(--text); background: #f0f2f5; line-height: 1.5; }
+.site-header { background: var(--teal-dark); color: white; padding: 20px 32px 16px; }
+.site-header h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; }
+.site-header p { font-size: 13px; color: #90caf9; margin-top: 4px; }
+.tag-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.tag { background: rgba(255,255,255,0.15); color: #e0f2fe; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.3px; }
+.nav-tabs { background: var(--teal); display: flex; overflow-x: auto; border-bottom: 3px solid var(--teal-dark); position: sticky; top: 0; z-index: 100; }
+.nav-tab { color: rgba(255,255,255,0.7); padding: 12px 20px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; border: none; background: none; transition: background 0.15s, color 0.15s; letter-spacing: 0.3px; }
+.nav-tab:hover { background: rgba(255,255,255,0.1); color: white; }
+.nav-tab.active { background: var(--teal-dark); color: white; border-bottom: 3px solid #ffd700; margin-bottom: -3px; }
+.main { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+.guide-box { background: var(--teal-dark); color: white; border-radius: 8px; padding: 20px 24px; margin-bottom: 24px; }
+.guide-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 12px; }
+.level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+.level-card { border-radius: 6px; padding: 12px 14px; }
+.level-card.approaching { background: rgba(192,57,43,0.3); border-left: 4px solid var(--approaching); }
+.level-card.meets { background: rgba(39,174,96,0.3); border-left: 4px solid var(--meets); }
+.level-card.exceeds { background: rgba(41,128,185,0.3); border-left: 4px solid var(--exceeds); }
+.level-name { font-weight: 700; font-size: 13px; margin-bottom: 5px; }
+.level-card.approaching .level-name { color: #ff8a80; }
+.level-card.meets .level-name { color: #69f0ae; }
+.level-card.exceeds .level-name { color: #82b1ff; }
+.level-card p { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+.week-section { display: none; }
+.week-section.active { display: block; }
+.week-header { background: var(--teal); color: white; border-radius: 8px 8px 0 0; padding: 16px 20px; margin-top: 20px; }
+.week-header h2 { font-size: 20px; font-weight: 900; }
+.week-header p { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 4px; }
+.week-body { background: white; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+.day-section { border-bottom: 1px solid var(--border); }
+.day-section:last-child { border-bottom: none; }
+.day-header { padding: 14px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--grey); transition: background 0.15s; }
+.day-header:hover { background: #e8f4f8; }
+.day-info { display: flex; align-items: center; gap: 12px; }
+.day-num { background: var(--teal); color: white; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+.day-title { font-weight: 700; font-size: 14px; }
+.day-concepts { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 2px; }
+.day-chevron { color: var(--muted); font-size: 16px; transition: transform 0.2s; flex-shrink: 0; }
+.day-section.open .day-chevron { transform: rotate(180deg); }
+.day-content { display: none; padding: 0; }
+.day-section.open .day-content { display: block; }
+.activity { padding: 16px 20px; border-top: 1px solid var(--border); }
+.activity-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+.exemplar { display: grid; grid-template-columns: 1fr 280px; gap: 0; border-radius: 6px; margin-bottom: 8px; overflow: hidden; border: 1px solid var(--border); }
+.exemplar.approaching { border-color: var(--approaching-border); }
+.exemplar.meets { border-color: var(--meets-border); }
+.exemplar.exceeds { border-color: var(--exceeds-border); }
+.exemplar-left { padding: 12px 14px; }
+.exemplar.approaching .exemplar-left { background: var(--approaching-bg); }
+.exemplar.meets .exemplar-left { background: var(--meets-bg); }
+.exemplar.exceeds .exemplar-left { background: var(--exceeds-bg); }
+.level-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 8px; }
+.approaching .level-badge { background: var(--approaching); color: white; }
+.meets .level-badge { background: var(--meets); color: white; }
+.exceeds .level-badge { background: var(--exceeds); color: white; }
+.student-text { font-size: 13px; line-height: 1.6; }
+.student-quote { font-style: italic; color: #333; background: rgba(0,0,0,0.04); border-left: 3px solid #ccc; padding: 6px 10px; margin: 6px 0; border-radius: 0 4px 4px 0; font-size: 12.5px; display: block; }
+.approaching .student-quote { border-color: var(--approaching); }
+.meets .student-quote { border-color: var(--meets); }
+.exceeds .student-quote { border-color: var(--exceeds); }
+.error-note { font-size: 11.5px; color: var(--muted); font-style: italic; margin-top: 5px; }
+.exemplar-right { background: #f8f9fa; padding: 12px 14px; border-left: 1px solid var(--border); font-size: 12px; color: #444; line-height: 1.55; font-style: italic; }
+.exemplar-right strong { color: var(--text); font-style: normal; }
+.benchmark { margin: 0; background: white; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+.benchmark-header { background: var(--teal-dark); color: white; padding: 12px 20px; font-size: 14px; font-weight: 700; }
+.benchmark-grid { display: grid; grid-template-columns: 140px 1fr 1fr 1fr; }
+.bm-cell { padding: 12px 14px; border-right: 1px solid var(--border); border-top: 1px solid var(--border); font-size: 12.5px; line-height: 1.6; }
+.bm-cell:last-child { border-right: none; }
+.bm-approaching { background: var(--approaching-bg); }
+.bm-meets { background: var(--meets-bg); }
+.bm-exceeds { background: var(--exceeds-bg); }
+.bm-row-label { background: var(--grey); font-weight: 700; font-size: 12px; }
+.bm-item { margin-bottom: 4px; padding-left: 12px; position: relative; }
+.bm-item::before { content: "–"; position: absolute; left: 0; color: var(--muted); }
+.formula-ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.formula-ref-table th { background: var(--teal-dark); color: white; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 700; }
+.formula-ref-table td { border: 1px solid var(--border); padding: 10px 14px; vertical-align: top; }
+.formula-ref-table tr:nth-child(even) td { background: var(--grey); }
+.formula-ref-table td:first-child { font-weight: 700; color: var(--teal); }
+.formula-code { font-family: "Courier New", monospace; font-size: 12px; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 2px; }
+.type-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: var(--teal-light); color: var(--teal); border: 1px solid var(--teal); }
+.error-cell { font-size: 12px; color: #c0392b; }
+@media (max-width: 700px) {
+  .exemplar { grid-template-columns: 1fr; }
+  .exemplar-right { border-left: none; border-top: 1px solid var(--border); }
+  .level-grid { grid-template-columns: 1fr; }
+  .benchmark-grid { grid-template-columns: 1fr; }
+  .bm-cell { border-right: none; }
+  .main { padding: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="site-header">
+  <h1>Velocity Arena</h1>
+  <p>Student Work Exemplars &nbsp;·&nbsp; Teacher Reference &nbsp;·&nbsp; Summer Sparks 2026</p>
+  <div class="tag-row">
+    <span class="tag">Days 1–16</span>
+    <span class="tag">Approaching / Meets / Exceeds</span>
+    <span class="tag">Week-End Benchmarks</span>
+    <span class="tag">Formula Reference</span>
+  </div>
+</div>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="showWeek('guide',this)">How to Use</button>
+  <button class="nav-tab" onclick="showWeek('w1',this)">Week 1 · Days 1–4</button>
+  <button class="nav-tab" onclick="showWeek('w2',this)">Week 2 · Days 5–8</button>
+  <button class="nav-tab" onclick="showWeek('w3',this)">Week 3 · Days 9–12</button>
+  <button class="nav-tab" onclick="showWeek('w4',this)">Week 4 · Days 13–16</button>
+  <button class="nav-tab" onclick="showWeek('ref',this)">Formula Reference</button>
+</nav>
+
+<div class="main">
+
+<!-- HOW TO USE -->
+<div id="guide" class="week-section active">
+  <div class="guide-box">
+    <h2>How to Read These Exemplars</h2>
+    <p style="color:rgba(255,255,255,0.8);margin-bottom:14px;font-size:13px">Each activity shows three levels of student work. The right column names the specific thinking pattern to look for — useful during circulating, discussion, and reviewing written work.</p>
+    <div class="level-grid">
+      <div class="level-card approaching"><div class="level-name">Approaching</div><p>Student attempts the task but makes a procedural, conceptual, or reasoning error. The error is specific and addressable — not a random guess. This is the most common state for students encountering a new concept.</p></div>
+      <div class="level-card meets"><div class="level-name">Meets</div><p>Student applies the formula or concept correctly and shows work. The calculation is accurate. The explanation connects the number to bot behavior, though often brief or literal.</p></div>
+      <div class="level-card exceeds"><div class="level-name">Exceeds</div><p>Student goes beyond correct calculation: they notice a pattern, make a strategic connection, anticipate a consequence, or explain the trade-off. The math is correct and the thinking is transferable.</p></div>
+    </div>
+    <p style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:16px">These are artificial examples — not transcribed from real students. They are intentionally imperfect at the lower levels.<br><br><strong style="color:#ffd700">Floor rule:</strong> <span style="color:rgba(255,255,255,0.8)">Bots never drop below 20% motor power during matches — the decay formula predicts a theoretical zero-crossing, but in play the bot slows to 20% and stays there.</span><br><br><strong style="color:#ffd700">Follow-through formula:</strong> <span style="color:rgba(255,255,255,0.8)">Power × 80 ms (not 100 ms).</span></p>
+  </div>
+</div>
+
+<!-- WEEK 1 -->
+<div id="w1" class="week-section">
+  <div class="week-header"><h2>Week 1 — Pre-Season: Stat Boot Camp (Days 1–4)</h2><p>Students build intuition for each stat formula before connecting to match outcomes. Goal: calculation fluency and the first link between formula output and physical behavior.</p></div>
+  <div class="week-body">
+
+    <div class="day-section open">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 1</span><div><div class="day-title">Speed Stat Challenge · First Bot Drive</div><div class="day-concepts">Proportional reasoning · Linear function</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Part 3 — Final Thinking: Decision + written sentence</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Student writes: <span class="student-quote">"I will put 5 points into Speed. Motor Power = 5 × 100 = 500%"</span><div class="error-note">Forgets to divide by 20. Gets a value over 100%, doesn't flag it as wrong.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Student forgets /20 step. Ask: 'Can motor power be over 100%? What does that tell you about step 2?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Student writes: <span class="student-quote">"I will put 6 into Speed. Motor Power = (6 × 100) / 20 = 30%. I chose 6 because it gives me a decent speed and leaves 14 points for other stats."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correct arithmetic with a brief strategic reason. Doesn't yet connect Speed choice to the other stats.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">Student writes: <span class="student-quote">"I put 8 into Speed: (8 × 100) / 20 = 40%. Every extra point adds exactly 5% motor power, so there's no reason to go above what I need. I'll keep 4 for Endurance so my bot doesn't die in minute 3."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Names the unit rate (5% per point), uses it to reason about trade-offs before knowing the other formulas.</div></div>
+        </div>
+        <div class="activity"><div class="activity-title">First Bot Drive — Doubling reflection sentence</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">"When we doubled Speed, distance also doubled. It works."</span><div class="error-note">Makes a claim without citing measured data.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Student asserts 'it worked' without using a distance ratio. Prompt: 'What two numbers from your table support that?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"Speed A = 2 → 35.88 cm. Speed B = 4 → 88.9 cm. We doubled Speed, and distance almost doubled but not exactly — the ratio was 88.9/35.88 = 2.48."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Uses the real measured values and computes the ratio. Notices it's larger than 2 but doesn't explain why.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"Speed A = 2 → 35.88 cm, Speed B = 4 → 88.9 cm. Distance ratio ≈ 2.48. Our formula says doubling Speed exactly doubles motor power (linear). The bigger-than-2 ratio probably means friction affects low Speed more — at Speed 2 the bot barely overcomes it, but at Speed 4 it's already past that threshold. The formula is still linear; real robots just have a floor."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Uses real data, calculates ratio ≈ 2.48, and offers a physical explanation (friction threshold at low speeds) that goes beyond the formula.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 2</span><div><div class="day-title">Endurance Allocation</div><div class="day-concepts">Linear decay · Slope-intercept · Rate of change</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Endurance table calculation + graph + comparison sentence (E = 4)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">t=1: P(1) = 100 − (20−4) × 1.5 × 1 = 76 ✓<br>t=2: P(2) = 100 − 16 × 2 = 68 <em>(forgets ×1.5)</em><br>t=3: P(3) = 100 − 16 × 3 = 52<div class="error-note">Applies the formula correctly for t=1 but drops the ×1.5 factor in later rows.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Common error — ask them to show the full parentheses each time.</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Decay rate = (20−4) × 1.5 = 24%/min<br>t=1: 76%, t=2: 52%, t=3: 28%, t=4: 4%, t≈4.17: theoretical zero<br><span class="student-quote">"Endurance 4 runs out at 4 min 10 sec (theoretical — 20% floor applies in real matches). The team with Endurance 6 lasts to 5 min 17 sec."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> All five rows correct. Comparison cites zero-crossing time for both teams. Solid but doesn't probe the 20% floor rule.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"Our decay rate is 24%/min. The E=6 team decays at 21%/min. The difference is only 3% per minute — but over 4 minutes that gap is 12 percentage points. Also: the 20% power floor means bots don't fully stop; they just slow way down. Endurance is a late-game stat. Low Endurance doesn't hurt you in the first minute at all."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Calculates rate difference AND invokes the 20% power floor rule. Frames Endurance as a late-game stat.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 3</span><div><div class="day-title">Distance-Time Graphs + Distance Formula</div><div class="day-concepts">Slope · Coordinate geometry · Distance formula</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Walk the Plane: Distance formula calculation — (1,1) to (4,5)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">d = √(4+5) = √9 = 3</span><div class="error-note">Adds the differences instead of squaring separately.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Classic error — ask: 'What happens to the differences before you add them?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">x₂−x₁ = 4−1 = 3, squared = 9<br>y₂−y₁ = 5−1 = 4, squared = 16<br><span class="student-quote">d = √(9+16) = √25 = 5 grid units</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Shows each step correctly with differences labeled. Gets √25 = 5.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">Correct calculation, then: <span class="student-quote">"This is a 3-4-5 right triangle. I recognized it before finishing the formula. That means anytime I see those differences, I don't need a calculator — it's always 5."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Recognizes the 3-4-5 Pythagorean triple, connecting the formula to a known pattern.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 4</span><div><div class="day-title">Power Stat Challenge + Budget Constraint</div><div class="day-concepts">Non-proportional scaling · Quadratic · Constraint equations</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Power table + ratio contrast + budget constraint calculation</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Power 2: 4% | Power 4: 16%<br><span class="student-quote">"The ratio is 16/4 = 4. That's the same as doubling."</span><div class="error-note">Confuses quadrupling with doubling.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Calculates the ratio correctly but misinterprets 'quadrupling' as 'doubling.' Ask them to compare the Speed and Power tables side by side.</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Power 2: 4% | Power 4: 16% → ratio = 4×<br>Power 4: 16% | Power 8: 64% → ratio = 4× again<br><span class="student-quote">"Doubling Power quadruples charge speed. Speed is linear (×2 gives ×2). Power is not."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> States the quadratic relationship accurately with both ratio examples. Contrast with Speed formula is explicit.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">Same calculations, then: <span class="student-quote">"Going from P=7 to P=8 adds only 15 percentage points (64−49), but from P=1 to P=2 adds only 3 points. The same 1-point increase isn't worth the same thing at every level. I should pick Power carefully — higher values cost more budget but give more per point at the high end."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Analyzes marginal gains — the extra output per point varies by position on the curve, a calculus-adjacent idea surfaced naturally.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="week-header" style="border-radius:8px;margin-top:12px"><h2>End-of-Week 1 Benchmark</h2><p>By end of Day 4, students should be able to…</p></div>
+  <div class="benchmark"><div class="benchmark-grid">
+    <div class="bm-cell bm-row-label" style="display:flex;align-items:center;border-right:1px solid var(--border);">By end of Day 4</div>
+    <div class="bm-cell bm-approaching"><div style="color:var(--approaching);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">APPROACHING</div><div class="bm-item">Apply one or two formulas correctly with reference card; needs prompting without it</div><div class="bm-item">Calculate motor power for Speed correctly, but can't explain why the formula works</div><div class="bm-item">Identify which stat a formula belongs to, but struggles to connect output values to bot behavior</div></div>
+    <div class="bm-cell bm-meets"><div style="color:var(--meets);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">MEETS</div><div class="bm-item">Apply all four stat formulas without a reference card</div><div class="bm-item">Calculate decay values at any t using the Endurance formula</div><div class="bm-item">Calculate distance between two grid points</div><div class="bm-item">State that Speed is linear and Power is quadratic, with one example each</div></div>
+    <div class="bm-cell bm-exceeds"><div style="color:var(--exceeds);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">EXCEEDS</div><div class="bm-item">Explain 'linear' and 'quadratic' in terms of bot behavior (not just formula types)</div><div class="bm-item">Use unit rate reasoning to compare stat efficiency</div><div class="bm-item">Name a specific trade-off between any two stats without prompting</div></div>
+  </div></div>
+</div>
+
+<!-- WEEK 2 -->
+<div id="w2" class="week-section">
+  <div class="week-header"><h2>Week 2 — Season 1: First Matches and Data Collection (Days 5–8)</h2><p>Students move from calculating in isolation to using math as decision-making tools. Key written outputs: concept tags, launch approach justification, Endurance equation, post-match revision entries.</p></div>
+  <div class="week-body">
+
+    <div class="day-section open">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 5</span><div><div class="day-title">Official Stat Allocation: Interleaved Problem Set</div><div class="day-concepts">All four formulas · Concept identification</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Concept tag column — identifying math type before calculating (E=6, t=4, find P(4))</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">P(4) = 100 − (20−6) × 1.5 × 4 = 16% ✓<br>Concept tag: <em>'Proportional reasoning'</em><div class="error-note">Picks a concept from the list but assigns it to the wrong formula type. Endurance decays — it's not proportional.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Selects a concept but misassigns it. Ask: 'What does proportional mean? Does power drop the same way Speed does?' Use the Day 2 graph to bridge to linear decay.</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">P(4) = 16% ✓ &nbsp; Concept tag: <strong>'Linear decay'</strong><br><span class="student-quote">"It's linear because the power drops by the same amount every minute (21% each time)."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Uses the concept vocabulary correctly and explains why. Makes the connection to slope.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">P(4) = 16% ✓ &nbsp; Concept tag: 'Linear decay'<br><span class="student-quote">"It drops 21% every minute, so at t=4 it should be 100 − (4×21) = 16%. That checks out. This team's bot will nearly stop during the match — with E=6 they lose power fast. If I were building my bot I'd put more into Endurance so I'm still moving in the last minute."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Verifies the calculation a second way and draws a match implication from the output value.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 6</span><div><div class="day-title">Field Geometry + Approach Planning + Endurance Decay Equation</div><div class="day-concepts">Coordinate distance · Proportional reasoning · Slope-intercept form</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Approach angle justification sentence (must cite a number)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">"We will approach from the left side because it feels like the right angle."</span><div class="error-note">No numerical justification — violates the stated standard.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> No numerical support. Hold to it: 'You need one distance value or stat number. Which one will you use?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"We start at corner (0, 0). Ball is at (4, 2). Distance = √(4² + 2²) = √20 ≈ 4.47 grid units. At Speed 7 → motor power = 35% → we estimate about 3 seconds to reach the ball. We'll turn left, move forward, then turn right to hit it straight-on."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correctly uses a valid corner, computes distance, describes a realistic multi-segment path. Connects path planning to stat choice.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"We start at corner (0, 4). Ball is at (4, 2). Two-segment path: drive diagonally toward (4,2), then straighten for a head-on kick. Total distance ≈ √20 ≈ 4.47 units. Starting at (0,4) means we approach from above, which lines up our scoop to deflect the ball right toward G = (8,2). We need one turn mid-path, so we kept Turning at 3."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Plans a two-segment path from a chosen corner, justifies the corner choice based on final approach angle to goal, and links the planned turn to their Turning stat allocation.</div></div>
+        </div>
+        <div class="activity"><div class="activity-title">Endurance Decay Equation in Slope-Intercept Form (E = 4)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Writes: <span class="student-quote">"P(t) = 100 − 24t"</span> — equation is correct. But labels slope as '24' without a negative sign. When asked what slope means: 'it's how fast it goes down.'</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Gets the equation right but doesn't name the slope as negative or tie it to 'rate of change.' Ask: 'What does the slope tell you is happening to the bot?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"P(t) = 100 − 24t. Slope = −24 (bot loses 24% power each minute). y-intercept = 100 (starts at full power). Theoretical zero at t = 100/24 ≈ 4.17 min — but the 20% floor means the bot slows to 20% and stays there in real matches."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correctly identifies slope, y-intercept, and zero-crossing. Mentions the 20% floor. Connects each to bot behavior.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"P(t) = 100 − 24t. Slope = −24: for every 1 minute that passes, my bot loses 24% power — that's rate of change. At t=3, my bot is at 28% power — just above the floor. My late-game offensive ability is reduced to 28% of my charge speed. I should plan to score early."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Applies the equation to match planning: calculates power at t=3 and draws a strategic inference.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 7</span><div><div class="day-title">Season 1 Matches: Pre-Match Prediction</div><div class="day-concepts">Proportional reasoning · Data interpretation</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Pre-match prediction entry in match log (goals + reasoning)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">"Predicted goals: 2"</span><div class="error-note">No calculation or reasoning. Just a number with no justification.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Prediction with no basis. Ask: 'Which stat number would help you estimate this? What does motor power tell you?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"Predicted goals: 1. Our motor power is 35% (Speed 7). A 3-minute match gives maybe 4-5 runs. If we score on about a quarter of them, that's 1 goal."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Grounds the prediction in their own motor power calculation and estimates runs per match.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"Predicted goals: 2. Motor power = 35% (Speed 7) — strong approach. Endurance at t=3: P(3) = 100 − (20−4) × 1.5 × 3 = 28% — we slow down late. Early in the match we'll be fast; late we'll be sluggish. I expect 2 goals early, maybe 0 late. Best case 2, worst case 1. I'll say 2."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Uses two of their own stats (Speed and Endurance) to model early-game vs. late-game performance, then commits to a range.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 8</span><div><div class="day-title">Formula Relay + Post-Match Revision</div><div class="day-concepts">All five formula types · Residual thinking</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Post-match data dashboard revision entry (when prediction is &gt;20% off)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">"We predicted 2 goals but scored 0. We need to be faster."</span><div class="error-note">Identifies a problem but doesn't locate it in a specific stat or formula.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Locates the gap emotionally without connecting to a stat value. Redirect: 'What number in your log is most different from your prediction?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"We predicted 2 goals, scored 0. Residual = 2. Our motor power was 35%, but we didn't reach the ball first in any run. I think our Turning is too high — we took curved paths and lost time. I'd lower Turning from 7 to 4."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Identifies the gap correctly, locates it in a specific stat (Turning), and proposes a change. The revision is plausible.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"Predicted 2, scored 0. Residual = 2. Their Speed was 8 (40% motor power) — we had Speed 7 (35%). That 5-point difference in motor power may not seem big, but they consistently reached the ball 0.4-0.6 seconds before us. Our model only compared our speed to the average, not to this specific opponent's speed. Revision: drop Speed to 6, add to Power. If we can't get there first, the charge needs to be stronger when we do arrive."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Quantifies the speed difference (5 percentage points), estimates its match impact, and makes a strategic reallocation that addresses root cause.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="week-header" style="border-radius:8px;margin-top:12px"><h2>End-of-Week 2 Benchmark</h2><p>By end of Day 8, students should be able to…</p></div>
+  <div class="benchmark"><div class="benchmark-grid">
+    <div class="bm-cell bm-row-label" style="display:flex;align-items:center;border-right:1px solid var(--border);">By end of Day 8</div>
+    <div class="bm-cell bm-approaching"><div style="color:var(--approaching);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">APPROACHING</div><div class="bm-item">Fill in the match log after reminders</div><div class="bm-item">Apply most formulas correctly; still needs reference card for Endurance</div><div class="bm-item">Make a prediction but without citing data</div></div>
+    <div class="bm-cell bm-meets"><div style="color:var(--meets);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">MEETS</div><div class="bm-item">Write Endurance decay equation in slope-intercept form with correct slope labeled</div><div class="bm-item">Calculate distance from starting position to ball on coordinate grid</div><div class="bm-item">Write a pre-match prediction with at least one stat cited</div><div class="bm-item">Write a post-match revision entry that names a specific stat to change</div></div>
+    <div class="bm-cell bm-exceeds"><div style="color:var(--exceeds);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">EXCEEDS</div><div class="bm-item">Calculate bot power at a specific match time (e.g., t=3) and draw a strategic conclusion</div><div class="bm-item">Use an opponent's stat card to identify a specific relative advantage</div><div class="bm-item">Explain why a prediction was wrong by identifying the variable the model missed</div></div>
+  </div></div>
+</div>
+
+<!-- WEEK 3 -->
+<div id="w3" class="week-section">
+  <div class="week-header"><h2>Week 3 — Season 1 Final + Commissioner + Season 2 Launch (Days 9–12)</h2><p>Season 1 closes with Formula Relay review, Distance Formula applied to real match data, and the Commissioner's Meeting where students use proportional scaling calculations to argue for rule changes.</p></div>
+  <div class="week-body">
+
+    <div class="day-section open">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 9</span><div><div class="day-title">Season 1: Adjustments, Linear Equations, and the Gap</div><div class="day-concepts">All 6 formula types · Formula Relay · Pre-match prediction · 20% gap rule</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Formula Relay (all 6 types, error-sort) + Season 1 Match Day 3 prediction with 20% gap rule</div>
+          <p style="font-size:12px;color:#666;padding:0 0 10px 0;font-style:italic">Note: Follow-through = Power × 80 ms &nbsp;·&nbsp; 6 formula types: Speed, Endurance, Power (charge + follow-through), Turning, Budget, Distance</p>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Formula Relay — Speed card: <span class="student-quote">'Speed 6 → motor power = 6 × 100 = 600.'</span><div class="error-note">Forgets /20. Gets an impossible value and does not flag it.</div>Pre-match prediction: 'We will score 4 goals.' (No formula cited.) Actual: 2 goals. Gap = 50%. Missing-variable sentence not written.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Formula error first: 'Can motor power exceed 100%?' Then the gap: 'What does your dashboard say about your last two matches?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">All 6 types correct: Speed (6×100)/20=30% · Endurance P(2)=100−(20−5)×1.5×2=55% · Power charge: 4²=16% · Follow-through: 4×80=320 ms · Distance &amp; Budget also correct.<br><br>Pre-match: 'Season 1 average: 6 goals/2 matches = 3 per match. Predict 3 goals.' Actual: 2. Gap = 33% (exceeds 20% rule).<br><span class="student-quote">'I did not account for opponent Turning stat.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> All six formula types correct. Prediction uses unit rate from prior matches. Gap check applied. Missing-variable sentence written.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">'I got Proportional Scaling wrong: I applied the 50% multiplier to the stat, not to the formula output. I need to calculate output first, then scale it.'</span><br><br>Pre-match (logged before match): <span class="student-quote">'Unit rate: 6 goals/2 matches = 3 per match. Opponent: E=8, so P(3)=46% — strong late game. Our E=4: P(3)=28% — we fade. Revise prediction down: 2 goals.'</span> Actual: 4. Gap = 50%. Missing-variable: <span class="student-quote">'I underestimated how much their late-game Endurance would work against them when we pushed early.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Identifies own weakest formula type. Pre-match prediction incorporates opponent Endurance decay comparison. Writes specific missing-variable sentence when gap &gt;20%.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 10</span><div><div class="day-title">Season 1 Final Matches + Distance Formula Applied to Match Data</div><div class="day-concepts">Distance formula · Coordinate geometry · Efficiency ratio · Season 1 final</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Distance Formula: A=(4,2), B (team-specific), G=(8,2); efficiency ratio</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">d = √((8+4)² + (2+2)²) = √160 ≈ 12.6</span><div class="error-note">Adds coordinates instead of subtracting. Classic error type 1.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Ask: 'The formula says x₂ minus x₁ — which number is x₂ and which is x₁?' Walk through the first pair together.</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">A→G: √((8−4)²+(2−2)²) = √16 = 4.0 units<br>A=(4,2)→B=(6,0): √((6−4)²+(0−2)²) = √8 ≈ 2.83 units<br>Efficiency ratio calculated. Season 1 Final prediction uses dashboard data. Residual recorded.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correct distance formula for multiple positions. Efficiency ratio calculated. Does not yet connect route distance to Season 2 reallocation logic.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">A→B: 2.83 units &nbsp; B→G: √((8−6)²+(2−0)²) = 2.83 units &nbsp; A→G direct: 4.0 units<br>Route total = 5.66 vs. direct = 4.0 → 41% longer than direct.<br><span class="student-quote">'Each charge costs Power² = 16% per shot. We need 3 charges min. If we could push from a closer position, our total route distance drops and we need fewer charges. This is the argument for reallocating points to Turning in Season 2 — tighter arcs mean shorter B-to-G.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Computes all three route segments, compares route to direct distance, and uses the ratio to build a specific Season 2 argument.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 11</span><div><div class="day-title">Commissioner Prep + the Underdog Mechanic</div><div class="day-concepts">Proportional vs. non-proportional scaling · Commissioner proposal · Equity reasoning</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Proportional Scaling Phase 1 + Commissioner Proposal Prep Phase 2</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Phase 1: <span class="student-quote">'Speed 4 to Speed 8 is a 4-point increase.'</span><div class="error-note">States the raw stat change. Does not calculate formula output or compare proportionality.</div>Phase 2 proposal: 'No team can have Speed above 6. Team Vortex has Speed 8 which is unfair.' Effect: 'It helps them.' (No formula output.)</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> States raw stat change but never runs the formula. Ask: 'What does Speed 8 actually produce in terms of motor power? Put that number in your proposal.'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Phase 1: Speed is proportional: Speed 4→20%, Speed 6→30%. +50% stat, +50% output. Consistent.<br>Power is not: Power 4→16%, Power 6→36%. +50% stat, +125% output. Non-proportional.<br><br>Phase 2: 'Speed ≤ 6.' Vortex: Speed 8→40% motor power → capped at 30% (−10 pts). Team Static (last place, Speed 3→15%): rule doesn't change their allocation.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correctly contrasts proportional vs. non-proportional scaling and uses it as proposal evidence. Effect on last-place team stated with a calculation.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">Phase 2: 'Speed ≤ 6.' Vortex loss: (30−40)/40 = −25% motor power.<br>Static opportunity: free reallocation (Underdog Mechanic) to Speed 6 = +100% motor power gain.<br><span class="student-quote">'The rule costs the leader 25% and opens +100% to the weakest team. Because Speed IS proportional, the cap transfers motor power in a calculable, equitable way. The Underdog Mechanic gives Static a free reallocation — they could use it to take full advantage.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Expresses both teams' changes as percent change in formula output. Explicitly connects the Underdog Mechanic to the proposal — the equity argument is complete.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 12</span><div><div class="day-title">The Commissioner's Meeting: You Change the Rules</div><div class="day-concepts">Data argumentation · Proportional scaling · Rule-making · Season 2 allocation</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Formal presentation (3 min) + vote + Season 2 allocation in MakeCode</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">'Our rule is Speed ≤ 6. Team Vortex has Speed 8. That is too high and gives them an unfair advantage.'</span><div class="error-note">Rule stated, but no formula output cited. Does not satisfy Criterion 6 (must name at least one concept type).</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Two gaps: missing math and missing concept label. Address the formula first: 'What does Speed 8 actually produce? Put that number in your first sentence.'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">'Speed ≤ 6. This is a proportional scaling rule. Team Vortex: Speed 8 → 40% motor power. Capped at Speed 6 → 30%. −10 percentage points. Team Static (last place, Speed 3 → 15%): does not change their current loadout. Narrows gap at the top. Criterion 6: proportional scaling.'</span><br>Passes audience math check. Programs Season 2 allocation before leaving.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Presentation includes formula evidence for both teams, names the concept type, satisfies Criterion 6. Passes math verification. Does not yet quantify change as percent change.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">'Speed ≤ 6. Proportional scaling rule. Vortex: 40% to 30% motor power = −25% loss. Static opportunity: free reallocation (Underdog Mechanic) to Speed 6 = +100% motor power gain. The rule costs the leader 25% and gives the bottom team a path to +100%. Criterion 6: proportional scaling and unit rate — motor power is 5% per Speed point.'</span><br>Audience verification: 'Speed 8 × 100/20 = 40%. Speed 6 × 100/20 = 30%. Difference = 10 percentage points. Verified.' Rule passes. Writes on wall. Immediately recalculates and test-drives Season 2 loadout.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Expresses both teams' changes as percent change. Names two concept types for Criterion 6. Passes audience verification with live calculation. Connects Underdog Mechanic to equity argument.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="week-header" style="border-radius:8px;margin-top:12px"><h2>End-of-Week 3 Benchmark</h2><p>By end of Day 12, students should be able to…</p></div>
+  <div class="benchmark"><div class="benchmark-grid">
+    <div class="bm-cell bm-row-label" style="display:flex;align-items:center;border-right:1px solid var(--border);">By end of Day 12</div>
+    <div class="bm-cell bm-approaching"><div style="color:var(--approaching);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">APPROACHING</div><div class="bm-item">Apply at least 4 of 6 formula types correctly with reference card</div><div class="bm-item">Write a Commissioner proposal with at least one formula output, even if the equity argument is missing</div><div class="bm-item">Apply the 20% gap rule and write a missing-variable sentence with some support</div></div>
+    <div class="bm-cell bm-meets"><div style="color:var(--meets);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">MEETS</div><div class="bm-item">Apply all 6 formula types correctly: Speed, Endurance, Power (charge + follow-through), Turning, Distance, Proportional Scaling</div><div class="bm-item">Write and deliver a Commissioner proposal with two formula outputs and calculated effect on last-place team</div><div class="bm-item">Name at least one concept type in the proposal (Criterion 6)</div><div class="bm-item">Apply the 20% gap rule independently; write specific missing-variable sentence when gap exceeds threshold</div><div class="bm-item">Calculate coordinate distance for at least two positions</div></div>
+    <div class="bm-cell bm-exceeds"><div style="color:var(--exceeds);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">EXCEEDS</div><div class="bm-item">Distinguish proportional from non-proportional scaling by calculating percent change in formula output (not just stat change)</div><div class="bm-item">Connect the Underdog Mechanic to the Commissioner proposal — show how the rule and free reallocation interact to produce an equity outcome</div><div class="bm-item">Use efficiency ratio (route distance vs. direct distance) to build a Season 2 reallocation argument</div></div>
+  </div></div>
+</div>
+
+<!-- WEEK 4 -->
+<div id="w4" class="week-section">
+  <div class="week-header"><h2>Week 4 — Your Win Equation + Season 2 + Community Exhibition (Days 13–16)</h2><p>Students build linear equations from match data, apply percent change to stat changes, run Season 2 under Commissioner-approved rules, and culminate with a Community Exhibition where they teach the math to visitors.</p></div>
+  <div class="week-body">
+
+    <div class="day-section open">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 13</span><div><div class="day-title">Your Win Equation + Season 2 Begins</div><div class="day-concepts">Linear equations from data · Slope · y-intercept · Residuals · Season 2 Match Day 1</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Building linear equations from 2 match data points + residual analysis — Points: (Speed 4, 1 win) and (Speed 7, 3 wins)</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Slope = (3−1) / (4−7) = 2/−3 = −0.67<div class="error-note">Subtracts x-values in wrong order. Negative slope.</div>Writes W = −0.67S + b and stops. No y-intercept calculated. Season 2 prediction: 'We predict 3 wins.' (No equation used, no residual.)</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Two errors: wrong subtraction order and no residual. Address slope first: 'If you add a Speed point, do you expect more wins or fewer? What sign should the slope have?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Slope = (3−1)/(7−4) = 2/3 ≈ 0.67 wins per Speed point.<br>Using (4,1): b = 1 − 0.67(4) = −1.67. Equation: W = 0.67S − 1.67<br>Equation written on whiteboard before afternoon matches.<br>Season 2 Match Day 1 (S=8): W = 0.67(8) − 1.67 = 3.69. Actual: 3 wins. Residual = 0.69. Recorded. 'Slope and unit rate match (4/6 = 0.67).'</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Correct slope, y-intercept, and slope-intercept form. Equation on whiteboard before afternoon. Prediction equation-based, residual recorded.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">W = 0.67S − 1.67 (correct, whiteboard before match)<br>Two ball modes tested:<br>Standard Mode: predicted 3.69, actual 3. Residual = +0.69 (over-predicted).<br>Chaos Mode (ping pong): predicted 3.69, actual 5. Residual = −1.31 (under-predicted).<br><span class="student-quote">'The model's error flipped sign between ball modes. Standard: I over-predict. Chaos: I under-predict. That is because Turning matters more in Chaos and my equation only uses Speed. I need a separate equation for each ball mode or I need to add Turning as a second variable.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Computes residuals across both ball modes, sees the sign flip, identifies the cause (equation is blind to ball mode), and proposes a fix.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 14</span><div><div class="day-title">Season 2: Percent Change and the Model vs. the Match</div><div class="day-concepts">Percent change · Proportional vs. non-proportional · Season 2 Match Day 2</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Percent Change Season 1 to Season 2 per stat; is percent change proportional?</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text">Speed 6 to Speed 8:<br><span class="student-quote">(8−6) / 8 × 100 = 25%</span><div class="error-note">Uses new value as denominator. Classic percent change error.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Ask: 'Which number is where you started — old or new?' Once corrected, return to the match prediction: 'Show the substitution.'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text">Speed 6→8: (8−6)/6 × 100 = 33.3%. Motor power: 30%→40% = also +33%. Speed is proportional.<br>Power 4→2: (2−4)/4 × 100 = −50%. Charge speed: 16%→4% = −75%. Not consistent — Power is non-proportional.<br><span class="student-quote">'Speed up 33% and Power dropped 50% stat-wise, but Power output dropped 75%. We gave up more offense than the stat suggests.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Percent change correct for both stats with proportional vs. non-proportional comparison. Match prediction equation-based, residual recorded.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text">Same calculations as Meets, then:<br><span class="student-quote">'Is percent change in stat always equal to percent change in output? Speed: +33% stat = +33% motor power. YES — proportional. Power: −50% stat = −75% charge speed. NO — non-proportional (quadratic). So the formula type determines whether percent change transfers equally.'</span><br>Stat Auction: before bidding on Power increase, calculates current P=2→4% charge, P=4→16% charge, +12 points gain. Tests hypothesis in the match. Proposes adding Power as a variable to the win equation.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Generalizes that formula type determines whether percent change transfers equally. Uses that insight in the Stat Auction. Tests hypothesis in the match.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 15</span><div><div class="day-title">Creative Expression: Bot Identity + Teach the Math + Season 2 Match Day 3</div><div class="day-concepts">Mathematical explanation · Verbal reasoning · Scouting citations · Post-task diagnostic</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Teach the Math (3 min per team, plain language) + Prediction Market resolution</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">'Our strategy is Speed-focused. We have a lot of motor power and reach the ball first.'</span><div class="error-note">Correct strategy, but no number supports it. 'A lot' is not a calculation.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Good strategy identification but no number. Ask before they present: 'What is the actual motor power output? Calculate it and put it in the first sentence.' One number transforms the pitch from opinion to evidence.</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">'Our strategy is Speed-dominant. Speed 8 → motor power = (8×100)/20 = 40%. Our opponent has Speed 5 → 25% motor power. We have 15 percentage points more approach speed. In plain language: we reach the ball first in most approaches.'</span><br>Follow-up: 'How did you get 40%?' → 'Speed times 100 divided by 20. Eight times 100 is 800. Divided by 20 is 40.' Prediction Market resolved.</div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Cites specific motor power for both teams, names the differential, and answers the follow-up with a live calculation. Does not yet cover all four stats.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">'Speed-Power balanced: S=7, P=5, E=4, T=4. Motor power = 35%. Charge speed = 5² = 25%. Opponent: S=5, motor power = 25% — we are 10 points faster. Their P=2 gives 4% charge — we hit 21 points harder. Our Endurance: P(t)=100−24t. At t=3: 28% — still functional. Theirs at t=3: 23.5%. We have approach, kick power, and late-game advantage.'</span><br>Prediction Market: original 6 wins. Actual 7. <span class="student-quote">'I underestimated how much the Commissioner rule would benefit us. I should have included opponent formula output in my prediction, not just my own.'</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Pitches all four stats with formula outputs for both teams, answers the follow-up live, and connects Endurance decay to late-game strategy. Prediction Market resolution includes a specific diagnosis of what was missing from the original model.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-section">
+      <div class="day-header" onclick="toggleDay(this)"><div class="day-info"><span class="day-num">Day 16</span><div><div class="day-title">Community Exhibition: You Are the Experts Now</div><div class="day-concepts">Proportional reasoning · Unit rate · Coordinate distance · Expert explanation</div></div></div><span class="day-chevron">▼</span></div>
+      <div class="day-content">
+        <div class="activity"><div class="activity-title">Student explanation of unit rate to a visitor (goals per Speed point) at the Community Exhibition station</div>
+          <div class="exemplar approaching"><div class="exemplar-left"><span class="level-badge">Approaching</span><div class="student-text"><span class="student-quote">"Our unit rate is 0.5. It means for every Speed point you get 0.5 goals."</span><div class="error-note">Correct definition but not connected to their actual data. Visitor cannot verify it.</div></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Uses unit rate vocabulary correctly but without data grounding. Ask: 'Can you show the division in your data log?'</div></div>
+          <div class="exemplar meets"><div class="exemplar-left"><span class="level-badge">Meets</span><div class="student-text"><span class="student-quote">"We scored 3 goals in Season 1 with Speed 6. Our unit rate is 3/6 = 0.5 goals per Speed point. We then changed to Speed 8 in Season 2. If the rate held, we'd predict 4 goals. We got 5 — slightly better than predicted."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Calculates unit rate from actual data, makes a prediction, checks against Season 2 actual. Strong demonstration of mathematical reasoning.</div></div>
+          <div class="exemplar exceeds"><div class="exemplar-left"><span class="level-badge">Exceeds</span><div class="student-text"><span class="student-quote">"Our Season 1 unit rate: 3 goals / Speed 6 = 0.5 goals per point. Season 2: Speed 8. Predicted: 4 goals. Actual: 5. The rate slightly improved. Here's why: in Season 2 we also increased Turning, which helped in Chaos Mode. The unit rate captures Speed's contribution but the other stats also matter — it is only one variable in our win equation. [Shows visitor the full equation.] The rate tells part of the story."</span></div></div><div class="exemplar-right"><strong>Teacher Look-For:</strong> Explains the unit rate, identifies its limitation (one variable among many), and connects it to the linear equation — graduate-level statistical thinking in plain language.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="week-header" style="border-radius:8px;margin-top:12px"><h2>End-of-Week 4 Benchmark (Program Exit)</h2><p>By end of Day 16, students should be able to…</p></div>
+  <div class="benchmark"><div class="benchmark-grid">
+    <div class="bm-cell bm-row-label" style="display:flex;align-items:center;border-right:1px solid var(--border);">By end of Day 16</div>
+    <div class="bm-cell bm-approaching"><div style="color:var(--approaching);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">APPROACHING</div><div class="bm-item">Apply all six formula types correctly with a reference card</div><div class="bm-item">Write and deliver a Commissioner proposal with at least one formula output</div><div class="bm-item">Build a linear equation from two data points with some support (may make slope-sign or y-intercept errors)</div><div class="bm-item">Explain bot strategy in plain language with at least one calculated number</div></div>
+    <div class="bm-cell bm-meets"><div style="color:var(--meets);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">MEETS</div><div class="bm-item">Build a goals-vs-Speed linear equation from two data points: correct slope, y-intercept, slope-intercept form</div><div class="bm-item">Compute residuals (predicted minus actual) and apply the 20% gap rule independently across multiple matches</div><div class="bm-item">Calculate percent change correctly (old value as denominator) and distinguish proportional from non-proportional stat changes</div><div class="bm-item">Deliver a 3-minute math explanation with at least two specific formula outputs and correct follow-up answers</div><div class="bm-item">Explain unit rate using own Season 1 data and connect it to the linear equation slope</div><div class="bm-item">Calculate coordinate distance for at least two positions and explain the efficiency ratio</div></div>
+    <div class="bm-cell bm-exceeds"><div style="color:var(--exceeds);font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">EXCEEDS</div><div class="bm-item">Detect that the win equation is ball-mode blind: residuals flip sign across Standard and Chaos modes, and propose a fix</div><div class="bm-item">Show that percent change in a stat does not always equal percent change in formula output — specifically identify Speed (proportional) vs. Power (non-proportional)</div><div class="bm-item">Teach the math to a visitor covering all four stats with formula outputs, and diagnose one limitation of their own win equation</div></div>
+  </div></div>
+</div>
+
+<!-- FORMULA REFERENCE -->
+<div id="ref" class="week-section">
+  <div class="week-header" style="border-radius:8px;"><h2>Formula Quick Reference for Facilitators</h2><p>All seven formula types with common Approaching errors. Laminate and keep at every facilitator station.</p></div>
+  <div style="background:white;border:1px solid var(--border);border-radius:0 0 8px 8px;overflow:hidden;margin-top:-1px;">
+    <table class="formula-ref-table">
+      <thead><tr><th style="width:110px">Stat</th><th>Formula</th><th style="width:150px">Type</th><th>Common Approaching Error</th></tr></thead>
+      <tbody>
+        <tr><td>Speed</td><td><span class="formula-code">Motor Power % = Speed × 100 / 20</span></td><td><span class="type-tag">Linear / proportional</span></td><td class="error-cell">Forgets ÷20. Gets &gt;100% and doesn't flag it.</td></tr>
+        <tr><td>Power</td><td><span class="formula-code">Charge % = Power²</span><br><span class="formula-code">Follow-through = Power × 80 ms</span></td><td><span class="type-tag">Quadratic</span> (charge)<br><span class="type-tag" style="margin-top:3px;display:inline-block">Linear</span> (follow-through)</td><td class="error-cell">Confuses 'doubling Power quadruples charge' with 'doubling output.' Uses 100 ms instead of 80 ms for follow-through.</td></tr>
+        <tr><td>Endurance</td><td><span class="formula-code">P(t) = 100 − (20 − E) × 1.5 × t</span><br><small style="color:#666;font-size:11px">Floor rule: bots never drop below 20% in matches</small></td><td><span class="type-tag">Linear decay</span><br><small style="color:#666">Slope = −decay rate</small></td><td class="error-cell">Drops ×1.5 factor after t=1. Lists slope as positive. States zero-crossing as when bot stops (bot actually floors at 20% in matches).</td></tr>
+        <tr><td>Turning</td><td><span class="formula-code">Turn Ratio = 0.2 + (T × 0.02)</span><br><span class="formula-code">Arc Segments = T</span></td><td><span class="type-tag">Linear</span></td><td class="error-cell">Confuses higher Turning with wider arcs — it's actually tighter arcs. Higher T = smaller radius.</td></tr>
+        <tr><td>Budget</td><td><span class="formula-code">S + P + E + T = 20</span></td><td><span class="type-tag">Constraint equation</span></td><td class="error-cell">Solves for the fourth stat but doesn't verify the sum. Power set to a non-valid value (not 1, 2, 4, or 8).</td></tr>
+        <tr><td>Distance</td><td><span class="formula-code">d = √((x₂−x₁)² + (y₂−y₁)²)</span></td><td><span class="type-tag">Pythagorean theorem</span></td><td class="error-cell">Adds differences before squaring. Also: adds coordinates instead of subtracting.</td></tr>
+        <tr><td>Percent Change</td><td><span class="formula-code">% change = (new − old) / old × 100</span></td><td><span class="type-tag">Proportional reasoning</span></td><td class="error-cell">Divides by new value instead of old value. States percent change in stat equals percent change in output (only true for proportional relationships like Speed).</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:16px 20px;background:#f8f9fa;border-top:1px solid var(--border);">
+      <p style="font-size:12px;color:#555;font-weight:700;margin-bottom:8px">Concept Types for Commissioner Proposals (Criterion 6)</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="type-tag">Proportional Scaling</span><span class="type-tag">Unit Rate</span><span class="type-tag">Ratio</span><span class="type-tag">Slope as Rate of Change</span><span class="type-tag">Linear Decay</span>
+      </div>
+      <p style="font-size:11px;color:#888;margin-top:12px">NYC FIRST · Velocity Arena · Student Work Exemplars · Summer Sparks 2026 · Teacher Reference</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- .main -->
+<script>
+function showWeek(id,btn) {
+  document.querySelectorAll('.week-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleDay(header) {
+  header.parentElement.classList.toggle('open');
+}
+</script>
+</body>
+</html>
