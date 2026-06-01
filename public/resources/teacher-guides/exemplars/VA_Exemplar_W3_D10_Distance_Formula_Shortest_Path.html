@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Week 2, Day 10 · Distance Formula: Shortest Path to the Goal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Shadows+Into+Light&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{--slate:#2B2D42;--red:#EF233C;--steel:#8D99AE;--ice:#EDF2F4;--ink:#1f3a8a;--pencil:#3f4654;--paper:#fdfdfb;--rule:#c9d0dd;--line:#e4e8ef;--box:#f4f6fa;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#dadfe7;background-image:radial-gradient(circle at 25% -5%,#e9edf3,#d2d7e0);font-family:"Montserrat",system-ui,sans-serif;color:var(--slate);-webkit-font-smoothing:antialiased;padding:38px 16px 90px;}
+.wrap{max-width:860px;margin:0 auto;}
+.intro{margin-bottom:26px;}
+.intro .eyebrow{font-weight:800;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.intro h1{font-weight:800;font-size:24px;letter-spacing:-.02em;margin-bottom:8px;}
+.intro p{font-size:13.5px;line-height:1.6;max-width:66ch;opacity:.85;}
+.cast{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;}
+.cast .c{font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:999px;color:#fff;}
+.cast .c b{font-weight:800;letter-spacing:.04em;}
+.c-ap{background:#c47d12;}.c-mt{background:#2a8f59;}.c-ex{background:#2b6fb0;}
+.sheet{background:var(--paper);border-radius:4px;border:1px solid #e7e2d6;box-shadow:0 1px 0 rgba(0,0,0,.04),0 18px 42px -24px rgba(43,45,66,.6);margin-bottom:40px;overflow:hidden;position:relative;}
+.level-tab{position:absolute;top:22px;right:0;color:#fff;font-weight:800;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:7px 15px;border-radius:4px 0 0 4px;z-index:3;}
+.tab-ap{background:#c47d12;}.tab-mt{background:#2a8f59;}.tab-ex{background:#2b6fb0;}
+.pg-head{display:flex;align-items:center;gap:10px;padding:16px 28px 10px;font-weight:700;font-size:11px;}
+.pg-head .l{text-transform:uppercase;letter-spacing:.12em;}.pg-head .r{margin-left:auto;font-weight:600;color:var(--steel);}
+.rule-strong{height:2px;background:var(--slate);margin:0 28px 14px;}
+.body{padding:0 28px 22px;}
+.wtitle{font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1.15;margin:2px 0 2px;}
+.wsub{font-size:12.5px;color:var(--steel);margin-bottom:14px;}
+/* ID rows */
+.id-stack{border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.id-row{display:flex;border-bottom:1px solid var(--rule);}
+.id-row:last-child{border-bottom:none;}
+.id-lbl{background:var(--ice);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;min-width:72px;display:flex;align-items:center;}
+.id-val{flex:1;padding:7px 12px;display:flex;align-items:center;}
+/* Question box */
+.q-box{border:1.5px solid var(--slate);border-radius:4px;padding:10px 14px;font-weight:700;font-size:13.5px;margin-bottom:12px;background:#fff;}
+/* Formula box */
+.formula-box{border:2px solid var(--slate);border-radius:5px;text-align:center;font-weight:800;font-size:18px;padding:12px;margin:6px 0 4px;background:#fff;}
+.formula-note{font-size:11.5px;color:var(--steel);margin-bottom:12px;font-style:italic;}
+/* bands and panels */
+.band{background:var(--ice);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--rule);border-bottom:0;}
+.panel{border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:12px 14px;margin-bottom:12px;}
+/* SVG field wrapper */
+.field-wrap{margin:6px 0 10px;}
+/* 3-column positions */
+.pos-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
+.pos-cell{border:1px solid var(--rule);border-radius:4px;padding:9px 11px;font-size:12px;}
+.pos-cell .pos-lbl{font-weight:800;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+.pos-cell .pos-sub{font-size:11px;color:var(--steel);margin-bottom:5px;line-height:1.4;}
+.pos-cell .pos-given{background:var(--slate);color:#fff;font-weight:800;border-radius:3px;padding:4px 10px;font-size:12.5px;display:inline-block;margin-top:2px;}
+/* 2-column step layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+/* Step boxes */
+.step-box{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:#fffef9;height:100%;}
+.step-box .sh{font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;color:var(--slate);}
+.calc-line{font-size:12.5px;line-height:2.0;display:flex;align-items:baseline;flex-wrap:wrap;gap:3px;margin-bottom:2px;}
+.calc-label{font-weight:700;font-size:11.5px;min-width:60px;}
+.step2-full{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:#fffef9;margin-bottom:10px;font-size:13px;}
+/* inline formula step line */
+.fl{font-size:11.5px;font-weight:700;color:var(--steel);margin-right:4px;}
+/* warning note */
+.warn{font-size:11px;color:var(--red);font-weight:700;margin-top:4px;}
+/* checklist items */
+.cbi{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:4px 0;}
+.cbx{display:inline-block;width:13px;height:13px;border:1.5px solid #aaa;border-radius:2px;background:#fff;text-align:center;line-height:12px;font-size:8px;flex-shrink:0;}
+.cbx.on{background:var(--ice);border-color:var(--slate);color:var(--slate);}
+/* circle selection */
+.copt{padding:2px 9px;border:1.5px solid var(--rule);border-radius:11px;font-weight:600;font-size:12px;}
+.copt.on{border:2px solid var(--ink);font-weight:800;}
+.copt.off{color:var(--steel);}
+/* Big Idea */
+.big-idea{border:2px solid var(--slate);border-radius:5px;padding:12px 14px;margin-bottom:12px;background:var(--box);}
+.big-idea .bi-lbl{font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:var(--slate);}
+.big-idea .bi-text{font-weight:700;font-size:13px;font-style:italic;line-height:1.7;}
+/* sheet foot */
+.sfoot{display:flex;justify-content:space-between;font-size:10px;padding:8px 0 4px;border-top:1.5px solid var(--slate);margin-top:12px;opacity:.75;}
+/* lookfor */
+.lookfor{margin:14px -28px 0;padding:14px 28px;background:#eef1f6;border-top:1px solid var(--line);}
+.lookfor .lab{font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;color:#2b6fb0;}
+.lookfor.ap .lab{color:#a96a0c;}.lookfor.mt .lab{color:#1f7a4c;}
+.lookfor .t{font-size:12.5px;line-height:1.55;}
+.lookfor .t em{font-style:italic;}
+.stamp{display:inline-block;font-weight:800;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);border:1.4px solid var(--steel);border-radius:3px;padding:3px 8px;transform:rotate(-2deg);margin-top:12px;}
+.hw{color:var(--ink);}.hw.p{color:var(--pencil);}
+.ap-hand{font-family:"Shadows Into Light",cursive;font-size:18px;line-height:1.2;}
+.mt-hand{font-family:"Caveat",cursive;font-size:21px;font-weight:600;line-height:1.1;}
+.ex-hand{font-family:"Reenie Beanie",cursive;font-size:23px;line-height:1.05;}
+.err{color:#c0202a;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="intro">
+  <p class="eyebrow">Completed student work · Week 2 · Day 10</p>
+  <h1>Distance Formula: Shortest Path to the Goal</h1>
+  <p>Students use the distance formula to measure how far their ball traveled (A→B) and how far it still needs to go (B→G), then compare "total movement" to "useful progress." The low sample writes raw differences in the Add step instead of squared values — a one-place error that cascades into an impossible efficiency greater than 1.00 (more progress than movement). The high sample uses efficiency=1.00 to argue that the bottleneck is Power, not aim. Illustrative samples, built before the pilot.</p>
+  <div class="cast">
+    <span class="c c-ap"><b>APPROACHING</b> · Marcus T. · Voltage · B=(6,3)</span>
+    <span class="c c-mt"><b>MEETS</b> · Jayda W. · Circuit Breakers · B=(6,1)</span>
+    <span class="c c-ex"><b>EXCEEDS</b> · Priya R. · Overclock · B=(7,2)</span>
+  </div>
+</div>
+
+<!-- ══════════ APPROACHING · Marcus ══════════ -->
+<div class="sheet"><div class="level-tab tab-ap">Approaching</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 2, Day 10</span><span class="r">Distance Formula</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Distance Formula:<br>Shortest Path to the Goal</div>
+  <div class="wsub" style="height:4px;"></div>
+  <div class="id-stack">
+    <div class="id-row"><span class="id-lbl">Team</span><span class="id-val hw ap-hand">Voltage</span></div>
+    <div class="id-row"><span class="id-lbl">Names</span><span class="id-val hw ap-hand">Marcus T.</span></div>
+  </div>
+
+  <div class="q-box">THE QUESTION: Can your bot move the ball far enough to score?</div>
+
+  <div class="band">The Distance Formula</div>
+  <div class="panel" style="padding-bottom:8px;">
+    <div class="formula-box">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div class="formula-note">Subtract first. Square each difference separately. Then add. Then take the square root.</div>
+  </div>
+
+  <div class="band">Setup — Label the field</div>
+  <div class="panel">
+    <div style="font-size:12px;margin-bottom:8px;">The 8×4 field is your coordinate plane. Opponent's goal center: G = (8, 2). Mark your Position B — <strong>where the ball landed after your best Season 1 charge.</strong></div>
+    <!-- SVG Field — Marcus B=(6,3) -->
+    <div class="field-wrap">
+      <svg viewBox="0 0 335 185" style="width:100%;max-width:420px;display:block;border:1px solid var(--rule);border-radius:3px;background:#fdfdfb;">
+        <rect x="40" y="55" width="35" height="70" fill="rgba(43,45,66,0.08)"/>
+        <rect x="285" y="55" width="35" height="70" fill="rgba(239,35,60,0.09)"/>
+        <rect x="40" y="20" width="280" height="140" fill="none" stroke="#2B2D42" stroke-width="1.5"/>
+        <g stroke="#dde3eb" stroke-width="0.7"><line x1="75" y1="20" x2="75" y2="160"/><line x1="110" y1="20" x2="110" y2="160"/><line x1="145" y1="20" x2="145" y2="160"/><line x1="180" y1="20" x2="180" y2="160"/><line x1="215" y1="20" x2="215" y2="160"/><line x1="250" y1="20" x2="250" y2="160"/><line x1="285" y1="20" x2="285" y2="160"/><line x1="40" y1="125" x2="320" y2="125"/><line x1="40" y1="90" x2="320" y2="90"/><line x1="40" y1="55" x2="320" y2="55"/></g>
+        <line x1="14" y1="160" x2="14" y2="18" stroke="#2B2D42" stroke-width="1.5"/><polyline points="10,22 14,16 18,22" fill="#2B2D42" stroke="none"/>
+        <text x="9" y="14" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">y</text>
+        <text x="28" y="163" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="28" y="128" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="28" y="93" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="28" y="58" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="28" y="23" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text>
+        <line x1="38" y1="163" x2="323" y2="163" stroke="#2B2D42" stroke-width="1.5"/><polyline points="319,159 325,163 319,167" fill="#2B2D42" stroke="none"/>
+        <text x="329" y="167" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">x</text>
+        <text x="40" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="75" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="110" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="145" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="180" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text><text x="215" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">5</text><text x="250" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">6</text><text x="285" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">7</text><text x="320" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">8</text>
+        <text x="57" y="98" font-size="7" text-anchor="middle" fill="#2B2D42" font-family="Montserrat,sans-serif" transform="rotate(-90 57 98)" letter-spacing="1">YOUR GOAL</text>
+        <text x="302" y="96" font-size="7" text-anchor="middle" fill="#EF233C" font-family="Montserrat,sans-serif" transform="rotate(-90 302 96)" letter-spacing="1">OPP GOAL</text>
+        <!-- A→B line -->
+        <line x1="180" y1="90" x2="250" y2="55" stroke="#1f3a8a" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>
+        <!-- B→G line -->
+        <line x1="250" y1="55" x2="320" y2="90" stroke="#8D99AE" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <!-- A (4,2) -->
+        <circle cx="180" cy="90" r="7" fill="#2B2D42"/>
+        <text x="187" y="84" font-size="10" font-weight="800" fill="#2B2D42" font-family="Montserrat,sans-serif">A (4,2)</text>
+        <!-- G (8,2) -->
+        <circle cx="320" cy="90" r="8" fill="none" stroke="#EF233C" stroke-width="2"/><line x1="313" y1="90" x2="327" y2="90" stroke="#EF233C" stroke-width="2"/><line x1="320" y1="83" x2="320" y2="97" stroke="#EF233C" stroke-width="2"/>
+        <text x="296" y="80" font-size="9" font-weight="800" fill="#EF233C" font-family="Montserrat,sans-serif">G (8,2)</text>
+        <!-- B=(6,3) Marcus -->
+        <circle cx="250" cy="55" r="6" fill="rgba(31,58,138,0.1)" stroke="#1f3a8a" stroke-width="2"/>
+        <text x="258" y="50" font-size="11" fill="#1f3a8a" font-family="Shadows Into Light,cursive" font-weight="700">B (6,3)</text>
+      </svg>
+    </div>
+    <div style="font-size:11.5px;font-style:italic;color:var(--steel);">Your B does not need to be perfect. It needs to be reasonable and consistent for the calculations.</div>
+
+    <div style="margin-top:10px;font-weight:800;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Step 1 — Record your three positions</div>
+    <div class="pos-row">
+      <div class="pos-cell"><div class="pos-lbl">A — Tip-Off</div><div class="pos-sub">Where the ball sits at the start of every match. Fixed.</div><div class="pos-given">A = (4, 2) [given]</div></div>
+      <div class="pos-cell"><div class="pos-lbl">B — Post-Charge</div><div class="pos-sub">Where the ball landed after your best Season 1 charge.</div><div style="font-size:13px;margin-top:4px;">B = (<span class="hw ap-hand" style="font-size:20px;">6</span>, <span class="hw ap-hand" style="font-size:20px;">3</span>)</div></div>
+      <div class="pos-cell"><div class="pos-lbl">G — Opponent's Goal</div><div class="pos-sub">The target. Every distance calculation ends here. Fixed.</div><div class="pos-given">G = (8, 2) [given]</div></div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="band">Step 2 — How far is the goal? &nbsp;A → G</div>
+  <div class="panel">
+    <div style="font-size:12.5px;margin-bottom:6px;">A = (4, 2) and G = (8, 2) share the same y-value (y = 2), so this is a horizontal distance:</div>
+    <div style="font-size:13px;font-weight:700;">Distance = 8 − 4 = <span class="hw ap-hand" style="font-size:22px;">4</span> units</div>
+  </div>
+
+  <!-- Steps 3 & 4 -->
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 3 — How far did you kick? &nbsp;A → B</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:8px;">A = (4, 2) and B = (<span class="hw ap-hand" style="font-size:18px;">6</span>, <span class="hw ap-hand" style="font-size:18px;">3</span>)</div>
+        <div class="calc-line"><span class="fl">Step 2</span> x₂−x₁: <span class="hw ap-hand" style="font-size:18px;">6</span> − <span class="hw ap-hand" style="font-size:18px;">4</span> = <span class="hw ap-hand" style="font-size:18px;">2</span> &nbsp;Square: (<span class="hw ap-hand" style="font-size:18px;">2</span>)² = <span class="hw ap-hand" style="font-size:18px;">4</span></div>
+        <div class="calc-line"><span class="fl">Step 3</span> y₂−y₁: <span class="hw ap-hand" style="font-size:18px;">3</span> − <span class="hw ap-hand" style="font-size:18px;">2</span> = <span class="hw ap-hand" style="font-size:18px;">1</span> &nbsp;Square: (<span class="hw ap-hand" style="font-size:18px;">1</span>)² = <span class="hw ap-hand" style="font-size:18px;">1</span></div>
+        <div class="calc-line"><span class="fl">Step 4</span> Add: <span class="hw ap-hand err" style="font-size:18px;">2</span> + <span class="hw ap-hand err" style="font-size:18px;">1</span> = <span class="hw ap-hand err" style="font-size:18px;">3</span></div>
+        <div class="calc-line"><span class="fl">Step 5</span> d = √<span class="hw ap-hand err" style="font-size:18px;">3</span> ≈ <span class="hw ap-hand err" style="font-size:18px;">1.73</span> grid units</div>
+        <div class="warn">△ Do not stop under the radical. Take the square root.</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 4 — Distance left to score &nbsp;B → G</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;"><strong>Before calculating:</strong> Should B→G be greater or less than 4? <span class="hw ap-hand" style="font-size:18px;">less than 4</span></div>
+        <div style="font-size:12px;margin-bottom:6px;">B = (<span class="hw ap-hand" style="font-size:18px;">6</span>, <span class="hw ap-hand" style="font-size:18px;">3</span>) and G = (8, 2)</div>
+        <div class="calc-line">x₂−x₁: 8 − <span class="hw ap-hand" style="font-size:18px;">6</span> = <span class="hw ap-hand" style="font-size:18px;">2</span> &nbsp;Square: (<span class="hw ap-hand" style="font-size:18px;">2</span>)² = <span class="hw ap-hand" style="font-size:18px;">4</span></div>
+        <div class="calc-line">y₂−y₁: 2 − <span class="hw ap-hand" style="font-size:18px;">3</span> = <span class="hw ap-hand" style="font-size:18px;">−1</span> &nbsp;Square: (<span class="hw ap-hand" style="font-size:18px;">−1</span>)² = <span class="hw ap-hand" style="font-size:18px;">1</span></div>
+        <div class="calc-line">Add: <span class="hw ap-hand err" style="font-size:18px;">2</span> + (<span class="hw ap-hand err" style="font-size:18px;">−1</span>) = <span class="hw ap-hand err" style="font-size:18px;">1</span></div>
+        <div class="calc-line">d = √<span class="hw ap-hand err" style="font-size:18px;">1</span> = <span class="hw ap-hand err" style="font-size:18px;">1</span> units</div>
+        <div style="font-size:11.5px;margin-top:4px;">Check: <span class="hw ap-hand" style="font-size:17px;">1 &lt; 4 ✓ looks right</span></div>
+        <div class="warn">△ Do not stop under the radical. Take the square root.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps 5 & 6 -->
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 5 — How much progress?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance to goal <strong>BEFORE</strong> = <span class="hw ap-hand" style="font-size:20px;">4</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance to goal <strong>AFTER</strong> = <span class="hw ap-hand err" style="font-size:20px;">1</span></div>
+        <div style="font-size:12px;font-style:italic;margin-bottom:8px;">"My kick (<span class="copt on">reduced</span> / <span class="copt off">increased</span>) the distance to the goal by <span class="hw ap-hand err" style="font-size:20px;">3</span> units."</div>
+        <div class="cbi"><span class="cbx on">✓</span>The ball got closer to the goal</div>
+        <div class="cbi"><span class="cbx"></span>The ball stayed the same distance</div>
+        <div class="cbi"><span class="cbx"></span>The ball got farther from the goal</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 6 — Movement vs. progress</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance ball traveled (A→B): <span class="hw ap-hand err" style="font-size:20px;">1.73</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance toward goal: <span class="hw ap-hand err" style="font-size:20px;">3</span></div>
+        <div style="font-size:12px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:8px;background:var(--box);">"The ball moved <span class="hw ap-hand err" style="font-size:19px;">1.73</span> units total, but only <span class="hw ap-hand err" style="font-size:19px;">3</span> units reduced the distance to the goal."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps 7 & 8 -->
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 7 — Efficiency</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;font-style:italic;">What fraction of total movement actually helped get closer to the goal?</div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Useful progress ÷ Total movement = <span class="hw ap-hand err" style="font-size:20px;">3 ÷ 1.73 ≈ 1.73</span></div>
+        <div class="cbi"><span class="cbx on">✓</span>Most of my movement was useful</div>
+        <div class="cbi"><span class="cbx"></span>Some movement was wasted</div>
+        <div class="cbi"><span class="cbx"></span>Most movement was wasted</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 8 — How many kicks needed?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:5px;font-style:italic;">Starting distance ÷ useful progress per kick:</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;"><span class="hw ap-hand err" style="font-size:20px;">4</span> ÷ <span class="hw ap-hand err" style="font-size:20px;">3</span> = <span class="hw ap-hand err" style="font-size:20px;">1.33</span></div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Round up → <span class="hw ap-hand err" style="font-size:20px;">2</span> kicks (theoretical minimum)</div>
+        <div style="font-size:12.5px;">Did one charge score? <span class="hw ap-hand" style="font-size:19px;">No</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps 9 & 10 -->
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 9 — Why did this happen?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Circle all that apply. Then star the one that mattered most.</div>
+        <div class="cbi"><span style="font-size:16px;margin-right:2px;">★</span><span class="cbx on">✓</span>Ball went sideways</div>
+        <div class="cbi"><span class="cbx"></span>Ball curved after impact</div>
+        <div class="cbi"><span class="cbx"></span>Contact was off-center</div>
+        <div class="cbi"><span class="cbx"></span>Too much turning during approach</div>
+        <div class="cbi"><span class="cbx"></span>Other: <span class="hw ap-hand" style="font-size:16px;"></span></div>
+        <div style="font-size:12px;margin-top:6px;">The biggest reason was <span class="hw ap-hand" style="font-size:18px;">sideways drift</span> because my diagram shows <span class="hw ap-hand" style="font-size:18px;">the ball went 1 unit up from center.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 10 — Strategy for Season 2</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div class="cbi"><span class="cbx"></span>Increase Power (more distance)</div>
+        <div class="cbi"><span class="cbx on">✓</span>Improve direction (better aim)</div>
+        <div class="cbi"><span class="cbx"></span>Adjust launch angle</div>
+        <div class="cbi"><span class="cbx"></span>Reduce turning during approach</div>
+        <div style="font-size:12px;margin-top:6px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:7px;background:var(--box);">"I will change <span class="hw ap-hand" style="font-size:18px;">direction</span> because my [<span class="copt on">useful progress</span>] was <span class="hw ap-hand err" style="font-size:18px;">3</span>, which means <span class="hw ap-hand err" style="font-size:17px;">I was already really efficient so I just need better aim.</span>"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Big Idea -->
+  <div class="band">Big Idea</div>
+  <div class="panel">
+    <div class="big-idea">
+      <div class="bi-lbl">Big Idea</div>
+      <div class="bi-text">"Hitting the ball farther does NOT always help because my ball moved <span class="hw ap-hand err" style="font-size:20px;">1.73</span> units, but only <span class="hw ap-hand err" style="font-size:20px;">3</span> units reduced the distance to the goal."</div>
+      <div style="margin-top:8px;font-size:12.5px;font-weight:700;">This means <span class="hw ap-hand" style="font-size:20px;">direction matters not just distance.</span></div>
+    </div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>Velocity Arena</span><span>Week 2, Day 10 · Distance Formula</span><span>Page 2 of 2</span></div>
+  <div class="lookfor ap"><div class="lab">Teacher look-for</div><div class="t">Marcus squares each difference correctly (2²=4, 1²=1) but in the <strong>Add step</strong> he writes the raw differences (2+1=3) instead of the squares (4+1=5). This cascades: A→B=√3≈1.73, B→G=√1=1. His efficiency (3÷1.73≈1.73) is mathematically impossible — you cannot reduce distance by more than you traveled. His Big Idea sentence shows this impossibility directly. This is his consistent pattern: individual pieces computed right, binding rule missed. <em>Ask: "In your Add step, where did the 2 and 1 come from? Check your squares from the lines above."</em></div></div>
+</div></div>
+
+
+<!-- ══════════ MEETS · Jayda ══════════ -->
+<div class="sheet"><div class="level-tab tab-mt">Meets</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 2, Day 10</span><span class="r">Distance Formula</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Distance Formula:<br>Shortest Path to the Goal</div>
+  <div class="wsub" style="height:4px;"></div>
+  <div class="id-stack">
+    <div class="id-row"><span class="id-lbl">Team</span><span class="id-val hw mt-hand">Circuit Breakers</span></div>
+    <div class="id-row"><span class="id-lbl">Names</span><span class="id-val hw mt-hand">Jayda W.</span></div>
+  </div>
+
+  <div class="q-box">THE QUESTION: Can your bot move the ball far enough to score?</div>
+
+  <div class="band">The Distance Formula</div>
+  <div class="panel" style="padding-bottom:8px;">
+    <div class="formula-box">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div class="formula-note">Subtract first. Square each difference separately. Then add. Then take the square root.</div>
+  </div>
+
+  <div class="band">Setup — Label the field</div>
+  <div class="panel">
+    <div style="font-size:12px;margin-bottom:8px;">The 8×4 field is your coordinate plane. Opponent's goal center: G = (8, 2). Mark your Position B — <strong>where the ball landed after your best Season 1 charge.</strong></div>
+    <!-- SVG Field — Jayda B=(6,1) -->
+    <div class="field-wrap">
+      <svg viewBox="0 0 335 185" style="width:100%;max-width:420px;display:block;border:1px solid var(--rule);border-radius:3px;background:#fdfdfb;">
+        <rect x="40" y="55" width="35" height="70" fill="rgba(43,45,66,0.08)"/>
+        <rect x="285" y="55" width="35" height="70" fill="rgba(239,35,60,0.09)"/>
+        <rect x="40" y="20" width="280" height="140" fill="none" stroke="#2B2D42" stroke-width="1.5"/>
+        <g stroke="#dde3eb" stroke-width="0.7"><line x1="75" y1="20" x2="75" y2="160"/><line x1="110" y1="20" x2="110" y2="160"/><line x1="145" y1="20" x2="145" y2="160"/><line x1="180" y1="20" x2="180" y2="160"/><line x1="215" y1="20" x2="215" y2="160"/><line x1="250" y1="20" x2="250" y2="160"/><line x1="285" y1="20" x2="285" y2="160"/><line x1="40" y1="125" x2="320" y2="125"/><line x1="40" y1="90" x2="320" y2="90"/><line x1="40" y1="55" x2="320" y2="55"/></g>
+        <line x1="14" y1="160" x2="14" y2="18" stroke="#2B2D42" stroke-width="1.5"/><polyline points="10,22 14,16 18,22" fill="#2B2D42" stroke="none"/>
+        <text x="9" y="14" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">y</text>
+        <text x="28" y="163" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="28" y="128" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="28" y="93" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="28" y="58" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="28" y="23" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text>
+        <line x1="38" y1="163" x2="323" y2="163" stroke="#2B2D42" stroke-width="1.5"/><polyline points="319,159 325,163 319,167" fill="#2B2D42" stroke="none"/>
+        <text x="329" y="167" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">x</text>
+        <text x="40" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="75" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="110" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="145" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="180" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text><text x="215" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">5</text><text x="250" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">6</text><text x="285" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">7</text><text x="320" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">8</text>
+        <text x="57" y="98" font-size="7" text-anchor="middle" fill="#2B2D42" font-family="Montserrat,sans-serif" transform="rotate(-90 57 98)" letter-spacing="1">YOUR GOAL</text>
+        <text x="302" y="96" font-size="7" text-anchor="middle" fill="#EF233C" font-family="Montserrat,sans-serif" transform="rotate(-90 302 96)" letter-spacing="1">OPP GOAL</text>
+        <!-- A→B line Jayda (going to 6,1 = svg 250,125) -->
+        <line x1="180" y1="90" x2="250" y2="125" stroke="#1f3a8a" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>
+        <line x1="250" y1="125" x2="320" y2="90" stroke="#8D99AE" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <circle cx="180" cy="90" r="7" fill="#2B2D42"/>
+        <text x="187" y="84" font-size="10" font-weight="800" fill="#2B2D42" font-family="Montserrat,sans-serif">A (4,2)</text>
+        <circle cx="320" cy="90" r="8" fill="none" stroke="#EF233C" stroke-width="2"/><line x1="313" y1="90" x2="327" y2="90" stroke="#EF233C" stroke-width="2"/><line x1="320" y1="83" x2="320" y2="97" stroke="#EF233C" stroke-width="2"/>
+        <text x="296" y="80" font-size="9" font-weight="800" fill="#EF233C" font-family="Montserrat,sans-serif">G (8,2)</text>
+        <!-- B=(6,1) Jayda at svg(250,125) -->
+        <circle cx="250" cy="125" r="6" fill="rgba(31,58,138,0.1)" stroke="#1f3a8a" stroke-width="2"/>
+        <text x="257" y="121" font-size="12" fill="#1f3a8a" font-family="Caveat,cursive" font-weight="700">B (6,1)</text>
+      </svg>
+    </div>
+    <div style="font-size:11.5px;font-style:italic;color:var(--steel);">Your B does not need to be perfect. It needs to be reasonable and consistent for the calculations.</div>
+
+    <div style="margin-top:10px;font-weight:800;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Step 1 — Record your three positions</div>
+    <div class="pos-row">
+      <div class="pos-cell"><div class="pos-lbl">A — Tip-Off</div><div class="pos-sub">Where the ball sits at the start of every match. Fixed.</div><div class="pos-given">A = (4, 2) [given]</div></div>
+      <div class="pos-cell"><div class="pos-lbl">B — Post-Charge</div><div class="pos-sub">Where the ball landed after your best Season 1 charge.</div><div style="font-size:13px;margin-top:4px;">B = (<span class="hw mt-hand" style="font-size:22px;">6</span>, <span class="hw mt-hand" style="font-size:22px;">1</span>)</div></div>
+      <div class="pos-cell"><div class="pos-lbl">G — Opponent's Goal</div><div class="pos-sub">The target. Every distance calculation ends here. Fixed.</div><div class="pos-given">G = (8, 2) [given]</div></div>
+    </div>
+  </div>
+
+  <div class="band">Step 2 — How far is the goal? &nbsp;A → G</div>
+  <div class="panel">
+    <div style="font-size:12.5px;margin-bottom:6px;">A = (4, 2) and G = (8, 2) share the same y-value, so this is a horizontal distance:</div>
+    <div style="font-size:13px;font-weight:700;">Distance = 8 − 4 = <span class="hw mt-hand" style="font-size:24px;">4</span> units</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 3 — How far did you kick? &nbsp;A → B</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:8px;">A = (4, 2) and B = (<span class="hw mt-hand" style="font-size:20px;">6</span>, <span class="hw mt-hand" style="font-size:20px;">1</span>)</div>
+        <div class="calc-line"><span class="fl">Step 2</span> x₂−x₁: <span class="hw mt-hand" style="font-size:20px;">6</span> − <span class="hw mt-hand" style="font-size:20px;">4</span> = <span class="hw mt-hand" style="font-size:20px;">2</span> &nbsp;Square: (<span class="hw mt-hand" style="font-size:20px;">2</span>)² = <span class="hw mt-hand" style="font-size:20px;">4</span></div>
+        <div class="calc-line"><span class="fl">Step 3</span> y₂−y₁: <span class="hw mt-hand" style="font-size:20px;">1</span> − <span class="hw mt-hand" style="font-size:20px;">2</span> = <span class="hw mt-hand" style="font-size:20px;">−1</span> &nbsp;Square: (<span class="hw mt-hand" style="font-size:20px;">−1</span>)² = <span class="hw mt-hand" style="font-size:20px;">1</span></div>
+        <div class="calc-line"><span class="fl">Step 4</span> Add: <span class="hw mt-hand" style="font-size:20px;">4</span> + <span class="hw mt-hand" style="font-size:20px;">1</span> = <span class="hw mt-hand" style="font-size:20px;">5</span></div>
+        <div class="calc-line"><span class="fl">Step 5</span> d = √<span class="hw mt-hand" style="font-size:20px;">5</span> ≈ <span class="hw mt-hand" style="font-size:20px;">2.24</span> grid units</div>
+        <div class="warn">△ Do not stop under the radical. Take the square root.</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 4 — Distance left to score &nbsp;B → G</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;"><strong>Before calculating:</strong> B→G greater or less than 4? <span class="hw mt-hand" style="font-size:20px;">less than 4</span></div>
+        <div style="font-size:12px;margin-bottom:6px;">B = (<span class="hw mt-hand" style="font-size:20px;">6</span>, <span class="hw mt-hand" style="font-size:20px;">1</span>) and G = (8, 2)</div>
+        <div class="calc-line">x₂−x₁: 8 − <span class="hw mt-hand" style="font-size:20px;">6</span> = <span class="hw mt-hand" style="font-size:20px;">2</span> &nbsp;Square: (<span class="hw mt-hand" style="font-size:20px;">2</span>)² = <span class="hw mt-hand" style="font-size:20px;">4</span></div>
+        <div class="calc-line">y₂−y₁: 2 − <span class="hw mt-hand" style="font-size:20px;">1</span> = <span class="hw mt-hand" style="font-size:20px;">1</span> &nbsp;Square: (<span class="hw mt-hand" style="font-size:20px;">1</span>)² = <span class="hw mt-hand" style="font-size:20px;">1</span></div>
+        <div class="calc-line">Add: <span class="hw mt-hand" style="font-size:20px;">4</span> + <span class="hw mt-hand" style="font-size:20px;">1</span> = <span class="hw mt-hand" style="font-size:20px;">5</span> &nbsp;d = √<span class="hw mt-hand" style="font-size:20px;">5</span> ≈ <span class="hw mt-hand" style="font-size:20px;">2.24</span> units</div>
+        <div style="font-size:11.5px;margin-top:4px;">Check: <span class="hw mt-hand" style="font-size:19px;">2.24 &lt; 4 ✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 5 — How much progress?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance to goal <strong>BEFORE</strong> = <span class="hw mt-hand" style="font-size:22px;">4</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance to goal <strong>AFTER</strong> = <span class="hw mt-hand" style="font-size:22px;">2.24</span></div>
+        <div style="font-size:12px;font-style:italic;margin-bottom:8px;">"My kick (<span class="copt on">reduced</span> / <span class="copt off">increased</span>) the distance to the goal by <span class="hw mt-hand" style="font-size:22px;">1.76</span> units."</div>
+        <div class="cbi"><span class="cbx on">✓</span>The ball got closer to the goal</div>
+        <div class="cbi"><span class="cbx"></span>The ball stayed the same distance</div>
+        <div class="cbi"><span class="cbx"></span>The ball got farther from the goal</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 6 — Movement vs. progress</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance ball traveled (A→B): <span class="hw mt-hand" style="font-size:22px;">2.24</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance toward goal: <span class="hw mt-hand" style="font-size:22px;">1.76</span></div>
+        <div style="font-size:12px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:8px;background:var(--box);">"The ball moved <span class="hw mt-hand" style="font-size:21px;">2.24</span> units total, but only <span class="hw mt-hand" style="font-size:21px;">1.76</span> units reduced the distance to the goal."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 7 — Efficiency</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;font-style:italic;">What fraction of total movement actually helped?</div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">1.76 ÷ 2.24 = <span class="hw mt-hand" style="font-size:22px;">0.79</span></div>
+        <div class="cbi"><span class="cbx"></span>Most of my movement was useful</div>
+        <div class="cbi"><span class="cbx on">✓</span>Some movement was wasted</div>
+        <div class="cbi"><span class="cbx"></span>Most movement was wasted</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 8 — How many kicks needed?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:5px;font-style:italic;">Starting distance ÷ useful progress per kick:</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;"><span class="hw mt-hand" style="font-size:22px;">4</span> ÷ <span class="hw mt-hand" style="font-size:22px;">1.76</span> = <span class="hw mt-hand" style="font-size:22px;">2.27</span></div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Round up → <span class="hw mt-hand" style="font-size:22px;">3</span> kicks (theoretical minimum)</div>
+        <div style="font-size:12.5px;">Did one charge score? <span class="hw mt-hand" style="font-size:21px;">No — 2.24 units short of goal</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 9 — Why did this happen?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div class="cbi"><span style="font-size:16px;margin-right:2px;">★</span><span class="cbx on">✓</span>Ball went sideways</div>
+        <div class="cbi"><span class="cbx"></span>Ball curved after impact</div>
+        <div class="cbi"><span class="cbx"></span>Contact was off-center</div>
+        <div class="cbi"><span class="cbx"></span>Too much turning during approach</div>
+        <div class="cbi"><span class="cbx"></span>Other: &nbsp;</div>
+        <div style="font-size:12px;margin-top:6px;">The biggest reason was <span class="hw mt-hand" style="font-size:20px;">sideways drift</span> because my diagram shows <span class="hw mt-hand" style="font-size:20px;">the ball landed 1 unit below center.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 10 — Strategy for Season 2</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div class="cbi"><span class="cbx"></span>Increase Power (more distance)</div>
+        <div class="cbi"><span class="cbx on">✓</span>Improve direction (better aim)</div>
+        <div class="cbi"><span class="cbx"></span>Adjust launch angle</div>
+        <div class="cbi"><span class="cbx"></span>Reduce turning during approach</div>
+        <div style="font-size:12px;margin-top:6px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:7px;background:var(--box);">"I will change <span class="hw mt-hand" style="font-size:20px;">direction</span> because my [<span class="copt on">useful progress</span>] was <span class="hw mt-hand" style="font-size:20px;">1.76</span>, which means <span class="hw mt-hand" style="font-size:19px;">0.24 of every unit I traveled was wasted going sideways.</span>"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">Big Idea</div>
+  <div class="panel">
+    <div class="big-idea">
+      <div class="bi-lbl">Big Idea</div>
+      <div class="bi-text">"Hitting the ball farther does NOT always help because my ball moved <span class="hw mt-hand" style="font-size:22px;">2.24</span> units, but only <span class="hw mt-hand" style="font-size:22px;">1.76</span> units reduced the distance to the goal."</div>
+      <div style="margin-top:8px;font-size:12.5px;font-weight:700;">This means <span class="hw mt-hand" style="font-size:21px;">direction matters as much as power — not all movement brings the ball closer.</span></div>
+    </div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>Velocity Arena</span><span>Week 2, Day 10 · Distance Formula</span><span>Page 2 of 2</span></div>
+  <div class="lookfor mt"><div class="lab">Teacher look-for</div><div class="t">All steps correct and verified: A→B=√5≈2.24, B→G=√5≈2.24, efficiency=1.76÷2.24≈0.79, kicks=4÷1.76≈2.27→3. Her Add steps use the squares (4+1=5), not the differences. She identifies the sideways drift correctly and chooses "Improve direction." She stops at description — she says 0.24 was wasted but doesn't connect this to a specific stat or formula change that would reduce T=4's arc contribution to sideways drift.</div></div>
+</div></div>
+
+
+<!-- ══════════ EXCEEDS · Priya ══════════ -->
+<div class="sheet"><div class="level-tab tab-ex">Exceeds</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 2, Day 10</span><span class="r">Distance Formula</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Distance Formula:<br>Shortest Path to the Goal</div>
+  <div class="wsub" style="height:4px;"></div>
+  <div class="id-stack">
+    <div class="id-row"><span class="id-lbl">Team</span><span class="id-val hw ex-hand">Overclock</span></div>
+    <div class="id-row"><span class="id-lbl">Names</span><span class="id-val hw ex-hand">Priya R.</span></div>
+  </div>
+
+  <div class="q-box">THE QUESTION: Can your bot move the ball far enough to score?</div>
+
+  <div class="band">The Distance Formula</div>
+  <div class="panel" style="padding-bottom:8px;">
+    <div class="formula-box">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div class="formula-note">Subtract first. Square each difference separately. Then add. Then take the square root.</div>
+  </div>
+
+  <div class="band">Setup — Label the field</div>
+  <div class="panel">
+    <div style="font-size:12px;margin-bottom:8px;">The 8×4 field is your coordinate plane. Opponent's goal center: G = (8, 2). Mark your Position B — <strong>where the ball landed after your best Season 1 charge.</strong></div>
+    <!-- SVG Field — Priya B=(7,2) -->
+    <div class="field-wrap">
+      <svg viewBox="0 0 335 185" style="width:100%;max-width:420px;display:block;border:1px solid var(--rule);border-radius:3px;background:#fdfdfb;">
+        <rect x="40" y="55" width="35" height="70" fill="rgba(43,45,66,0.08)"/>
+        <rect x="285" y="55" width="35" height="70" fill="rgba(239,35,60,0.09)"/>
+        <rect x="40" y="20" width="280" height="140" fill="none" stroke="#2B2D42" stroke-width="1.5"/>
+        <g stroke="#dde3eb" stroke-width="0.7"><line x1="75" y1="20" x2="75" y2="160"/><line x1="110" y1="20" x2="110" y2="160"/><line x1="145" y1="20" x2="145" y2="160"/><line x1="180" y1="20" x2="180" y2="160"/><line x1="215" y1="20" x2="215" y2="160"/><line x1="250" y1="20" x2="250" y2="160"/><line x1="285" y1="20" x2="285" y2="160"/><line x1="40" y1="125" x2="320" y2="125"/><line x1="40" y1="90" x2="320" y2="90"/><line x1="40" y1="55" x2="320" y2="55"/></g>
+        <line x1="14" y1="160" x2="14" y2="18" stroke="#2B2D42" stroke-width="1.5"/><polyline points="10,22 14,16 18,22" fill="#2B2D42" stroke="none"/>
+        <text x="9" y="14" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">y</text>
+        <text x="28" y="163" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="28" y="128" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="28" y="93" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="28" y="58" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="28" y="23" font-size="9" text-anchor="end" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text>
+        <line x1="38" y1="163" x2="323" y2="163" stroke="#2B2D42" stroke-width="1.5"/><polyline points="319,159 325,163 319,167" fill="#2B2D42" stroke="none"/>
+        <text x="329" y="167" font-size="11" font-family="Montserrat,sans-serif" fill="#2B2D42" font-weight="700">x</text>
+        <text x="40" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">0</text><text x="75" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">1</text><text x="110" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">2</text><text x="145" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">3</text><text x="180" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">4</text><text x="215" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">5</text><text x="250" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">6</text><text x="285" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">7</text><text x="320" y="176" font-size="9" text-anchor="middle" fill="#8D99AE" font-family="Montserrat,sans-serif">8</text>
+        <text x="57" y="98" font-size="7" text-anchor="middle" fill="#2B2D42" font-family="Montserrat,sans-serif" transform="rotate(-90 57 98)" letter-spacing="1">YOUR GOAL</text>
+        <text x="302" y="96" font-size="7" text-anchor="middle" fill="#EF233C" font-family="Montserrat,sans-serif" transform="rotate(-90 302 96)" letter-spacing="1">OPP GOAL</text>
+        <!-- A→B horizontal to (7,2) = svg(285,90) -->
+        <line x1="180" y1="90" x2="285" y2="90" stroke="#1f3a8a" stroke-width="2" stroke-dasharray="5,3" opacity="0.8"/>
+        <!-- B→G: (285,90)→(320,90) shorter -->
+        <line x1="285" y1="90" x2="320" y2="90" stroke="#8D99AE" stroke-width="2" stroke-dasharray="5,3"/>
+        <circle cx="180" cy="90" r="7" fill="#2B2D42"/>
+        <text x="187" y="84" font-size="10" font-weight="800" fill="#2B2D42" font-family="Montserrat,sans-serif">A (4,2)</text>
+        <circle cx="320" cy="90" r="8" fill="none" stroke="#EF233C" stroke-width="2"/><line x1="313" y1="90" x2="327" y2="90" stroke="#EF233C" stroke-width="2"/><line x1="320" y1="83" x2="320" y2="97" stroke="#EF233C" stroke-width="2"/>
+        <text x="296" y="80" font-size="9" font-weight="800" fill="#EF233C" font-family="Montserrat,sans-serif">G (8,2)</text>
+        <!-- B=(7,2) Priya at svg(285,90) — directly on the A→G line -->
+        <circle cx="285" cy="90" r="6" fill="rgba(31,58,138,0.1)" stroke="#1f3a8a" stroke-width="2"/>
+        <text x="275" y="78" font-size="13" fill="#1f3a8a" font-family="Reenie Beanie,cursive" font-weight="700">B (7,2)</text>
+      </svg>
+    </div>
+    <div style="font-size:11.5px;font-style:italic;color:var(--steel);">Your B does not need to be perfect. It needs to be reasonable and consistent for the calculations.</div>
+
+    <div style="margin-top:10px;font-weight:800;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Step 1 — Record your three positions</div>
+    <div class="pos-row">
+      <div class="pos-cell"><div class="pos-lbl">A — Tip-Off</div><div class="pos-sub">Where the ball sits at the start of every match. Fixed.</div><div class="pos-given">A = (4, 2) [given]</div></div>
+      <div class="pos-cell"><div class="pos-lbl">B — Post-Charge</div><div class="pos-sub">Where the ball landed after your best Season 1 charge.</div><div style="font-size:13px;margin-top:4px;">B = (<span class="hw ex-hand" style="font-size:24px;">7</span>, <span class="hw ex-hand" style="font-size:24px;">2</span>)</div></div>
+      <div class="pos-cell"><div class="pos-lbl">G — Opponent's Goal</div><div class="pos-sub">The target. Every distance calculation ends here. Fixed.</div><div class="pos-given">G = (8, 2) [given]</div></div>
+    </div>
+  </div>
+
+  <div class="band">Step 2 — How far is the goal? &nbsp;A → G</div>
+  <div class="panel">
+    <div style="font-size:12.5px;margin-bottom:6px;">A = (4, 2) and G = (8, 2) share the same y-value, so this is a horizontal distance:</div>
+    <div style="font-size:13px;font-weight:700;">Distance = 8 − 4 = <span class="hw ex-hand" style="font-size:26px;">4</span> units</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 3 — How far did you kick? &nbsp;A → B</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:8px;">A = (4, 2) and B = (<span class="hw ex-hand" style="font-size:22px;">7</span>, <span class="hw ex-hand" style="font-size:22px;">2</span>)</div>
+        <div class="calc-line"><span class="fl">Step 2</span> x₂−x₁: <span class="hw ex-hand" style="font-size:22px;">7</span> − <span class="hw ex-hand" style="font-size:22px;">4</span> = <span class="hw ex-hand" style="font-size:22px;">3</span> &nbsp;Square: (<span class="hw ex-hand" style="font-size:22px;">3</span>)² = <span class="hw ex-hand" style="font-size:22px;">9</span></div>
+        <div class="calc-line"><span class="fl">Step 3</span> y₂−y₁: <span class="hw ex-hand" style="font-size:22px;">2</span> − <span class="hw ex-hand" style="font-size:22px;">2</span> = <span class="hw ex-hand" style="font-size:22px;">0</span> &nbsp;Square: (<span class="hw ex-hand" style="font-size:22px;">0</span>)² = <span class="hw ex-hand" style="font-size:22px;">0</span></div>
+        <div class="calc-line"><span class="fl">Step 4</span> Add: <span class="hw ex-hand" style="font-size:22px;">9</span> + <span class="hw ex-hand" style="font-size:22px;">0</span> = <span class="hw ex-hand" style="font-size:22px;">9</span></div>
+        <div class="calc-line"><span class="fl">Step 5</span> d = √<span class="hw ex-hand" style="font-size:22px;">9</span> = <span class="hw ex-hand" style="font-size:22px;">3</span> grid units</div>
+        <div style="margin-top:5px;"><span class="hw p ex-hand" style="font-size:18px;color:var(--pencil);">← perfectly horizontal — no sideways drift at all</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 4 — Distance left to score &nbsp;B → G</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;"><strong>Before calculating:</strong> B→G greater or less than 4? <span class="hw ex-hand" style="font-size:21px;">= 1, since both at y=2</span></div>
+        <div style="font-size:12px;margin-bottom:6px;">B = (<span class="hw ex-hand" style="font-size:22px;">7</span>, <span class="hw ex-hand" style="font-size:22px;">2</span>) and G = (8, 2)</div>
+        <div class="calc-line">x₂−x₁: 8 − <span class="hw ex-hand" style="font-size:22px;">7</span> = <span class="hw ex-hand" style="font-size:22px;">1</span> &nbsp;Square: (<span class="hw ex-hand" style="font-size:22px;">1</span>)² = <span class="hw ex-hand" style="font-size:22px;">1</span></div>
+        <div class="calc-line">y₂−y₁: 2 − <span class="hw ex-hand" style="font-size:22px;">2</span> = <span class="hw ex-hand" style="font-size:22px;">0</span> &nbsp;Square: (<span class="hw ex-hand" style="font-size:22px;">0</span>)² = <span class="hw ex-hand" style="font-size:22px;">0</span></div>
+        <div class="calc-line">Add: <span class="hw ex-hand" style="font-size:22px;">1</span> + <span class="hw ex-hand" style="font-size:22px;">0</span> = <span class="hw ex-hand" style="font-size:22px;">1</span> &nbsp;d = √<span class="hw ex-hand" style="font-size:22px;">1</span> = <span class="hw ex-hand" style="font-size:22px;">1</span> unit</div>
+        <div style="font-size:11.5px;margin-top:4px;">Check: <span class="hw ex-hand" style="font-size:21px;">1 &lt; 4 ✓ matches estimate</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 5 — How much progress?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance to goal <strong>BEFORE</strong> = <span class="hw ex-hand" style="font-size:24px;">4</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance to goal <strong>AFTER</strong> = <span class="hw ex-hand" style="font-size:24px;">1</span></div>
+        <div style="font-size:12px;font-style:italic;margin-bottom:8px;">"My kick (<span class="copt on">reduced</span> / <span class="copt off">increased</span>) the distance to the goal by <span class="hw ex-hand" style="font-size:24px;">3</span> units."</div>
+        <div class="cbi"><span class="cbx on">✓</span>The ball got closer to the goal</div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 6 — Movement vs. progress</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12.5px;margin-bottom:5px;">Distance ball traveled (A→B): <span class="hw ex-hand" style="font-size:24px;">3</span></div>
+        <div style="font-size:12.5px;margin-bottom:8px;">Distance toward goal: <span class="hw ex-hand" style="font-size:24px;">3</span></div>
+        <div style="font-size:12px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:8px;background:var(--box);">"The ball moved <span class="hw ex-hand" style="font-size:23px;">3</span> units total, and <span class="hw ex-hand" style="font-size:23px;">3</span> units reduced the distance to the goal."</div>
+        <div style="margin-top:5px;"><span class="hw p ex-hand" style="font-size:18px;color:var(--pencil);">← same number both blanks = 100% efficiency</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 7 — Efficiency</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:6px;font-style:italic;">What fraction of total movement actually helped?</div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">3 ÷ 3 = <span class="hw ex-hand" style="font-size:24px;">1.00</span></div>
+        <div class="cbi"><span class="cbx on">✓</span>Most of my movement was useful</div>
+        <div style="margin-top:5px;"><span class="hw ex-hand" style="font-size:18px;color:var(--ink);">1.00 = perfect — zero wasted movement. The ball went straight.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 8 — How many kicks needed?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div style="font-size:12px;margin-bottom:5px;font-style:italic;">Starting distance ÷ useful progress per kick:</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;"><span class="hw ex-hand" style="font-size:24px;">4</span> ÷ <span class="hw ex-hand" style="font-size:24px;">3</span> = <span class="hw ex-hand" style="font-size:24px;">1.33</span></div>
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Round up → <span class="hw ex-hand" style="font-size:24px;">2</span> kicks (theoretical minimum)</div>
+        <div style="font-size:12.5px;">Did one charge score? <span class="hw ex-hand" style="font-size:22px;">No — still 1 unit short</span></div>
+        <div style="margin-top:4px;"><span class="hw p ex-hand" style="font-size:17px;color:var(--pencil);">← need 4 units, got 3. Gap = 1.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 9 — Why did this happen?</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div class="cbi"><span class="cbx"></span>Ball went sideways</div>
+        <div class="cbi"><span class="cbx"></span>Ball curved after impact</div>
+        <div class="cbi"><span class="cbx"></span>Contact was off-center</div>
+        <div class="cbi"><span class="cbx"></span>Too much turning during approach</div>
+        <div class="cbi"><span style="font-size:16px;margin-right:2px;">★</span><span class="cbx on">✓</span>Other: <span class="hw ex-hand" style="font-size:20px;">not enough distance</span></div>
+        <div style="font-size:12px;margin-top:6px;">The biggest reason was <span class="hw ex-hand" style="font-size:20px;">Power (P4 only gave 3 units)</span> because my diagram shows <span class="hw ex-hand" style="font-size:19px;">the ball went perfectly straight — aim wasn't the issue.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="band" style="font-size:10.5px;">Step 10 — Strategy for Season 2</div>
+      <div class="step-box" style="border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:11px 12px;background:#fffef9;margin-bottom:10px;">
+        <div class="cbi"><span class="cbx on">✓</span>Increase Power (more distance)</div>
+        <div class="cbi"><span class="cbx"></span>Improve direction (better aim)</div>
+        <div class="cbi"><span class="cbx"></span>Adjust launch angle</div>
+        <div class="cbi"><span class="cbx"></span>Reduce turning during approach</div>
+        <div style="font-size:12px;margin-top:6px;font-style:italic;border:1px dashed var(--rule);border-radius:3px;padding:7px;background:var(--box);">"I will change <span class="hw ex-hand" style="font-size:20px;">Power</span> because my [<span class="copt on">efficiency</span>] was <span class="hw ex-hand" style="font-size:20px;">1.00</span>, which means <span class="hw ex-hand" style="font-size:19px;">direction is already perfect — P4→P5 pushes Charge Speed 16→25, enough for the 1 extra unit to score in one kick.</span>"</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">Big Idea</div>
+  <div class="panel">
+    <div class="big-idea">
+      <div class="bi-lbl">Big Idea</div>
+      <div class="bi-text">"Hitting the ball farther does NOT always help because my ball moved <span class="hw ex-hand" style="font-size:24px;">3</span> units, but only <span class="hw ex-hand" style="font-size:24px;">3</span> units reduced the distance to the goal."</div>
+      <div style="margin-top:8px;font-size:12.5px;font-weight:700;">This means <span class="hw ex-hand" style="font-size:22px;">in my case all movement was useful — the bottleneck is Power, not aim. One more unit of charge distance scores.</span></div>
+    </div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>Velocity Arena</span><span>Week 2, Day 10 · Distance Formula</span><span>Page 2 of 2</span></div>
+  <div class="lookfor"><div class="lab">Teacher look-for</div><div class="t">All steps correct and verified: A→B=3, B→G=1, efficiency=3÷3=1.00, kicks=4÷3≈1.33→2. The clean integers come from B being exactly on the A→G line. Her insight is specific and strategic: efficiency=1.00 means the problem is NOT direction — it's Power. She calculates that P4→P5 increases Charge Speed from 16 to 25, names the exact 1-unit gap, and concludes one more unit would score in a single kick. She ties today's measurement directly to tomorrow's allocation decision.</div></div>
+</div></div>
+
+</div>
+</body></html>

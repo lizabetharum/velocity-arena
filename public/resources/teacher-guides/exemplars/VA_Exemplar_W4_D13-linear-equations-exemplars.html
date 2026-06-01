@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — Predicting Win% from Class Data — Exemplars</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Shadows+Into+Light&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{--slate:#2B2D42;--red:#EF233C;--steel:#8D99AE;--ice:#EDF2F4;--ink:#1f3a8a;--pencil:#3f4654;--paper:#fdfdfb;--rule:#c9d0dd;--line:#e4e8ef;--box:#f4f6fa;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#dadfe7;font-family:"Montserrat",sans-serif;color:var(--slate);padding:38px 16px 90px;}
+.wrap{max-width:860px;margin:0 auto;}
+.sheet{background:var(--paper);border-radius:4px;border:1px solid #e7e2d6;box-shadow:0 18px 42px -24px rgba(43,45,66,.6);margin-bottom:48px;overflow:hidden;position:relative;}
+.level-tab{position:absolute;top:22px;right:0;color:#fff;font-weight:800;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:7px 15px;border-radius:4px 0 0 4px;}
+.tab-ap{background:#c47d12;}
+.tab-mt{background:#2a8f59;}
+.tab-ex{background:#2b6fb0;}
+.pg-head{display:flex;gap:10px;padding:16px 28px 10px;font-weight:700;font-size:11px;}
+.pg-head .l{text-transform:uppercase;letter-spacing:.12em;}
+.pg-head .r{margin-left:auto;color:var(--steel);}
+.rule-strong{height:2px;background:var(--slate);margin:0 28px 14px;}
+.pg-cont{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);padding:0 28px 10px;}
+.page-divider{border-top:1px dashed #bdc4d0;margin:20px 0 0;}
+.body{padding:0 28px 20px;}
+.wtitle{font-weight:800;font-size:22px;line-height:1.2;margin-bottom:5px;}
+.wsub{font-size:12px;font-style:italic;color:var(--steel);margin-bottom:18px;line-height:1.5;}
+
+/* Header row */
+.hdr-row{display:flex;border:1.5px solid var(--slate);margin-bottom:20px;}
+.hdr-lbl{padding:8px 12px;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--ice);min-width:80px;}
+.hdr-val{flex:1;padding:8px 12px;border-left:1.5px solid var(--slate);font-size:12px;}
+.hdr-lbl2{padding:8px 12px;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--ice);border-left:1.5px solid var(--slate);min-width:80px;}
+.hdr-val2{flex:2;padding:8px 12px;border-left:1.5px solid var(--slate);font-size:12px;}
+
+/* Sections */
+.band{background:var(--ice);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 14px;border:1px solid var(--rule);border-bottom:0;display:flex;align-items:center;gap:10px;}
+.band .num{background:var(--slate);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.band-gray{background:#e8eaee;color:var(--steel);font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:9px 14px;border:1px solid var(--rule);border-bottom:0;}
+.panel{border:1px solid var(--rule);padding:14px 16px;margin-bottom:18px;background:#fff;}
+
+/* Instructions */
+.inst{font-size:12px;line-height:1.65;margin-bottom:12px;color:var(--slate);}
+
+/* Stat selector */
+.stat-row{display:flex;align-items:baseline;gap:6px;font-size:13px;font-weight:700;margin:8px 0 12px;}
+.stat-opts{display:flex;gap:20px;margin-left:8px;}
+.stat-opt{font-size:12.5px;font-weight:600;padding:2px 6px;}
+
+/* Spread check */
+.spread-check{border-left:4px solid var(--red);background:#fff8f8;padding:10px 14px;margin:10px 0 14px;font-size:11.5px;line-height:1.7;}
+.sc-head{font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+
+/* Bot boxes */
+.bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0;}
+.bot-box{border:1.5px solid var(--rule);padding:12px 14px;background:var(--box);}
+.bb-head{font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);margin-bottom:10px;}
+.bb-head em{font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;}
+.frow{display:flex;align-items:baseline;gap:8px;margin:6px 0;font-size:12px;font-weight:600;}
+.frow .lbl{min-width:90px;flex-shrink:0;}
+.pt-row{display:flex;align-items:baseline;gap:5px;margin-top:10px;font-size:12.5px;font-weight:700;}
+.pt-sub{font-size:9px;color:var(--steel);margin-top:3px;}
+
+/* Calc boxes */
+.calc-block{margin:12px 0 16px;}
+.calc-lbl{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:9px;}
+.calc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cbox{border:1.5px solid #aab0be;background:#fff;min-width:70px;height:48px;padding:4px 6px;display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;}
+.cval{font-size:10px;padding-bottom:1px;text-align:center;width:100%;}
+.clbl{font-size:7.5px;color:var(--steel);font-weight:600;letter-spacing:.07em;text-transform:uppercase;text-align:center;width:100%;}
+.op{font-size:22px;font-weight:700;color:var(--slate);line-height:1;}
+.eqsym{font-size:22px;font-weight:700;color:var(--slate);line-height:1;}
+
+/* Slope meaning */
+.slope-meaning{font-size:13px;font-weight:700;line-height:1.55;margin-top:10px;}
+
+/* Section 3 equation */
+.b-formula-row{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin:10px 0 14px;flex-wrap:wrap;}
+.b-label{font-size:16px;font-weight:800;font-style:italic;}
+.paren{font-size:18px;color:var(--slate);}
+.my-equation{border:2px solid var(--slate);padding:14px 16px;margin:12px 0;background:var(--box);}
+.me-lbl{font-weight:800;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.eq-line{display:flex;align-items:baseline;gap:8px;font-size:16px;font-weight:700;}
+.eq-var{font-style:italic;font-size:18px;font-weight:800;}
+.eq-slot{border-bottom:2px solid var(--slate);min-width:60px;display:inline-block;text-align:center;}
+.eq-sublbl{display:flex;gap:10px;font-size:9px;color:var(--steel);margin-top:6px;}
+.eq-sublbl span:last-child{margin-left:50px;}
+.plain-lang{font-size:13px;font-weight:700;margin-top:12px;line-height:1.5;}
+
+/* Test it */
+.warning-box{border:1.5px solid #888;background:#f0f1f4;padding:10px 13px;font-size:11.5px;font-weight:700;line-height:1.55;margin-bottom:14px;}
+.warn-head{font-weight:800;text-transform:uppercase;font-size:10px;letter-spacing:.1em;margin-bottom:4px;}
+.test-frow{display:flex;align-items:baseline;gap:10px;font-size:13px;font-weight:700;margin:8px 0;}
+.choice-row{display:flex;gap:20px;margin:8px 0;font-size:13px;font-weight:600;}
+.choice{padding:3px 8px;border:1.5px solid transparent;border-radius:3px;}
+.choice.sel{border-color:var(--ink);background:#eef2fb;}
+.missed-row{font-size:13px;font-weight:700;margin-top:10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+
+/* Section 5 */
+.s2-sentence-box{border:2px solid var(--slate);padding:14px 16px;margin:10px 0;background:var(--box);}
+.s2s-lbl{font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;}
+.sentence-frame{font-size:13px;font-weight:700;line-height:2.2;}
+.s2s-sublbl{display:flex;gap:10px;font-size:9px;color:var(--steel);margin-top:4px;}
+.show-calc{font-size:13px;font-weight:700;margin:10px 0;}
+.divider-line{height:1px;background:var(--line);margin:14px 0;}
+.big-idea-box{border:2px solid var(--slate);padding:12px 16px;margin:10px 0;font-size:13px;font-weight:700;line-height:1.6;background:#fff;}
+.bi-lbl{font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.conf-row{display:flex;gap:20px;margin:8px 0;font-size:13px;font-weight:600;}
+.conf{padding:3px 8px;border:1.5px solid transparent;border-radius:3px;}
+.conf.sel{border-color:var(--ink);background:#eef2fb;}
+.because-row{font-size:13px;font-weight:700;margin-top:10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+
+/* Report card */
+.report-card{border:2px solid var(--slate);padding:14px 16px;margin:16px 0;background:var(--box);}
+.rc-head{font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.rc-col .rc-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--steel);margin-bottom:5px;}
+.listen-lbl{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.listen-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.listen-item{display:flex;gap:8px;font-size:11px;line-height:1.55;}
+.cb{width:14px;height:14px;border:1.5px solid var(--slate);flex-shrink:0;margin-top:1px;background:#fff;}
+
+/* Stamp + lookfor */
+.stamp-wrap{padding:8px 28px 4px;}
+.stamp{display:inline-block;font-weight:800;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);border:1.4px solid var(--steel);border-radius:3px;padding:3px 8px;transform:rotate(-2deg);}
+.lookfor{padding:14px 28px;background:#eef1f6;border-top:1px solid var(--line);}
+.lookfor .lab{font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:#2b6fb0;}
+.lookfor.ap .lab{color:#a96a0c;}
+.lookfor.mt .lab{color:#1f7a4c;}
+.lookfor .t{font-size:12.5px;line-height:1.6;}
+
+/* Footer */
+.pg-foot{display:flex;gap:6px;padding:8px 28px;font-size:9px;font-weight:600;color:var(--steel);border-top:1px solid var(--line);margin-top:8px;flex-wrap:wrap;}
+.pg-foot .mid{margin:0 auto;}
+
+/* Handwriting */
+.hw{color:var(--ink);}
+.hw.p{color:var(--pencil);}
+.ap-hand{font-family:"Shadows Into Light",cursive;font-size:18px;}
+.mt-hand{font-family:"Caveat",cursive;font-size:21px;font-weight:600;}
+.ex-hand{font-family:"Reenie Beanie",cursive;font-size:23px;}
+
+/* Underline selected stat */
+.stat-chosen{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============================================================
+     SHEET 1 — MARCUS T. — APPROACHING
+     Error: inverts the slope division (writes stat change ÷ win% change)
+     ============================================================ -->
+<div class="sheet">
+  <div class="level-tab tab-ap">Approaching</div>
+
+  <!-- PAGE 1 -->
+  <div class="pg-head">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="body">
+    <div class="wtitle">Predicting Win% from Class Data</div>
+    <div class="wsub">Use two bots from the class data table to build a linear equation. Test it on a third bot. Make a Season 2 prediction — with the right language.</div>
+
+    <div class="hdr-row">
+      <div class="hdr-lbl">Team</div>
+      <div class="hdr-val"><span class="hw ap-hand">Voltage</span></div>
+      <div class="hdr-lbl2">Names</div>
+      <div class="hdr-val2"><span class="hw ap-hand">Marcus T.</span></div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="band"><span class="num">1</span> Data — Choose Your Stat</div>
+    <div class="panel">
+      <div class="inst">Look at the class data table on the board. Pick <strong>one stat</strong> to analyze. Check whether that stat actually varies across bots before choosing your bots.</div>
+
+      <div class="stat-row">
+        <span style="font-size:13px;font-weight:700;">The stat I'm analyzing:</span>
+        <div class="stat-opts">
+          <span class="stat-opt hw ap-hand stat-chosen">Speed</span>
+          <span class="stat-opt">Endurance</span>
+          <span class="stat-opt">Turning</span>
+          <span class="stat-opt">Power</span>
+        </div>
+      </div>
+
+      <div class="spread-check">
+        <div class="sc-head">⚠ Spread Check — Do This Before Picking Bots</div>
+        Scan your stat column. Lowest value? <span class="hw ap-hand">2</span> &nbsp;&nbsp; Highest? <span class="hw ap-hand">10</span> &nbsp;&nbsp; If the range is less than 3 points, choose a different stat.
+      </div>
+
+      <div class="inst">Pick <strong>two bots</strong> with different values of your chosen stat — choose bots that are far apart for a more reliable slope.</div>
+
+      <div class="bot-grid">
+        <div class="bot-box">
+          <div class="bb-head">Build Bot A <em>(First Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw ap-hand">Glacier / Cold Front</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₁):</span> <span class="hw ap-hand">2</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₁):</span> <span class="hw ap-hand">25</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw ap-hand">2</span> , <span class="hw ap-hand">25</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+        <div class="bot-box">
+          <div class="bb-head">Build Bot B <em>(Second Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw ap-hand">Blitz / Speed Demons</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₂):</span> <span class="hw ap-hand">10</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₂):</span> <span class="hw ap-hand">65</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw ap-hand">10</span> , <span class="hw ap-hand">65</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="band"><span class="num">2</span> Rate — Slope (M)</div>
+    <div class="panel">
+      <div class="inst">Slope = how much Win% changes for each one-point increase in your stat, <em>across the class data</em>.</div>
+
+      <!-- 2A -->
+      <div class="calc-block">
+        <div class="calc-lbl">A &nbsp; Win% Change = Bot B Win% – Bot A Win%</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ap-hand">65</div><div class="clbl">Bot B Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ap-hand">25</div><div class="clbl">Bot A Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">40</div><div class="clbl">Win% Change</div></div>
+        </div>
+      </div>
+
+      <!-- 2B -->
+      <div class="calc-block">
+        <div class="calc-lbl">B &nbsp; Stat Change = Bot B Stat – Bot A Stat</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ap-hand">10</div><div class="clbl">Bot B Stat</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ap-hand">2</div><div class="clbl">Bot A Stat</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">8</div><div class="clbl">Stat Change</div></div>
+        </div>
+      </div>
+
+      <!-- 2C — MARCUS'S ERROR: fills boxes in reverse (8 ÷ 40 instead of 40 ÷ 8) -->
+      <div class="calc-block">
+        <div class="calc-lbl">C &nbsp; Divide: Win% Change ÷ Stat Change = Slope (M)</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ap-hand">8</div><div class="clbl">Win% Change</div></div>
+          <span class="op">÷</span>
+          <div class="cbox"><div class="cval hw ap-hand">40</div><div class="clbl">Stat Change</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">0.2</div><div class="clbl">Slope M =</div></div>
+        </div>
+      </div>
+
+      <div class="slope-meaning">What your slope means: For every 1 point I add to my stat, Win% in the class data changes by <span class="hw ap-hand">0.2</span>.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Equation → Test It</div>
+  <div class="body">
+
+    <!-- SECTION 3 -->
+    <div class="band"><span class="num">3</span> Equation — Starting Point (B) + Full Equation</div>
+    <div class="panel">
+      <div class="inst">Use Bot A's data point and your slope to find b. Then write the full equation.</div>
+      <div class="calc-lbl" style="margin-bottom:10px;">Formula: b = Bot A Win% – (Slope × Bot A Stat)</div>
+
+      <div class="b-formula-row">
+        <span class="b-label">b =</span>
+        <div class="cbox"><div class="cval hw ap-hand">25</div><div class="clbl">Bot A Win%</div></div>
+        <span class="op">−</span>
+        <span class="paren">(</span>
+        <div class="cbox"><div class="cval hw ap-hand">0.2</div><div class="clbl">Slope</div></div>
+        <span class="op">×</span>
+        <div class="cbox"><div class="cval hw ap-hand">2</div><div class="clbl">Bot A Stat</div></div>
+        <span class="paren">)</span>
+        <span class="eqsym">=</span>
+        <div class="cbox"><div class="cval hw ap-hand">24.6</div><div class="clbl">b =</div></div>
+      </div>
+
+      <div class="my-equation">
+        <div class="me-lbl">My Equation</div>
+        <div class="eq-line">
+          <span class="eq-var">y</span>
+          <span>=</span>
+          <span class="hw ap-hand" style="font-size:20px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">0.2</span>
+          <span style="font-weight:800;">× <em style="font-size:18px;">x</em> +</span>
+          <span class="hw ap-hand" style="font-size:20px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">24.6</span>
+        </div>
+        <div style="display:flex;gap:10px;font-size:9px;color:var(--steel);margin-top:6px;">
+          <span>slope (m)</span>
+          <span style="margin-left:54px;">starting point (b)</span>
+        </div>
+      </div>
+
+      <div class="plain-lang">In plain language: "For every 1 point I add to my stat, Win% in the class data changes by <span class="hw ap-hand">0.2</span>."</div>
+    </div>
+
+    <!-- TEST IT -->
+    <div class="band-gray">Test It — Choose Test Bot C</div>
+    <div class="panel">
+      <div class="warning-box">
+        <div class="warn-head">⚠ Test Bot C must be different from Build Bots A and B</div>
+        If you test on a bot you already used to build the equation, the residual will be 0. That tells you nothing. Pick a bot you haven't touched.
+      </div>
+
+      <div class="test-frow">
+        <span>Test Bot C name / team:</span>
+        <span class="hw ap-hand">Spark / Circuit Breakers</span>
+        <span style="margin-left:14px;">Stat value:</span>
+        <span class="hw ap-hand">6</span>
+      </div>
+
+      <div class="test-frow">
+        <span>Actual Win%:</span>
+        <span class="hw ap-hand">52</span>
+        <span>%</span>
+      </div>
+
+      <div class="calc-block" style="margin-top:14px;">
+        <div class="calc-lbl">Predicted Win% — Plug Bot C's Stat Into Your Equation</div>
+        <div class="calc-row">
+          <span class="eq-var" style="font-size:15px;">y</span>
+          <span style="font-size:15px;font-weight:700;">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">0.2</div><div class="clbl">Slope</div></div>
+          <span class="op" style="font-size:18px;">×</span>
+          <div class="cbox"><div class="cval hw ap-hand">6</div><div class="clbl">Bot C Stat</div></div>
+          <span class="op" style="font-size:18px;">+</span>
+          <div class="cbox"><div class="cval hw ap-hand">24.6</div><div class="clbl">b</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">25.8</div><div class="clbl">Predicted Win%</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">Residual = Predicted − Actual</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ap-hand">25.8</div><div class="clbl">Predicted Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ap-hand">52</div><div class="clbl">Actual Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ap-hand">−26.2</div><div class="clbl">Residual</div></div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:10px 0 6px;">My residual means my model:</div>
+      <div class="choice-row">
+        <span class="choice">over-predicted</span>
+        <span class="choice sel hw ap-hand">under-predicted</span>
+        <span class="choice">was close</span>
+      </div>
+
+      <div class="missed-row">
+        <span>One reason my model may have missed:</span>
+        <span class="hw ap-hand">maybe speed doesnt really affect win% that much??</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Season 2 Prediction + Report</div>
+  <div class="body">
+
+    <!-- SECTION 5 -->
+    <div class="band"><span class="num">5</span> Report — Season 2 Prediction</div>
+    <div class="panel">
+      <div class="inst">Use your equation to estimate what would happen if you changed your stat for Season 2. Fill in the sentence exactly as written — the language matters.</div>
+
+      <div class="s2-sentence-box">
+        <div class="s2s-lbl">Season 2 Prediction — Write This Sentence</div>
+        <div class="sentence-frame">
+          "Based on the Season 1 class data, changing
+          <span class="hw ap-hand">Speed</span>
+          from
+          <span class="hw ap-hand">5</span>
+          to
+          <span class="hw ap-hand">8</span>
+          predicts approximately
+          <span class="hw ap-hand">26</span>% win rate."
+        </div>
+        <div class="s2s-sublbl">
+          <span>stat name</span>
+          <span style="margin-left:32px;">current</span>
+          <span style="margin-left:16px;">new value</span>
+          <span style="margin-left:50px;">your equation's output</span>
+        </div>
+      </div>
+
+      <div class="show-calc">
+        Show your calculation: &nbsp;<span style="font-style:italic;font-weight:800;">y</span> =
+        <span class="hw ap-hand">0.2</span> ×
+        <span class="hw ap-hand">8</span> +
+        <span class="hw ap-hand">24.6</span> =
+        <span class="hw ap-hand">26.2</span>%
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="bi-lbl">Big Idea — Write This Sentence</div>
+      <div class="big-idea-box">
+        "This equation describes a pattern in the class data. It does not prove that one stat alone <em>caused</em> winning."
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:12px 0 8px;">Does your prediction change how confident you are about Season 2?</div>
+      <div class="conf-row">
+        <span class="conf sel hw ap-hand">More confident</span>
+        <span class="conf">Less confident</span>
+        <span class="conf">About the same</span>
+      </div>
+      <div class="because-row">
+        <span>Because:</span>
+        <span class="hw ap-hand">more speed should help us win more games</span>
+      </div>
+
+      <div class="report-card">
+        <div class="rc-head">Report Card — Share-out</div>
+        <div class="rc-grid">
+          <div class="rc-col">
+            <div class="rc-lbl">My Equation</div>
+            <div class="rc-val"><span class="hw ap-hand" style="font-size:17px;">y = 0.2 × x + 24.6</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Slope (M)</div>
+            <div class="rc-val"><span class="hw ap-hand" style="font-size:18px;">0.2</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Bot C Residual</div>
+            <div class="rc-val"><span class="hw ap-hand" style="font-size:18px;">−26.2%</span></div>
+          </div>
+        </div>
+        <div class="listen-lbl">When Other Teams Share, Listen For:</div>
+        <div class="listen-grid">
+          <div class="listen-item"><div class="cb"></div><span>Who has the steepest slope? Their stat matters most.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Who has the smallest residual? Their model was most accurate.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did two teams use the same stat but get different slopes? What does that mean?</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did anyone's prediction use the word "will"? Should it?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-foot">
+      <span>NYC First · Velocity Arena</span>
+      <span class="mid">Week 3, Day 13 · Linear Equations — Class Data Model</span>
+      <span>Page 3 of 3 · Keep this sheet — it goes in your data log</span>
+    </div>
+  </div>
+
+  <div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+  <div class="lookfor ap">
+    <div class="lab">Teacher Look-For — Approaching (Marcus T.)</div>
+    <div class="t">Marcus got steps 2A and 2B exactly right — Win% Change = 40 and Stat Change = 8 are both correct. His error surfaces in step 2C: he wrote 8 ÷ 40 = 0.2, swapping the two values and computing stat change over win% change instead of the other way around. This is his recurring pattern — individual formula steps are correct, but he mishandles the operation that combines them. The −26.2 residual is a clear signal something broke in the slope, not the data. Ask him: "In slope = rise ÷ run, point at the 'rise' on your table — which row did you get that from?" If he can't identify the Win% row as rise, have him sketch the two points on a graph and count up before counting across.</div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SHEET 2 — JAYDA W. — MEETS
+     Correct and complete; literal interpretation only
+     ============================================================ -->
+<div class="sheet">
+  <div class="level-tab tab-mt">Meets</div>
+
+  <!-- PAGE 1 -->
+  <div class="pg-head">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="body">
+    <div class="wtitle">Predicting Win% from Class Data</div>
+    <div class="wsub">Use two bots from the class data table to build a linear equation. Test it on a third bot. Make a Season 2 prediction — with the right language.</div>
+
+    <div class="hdr-row">
+      <div class="hdr-lbl">Team</div>
+      <div class="hdr-val"><span class="hw mt-hand">Circuit Breakers</span></div>
+      <div class="hdr-lbl2">Names</div>
+      <div class="hdr-val2"><span class="hw mt-hand">Jayda W.</span></div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="band"><span class="num">1</span> Data — Choose Your Stat</div>
+    <div class="panel">
+      <div class="inst">Look at the class data table on the board. Pick <strong>one stat</strong> to analyze. Check whether that stat actually varies across bots before choosing your bots.</div>
+
+      <div class="stat-row">
+        <span style="font-size:13px;font-weight:700;">The stat I'm analyzing:</span>
+        <div class="stat-opts">
+          <span class="stat-opt hw mt-hand stat-chosen">Speed</span>
+          <span class="stat-opt">Endurance</span>
+          <span class="stat-opt">Turning</span>
+          <span class="stat-opt">Power</span>
+        </div>
+      </div>
+
+      <div class="spread-check">
+        <div class="sc-head">⚠ Spread Check — Do This Before Picking Bots</div>
+        Scan your stat column. Lowest value? <span class="hw mt-hand">2</span> &nbsp;&nbsp; Highest? <span class="hw mt-hand">10</span> &nbsp;&nbsp; If the range is less than 3 points, choose a different stat.
+      </div>
+
+      <div class="inst">Pick <strong>two bots</strong> with different values of your chosen stat — choose bots that are far apart for a more reliable slope.</div>
+
+      <div class="bot-grid">
+        <div class="bot-box">
+          <div class="bb-head">Build Bot A <em>(First Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw mt-hand">Glacier / Cold Front</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₁):</span> <span class="hw mt-hand">2</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₁):</span> <span class="hw mt-hand">25</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw mt-hand">2</span> , <span class="hw mt-hand">25</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+        <div class="bot-box">
+          <div class="bb-head">Build Bot B <em>(Second Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw mt-hand">Blitz / Speed Demons</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₂):</span> <span class="hw mt-hand">10</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₂):</span> <span class="hw mt-hand">65</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw mt-hand">10</span> , <span class="hw mt-hand">65</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="band"><span class="num">2</span> Rate — Slope (M)</div>
+    <div class="panel">
+      <div class="inst">Slope = how much Win% changes for each one-point increase in your stat, <em>across the class data</em>.</div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">A &nbsp; Win% Change = Bot B Win% – Bot A Win%</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw mt-hand">65</div><div class="clbl">Bot B Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw mt-hand">25</div><div class="clbl">Bot A Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">40</div><div class="clbl">Win% Change</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">B &nbsp; Stat Change = Bot B Stat – Bot A Stat</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw mt-hand">10</div><div class="clbl">Bot B Stat</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw mt-hand">2</div><div class="clbl">Bot A Stat</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">8</div><div class="clbl">Stat Change</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">C &nbsp; Divide: Win% Change ÷ Stat Change = Slope (M)</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw mt-hand">40</div><div class="clbl">Win% Change</div></div>
+          <span class="op">÷</span>
+          <div class="cbox"><div class="cval hw mt-hand">8</div><div class="clbl">Stat Change</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">5</div><div class="clbl">Slope M =</div></div>
+        </div>
+      </div>
+
+      <div class="slope-meaning">What your slope means: For every 1 point I add to my stat, Win% in the class data changes by <span class="hw mt-hand">5</span>.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Equation → Test It</div>
+  <div class="body">
+
+    <!-- SECTION 3 -->
+    <div class="band"><span class="num">3</span> Equation — Starting Point (B) + Full Equation</div>
+    <div class="panel">
+      <div class="inst">Use Bot A's data point and your slope to find b. Then write the full equation.</div>
+      <div class="calc-lbl" style="margin-bottom:10px;">Formula: b = Bot A Win% – (Slope × Bot A Stat)</div>
+
+      <div class="b-formula-row">
+        <span class="b-label">b =</span>
+        <div class="cbox"><div class="cval hw mt-hand">25</div><div class="clbl">Bot A Win%</div></div>
+        <span class="op">−</span>
+        <span class="paren">(</span>
+        <div class="cbox"><div class="cval hw mt-hand">5</div><div class="clbl">Slope</div></div>
+        <span class="op">×</span>
+        <div class="cbox"><div class="cval hw mt-hand">2</div><div class="clbl">Bot A Stat</div></div>
+        <span class="paren">)</span>
+        <span class="eqsym">=</span>
+        <div class="cbox"><div class="cval hw mt-hand">15</div><div class="clbl">b =</div></div>
+      </div>
+
+      <div class="my-equation">
+        <div class="me-lbl">My Equation</div>
+        <div class="eq-line">
+          <span class="eq-var">y</span>
+          <span>=</span>
+          <span class="hw mt-hand" style="font-size:22px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">5</span>
+          <span style="font-weight:800;">× <em style="font-size:18px;">x</em> +</span>
+          <span class="hw mt-hand" style="font-size:22px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">15</span>
+        </div>
+        <div style="display:flex;gap:10px;font-size:9px;color:var(--steel);margin-top:6px;">
+          <span>slope (m)</span>
+          <span style="margin-left:54px;">starting point (b)</span>
+        </div>
+      </div>
+
+      <div class="plain-lang">In plain language: "For every 1 point I add to my stat, Win% in the class data changes by <span class="hw mt-hand">5</span>."</div>
+    </div>
+
+    <!-- TEST IT -->
+    <div class="band-gray">Test It — Choose Test Bot C</div>
+    <div class="panel">
+      <div class="warning-box">
+        <div class="warn-head">⚠ Test Bot C must be different from Build Bots A and B</div>
+        If you test on a bot you already used to build the equation, the residual will be 0. That tells you nothing. Pick a bot you haven't touched.
+      </div>
+
+      <div class="test-frow">
+        <span>Test Bot C name / team:</span>
+        <span class="hw mt-hand">Inferno / Fire Starters</span>
+        <span style="margin-left:14px;">Stat value:</span>
+        <span class="hw mt-hand">7</span>
+      </div>
+
+      <div class="test-frow">
+        <span>Actual Win%:</span>
+        <span class="hw mt-hand">48</span>
+        <span>%</span>
+      </div>
+
+      <div class="calc-block" style="margin-top:14px;">
+        <div class="calc-lbl">Predicted Win% — Plug Bot C's Stat Into Your Equation</div>
+        <div class="calc-row">
+          <span class="eq-var" style="font-size:15px;">y</span>
+          <span style="font-size:15px;font-weight:700;">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">5</div><div class="clbl">Slope</div></div>
+          <span class="op" style="font-size:18px;">×</span>
+          <div class="cbox"><div class="cval hw mt-hand">7</div><div class="clbl">Bot C Stat</div></div>
+          <span class="op" style="font-size:18px;">+</span>
+          <div class="cbox"><div class="cval hw mt-hand">15</div><div class="clbl">b</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">50</div><div class="clbl">Predicted Win%</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">Residual = Predicted − Actual</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw mt-hand">50</div><div class="clbl">Predicted Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw mt-hand">48</div><div class="clbl">Actual Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw mt-hand">+2</div><div class="clbl">Residual</div></div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:10px 0 6px;">My residual means my model:</div>
+      <div class="choice-row">
+        <span class="choice">over-predicted</span>
+        <span class="choice">under-predicted</span>
+        <span class="choice sel hw mt-hand">was close</span>
+      </div>
+
+      <div class="missed-row">
+        <span>One reason my model may have missed:</span>
+        <span class="hw mt-hand">Inferno might have better Endurance that helped their win% a little</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Season 2 Prediction + Report</div>
+  <div class="body">
+
+    <!-- SECTION 5 -->
+    <div class="band"><span class="num">5</span> Report — Season 2 Prediction</div>
+    <div class="panel">
+      <div class="inst">Use your equation to estimate what would happen if you changed your stat for Season 2. Fill in the sentence exactly as written — the language matters.</div>
+
+      <div class="s2-sentence-box">
+        <div class="s2s-lbl">Season 2 Prediction — Write This Sentence</div>
+        <div class="sentence-frame">
+          "Based on the Season 1 class data, changing
+          <span class="hw mt-hand">Speed</span>
+          from
+          <span class="hw mt-hand">6</span>
+          to
+          <span class="hw mt-hand">8</span>
+          predicts approximately
+          <span class="hw mt-hand">55</span>% win rate."
+        </div>
+        <div class="s2s-sublbl">
+          <span>stat name</span>
+          <span style="margin-left:32px;">current</span>
+          <span style="margin-left:16px;">new value</span>
+          <span style="margin-left:50px;">your equation's output</span>
+        </div>
+      </div>
+
+      <div class="show-calc">
+        Show your calculation: &nbsp;<span style="font-style:italic;font-weight:800;">y</span> =
+        <span class="hw mt-hand">5</span> ×
+        <span class="hw mt-hand">8</span> +
+        <span class="hw mt-hand">15</span> =
+        <span class="hw mt-hand">55</span>%
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="bi-lbl">Big Idea — Write This Sentence</div>
+      <div class="big-idea-box">
+        "This equation describes a pattern in the class data. It does not prove that one stat alone <em>caused</em> winning."
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:12px 0 8px;">Does your prediction change how confident you are about Season 2?</div>
+      <div class="conf-row">
+        <span class="conf sel hw mt-hand">More confident</span>
+        <span class="conf">Less confident</span>
+        <span class="conf">About the same</span>
+      </div>
+      <div class="because-row">
+        <span>Because:</span>
+        <span class="hw mt-hand">the residual was only +2% so the equation seems pretty accurate for Speed</span>
+      </div>
+
+      <div class="report-card">
+        <div class="rc-head">Report Card — Share-out</div>
+        <div class="rc-grid">
+          <div class="rc-col">
+            <div class="rc-lbl">My Equation</div>
+            <div class="rc-val"><span class="hw mt-hand" style="font-size:18px;">y = 5 × x + 15</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Slope (M)</div>
+            <div class="rc-val"><span class="hw mt-hand" style="font-size:20px;">5</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Bot C Residual</div>
+            <div class="rc-val"><span class="hw mt-hand" style="font-size:20px;">+2%</span></div>
+          </div>
+        </div>
+        <div class="listen-lbl">When Other Teams Share, Listen For:</div>
+        <div class="listen-grid">
+          <div class="listen-item"><div class="cb"></div><span>Who has the steepest slope? Their stat matters most.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Who has the smallest residual? Their model was most accurate.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did two teams use the same stat but get different slopes? What does that mean?</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did anyone's prediction use the word "will"? Should it?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-foot">
+      <span>NYC First · Velocity Arena</span>
+      <span class="mid">Week 3, Day 13 · Linear Equations — Class Data Model</span>
+      <span>Page 3 of 3 · Keep this sheet — it goes in your data log</span>
+    </div>
+  </div>
+
+  <div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+  <div class="lookfor mt">
+    <div class="lab">Teacher Look-For — Meets (Jayda W.)</div>
+    <div class="t">Jayda executed every step correctly — slope = 5, b = 15, predicted Win% = 50, residual = +2. Her plain-language interpretation is accurate and her "because" names a real reason (small residual = reliable model). She stopped at description: she explains that Inferno might have high Endurance but doesn't test it or compute what Endurance would need to be to account for a 2% gap. A good next question: "Your equation predicted 50% and Inferno actually got 48% — what does that +2 residual tell us about whether Speed is the only thing that matters?"</div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SHEET 3 — PRIYA R. — EXCEEDS
+     Correct + transferable insight: computes residual for off-line bot,
+     names the budget trade-off in Season 2 prediction
+     ============================================================ -->
+<div class="sheet">
+  <div class="level-tab tab-ex">Exceeds</div>
+
+  <!-- PAGE 1 -->
+  <div class="pg-head">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="body">
+    <div class="wtitle">Predicting Win% from Class Data</div>
+    <div class="wsub">Use two bots from the class data table to build a linear equation. Test it on a third bot. Make a Season 2 prediction — with the right language.</div>
+
+    <div class="hdr-row">
+      <div class="hdr-lbl">Team</div>
+      <div class="hdr-val"><span class="hw ex-hand">Overclock</span></div>
+      <div class="hdr-lbl2">Names</div>
+      <div class="hdr-val2"><span class="hw ex-hand">Priya R.</span></div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="band"><span class="num">1</span> Data — Choose Your Stat</div>
+    <div class="panel">
+      <div class="inst">Look at the class data table on the board. Pick <strong>one stat</strong> to analyze. Check whether that stat actually varies across bots before choosing your bots.</div>
+
+      <div class="stat-row">
+        <span style="font-size:13px;font-weight:700;">The stat I'm analyzing:</span>
+        <div class="stat-opts">
+          <span class="stat-opt hw ex-hand stat-chosen">Speed</span>
+          <span class="stat-opt">Endurance</span>
+          <span class="stat-opt">Turning</span>
+          <span class="stat-opt">Power</span>
+        </div>
+      </div>
+
+      <div class="spread-check">
+        <div class="sc-head">⚠ Spread Check — Do This Before Picking Bots</div>
+        Scan your stat column. Lowest value? <span class="hw ex-hand">2</span> &nbsp;&nbsp; Highest? <span class="hw ex-hand">10</span> &nbsp;&nbsp; If the range is less than 3 points, choose a different stat.
+      </div>
+
+      <div class="inst">Pick <strong>two bots</strong> with different values of your chosen stat — choose bots that are far apart for a more reliable slope.</div>
+
+      <div class="bot-grid">
+        <div class="bot-box">
+          <div class="bb-head">Build Bot A <em>(First Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw ex-hand">Glacier / Cold Front</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₁):</span> <span class="hw ex-hand">2</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₁):</span> <span class="hw ex-hand">25</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw ex-hand">2</span> , <span class="hw ex-hand">25</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+        <div class="bot-box">
+          <div class="bb-head">Build Bot B <em>(Second Data Point)</em></div>
+          <div class="frow"><span class="lbl">Bot name / team:</span> <span class="hw ex-hand">Blitz / Speed Demons</span></div>
+          <div class="frow">
+            <span class="lbl">Stat (x₂):</span> <span class="hw ex-hand">10</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="lbl">Win% (y₂):</span> <span class="hw ex-hand">65</span> %
+          </div>
+          <div class="pt-row">Write as a point: &nbsp;( <span class="hw ex-hand">10</span> , <span class="hw ex-hand">65</span> )</div>
+          <div class="pt-sub">stat · win%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="band"><span class="num">2</span> Rate — Slope (M)</div>
+    <div class="panel">
+      <div class="inst">Slope = how much Win% changes for each one-point increase in your stat, <em>across the class data</em>.</div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">A &nbsp; Win% Change = Bot B Win% – Bot A Win%</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ex-hand">65</div><div class="clbl">Bot B Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ex-hand">25</div><div class="clbl">Bot A Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">40</div><div class="clbl">Win% Change</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">B &nbsp; Stat Change = Bot B Stat – Bot A Stat</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ex-hand">10</div><div class="clbl">Bot B Stat</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ex-hand">2</div><div class="clbl">Bot A Stat</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">8</div><div class="clbl">Stat Change</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">C &nbsp; Divide: Win% Change ÷ Stat Change = Slope (M)</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ex-hand">40</div><div class="clbl">Win% Change</div></div>
+          <span class="op">÷</span>
+          <div class="cbox"><div class="cval hw ex-hand">8</div><div class="clbl">Stat Change</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">5</div><div class="clbl">Slope M =</div></div>
+        </div>
+      </div>
+
+      <div class="slope-meaning">What your slope means: For every 1 point I add to my stat, Win% in the class data changes by <span class="hw ex-hand">5</span>.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Equation → Test It</div>
+  <div class="body">
+
+    <!-- SECTION 3 -->
+    <div class="band"><span class="num">3</span> Equation — Starting Point (B) + Full Equation</div>
+    <div class="panel">
+      <div class="inst">Use Bot A's data point and your slope to find b. Then write the full equation.</div>
+      <div class="calc-lbl" style="margin-bottom:10px;">Formula: b = Bot A Win% – (Slope × Bot A Stat)</div>
+
+      <div class="b-formula-row">
+        <span class="b-label">b =</span>
+        <div class="cbox"><div class="cval hw ex-hand">25</div><div class="clbl">Bot A Win%</div></div>
+        <span class="op">−</span>
+        <span class="paren">(</span>
+        <div class="cbox"><div class="cval hw ex-hand">5</div><div class="clbl">Slope</div></div>
+        <span class="op">×</span>
+        <div class="cbox"><div class="cval hw ex-hand">2</div><div class="clbl">Bot A Stat</div></div>
+        <span class="paren">)</span>
+        <span class="eqsym">=</span>
+        <div class="cbox"><div class="cval hw ex-hand">15</div><div class="clbl">b =</div></div>
+      </div>
+
+      <div class="my-equation">
+        <div class="me-lbl">My Equation</div>
+        <div class="eq-line">
+          <span class="eq-var">y</span>
+          <span>=</span>
+          <span class="hw ex-hand" style="font-size:24px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">5</span>
+          <span style="font-weight:800;">× <em style="font-size:18px;">x</em> +</span>
+          <span class="hw ex-hand" style="font-size:24px;border-bottom:2px solid var(--slate);padding:0 8px;min-width:56px;display:inline-block;text-align:center;">15</span>
+        </div>
+        <div style="display:flex;gap:10px;font-size:9px;color:var(--steel);margin-top:6px;">
+          <span>slope (m)</span>
+          <span style="margin-left:54px;">starting point (b)</span>
+        </div>
+      </div>
+
+      <div class="plain-lang">In plain language: "For every 1 point I add to my stat, Win% in the class data changes by <span class="hw ex-hand">5</span>."</div>
+    </div>
+
+    <!-- TEST IT -->
+    <div class="band-gray">Test It — Choose Test Bot C</div>
+    <div class="panel">
+      <div class="warning-box">
+        <div class="warn-head">⚠ Test Bot C must be different from Build Bots A and B</div>
+        If you test on a bot you already used to build the equation, the residual will be 0. That tells you nothing. Pick a bot you haven't touched.
+      </div>
+
+      <div class="test-frow">
+        <span>Test Bot C name / team:</span>
+        <span class="hw ex-hand">Bolt / Voltage</span>
+        <span style="margin-left:14px;">Stat value:</span>
+        <span class="hw ex-hand">5</span>
+      </div>
+
+      <div class="test-frow">
+        <span>Actual Win%:</span>
+        <span class="hw ex-hand">40</span>
+        <span>%</span>
+      </div>
+
+      <div class="calc-block" style="margin-top:14px;">
+        <div class="calc-lbl">Predicted Win% — Plug Bot C's Stat Into Your Equation</div>
+        <div class="calc-row">
+          <span class="eq-var" style="font-size:15px;">y</span>
+          <span style="font-size:15px;font-weight:700;">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">5</div><div class="clbl">Slope</div></div>
+          <span class="op" style="font-size:18px;">×</span>
+          <div class="cbox"><div class="cval hw ex-hand">5</div><div class="clbl">Bot C Stat</div></div>
+          <span class="op" style="font-size:18px;">+</span>
+          <div class="cbox"><div class="cval hw ex-hand">15</div><div class="clbl">b</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">40</div><div class="clbl">Predicted Win%</div></div>
+        </div>
+      </div>
+
+      <div class="calc-block">
+        <div class="calc-lbl">Residual = Predicted − Actual</div>
+        <div class="calc-row">
+          <div class="cbox"><div class="cval hw ex-hand">40</div><div class="clbl">Predicted Win%</div></div>
+          <span class="op">−</span>
+          <div class="cbox"><div class="cval hw ex-hand">40</div><div class="clbl">Actual Win%</div></div>
+          <span class="eqsym">=</span>
+          <div class="cbox"><div class="cval hw ex-hand">0</div><div class="clbl">Residual</div></div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:10px 0 6px;">My residual means my model:</div>
+      <div class="choice-row">
+        <span class="choice">over-predicted</span>
+        <span class="choice">under-predicted</span>
+        <span class="choice sel hw ex-hand">was close</span>
+      </div>
+
+      <!-- EXCEEDS INSIGHT: checks a second bot off the line -->
+      <div class="missed-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+        <span>One reason my model may have missed:</span>
+        <span class="hw ex-hand" style="line-height:1.5;">residual = 0, model was exact! but i checked Spark (Speed 6, Win% 52%) just to see — equation predicts 45%, so residual = +7. Spark wins 7% more than the line says. probably bc their Endurance or Turning is really high — Speed isn't the only thing going on</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3 -->
+  <div class="page-divider"></div>
+  <div class="pg-head" style="padding-top:14px;">
+    <span class="l">NYC First · Velocity Arena · Week 3, Day 13</span>
+    <span class="r">Linear Equations — Class Data Model</span>
+  </div>
+  <div class="rule-strong"></div>
+  <div class="pg-cont">Continued · Season 2 Prediction + Report</div>
+  <div class="body">
+
+    <!-- SECTION 5 -->
+    <div class="band"><span class="num">5</span> Report — Season 2 Prediction</div>
+    <div class="panel">
+      <div class="inst">Use your equation to estimate what would happen if you changed your stat for Season 2. Fill in the sentence exactly as written — the language matters.</div>
+
+      <div class="s2-sentence-box">
+        <div class="s2s-lbl">Season 2 Prediction — Write This Sentence</div>
+        <div class="sentence-frame">
+          "Based on the Season 1 class data, changing
+          <span class="hw ex-hand">Speed</span>
+          from
+          <span class="hw ex-hand">8</span>
+          to
+          <span class="hw ex-hand">10</span>
+          predicts approximately
+          <span class="hw ex-hand">65</span>% win rate."
+        </div>
+        <div class="s2s-sublbl">
+          <span>stat name</span>
+          <span style="margin-left:32px;">current</span>
+          <span style="margin-left:16px;">new value</span>
+          <span style="margin-left:50px;">your equation's output</span>
+        </div>
+      </div>
+
+      <div class="show-calc">
+        Show your calculation: &nbsp;<span style="font-style:italic;font-weight:800;">y</span> =
+        <span class="hw ex-hand">5</span> ×
+        <span class="hw ex-hand">10</span> +
+        <span class="hw ex-hand">15</span> =
+        <span class="hw ex-hand">65</span>%
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="bi-lbl">Big Idea — Write This Sentence</div>
+      <div class="big-idea-box">
+        "This equation describes a pattern in the class data. It does not prove that one stat alone <em>caused</em> winning."
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:12px 0 8px;">Does your prediction change how confident you are about Season 2?</div>
+      <div class="conf-row">
+        <span class="conf">More confident</span>
+        <span class="conf">Less confident</span>
+        <span class="conf sel hw ex-hand">About the same</span>
+      </div>
+      <!-- EXCEEDS INSIGHT: names the budget trade-off -->
+      <div class="because-row" style="flex-direction:column;align-items:flex-start;gap:6px;">
+        <span>Because:</span>
+        <span class="hw ex-hand" style="line-height:1.5;">to raise Speed from 8 to 10 we'd have to drop 2 points somewhere else (budget = 20). the equation can't tell me what we'd lose — maybe we'd get +10% win rate from Speed but lose even more from lower Endurance. I'd need a second equation to know if the trade-off is worth it</span>
+      </div>
+
+      <div class="report-card">
+        <div class="rc-head">Report Card — Share-out</div>
+        <div class="rc-grid">
+          <div class="rc-col">
+            <div class="rc-lbl">My Equation</div>
+            <div class="rc-val"><span class="hw ex-hand" style="font-size:20px;">y = 5 × x + 15</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Slope (M)</div>
+            <div class="rc-val"><span class="hw ex-hand" style="font-size:22px;">5</span></div>
+          </div>
+          <div class="rc-col">
+            <div class="rc-lbl">Bot C Residual</div>
+            <div class="rc-val"><span class="hw ex-hand" style="font-size:22px;">0%</span></div>
+          </div>
+        </div>
+        <div class="listen-lbl">When Other Teams Share, Listen For:</div>
+        <div class="listen-grid">
+          <div class="listen-item"><div class="cb"></div><span>Who has the steepest slope? Their stat matters most.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Who has the smallest residual? Their model was most accurate.</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did two teams use the same stat but get different slopes? What does that mean?</span></div>
+          <div class="listen-item"><div class="cb"></div><span>Did anyone's prediction use the word "will"? Should it?</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pg-foot">
+      <span>NYC First · Velocity Arena</span>
+      <span class="mid">Week 3, Day 13 · Linear Equations — Class Data Model</span>
+      <span>Page 3 of 3 · Keep this sheet — it goes in your data log</span>
+    </div>
+  </div>
+
+  <div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+  <div class="lookfor">
+    <div class="lab">Teacher Look-For — Exceeds (Priya R.)</div>
+    <div class="t">Priya's equation is correct and her Bot C test landed a residual of exactly 0, which she correctly named as "the model was exact." She didn't stop there — she independently tested a second bot (Spark, Speed=6), computed the residual as +7, and offered a plausible causal explanation (other stats are covering for Speed). Her Season 2 reflection identifies the budget constraint by name and explains why one equation isn't enough to evaluate a trade-off, attaching appropriate uncertainty to the prediction. Both of these moves — using a residual as an inferential tool and naming a model's structural limits — are the transferable skills this worksheet is reaching for.</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

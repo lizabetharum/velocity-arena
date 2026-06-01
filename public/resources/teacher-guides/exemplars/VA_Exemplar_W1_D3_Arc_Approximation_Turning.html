@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Week 1, Day 3 · Arc Approximation: Introducing Turning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Shadows+Into+Light&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{--slate:#2B2D42;--red:#EF233C;--steel:#8D99AE;--ice:#EDF2F4;--ink:#1f3a8a;--pencil:#3f4654;--paper:#fdfdfb;--rule:#c9d0dd;--line:#e4e8ef;--box:#f4f6fa;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#dadfe7;background-image:radial-gradient(circle at 25% -5%,#e9edf3,#d2d7e0);font-family:"Montserrat",system-ui,sans-serif;color:var(--slate);-webkit-font-smoothing:antialiased;padding:38px 16px 90px;}
+.wrap{max-width:860px;margin:0 auto;}
+.intro{margin-bottom:26px;}
+.intro .eyebrow{font-weight:800;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.intro h1{font-weight:800;font-size:24px;letter-spacing:-.02em;margin-bottom:8px;}
+.intro p{font-size:13.5px;line-height:1.6;max-width:66ch;opacity:.85;}
+.cast{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;}
+.cast .c{font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:999px;color:#fff;}
+.cast .c b{font-weight:800;letter-spacing:.04em;}
+.c-ap{background:#c47d12;}.c-mt{background:#2a8f59;}.c-ex{background:#2b6fb0;}
+.sheet{background:var(--paper);border-radius:4px;border:1px solid #e7e2d6;box-shadow:0 1px 0 rgba(0,0,0,.04),0 18px 42px -24px rgba(43,45,66,.6);margin-bottom:40px;overflow:hidden;position:relative;}
+.level-tab{position:absolute;top:22px;right:0;color:#fff;font-weight:800;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:7px 15px;border-radius:4px 0 0 4px;z-index:3;}
+.tab-ap{background:#c47d12;}.tab-mt{background:#2a8f59;}.tab-ex{background:#2b6fb0;}
+.pg-head{display:flex;align-items:center;gap:10px;padding:16px 28px 10px;font-weight:700;font-size:11px;}
+.pg-head .l{text-transform:uppercase;letter-spacing:.12em;}.pg-head .r{margin-left:auto;font-weight:600;color:var(--steel);}
+.rule-strong{height:2px;background:var(--slate);margin:0 28px 14px;}
+.body{padding:0 28px 22px;}
+.wtitle{font-weight:800;font-size:21px;letter-spacing:-.01em;margin:2px 0 1px;}
+.wsub{font-size:12.5px;font-style:italic;color:var(--steel);margin-bottom:16px;}
+.idrow{display:flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin-bottom:16px;}
+.idrow .lab{background:var(--ice);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:11px 12px;display:flex;align-items:center;border-right:1px solid var(--rule);}
+.idrow .fill{flex:1;padding:8px 12px;border-right:1px solid var(--rule);display:flex;align-items:center;}
+.idrow .fill:last-child{border-right:0;}
+.band{background:var(--ice);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border:1px solid var(--rule);border-bottom:0;}
+.panel{border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:13px 14px;margin-bottom:14px;}
+.panel-flush{border:1px solid var(--rule);border-radius:0 0 4px 4px;padding:0;margin-bottom:14px;overflow:hidden;}
+.shead{font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:13px 0 7px;color:var(--slate);}
+.shead:first-child{margin-top:0;}
+/* distance */
+.dist-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 10px;}
+.dist-ex{background:var(--box);border:1px solid var(--rule);border-radius:4px;padding:10px 12px;font-size:11.5px;}
+.dist-ex .dl{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:var(--steel);}
+.dist-work{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:#fffef9;font-size:12.5px;line-height:2.0;}
+.bigformula{border:2px solid var(--slate);border-radius:4px;text-align:center;font-weight:800;font-size:14.5px;padding:9px 12px;margin:6px 0 10px;background:#fff;}
+/* corners */
+.corners{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px;}
+.copt{display:inline-block;border:1.5px solid var(--rule);border-radius:22px;padding:4px 11px;font-weight:700;font-size:12px;color:var(--steel);}
+.copt.sel{border:2.5px solid var(--ink);color:var(--ink);background:rgba(31,58,138,0.05);}
+/* stop table */
+table.stop{width:100%;border-collapse:collapse;margin:6px 0 8px;}
+table.stop th{background:var(--slate);color:#fff;font-weight:700;font-size:9.5px;padding:7px 10px;text-align:left;}
+table.stop td{border:1px solid var(--rule);padding:0 11px;height:33px;font-size:12px;}
+table.stop td.pr{background:var(--box);font-weight:700;}
+/* formula flow */
+.fflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 6px;}
+.fbox{border:1.5px solid var(--slate);border-radius:4px;padding:7px 12px;font-weight:700;font-size:12px;text-align:center;line-height:1.2;}
+.fbox.fin{background:var(--box);}.fbox.fmid{background:#fff;font-size:11px;}.fbox.fout{background:var(--slate);color:#fff;}
+.fbox .fl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel);margin-top:2px;display:block;font-weight:600;}
+.fbox.fout .fl{color:rgba(255,255,255,.6);}
+.farrow{font-size:18px;color:var(--steel);}
+/* T table */
+table.tt{width:100%;border-collapse:collapse;margin:6px 0 10px;}
+table.tt th{background:var(--slate);color:#fff;font-weight:700;font-size:9.5px;padding:7px 10px;text-align:left;}
+table.tt td{border:1px solid var(--rule);padding:0 10px;height:35px;font-size:11px;}
+table.tt .pr td{background:var(--box);font-style:italic;}
+table.tt .fi td{background:#fffef9;}
+/* predict */
+.pred-row{display:flex;gap:14px;align-items:center;margin:4px 0 8px;flex-wrap:wrap;font-size:12.5px;}
+.pred-lbl{font-weight:700;}
+.popt{padding:3px 11px;border:1.5px solid var(--rule);border-radius:12px;font-weight:600;font-size:12px;}
+.popt.on{border:2px solid var(--ink);font-weight:800;}
+.popt.off{color:var(--steel);}
+/* checkboxes */
+.cbrow{display:flex;gap:16px;flex-wrap:wrap;margin:3px 0;}
+.cbi{display:flex;align-items:center;gap:5px;font-size:12px;}
+.cbx{display:inline-block;width:13px;height:13px;border:1.5px solid #aaa;border-radius:2px;background:#fff;text-align:center;line-height:12px;font-size:8px;flex-shrink:0;}
+.cbx.on{background:var(--ice);border-color:var(--slate);color:var(--slate);}
+/* arena grid */
+table.arena{border-collapse:collapse;margin:4px 0 4px;}
+table.arena td{border:1px solid var(--rule);width:29px;height:24px;text-align:center;font-size:9.5px;color:var(--steel);vertical-align:middle;}
+table.arena td.ya{border:none;width:16px;font-size:9px;font-weight:700;color:var(--steel);text-align:right;padding-right:4px;}
+table.arena td.xa{border:none;font-size:9px;color:var(--steel);padding-top:2px;height:15px;text-align:center;}
+table.arena td.xsp{border:none;width:16px;}
+table.arena td.cov{background:rgba(31,58,138,0.11);color:var(--ink);font-weight:700;border:1.5px dashed var(--ink);}
+table.arena td.cov.st{font-size:11px;}
+/* coverage summary */
+table.covs{width:100%;border-collapse:collapse;margin:6px 0 10px;}
+table.covs th{background:var(--slate);color:#fff;font-weight:700;font-size:9.5px;padding:7px 10px;text-align:left;}
+table.covs td{border:1px solid var(--rule);padding:0 10px;height:32px;font-size:12px;}
+table.covs td.pr{background:var(--box);font-style:italic;font-size:11px;}
+/* budget calc */
+.bud{border-left:3px solid var(--red);background:var(--box);padding:8px 12px;font-size:12.5px;line-height:1.6;border-radius:3px;margin-bottom:10px;}
+.brow{font-weight:700;font-size:13px;margin:6px 0;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+/* sheet foot */
+.sfoot{display:flex;justify-content:space-between;font-size:10px;padding:8px 0 4px;border-top:1.5px solid var(--slate);margin-top:12px;opacity:.75;}
+/* lookfor */
+.lookfor{margin:14px -28px 0;padding:14px 28px;background:#eef1f6;border-top:1px solid var(--line);}
+.lookfor .lab{font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;color:#2b6fb0;}
+.lookfor.ap .lab{color:#a96a0c;}.lookfor.mt .lab{color:#1f7a4c;}
+.lookfor .t{font-size:12.5px;line-height:1.55;}
+.lookfor .t em{font-style:italic;}
+.stamp{display:inline-block;font-weight:800;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);border:1.4px solid var(--steel);border-radius:3px;padding:3px 8px;transform:rotate(-2deg);margin-top:12px;}
+.hw{color:var(--ink);}
+.hw.p{color:var(--pencil);}
+.ap-hand{font-family:"Shadows Into Light",cursive;font-size:18px;line-height:1.2;}
+.mt-hand{font-family:"Caveat",cursive;font-size:21px;font-weight:600;line-height:1.1;}
+.ex-hand{font-family:"Reenie Beanie",cursive;font-size:23px;line-height:1.05;}
+.err{color:#c0202a;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="intro">
+  <p class="eyebrow">Completed student work · Week 1 · Day 3</p>
+  <h1>Arc Approximation: Introducing Turning</h1>
+  <p>Students use the distance formula to calculate launch distances, then discover how the Turn Ratio formula shapes bot movement. The low sample correctly computes the T×0.02 part of the turnRatio but forgets to add the 0.2 base — a one-term error that carries into the stat card. The high sample names why her Speed stat changes the strategic value of a low Turning allocation. Illustrative samples, built before the pilot.</p>
+  <div class="cast">
+    <span class="c c-ap"><b>APPROACHING</b> · Marcus T. · Voltage</span>
+    <span class="c c-mt"><b>MEETS</b> · Jayda W. · Circuit Breakers</span>
+    <span class="c c-ex"><b>EXCEEDS</b> · Priya R. · Overclock</span>
+  </div>
+</div>
+
+<!-- ════════════ APPROACHING · Marcus ════════════ -->
+<div class="sheet"><div class="level-tab tab-ap">Approaching</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 3</span><span class="r">Arc Approximation · Turning</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Arc Approximation: Introducing Turning</div>
+  <div class="wsub">Use the distance formula to plan your launch path, then discover how TURNING shapes your bot's movement across the arena.</div>
+  <div class="idrow">
+    <span class="lab">Team</span><span class="fill hw ap-hand">Voltage</span>
+    <span class="lab">Names</span><span class="fill hw ap-hand">Marcus T.</span>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="band">● Part 1 — Launch Sequence · 20 min</div>
+  <div class="panel">
+    <p style="font-size:12.5px;line-height:1.7;margin-bottom:10px;">The ball starts at <strong>(4, 2)</strong>. Your first job in every match: get your bot to the ball before your opponent. Choose a starting corner, calculate the distance, then program and measure your run.</p>
+
+    <div class="shead">Step 1 — Circle your starting corner</div>
+    <div class="corners">
+      <span class="copt">(0, 0)</span>
+      <span class="copt">(0, 4)</span>
+      <span class="copt sel">(8, 0)</span>
+      <span class="copt">(8, 4)</span>
+    </div>
+
+    <div class="shead">Step 2 — Calculate your distance to the ball</div>
+    <div class="bigformula">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div style="font-size:11px;color:var(--steel);margin-bottom:8px;">x₁, y₁ = your starting corner &nbsp;·&nbsp; x₂, y₂ = ball position (4, 2)</div>
+
+    <div class="dist-2col">
+      <div class="dist-ex">
+        <div class="dl">Example — Corner (0, 0) → Ball (4, 2)</div>
+        <div style="font-size:11px;line-height:1.9;">
+          d = √((4−0)² + (2−0)²)<br>
+          = √(16 + 4)<br>
+          = √20<br>
+          <strong>≈ 4.47 grid units</strong>
+        </div>
+      </div>
+      <div class="dist-work">
+        <span style="font-size:11.5px;font-weight:700;">Your corner: (8, 0) → Ball (4, 2)</span><br>
+        <span class="hw ap-hand">d = √((4 − 8)² + (2 − 0)²)</span><br>
+        <span class="hw ap-hand">= √(16 + 4)</span><br>
+        <span class="hw ap-hand">= √20</span><br>
+        <span class="hw ap-hand">≈ 4.47 grid units</span>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule);font-size:12px;">
+          <strong>All four corners — which is closest?</strong><br>
+          Shortest distance: corner <span class="hw ap-hand">(8,0)</span> ≈ <span class="hw ap-hand">4.47</span> units
+        </div>
+      </div>
+    </div>
+
+    <div class="shead">Step 3 — Program your path, then measure where your bot actually stopped</div>
+    <p style="font-size:11.5px;margin-bottom:8px;">Open the launch sequence program. Add your moves between <code style="background:var(--box);padding:1px 4px;border-radius:3px;font-size:10px;">launchActive = true</code> and <code style="background:var(--box);padding:1px 4px;border-radius:3px;font-size:10px;">launchActive = false</code>. Run the bot, then record where it stopped.</p>
+    <table class="stop">
+      <tr><th style="width:55%;">Position</th><th>X Position</th><th>Y Position</th></tr>
+      <tr><td class="pr">Where you aimed <em>(called)</em></td><td class="pr" style="text-align:center;">4</td><td class="pr" style="text-align:center;">2</td></tr>
+      <tr><td>Where it stopped <em>(reached)</em></td><td style="text-align:center;"><span class="hw ap-hand">5</span></td><td style="text-align:center;"><span class="hw ap-hand">2</span></td></tr>
+    </table>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:4px;">Now use the formula again to find the gap:</div>
+    <div style="font-size:12.5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+      <span>d = √(( </span><span class="hw ap-hand">5</span><span> − 4)² + ( </span><span class="hw ap-hand">2</span><span> − 2)²) = √(1 + 0) = √1 ≈</span><span class="hw ap-hand">1</span><span> grid unit off</span>
+    </div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="band">Part 2 — Arc Approximation · 70 min</div>
+  <div class="panel">
+    <div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:10px;">
+      <div style="text-align:center;">
+        <svg width="68" height="50" viewBox="0 0 68 50"><polyline points="6,46 34,8 62,46" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">2 Segments</div>
+        <div style="font-size:10px;color:var(--steel);font-style:italic;">Choppy Path</div>
+      </div>
+      <div style="text-align:center;">
+        <svg width="68" height="50" viewBox="0 0 68 50"><polyline points="4,46 13,36 21,27 29,20 37,15 45,12 53,14 62,20" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">8 Segments</div>
+        <div style="font-size:10px;color:var(--steel);font-style:italic;">Smoother Arc</div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.7;flex:1;">
+        <strong>A "curve" in Velocity Arena is not a real curve — it is many short straight lines.</strong><br>
+        One wheel spins faster than the other. More line segments = a smoother-looking arc.<br>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">If one wheel is faster, the bot goes <span class="hw ap-hand" style="font-size:17px;">&nbsp;in a curve</span></span>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:2px;">If the right wheel is faster, the bot turns <span class="hw ap-hand" style="font-size:17px;">&nbsp;left</span></span>
+      </div>
+    </div>
+
+    <div style="background:var(--box);border:1px solid var(--rule);border-radius:4px;padding:10px 14px;margin-bottom:10px;">
+      <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">F — The Turn Ratio Formula</div>
+      <div class="fflow">
+        <div><div class="fbox fin">T<div class="fl">your stat</div></div></div>
+        <span class="farrow">→</span>
+        <div><div class="fbox fmid">0.2 + (T × 0.02)<div class="fl">formula</div></div></div>
+        <span class="farrow">→</span>
+        <div><div class="fbox fout">turnRatio<div class="fl">result</div></div></div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.8;font-weight:700;">
+        Left wheel = motorPower × (1 − turnRatio)<br>
+        Right wheel = motorPower × (1 + turnRatio)
+      </div>
+      <div style="font-size:11.5px;font-style:italic;color:var(--steel);margin-top:4px;">e.g. T=2: ratio = 0.24 → Left = 50×0.76 = 38, Right = 50×1.24 = 62</div>
+    </div>
+
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Your Turn — T = 2 and T = 10 are done. Fill in T = 5. Use motorPower = 50.</div>
+    <table class="tt">
+      <tr><th style="width:8%;">T</th><th>TurnRatio &nbsp;(0.2 + T×0.02)</th><th>Left Wheel &nbsp;50 × (1 − ratio)</th><th>Right Wheel &nbsp;50 × (1 + ratio)</th></tr>
+      <tr class="pr"><td><em>2</em></td><td>0.2 + 0.04 = 0.24</td><td>50 × 0.76 = 38</td><td>50 × 1.24 = 62</td></tr>
+      <tr class="fi">
+        <td style="font-weight:800;font-style:italic;">5</td>
+        <td>0.2 + (5 × 0.02) = <span class="hw ap-hand err" style="font-size:17px;">0.10</span></td>
+        <td>50 × (1 − <span class="hw ap-hand err" style="font-size:17px;">0.10</span>) = <span class="hw ap-hand err" style="font-size:17px;">45</span></td>
+        <td>50 × (1 + <span class="hw ap-hand err" style="font-size:17px;">0.10</span>) = <span class="hw ap-hand err" style="font-size:17px;">55</span></td>
+      </tr>
+      <tr class="pr"><td><em>10</em></td><td>0.2 + 0.20 = 0.40</td><td>50 × 0.60 = 30</td><td>50 × 1.40 = 70</td></tr>
+    </table>
+
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Predict — What will your bot do at each value?</div>
+    <div class="pred-row"><span class="pred-lbl">T = 2:</span><span class="popt on">wide path</span><span class="popt off">tight circle</span></div>
+    <div class="pred-row"><span class="pred-lbl">T = 10:</span><span class="popt off">wide path</span><span class="popt on">tight circle</span></div>
+
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;margin-bottom:6px;">After Testing — Check what you actually observed:</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 2</div>
+        <div class="cbrow"><div class="cbi"><span class="cbx on">✓</span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 5</div>
+        <div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx on">✓</span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 10</div>
+        <div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx on">✓</span>sharp curve</div></div></div>
+    </div>
+  </div>
+
+  <!-- COVERAGE CHALLENGE -->
+  <div class="band">Coverage Challenge — Count your squares</div>
+  <div class="panel">
+    <p style="font-size:12px;margin-bottom:10px;">Run 15 seconds each. Start at midfield center (4, 2) — marked ● on each grid. After each run, circle every square the robot touched. Count the circled squares and record below.<br><span style="color:var(--steel);">Field: 8′ × 4′ · Each square = 10.75″ (27 cm) · 32 squares total</span></p>
+
+    <!-- Trial 1 -->
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 1 · T = 2 · turnRatio = 0.24 · Left: 38 · Right: 62</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td class="cov">7</td><td class="cov">8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td>11</td><td>12</td><td class="cov">13</td><td class="cov">14</td><td class="cov">15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td>20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;">
+      <span><strong>Squares covered:</strong> <span class="hw ap-hand" style="font-size:20px;">8</span></span>
+      <span>Robot ends near sq. <span class="hw ap-hand" style="font-size:20px;">7</span></span>
+    </div>
+
+    <!-- Trial 2 -->
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 2 · T = 5 · turnRatio = 0.30 · Left: 35 · Right: 65</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td class="cov">5</td><td class="cov">6</td><td class="cov">7</td><td>8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td class="cov">11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td class="cov">15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td>20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;">
+      <span><strong>Squares covered:</strong> <span class="hw ap-hand" style="font-size:20px;">11</span></span>
+      <span>Robot ends near sq. <span class="hw ap-hand" style="font-size:20px;">5</span></span>
+    </div>
+
+    <!-- Trial 3 -->
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 3 · T = 10 · turnRatio = 0.40 · Left: 30 · Right: 70</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td class="cov">11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td>15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td class="cov">18</td><td class="cov">19</td><td class="cov">20</td><td class="cov st">●21</td><td class="cov">22</td><td>23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;">
+      <span><strong>Squares covered:</strong> <span class="hw ap-hand" style="font-size:20px;">9</span></span>
+      <span>Robot ends near sq. <span class="hw ap-hand" style="font-size:20px;">19</span></span>
+    </div>
+
+    <table class="covs">
+      <tr><th style="width:12%;">T</th><th>Left Wheel</th><th>Right Wheel</th><th>Squares Covered</th></tr>
+      <tr><td class="pr">2</td><td class="pr">38</td><td class="pr">62</td><td><span class="hw ap-hand" style="font-size:20px;">8</span></td></tr>
+      <tr><td class="pr">5</td><td class="pr">35</td><td class="pr">65</td><td><span class="hw ap-hand" style="font-size:20px;">11</span></td></tr>
+      <tr><td class="pr">10</td><td class="pr">30</td><td class="pr">70</td><td><span class="hw ap-hand" style="font-size:20px;">9</span></td></tr>
+    </table>
+
+    <div style="font-size:12.5px;margin-bottom:6px;font-weight:700;">The value that covered the most area: T = <span class="hw ap-hand" style="font-size:20px;">5</span></div>
+    <div style="font-size:12.5px;margin-bottom:5px;font-weight:700;">A higher TURNING value covers:
+      <span class="popt off" style="margin-left:6px;">more area</span>
+      <span class="popt off" style="margin:0 4px;">less area</span>
+      <span class="popt on">it depends</span>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;">Which path covers more area?
+      <span class="cbx" style="margin-left:6px;"></span> small tight loops &nbsp;&nbsp;
+      <span class="cbx on">✓</span> wide sweeping paths
+    </div>
+  </div>
+
+  <!-- TURNING ALLOCATION -->
+  <div class="band">Turning Allocation — Lock in your stat</div>
+  <div class="panel">
+    <div class="bud"><strong>Budget Rule:</strong> Speed + Endurance + Turning ≤ 19 &nbsp;(save at least 1 point for Power — you allocate Power tomorrow)</div>
+    <div style="font-size:12.5px;margin-bottom:6px;">
+      My Speed (Day 1): <span class="hw ap-hand" style="font-size:20px;">5</span>&nbsp;&nbsp;&nbsp;
+      My Endurance (Day 2): <span class="hw ap-hand" style="font-size:20px;">5</span>
+    </div>
+    <div class="brow">Points left for Turning: 19 − <span class="hw ap-hand" style="font-size:20px;">5</span> − <span class="hw ap-hand" style="font-size:20px;">5</span> = <span class="hw ap-hand" style="font-size:20px;">9</span> points</div>
+    <div style="font-size:12.5px;font-weight:700;margin:8px 0 4px;">My TURNING value: <span class="hw ap-hand" style="font-size:22px;">5</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">I chose this value because:</div>
+    <div class="cbrow" style="flex-direction:column;gap:7px;">
+      <div class="cbi"><span class="cbx"></span> I want wide coverage — my bot patrols more of the arena</div>
+      <div class="cbi"><span class="cbx"></span> I want tight control — my bot stays close to one area</div>
+      <div class="cbi"><span class="cbx on">✓</span> I want balanced movement — moderate curves</div>
+    </div>
+  </div>
+
+  <!-- STAT CARD -->
+  <div class="band">Write on your stat card now — this value is binding</div>
+  <div class="panel">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">TURNING = <span class="hw ap-hand" style="font-size:22px;">5</span></div>
+    <div style="font-size:12.5px;display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px;align-items:baseline;">
+      <span>turnRatio = <span class="hw ap-hand err" style="font-size:20px;">0.10</span></span>
+      <span>Left wheel = <span class="hw ap-hand err" style="font-size:20px;">45</span></span>
+      <span>Right wheel = <span class="hw ap-hand err" style="font-size:20px;">55</span></span>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;">Coverage rank: T = <span class="hw ap-hand" style="font-size:20px;">5</span> covered most &nbsp;·&nbsp; T = <span class="hw ap-hand" style="font-size:20px;">2</span> covered least</div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>NYC FIRST · Velocity Arena</span><span>Week 1, Day 3 · Arc Approximation: Turning</span><span>Write TURNING on your stat card</span></div>
+  <div class="lookfor ap"><div class="lab">Teacher look-for</div><div class="t">Marcus's distance formula is correct (√20 ≈ 4.47) and his T=2/T=10 predictions are right. His one error: filling in T=5 turnRatio as <strong>0.10</strong> instead of 0.30 — he computed 5×0.02=0.10 correctly but dropped the 0.2 base even though it's printed in the formula. The error cascades into Left=45/Right=55 (internally consistent with his wrong ratio) and repeats on the stat card. <em>Ask: "Look at T=2 (0.24) and T=10 (0.40). Does 0.10 fit that sequence? What's the smallest turnRatio this formula can ever produce?"</em></div></div>
+</div></div>
+
+
+<!-- ════════════ MEETS · Jayda ════════════ -->
+<div class="sheet"><div class="level-tab tab-mt">Meets</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 3</span><span class="r">Arc Approximation · Turning</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Arc Approximation: Introducing Turning</div>
+  <div class="wsub">Use the distance formula to plan your launch path, then discover how TURNING shapes your bot's movement across the arena.</div>
+  <div class="idrow">
+    <span class="lab">Team</span><span class="fill hw mt-hand">Circuit Breakers</span>
+    <span class="lab">Names</span><span class="fill hw mt-hand">Jayda W.</span>
+  </div>
+
+  <div class="band">● Part 1 — Launch Sequence · 20 min</div>
+  <div class="panel">
+    <p style="font-size:12.5px;line-height:1.7;margin-bottom:10px;">The ball starts at <strong>(4, 2)</strong>. Your first job in every match: get your bot to the ball before your opponent. Choose a starting corner, calculate the distance, then program and measure your run.</p>
+    <div class="shead">Step 1 — Circle your starting corner</div>
+    <div class="corners">
+      <span class="copt">(0, 0)</span>
+      <span class="copt sel">(0, 4)</span>
+      <span class="copt">(8, 0)</span>
+      <span class="copt">(8, 4)</span>
+    </div>
+    <div class="shead">Step 2 — Calculate your distance to the ball</div>
+    <div class="bigformula">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div style="font-size:11px;color:var(--steel);margin-bottom:8px;">x₁, y₁ = your starting corner &nbsp;·&nbsp; x₂, y₂ = ball position (4, 2)</div>
+    <div class="dist-2col">
+      <div class="dist-ex">
+        <div class="dl">Example — Corner (0, 0) → Ball (4, 2)</div>
+        <div style="font-size:11px;line-height:1.9;">d = √((4−0)² + (2−0)²)<br>= √(16 + 4)<br>= √20<br><strong>≈ 4.47 grid units</strong></div>
+      </div>
+      <div class="dist-work">
+        <span style="font-size:11.5px;font-weight:700;">Your corner: (0, 4) → Ball (4, 2)</span><br>
+        <span class="hw mt-hand">d = √((4 − 0)² + (2 − 4)²)</span><br>
+        <span class="hw mt-hand">= √(16 + 4)</span><br>
+        <span class="hw mt-hand">= √20</span><br>
+        <span class="hw mt-hand">≈ 4.47 grid units</span>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule);font-size:12px;">
+          <strong>All four corners — which is closest?</strong><br>
+          Shortest distance: corner <span class="hw mt-hand">all ≈ 4.47</span> — <span class="hw mt-hand" style="font-size:17px;">they're all equal</span>
+        </div>
+      </div>
+    </div>
+    <div class="shead">Step 3 — Program your path, then measure where your bot actually stopped</div>
+    <table class="stop">
+      <tr><th style="width:55%;">Position</th><th>X Position</th><th>Y Position</th></tr>
+      <tr><td class="pr">Where you aimed <em>(called)</em></td><td class="pr" style="text-align:center;">4</td><td class="pr" style="text-align:center;">2</td></tr>
+      <tr><td>Where it stopped <em>(reached)</em></td><td style="text-align:center;"><span class="hw mt-hand">3.5</span></td><td style="text-align:center;"><span class="hw mt-hand">2</span></td></tr>
+    </table>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:4px;">Now use the formula again to find the gap:</div>
+    <div style="font-size:12.5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+      <span>d = √(( </span><span class="hw mt-hand">3.5</span><span> − 4)² + ( </span><span class="hw mt-hand">2</span><span> − 2)²) = √(0.25 + 0) ≈ </span><span class="hw mt-hand">0.5</span><span> grid units off</span>
+    </div>
+  </div>
+
+  <div class="band">Part 2 — Arc Approximation · 70 min</div>
+  <div class="panel">
+    <div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:10px;">
+      <div style="text-align:center;"><svg width="68" height="50" viewBox="0 0 68 50"><polyline points="6,46 34,8 62,46" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg><div style="font-size:10px;font-weight:700;text-transform:uppercase;">2 Segments</div><div style="font-size:10px;color:var(--steel);font-style:italic;">Choppy Path</div></div>
+      <div style="text-align:center;"><svg width="68" height="50" viewBox="0 0 68 50"><polyline points="4,46 13,36 21,27 29,20 37,15 45,12 53,14 62,20" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg><div style="font-size:10px;font-weight:700;text-transform:uppercase;">8 Segments</div><div style="font-size:10px;color:var(--steel);font-style:italic;">Smoother Arc</div></div>
+      <div style="font-size:12.5px;line-height:1.7;flex:1;">
+        <strong>A "curve" in Velocity Arena is not a real curve — it is many short straight lines.</strong><br>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">If one wheel is faster, the bot goes <span class="hw mt-hand" style="font-size:19px;">&nbsp;in a curve</span></span>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:2px;">If the right wheel is faster, the bot turns <span class="hw mt-hand" style="font-size:19px;">&nbsp;left</span></span>
+      </div>
+    </div>
+    <div style="background:var(--box);border:1px solid var(--rule);border-radius:4px;padding:10px 14px;margin-bottom:10px;">
+      <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">F — The Turn Ratio Formula</div>
+      <div class="fflow"><div><div class="fbox fin">T<div class="fl">your stat</div></div></div><span class="farrow">→</span><div><div class="fbox fmid">0.2 + (T × 0.02)<div class="fl">formula</div></div></div><span class="farrow">→</span><div><div class="fbox fout">turnRatio<div class="fl">result</div></div></div></div>
+      <div style="font-size:12.5px;line-height:1.8;font-weight:700;">Left wheel = motorPower × (1 − turnRatio)<br>Right wheel = motorPower × (1 + turnRatio)</div>
+      <div style="font-size:11.5px;font-style:italic;color:var(--steel);margin-top:4px;">e.g. T=2: ratio = 0.24 → Left = 50×0.76 = 38, Right = 50×1.24 = 62</div>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Your Turn — T = 2 and T = 10 are done. Fill in T = 5. Use motorPower = 50.</div>
+    <table class="tt">
+      <tr><th style="width:8%;">T</th><th>TurnRatio &nbsp;(0.2 + T×0.02)</th><th>Left Wheel &nbsp;50 × (1 − ratio)</th><th>Right Wheel &nbsp;50 × (1 + ratio)</th></tr>
+      <tr class="pr"><td><em>2</em></td><td>0.2 + 0.04 = 0.24</td><td>50 × 0.76 = 38</td><td>50 × 1.24 = 62</td></tr>
+      <tr class="fi">
+        <td style="font-weight:800;font-style:italic;">5</td>
+        <td>0.2 + (5 × 0.02) = <span class="hw mt-hand" style="font-size:19px;">0.30</span></td>
+        <td>50 × (1 − <span class="hw mt-hand" style="font-size:19px;">0.30</span>) = <span class="hw mt-hand" style="font-size:19px;">35</span></td>
+        <td>50 × (1 + <span class="hw mt-hand" style="font-size:19px;">0.30</span>) = <span class="hw mt-hand" style="font-size:19px;">65</span></td>
+      </tr>
+      <tr class="pr"><td><em>10</em></td><td>0.2 + 0.20 = 0.40</td><td>50 × 0.60 = 30</td><td>50 × 1.40 = 70</td></tr>
+    </table>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Predict — What will your bot do at each value?</div>
+    <div class="pred-row"><span class="pred-lbl">T = 2:</span><span class="popt on">wide path</span><span class="popt off">tight circle</span></div>
+    <div class="pred-row"><span class="pred-lbl">T = 10:</span><span class="popt off">wide path</span><span class="popt on">tight circle</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;margin-bottom:6px;">After Testing — Check what you actually observed:</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 2</div><div class="cbrow"><div class="cbi"><span class="cbx on">✓</span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 5</div><div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx on">✓</span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 10</div><div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx on">✓</span>sharp curve</div></div></div>
+    </div>
+  </div>
+
+  <div class="band">Coverage Challenge — Count your squares</div>
+  <div class="panel">
+    <p style="font-size:12px;margin-bottom:10px;">Run 15 seconds each. Start at midfield center (4, 2). After each run, circle every square the robot touched.<br><span style="color:var(--steel);">Field: 8′ × 4′ · Each square = 10.75″ (27 cm) · 32 squares total</span></p>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 1 · T = 2 · turnRatio = 0.24 · Left: 38 · Right: 62</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td class="cov">8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td class="cov">14</td><td class="cov">15</td><td class="cov">16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td>20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td class="cov">24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw mt-hand" style="font-size:22px;">8</span></span><span>Robot ends near sq. <span class="hw mt-hand" style="font-size:22px;">8</span></span></div>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 2 · T = 5 · turnRatio = 0.30 · Left: 35 · Right: 65</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td class="cov">5</td><td class="cov">6</td><td class="cov">7</td><td class="cov">8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td>11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td class="cov">15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td class="cov">20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw mt-hand" style="font-size:22px;">12</span></span><span>Robot ends near sq. <span class="hw mt-hand" style="font-size:22px;">5</span></span></div>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 3 · T = 10 · turnRatio = 0.40 · Left: 30 · Right: 70</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td class="cov">10</td><td class="cov">11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td>15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td class="cov">19</td><td class="cov">20</td><td class="cov st">●21</td><td class="cov">22</td><td>23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw mt-hand" style="font-size:22px;">9</span></span><span>Robot ends near sq. <span class="hw mt-hand" style="font-size:22px;">14</span></span></div>
+    <table class="covs">
+      <tr><th style="width:12%;">T</th><th>Left Wheel</th><th>Right Wheel</th><th>Squares Covered</th></tr>
+      <tr><td class="pr">2</td><td class="pr">38</td><td class="pr">62</td><td><span class="hw mt-hand" style="font-size:22px;">8</span></td></tr>
+      <tr><td class="pr">5</td><td class="pr">35</td><td class="pr">65</td><td><span class="hw mt-hand" style="font-size:22px;">12</span></td></tr>
+      <tr><td class="pr">10</td><td class="pr">30</td><td class="pr">70</td><td><span class="hw mt-hand" style="font-size:22px;">9</span></td></tr>
+    </table>
+    <div style="font-size:12.5px;margin-bottom:6px;font-weight:700;">The value that covered the most area: T = <span class="hw mt-hand" style="font-size:22px;">5</span></div>
+    <div style="font-size:12.5px;margin-bottom:5px;font-weight:700;">A higher TURNING value covers: <span class="popt off" style="margin-left:6px;">more area</span><span class="popt off" style="margin:0 4px;">less area</span><span class="popt on">it depends</span></div>
+    <div style="font-size:12.5px;font-weight:700;">Which path covers more area? <span class="cbx" style="margin-left:6px;"></span> small tight loops &nbsp;&nbsp;<span class="cbx on">✓</span> wide sweeping paths</div>
+  </div>
+
+  <div class="band">Turning Allocation — Lock in your stat</div>
+  <div class="panel">
+    <div class="bud"><strong>Budget Rule:</strong> Speed + Endurance + Turning ≤ 19 &nbsp;(save at least 1 point for Power — you allocate Power tomorrow)</div>
+    <div style="font-size:12.5px;margin-bottom:6px;">My Speed (Day 1): <span class="hw mt-hand" style="font-size:22px;">6</span>&nbsp;&nbsp;&nbsp;My Endurance (Day 2): <span class="hw mt-hand" style="font-size:22px;">6</span></div>
+    <div class="brow">Points left for Turning: 19 − <span class="hw mt-hand" style="font-size:22px;">6</span> − <span class="hw mt-hand" style="font-size:22px;">6</span> = <span class="hw mt-hand" style="font-size:22px;">7</span> points</div>
+    <div style="font-size:12.5px;font-weight:700;margin:8px 0 4px;">My TURNING value: <span class="hw mt-hand" style="font-size:24px;">4</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">I chose this value because:</div>
+    <div class="cbrow" style="flex-direction:column;gap:7px;">
+      <div class="cbi"><span class="cbx"></span> I want wide coverage — my bot patrols more of the arena</div>
+      <div class="cbi"><span class="cbx"></span> I want tight control — my bot stays close to one area</div>
+      <div class="cbi"><span class="cbx on">✓</span> I want balanced movement — moderate curves</div>
+    </div>
+  </div>
+
+  <div class="band">Write on your stat card now — this value is binding</div>
+  <div class="panel">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">TURNING = <span class="hw mt-hand" style="font-size:24px;">4</span></div>
+    <div style="font-size:12.5px;display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px;align-items:baseline;">
+      <span>turnRatio = <span class="hw mt-hand" style="font-size:22px;">0.28</span></span>
+      <span>Left wheel = <span class="hw mt-hand" style="font-size:22px;">36</span></span>
+      <span>Right wheel = <span class="hw mt-hand" style="font-size:22px;">64</span></span>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;">Coverage rank: T = <span class="hw mt-hand" style="font-size:22px;">5</span> covered most &nbsp;·&nbsp; T = <span class="hw mt-hand" style="font-size:22px;">2</span> covered least</div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>NYC FIRST · Velocity Arena</span><span>Week 1, Day 3 · Arc Approximation: Turning</span><span>Write TURNING on your stat card</span></div>
+  <div class="lookfor mt"><div class="lab">Teacher look-for</div><div class="t">Distance formula correct (√20 ≈ 4.47), T=5 row correct (0.30, 35, 65 — verified: 0.2+0.10=0.30, 50×0.70=35, 50×1.30=65), and stat card correct for T=4 (0.28, 36, 64). She notes that all four corners are equidistant. Her coverage counts are consistent and she identifies T=5 as peak coverage. She stops at description — she records the "it depends" answer but doesn't explain <em>why</em> T=10's tighter loop covers fewer unique squares than T=5's arc.</div></div>
+</div></div>
+
+
+<!-- ════════════ EXCEEDS · Priya ════════════ -->
+<div class="sheet"><div class="level-tab tab-ex">Exceeds</div>
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 3</span><span class="r">Arc Approximation · Turning</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Arc Approximation: Introducing Turning</div>
+  <div class="wsub">Use the distance formula to plan your launch path, then discover how TURNING shapes your bot's movement across the arena.</div>
+  <div class="idrow">
+    <span class="lab">Team</span><span class="fill hw ex-hand">Overclock</span>
+    <span class="lab">Names</span><span class="fill hw ex-hand">Priya R.</span>
+  </div>
+
+  <div class="band">● Part 1 — Launch Sequence · 20 min</div>
+  <div class="panel">
+    <p style="font-size:12.5px;line-height:1.7;margin-bottom:10px;">The ball starts at <strong>(4, 2)</strong>. Your first job in every match: get your bot to the ball before your opponent. Choose a starting corner, calculate the distance, then program and measure your run.</p>
+    <div class="shead">Step 1 — Circle your starting corner</div>
+    <div class="corners">
+      <span class="copt">(0, 0)</span><span class="copt">(0, 4)</span><span class="copt">(8, 0)</span><span class="copt sel">(8, 4)</span>
+    </div>
+    <div class="shead">Step 2 — Calculate your distance to the ball</div>
+    <div class="bigformula">d = √( (x<sub>2</sub> − x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub> − y<sub>1</sub>)<sup>2</sup> )</div>
+    <div style="font-size:11px;color:var(--steel);margin-bottom:8px;">x₁, y₁ = your starting corner &nbsp;·&nbsp; x₂, y₂ = ball position (4, 2)</div>
+    <div class="dist-2col">
+      <div class="dist-ex">
+        <div class="dl">Example — Corner (0, 0) → Ball (4, 2)</div>
+        <div style="font-size:11px;line-height:1.9;">d = √((4−0)² + (2−0)²)<br>= √(16 + 4)<br>= √20<br><strong>≈ 4.47 grid units</strong></div>
+      </div>
+      <div class="dist-work">
+        <span style="font-size:11.5px;font-weight:700;">Your corner: (8, 4) → Ball (4, 2)</span><br>
+        <span class="hw ex-hand">d = √((4 − 8)² + (2 − 4)²)</span><br>
+        <span class="hw ex-hand">= √(16 + 4) = √20</span><br>
+        <span class="hw ex-hand">≈ 4.47 grid units</span>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--rule);font-size:12px;">
+          <strong>All four corners — which is closest?</strong><br>
+          <span class="hw ex-hand" style="font-size:19px;">All 4 corners = √20 ≈ 4.47. (4,2) is the exact center of the 8×4 field — every corner is equidistant.</span>
+        </div>
+      </div>
+    </div>
+    <div class="shead">Step 3 — Program your path, then measure where your bot actually stopped</div>
+    <table class="stop">
+      <tr><th style="width:55%;">Position</th><th>X Position</th><th>Y Position</th></tr>
+      <tr><td class="pr">Where you aimed <em>(called)</em></td><td class="pr" style="text-align:center;">4</td><td class="pr" style="text-align:center;">2</td></tr>
+      <tr><td>Where it stopped <em>(reached)</em></td><td style="text-align:center;"><span class="hw ex-hand">4</span></td><td style="text-align:center;"><span class="hw ex-hand">2.5</span></td></tr>
+    </table>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:4px;">Now use the formula again to find the gap:</div>
+    <div style="font-size:12.5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+      <span>d = √(( </span><span class="hw ex-hand">4</span><span> − 4)² + ( </span><span class="hw ex-hand">2.5</span><span> − 2)²) = √(0 + 0.25) ≈ </span><span class="hw ex-hand">0.5</span><span> grid units off</span>
+    </div>
+    <div style="margin-top:6px;"><span class="hw p ex-hand" style="font-size:19px;color:var(--pencil);">← only off in y — my run was straight but slightly long</span></div>
+  </div>
+
+  <div class="band">Part 2 — Arc Approximation · 70 min</div>
+  <div class="panel">
+    <div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:10px;">
+      <div style="text-align:center;"><svg width="68" height="50" viewBox="0 0 68 50"><polyline points="6,46 34,8 62,46" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg><div style="font-size:10px;font-weight:700;text-transform:uppercase;">2 Segments</div><div style="font-size:10px;color:var(--steel);font-style:italic;">Choppy Path</div></div>
+      <div style="text-align:center;"><svg width="68" height="50" viewBox="0 0 68 50"><polyline points="4,46 13,36 21,27 29,20 37,15 45,12 53,14 62,20" fill="none" stroke="var(--slate)" stroke-width="2.5"/></svg><div style="font-size:10px;font-weight:700;text-transform:uppercase;">8 Segments</div><div style="font-size:10px;color:var(--steel);font-style:italic;">Smoother Arc</div></div>
+      <div style="font-size:12.5px;line-height:1.7;flex:1;">
+        <strong>A "curve" in Velocity Arena is not a real curve — it is many short straight lines.</strong><br>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">If one wheel is faster, the bot goes <span class="hw ex-hand" style="font-size:21px;">&nbsp;in an arc</span></span>
+        <span style="display:flex;align-items:baseline;gap:4px;margin-top:2px;">If the right wheel is faster, the bot turns <span class="hw ex-hand" style="font-size:21px;">&nbsp;to the left</span></span>
+      </div>
+    </div>
+    <div style="background:var(--box);border:1px solid var(--rule);border-radius:4px;padding:10px 14px;margin-bottom:10px;">
+      <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">F — The Turn Ratio Formula</div>
+      <div class="fflow"><div><div class="fbox fin">T<div class="fl">your stat</div></div></div><span class="farrow">→</span><div><div class="fbox fmid">0.2 + (T × 0.02)<div class="fl">formula</div></div></div><span class="farrow">→</span><div><div class="fbox fout">turnRatio<div class="fl">result</div></div></div></div>
+      <div style="font-size:12.5px;line-height:1.8;font-weight:700;">Left wheel = motorPower × (1 − turnRatio)<br>Right wheel = motorPower × (1 + turnRatio)</div>
+      <div style="font-size:11.5px;font-style:italic;color:var(--steel);margin-top:4px;">e.g. T=2: ratio = 0.24 → Left = 50×0.76 = 38, Right = 50×1.24 = 62</div>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:6px;">Your Turn — T = 2 and T = 10 are done. Fill in T = 5. Use motorPower = 50.</div>
+    <table class="tt">
+      <tr><th style="width:8%;">T</th><th>TurnRatio &nbsp;(0.2 + T×0.02)</th><th>Left Wheel &nbsp;50 × (1 − ratio)</th><th>Right Wheel &nbsp;50 × (1 + ratio)</th></tr>
+      <tr class="pr"><td><em>2</em></td><td>0.2 + 0.04 = 0.24</td><td>50 × 0.76 = 38</td><td>50 × 1.24 = 62</td></tr>
+      <tr class="fi">
+        <td style="font-weight:800;font-style:italic;">5</td>
+        <td>0.2 + (5 × 0.02) = <span class="hw ex-hand" style="font-size:21px;">0.30</span></td>
+        <td>50 × (1 − <span class="hw ex-hand" style="font-size:21px;">0.30</span>) = <span class="hw ex-hand" style="font-size:21px;">35</span></td>
+        <td>50 × (1 + <span class="hw ex-hand" style="font-size:21px;">0.30</span>) = <span class="hw ex-hand" style="font-size:21px;">65</span></td>
+      </tr>
+      <tr class="pr"><td><em>10</em></td><td>0.2 + 0.20 = 0.40</td><td>50 × 0.60 = 30</td><td>50 × 1.40 = 70</td></tr>
+    </table>
+    <div style="margin-top:-4px;margin-bottom:8px;"><span class="hw p ex-hand" style="font-size:19px;color:var(--pencil);">← Right−Left diff: T=2 is 24, T=5 is 30, T=10 is 40 — the split grows linearly with T</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Predict — What will your bot do at each value?</div>
+    <div class="pred-row"><span class="pred-lbl">T = 2:</span><span class="popt on">wide path</span><span class="popt off">tight circle</span></div>
+    <div class="pred-row"><span class="pred-lbl">T = 10:</span><span class="popt off">wide path</span><span class="popt on">tight circle</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-top:10px;margin-bottom:6px;">After Testing — Check what you actually observed:</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 2</div><div class="cbrow"><div class="cbi"><span class="cbx on">✓</span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 5</div><div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx on">✓</span>medium curve</div><div class="cbi"><span class="cbx"></span>sharp curve</div></div></div>
+      <div><div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">T = 10</div><div class="cbrow"><div class="cbi"><span class="cbx"></span>slight curve</div><div class="cbi"><span class="cbx"></span>medium curve</div><div class="cbi"><span class="cbx on">✓</span>sharp curve</div></div></div>
+    </div>
+  </div>
+
+  <div class="band">Coverage Challenge — Count your squares</div>
+  <div class="panel">
+    <p style="font-size:12px;margin-bottom:10px;">Run 15 seconds each. Start at midfield center (4, 2). After each run, circle every square the robot touched.<br><span style="color:var(--steel);">Field: 8′ × 4′ · Each square = 10.75″ (27 cm) · 32 squares total</span></p>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 1 · T = 2 · turnRatio = 0.24 · Left: 38 · Right: 62</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td class="cov">7</td><td class="cov">8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td class="cov">14</td><td class="cov">15</td><td class="cov">16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td>20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw ex-hand" style="font-size:24px;">8</span></span><span>Robot ends near sq. <span class="hw ex-hand" style="font-size:24px;">7</span></span></div>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 2 · T = 5 · turnRatio = 0.30 · Left: 35 · Right: 65</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td class="cov">4</td><td class="cov">5</td><td class="cov">6</td><td class="cov">7</td><td class="cov">8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td>10</td><td class="cov">11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td class="cov">15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td>18</td><td>19</td><td>20</td><td class="cov st">●21</td><td class="cov">22</td><td class="cov">23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw ex-hand" style="font-size:24px;">13</span></span><span>Robot ends near sq. <span class="hw ex-hand" style="font-size:24px;">4</span></span></div>
+    <div style="font-weight:700;font-size:11.5px;margin-bottom:4px;">Trial 3 · T = 10 · turnRatio = 0.40 · Left: 30 · Right: 70</div>
+    <table class="arena">
+      <tr><td class="ya">4</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+      <tr><td class="ya">3</td><td>9</td><td class="cov">10</td><td class="cov">11</td><td class="cov">12</td><td class="cov">13</td><td class="cov">14</td><td>15</td><td>16</td></tr>
+      <tr><td class="ya">2</td><td>17</td><td class="cov">18</td><td class="cov">19</td><td class="cov">20</td><td class="cov st">●21</td><td class="cov">22</td><td>23</td><td>24</td></tr>
+      <tr><td class="ya">1</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td>32</td></tr>
+      <tr><td class="xsp"></td><td class="xa">0</td><td class="xa">1</td><td class="xa">2</td><td class="xa">3</td><td class="xa">4</td><td class="xa">5</td><td class="xa">6</td><td class="xa">7</td></tr>
+    </table>
+    <div style="display:flex;gap:20px;font-size:12.5px;margin-top:4px;margin-bottom:12px;align-items:center;"><span><strong>Squares covered:</strong> <span class="hw ex-hand" style="font-size:24px;">10</span></span><span>Robot ends near sq. <span class="hw ex-hand" style="font-size:24px;">20</span></span></div>
+    <div style="margin-top:-4px;margin-bottom:8px;"><span class="hw p ex-hand" style="font-size:19px;color:var(--pencil);">← T=10 circled the same center squares 2× — counted unique only</span></div>
+    <table class="covs">
+      <tr><th style="width:12%;">T</th><th>Left Wheel</th><th>Right Wheel</th><th>Squares Covered</th></tr>
+      <tr><td class="pr">2</td><td class="pr">38</td><td class="pr">62</td><td><span class="hw ex-hand" style="font-size:24px;">8</span></td></tr>
+      <tr><td class="pr">5</td><td class="pr">35</td><td class="pr">65</td><td><span class="hw ex-hand" style="font-size:24px;">13</span></td></tr>
+      <tr><td class="pr">10</td><td class="pr">30</td><td class="pr">70</td><td><span class="hw ex-hand" style="font-size:24px;">10</span></td></tr>
+    </table>
+    <div style="font-size:12.5px;margin-bottom:6px;font-weight:700;">The value that covered the most area: T = <span class="hw ex-hand" style="font-size:24px;">5</span></div>
+    <div style="font-size:12.5px;margin-bottom:5px;font-weight:700;">A higher TURNING value covers: <span class="popt off" style="margin-left:6px;">more area</span><span class="popt off" style="margin:0 4px;">less area</span><span class="popt on">it depends</span></div>
+    <div style="font-size:12.5px;font-weight:700;">Which path covers more area? <span class="cbx" style="margin-left:6px;"></span> small tight loops &nbsp;&nbsp;<span class="cbx on">✓</span> wide sweeping paths</div>
+    <div style="margin-top:6px;"><span class="hw ex-hand" style="font-size:19px;color:var(--ink);">T=5's arc swept new squares each segment. T=10 looped back and re-touched squares it already covered — so the total unique count dropped even though T was higher.</span></div>
+  </div>
+
+  <div class="band">Turning Allocation — Lock in your stat</div>
+  <div class="panel">
+    <div class="bud"><strong>Budget Rule:</strong> Speed + Endurance + Turning ≤ 19 &nbsp;(save at least 1 point for Power — you allocate Power tomorrow)</div>
+    <div style="font-size:12.5px;margin-bottom:6px;">My Speed (Day 1): <span class="hw ex-hand" style="font-size:24px;">8</span>&nbsp;&nbsp;&nbsp;My Endurance (Day 2): <span class="hw ex-hand" style="font-size:24px;">5</span></div>
+    <div class="brow">Points left for Turning: 19 − <span class="hw ex-hand" style="font-size:24px;">8</span> − <span class="hw ex-hand" style="font-size:24px;">5</span> = <span class="hw ex-hand" style="font-size:24px;">6</span> points</div>
+    <div style="font-size:12.5px;font-weight:700;margin:8px 0 4px;">My TURNING value: <span class="hw ex-hand" style="font-size:26px;">3</span></div>
+    <div style="font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">I chose this value because:</div>
+    <div class="cbrow" style="flex-direction:column;gap:7px;">
+      <div class="cbi"><span class="cbx on">✓</span> I want wide coverage — my bot patrols more of the arena</div>
+      <div class="cbi"><span class="cbx"></span> I want tight control — my bot stays close to one area</div>
+      <div class="cbi"><span class="cbx"></span> I want balanced movement — moderate curves</div>
+    </div>
+    <div style="margin-top:6px;"><span class="hw ex-hand" style="font-size:19px;color:var(--ink);">Also — Speed=8 already means I get to the ball fast. Spending 6 more points on T doesn't help me as much as saving 3 of them for Power tomorrow.</span></div>
+  </div>
+
+  <div class="band">Write on your stat card now — this value is binding</div>
+  <div class="panel">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">TURNING = <span class="hw ex-hand" style="font-size:26px;">3</span></div>
+    <div style="font-size:12.5px;display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px;align-items:baseline;">
+      <span>turnRatio = <span class="hw ex-hand" style="font-size:24px;">0.26</span></span>
+      <span>Left wheel = <span class="hw ex-hand" style="font-size:24px;">37</span></span>
+      <span>Right wheel = <span class="hw ex-hand" style="font-size:24px;">63</span></span>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;">Coverage rank: T = <span class="hw ex-hand" style="font-size:24px;">5</span> covered most &nbsp;·&nbsp; T = <span class="hw ex-hand" style="font-size:24px;">2</span> covered least</div>
+  </div>
+
+  <span class="stamp">Sample · pre-pilot</span>
+  <div class="sfoot"><span>NYC FIRST · Velocity Arena</span><span>Week 1, Day 3 · Arc Approximation: Turning</span><span>Write TURNING on your stat card</span></div>
+  <div class="lookfor"><div class="lab">Teacher look-for</div><div class="t">All formulas correct and verified: T=5 row (0.30, 35, 65), stat card for T=3 (0.26, 37, 63). She notes the field symmetry (all corners = √20) and flags that T=10 re-covered central squares — a direct explanation for why "it depends." Her allocation insight is budget-strategic: she chose T=3 not just for arc shape but to preserve points for Power, linking today's decision to tomorrow's allocation. Her pencil margin note on the wheel-split sequence (+24/+30/+40) names the linear growth of the ratio without being prompted.</div></div>
+</div></div>
+
+</div>
+</body></html>
