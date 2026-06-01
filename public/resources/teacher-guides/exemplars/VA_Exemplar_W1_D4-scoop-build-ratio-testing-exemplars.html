@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Day 4 — Scoop Build + Ratio Testing — Exemplars</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Shadows+Into+Light&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{--slate:#2B2D42;--red:#EF233C;--steel:#8D99AE;--ice:#EDF2F4;--ink:#1f3a8a;--pencil:#3f4654;--paper:#fdfdfb;--rule:#c9d0dd;--line:#e4e8ef;--box:#f4f6fa;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#dadfe7;font-family:"Montserrat",sans-serif;color:var(--slate);padding:38px 16px 90px;}
+.wrap{max-width:860px;margin:0 auto;}
+.sheet{background:var(--paper);border-radius:4px;border:1px solid #e7e2d6;box-shadow:0 18px 42px -24px rgba(43,45,66,.6);margin-bottom:48px;overflow:hidden;position:relative;}
+.level-tab{position:absolute;top:22px;right:0;color:#fff;font-weight:800;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:7px 15px;border-radius:4px 0 0 4px;}
+.tab-ap{background:#c47d12;}.tab-mt{background:#2a8f59;}.tab-ex{background:#2b6fb0;}
+.pg-head{display:flex;gap:10px;padding:16px 28px 10px;font-weight:700;font-size:11px;}
+.pg-head .l{text-transform:uppercase;letter-spacing:.12em;}.pg-head .r{margin-left:auto;color:var(--steel);}
+.rule-strong{height:2px;background:var(--slate);margin:0 28px 14px;}
+.pg-cont{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);padding:0 28px 10px;}
+.page-div{border-top:1px dashed #bdc4d0;margin:20px 0 0;}
+.body{padding:0 28px 20px;}
+.wtitle{font-weight:800;font-size:22px;line-height:1.2;margin-bottom:4px;}
+.wsub{font-size:12px;font-style:italic;color:var(--steel);margin-bottom:18px;line-height:1.5;}
+.hdr-row{display:flex;border:1.5px solid var(--slate);margin-bottom:16px;}
+.hdr-lbl{padding:8px 12px;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--ice);min-width:80px;}
+.hdr-val{flex:1;padding:8px 12px;border-left:1.5px solid var(--slate);}
+.hdr-lbl2{padding:8px 12px;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--ice);border-left:1.5px solid var(--slate);min-width:80px;}
+.hdr-val2{flex:2;padding:8px 12px;border-left:1.5px solid var(--slate);}
+/* formula ref */
+.formula-ref{border:1.5px solid var(--rule);padding:12px 16px;margin-bottom:16px;background:#fff;}
+.fr-lbl{font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.fr-eq{font-size:22px;font-weight:700;margin-bottom:6px;}
+.fr-examples{display:flex;gap:24px;font-size:12px;font-weight:700;margin-bottom:6px;}
+.fr-note{font-size:12px;font-weight:700;}
+/* prediction box */
+.pred-box{border:1.5px solid var(--rule);padding:12px 16px;margin-bottom:16px;background:#fff;}
+.pred-head{font-weight:700;font-size:13px;margin-bottom:8px;}
+.pred-q{font-size:13px;font-weight:700;margin-bottom:10px;}
+.pred-blank{border-bottom:1.5px solid var(--slate);display:inline-block;min-width:60px;vertical-align:bottom;}
+.pred-opts{display:flex;flex-direction:column;gap:7px;font-size:12.5px;font-weight:600;margin-bottom:10px;}
+.pred-opt-row{display:flex;align-items:baseline;gap:8px;}
+.pred-opt-row .rb{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--slate);flex-shrink:0;margin-top:1px;background:#fff;display:inline-flex;align-items:center;justify-content:center;}
+.pred-opt-row .rb.sel::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--slate);display:block;}
+.explain-row{font-size:12.5px;font-weight:700;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+/* scoop check */
+.section-box{border:1.5px solid var(--rule);padding:12px 16px;margin-bottom:14px;background:#fff;}
+.sb-head{font-weight:800;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.sb-inst{font-size:12px;line-height:1.6;margin-bottom:10px;}
+/* scoop diagrams */
+.scoop-diagrams{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-bottom:12px;border:1px solid var(--rule);}
+.diagram-cell{padding:10px;text-align:center;border-right:1px solid var(--rule);}
+.diagram-cell:last-child{border-right:0;}
+.diagram-cell svg{width:100%;height:56px;}
+.diagram-label{font-size:10px;font-weight:700;margin-top:5px;}
+.check-list{list-style:none;margin-bottom:10px;}
+.check-list li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;margin:6px 0;}
+.cb{width:14px;height:14px;border:1.5px solid var(--slate);flex-shrink:0;background:#fff;}
+.cb.chk{background:var(--slate);}
+.fix-row{font-size:12.5px;font-weight:700;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+/* setup rules */
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.setup-item{display:flex;gap:8px;font-size:12px;font-weight:600;align-items:flex-start;}
+.you-must{font-weight:800;font-size:12px;margin-top:8px;}
+/* data log */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
+.data-table th{background:var(--slate);color:#fff;font-weight:700;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;padding:6px 8px;border:1px solid var(--slate);text-align:left;}
+.data-table td{padding:7px 8px;border:1px solid var(--rule);}
+.data-table td.setting-lbl{font-weight:800;font-size:12px;}
+.data-table td.prefilled{background:var(--ice);font-weight:700;text-align:center;}
+.compared-row{font-size:12.5px;font-weight:700;margin:8px 0 14px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+/* ratio analysis */
+.ratio-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px;}
+.ratio-table th{background:#f0f2f5;font-weight:700;font-size:10px;letter-spacing:.09em;text-transform:uppercase;padding:7px 10px;border:1px solid var(--rule);}
+.ratio-table td{padding:8px 10px;border:1px solid var(--rule);}
+.ratio-table td:first-child{font-weight:700;background:var(--box);}
+.ratio-box{border:1.5px solid var(--rule);padding:12px 14px;margin-bottom:12px;background:#fffef9;}
+.sentence-fill{font-size:13px;font-weight:700;line-height:2.0;}
+.blank{border-bottom:1.5px solid var(--slate);display:inline-block;min-width:50px;vertical-align:bottom;text-align:center;}
+/* prediction check */
+.check-row{font-size:13px;font-weight:700;margin:10px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cb-sq{width:14px;height:14px;border:1.5px solid var(--slate);flex-shrink:0;display:inline-block;background:#fff;}
+.cb-sq.chk{background:var(--slate);}
+/* circles */
+.pill{display:inline-block;padding:2px 10px;border:1.5px solid #aab0be;border-radius:20px;font-size:12px;font-weight:700;margin:0 2px;color:var(--steel);}
+.pill.sel{border-color:var(--slate);background:var(--slate);color:#fff;}
+/* efficiency */
+.eff-row{font-size:13px;font-weight:700;margin:8px 0;}
+.eff-more{font-size:13px;font-weight:700;margin:10px 0;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+/* final decision */
+.fd-list{list-style:none;margin:10px 0;}
+.fd-list li{display:flex;gap:8px;font-size:12.5px;font-weight:600;margin:8px 0;align-items:flex-start;}
+.fd-bottom{font-size:13px;font-weight:700;margin:12px 0 6px;}
+.fd-note{font-size:11px;color:var(--steel);margin-top:4px;}
+/* footer + stamp + lookfor */
+.pg-foot{display:flex;gap:6px;padding:8px 28px 10px;font-size:9px;font-weight:600;color:var(--steel);border-top:1px solid var(--line);flex-wrap:wrap;}
+.pg-foot .mid{margin:0 auto;}
+.stamp-wrap{padding:6px 28px 4px;}
+.stamp{display:inline-block;font-weight:800;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);border:1.4px solid var(--steel);border-radius:3px;padding:3px 8px;transform:rotate(-2deg);}
+.lookfor{padding:14px 28px;background:#eef1f6;border-top:1px solid var(--line);}
+.lookfor .lab{font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:#2b6fb0;}
+.lookfor.ap .lab{color:#a96a0c;}.lookfor.mt .lab{color:#1f7a4c;}
+.lookfor .t{font-size:12.5px;line-height:1.6;}
+/* handwriting */
+.hw{color:var(--ink);}
+.ap-hand{font-family:"Shadows Into Light",cursive;font-size:17px;}
+.mt-hand{font-family:"Caveat",cursive;font-size:20px;font-weight:600;}
+.ex-hand{font-family:"Reenie Beanie",cursive;font-size:22px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============================================================
+     SHEET 1 — Marty T. — APPROACHING
+     Error: reads Power ratio (4→8 = 2×) as charge speed ratio.
+     Writes 2× instead of 4×; distance ratio also ≈2×, so he concludes
+     they "matched" — inverting the lesson's central finding.
+     ============================================================ -->
+<div class="sheet">
+<div class="level-tab tab-ap">Approaching</div>
+
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Scoop Build + Ratio Testing</div>
+  <div class="wsub">Build your scoop, predict the ratio, test it, then explain why charge speed and distance don't match.</div>
+  <div class="hdr-row">
+    <div class="hdr-lbl">Team</div><div class="hdr-val"><span class="hw ap-hand">Voltage</span></div>
+    <div class="hdr-lbl2">Names</div><div class="hdr-val2"><span class="hw ap-hand">Marty T.</span></div>
+  </div>
+
+  <!-- FORMULA REFERENCE -->
+  <div class="formula-ref">
+    <div class="fr-lbl">Formula Reference</div>
+    <div class="fr-eq">Charge Speed % &nbsp;= &nbsp;Power²</div>
+    <div class="fr-examples">
+      <span>Power 2 → <strong>4%</strong></span>
+      <span>Power 4 → <strong>16%</strong></span>
+      <span>Power 8 → <strong>64%</strong></span>
+    </div>
+    <div class="fr-note">When Power doubles → charge speed <strong>quadruples</strong>. Real-world distance may not.</div>
+  </div>
+
+  <!-- PREDICTION -->
+  <div class="pred-box">
+    <div class="pred-head">Before you build or test — make a prediction.</div>
+    <div class="pred-q">If charge speed increases 4× (from 16% to 64%), the ball will travel: <span class="hw ap-hand">4</span> × as far.</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle your reasoning:</div>
+    <div class="pred-opts">
+      <div class="pred-opt-row"><div class="rb sel"></div> <span class="hw ap-hand">exactly 4×</span> — charge speed scales directly to distance</div>
+      <div class="pred-opt-row"><div class="rb"></div> less than 4× — real-world losses reduce the output</div>
+      <div class="pred-opt-row"><div class="rb"></div> more than 4× — the scoop adds extra force</div>
+    </div>
+    <div class="explain-row">Explain how you got your prediction (1 sentence): <span class="hw ap-hand">if charge speed is 4× higher the ball should go 4× farther because it has 4× more power</span></div>
+  </div>
+
+  <!-- SCOOP CHECK -->
+  <div class="section-box">
+    <div class="sb-head">Scoop Check — Pass All Three Before You Test</div>
+    <div class="sb-inst">Run a slow practice push. Check each condition. If any box is unchecked, fix your scoop before continuing — do not collect data with a failing scoop.</div>
+    <!-- Diagrams -->
+    <div class="scoop-diagrams">
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/>
+          <circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <rect x="40" y="36" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="70" cy="39" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <line x1="56" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/>
+          <line x1="90" y1="30" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+        <div class="diagram-label">✓ Clean contact</div>
+      </div>
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none">
+          <rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/>
+          <circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <rect x="40" y="34" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="62" cy="30" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <path d="M56 35 Q60 20 70 14" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="44" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/>
+        </svg>
+        <div class="diagram-label">✗ Ball rides up</div>
+      </div>
+      <div class="diagram-cell" style="border-right:0;">
+        <svg viewBox="0 0 120 56" fill="none">
+          <rect x="6" y="22" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/>
+          <circle cx="12" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="28" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <circle cx="55" cy="29" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/>
+          <path d="M63 24 Q85 10 100 8" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+        <div class="diagram-label">✗ Veers sideways</div>
+      </div>
+    </div>
+    <ul class="check-list">
+      <li><div class="cb chk"></div> Scoop makes clean, straight contact with the ball.</li>
+      <li><div class="cb chk"></div> Ball does NOT ride up over the scoop on impact.</li>
+      <li><div class="cb chk"></div> Ball does NOT veer sideways after contact.</li>
+    </ul>
+    <div class="fix-row">If you had to fix something, what did you change? <span class="hw ap-hand">scoop was too high — pushed it down</span></div>
+  </div>
+
+  <!-- SETUP RULES -->
+  <div class="section-box">
+    <div class="sb-head">Setup Rules — Every Run, No Exceptions</div>
+    <div class="setup-grid">
+      <div class="setup-item"><div class="cb chk"></div> <span>Bot nose on the same tape mark every run.</span></div>
+      <div class="setup-item"><div class="cb chk"></div> <span>Ball on the same tape mark every run.</span></div>
+      <div class="setup-item"><div class="cb chk"></div> <span>Measure from ball start to where the ball stops.</span></div>
+      <div class="setup-item"><div class="cb chk"></div> <span>Change ONLY the Power value between settings.</span></div>
+    </div>
+    <div class="you-must">YOU MUST TEST: &nbsp; Setting A = Power 4 (16% charge speed) &nbsp;&nbsp; Setting B = Power 8 (64% charge speed)</div>
+  </div>
+
+  <div class="pg-foot"><span>NYC First · Velocity Arena</span><span class="mid">Week 1, Day 4 · Scoop Build + Ratio Testing</span><span>Page 1 of 2</span></div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page-div"></div>
+<div class="pg-head" style="padding-top:14px;"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="pg-cont">Continued · Record Shots Before Running the Next Setting. Do Not Go Back and Change Data.</div>
+<div class="body">
+
+  <!-- DATA LOG -->
+  <div class="section-box">
+    <div class="sb-head">Data Log — Record All Three Shots Per Setting</div>
+    <div style="font-size:12px;margin-bottom:10px;">Write your predicted distance before each setting. Measure and record all three shots. Calculate the average.</div>
+    <table class="data-table">
+      <tr>
+        <th>Setting</th><th>Power (pts)</th><th>Charge Speed %</th><th>Predicted (cm)</th><th>Shot 1 (cm)</th><th>Shot 2 (cm)</th><th>Shot 3 (cm)</th><th>Average (cm)</th>
+      </tr>
+      <tr>
+        <td class="setting-lbl">Setting A</td>
+        <td class="prefilled">4</td>
+        <td class="prefilled">16%</td>
+        <td><span class="hw ap-hand">50</span></td>
+        <td><span class="hw ap-hand">38</span></td>
+        <td><span class="hw ap-hand">42</span></td>
+        <td><span class="hw ap-hand">40</span></td>
+        <td><span class="hw ap-hand">40</span></td>
+      </tr>
+      <tr>
+        <td class="setting-lbl">Setting B</td>
+        <td class="prefilled">8</td>
+        <td class="prefilled">64%</td>
+        <td><span class="hw ap-hand">160</span></td>
+        <td><span class="hw ap-hand">88</span></td>
+        <td><span class="hw ap-hand">90</span></td>
+        <td><span class="hw ap-hand">86</span></td>
+        <td><span class="hw ap-hand">88</span></td>
+      </tr>
+    </table>
+    <div class="compared-row">Compared to Setting A, Setting B distance: <span class="pill sel">increased a lot</span> <span class="pill">increased a little</span> <span class="pill">stayed about the same</span></div>
+  </div>
+
+  <!-- RATIO ANALYSIS -->
+  <div class="section-box">
+    <div class="sb-head">Ratio Analysis — Compare Charge Speed to Distance</div>
+    <table class="ratio-table">
+      <tr><th>What Changed</th><th>Calculation</th><th style="width:90px;">Ratio</th></tr>
+      <tr>
+        <td>Charge speed ratio</td>
+        <!-- Marty ERROR: writes 2 instead of 4 (reads Power ratio 4→8 as charge speed ratio) -->
+        <td>64% ÷ 16% = <span class="hw ap-hand">2</span></td>
+        <td style="text-align:center;"><span class="hw ap-hand">2</span> : 1</td>
+      </tr>
+      <tr>
+        <td>Distance ratio</td>
+        <td>Avg B ÷ Avg A = <span class="hw ap-hand">88</span> ÷ <span class="hw ap-hand">40</span></td>
+        <td style="text-align:center;"><span class="hw ap-hand">2.2</span> : 1</td>
+      </tr>
+    </table>
+    <div class="ratio-box">
+      <div class="sentence-fill">
+        "Charge speed increased by <span class="blank hw ap-hand">2</span>×. Distance increased by <span class="blank hw ap-hand">2.2</span>×.
+        They <span class="pill sel" style="font-size:12px;">matched</span> <span class="pill" style="font-size:12px;">did NOT match</span>
+        because <span class="hw ap-hand">both went up about 2× so they were basically the same</span>"
+      </div>
+    </div>
+    <div class="check-row">Check your prediction from page 1. Was it right? <div class="cb-sq"></div> YES &nbsp; <div class="cb-sq chk"></div> NO</div>
+    <div class="check-row">My model was: <div class="cb-sq chk"></div> overestimating (predicted more distance than bot did) &nbsp;&nbsp; <div class="cb-sq"></div> underestimating</div>
+    <div style="height:1px;background:var(--line);margin:12px 0;border-top:1px dashed var(--rule);"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle ONE main reason charge speed and distance didn't scale equally:</div>
+    <div style="font-size:13px;font-weight:600;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
+      <span>friction</span>
+      <span>energy loss on impact</span>
+      <span class="pill sel" style="font-size:12px;">scoop design</span>
+      <span>ball contact angle</span>
+      <span>other</span>
+    </div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">Explain: <span class="hw ap-hand">our scoop wasnt perfect so it lost some distance</span></div>
+  </div>
+
+  <!-- EFFICIENCY -->
+  <div class="section-box">
+    <div class="sb-head">Efficiency — Distance Per Power Point</div>
+    <div style="font-size:12.5px;font-weight:600;margin-bottom:10px;">Which setting gives you more distance for each point you invest?</div>
+    <div class="eff-row">Setting A: <span class="hw ap-hand">40</span> cm ÷ 4 pts = <span class="hw ap-hand">10</span> cm per point</div>
+    <div class="eff-row">Setting B: <span class="hw ap-hand">88</span> cm ÷ 8 pts = <span class="hw ap-hand">11</span> cm per point</div>
+    <div class="eff-more">More efficient setting: <span class="pill">Setting A (Power 4)</span> <span class="pill sel">Setting B (Power 8)</span></div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">As Power increases, efficiency (distance per point): <span class="pill sel">goes up</span> <span class="pill">goes down</span> <span class="pill">stays the same</span></div>
+  </div>
+
+  <!-- FINAL DECISION -->
+  <div class="section-box">
+    <div class="sb-head">Final Decision — Lock In Your Power Stat Now</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Because: (check one)</div>
+    <ul class="fd-list">
+      <li><div class="cb chk"></div> Setting B gives maximum burst — the big charge speed jump is worth the points.</li>
+      <li><div class="cb"></div> Setting A is more efficient per point — I'd rather spread points across other stats.</li>
+      <li><div class="cb"></div> I want something between A and B. → What exactly do you need to test first?</li>
+    </ul>
+    <div class="fd-bottom">
+      I choose Power = <span class="hw ap-hand">8</span> pts → Charge speed = <span class="hw ap-hand">64</span>%
+      <span style="font-size:12px;font-weight:700;"> (show: <span class="hw ap-hand">8</span>² = <span class="hw ap-hand">64</span>)</span>
+    </div>
+    <div class="fd-note">Your 20-point total across all four stats must still equal 20. Confirm before writing on your stat card.</div>
+  </div>
+
+</div>
+<div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+<div class="lookfor ap">
+  <div class="lab">Teacher Look-For — Approaching (Marty T.)</div>
+  <div class="t">Marty correctly computed both charge speeds (4²=16, 8²=64) — the squaring formula is not the problem. His error is in the ratio step: instead of dividing 64÷16=4, he sees that Power doubled (4→8) and writes that as the charge speed ratio: 2×. Because his distance ratio (88÷40=2.2) is also about 2×, he concludes charge speed and distance "matched" — the exact opposite of what the data shows. The formula reference right on page 1 says "when Power doubles → charge speed quadruples," which is the direct check he bypassed. Ask him: "You wrote 64÷16 and got 2. Can you do that division again step by step? What's 64 divided by 16?"</div>
+</div>
+</div>
+
+
+<!-- ============================================================
+     SHEET 2 — JAYDA W. — MEETS
+     Correct throughout; catches 4× vs 2.4× mismatch; literal explanation
+     ============================================================ -->
+<div class="sheet">
+<div class="level-tab tab-mt">Meets</div>
+
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Scoop Build + Ratio Testing</div>
+  <div class="wsub">Build your scoop, predict the ratio, test it, then explain why charge speed and distance don't match.</div>
+  <div class="hdr-row">
+    <div class="hdr-lbl">Team</div><div class="hdr-val"><span class="hw mt-hand">Circuit Breakers</span></div>
+    <div class="hdr-lbl2">Names</div><div class="hdr-val2"><span class="hw mt-hand">Jayda W.</span></div>
+  </div>
+
+  <div class="formula-ref">
+    <div class="fr-lbl">Formula Reference</div>
+    <div class="fr-eq">Charge Speed % &nbsp;= &nbsp;Power²</div>
+    <div class="fr-examples">
+      <span>Power 2 → <strong>4%</strong></span>
+      <span>Power 4 → <strong>16%</strong></span>
+      <span>Power 8 → <strong>64%</strong></span>
+    </div>
+    <div class="fr-note">When Power doubles → charge speed <strong>quadruples</strong>. Real-world distance may not.</div>
+  </div>
+
+  <div class="pred-box">
+    <div class="pred-head">Before you build or test — make a prediction.</div>
+    <div class="pred-q">If charge speed increases 4× (from 16% to 64%), the ball will travel: <span class="hw mt-hand">2</span> × as far.</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle your reasoning:</div>
+    <div class="pred-opts">
+      <div class="pred-opt-row"><div class="rb"></div> exactly 4× — charge speed scales directly to distance</div>
+      <div class="pred-opt-row"><div class="rb sel"></div> <span class="hw mt-hand">less than 4×</span> — real-world losses reduce the output</div>
+      <div class="pred-opt-row"><div class="rb"></div> more than 4× — the scoop adds extra force</div>
+    </div>
+    <div class="explain-row">Explain how you got your prediction: <span class="hw mt-hand">friction and energy loss when the scoop hits the ball will reduce the distance</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Scoop Check — Pass All Three Before You Test</div>
+    <div class="sb-inst">Run a slow practice push. Check each condition. If any box is unchecked, fix your scoop before continuing — do not collect data with a failing scoop.</div>
+    <div class="scoop-diagrams">
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><rect x="40" y="36" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="70" cy="39" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><line x1="56" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/><line x1="90" y1="30" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+        <div class="diagram-label">✓ Clean contact</div>
+      </div>
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><rect x="40" y="34" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="62" cy="30" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><path d="M56 35 Q60 20 70 14" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="44" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/></svg>
+        <div class="diagram-label">✗ Ball rides up</div>
+      </div>
+      <div class="diagram-cell" style="border-right:0;">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="6" y="22" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="12" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="28" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="55" cy="29" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><path d="M63 24 Q85 10 100 8" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+        <div class="diagram-label">✗ Veers sideways</div>
+      </div>
+    </div>
+    <ul class="check-list">
+      <li><div class="cb chk"></div> Scoop makes clean, straight contact with the ball.</li>
+      <li><div class="cb chk"></div> Ball does NOT ride up over the scoop on impact.</li>
+      <li><div class="cb chk"></div> Ball does NOT veer sideways after contact.</li>
+    </ul>
+    <div class="fix-row">If you had to fix something, what did you change? <span class="hw mt-hand">nothing, all three passed first try</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Setup Rules — Every Run, No Exceptions</div>
+    <div class="setup-grid">
+      <div class="setup-item"><div class="cb chk"></div> Bot nose on the same tape mark every run.</div>
+      <div class="setup-item"><div class="cb chk"></div> Ball on the same tape mark every run.</div>
+      <div class="setup-item"><div class="cb chk"></div> Measure from ball start to where the ball stops.</div>
+      <div class="setup-item"><div class="cb chk"></div> Change ONLY the Power value between settings.</div>
+    </div>
+    <div class="you-must">YOU MUST TEST: &nbsp; Setting A = Power 4 (16% charge speed) &nbsp;&nbsp; Setting B = Power 8 (64% charge speed)</div>
+  </div>
+
+  <div class="pg-foot"><span>NYC First · Velocity Arena</span><span class="mid">Week 1, Day 4 · Scoop Build + Ratio Testing</span><span>Page 1 of 2</span></div>
+</div>
+
+<div class="page-div"></div>
+<div class="pg-head" style="padding-top:14px;"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="pg-cont">Continued · Record Shots Before Running the Next Setting. Do Not Go Back and Change Data.</div>
+<div class="body">
+
+  <div class="section-box">
+    <div class="sb-head">Data Log — Record All Three Shots Per Setting</div>
+    <div style="font-size:12px;margin-bottom:10px;">Write your predicted distance before each setting. Measure and record all three shots. Calculate the average.</div>
+    <table class="data-table">
+      <tr><th>Setting</th><th>Power (pts)</th><th>Charge Speed %</th><th>Predicted (cm)</th><th>Shot 1 (cm)</th><th>Shot 2 (cm)</th><th>Shot 3 (cm)</th><th>Average (cm)</th></tr>
+      <tr>
+        <td class="setting-lbl">Setting A</td>
+        <td class="prefilled">4</td>
+        <td class="prefilled">16%</td>
+        <td><span class="hw mt-hand">45</span></td>
+        <td><span class="hw mt-hand">40</span></td>
+        <td><span class="hw mt-hand">42</span></td>
+        <td><span class="hw mt-hand">38</span></td>
+        <td><span class="hw mt-hand">40</span></td>
+      </tr>
+      <tr>
+        <td class="setting-lbl">Setting B</td>
+        <td class="prefilled">8</td>
+        <td class="prefilled">64%</td>
+        <td><span class="hw mt-hand">80</span></td>
+        <td><span class="hw mt-hand">96</span></td>
+        <td><span class="hw mt-hand">98</span></td>
+        <td><span class="hw mt-hand">94</span></td>
+        <td><span class="hw mt-hand">96</span></td>
+      </tr>
+    </table>
+    <div class="compared-row">Compared to Setting A, Setting B distance: <span class="pill sel">increased a lot</span> <span class="pill">increased a little</span> <span class="pill">stayed about the same</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Ratio Analysis — Compare Charge Speed to Distance</div>
+    <table class="ratio-table">
+      <tr><th>What Changed</th><th>Calculation</th><th style="width:90px;">Ratio</th></tr>
+      <tr>
+        <td>Charge speed ratio</td>
+        <td>64% ÷ 16% = <span class="hw mt-hand">4</span></td>
+        <td style="text-align:center;"><span class="hw mt-hand">4</span> : 1</td>
+      </tr>
+      <tr>
+        <td>Distance ratio</td>
+        <td>Avg B ÷ Avg A = <span class="hw mt-hand">96</span> ÷ <span class="hw mt-hand">40</span></td>
+        <td style="text-align:center;"><span class="hw mt-hand">2.4</span> : 1</td>
+      </tr>
+    </table>
+    <div class="ratio-box">
+      <div class="sentence-fill">
+        "Charge speed increased by <span class="blank hw mt-hand">4</span>×. Distance increased by <span class="blank hw mt-hand">2.4</span>×.
+        They <span class="pill" style="font-size:12px;">matched</span> <span class="pill sel" style="font-size:12px;">did NOT match</span>
+        because <span class="hw mt-hand">energy is lost during impact and friction reduces the output</span>"
+      </div>
+    </div>
+    <div class="check-row">Check your prediction from page 1. Was it right? <div class="cb-sq chk"></div> YES &nbsp; <div class="cb-sq"></div> NO</div>
+    <div class="check-row">My model was: <div class="cb-sq"></div> overestimating &nbsp;&nbsp; <div class="cb-sq chk"></div> underestimating (predicted less distance than bot did)</div>
+    <div style="height:1px;border-top:1px dashed var(--rule);margin:12px 0;"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle ONE main reason charge speed and distance didn't scale equally:</div>
+    <div style="font-size:13px;font-weight:600;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
+      <span>friction</span>
+      <span class="pill sel" style="font-size:12px;">energy loss on impact</span>
+      <span>scoop design</span>
+      <span>ball contact angle</span>
+      <span>other</span>
+    </div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">Explain: <span class="hw mt-hand">some energy gets absorbed when the scoop hits the ball — not all of the charge speed converts to ball movement</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Efficiency — Distance Per Power Point</div>
+    <div style="font-size:12.5px;font-weight:600;margin-bottom:10px;">Which setting gives you more distance for each point you invest?</div>
+    <div class="eff-row">Setting A: <span class="hw mt-hand">40</span> cm ÷ 4 pts = <span class="hw mt-hand">10</span> cm per point</div>
+    <div class="eff-row">Setting B: <span class="hw mt-hand">96</span> cm ÷ 8 pts = <span class="hw mt-hand">12</span> cm per point</div>
+    <div class="eff-more">More efficient setting: <span class="pill">Setting A (Power 4)</span> <span class="pill sel">Setting B (Power 8)</span></div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">As Power increases, efficiency (distance per point): <span class="pill sel">goes up</span> <span class="pill">goes down</span> <span class="pill">stays the same</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Final Decision — Lock In Your Power Stat Now</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Because: (check one)</div>
+    <ul class="fd-list">
+      <li><div class="cb chk"></div> Setting B gives maximum burst — the big charge speed jump is worth the points.</li>
+      <li><div class="cb"></div> Setting A is more efficient per point — I'd rather spread points across other stats.</li>
+      <li><div class="cb"></div> I want something between A and B. → What exactly do you need to test first?</li>
+    </ul>
+    <div class="fd-bottom">
+      I choose Power = <span class="hw mt-hand">8</span> pts → Charge speed = <span class="hw mt-hand">64</span>%
+      <span style="font-size:12px;font-weight:700;"> (show: <span class="hw mt-hand">8</span>² = <span class="hw mt-hand">64</span>)</span>
+    </div>
+    <div class="fd-note">Your 20-point total across all four stats must still equal 20. Confirm before writing on your stat card.</div>
+  </div>
+
+</div>
+<div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+<div class="lookfor mt">
+  <div class="lab">Teacher Look-For — Meets (Jayda W.)</div>
+  <div class="t">Jayda correctly computed the charge speed ratio (64÷16=4), identified the mismatch with her distance ratio (2.4×), and named a legitimate cause (energy loss on impact). Her efficiency calculation is correct and she used it appropriately to justify choosing Power 8. She stopped there — she doesn't use the efficiency numbers to ask a follow-up question, like whether Power 6 might give better value, or what the mismatch implies about the limits of the formula for predicting shot distance. A good next question: "Your efficiency went up from 10 to 12 cm per point — does that pattern continue if you kept increasing Power, and why does it matter for your stat choices?"</div>
+</div>
+</div>
+
+
+<!-- ============================================================
+     SHEET 3 — PRIYA R. — EXCEEDS
+     Correct + insight: notes efficiency gains even with mismatch;
+     picks Power 6 (not max/min) and justifies with budget reasoning
+     ============================================================ -->
+<div class="sheet">
+<div class="level-tab tab-ex">Exceeds</div>
+
+<div class="pg-head"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="body">
+  <div class="wtitle">Scoop Build + Ratio Testing</div>
+  <div class="wsub">Build your scoop, predict the ratio, test it, then explain why charge speed and distance don't match.</div>
+  <div class="hdr-row">
+    <div class="hdr-lbl">Team</div><div class="hdr-val"><span class="hw ex-hand">Overclock</span></div>
+    <div class="hdr-lbl2">Names</div><div class="hdr-val2"><span class="hw ex-hand">Priya R.</span></div>
+  </div>
+
+  <div class="formula-ref">
+    <div class="fr-lbl">Formula Reference</div>
+    <div class="fr-eq">Charge Speed % &nbsp;= &nbsp;Power²</div>
+    <div class="fr-examples">
+      <span>Power 2 → <strong>4%</strong></span>
+      <span>Power 4 → <strong>16%</strong></span>
+      <span>Power 8 → <strong>64%</strong></span>
+    </div>
+    <div class="fr-note">When Power doubles → charge speed <strong>quadruples</strong>. Real-world distance may not.</div>
+  </div>
+
+  <div class="pred-box">
+    <div class="pred-head">Before you build or test — make a prediction.</div>
+    <div class="pred-q">If charge speed increases 4× (from 16% to 64%), the ball will travel: <span class="hw ex-hand">2.5</span> × as far.</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle your reasoning:</div>
+    <div class="pred-opts">
+      <div class="pred-opt-row"><div class="rb"></div> exactly 4× — charge speed scales directly to distance</div>
+      <div class="pred-opt-row"><div class="rb sel"></div> <span class="hw ex-hand">less than 4×</span> — real-world losses reduce the output</div>
+      <div class="pred-opt-row"><div class="rb"></div> more than 4× — the scoop adds extra force</div>
+    </div>
+    <div class="explain-row">Explain: <span class="hw ex-hand">charge speed quadruples but every hit loses energy to the ball surface and floor — I'm guessing roughly half the gain carries through so about 2.5×</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Scoop Check — Pass All Three Before You Test</div>
+    <div class="sb-inst">Run a slow practice push. Check each condition. If any box is unchecked, fix your scoop before continuing — do not collect data with a failing scoop.</div>
+    <div class="scoop-diagrams">
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><rect x="40" y="36" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="70" cy="39" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><line x1="56" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/><line x1="90" y1="30" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+        <div class="diagram-label">✓ Clean contact</div>
+      </div>
+      <div class="diagram-cell">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="10" y="32" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="18" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="36" cy="46" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><rect x="40" y="34" width="16" height="6" rx="1" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="62" cy="30" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><path d="M56 35 Q60 20 70 14" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="44" y1="46" x2="110" y2="46" stroke="#2B2D42" stroke-width="1.5"/></svg>
+        <div class="diagram-label">✗ Ball rides up</div>
+      </div>
+      <div class="diagram-cell" style="border-right:0;">
+        <svg viewBox="0 0 120 56" fill="none"><rect x="6" y="22" width="30" height="14" rx="2" stroke="#2B2D42" stroke-width="1.5" fill="#edf2f4"/><circle cx="12" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="28" cy="36" r="5" stroke="#2B2D42" stroke-width="1.5" fill="none"/><circle cx="55" cy="29" r="8" stroke="#2B2D42" stroke-width="1.5" fill="none"/><path d="M63 24 Q85 10 100 8" stroke="#2B2D42" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+        <div class="diagram-label">✗ Veers sideways</div>
+      </div>
+    </div>
+    <ul class="check-list">
+      <li><div class="cb chk"></div> Scoop makes clean, straight contact with the ball.</li>
+      <li><div class="cb chk"></div> Ball does NOT ride up over the scoop on impact.</li>
+      <li><div class="cb chk"></div> Ball does NOT veer sideways after contact.</li>
+    </ul>
+    <div class="fix-row">If you had to fix something, what did you change? <span class="hw ex-hand">nothing fixed — all passed</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Setup Rules — Every Run, No Exceptions</div>
+    <div class="setup-grid">
+      <div class="setup-item"><div class="cb chk"></div> Bot nose on the same tape mark every run.</div>
+      <div class="setup-item"><div class="cb chk"></div> Ball on the same tape mark every run.</div>
+      <div class="setup-item"><div class="cb chk"></div> Measure from ball start to where the ball stops.</div>
+      <div class="setup-item"><div class="cb chk"></div> Change ONLY the Power value between settings.</div>
+    </div>
+    <div class="you-must">YOU MUST TEST: &nbsp; Setting A = Power 4 (16% charge speed) &nbsp;&nbsp; Setting B = Power 8 (64% charge speed)</div>
+  </div>
+
+  <div class="pg-foot"><span>NYC First · Velocity Arena</span><span class="mid">Week 1, Day 4 · Scoop Build + Ratio Testing</span><span>Page 1 of 2</span></div>
+</div>
+
+<div class="page-div"></div>
+<div class="pg-head" style="padding-top:14px;"><span class="l">NYC First · Velocity Arena · Week 1, Day 4</span><span class="r">Scoop Build + Ratio Testing</span></div>
+<div class="rule-strong"></div>
+<div class="pg-cont">Continued · Record Shots Before Running the Next Setting. Do Not Go Back and Change Data.</div>
+<div class="body">
+
+  <div class="section-box">
+    <div class="sb-head">Data Log — Record All Three Shots Per Setting</div>
+    <div style="font-size:12px;margin-bottom:10px;">Write your predicted distance before each setting. Measure and record all three shots. Calculate the average.</div>
+    <table class="data-table">
+      <tr><th>Setting</th><th>Power (pts)</th><th>Charge Speed %</th><th>Predicted (cm)</th><th>Shot 1 (cm)</th><th>Shot 2 (cm)</th><th>Shot 3 (cm)</th><th>Average (cm)</th></tr>
+      <tr>
+        <td class="setting-lbl">Setting A</td>
+        <td class="prefilled">4</td>
+        <td class="prefilled">16%</td>
+        <td><span class="hw ex-hand">50</span></td>
+        <td><span class="hw ex-hand">48</span></td>
+        <td><span class="hw ex-hand">52</span></td>
+        <td><span class="hw ex-hand">50</span></td>
+        <td><span class="hw ex-hand">50</span></td>
+      </tr>
+      <tr>
+        <td class="setting-lbl">Setting B</td>
+        <td class="prefilled">8</td>
+        <td class="prefilled">64%</td>
+        <td><span class="hw ex-hand">125</span></td>
+        <td><span class="hw ex-hand">113</span></td>
+        <td><span class="hw ex-hand">117</span></td>
+        <td><span class="hw ex-hand">115</span></td>
+        <td><span class="hw ex-hand">115</span></td>
+      </tr>
+    </table>
+    <div class="compared-row">Compared to Setting A, Setting B distance: <span class="pill sel">increased a lot</span> <span class="pill">increased a little</span> <span class="pill">stayed about the same</span></div>
+  </div>
+
+  <div class="section-box">
+    <div class="sb-head">Ratio Analysis — Compare Charge Speed to Distance</div>
+    <table class="ratio-table">
+      <tr><th>What Changed</th><th>Calculation</th><th style="width:90px;">Ratio</th></tr>
+      <tr>
+        <td>Charge speed ratio</td>
+        <td>64% ÷ 16% = <span class="hw ex-hand">4</span></td>
+        <td style="text-align:center;"><span class="hw ex-hand">4</span> : 1</td>
+      </tr>
+      <tr>
+        <td>Distance ratio</td>
+        <td>Avg B ÷ Avg A = <span class="hw ex-hand">115</span> ÷ <span class="hw ex-hand">50</span></td>
+        <td style="text-align:center;"><span class="hw ex-hand">2.3</span> : 1</td>
+      </tr>
+    </table>
+    <div class="ratio-box">
+      <div class="sentence-fill">
+        "Charge speed increased by <span class="blank hw ex-hand">4</span>×. Distance increased by <span class="blank hw ex-hand">2.3</span>×.
+        They <span class="pill" style="font-size:12px;">matched</span> <span class="pill sel" style="font-size:12px;">did NOT match</span>
+        because <span class="hw ex-hand">energy dissipates when the scoop contacts the ball — charge speed is stored energy but not all of it transfers to the ball's motion</span>"
+      </div>
+    </div>
+    <div class="check-row">Check your prediction from page 1. Was it right? <div class="cb-sq chk"></div> YES &nbsp; <div class="cb-sq"></div> NO</div>
+    <div class="check-row">My model was: <div class="cb-sq chk"></div> overestimating (predicted 2.5× = 125 cm, got 115 cm) &nbsp;&nbsp; <div class="cb-sq"></div> underestimating</div>
+    <div style="height:1px;border-top:1px dashed var(--rule);margin:12px 0;"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Circle ONE main reason charge speed and distance didn't scale equally:</div>
+    <div style="font-size:13px;font-weight:600;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
+      <span>friction</span>
+      <span class="pill sel" style="font-size:12px;">energy loss on impact</span>
+      <span>scoop design</span>
+      <span>ball contact angle</span>
+      <span>other</span>
+    </div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">Explain: <span class="hw ex-hand">energy converts to heat and compression at contact point — a better-angled scoop would transfer more of the charge to kinetic motion</span></div>
+  </div>
+
+  <!-- EFFICIENCY — Priya's Exceeds insight is here -->
+  <div class="section-box">
+    <div class="sb-head">Efficiency — Distance Per Power Point</div>
+    <div style="font-size:12.5px;font-weight:600;margin-bottom:10px;">Which setting gives you more distance for each point you invest?</div>
+    <div class="eff-row">Setting A: <span class="hw ex-hand">50</span> cm ÷ 4 pts = <span class="hw ex-hand">12.5</span> cm per point</div>
+    <div class="eff-row">Setting B: <span class="hw ex-hand">115</span> cm ÷ 8 pts = <span class="hw ex-hand">14.4</span> cm per point</div>
+    <div class="eff-more">More efficient setting: <span class="pill">Setting A (Power 4)</span> <span class="pill sel">Setting B (Power 8)</span></div>
+    <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">As Power increases, efficiency (distance per point): <span class="pill sel">goes up</span> <span class="pill">goes down</span> <span class="pill">stays the same</span></div>
+    <!-- EXCEEDS INSIGHT appended under efficiency -->
+    <div style="margin-top:10px;font-family:'Reenie Beanie',cursive;font-size:20px;color:var(--pencil);line-height:1.5;">← even though charge speed and distance didn't match ratios, efficiency still goes UP at higher power. that means the energy loss doesn't cancel out the gain — higher power is still worth it per point invested</div>
+  </div>
+
+  <!-- FINAL DECISION — Priya picks Power 6, budget reasoning -->
+  <div class="section-box">
+    <div class="sb-head">Final Decision — Lock In Your Power Stat Now</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Because: (check one)</div>
+    <ul class="fd-list">
+      <li><div class="cb"></div> Setting B gives maximum burst — the big charge speed jump is worth the points.</li>
+      <li><div class="cb"></div> Setting A is more efficient per point — I'd rather spread points across other stats.</li>
+      <li><div class="cb chk"></div> I want something between A and B. → <span class="hw ex-hand" style="font-size:18px;">P8 costs 8/20 of my whole budget. P6 = 36% charge which is still way more than 16%, and I'd have 14 pts left for Speed, Endurance, Turning. Want to test P6 but based on the trend it should be better per point than P4.</span></li>
+    </ul>
+    <div class="fd-bottom">
+      I choose Power = <span class="hw ex-hand">6</span> pts → Charge speed = <span class="hw ex-hand">36</span>%
+      <span style="font-size:12px;font-weight:700;"> (show: <span class="hw ex-hand">6</span>² = <span class="hw ex-hand">36</span>)</span>
+    </div>
+    <div class="fd-note">Your 20-point total across all four stats must still equal 20. Confirm before writing on your stat card.</div>
+  </div>
+
+</div>
+<div class="stamp-wrap"><div class="stamp">Sample — Pre-Pilot</div></div>
+<div class="lookfor">
+  <div class="lab">Teacher Look-For — Exceeds (Priya R.)</div>
+  <div class="t">Priya correctly computed the 4× charge speed ratio, identified the mismatch (2.3× distance), and named a precise cause (energy converts to heat and compression at contact). She then read the efficiency section against the ratio analysis — noting that even though charge speed and distance don't scale proportionally, efficiency per power point still goes UP, which means the energy loss doesn't eliminate the advantage of higher Power. That move (reconciling two conflicting signals from the data) is the key analytical skill. Her final decision to choose Power 6 — rather than 4 or 8 — uses the efficiency trend as evidence and names the budget trade-off explicitly (8 pts = 40% of budget). The phrase "based on the trend it should be better per point" shows appropriate uncertainty about an untested value, which is exactly the epistemic voice this sheet is reaching for.</div>
+</div>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 — Prediction Tracker — Match Day 2 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   VELOCITY ARENA DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --slate: #2B2D42;
+  --red:   #EF233C;
+  --ice:   #EDF2F4;
+  --steel: #8D99AE;
+  --rule:  #c9d0dd;
+  --paper: #fefefe;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #d6d9e0;
+  color: var(--slate);
+}
+
+/* ---- Print / Save button ---- */
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 11px 22px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(239,35,60,.35);
+  transition: background .15s;
+}
+.print-btn:hover { background: #c91530; }
+.print-btn svg { flex-shrink: 0; }
+
+/* ---- Page shell ---- */
+.page {
+  background: var(--paper);
+  width: 816px;          /* 8.5 in @ 96 dpi */
+  min-height: 1056px;    /* 11 in @ 96 dpi */
+  margin: 28px auto;
+  padding: 56px 68px 52px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 28px rgba(43,45,66,.18);
+}
+
+/* ---- Page meta ---- */
+.pg-eyebrow {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--steel);
+  margin-bottom: 14px;
+}
+.pg-num {
+  position: absolute;
+  bottom: 28px;
+  left: 68px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--steel);
+}
+
+/* ---- Titles ---- */
+h1.doc-title {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+  color: var(--slate);
+  line-height: 1.05;
+  margin-bottom: 6px;
+}
+.title-rule {
+  height: 3px;
+  background: var(--slate);
+  margin-bottom: 20px;
+}
+
+h2.round-num {
+  font-size: 40px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -.03em;
+  color: var(--slate);
+  line-height: 1;
+}
+
+/* ---- Section headers ---- */
+.sec-head {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--slate);
+  border-bottom: 2px solid var(--slate);
+  padding-bottom: 5px;
+  margin: 18px 0 12px;
+}
+
+/* ---- Form blanks ---- */
+input.blank {
+  border: none;
+  border-bottom: 1.5px solid var(--slate);
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate);
+  outline: none;
+  padding: 1px 3px;
+  min-width: 56px;
+  vertical-align: baseline;
+}
+input.blank-sm  { min-width: 52px; }
+input.blank-md  { min-width: 100px; }
+input.blank-lg  { min-width: 160px; }
+input.blank-xl  { min-width: 230px; }
+input.blank-xxl { min-width: 300px; }
+
+/* ---- Circle options ---- */
+/* For "circle one" — styled slashed options */
+.circle-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.circ {
+  padding: 2px 8px;
+  border: 1.5px solid var(--slate);
+  border-radius: 14px;
+  cursor: default;
+  font-weight: 800;
+}
+.sep { font-weight: 400; color: var(--steel); padding: 0 2px; }
+.hint-it { font-size: 10.5px; font-style: italic; font-weight: 400; color: var(--steel); }
+
+/* ---- MY EQUATION boxed section ---- */
+.eq-section-box {
+  border: 2px solid var(--slate);
+  padding: 14px 18px;
+  margin: 12px 0 16px;
+}
+.eq-section-box .inner-row {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 6px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.eq-big {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* ---- Equation plug-in display ---- */
+.plug-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+.plug-y {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 22px;
+  gap: 0;
+}
+.plug-y span { font-size: 20px; font-weight: 900; line-height: 1.1; }
+.plug-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.plug-cell .c-box {
+  border: 1.5px solid var(--slate);
+  min-width: 88px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.plug-cell .c-box input {
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  width: 80px;
+  background: transparent;
+}
+.plug-cell .c-lbl {
+  font-size: 8px;
+  color: var(--steel);
+  font-style: italic;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 4px;
+  max-width: 88px;
+  line-height: 1.3;
+}
+.plug-result .c-box {
+  background: var(--ice);
+  min-width: 108px;
+}
+.plug-result .c-box input { font-size: 17px; font-weight: 800; width: 100px; }
+.plug-result .c-lbl { font-weight: 700; color: var(--slate); font-size: 8.5px; }
+.plug-op {
+  font-size: 22px;
+  font-weight: 800;
+  padding-bottom: 26px;
+  color: var(--slate);
+}
+
+/* ---- Residual calc row ---- */
+.resid-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 10px 0 6px;
+}
+.resid-row .c-box {
+  border: 1.5px solid var(--slate);
+  min-width: 110px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resid-row .c-box input {
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  width: 100px;
+  background: transparent;
+}
+.resid-row .c-lbl {
+  font-size: 8px;
+  color: var(--steel);
+  font-style: italic;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 4px;
+  max-width: 110px;
+}
+.resid-result .c-box {
+  background: var(--ice);
+  min-width: 100px;
+}
+.resid-result .c-box input {
+  width: 90px;
+  color: var(--steel);
+  font-style: italic;
+}
+.resid-result .c-lbl { color: var(--steel); font-style: italic; }
+
+/* ---- Conditional box ---- */
+.cond-box {
+  border: 1.5px solid var(--steel);
+  background: var(--ice);
+  padding: 10px 14px;
+  margin: 14px 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.cond-box strong { font-style: italic; font-weight: 800; color: var(--steel); }
+
+/* ---- Tell one team ---- */
+.tell-row {
+  font-size: 12.5px;
+  font-weight: 700;
+  font-style: italic;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.tell-row .not-italic { font-style: normal; font-weight: 800; }
+
+/* ---- Divider ---- */
+.hr { height: 1px; background: var(--rule); margin: 16px 0; }
+
+/* ---- Body text ---- */
+.body-text { font-size: 13px; font-weight: 600; line-height: 1.65; }
+
+/* ---- EXAMPLE box ---- */
+.example-wrap {
+  border-top: 1.5px solid var(--rule);
+  border-bottom: 1.5px solid var(--rule);
+  padding: 14px 0;
+  margin-top: 20px;
+}
+.ex-head {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--steel);
+  border-bottom: 1.5px solid var(--rule);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+.ex-body {
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.75;
+  color: #3a3c4e;
+}
+.ex-body strong { font-weight: 800; color: var(--slate); }
+.ex-body em { color: #555; font-style: italic; }
+.ex-body .ex-dim { color: #999; font-style: italic; font-size: 11px; }
+
+/* ---- END OF DAY box ---- */
+.eod-wrap {
+  border: 2px solid var(--slate);
+  padding: 16px 18px;
+  margin-top: 24px;
+}
+.eod-head {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--slate);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+.write-area {
+  border: 1.5px solid var(--rule);
+  min-height: 58px;
+  margin: 8px 0;
+  padding: 6px 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: var(--slate);
+  outline: none;
+  resize: none;
+  width: 100%;
+}
+
+/* ---- Cut-out cards ---- */
+.cards-row {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+}
+.cut-card {
+  border: 1.5px solid var(--rule);
+  padding: 14px 16px;
+  min-width: 190px;
+}
+.cut-card .card-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--steel);
+  margin-bottom: 6px;
+}
+.cut-card .card-line {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 2.2;
+}
+
+/* ---- Spacers ---- */
+.s6  { height: 6px; }
+.s10 { height: 10px; }
+.s14 { height: 14px; }
+.s20 { height: 20px; }
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  .print-btn { display: none !important; }
+
+  body {
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 44px 56px 44px;
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .page:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Keep round sections from splitting across pages */
+  .sec-head { break-after: avoid; }
+  .plug-row  { break-inside: avoid; }
+  .resid-row { break-inside: avoid; }
+  .cond-box  { break-inside: avoid; }
+  .eod-wrap  { break-inside: avoid; }
+
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  input.blank,
+  input[type="text"] {
+    border-bottom: 1px solid #999;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .plug-cell .c-box,
+  .resid-row .c-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .plug-result .c-box,
+  .resid-result .c-box { background: #EDF2F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cond-box { background: #EDF2F4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .eq-section-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PRINT BUTTON
+     ============================================================ -->
+<button class="print-btn" onclick="window.print()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+    <rect x="6" y="14" width="12" height="8"></rect>
+  </svg>
+  Print / Save PDF
+</button>
+
+
+<!-- ============================================================
+     PAGE 1 — MY EQUATION + EXAMPLE
+     ============================================================ -->
+<div class="page">
+  <div class="pg-eyebrow">Velocity Arena · Day 14</div>
+
+  <h1 class="doc-title">Prediction Tracker — Match Day 2</h1>
+  <div class="title-rule"></div>
+
+  <div class="body-text" style="margin-bottom:22px;">
+    Team Name: <input type="text" class="blank blank-xl" aria-label="Team name">
+  </div>
+
+  <!-- MY EQUATION -->
+  <p style="font-size:14px;font-weight:800;margin-bottom:14px;">
+    My Equation &nbsp;<span style="font-weight:600;">— Fill this in once. You will use it for all 3 rounds.</span>
+  </p>
+
+  <p class="body-text" style="font-weight:800;margin-bottom:6px;">Step 1:</p>
+  <p class="body-text" style="margin-bottom:8px;">
+    Get your <strong style="font-weight:800;">Linear Equations worksheet</strong>. Find the box where you wrote your equation. It looks like:
+  </p>
+  <p style="font-size:17px;font-weight:900;margin-bottom:14px;">y = ___ × x + ___</p>
+
+  <div class="hr"></div>
+
+  <p class="body-text" style="margin-bottom:10px;">
+    <strong style="font-weight:800;">Step 2:</strong> Copy the two numbers from that box into here:
+  </p>
+
+  <div class="eq-section-box">
+    <div class="inner-row">
+      From my worksheet: &nbsp; slope (m) =
+      <input type="text" class="blank blank-sm" aria-label="slope m">
+      &nbsp;&nbsp;&nbsp;
+      starting point (b) =
+      <input type="text" class="blank blank-sm" aria-label="starting point b">
+    </div>
+    <div class="inner-row" style="margin-top:8px;">
+      <span class="eq-big">So my equation is: &nbsp; y =</span>
+      <input type="text" class="blank blank-sm" style="font-size:17px;font-weight:900;" aria-label="slope copy">
+      <span class="eq-big">× x +</span>
+      <input type="text" class="blank blank-sm" style="font-size:17px;font-weight:900;" aria-label="b copy">
+    </div>
+    <div class="inner-row" style="margin-top:10px;flex-wrap:wrap;gap:12px;">
+      <strong>My x variable (circle one):</strong>
+      <span class="circle-row">
+        <span class="circ">Speed</span>
+        <span class="circ">Endurance</span>
+        <span class="circ">Turning</span>
+        <span class="circ">Power</span>
+      </span>
+    </div>
+  </div>
+
+  <p class="body-text" style="margin-bottom:0;">
+    <strong>Prediction card goal:</strong> I said I would win
+    <input type="text" class="blank blank-sm" aria-label="wins goal">
+    out of
+    <input type="text" class="blank blank-sm" aria-label="total matches">
+    matches today.
+  </p>
+
+  <!-- EXAMPLE -->
+  <div class="example-wrap">
+    <div class="ex-head">Example — Here Is a Filled-In Round So You Know What To Do</div>
+    <div class="ex-body">
+      <p><strong>My equation:</strong> y = 2 × x + <em>10</em> &nbsp;→&nbsp; slope (m) = 2, starting point (b) = 10</p>
+      <div class="s6"></div>
+      <p><strong>BEFORE:</strong> My MD1 residual was <em>−53</em>, so I am adjusting my prediction <strong>UP</strong>.</p>
+      <p>I look at the opponent's bot. I think their Speed stat is about <em>6</em>.</p>
+      <p>I plug in: y = 2 × 6 + <em>10</em> = <strong>22</strong> &nbsp;→&nbsp; My prediction number is <strong>22</strong></p>
+      <div class="s6"></div>
+      <p><strong>AFTER:</strong> The match ends. Goals: <em>3 – 1</em>. We <strong>WON</strong>. Actual win % from data log: <em>75</em>.</p>
+      <p>Residual = Predicted − Actual = 22 − 75 = <strong>−53</strong> &nbsp;→&nbsp; Negative = I predicted <strong>TOO LOW</strong>. My number was smaller than what happened.</p>
+      <div class="s6"></div>
+      <p class="ex-dim">Residual is &gt; 20, so I write: "My equation missed how well-rested my bot was before the match."</p>
+      <p><strong>Sharing:</strong> <em>"Our residual was −53, so we're changing our slope from 2 to 3."</em></p>
+    </div>
+  </div>
+
+  <div class="pg-num">1</div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 2 — ROUND 1
+     ============================================================ -->
+<div class="page">
+  <div class="pg-eyebrow">Velocity Arena · Day 14</div>
+
+  <div style="display:flex;align-items:baseline;gap:20px;margin-bottom:2px;">
+    <h2 class="round-num">Round 1</h2>
+    <span class="body-text">vs. Opponent team: <input type="text" class="blank blank-lg" aria-label="opponent team R1"></span>
+  </div>
+  <div class="hr" style="margin-top:10px;"></div>
+
+  <!-- BEFORE -->
+  <div class="sec-head">Before the Match</div>
+
+  <div class="body-text s14">
+    My MD1 residual was: <input type="text" class="blank blank-sm" aria-label="R1 MD1 residual">
+    &nbsp;&nbsp;&nbsp;
+    Adjusting my prediction:
+    <span class="circle-row">
+      <span class="circ">UP</span><span class="sep">/</span>
+      <span class="circ">DOWN</span><span class="sep">/</span>
+      <span class="circ">SAME</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    My slope (m) = <input type="text" class="blank blank-sm" aria-label="R1 slope">
+    &nbsp;&nbsp;
+    My starting point (b) = <input type="text" class="blank blank-sm" aria-label="R1 b">
+    <span class="hint-it" style="margin-left:6px;">(same as your equation — just copy them here)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    I look at my opponent's bot. I think their
+    <input type="text" class="blank blank-md" aria-label="R1 stat name">
+    stat is about <input type="text" class="blank blank-sm" aria-label="R1 stat value">.
+    <br>
+    <span class="hint-it">(their main stat — Speed, Endurance, Turning, or Power)</span>
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">I plug my numbers into the equation:</p>
+
+  <div class="plug-row">
+    <div class="plug-y"><span>y</span><span>=</span></div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R1 slope plug"></div>
+      <div class="c-lbl">my slope (m)</div>
+    </div>
+    <div class="plug-op">×</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R1 stat plug"></div>
+      <div class="c-lbl">opponent's stat</div>
+    </div>
+    <div class="plug-op">+</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R1 b plug"></div>
+      <div class="c-lbl">starting point (b)</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell plug-result">
+      <div class="c-box"><input type="text" aria-label="R1 prediction"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="sec-head">After the Match</div>
+
+  <div class="body-text s10">
+    Goals scored: <input type="text" class="blank blank-sm" aria-label="R1 goals scored">
+    &nbsp;
+    Goals allowed: <input type="text" class="blank blank-sm" aria-label="R1 goals allowed">
+    &nbsp;&nbsp;
+    Result:
+    <span class="circle-row">
+      <span class="circ">W</span><span class="sep">/</span><span class="circ">L</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    Actual win % from my data log: <input type="text" class="blank blank-sm" aria-label="R1 actual win pct">
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">Calculate the residual:</p>
+
+  <div class="resid-row">
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:120px;"><input type="text" style="width:110px;" aria-label="R1 prediction copy"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+    <div class="plug-op">−</div>
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:110px;"><input type="text" style="width:100px;" aria-label="R1 actual copy"></div>
+      <div class="c-lbl">actual win %</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell resid-result">
+      <div class="c-box" style="min-width:100px;background:var(--ice);"><input type="text" style="width:90px;font-style:italic;color:var(--steel);" placeholder="residual" aria-label="R1 residual"></div>
+      <div class="c-lbl">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="s6"></div>
+  <p class="body-text">
+    If my residual is <strong>positive (+)</strong>, I predicted too <strong>HIGH</strong>. &nbsp;&nbsp;
+    If my residual is <strong>negative (−)</strong>, I predicted too <strong>LOW</strong>.
+    <br>
+    My prediction was:
+    <span class="circle-row">
+      <span class="circ">TOO HIGH</span><span class="sep">/</span>
+      <span class="circ">TOO LOW</span><span class="sep">/</span>
+      <span class="circ">PRETTY CLOSE</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </p>
+
+  <div class="cond-box">
+    <strong>Only fill if residual &gt; 20:</strong> My equation missed <input type="text" class="blank blank-xxl" aria-label="R1 equation missed">
+  </div>
+
+  <div class="tell-row">
+    <span class="not-italic">Tell one team:</span>
+    "Our residual was <input type="text" class="blank blank-sm" aria-label="R1 tell residual">,
+    so we're changing <input type="text" class="blank" style="min-width:220px;" aria-label="R1 tell change">."
+    <span class="hint-it" style="font-style:normal;">(one sentence — say it out loud)</span>
+  </div>
+
+  <div class="hr" style="margin-top:auto;"></div>
+  <div class="pg-num">2</div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 3 — ROUND 2
+     ============================================================ -->
+<div class="page">
+  <div class="pg-eyebrow">Velocity Arena · Day 14</div>
+
+  <div style="display:flex;align-items:baseline;gap:20px;margin-bottom:2px;">
+    <h2 class="round-num">Round 2</h2>
+    <span class="body-text">vs. Opponent team: <input type="text" class="blank blank-lg" aria-label="opponent team R2"></span>
+  </div>
+  <div class="hr" style="margin-top:10px;"></div>
+
+  <div class="sec-head">Before the Match</div>
+
+  <div class="body-text s14">
+    My MD1 residual was: <input type="text" class="blank blank-sm" aria-label="R2 MD1 residual">
+    &nbsp;&nbsp;&nbsp;
+    Adjusting my prediction:
+    <span class="circle-row">
+      <span class="circ">UP</span><span class="sep">/</span>
+      <span class="circ">DOWN</span><span class="sep">/</span>
+      <span class="circ">SAME</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    My slope (m) = <input type="text" class="blank blank-sm" aria-label="R2 slope">
+    &nbsp;&nbsp;
+    My starting point (b) = <input type="text" class="blank blank-sm" aria-label="R2 b">
+    <span class="hint-it" style="margin-left:6px;">(same as your equation — just copy them here)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    I look at my opponent's bot. I think their
+    <input type="text" class="blank blank-md" aria-label="R2 stat name">
+    stat is about <input type="text" class="blank blank-sm" aria-label="R2 stat value">.
+    <br>
+    <span class="hint-it">(their main stat — Speed, Endurance, Turning, or Power)</span>
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">I plug my numbers into the equation:</p>
+
+  <div class="plug-row">
+    <div class="plug-y"><span>y</span><span>=</span></div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R2 slope plug"></div>
+      <div class="c-lbl">my slope (m)</div>
+    </div>
+    <div class="plug-op">×</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R2 stat plug"></div>
+      <div class="c-lbl">opponent's stat</div>
+    </div>
+    <div class="plug-op">+</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R2 b plug"></div>
+      <div class="c-lbl">starting point (b)</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell plug-result">
+      <div class="c-box"><input type="text" aria-label="R2 prediction"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+  </div>
+
+  <div class="sec-head">After the Match</div>
+
+  <div class="body-text s10">
+    Goals scored: <input type="text" class="blank blank-sm" aria-label="R2 goals scored">
+    &nbsp;
+    Goals allowed: <input type="text" class="blank blank-sm" aria-label="R2 goals allowed">
+    &nbsp;&nbsp;
+    Result:
+    <span class="circle-row">
+      <span class="circ">W</span><span class="sep">/</span><span class="circ">L</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    Actual win % from my data log: <input type="text" class="blank blank-sm" aria-label="R2 actual win pct">
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">Calculate the residual:</p>
+
+  <div class="resid-row">
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:120px;"><input type="text" style="width:110px;" aria-label="R2 prediction copy"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+    <div class="plug-op">−</div>
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:110px;"><input type="text" style="width:100px;" aria-label="R2 actual copy"></div>
+      <div class="c-lbl">actual win %</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell resid-result">
+      <div class="c-box" style="min-width:100px;background:var(--ice);"><input type="text" style="width:90px;font-style:italic;color:var(--steel);" placeholder="residual" aria-label="R2 residual"></div>
+      <div class="c-lbl">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="s6"></div>
+  <p class="body-text">
+    If my residual is <strong>positive (+)</strong>, I predicted too <strong>HIGH</strong>. &nbsp;&nbsp;
+    If my residual is <strong>negative (−)</strong>, I predicted too <strong>LOW</strong>.
+    <br>
+    My prediction was:
+    <span class="circle-row">
+      <span class="circ">TOO HIGH</span><span class="sep">/</span>
+      <span class="circ">TOO LOW</span><span class="sep">/</span>
+      <span class="circ">PRETTY CLOSE</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </p>
+
+  <div class="cond-box">
+    <strong>Only fill if residual &gt; 20:</strong> My equation missed <input type="text" class="blank blank-xxl" aria-label="R2 equation missed">
+  </div>
+
+  <div class="tell-row">
+    <span class="not-italic">Tell one team:</span>
+    "Our residual was <input type="text" class="blank blank-sm" aria-label="R2 tell residual">,
+    so we're changing <input type="text" class="blank" style="min-width:220px;" aria-label="R2 tell change">."
+    <span class="hint-it" style="font-style:normal;">(one sentence — say it out loud)</span>
+  </div>
+
+  <div class="hr" style="margin-top:auto;"></div>
+  <div class="pg-num">3</div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 4 — ROUND 3 + END OF DAY
+     ============================================================ -->
+<div class="page">
+  <div class="pg-eyebrow">Velocity Arena · Day 14</div>
+
+  <div style="display:flex;align-items:baseline;gap:20px;margin-bottom:2px;">
+    <h2 class="round-num">Round 3</h2>
+    <span class="body-text">vs. Opponent team: <input type="text" class="blank blank-lg" aria-label="opponent team R3"></span>
+  </div>
+  <div class="hr" style="margin-top:10px;"></div>
+
+  <div class="sec-head">Before the Match</div>
+
+  <div class="body-text s14">
+    My MD1 residual was: <input type="text" class="blank blank-sm" aria-label="R3 MD1 residual">
+    &nbsp;&nbsp;&nbsp;
+    Adjusting my prediction:
+    <span class="circle-row">
+      <span class="circ">UP</span><span class="sep">/</span>
+      <span class="circ">DOWN</span><span class="sep">/</span>
+      <span class="circ">SAME</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    My slope (m) = <input type="text" class="blank blank-sm" aria-label="R3 slope">
+    &nbsp;&nbsp;
+    My starting point (b) = <input type="text" class="blank blank-sm" aria-label="R3 b">
+    <span class="hint-it" style="margin-left:6px;">(same as your equation — just copy them here)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    I look at my opponent's bot. I think their
+    <input type="text" class="blank blank-md" aria-label="R3 stat name">
+    stat is about <input type="text" class="blank blank-sm" aria-label="R3 stat value">.
+    <br>
+    <span class="hint-it">(their main stat — Speed, Endurance, Turning, or Power)</span>
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">I plug my numbers into the equation:</p>
+
+  <div class="plug-row">
+    <div class="plug-y"><span>y</span><span>=</span></div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R3 slope plug"></div>
+      <div class="c-lbl">my slope (m)</div>
+    </div>
+    <div class="plug-op">×</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R3 stat plug"></div>
+      <div class="c-lbl">opponent's stat</div>
+    </div>
+    <div class="plug-op">+</div>
+    <div class="plug-cell">
+      <div class="c-box"><input type="text" aria-label="R3 b plug"></div>
+      <div class="c-lbl">starting point (b)</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell plug-result">
+      <div class="c-box"><input type="text" aria-label="R3 prediction"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+  </div>
+
+  <div class="sec-head">After the Match</div>
+
+  <div class="body-text s10">
+    Goals scored: <input type="text" class="blank blank-sm" aria-label="R3 goals scored">
+    &nbsp;
+    Goals allowed: <input type="text" class="blank blank-sm" aria-label="R3 goals allowed">
+    &nbsp;&nbsp;
+    Result:
+    <span class="circle-row">
+      <span class="circ">W</span><span class="sep">/</span><span class="circ">L</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </div>
+
+  <div class="s10"></div>
+  <div class="body-text">
+    Actual win % from my data log: <input type="text" class="blank blank-sm" aria-label="R3 actual win pct">
+  </div>
+
+  <div class="s10"></div>
+  <p class="body-text">Calculate the residual:</p>
+
+  <div class="resid-row">
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:120px;"><input type="text" style="width:110px;" aria-label="R3 prediction copy"></div>
+      <div class="c-lbl">my prediction number</div>
+    </div>
+    <div class="plug-op">−</div>
+    <div class="plug-cell">
+      <div class="c-box" style="min-width:110px;"><input type="text" style="width:100px;" aria-label="R3 actual copy"></div>
+      <div class="c-lbl">actual win %</div>
+    </div>
+    <div class="plug-op">=</div>
+    <div class="plug-cell resid-result">
+      <div class="c-box" style="min-width:100px;background:var(--ice);"><input type="text" style="width:90px;font-style:italic;color:var(--steel);" placeholder="residual" aria-label="R3 residual"></div>
+      <div class="c-lbl">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="s6"></div>
+  <p class="body-text">
+    If my residual is <strong>positive (+)</strong>, I predicted too <strong>HIGH</strong>. &nbsp;&nbsp;
+    If my residual is <strong>negative (−)</strong>, I predicted too <strong>LOW</strong>.
+    <br>
+    My prediction was:
+    <span class="circle-row">
+      <span class="circ">TOO HIGH</span><span class="sep">/</span>
+      <span class="circ">TOO LOW</span><span class="sep">/</span>
+      <span class="circ">PRETTY CLOSE</span>
+    </span>
+    <span class="hint-it">(circle one)</span>
+  </p>
+
+  <div class="cond-box">
+    <strong>Only fill if residual &gt; 20:</strong> My equation missed <input type="text" class="blank blank-xxl" aria-label="R3 equation missed">
+  </div>
+
+  <div class="tell-row">
+    <span class="not-italic">Tell one team:</span>
+    "Our residual was <input type="text" class="blank blank-sm" aria-label="R3 tell residual">,
+    so we're changing <input type="text" class="blank" style="min-width:220px;" aria-label="R3 tell change">."
+    <span class="hint-it" style="font-style:normal;">(one sentence — say it out loud)</span>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- END OF DAY -->
+  <div class="eod-wrap">
+    <div class="eod-head">End of Day — Answer These Before You Leave</div>
+
+    <p class="body-text" style="margin-bottom:10px;">
+      Today I went <input type="text" class="blank blank-sm" aria-label="wins today"> W and <input type="text" class="blank blank-sm" aria-label="losses today"> L.
+      &nbsp;&nbsp;
+      Prediction card — am I on track?
+      <span class="circle-row">
+        <span class="circ">YES</span><span class="sep">/</span><span class="circ">NO</span>
+      </span>
+      <span class="hint-it">(circle)</span>
+    </p>
+
+    <p class="body-text" style="margin-bottom:14px;">
+      Compared to Match Day 1, my residuals are getting:
+      <span class="circle-row">
+        <span class="circ">SMALLER</span><span class="sep">/</span>
+        <span class="circ">BIGGER</span><span class="sep">/</span>
+        <span class="circ">ABOUT THE SAME</span>
+      </span>
+      <span class="hint-it">(circle)</span>
+    </p>
+
+    <p class="body-text" style="margin-bottom:6px;">
+      The round where my equation was most wrong: Round <input type="text" class="blank blank-sm" aria-label="worst round"> &nbsp; Because:
+    </p>
+    <textarea class="write-area" rows="3" aria-label="because reason" style="margin-bottom:0;"></textarea>
+  </div>
+
+  <div class="s14"></div>
+  <p style="font-size:13px;font-weight:800;margin-bottom:8px;">For tomorrow's Open Lab, the ONE thing I want to change:</p>
+  <textarea class="write-area" rows="3" aria-label="one thing to change"></textarea>
+
+  <div class="hr" style="margin-top:auto;"></div>
+  <div class="pg-num">4</div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 5 — CUT-OUT CARDS
+     ============================================================ -->
+<div class="page">
+  <div class="pg-eyebrow">Velocity Arena · Day 14</div>
+
+  <div class="cards-row">
+    <div class="cut-card">
+      <div class="card-eyebrow">My slope (m)</div>
+      <div class="card-line">
+        Change from <input type="text" class="blank blank-sm" aria-label="slope from"> to
+        <br>
+        <input type="text" class="blank blank-sm" aria-label="slope to">
+      </div>
+    </div>
+    <div class="cut-card">
+      <div class="card-eyebrow">My x variable</div>
+      <div class="card-line">
+        Change from
+        <br>
+        <input type="text" class="blank blank-md" aria-label="variable from"> to
+        <br>
+        <input type="text" class="blank blank-md" aria-label="variable to">
+      </div>
+    </div>
+  </div>
+
+  <div class="pg-num">5</div>
+</div>
+
+</body>
+</html>
