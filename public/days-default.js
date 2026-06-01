@@ -248,8 +248,8 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/1RHggdduPeGWT5enQ7ePXKJczlZ16xtZ8qMMPLIvswCE/edit?tab=t.0", label: "Card A"},
            {url: "https://docs.google.com/document/d/1PZ3buLyF06EgnHL6D2KZho6fDSaeIIgX9Vo0CeKfh7M/edit?tab=t.0", label: "Card B"}
     ],
-    "exemplar": [{url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time Graphs_DataCard_A.html", label: "Card A"},
-           {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time Graphs_DataCard_B.html", label: "Card B"}],
+    "exemplar": [{url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time_Graphs_DataCard_A.html", label: "Card A"},
+           {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Distance-Time_Graphs_DataCard_B.html", label: "Card B"}],
    "exit": "https://docs.google.com/document/d/1DSFwsS2V4d9_GwrPjsxGdlth_IQ9DIk_kwdp7nFq9nI/edit?usp=sharing",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-02-distance-time-graphs.html"
       },
