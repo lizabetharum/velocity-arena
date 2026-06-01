@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Day 10 – Season 1 Analysis Block – Exemplars</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@500;600;700&family=Shadows+Into+Light&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1b2a;--surface:#132033;--card:#1a2d45;--border:#2a4060;
+  --cyan:#00e5ff;--cyan-tint:rgba(0,229,255,0.10);--cyan-line:rgba(0,229,255,0.32);
+  --yellow:#ffd600;--green:#00e676;--red:#ff5252;--orange:#ff9100;
+  --text:#e8f0fe;--muted:#7a9cc0;--dim:#455367;--line:rgba(255,255,255,0.08);
+  --line-strong:rgba(255,255,255,0.14);--r:10px;
+  --ap-color:#ffa726;--mt-color:#00e676;--ex-color:#00e5ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a1520;font-family:'Inter',sans-serif;color:var(--text);padding:32px 16px 80px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:900px;margin:0 auto;}
+
+/* ── SHEET ── */
+.sheet{background:var(--bg);border-radius:12px;border:1px solid var(--border);box-shadow:0 24px 60px -20px rgba(0,0,0,.8);margin-bottom:56px;overflow:hidden;position:relative;}
+.level-tab{position:absolute;top:20px;right:0;color:#0d1b2a;font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:6px 14px;border-radius:4px 0 0 4px;}
+.tab-ap{background:var(--ap-color);}.tab-mt{background:var(--mt-color);}.tab-ex{background:var(--ex-color);}
+
+/* ── SHEET HEADER ── */
+.sheet-head{background:var(--surface);border-bottom:1px solid var(--line-strong);padding:16px 24px 12px;}
+.sheet-head-top{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.day-badge{background:var(--cyan);color:#0d1b2a;font:700 13px/1 'Inter';letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:4px;}
+.sheet-title{font:700 15px/1 'Inter';color:var(--text);}
+.sheet-sub{font:500 12px/1 'JetBrains Mono';color:var(--muted);}
+.team-row{display:flex;gap:6px;align-items:baseline;font:500 13px/1 'JetBrains Mono';color:var(--muted);}
+.team-val{font-weight:700;}
+
+/* ── PHASE DIVIDER ── */
+.phase-div{display:flex;align-items:center;gap:10px;padding:16px 24px 10px;border-top:1px solid var(--line);}
+.phase-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px/1 'Inter';flex-shrink:0;}
+.phase-title{font:700 13px/1 'Inter';letter-spacing:.14em;text-transform:uppercase;}
+.phase-time{margin-left:auto;font:500 12px/1 'JetBrains Mono';color:var(--muted);}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r);padding:16px 18px;margin:0 24px 12px;}
+.card-title{font:700 12px/1 'Inter';letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px;}
+
+/* ── ERROR TABLE ── */
+.err-table{width:100%;border-collapse:collapse;}
+.err-table th{font:600 10px/1 'Inter';letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:0 6px 6px 0;text-align:left;}
+.err-table td{font:500 12px/1 'JetBrains Mono';padding:4px 6px 4px 0;border-top:1px solid var(--line);color:var(--muted);}
+.err-table td.val{font-weight:700;font-size:13px;}
+.v-pos{color:var(--red);}
+.v-neg{color:var(--cyan);}
+.v-zer{color:var(--green);}
+
+/* ── CALC STRIP ── */
+.calc-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.calc-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.cb-label{font:500 11px/1 'JetBrains Mono';color:var(--muted);margin-bottom:7px;}
+.cb-val{font:500 26px/1 'JetBrains Mono';font-variant-numeric:tabular-nums;}
+
+/* ── TILES ── */
+.tile-row{display:grid;gap:8px;}
+.t3{grid-template-columns:repeat(3,1fr);}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center;}
+.tile.sel{border-width:2px;}
+.tile-word{font:700 12px/1 'Inter';letter-spacing:.08em;text-transform:uppercase;margin-top:5px;}
+.tile-desc{font:400 11px/1.4 'Inter';color:var(--dim);margin-top:3px;}
+
+/* ── TREND INPUTS ── */
+.trend-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.field-lbl{font:600 10px/1 'Inter';letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.field-val{font:700 15px/1 'JetBrains Mono';background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);}
+
+/* ── TOP 3 ── */
+.top3-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.top3-grid{display:grid;grid-template-columns:24px 1fr 1fr;gap:10px;align-items:start;margin-bottom:8px;}
+.rank{width:24px;height:24px;border-radius:50%;background:rgba(255,82,82,.12);border:1px solid rgba(255,82,82,.3);color:var(--red);font:700 12px/1 'Inter';display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.t3-note{margin-top:4px;}
+
+/* ── SENTENCE BUILDER ── */
+.sb{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.sb-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font:600 14px/2.0 'Inter';color:var(--text);}
+.sb-fixed{color:var(--muted);}
+.sb-val{font-family:'Inter';font-weight:700;border-radius:4px;padding:2px 8px;display:inline-block;}
+
+/* ── WARNING ── */
+.warn{background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.3);border-radius:8px;padding:10px 13px;margin-top:8px;font:400 12px/1.6 'Inter';color:var(--red);}
+.disconnect-warn{background:rgba(255,145,0,.08);border:1px solid rgba(255,145,0,.3);border-radius:8px;padding:10px 13px;margin-top:8px;font:400 12px/1.6 'Inter';color:var(--orange);}
+
+/* ── EQUATION ROW ── */
+.eq-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.eq-fixed{font:600 16px/1 'JetBrains Mono';color:var(--muted);}
+.eq-formula{font:600 18px/1 'JetBrains Mono';color:var(--green);}
+.eq-val{font:700 16px/1 'JetBrains Mono';background:var(--card);border:1px solid var(--border);border-radius:5px;padding:4px 10px;}
+
+/* ── PRED CHECKPOINT ── */
+.pred-btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.pred-btn{font:700 12px/1 'Inter';padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);}
+.pred-btn.sel{border-color:var(--green);background:rgba(0,230,118,.10);color:var(--green);}
+
+/* ── RESULT STRIP ── */
+.result-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+
+/* ── HYPO BUILDER ── */
+.hypo-builder{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;}
+.hypo-row{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);align-items:start;}
+.hypo-row:last-child{border-bottom:none;}
+.hypo-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 12px/1 'Inter';}
+.hypo-fld-lbl{font:600 10px/1 'Inter';letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.hypo-auto{font:600 15px/1.6 'Inter';}
+.hypo-textarea{font:400 13px/1.7 'Inter';color:var(--text);background:transparent;}
+
+/* ── HYPO PREVIEW ── */
+.hypo-preview{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.25);border-radius:10px;padding:18px 20px;margin:0 24px 12px;}
+.hp-title{font:700 11px/1 'Inter';letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+.hp-text{font:400 14px/1.8 'Inter';color:var(--text);}
+
+/* ── QUALITY BAR ── */
+.quality-row{display:flex;align-items:center;gap:10px;margin:0 24px 16px;}
+.q-label{font:600 12px/1 'Inter';letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.q-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.q-fill{height:100%;border-radius:2px;}
+.q-val{font:500 12px/1 'JetBrains Mono';min-width:80px;text-align:right;}
+
+/* ── STAMP ── */
+.stamp-row{padding:0 24px 16px;display:flex;align-items:center;gap:12px;}
+.stamp{display:inline-block;font:800 9px/1 'Inter';letter-spacing:.13em;text-transform:uppercase;color:var(--muted);border:1.4px solid var(--muted);border-radius:3px;padding:3px 8px;transform:rotate(-2deg);}
+
+/* ── LOOK-FOR ── */
+.lookfor{background:rgba(0,229,255,.04);border-top:1px solid var(--line-strong);padding:16px 24px 20px;}
+.lf-label{font:800 10px/1 'Inter';letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;}
+.lf-text{font:400 13px/1.65 'Inter';color:var(--muted);}
+
+/* ── STUDENT TEXT COLORS per level ── */
+.ap-val{color:var(--ap-color) !important;font-weight:700;}
+.mt-val{color:var(--mt-color) !important;font-weight:700;}
+.ex-val{color:var(--ex-color) !important;font-weight:700;}
+
+/* ── MISC ── */
+.instr{background:var(--surface);border-left:3px solid var(--border);border-radius:0 8px 8px 0;padding:10px 14px;margin:0 24px 12px;font:400 13px/1.7 'Inter';color:var(--text);}
+.pattern-hint{background:var(--cyan-tint);border:1px solid var(--cyan-line);border-radius:8px;padding:10px 13px;margin-top:10px;font:400 12px/1.6 'Inter';color:var(--text);}
+.bc-display{font:700 15px/1.5 'Inter';padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══════════════════ SHEET 1: MARCUS — APPROACHING ══════════════════ -->
+<div class="sheet">
+<div class="level-tab tab-ap">Approaching</div>
+<div class="sheet-head">
+  <div class="sheet-head-top">
+    <div class="day-badge">Day 10</div>
+    <div>
+      <div class="sheet-title">Season 1 Analysis Block</div>
+      <div class="sheet-sub">Season 1 · Analysis Block · 25 min</div>
+    </div>
+  </div>
+  <div class="team-row">Team: <span class="team-val ap-val">&nbsp;Voltage</span>&nbsp;&nbsp;|&nbsp;&nbsp;Student: <span class="team-val ap-val">&nbsp;Marcus T.</span></div>
+</div>
+
+<!-- PHASE A -->
+<div class="phase-div">
+  <div class="phase-num" style="background:rgba(0,229,255,.15);border:1px solid var(--cyan-line);color:var(--cyan);">1</div>
+  <div class="phase-title" style="color:var(--cyan);">Your Season 1 Data</div>
+  <div class="phase-time">8–10 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Season 1 Error Values — All Matches</div>
+  <table class="err-table">
+    <tr><th>Match</th><th>Error</th><th style="padding-left:24px;">Match</th><th>Error</th></tr>
+    <tr><td>Day 7 · R1</td><td class="val v-pos ap-val">+4</td><td style="padding-left:24px;">Day 9 · R1</td><td class="val v-pos ap-val">+3</td></tr>
+    <tr><td>Day 7 · R2</td><td class="val v-pos ap-val">+3</td><td style="padding-left:24px;">Day 9 · R2</td><td class="val v-pos ap-val">+1</td></tr>
+    <tr><td>Day 7 · R3</td><td class="val v-pos ap-val">+2</td><td style="padding-left:24px;">Day 9 · R3</td><td class="val v-pos ap-val">+2</td></tr>
+    <tr><td>Day 8 · R1</td><td class="val v-pos ap-val">+3</td><td style="padding-left:24px;">Today · R1</td><td class="val v-neg ap-val">−1</td></tr>
+    <tr><td>Day 8 · R2</td><td class="val v-neg ap-val">−1</td><td style="padding-left:24px;">Today · R2</td><td class="val v-pos ap-val">+1</td></tr>
+    <tr><td>Day 8 · R3</td><td class="val v-pos ap-val">+2</td><td style="padding-left:24px;">Today · R3</td><td class="val v-neg ap-val">−1</td></tr>
+  </table>
+  <div class="calc-strip">
+    <div class="calc-box"><div class="cb-label">Sum of Errors</div><div class="cb-val v-pos ap-val">+18</div></div>
+    <div class="calc-box"><div class="cb-label">Match Count</div><div class="cb-val ap-val">12</div></div>
+    <div class="calc-box"><div class="cb-label">Average Error — Bias</div><div class="cb-val v-pos ap-val">+1.50</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 2 — Sign of Average Error</div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--ap-color);background:rgba(255,167,38,.10);">
+      <div class="tile-word ap-val">Positive</div><div class="tile-desc">Consistently over-predicted</div>
+    </div>
+    <div class="tile"><div class="tile-word">Negative</div><div class="tile-desc">Consistently under-predicted</div></div>
+    <div class="tile"><div class="tile-word">Near Zero</div><div class="tile-desc">Prediction was balanced</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 3 — Error Trend Across Season</div>
+  <div class="trend-inputs">
+    <div><div class="field-lbl">First Error size (Day 7 · R1)</div><div class="field-val ap-val">4</div></div>
+    <div><div class="field-lbl">Last Error size (Today · R3)</div><div class="field-val ap-val">1</div></div>
+  </div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--ap-color);background:rgba(255,167,38,.10);">
+      <div class="tile-word ap-val">Improving</div><div class="tile-desc">Errors are shrinking</div>
+    </div>
+    <div class="tile"><div class="tile-word">Flat</div><div class="tile-desc">Error size stayed the same</div></div>
+    <div class="tile"><div class="tile-word">Worsening</div><div class="tile-desc">Errors are growing</div></div>
+  </div>
+</div>
+
+<!-- PHASE B -->
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);">2</div>
+  <div class="phase-title" style="color:var(--yellow);">Find the Pattern</div>
+  <div class="phase-time">6–8 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Top 3 Biggest Errors — by Size</div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">1</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ap-val">fast opponents</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ap-val v-pos">+4</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ap-val">they scored a lot and we couldn't stop them, way more than we predicted</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">2</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ap-val">strong opponents</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ap-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ap-val">went way better for them than we expected</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">3</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ap-val">opponents scored more</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ap-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ap-val">our prediction was way off they scored fast</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Write Your Sentence</div>
+  <div class="sb">
+    <div class="sb-line">
+      <span class="sb-fixed">My model consistently</span>
+      <span class="sb-val" style="background:rgba(255,167,38,.15);color:var(--ap-color);">over-predicts</span>
+      <span class="sb-fixed">because it</span>
+      <span class="sb-val" style="background:rgba(255,167,38,.15);color:var(--ap-color);">does not account for</span>
+      <span class="sb-val ap-val" style="background:rgba(255,167,38,.15);">fast opponents</span>
+      <span class="sb-fixed">.</span>
+    </div>
+  </div>
+  <div class="warn">That looks like an outcome, not an input variable. Examples of input variables: Speed, Turning, Power, Endurance, distance, launch angle. Do not write: lost, won, goals, score, opponent, match.</div>
+</div>
+
+<!-- PHASE C -->
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(0,230,118,.10);border:1px solid rgba(0,230,118,.3);color:var(--green);">3</div>
+  <div class="phase-title" style="color:var(--green);">Build Your Hypothesis</div>
+  <div class="phase-time">6–7 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Does Your Stat Change Fix The Problem?</div>
+  <div class="section-grid">
+    <div><div class="field-lbl">The variable your model is missing (from Step 2):</div><div class="bc-display ap-val">fast opponents</div></div>
+    <div><div class="field-lbl">The robot stat you want to change for Season 2:</div><div class="field-val ap-val">Speed</div></div>
+  </div>
+  <div class="field-lbl">Explain the connection:</div>
+  <div class="field-val ap-val" style="line-height:1.6;">If we have more Speed we can keep up with opponents better</div>
+  <div class="disconnect-warn">Your identified weakness and your proposed stat change look different. That can be valid — but explain the connection above before continuing.</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Enter Your Day 8 Scatter Plot Equation</div>
+  <div class="eq-row">
+    <span class="eq-fixed">Equation:</span>
+    <span class="eq-formula">y =</span>
+    <span class="eq-val ap-val">0.4</span>
+    <span class="eq-fixed">x +</span>
+    <span class="eq-val ap-val">1.2</span>
+  </div>
+  <div class="section-grid">
+    <div><div class="field-lbl">Current Speed Value (x)</div><div class="field-val ap-val">5</div></div>
+    <div><div class="field-lbl">Proposed New Speed Value (x)</div><div class="field-val ap-val">7</div></div>
+  </div>
+  <div class="section-grid" style="margin-top:8px;">
+    <div><div class="field-lbl">Season 1 Actual Avg Goals / Match</div><div class="field-val ap-val">3.1</div></div>
+    <div><div class="field-lbl">Stat You Are Changing</div><div class="field-val ap-val">Speed</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Commit Before You Calculate</div>
+  <div class="pred-btns">
+    <div class="pred-btn sel">Positive improvement</div>
+    <div class="pred-btn">Negative impact</div>
+    <div class="pred-btn">Near zero</div>
+  </div>
+  <div class="field-lbl">My reason:</div>
+  <div class="field-val ap-val">Faster speed means we score more goals</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Calculation Results</div>
+  <div class="result-strip">
+    <div class="calc-box"><div class="cb-label">Current Predicted Goals</div><div class="cb-val ap-val">3.20</div></div>
+    <div class="calc-box"><div class="cb-label">Proposed Predicted Goals</div><div class="cb-val ap-val">4.00</div></div>
+    <div class="calc-box"><div class="cb-label">Model-Predicted Difference</div><div class="cb-val v-zer ap-val">+0.90</div><div style="font:400 10px/1.4 'Inter';color:var(--muted);margin-top:6px;">proposed prediction − Season 1 actual average</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Season 2 Hypothesis Builder</div>
+  <div class="hypo-builder">
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(255,167,38,.15);border:1px solid rgba(255,167,38,.3);color:var(--ap-color);">1</div>
+      <div><div class="hypo-fld-lbl">Stat Change</div><div class="hypo-auto ap-val">If I change Speed from 5 to 7…</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(255,167,38,.15);border:1px solid rgba(255,167,38,.3);color:var(--ap-color);">2</div>
+      <div><div class="hypo-fld-lbl">Equation Output</div><div class="hypo-auto ap-val">…my equation y = 0.4x + 1.2 gives y = 4.00 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(255,167,38,.15);border:1px solid rgba(255,167,38,.3);color:var(--ap-color);">3</div>
+      <div><div class="hypo-fld-lbl">Model-Predicted Difference</div><div class="hypo-auto ap-val">Season 1 actual avg: 3.1 goals/match. Model-predicted difference: +0.90 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(255,167,38,.15);border:1px solid rgba(255,167,38,.3);color:var(--ap-color);">4</div>
+      <div>
+        <div class="hypo-fld-lbl">Why does this stat change fix the problem?</div>
+        <div class="hypo-textarea ap-val">Being faster helps us keep up with fast opponents and score more goals</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">What Would Prove You Wrong?</div>
+  <div class="field-val" style="color:var(--dim);font-style:italic;">(left blank)</div>
+</div>
+<div class="quality-row">
+  <span class="q-label">Hypothesis</span>
+  <div class="q-track"><div class="q-fill" style="width:75%;background:var(--yellow);"></div></div>
+  <span class="q-val" style="color:var(--yellow);">Add falsification test</span>
+</div>
+<div class="stamp-row"><span class="stamp">Sample – pre-pilot</span></div>
+<div class="lookfor">
+  <div class="lf-label" style="color:var(--ap-color);">Teacher Look-For — Approaching (Marcus T., Voltage)</div>
+  <div class="lf-text">Marcus correctly enters all 12 errors, gets sum/average/sign right, and correctly plugs the equation in Phase C. His systematic error is in Phase B: he writes result observations ("fast opponents," "opponents scored more," "strong opponents") instead of naming a missing input variable. The result-word warning fires for his sentence and he leaves it. His B→C connection ("being faster helps") is too vague — it doesn't name a mechanism or formula, and doesn't link the Phase B gap to the Phase C stat choice. His falsification test is blank. Ask him: <em>"What specific robot stat does 'fast opponent' refer to — Speed? Turning? And is that stat in your y = mx + b equation or not?"</em></div>
+</div>
+</div><!-- /sheet -->
+
+
+<!-- ══════════════════ SHEET 2: JAYDA — MEETS ══════════════════ -->
+<div class="sheet">
+<div class="level-tab tab-mt">Meets</div>
+<div class="sheet-head">
+  <div class="sheet-head-top">
+    <div class="day-badge">Day 10</div>
+    <div>
+      <div class="sheet-title">Season 1 Analysis Block</div>
+      <div class="sheet-sub">Season 1 · Analysis Block · 25 min</div>
+    </div>
+  </div>
+  <div class="team-row">Team: <span class="team-val mt-val">&nbsp;Circuit Breakers</span>&nbsp;&nbsp;|&nbsp;&nbsp;Student: <span class="team-val mt-val">&nbsp;Jayda W.</span></div>
+</div>
+
+<div class="phase-div">
+  <div class="phase-num" style="background:rgba(0,229,255,.15);border:1px solid var(--cyan-line);color:var(--cyan);">1</div>
+  <div class="phase-title" style="color:var(--cyan);">Your Season 1 Data</div>
+  <div class="phase-time">8–10 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Season 1 Error Values — All Matches</div>
+  <table class="err-table">
+    <tr><th>Match</th><th>Error</th><th style="padding-left:24px;">Match</th><th>Error</th></tr>
+    <tr><td>Day 7 · R1</td><td class="val v-pos mt-val">+3</td><td style="padding-left:24px;">Day 9 · R1</td><td class="val v-pos mt-val">+1</td></tr>
+    <tr><td>Day 7 · R2</td><td class="val v-neg mt-val">−1</td><td style="padding-left:24px;">Day 9 · R2</td><td class="val v-neg mt-val">−1</td></tr>
+    <tr><td>Day 7 · R3</td><td class="val v-pos mt-val">+4</td><td style="padding-left:24px;">Day 9 · R3</td><td class="val v-pos mt-val">+2</td></tr>
+    <tr><td>Day 8 · R1</td><td class="val v-pos mt-val">+2</td><td style="padding-left:24px;">Today · R1</td><td class="val v-pos mt-val">+3</td></tr>
+    <tr><td>Day 8 · R2</td><td class="val v-neg mt-val">−2</td><td style="padding-left:24px;">Today · R2</td><td class="val v-neg mt-val">−2</td></tr>
+    <tr><td>Day 8 · R3</td><td class="val v-pos mt-val">+3</td><td style="padding-left:24px;">Today · R3</td><td class="val v-pos mt-val">+2</td></tr>
+  </table>
+  <div class="calc-strip">
+    <div class="calc-box"><div class="cb-label">Sum of Errors</div><div class="cb-val v-pos mt-val">+14</div></div>
+    <div class="calc-box"><div class="cb-label">Match Count</div><div class="cb-val mt-val">12</div></div>
+    <div class="calc-box"><div class="cb-label">Average Error — Bias</div><div class="cb-val v-pos mt-val">+1.17</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 2 — Sign of Average Error</div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--mt-color);background:rgba(0,230,118,.08);">
+      <div class="tile-word mt-val">Positive</div><div class="tile-desc">Consistently over-predicted</div>
+    </div>
+    <div class="tile"><div class="tile-word">Negative</div><div class="tile-desc">Consistently under-predicted</div></div>
+    <div class="tile"><div class="tile-word">Near Zero</div><div class="tile-desc">Prediction was balanced</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 3 — Error Trend Across Season</div>
+  <div class="trend-inputs">
+    <div><div class="field-lbl">First Error size (Day 7 · R1)</div><div class="field-val mt-val">3</div></div>
+    <div><div class="field-lbl">Last Error size (Today · R3)</div><div class="field-val mt-val">2</div></div>
+  </div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--mt-color);background:rgba(0,230,118,.08);">
+      <div class="tile-word mt-val">Improving</div><div class="tile-desc">Errors are shrinking</div>
+    </div>
+    <div class="tile"><div class="tile-word">Flat</div><div class="tile-desc">Error size stayed the same</div></div>
+    <div class="tile"><div class="tile-word">Worsening</div><div class="tile-desc">Errors are growing</div></div>
+  </div>
+</div>
+
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);">2</div>
+  <div class="phase-title" style="color:var(--yellow);">Find the Pattern</div>
+  <div class="phase-time">6–8 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Top 3 Biggest Errors — by Size</div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">1</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val mt-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val mt-val v-pos">+4</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val mt-val">High-Turning opponent scored from angles we didn't predict — Turning isn't in y = mx + b</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">2</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val mt-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val mt-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val mt-val">Same pattern — T=8 opponent cut around our defense twice</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">3</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val mt-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val mt-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val mt-val">Sharp cutting bot again — high Turning every time we over-predicted most</div></div>
+  </div>
+  <div class="pattern-hint">⬡ <strong>Clear pattern:</strong> The same stat — <strong>Turning</strong> — appears in all three biggest errors. That's your systematic weakness.</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Write Your Sentence</div>
+  <div class="sb">
+    <div class="sb-line">
+      <span class="sb-fixed">My model consistently</span>
+      <span class="sb-val" style="background:rgba(0,230,118,.12);color:var(--mt-color);">over-predicts</span>
+      <span class="sb-fixed">because it</span>
+      <span class="sb-val" style="background:rgba(0,230,118,.12);color:var(--mt-color);">does not account for</span>
+      <span class="sb-val mt-val" style="background:rgba(0,230,118,.12);">Turning</span>
+      <span class="sb-fixed">.</span>
+    </div>
+  </div>
+  <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font:400 12px/1.6 'Inter';color:var(--green);">✓ <em style="color:var(--text);">"My model consistently over-predicts because it does not account for Turning."</em></div>
+</div>
+
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(0,230,118,.10);border:1px solid rgba(0,230,118,.3);color:var(--green);">3</div>
+  <div class="phase-title" style="color:var(--green);">Build Your Hypothesis</div>
+  <div class="phase-time">6–7 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Does Your Stat Change Fix The Problem?</div>
+  <div class="section-grid">
+    <div><div class="field-lbl">The variable your model is missing (from Step 2):</div><div class="bc-display mt-val">Turning</div></div>
+    <div><div class="field-lbl">The robot stat you want to change for Season 2:</div><div class="field-val mt-val">Speed</div></div>
+  </div>
+  <div class="field-lbl">Explain the connection:</div>
+  <div class="field-val mt-val" style="line-height:1.6;">Increasing Speed means we get to the ball before high-Turning opponents can set up their angled shots. That's why they were scoring from spots my model didn't predict.</div>
+  <div class="disconnect-warn">Your identified weakness and your proposed stat change look different. That can be valid — but explain the connection above before continuing.</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Enter Your Day 8 Scatter Plot Equation</div>
+  <div class="eq-row">
+    <span class="eq-fixed">Equation:</span><span class="eq-formula">y =</span>
+    <span class="eq-val mt-val">0.4</span><span class="eq-fixed">x +</span><span class="eq-val mt-val">1.2</span>
+  </div>
+  <div class="section-grid">
+    <div><div class="field-lbl">Current Speed Value (x)</div><div class="field-val mt-val">6</div></div>
+    <div><div class="field-lbl">Proposed New Speed Value (x)</div><div class="field-val mt-val">8</div></div>
+  </div>
+  <div class="section-grid" style="margin-top:8px;">
+    <div><div class="field-lbl">Season 1 Actual Avg Goals / Match</div><div class="field-val mt-val">3.8</div></div>
+    <div><div class="field-lbl">Stat You Are Changing</div><div class="field-val mt-val">Speed</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Commit Before You Calculate</div>
+  <div class="pred-btns">
+    <div class="pred-btn sel" style="border-color:var(--green);background:rgba(0,230,118,.10);color:var(--green);">Positive improvement</div>
+    <div class="pred-btn">Negative impact</div>
+    <div class="pred-btn">Near zero</div>
+  </div>
+  <div class="field-lbl">My reason:</div>
+  <div class="field-val mt-val">More Speed means we reach the ball faster, scoring before high-Turning bots can reposition</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Calculation Results</div>
+  <div class="result-strip">
+    <div class="calc-box"><div class="cb-label">Current Predicted Goals</div><div class="cb-val mt-val">3.60</div></div>
+    <div class="calc-box"><div class="cb-label">Proposed Predicted Goals</div><div class="cb-val mt-val">4.40</div></div>
+    <div class="calc-box"><div class="cb-label">Model-Predicted Difference</div><div class="cb-val v-zer mt-val">+0.60</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Season 2 Hypothesis Builder</div>
+  <div class="hypo-builder">
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);">1</div>
+      <div><div class="hypo-fld-lbl">Stat Change</div><div class="hypo-auto mt-val">If I change Speed from 6 to 8…</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);">2</div>
+      <div><div class="hypo-fld-lbl">Equation Output</div><div class="hypo-auto mt-val">…my equation y = 0.4x + 1.2 gives y = 4.40 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);">3</div>
+      <div><div class="hypo-fld-lbl">Model-Predicted Difference</div><div class="hypo-auto mt-val">Season 1 actual avg: 3.8 goals/match. Model-predicted difference: +0.60 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green);">4</div>
+      <div><div class="hypo-fld-lbl">Why does this stat change fix the problem?</div>
+      <div class="hypo-textarea mt-val">When I increase Speed, we reach the ball faster before high-Turning opponents can set up their angled shots. That's the main reason they scored when we predicted they wouldn't.</div></div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">What Would Prove You Wrong?</div>
+  <div class="field-val mt-val" style="line-height:1.6;">My hypothesis would be wrong if we still over-predict by +2 or more goals against high-Turning opponents even after raising Speed to 8.</div>
+</div>
+<div class="hypo-preview">
+  <div class="hp-title">Your Season 2 Hypothesis</div>
+  <div class="hp-text">If I change <strong>Speed</strong> from <strong>6</strong> to <strong>8</strong>, my scatter plot equation y = 0.4x + 1.2 predicts <strong>4.40 goals/match</strong>. My Season 1 actual average was <strong>3.8 goals/match</strong>. The equation predicts a difference of <strong>+0.60 goals/match</strong>. <em>This is a hypothesis, not proof.</em><br><br><strong>Step 2 connection:</strong> When I increase Speed, we reach the ball faster before high-Turning opponents can set up their angled shots. That's the main reason they scored when we predicted they wouldn't.<br><br><strong>Falsification test:</strong> My hypothesis would be wrong if we still over-predict by +2 or more goals against high-Turning opponents even after raising Speed to 8.</div>
+</div>
+<div class="quality-row">
+  <span class="q-label">Hypothesis</span>
+  <div class="q-track"><div class="q-fill" style="width:100%;background:var(--green);"></div></div>
+  <span class="q-val" style="color:var(--green);">Strong ✓</span>
+</div>
+<div class="stamp-row"><span class="stamp">Sample – pre-pilot</span></div>
+<div class="lookfor">
+  <div class="lf-label" style="color:var(--mt-color);">Teacher Look-For — Meets (Jayda W., Circuit Breakers)</div>
+  <div class="lf-text">Jayda correctly identifies Turning as the missing input variable in all three biggest-error matches, gets a clean sentence, and fills in the B→C disconnect correctly. Her prediction checkpoint commits to a reason, and her falsification test names a specific condition (over-predict by +2 or more against high-Turning). What she doesn't address: her +0.60 model-predicted difference comes from a Speed equation with no Turning term — so the prediction implicitly assumes the Turning gap stays unchanged. The push question: <em>"Your equation still doesn't include Turning after this change. Does the +0.60 prediction account for that gap at all?"</em></div>
+</div>
+</div><!-- /sheet -->
+
+
+<!-- ══════════════════ SHEET 3: PRIYA — EXCEEDS ══════════════════ -->
+<div class="sheet">
+<div class="level-tab tab-ex">Exceeds</div>
+<div class="sheet-head">
+  <div class="sheet-head-top">
+    <div class="day-badge">Day 10</div>
+    <div>
+      <div class="sheet-title">Season 1 Analysis Block</div>
+      <div class="sheet-sub">Season 1 · Analysis Block · 25 min</div>
+    </div>
+  </div>
+  <div class="team-row">Team: <span class="team-val ex-val">&nbsp;Overclock</span>&nbsp;&nbsp;|&nbsp;&nbsp;Student: <span class="team-val ex-val">&nbsp;Priya R.</span></div>
+</div>
+
+<div class="phase-div">
+  <div class="phase-num" style="background:rgba(0,229,255,.15);border:1px solid var(--cyan-line);color:var(--cyan);">1</div>
+  <div class="phase-title" style="color:var(--cyan);">Your Season 1 Data</div>
+  <div class="phase-time">8–10 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Season 1 Error Values — All Matches</div>
+  <table class="err-table">
+    <tr><th>Match</th><th>Error</th><th style="padding-left:24px;">Match</th><th>Error</th></tr>
+    <tr><td>Day 7 · R1</td><td class="val v-pos ex-val">+2</td><td style="padding-left:24px;">Day 9 · R1</td><td class="val v-neg ex-val">−1</td></tr>
+    <tr><td>Day 7 · R2</td><td class="val v-neg ex-val">−1</td><td style="padding-left:24px;">Day 9 · R2</td><td class="val v-pos ex-val">+2</td></tr>
+    <tr><td>Day 7 · R3</td><td class="val v-pos ex-val">+3</td><td style="padding-left:24px;">Day 9 · R3</td><td class="val v-pos ex-val">+2</td></tr>
+    <tr><td>Day 8 · R1</td><td class="val v-pos ex-val">+1</td><td style="padding-left:24px;">Today · R1</td><td class="val v-neg ex-val">−2</td></tr>
+    <tr><td>Day 8 · R2</td><td class="val v-neg ex-val">−2</td><td style="padding-left:24px;">Today · R2</td><td class="val v-pos ex-val">+1</td></tr>
+    <tr><td>Day 8 · R3</td><td class="val v-pos ex-val">+3</td><td style="padding-left:24px;">Today · R3</td><td class="val v-neg ex-val">−1</td></tr>
+  </table>
+  <div class="calc-strip">
+    <div class="calc-box"><div class="cb-label">Sum of Errors</div><div class="cb-val v-pos ex-val">+7</div></div>
+    <div class="calc-box"><div class="cb-label">Match Count</div><div class="cb-val ex-val">12</div></div>
+    <div class="calc-box"><div class="cb-label">Average Error — Bias</div><div class="cb-val v-pos ex-val">+0.58</div><div style="font:400 10px/1.5 'Inter';color:var(--cyan);margin-top:6px;">Note: large +3 errors against Turning-heavy opponents are partially cancelled by near-zero errors in other matches — average masks the pattern</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 2 — Sign of Average Error</div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--ex-color);background:rgba(0,229,255,.08);">
+      <div class="tile-word ex-val">Positive</div><div class="tile-desc">Consistently over-predicted</div>
+    </div>
+    <div class="tile"><div class="tile-word">Negative</div><div class="tile-desc">Consistently under-predicted</div></div>
+    <div class="tile"><div class="tile-word">Near Zero</div><div class="tile-desc">Prediction was balanced</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--cyan);">Step 3 — Error Trend Across Season</div>
+  <div class="trend-inputs">
+    <div><div class="field-lbl">First Error size (Day 7 · R1)</div><div class="field-val ex-val">2</div></div>
+    <div><div class="field-lbl">Last Error size (Today · R3)</div><div class="field-val ex-val">1</div></div>
+  </div>
+  <div class="tile-row t3">
+    <div class="tile sel" style="border-color:var(--ex-color);background:rgba(0,229,255,.08);">
+      <div class="tile-word ex-val">Improving</div><div class="tile-desc">Errors are shrinking</div>
+    </div>
+    <div class="tile"><div class="tile-word">Flat</div><div class="tile-desc">Error size stayed the same</div></div>
+    <div class="tile"><div class="tile-word">Worsening</div><div class="tile-desc">Errors are growing</div></div>
+  </div>
+</div>
+
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--yellow);">2</div>
+  <div class="phase-title" style="color:var(--yellow);">Find the Pattern</div>
+  <div class="phase-time">6–8 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Top 3 Biggest Errors — by Size</div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">1</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ex-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ex-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ex-val">T=9 opponent scored twice from sharp angles. We predicted 5 goals, actual 2. Turning has no coefficient in y = mx + b.</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">2</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ex-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ex-val v-pos">+3</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ex-val">T=8 — same pattern. They cut around defense. Turning coefficient = 0 in my model.</div></div>
+  </div>
+  <div class="top3-item">
+    <div class="top3-grid">
+      <div class="rank">3</div>
+      <div><div class="field-lbl">Which stat was that opponent strong in?</div><div class="field-val ex-val">Turning</div></div>
+      <div><div class="field-lbl">Your error for that match</div><div class="field-val ex-val v-pos">+2</div></div>
+    </div>
+    <div class="t3-note"><div class="field-lbl">What happened?</div><div class="field-val ex-val">T=7, smaller miss but same variable. All 3 top errors = high-Turning opponent. No coincidence.</div></div>
+  </div>
+  <div class="pattern-hint">⬡ <strong>Clear pattern:</strong> Turning in all 3 — systematic weakness.</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Write Your Sentence</div>
+  <div class="sb">
+    <div class="sb-line">
+      <span class="sb-fixed">My model consistently</span>
+      <span class="sb-val" style="background:rgba(0,229,255,.12);color:var(--ex-color);">over-predicts</span>
+      <span class="sb-fixed">because it</span>
+      <span class="sb-val" style="background:rgba(0,229,255,.12);color:var(--ex-color);">does not account for</span>
+      <span class="sb-val ex-val" style="background:rgba(0,229,255,.12);">Turning</span>
+      <span class="sb-fixed">.</span>
+    </div>
+  </div>
+  <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font:400 12px/1.6 'Inter';color:var(--green);">✓ <em style="color:var(--text);">"My model consistently over-predicts because it does not account for Turning."</em></div>
+</div>
+
+<div class="phase-div" style="border-top:1px solid var(--line);">
+  <div class="phase-num" style="background:rgba(0,230,118,.10);border:1px solid rgba(0,230,118,.3);color:var(--green);">3</div>
+  <div class="phase-title" style="color:var(--green);">Build Your Hypothesis</div>
+  <div class="phase-time">6–7 min</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--yellow);">Does Your Stat Change Fix The Problem?</div>
+  <div class="section-grid">
+    <div><div class="field-lbl">The variable your model is missing (from Step 2):</div><div class="bc-display ex-val">Turning</div></div>
+    <div><div class="field-lbl">The robot stat you want to change for Season 2:</div><div class="field-val ex-val">Speed</div></div>
+  </div>
+  <div class="field-lbl">Explain the connection:</div>
+  <div class="field-val ex-val" style="line-height:1.6;">Increasing Speed means we reach the ball before high-Turning opponents set up angled shots. But I need to flag: my equation doesn't include Turning, so the +1.1 prediction may overestimate the real improvement. The actual gain could be smaller — the Turning gap that caused my biggest errors doesn't disappear when Speed goes up.</div>
+  <div class="disconnect-warn">Your identified weakness and your proposed stat change look different. That can be valid — but explain the connection above before continuing.</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Enter Your Day 8 Scatter Plot Equation</div>
+  <div class="eq-row">
+    <span class="eq-fixed">Equation:</span><span class="eq-formula">y =</span>
+    <span class="eq-val ex-val">0.4</span><span class="eq-fixed">x +</span><span class="eq-val ex-val">1.2</span>
+  </div>
+  <div class="section-grid">
+    <div><div class="field-lbl">Current Speed Value (x)</div><div class="field-val ex-val">8</div></div>
+    <div><div class="field-lbl">Proposed New Speed Value (x)</div><div class="field-val ex-val">10</div></div>
+  </div>
+  <div class="section-grid" style="margin-top:8px;">
+    <div><div class="field-lbl">Season 1 Actual Avg Goals / Match</div><div class="field-val ex-val">4.1</div></div>
+    <div><div class="field-lbl">Stat You Are Changing</div><div class="field-val ex-val">Speed</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Commit Before You Calculate</div>
+  <div class="pred-btns">
+    <div class="pred-btn sel" style="border-color:var(--green);background:rgba(0,230,118,.10);color:var(--green);">Positive improvement</div>
+    <div class="pred-btn">Negative impact</div>
+    <div class="pred-btn">Near zero</div>
+  </div>
+  <div class="field-lbl">My reason:</div>
+  <div class="field-val ex-val">Speed 10 gets us to the ball first, limiting angle-setting opportunities for high-Turning opponents — but the size of the gain is uncertain since Turning is outside the model</div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Calculation Results</div>
+  <div class="result-strip">
+    <div class="calc-box"><div class="cb-label">Current Predicted Goals</div><div class="cb-val ex-val">4.40</div></div>
+    <div class="calc-box"><div class="cb-label">Proposed Predicted Goals</div><div class="cb-val ex-val">5.20</div></div>
+    <div class="calc-box"><div class="cb-label">Model-Predicted Difference</div><div class="cb-val v-zer ex-val">+1.10</div><div style="font:400 10px/1.4 'Inter';color:var(--cyan);margin-top:6px;">Based on Speed equation only — Turning not captured</div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">Season 2 Hypothesis Builder</div>
+  <div class="hypo-builder">
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--cyan);">1</div>
+      <div><div class="hypo-fld-lbl">Stat Change</div><div class="hypo-auto ex-val">If I change Speed from 8 to 10…</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--cyan);">2</div>
+      <div><div class="hypo-fld-lbl">Equation Output</div><div class="hypo-auto ex-val">…my equation y = 0.4x + 1.2 gives y = 5.20 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--cyan);">3</div>
+      <div><div class="hypo-fld-lbl">Model-Predicted Difference</div><div class="hypo-auto ex-val">Season 1 actual avg: 4.1 goals/match. Model-predicted difference: +1.10 goals/match.</div></div>
+    </div>
+    <div class="hypo-row">
+      <div class="hypo-num" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.3);color:var(--cyan);">4</div>
+      <div><div class="hypo-fld-lbl">Why does this stat change fix the problem?</div>
+      <div class="hypo-textarea ex-val">Increasing Speed gets us to the ball before high-Turning opponents set up angled shots. However, since my model has no Turning term, the +1.10 prediction may be optimistic. The average error against high-Turning opponents was +3.0 for those three matches specifically — much higher than the overall +0.58. That gap only closes if the Speed advantage actually neutralizes the Turning angles, which the equation can't predict.</div></div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="color:var(--green);">What Would Prove You Wrong?</div>
+  <div class="field-val ex-val" style="line-height:1.6;">My hypothesis would be wrong if errors against opponents with Turning ≥ 7 remain above +2 goals/match even with Speed = 10. That would mean Speed alone doesn't offset the Turning gap — I'd need to add a Turning term to the model to fix it properly.</div>
+</div>
+<div class="hypo-preview">
+  <div class="hp-title">Your Season 2 Hypothesis</div>
+  <div class="hp-text">If I change <strong>Speed</strong> from <strong>8</strong> to <strong>10</strong>, my scatter plot equation y = 0.4x + 1.2 predicts <strong>5.20 goals/match</strong>. My Season 1 actual average was <strong>4.1 goals/match</strong>. The equation predicts a difference of <strong>+1.10 goals/match</strong>. <em>This is a hypothesis, not proof.</em><br><br><strong>Step 2 connection:</strong> Increasing Speed gets us to the ball before high-Turning opponents set up angled shots. However, since my model has no Turning term, the +1.10 prediction may be optimistic — the average error against high-Turning opponents was +3.0 for those three matches specifically, much higher than my overall +0.58. That gap only closes if the Speed advantage actually neutralizes the Turning angles, which the equation can't predict.<br><br><strong>Falsification test:</strong> My hypothesis would be wrong if errors against opponents with Turning ≥ 7 remain above +2 goals/match even with Speed = 10. That would mean Speed alone doesn't offset the Turning gap — I'd need to add a Turning term to the model.</div>
+</div>
+<div class="quality-row">
+  <span class="q-label">Hypothesis</span>
+  <div class="q-track"><div class="q-fill" style="width:100%;background:var(--green);"></div></div>
+  <span class="q-val" style="color:var(--green);">Strong ✓</span>
+</div>
+<div class="stamp-row"><span class="stamp">Sample – pre-pilot</span></div>
+<div class="lookfor">
+  <div class="lf-label" style="color:var(--ex-color);">Teacher Look-For — Exceeds (Priya R., Overclock)</div>
+  <div class="lf-text">Priya correctly identifies Turning as the missing variable, gets the right sum/average/sign, and produces a valid sentence. In Phase C, she adds an unprompted model limitation: the +1.10 prediction comes from a Speed equation with no Turning term, so it likely overestimates the real improvement. She separates her overall average error (+0.58) from the error specifically against high-Turning opponents (+3.0), showing she understands how cancellation can hide a pattern. Her falsification test names the specific condition (Turning ≥ 7, error above +2, Speed = 10) and proposes the structural fix. The observation that "the average masks the pattern" in Phase A is the same insight the worksheet's cancellation warning targets — she names it unprompted.</div>
+</div>
+</div><!-- /sheet -->
+
+</div><!-- /wrap -->
+</body>
+</html>

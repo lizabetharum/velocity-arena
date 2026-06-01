@@ -356,7 +356,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
         "makecode":"https://makecode.microbit.org/S63963-81221-45609-58211",
-        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D5-scoop-build-ratio-testing-exemplars.html",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4-scoop-build-ratio-testing-exemplars.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
       {
@@ -743,6 +743,7 @@ const DAYS_DEFAULT = [
         "description": "Each team writes one trash-talk card to a specific rival. One rule: the trash talk must cite a specific stat or data point from the dashboard. 'Your Endurance = 3 means your bot slows at minute 4. We will be ready.' No data, no card. Post on the wall.",
         "facilitatorDescription": "Each team writes one trash-talk card directed at a specific rival. The only rule: the trash talk must cite a specific stat or data point from the dashboard ('Your Endurance = 3 means your bot slows at minute 4'). No data, no card. Cards go on the wall as persistent artifacts. Adversarial framing motivates deeper dashboard engagement.",
         "script": "https://docs.google.com/document/d/1nPSD1hV8jj-v_G17Ylau1FFYMEIzU446v00SRzFM4dg/edit?usp=drive_link",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D8-rivalry-cards-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-04-rivalry-cards.html"
       },
     
@@ -858,6 +859,7 @@ const DAYS_DEFAULT = [
         "description": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. You walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding, not who won the most, but who learned the most from one match result.",
         "facilitatorDescription": "Each team posts the stat configuration and result of their single best Season 1 match on an index card. Students walk the room and read every card. Dot-sticker vote: which team had the most mathematically interesting finding -- not who won the most, but who learned the most from one match result. Emphasize that the vote is about learning, not record.",
         "script": "https://docs.google.com/document/d/1xMUVjmU2S0wIzAEcFF8N4Gx7ol96ItPGM5AMiu8rI-g/edit?usp=drive_link",
+        "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D10-best-match-gallery-walk-exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-01-best-match-gallery-walk.html"
       },
      
@@ -900,7 +902,8 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Final Season 1 round-robin matches. Loss-recovery for every losing team, same three-step script. After all matches: complete data dashboard --  win/loss by stat matchup.  Leaderboard gets its final Season 1 update. This is the close of Season 1 and the setup for the Commissioner's Week.",
         "script": "https://docs.google.com/document/d/1nDIFSSs9hH2m1YF55zIwJxYLpvB6c4gepoi7yyzRj_c/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-04-season1-final-round.html",
-        "exit": "https://docs.google.com/document/d/107J961KuTWvqb6B6CFyopDkdD8PnyV-9RjHNZ7TnLkM/edit?usp=sharing"
+       "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D10_AnalysisBlock_Exemplars.html",
+       "exit": "https://docs.google.com/document/d/107J961KuTWvqb6B6CFyopDkdD8PnyV-9RjHNZ7TnLkM/edit?usp=sharing"
       },
       {
         "name": "Open Lab: Season 2 Planning",
@@ -957,6 +960,7 @@ const DAYS_DEFAULT = [
         "webpage" :["https://velocity-arena-gold.vercel.app/lessons/proportional-scaling.html",
           "https://velocity-arena-gold.vercel.app/lessons/day11-commissioner-proposal.html"
         ],
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12_Commissioner_Proposal.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-02-commissioner-proposal-prep.html"
       },
     
@@ -1068,7 +1072,7 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
         ],
-       "exemplar":[{url:"VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
+       "exemplar":[{url:"ttps://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day12-03-commissioners-meeting.html"
       },
      
@@ -1114,6 +1118,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Each team writes a Season 2 win total prediction on an index card: 'We will win [X] of [Y] matches.' Cards post publicly; every team's prediction is visible. Revisit on Day 15. Creates public stakes for the whole week and makes prediction accuracy socially real.",
         "script": "https://docs.google.com/document/d/1uWzF6XEpkiSSJwPvIaGsZD4AqImzyNvTC5vtt3aAF6I/edit?usp=drive_link",
         "webpage":"https://velocity-arena-gold.vercel.app/lessons/day13-linear-equations.html",
+         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D13-prediction-market-exemplars.html",
          "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-01-prediction-market.html"
       },
       
@@ -1219,6 +1224,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Three matches. Pre-match equation-based prediction. Post-match actual recorded. 20% rule: teams write one sentence identifying the missing variable when prediction and actual differ by more than 20%. Loss-recovery for every losing team. Dashboard fully updated before end of session.",
         "script": "https://docs.google.com/document/d/1DQPG1E04HP4KRVyCSgc4COQUwtcYzSF2MvvQz3GXAGM/edit?usp=sharing",
         "worksheet": "https://docs.google.com/document/d/1BDDPR3_KtBbqVmK3XSt3HgHBHNcMujno8whS0izoUoo/edit?usp=sharing",
+        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D14-prediction-tracker.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day14-03-s2-match-day-2.html"
       },
     
