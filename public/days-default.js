@@ -1067,7 +1067,10 @@ const DAYS_DEFAULT = [
         "block": "Match-Build-Make",
         "description": "Each team has 3 minutes. Cite two data points, explain your reasoning, describe how the change affects the last-place team. The league votes. Proposals that pass become rules -- written on the wall in permanent marker. Then adjust your Season 2 allocation under the new constraints before you leave.",
         "facilitatorDescription": "Each team has 3 minutes to cite two data points, explain reasoning, and describe how the change affects the last-place team. The league votes. Passing proposals become rules -- write them on the wall in permanent marker. After the meeting, teams adjust their Season 2 allocation under the new constraints before leaving. After every presentation, ask the room: 'Does this proposal use the data correctly? Can anyone verify the math?' -- including for strong presentations. Highest-agency moment of the program.",
-        "script": "https://docs.google.com/document/d/11b4vHFTJAh9U815GM9ss0bsvUEQsRfxzD0WYuLgc_58/edit?usp=drive_link",
+        "script": [
+          {url: "https://docs.google.com/document/d/11b4vHFTJAh9U815GM9ss0bsvUEQsRfxzD0WYuLgc_58/edit?usp=drive_link", label: "Script"},
+          {url: "https://docs.google.com/document/d/1XRI6UGVz5gP-G1TY3OUG_GfU_hDZR-HMRoM6AKoUqnk/edit?usp=sharing", label: "Reference"}
+        ],
         "worksheet": [
           {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
