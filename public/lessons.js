@@ -67,7 +67,7 @@ const ACTIVITY_LESSONS = {
   'Open Lab: Season 2 Allocation': [{url: '/lessons/what-if/', label: 'What-If? Analysis'},
   {url: '/lessons/what-if-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
   'What-If? Analysis':[{url: '/lessons/what-if/', label: 'What-If? Analysis'},
-  {url: '/lessons/what-if-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
+  {url: '/lessons/what-If-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
   'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
