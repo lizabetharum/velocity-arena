@@ -1158,12 +1158,12 @@ const DAYS_DEFAULT = [
       },
     
       {
-        "name": "Open Lab: Residual Analysis or Bot Calibration",
+        "name": "Open Lab: Residual Logging and Match Review",
         "mins": 35,
         "block": "Open Lab",
-        "description": "Track A (Data Dive): Look at your two residuals and your wins-per-Speed-point unit rate from the MAP FAL. Look at your Season 2 match prediction and actual. Write one sentence: is your model's error getting smaller or larger? What does that tell you about what the model is missing? Track B (Bot Lab): Run one calibration test under the new Commissioner rules. Does the rule change affect how your bot performs in ways your formula did not predict?",
-        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams compare their two residuals and wins-per-Speed-point unit rate to Season 2 match prediction and actual. One sentence: is model error getting smaller or larger, and what does that indicate about what the model is missing? Track B (Bot Lab): teams run one calibration test under the new Commissioner rules and observe whether the rule change affects bot performance in ways the formula did not predict.",
-        "script": "https://docs.google.com/document/d/1U0cbB9ixVtfxtBcDY4yKjn54nQCvgR497j4teWAtD2A/edit?usp=drive_link",
+       "description": "Calculate residuals from today's matches, identify emerging error patterns, and write a question for further investigation. No equation changes are made today.",
+      "facilitatorDescription": "Teams analyze three match results, calculate residuals, and document any emerging patterns or uncertainties. Students use the evidence to generate questions for future testing rather than revising their model. Early finishers complete a prediction-and-test challenge in Skills Arena.",
+       "script": "https://docs.google.com/document/d/1U0cbB9ixVtfxtBcDY4yKjn54nQCvgR497j4teWAtD2A/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-04-open-lab-residual-calibration.html"
       }
     ],
@@ -1232,12 +1232,13 @@ const DAYS_DEFAULT = [
       },
     
       {
-        "name": "Open Lab: Equation Revision or Loadout Experiments",
+        "name": "Open Lab: Residual Analysis and Stat Auction Testing",
         "mins": 40,
         "block": "Open Lab",
-        "description": "Track A: Look at your residuals from the last two match days. If your model's error has increased, identify one variable to add. Track B: Test the new stat points from the Stat Auction under match conditions. Do they perform as the formula predicted?",
-        "facilitatorDescription": "Two tracks. Track A (Data Dive): teams look at residuals from the last two match days; if model error has increased, identify one variable to add. Track B (Bot Lab): teams test new stat points from the Stat Auction under match conditions and check whether performance matches formula predictions.",
-        "script": "https://docs.google.com/document/d/1Ttdu2hNLgwJswRGZozjztwdZhaKL-zq2AJQyROfKOSg/edit?usp=drive_link",
+        "description": "Use residual analysis to evaluate prediction errors across two ball modes, decide whether to revise or hold your equation, and generate a Match Day 3 hypothesis. Early finishers test a single stat change and compare predicted versus actual outcomes.",
+"facilitatorDescription": "Teams analyze six residuals from two ball modes, identify whether error patterns indicate a model issue or a ball-mode confound, and either revise one equation parameter or justify holding the model. Students support their decision with evidence and create a hypothesis for Match Day 3. Early finishers conduct a controlled stat experiment and compare predicted and observed results.",
+       "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D14_residual_exemplars.html",
+       "script": "https://docs.google.com/document/d/1Ttdu2hNLgwJswRGZozjztwdZhaKL-zq2AJQyROfKOSg/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day14-04-open-lab-equation-loadout.html"
       }
     ],
