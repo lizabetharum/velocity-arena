@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resources in Context · Velocity Arena</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-1);
+      color: var(--fg-0);
+      min-height: 100vh;
+      padding-bottom: 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-bright); text-decoration: underline; }
+
+    /* ── topnav ─────────────────────────────────────────── */
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    /* ── page header ────────────────────────────────────── */
+    .page-shell { max-width: 1040px; margin: 0 auto; padding: 48px 24px 0; }
+    .eyebrow { font: 600 11px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 12px; }
+    .eyebrow b { color: var(--accent); margin-right: 8px; font-weight: 600; }
+    h1.title { font: 800 34px/1.05 var(--font-sans); letter-spacing: -.02em; color: var(--fg-0); margin: 0 0 12px; }
+    p.sub { font: 400 15px/1.6 var(--font-sans); color: var(--fg-1); max-width: 70ch; margin: 0; }
+
+    /* ── how-to-read strip ──────────────────────────────── */
+    .legend {
+      max-width: 1040px; margin: 32px auto 0; padding: 0 24px;
+    }
+    .legend-card {
+      background: rgba(0,229,255,.04);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      font: 400 13.5px/1.65 var(--font-sans);
+      color: var(--fg-1);
+    }
+    .legend-card strong { color: var(--fg-0); }
+    .legend-card .tag {
+      display: inline-block;
+      font: 700 9.5px/1 var(--font-mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.25);
+      border-radius: 4px;
+      padding: 3px 7px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── main ─────────────────────────────────────────── */
+    main { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── in-page TOC ─────────────────────────────────── */
+    .toc-wrap {
+      position: sticky;
+      top: 70px;
+      z-index: 5;
+      margin: 28px auto 0;
+      max-width: 1040px;
+      padding: 0 24px;
+    }
+    .toc {
+      background: rgba(11,22,38,.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font: 600 11px/1 var(--font-sans);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .toc .toc-lbl {
+      color: var(--fg-2);
+      font-family: var(--font-mono);
+      letter-spacing: .14em;
+      margin-right: 4px;
+    }
+    .toc a {
+      color: var(--fg-1);
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .toc a:hover { color: var(--fg-0); border-color: var(--line-strong); background: rgba(255,255,255,.03); text-decoration: none; }
+    .toc a.active { color: var(--accent); border-color: rgba(0,229,255,.32); background: rgba(0,229,255,.05); }
+    .toc .toc-num { font-family: var(--font-mono); opacity: .55; margin-right: 5px; }
+    @media (max-width: 720px) {
+      .toc-wrap { position: static; }
+      .toc { font-size: 10px; padding: 8px 10px; }
+      .toc .toc-lbl { display: none; }
+    }
+
+    .arc-section {
+      margin-top: 40px;
+      scroll-margin-top: 130px;
+    }
+    .arc-head {
+      display: flex; align-items: baseline; gap: 16px;
+      margin-bottom: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .arc-num {
+      font: 800 11px/1 var(--font-mono);
+      color: var(--accent);
+      letter-spacing: .14em;
+    }
+    .arc-title {
+      font: 700 18px/1.2 var(--font-sans);
+      color: var(--fg-0);
+      letter-spacing: -.005em;
+    }
+    .arc-when {
+      margin-left: auto;
+      font: 500 11px/1 var(--font-mono);
+      color: var(--fg-2);
+      letter-spacing: .04em;
+    }
+    .arc-intro {
+      font: 400 13.5px/1.6 var(--font-sans);
+      color: var(--fg-1);
+      max-width: 68ch;
+      margin: 0 0 18px;
+    }
+
+    /* ── decision-moment cards ──────────────────────────── */
+    .moments {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .moment {
+      background: var(--bg-2);
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 880px) {
+      .moment { grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); column-gap: 28px; row-gap: 4px; }
+      .moment .m-q { grid-column: 1 / -1; }
+      .moment .m-tags { grid-column: 1 / -1; }
+      .moment .m-shows { grid-column: 1; }
+      .moment .m-supports { grid-column: 2; }
+    }
+
+    .moment .m-q {
+      font: 700 15.5px/1.4 var(--font-sans);
+      color: var(--fg-0);
+      letter-spacing: -.003em;
+    }
+    .moment .m-q::before {
+      content: "Q ";
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: .14em;
+      margin-right: 4px;
+      vertical-align: 2px;
+    }
+
+    .m-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+    .m-tag {
+      font: 700 9.5px/1 var(--font-mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.22);
+      border-radius: 4px;
+      padding: 4px 8px;
+    }
+    .m-tag.assessment { color: var(--warn); background: rgba(255,200,87,.06); border-color: rgba(255,200,87,.28); }
+    .m-tag.exemplar   { color: #C792EA; background: rgba(199,146,234,.06); border-color: rgba(199,146,234,.28); }
+    .m-tag.student    { color: var(--ok); background: rgba(61,220,151,.06); border-color: rgba(61,220,151,.28); }
+    .m-tag.dashboard  { color: #FF8C42; background: rgba(255,140,66,.06); border-color: rgba(255,140,66,.28); }
+
+    .m-shows, .m-supports {
+      font: 400 13px/1.55 var(--font-sans);
+      color: var(--fg-1);
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    .m-shows .lbl, .m-supports .lbl {
+      display: block;
+      font: 700 9.5px/1 var(--font-mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+      margin-bottom: 5px;
+    }
+    .m-shows strong, .m-supports strong { color: var(--fg-0); font-weight: 600; }
+
+    .m-links { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .m-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font: 600 12px/1 var(--font-sans);
+      color: var(--accent);
+      border: 1px solid rgba(0,229,255,.32);
+      border-radius: 6px;
+      padding: 7px 11px;
+      text-decoration: none;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .m-link:hover { background: rgba(0,229,255,.06); border-color: var(--accent); text-decoration: none; }
+    .m-link .arrow { font-family: var(--font-mono); font-size: 11px; opacity: .7; }
+
+    /* ── categories covered ─────────────────────────────── */
+    .categories { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
+    .cat-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .cat-num { font: 800 11px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .cat-title { font: 700 18px/1.2 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .cat-when { margin-left: auto; font: 500 11px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .04em; }
+    .cat-intro { font: 400 13.5px/1.6 var(--font-sans); color: var(--fg-1); max-width: 68ch; margin: 0 0 18px; }
+    .cat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    @media (max-width: 920px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .cat-grid { grid-template-columns: 1fr; } }
+    .cat-cell { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .cat-cell .cat-tag { align-self: flex-start; font: 700 9.5px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.22); border-radius: 4px; padding: 4px 8px; }
+    .cat-cell .cat-tag.assessment { color: var(--warn); background: rgba(255,200,87,.06); border-color: rgba(255,200,87,.28); }
+    .cat-cell .cat-tag.exemplar   { color: #C792EA; background: rgba(199,146,234,.06); border-color: rgba(199,146,234,.28); }
+    .cat-cell .cat-tag.student    { color: var(--ok); background: rgba(61,220,151,.06); border-color: rgba(61,220,151,.28); }
+    .cat-cell .cat-tag.dashboard  { color: #FF8C42; background: rgba(255,140,66,.06); border-color: rgba(255,140,66,.28); }
+    .cat-cell .cat-count { font: 800 24px/1 var(--font-sans); color: var(--fg-0); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .cat-cell .cat-desc { font: 400 12px/1.55 var(--font-sans); color: var(--fg-1); }
+
+    /* ── footer note ─────────────────────────────────────── */
+    .footer-note {
+      max-width: 1040px;
+      margin: 56px auto 0;
+      padding: 18px 24px;
+      font: 400 12.5px/1.6 var(--font-sans);
+      color: var(--fg-2);
+      border-top: 1px solid var(--line);
+    }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      .topnav { display: none; }
+      a { color: #111; text-decoration: underline; }
+      .moment { background: #fff; border: 1px solid #ccc; page-break-inside: avoid; }
+      .m-q, .arc-title, h1.title { color: #111; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/index.html"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">RESOURCES · IN CONTEXT</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<div class="page-shell">
+  <p class="eyebrow"><b>WALKTHROUGH</b>Facilitator resource</p>
+  <h1 class="title">Resources, organized by the decisions they support.</h1>
+  <p class="sub">The program ships with a lot of resources. The question isn't "what's available?" — it's "which one do I reach for, when, and what decision does it help me make?" This page walks the four-week arc from before Day 1 through the closing exhibition and names the resource that belongs at each decision moment.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-card">
+    <strong>How to read each card:</strong> the <strong>Q</strong> is the question you're trying to answer in that moment. <strong>Use</strong> names the resource. <strong>You'll see</strong> describes what it gives back to you. <strong>So you can</strong> names the decision or action the resource is built to support. Coloured tags map every resource to the reviewer's five categories:
+    <span style="display:block;margin-top:10px;line-height:2;">
+      <span class="m-tag dashboard">Dashboard tool</span>
+      <span class="m-tag student">Student support</span>
+      <span class="m-tag">Teacher support</span>
+      <span class="m-tag exemplar">Exemplar</span>
+      <span class="m-tag assessment">Assessment</span>
+    </span>
+  </div>
+</div>
+
+<div class="toc-wrap">
+  <nav class="toc" aria-label="Page sections">
+    <span class="toc-lbl">Jump to</span>
+    <a href="#phase-1" data-phase="phase-1"><span class="toc-num">01</span>Before Day 1</a>
+    <a href="#phase-2" data-phase="phase-2"><span class="toc-num">02</span>Each day</a>
+    <a href="#phase-3" data-phase="phase-3"><span class="toc-num">03</span>Match</a>
+    <a href="#phase-4" data-phase="phase-4"><span class="toc-num">04</span>Week's end</a>
+    <a href="#phase-5" data-phase="phase-5"><span class="toc-num">05</span>Program end</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ── PHASE 1 ──────────────────────────────────── -->
+  <section class="arc-section" id="phase-1">
+    <div class="arc-head">
+      <span class="arc-num">PHASE 01</span>
+      <span class="arc-title">Before Day 1 — Get ready.</span>
+      <span class="arc-when">Pre-season prep</span>
+    </div>
+    <p class="arc-intro">Everything in this phase is about closing gaps in your own readiness before you stand in front of students. Three of the four resources here are <em>not</em> things students ever see — they're scaffolding for you.</p>
+
+    <div class="moments">
+
+      <div class="moment">
+        <div class="m-q">Am I prepared to run Day 1 without faking it?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/facilitator-prep-checklist.html" target="_blank" rel="noopener">Facilitator Prep Checklist <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Ten specific items: every formula calculated by memory in under 10 seconds, the four-step loss-recovery script practiced aloud, the room laid out with the wall reserved for Driving Question + Bot Names + Leaderboard + Rivalry Cards.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Not open Day 1 with anything on this list unfinished.</strong> The list exists because the ten most common new-facilitator failures correspond exactly to skipping one of these ten items.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">What is this program actually asking students to do, and how will I know it's working?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/teacher-guides/toolkit-facilitator-guide.html" target="_blank" rel="noopener">Toolkit Facilitator Guide <span class="arrow">↗</span></a>
+            <a class="m-link" href="/resources/VA_Facilitator_Schedule.html" target="_blank" rel="noopener">Facilitator Schedule <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">The four program goals with named evidence statements, the six-block daily structure, room setup, and a day-by-day arc with risk moments flagged.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Recognize success in real time.</strong> The evidence statements ("a residual: predicted vs. actual, named", "an explanation revised after a visitor got stuck") are the look-fors you'll use every block.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">Where are my students mathematically before we begin?</div>
+        <div class="m-tags">
+          <span class="m-tag assessment">Assessment</span>
+          <span class="m-tag dashboard">Dashboard tool</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/diagnostic/" target="_blank" rel="noopener">Pre-Task Diagnostic <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/diagnostic-dashboard/" target="_blank" rel="noopener">Diagnostic Growth Dashboard <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">An 8-question, 12-minute baseline covering proportional reasoning, slope, distance, and quadratic thinking — no bot framing. Results land per-concept on the dashboard.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Decide which Day 1–5 mini-blocks need extra scaffolding for which students</strong> — and have a baseline you can compare against on Day 15 to show actual growth, not vibes.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">Is the hardware ready to put in students' hands?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/makecode.html" target="_blank" rel="noopener">MakeCode setup <span class="arrow">↗</span></a>
+            <a class="m-link" href="/resources/launch-sequences.html" target="_blank" rel="noopener">Launch Sequences <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Offline MakeCode install, WebUSB pairing flow, and a reference launch-sequence MakeCode block teams will adapt for Day 6.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Catch hardware problems before students do.</strong> A bot that won't pair on Day 1 burns the trust the Failure Bow is supposed to build.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PHASE 2 ──────────────────────────────────── -->
+  <section class="arc-section" id="phase-2">
+    <div class="arc-head">
+      <span class="arc-num">PHASE 02</span>
+      <span class="arc-title">Each day — Plan and run the blocks.</span>
+      <span class="arc-when">D 01 → D 16, daily loop</span>
+    </div>
+    <p class="arc-intro">Every day has the same six-block shape (Hook → Challenge → Snack → Match-Build-Make → Open Lab → ENDS). These are the resources you reach for inside the loop, not the ones you read once before the program starts.</p>
+
+    <div class="moments">
+
+      <div class="moment">
+        <div class="m-q">What am I running today, in what order, with what timings?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/today.html" target="_blank" rel="noopener">Today <span class="arrow">↗</span></a>
+            <a class="m-link" href="/teacher-schedule.html" target="_blank" rel="noopener">Teacher Schedule <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">The day's six blocks with durations and the per-activity facilitator description — the same description that's now mirrored across days-default.js, days-tn.js, and facilitator-moves.js.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Know where to stand at each transition</strong> and what the next 30 seconds of the activity must accomplish — instead of reading the script mid-block.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">How do I run <em>this specific</em> activity? What are the facilitator moves?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html" target="_blank" rel="noopener">Quick Cards + Scripts (Teacher Schedule) <span class="arrow">↗</span></a>
+            <a class="m-link" href="/teacher-cheatsheet.html" target="_blank" rel="noopener">Cheat Sheet <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Each activity links a teacher-only quick card (pink pill) and a full facilitator script (Google Doc). Quick cards are scripted lines, common-error watchlist, and exit-ticket expectations. Cheat sheet collapses all four formulas onto one page.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Run the activity from the front of the room without paper</strong> — and intervene with the right talk-move when a team is stuck, not whatever comes to mind.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">What does the student-facing version look like? Am I asking them to do what the lesson asks?</div>
+        <div class="m-tags">
+          <span class="m-tag student">Student support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html" target="_blank" rel="noopener">Worksheet + Lesson links (Teacher Schedule) <span class="arrow">↗</span></a>
+            <a class="m-link" href="/day.html" target="_blank" rel="noopener">Student day view <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Every activity in the Teacher Schedule lists the worksheet, the interactive lesson page, and (where it exists) the MakeCode link students will use. The Student day view is the same page students see — no teacher-only fields rendered.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Pace-check against the lesson, not against your gut.</strong> If you can't predict where a team will be at minute 20, re-read the lesson — students may be on a section you haven't seen.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">How will I know if a team's work is at the level we expect?</div>
+        <div class="m-tags">
+          <span class="m-tag exemplar">Exemplar</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/teacher-guides/VA_Student_Work_Exemplars.html" target="_blank" rel="noopener">Student Work Exemplars <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">For most activities, three real student-work samples at Approaching / Meets / Exceeds, with a one-line explanation of what distinguishes each level. Also surfaced inline in the Teacher Schedule as purple <em>Exemplar</em> pills next to each activity.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Push a team using a specific language move:</strong> "Your work looks like the Meets sample — what's missing to make it Exceeds?" Better than a generic "add more detail."</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">How do students first enter a loadout and gap sentence into the dashboard? (Days 1–5)</div>
+        <div class="m-tags">
+          <span class="m-tag dashboard">Dashboard tool</span>
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/dashboard/dashboard-guide-preseason.html" target="_blank" rel="noopener">Pre-Season Dashboard Guide <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/dashboard/facilitator-script.html" target="_blank" rel="noopener">Dashboard Intro Script <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Pre-Season guide walks through the Days 1–5 workflow: stat cards, the first official allocation, dashboard loadout entry, and the three-part gap sentence (formula predicted / bot did / gap). Intro Script is the 12–15 min Day 5 walkthrough that lands all teams in the dashboard the same way.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Lock in the data-entry standard before Season 1 begins.</strong> Every team enters loadouts the same way and writes gap sentences in the same format — so when Season 1 matches start, residuals are comparable instead of each team using its own shorthand.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">A team is stuck on a specific math concept — where do I send them (or take the whole room)?</div>
+        <div class="m-tags">
+          <span class="m-tag student">Student support</span>
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/math/index.html" target="_blank" rel="noopener">Interactive Math Concepts <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/math/playground.html" target="_blank" rel="noopener">Math Playground <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Thirteen browser-based concept pages — Unit Rate, Ratio, Proportional Scaling, Linear Decay, Coordinate Geometry, Arc Approximation, Slope, Budget, Percent Change, Graphs, Linear Equations, Data &amp; Residuals — plus a Playground that runs all eight core visualizations on one canvas for board demos.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Hand a stuck team a self-contained interactive</strong> instead of a re-explanation — they manipulate it, you keep moving. Use Playground when you need a quick whole-room visualization (e.g. "watch what happens to Charge% when I drag Power from 4 to 8").</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PHASE 3 ──────────────────────────────────── -->
+  <section class="arc-section" id="phase-3">
+    <div class="arc-head">
+      <span class="arc-num">PHASE 03</span>
+      <span class="arc-title">During a match — Predict, run, recover.</span>
+      <span class="arc-when">Match days · D 06 → D 15</span>
+    </div>
+    <p class="arc-intro">The match itself isn't the assessment — the loop around it is. Prediction before the bots move, residual calculation after, and a structured recovery for the team that lost.</p>
+
+    <div class="moments">
+
+      <div class="moment">
+        <div class="m-q">How do I run the pre-match prediction ritual and the post-match residual entry?</div>
+        <div class="m-tags">
+          <span class="m-tag dashboard">Dashboard tool</span>
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/dashboard/dashboard-guide-inseason.html" target="_blank" rel="noopener">In-Season Dashboard Guide <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Walks through the match-day workflow across Seasons 1 and 2: equation-based prediction before the match, real-time match logging, residual calculation, and the gap-sentence entry that ties each match back to the team's model.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Require a written prediction before any bot moves</strong> — the rule that converts a match from "drama" into "data."</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">A team wants to try a risky loadout — can I let them preview it without losing a match?</div>
+        <div class="m-tags">
+          <span class="m-tag dashboard">Dashboard tool</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/teacher-guides/simulation.html" target="_blank" rel="noopener">Match Simulator <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Cutebot Pro Soccer simulation: enter two stat loadouts, run a match, see goal/time/residual outcomes. Useful in Open Lab and Commissioner's Week reallocation.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Direct teams toward bench-testing instead of live testing</strong> when stakes are high (Season 1 final, Championship), and surface the loadouts most worth running on the field.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">A team just lost badly and is shutting down — what now?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+          <span class="m-tag student">Student support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/loss_recovery_protocol.html" target="_blank" rel="noopener">Loss Recovery Protocol <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">A four-step script. Step 1 is 30 seconds of silence after naming the feeling. Step 2 is the dashboard. Step 3 is the next match. The script is the resource — say it the way it's written.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Hand a frustrated team a specific math move</strong> instead of generic reassurance. Run it for every losing team, every time — not just the ones who visibly need it.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">What does a "good" residual analysis look like before I judge a team's?</div>
+        <div class="m-tags">
+          <span class="m-tag exemplar">Exemplar</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/teacher-guides/VA_Student_Work_Exemplars.html" target="_blank" rel="noopener">Day 10 / 13 / 14 residual exemplars <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Three sample residual analyses per activity. The Exceeds samples typically name which equation parameter (slope vs intercept) the residual implicates; the Approaching samples stop at "the bot was off."</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Pick the team to call on for share-out</strong> — and know in advance whether their finding will move the room forward or stall it.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PHASE 4 ──────────────────────────────────── -->
+  <section class="arc-section" id="phase-4">
+    <div class="arc-head">
+      <span class="arc-num">PHASE 04</span>
+      <span class="arc-title">End of week — Are teams tracking?</span>
+      <span class="arc-when">Friday + season transitions</span>
+    </div>
+    <p class="arc-intro">Every Friday you make the same call: who's behind, on what concept, and what fits inside next week to address it. The dashboard is the system that tells you, and Cold Recall (Day 10) is the formal check.</p>
+
+    <div class="moments">
+
+      <div class="moment">
+        <div class="m-q">Who's behind, on what, by how much?</div>
+        <div class="m-tags">
+          <span class="m-tag dashboard">Dashboard tool</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank" rel="noopener">Live Dashboard <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/dashboard/leaderboard.html" target="_blank" rel="noopener">Leaderboard <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Per-team match history, prediction accuracy, residual size and direction. The Best Prediction column tracks model accuracy independent of win/loss, so a team that loses with tight residuals is visible.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Pick the one or two teams to target in next week's Open Labs</strong> — and decide whether the gap is a model problem, a code problem, or a hardware problem.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">Did the class actually retain the math, or did they fake it during instruction?</div>
+        <div class="m-tags">
+          <span class="m-tag assessment">Assessment</span>
+          <span class="m-tag student">Student support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html#day-10" target="_blank" rel="noopener">Day 10 Cold Recall Check <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/math/index.html" target="_blank" rel="noopener">Math Concepts (re-teach surface) <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Five questions, individual, no notes, no devices, no grade. The point isn't to score it — it's to tally who can still write the Endurance decay or Power² formula cold. When the tally shows a class-wide gap, the matching interactive concept page (Linear Decay, Proportional Scaling, etc.) is the re-teach.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Fold the re-teach into the next Challenge Block</strong> with specific names attached — and send students to the concept page in Open Lab instead of re-lecturing.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">What do I actually do at the Commissioner's Meeting and Vote?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html#day-12" target="_blank" rel="noopener">Day 12 facilitator script + reference doc <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">3-minute presentation format, math-verification protocol, the rule that an objection only counts if it names a number and a calculation showing differential impact. The reference doc (teacher-only) holds the worked examples.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Dismiss "I don't like it" arguments without a number</strong> and hold the room to the standard the rest of the program has built.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── PHASE 5 ──────────────────────────────────── -->
+  <section class="arc-section" id="phase-5">
+    <div class="arc-head">
+      <span class="arc-num">PHASE 05</span>
+      <span class="arc-title">End of program — Did it work?</span>
+      <span class="arc-when">Day 15 + Day 16</span>
+    </div>
+    <p class="arc-intro">Two summative measures: the post-task diagnostic (math you can measure) and the visitor exhibition (math students can teach). Both produce reportable evidence.</p>
+
+    <div class="moments">
+
+      <div class="moment">
+        <div class="m-q">Did students learn what we said they would?</div>
+        <div class="m-tags">
+          <span class="m-tag assessment">Assessment</span>
+          <span class="m-tag dashboard">Dashboard tool</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/activities/diagnostic-post/" target="_blank" rel="noopener">Post-Task Diagnostic <span class="arrow">↗</span></a>
+            <a class="m-link" href="/activities/diagnostic-dashboard/" target="_blank" rel="noopener">Growth Dashboard <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Parallel-form post-diagnostic on Day 15. The Growth Dashboard shows per-concept percent change vs. Day 1 baseline, anonymized.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Report concrete growth to stakeholders</strong> — and identify which concept(s) underperformed for the next cohort's redesign.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">Can students explain the math to someone who's never seen the program?</div>
+        <div class="m-tags">
+          <span class="m-tag assessment">Assessment</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html#day-16" target="_blank" rel="noopener">Day 16 Community Exhibition <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Each visitor attempts three mini-challenges (unit rate, coordinate distance, proportional scaling) after the student's explanation. A Visitor Completion Tracker logs first-try completions per team.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Score Goal 4 ("the ability to teach") as a binary observable</strong> — did a stranger complete all three challenges on the first try? — rather than a judgment call.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">What story do I tell at the closing ceremony — what did the program actually produce?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/teacher-schedule.html#day-16" target="_blank" rel="noopener">Walk the Wall + Awards Ceremony <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Every artifact from four weeks on the wall — bot names, leaderboard, Commissioner rules, scouting reports. The Awards Ceremony script names each award with its data criterion (e.g. "Most Improved — the highest Season 1 → Season 2 win-rate percent change") so the math stays visible in the celebration.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Close on what the program produced</strong> — not a single winner, but a room of students who can explain algebra using their own data.</p>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="m-q">I want to get better at this. Where do I review my own moves before the next cohort?</div>
+        <div class="m-tags">
+          <span class="m-tag">Teacher support</span>
+        </div>
+        <div class="m-shows">
+          <span class="lbl">Use</span>
+          <div class="m-links">
+            <a class="m-link" href="/resources/teacher-guides/toolkit-failure-modes.html" target="_blank" rel="noopener">Failure Modes <span class="arrow">↗</span></a>
+            <a class="m-link" href="/resources/teacher-guides/toolkit-experience-map.html" target="_blank" rel="noopener">Experience Map <span class="arrow">↗</span></a>
+            <a class="m-link" href="/resources/teacher-guides/toolkit-battlefield-cards.html" target="_blank" rel="noopener">Battlefield Cards <span class="arrow">↗</span></a>
+          </div>
+          <p style="margin-top:8px;">Three reflective toolkit pages aimed at the facilitator, not the student. Failure Modes catalogs the moves that quietly sink a session (rescuing too early, dropping the exit ticket, narrating the gallery walk). Experience Map traces the emotional arc across the 16 days so you can see which moment a struggle actually belongs to. Battlefield Cards are the talk-moves and recovery scripts in print-and-keep-in-pocket form.</p>
+        </div>
+        <div class="m-supports">
+          <span class="lbl">So you can</span>
+          <p><strong>Name what didn't work and pick one change for next time</strong> — instead of relying on vague "I should run that differently." Between-cohort reflection is the only place these resources land; during a session you reach for the scripts instead.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── CATEGORIES COVERED ──────────────────────────── -->
+  <section class="categories">
+    <div class="cat-head">
+      <span class="cat-num">SUMMARY</span>
+      <span class="cat-title">Resource categories covered.</span>
+      <span class="cat-when">5 / 5</span>
+    </div>
+    <p class="cat-intro">The reviewer asked us to walk five resource categories through the lens of implementation. Each category is represented in the page above — woven through the arc, tagged on every card. Counts are tag occurrences across all decision moments.</p>
+    <div class="cat-grid">
+      <div class="cat-cell"><span class="cat-tag dashboard">Dashboard tool</span><span class="cat-count">6</span><span class="cat-desc">Live Dashboard, Leaderboard, Pre-Season Guide, In-Season Guide, Intro Script, Match Simulator</span></div>
+      <div class="cat-cell"><span class="cat-tag student">Student support</span><span class="cat-count">4</span><span class="cat-desc">Worksheets, Lesson pages, Loss Recovery Protocol, Interactive Math Concepts</span></div>
+      <div class="cat-cell"><span class="cat-tag">Teacher support</span><span class="cat-count">12</span><span class="cat-desc">Prep Checklist, Toolkit Guide, Facilitator Schedule, Quick Cards, Scripts, Cheat Sheet, Failure Modes, Experience Map, Battlefield Cards, and more</span></div>
+      <div class="cat-cell"><span class="cat-tag exemplar">Exemplar</span><span class="cat-count">2</span><span class="cat-desc">Student Work Exemplars (Approaching / Meets / Exceeds) — surfaced inline on the Teacher Schedule and during residual analysis</span></div>
+      <div class="cat-cell"><span class="cat-tag assessment">Assessment</span><span class="cat-count">4</span><span class="cat-desc">Pre-Task Diagnostic, Post-Task Diagnostic, Growth Dashboard, Cold Recall Check, Visitor Completion Tracker</span></div>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    This page is a walkthrough, not an index. The flat list of every resource lives on <a href="/teachers.html">teachers.html</a>. If a resource isn't named here, it's either student-facing only or so general it doesn't tie to a specific decision moment.
+  </div>
+
+</main>
+
+<script>
+  (function() {
+    const links = document.querySelectorAll('.toc a[data-phase]');
+    const sections = Array.from(document.querySelectorAll('.arc-section[id]'));
+    if (!links.length || !sections.length || !('IntersectionObserver' in window)) return;
+
+    const byId = {};
+    links.forEach(a => { byId[a.dataset.phase] = a; });
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(a => a.classList.remove('active'));
+          const a = byId[e.target.id];
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(s => obs.observe(s));
+  })();
+</script>
+
+</body>
+</html>
