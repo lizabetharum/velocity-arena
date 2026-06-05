@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Math, Before the Project · Velocity Arena</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: var(--bg-1); color: var(--fg-0); min-height: 100vh; padding-bottom: 5rem; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-bright); text-decoration: underline; }
+
+    /* ── topnav ─────────────────────────────────────────── */
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    /* ── page header ────────────────────────────────────── */
+    .page-shell { max-width: 1100px; margin: 0 auto; padding: 48px 24px 0; }
+    .eyebrow { font: 600 11px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 12px; }
+    .eyebrow b { color: var(--accent); margin-right: 8px; font-weight: 600; }
+    h1.title { font: 800 36px/1.05 var(--font-sans); letter-spacing: -.02em; color: var(--fg-0); margin: 0 0 14px; }
+    p.sub { font: 400 15.5px/1.6 var(--font-sans); color: var(--fg-1); max-width: 72ch; margin: 0; }
+    p.sub strong { color: var(--fg-0); }
+
+    .time-pill { display: inline-flex; align-items: center; gap: 7px; font: 700 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.22); border-radius: 999px; padding: 6px 12px; margin-bottom: 14px; }
+    .time-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    /* ── main ─────────────────────────────────────────── */
+    main { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    .sec-head { display: flex; align-items: baseline; gap: 14px; margin: 48px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .sec-num { font: 800 11px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .sec-title { font: 700 19px/1.2 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .sec-sub { font: 400 13.5px/1.55 var(--font-sans); color: var(--fg-1); max-width: 68ch; margin: 0 0 20px; }
+
+    /* ── section 1: five relationship cards ───────── */
+    .rel-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 8px; }
+    @media (max-width: 980px) { .rel-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .rel-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 420px) { .rel-grid { grid-template-columns: 1fr; } }
+
+    .rel { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 9px; position: relative; overflow: hidden; }
+    .rel::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--rel-color, var(--accent)); }
+    .rel-stat { font: 800 10px/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--rel-color); }
+    .rel-type { font: 700 15px/1.25 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .rel-formula { font: 600 13px/1.4 var(--font-mono); color: var(--fg-1); background: var(--bg-3); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; word-break: break-word; }
+    .rel-day { font: 600 10px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .08em; }
+    .rel-ccss { font: 400 11px/1.4 var(--font-sans); color: var(--fg-2); padding-top: 7px; border-top: 1px solid var(--line); margin-top: auto; }
+
+    .rel.speed     { --rel-color: var(--accent); }
+    .rel.endurance { --rel-color: var(--warn); }
+    .rel.turning   { --rel-color: #C792EA; }
+    .rel.power     { --rel-color: var(--error); }
+    .rel.budget    { --rel-color: var(--ok); }
+
+    /* ── section 2: progression flow ────────────── */
+    .flow-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; position: relative; }
+    @media (max-width: 820px) { .flow-grid { grid-template-columns: 1fr; gap: 14px; } .flow-arrow { display: none; } }
+    .flow-cell { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 10px; padding: 14px 14px 12px; position: relative; }
+    .flow-when { font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .flow-name { font: 700 13.5px/1.3 var(--font-sans); color: var(--fg-0); margin-bottom: 6px; }
+    .flow-desc { font: 400 12px/1.5 var(--font-sans); color: var(--fg-1); }
+    .flow-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--fg-3); z-index: 1; pointer-events: none; }
+    .flow-cell:last-child .flow-arrow { display: none; }
+
+    .progression-note { margin-top: 20px; padding: 14px 18px; background: rgba(0,229,255,.04); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; font: 400 13px/1.6 var(--font-sans); color: var(--fg-1); }
+    .progression-note strong { color: var(--fg-0); }
+
+    /* ── section 3: four understandings ─────────── */
+    .und-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px) { .und-grid { grid-template-columns: 1fr; } }
+    .und { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 18px 20px; display: flex; gap: 14px; }
+    .und-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px; background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.28); color: var(--accent); font: 800 14px/1 var(--font-sans); display: flex; align-items: center; justify-content: center; }
+    .und-body h3 { font: 700 14.5px/1.3 var(--font-sans); color: var(--fg-0); margin: 0 0 6px; letter-spacing: -.005em; }
+    .und-body p { font: 400 13px/1.55 var(--font-sans); color: var(--fg-1); margin: 0; }
+    .und-goal { display: inline-block; font: 700 9.5px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-top: 8px; padding: 4px 8px; background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.22); border-radius: 4px; }
+    .und-goal.ownership { color: #C792EA; background: rgba(199,146,234,.06); border-color: rgba(199,146,234,.28); }
+    .und-goal.failure   { color: var(--error); background: rgba(255,93,108,.06); border-color: rgba(255,93,108,.28); }
+    .und-goal.teach     { color: var(--ok); background: rgba(61,220,151,.06); border-color: rgba(61,220,151,.28); }
+
+    /* ── go-deeper ─────────────────────────────────── */
+    .next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 760px) { .next-grid { grid-template-columns: 1fr; } }
+    .next-card { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 18px 20px; text-decoration: none; transition: border-color .15s, background .15s; display: flex; flex-direction: column; gap: 8px; }
+    .next-card:hover { border-color: var(--accent); background: rgba(0,229,255,.03); text-decoration: none; }
+    .next-card .next-lbl { font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+    .next-card h3 { font: 700 15px/1.25 var(--font-sans); color: var(--fg-0); margin: 0; }
+    .next-card p { font: 400 12.5px/1.55 var(--font-sans); color: var(--fg-1); margin: 0; }
+    .next-card .arr { margin-top: 6px; font: 600 12px/1 var(--font-mono); color: var(--accent); }
+
+    .footer-note { max-width: 1100px; margin: 56px auto 0; padding: 18px 24px; font: 400 12.5px/1.6 var(--font-sans); color: var(--fg-2); border-top: 1px solid var(--line); }
+
+    @media print {
+      body { background: #fff; color: #111; padding: 0; }
+      .topnav, .footer-note { display: none; }
+      a { color: #111; }
+      .rel, .flow-cell, .und, .next-card { background: #fff; border: 1px solid #ccc; page-break-inside: avoid; }
+      h1.title, .sec-title, .rel-type, .flow-name, .und-body h3, .next-card h3 { color: #111; }
+      .rel-formula { background: #f5f5f5; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/index.html"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">MATH · PRE-BRIEF</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<div class="page-shell">
+  <div class="time-pill"><span class="dot"></span>5-minute read · before everything else</div>
+  <p class="eyebrow"><b>PRIMER</b>Facilitator orientation</p>
+  <h1 class="title">The math, before the project.</h1>
+  <p class="sub">You'll have to hold the project, the math, the code, the facilitation moves, and the instructional goals in your head at once. This page is just the math — <strong>so you know the destination before the journey starts</strong>. Read this first. The Toolkit Guide and the deep walkthroughs come after.</p>
+</div>
+
+<main>
+
+  <!-- ── SECTION 1 ───────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <span class="sec-title">Five mathematical relationships, one per stat.</span>
+  </div>
+  <p class="sec-sub">Each of the four stats carries a different functional relationship — and the 20-point budget is itself an algebraic constraint. Together they cover proportional, linear, coordinate, quadratic, and equation-as-balance reasoning. The relationships aren't decorative; the program's whole job is to teach them through use.</p>
+
+  <div class="rel-grid">
+    <div class="rel speed">
+      <div class="rel-stat">Speed · Day 1</div>
+      <div class="rel-type">Proportional</div>
+      <div class="rel-formula">Motor% = Speed × 5</div>
+      <div class="rel-day">Doubling input doubles output.</div>
+      <div class="rel-ccss">CCSS 7.RP.A.2 — Recognize and represent proportional relationships.</div>
+    </div>
+    <div class="rel endurance">
+      <div class="rel-stat">Endurance · Day 2</div>
+      <div class="rel-type">Linear decay</div>
+      <div class="rel-formula">P(t) = 100 − (20−E) × 1.5 × t</div>
+      <div class="rel-day">Slope as negative rate of change.</div>
+      <div class="rel-ccss">CCSS 8.F.B.4 — Construct a function to model a linear relationship.</div>
+    </div>
+    <div class="rel turning">
+      <div class="rel-stat">Turning · Day 3</div>
+      <div class="rel-type">Coordinate geometry</div>
+      <div class="rel-formula">d = √((x₁−x₂)² + (y₁−y₂)²)</div>
+      <div class="rel-day">Position and distance on the plane.</div>
+      <div class="rel-ccss">CCSS 8.G.B.8 — Distance between two points in a coordinate system.</div>
+    </div>
+    <div class="rel power">
+      <div class="rel-stat">Power · Day 4</div>
+      <div class="rel-type">Quadratic</div>
+      <div class="rel-formula">Charge% = Power²</div>
+      <div class="rel-day">Doubling input quadruples output.</div>
+      <div class="rel-ccss">CCSS 8.EE.A.1 — Properties of integer exponents.</div>
+    </div>
+    <div class="rel budget">
+      <div class="rel-stat">Budget · Day 5</div>
+      <div class="rel-type">Equation as constraint</div>
+      <div class="rel-formula">S + E + T + P = 20</div>
+      <div class="rel-day">"=" means balance, not arithmetic.</div>
+      <div class="rel-ccss">CCSS 6.EE.B.5 — Solving equations as a process of finding values that make the equation true.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2 ───────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <span class="sec-title">How proportional, linear, and quadratic emerge.</span>
+  </div>
+  <p class="sec-sub">The five relationships are introduced one per day in Week 1, then layered: applied as predictions, derived from real data, compared via percent change, written as inequalities, finally translated to plain language. The same math reappears at each layer with more demanded of it.</p>
+
+  <div class="flow-grid">
+    <div class="flow-cell">
+      <div class="flow-when">D 01 → 05</div>
+      <div class="flow-name">Introduce</div>
+      <div class="flow-desc">One stat per day. One relationship type per day. Students predict, calculate, compare, and program the formula into the bot.</div>
+      <svg class="flow-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 2 10 7 3 12"/></svg>
+    </div>
+    <div class="flow-cell">
+      <div class="flow-when">D 06 → 10</div>
+      <div class="flow-name">Apply + Derive</div>
+      <div class="flow-desc">Formulas become predictions before matches. From class scatter plots, students derive their own linear equation (y = mx + b) — formula from data, not from the teacher.</div>
+      <svg class="flow-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 2 10 7 3 12"/></svg>
+    </div>
+    <div class="flow-cell">
+      <div class="flow-when">D 11 → 12</div>
+      <div class="flow-name">Compare + Constrain</div>
+      <div class="flow-desc">Percent change surfaces linear vs. quadratic scaling. Students write CAP/FLOOR inequalities as Commissioner proposals — equations now as constraints on the system, not just predictions.</div>
+      <svg class="flow-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 2 10 7 3 12"/></svg>
+    </div>
+    <div class="flow-cell">
+      <div class="flow-when">D 13 → 14</div>
+      <div class="flow-name">Revise</div>
+      <div class="flow-desc">Residual = predicted − actual. A pattern in residuals implicates a specific model parameter — slope, intercept, or formula type — that students update with percent-change reasoning.</div>
+      <svg class="flow-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 2 10 7 3 12"/></svg>
+    </div>
+    <div class="flow-cell">
+      <div class="flow-when">D 15 → 16</div>
+      <div class="flow-name">Translate</div>
+      <div class="flow-desc">Students explain one formula in plain language — no jargon — and teach a stranger to complete three mini-challenges (unit rate, distance, scaling). Math leaves the arena.</div>
+    </div>
+  </div>
+
+  <div class="progression-note">
+    <strong>The single sentence to remember:</strong> Days 1–5 introduce the relationships, Days 6–10 use them to predict, Days 11–12 use them to argue, Days 13–14 use them to revise, Days 15–16 use them to teach. Same math, harder demands at each layer.
+  </div>
+
+  <!-- ── SECTION 3 ───────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <span class="sec-title">Four mathematical understandings — the destination.</span>
+  </div>
+  <p class="sec-sub">These are what students should leave with on Day 16. They're stated in math terms here; the Toolkit Guide's Program Goals translate the same ideas into evidence statements.</p>
+
+  <div class="und-grid">
+    <div class="und">
+      <div class="und-num">1</div>
+      <div class="und-body">
+        <h3>Formulas are predictions, not procedures.</h3>
+        <p>A formula gives you a number to test against reality. When the prediction is wrong, the formula's parameters — not the student — are what needs revision.</p>
+        <span class="und-goal">Goal 1 · Transfer</span>
+      </div>
+    </div>
+    <div class="und">
+      <div class="und-num">2</div>
+      <div class="und-body">
+        <h3>Models are authored, not received.</h3>
+        <p>Students derive their own linear equation from their own scatter plot data and defend it against another team's equation by pointing at the math, not at the teacher.</p>
+        <span class="und-goal ownership">Goal 2 · Ownership</span>
+      </div>
+    </div>
+    <div class="und">
+      <div class="und-num">3</div>
+      <div class="und-body">
+        <h3>Residuals name the gap.</h3>
+        <p>Predicted − actual is a signed number with a hypothesis attached. A losing match doesn't mean "we're bad"; it means a specific parameter of the model needs updating.</p>
+        <span class="und-goal failure">Goal 3 · Failure</span>
+      </div>
+    </div>
+    <div class="und">
+      <div class="und-num">4</div>
+      <div class="und-body">
+        <h3>Math is teachable.</h3>
+        <p>If a student can't explain the formula to a stranger using the field and the bot as concrete examples — first try, no jargon — they don't yet own it. The Exhibition is the summative.</p>
+        <span class="und-goal teach">Goal 4 · Teach</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GO DEEPER ───────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <span class="sec-title">Now go deeper.</span>
+  </div>
+  <p class="sec-sub">Three parallel walkthroughs share the same five-phase arc. Each answers a different prep question. Open them after this primer.</p>
+
+  <div class="next-grid">
+    <a class="next-card" href="/resources/teacher-guides/resources-in-context.html">
+      <span class="next-lbl">Resources</span>
+      <h3>Which tool, when?</h3>
+      <p>Every resource mapped to the decision moment it supports — from the Pre-Task Diagnostic to the Awards Ceremony.</p>
+      <span class="arr">Open ↗</span>
+    </a>
+    <a class="next-card" href="/resources/teacher-guides/evidence-in-context.html">
+      <span class="next-lbl">Evidence</span>
+      <h3>What am I looking at?</h3>
+      <p>What to collect, what strong sounds like, the trouble signal to catch, and when teams are ready to move forward.</p>
+      <span class="arr">Open ↗</span>
+    </a>
+    <a class="next-card" href="/resources/teacher-guides/progression-in-context.html">
+      <span class="next-lbl">Progression</span>
+      <h3>Why this, why now?</h3>
+      <p>How the math idea on each day depends on the one before it — with a concept-thread map and per-card cross-references.</p>
+      <span class="arr">Open ↗</span>
+    </a>
+  </div>
+
+  <div class="footer-note">
+    This primer is deliberately short. It exists to lower cognitive load before the full materials — so when you read the Toolkit Guide or sit down with a facilitator script, you already know the math destination. For the full Program Goals + evidence statements, see <a href="/resources/teacher-guides/toolkit-facilitator-guide.html#program-goals">Toolkit Facilitator Guide</a>.
+  </div>
+
+</main>
+
+</body>
+</html>
