@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Running the Program · Velocity Arena</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: var(--bg-1); color: var(--fg-0); min-height: 100vh; padding-bottom: 5rem; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-bright); text-decoration: underline; }
+
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    .page-shell { max-width: 1040px; margin: 0 auto; padding: 48px 24px 0; position: relative; }
+    .eyebrow { font: 600 11px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 12px; }
+    .eyebrow b { color: var(--accent); margin-right: 8px; font-weight: 600; }
+    h1.title { font: 800 34px/1.05 var(--font-sans); letter-spacing: -.02em; color: var(--fg-0); margin: 0 0 12px; }
+    p.sub { font: 400 15px/1.6 var(--font-sans); color: var(--fg-1); max-width: 72ch; margin: 0; }
+    p.sub strong { color: var(--fg-0); }
+    p.sub code { font: 600 13px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 2px 5px; border-radius: 3px; }
+
+    main { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* sticky TOC */
+    .toc-wrap { position: sticky; top: 70px; z-index: 5; margin: 28px auto 0; max-width: 1040px; padding: 0 24px; }
+    .toc { background: rgba(11,22,38,.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--line-strong); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font: 600 11px/1 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; }
+    .toc .toc-lbl { color: var(--fg-2); font-family: var(--font-mono); letter-spacing: .14em; margin-right: 4px; }
+    .toc a { color: var(--fg-1); text-decoration: none; padding: 6px 9px; border-radius: 6px; border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; }
+    .toc a:hover { color: var(--fg-0); border-color: var(--line-strong); background: rgba(255,255,255,.03); text-decoration: none; }
+    .toc a.active { color: var(--accent); border-color: rgba(0,229,255,.32); background: rgba(0,229,255,.05); }
+    .toc .toc-num { font-family: var(--font-mono); opacity: .55; margin-right: 4px; }
+    @media (max-width: 780px) { .toc-wrap { position: static; } .toc { font-size: 10px; padding: 8px 10px; } .toc .toc-lbl { display: none; } }
+
+    /* sections */
+    .arc-section { margin-top: 40px; scroll-margin-top: 130px; }
+    .arc-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .arc-num { font: 800 11px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .arc-title { font: 700 18px/1.2 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .arc-when { margin-left: auto; font: 500 11px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .04em; }
+    .arc-intro { font: 400 13.5px/1.6 var(--font-sans); color: var(--fg-1); max-width: 68ch; margin: 0 0 18px; }
+    .arc-intro code { font: 600 12.5px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 1px 5px; border-radius: 3px; }
+    .arc-intro strong { color: var(--fg-0); }
+    .arc-intro a { color: var(--accent); }
+
+    /* bullet list (default body) */
+    ul.body-list { padding-left: 1.25rem; margin: 0; list-style: none; }
+    ul.body-list li { position: relative; font: 400 13.5px/1.65 var(--font-sans); color: var(--fg-1); padding-left: 14px; margin-bottom: 9px; }
+    ul.body-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .55; }
+    ul.body-list li:last-child { margin-bottom: 0; }
+    ul.body-list li strong { color: var(--fg-0); font-weight: 600; }
+    ul.body-list li code { font: 600 12px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 1px 5px; border-radius: 3px; }
+    ul.body-list li a { color: var(--accent); }
+
+    /* tables */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--line-strong); margin-top: 4px; }
+    table.rg { width: 100%; border-collapse: collapse; background: var(--bg-2); }
+    table.rg th, table.rg td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); font: 400 13px/1.5 var(--font-sans); vertical-align: top; }
+    table.rg th { background: var(--bg-3); font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--line-strong); }
+    table.rg td { color: var(--fg-1); }
+    table.rg tr:last-child td { border-bottom: 0; }
+    table.rg td strong { color: var(--fg-0); }
+    table.rg td code { font: 600 11.5px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 1px 5px; border-radius: 3px; }
+    table.rg td.num { font: 700 12px/1 var(--font-mono); color: var(--accent); text-align: center; width: 56px; }
+
+    /* numbered cards (non-negotiables, etc.) */
+    .num-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 780px) { .num-grid.three { grid-template-columns: repeat(3, 1fr); } }
+    .num-card { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px 18px; display: flex; gap: 14px; }
+    .num-card .num-badge { flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px; background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.32); color: var(--accent); font: 800 14px/1 var(--font-mono); display: flex; align-items: center; justify-content: center; }
+    .num-card .num-body { font: 400 13.5px/1.55 var(--font-sans); color: var(--fg-1); }
+    .num-card .num-body h3 { font: 700 14.5px/1.3 var(--font-sans); color: var(--fg-0); margin: 0 0 6px; letter-spacing: -.005em; }
+    .num-card .num-body code { font: 600 11.5px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 1px 5px; border-radius: 3px; }
+
+    /* callouts */
+    .cal { padding: 14px 18px; border-radius: 0 8px 8px 0; font: 400 13.5px/1.65 var(--font-sans); color: var(--fg-1); margin-top: 4px; }
+    .cal .lbl { display: block; font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+    .cal strong { color: var(--fg-0); }
+    .cal code { font: 600 12px/1 var(--font-mono); padding: 1px 5px; border-radius: 3px; }
+    .cal.warn { background: rgba(255,93,108,.05); border-left: 3px solid var(--error); }
+    .cal.warn .lbl { color: var(--error); }
+    .cal.warn code { color: var(--error); background: rgba(255,93,108,.08); }
+    .cal.tip  { background: rgba(0,229,255,.04); border-left: 3px solid var(--accent); }
+    .cal.tip .lbl { color: var(--accent); }
+    .cal.tip code { color: var(--accent); background: rgba(0,229,255,.08); }
+    .cal.hold { background: rgba(199,146,234,.04); border-left: 3px solid #C792EA; }
+    .cal.hold .lbl { color: #C792EA; }
+    .cal.hold code { color: #C792EA; background: rgba(199,146,234,.08); }
+
+    /* two-column comparison (teacher-only vs student) */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+    .compare .col { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 16px 18px; }
+    .compare .col-lbl { font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .compare .col.teacher-only { border-left: 3px solid var(--warn); }
+    .compare .col.teacher-only .col-lbl { color: var(--warn); }
+    .compare .col.student { border-left: 3px solid var(--ok); }
+    .compare .col.student .col-lbl { color: var(--ok); }
+    .compare ul { list-style: none; padding: 0; margin: 0; }
+    .compare li { font: 400 13px/1.5 var(--font-sans); color: var(--fg-1); padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .compare li:last-child { border-bottom: 0; }
+    .compare li code { font: 600 11.5px/1 var(--font-mono); color: var(--accent); }
+    .compare li strong { color: var(--fg-0); }
+
+    .footer-note { max-width: 1040px; margin: 56px auto 0; padding: 18px 24px; font: 400 12.5px/1.6 var(--font-sans); color: var(--fg-2); border-top: 1px solid var(--line); }
+    .footer-note a { color: var(--accent); }
+
+    @media print {
+      body { background: #fff; color: #111; padding: 0; }
+      .topnav, .toc-wrap, .footer-note { display: none; }
+      a { color: #111; text-decoration: underline; }
+      .arc-section { page-break-inside: avoid; }
+      table.rg, .num-card, .cal, .compare .col { background: #fff !important; border-color: #bbb !important; page-break-inside: avoid; }
+      table.rg th { background: #eef2f6 !important; color: #024c66 !important; }
+      table.rg td, .arc-intro, ul.body-list li, .cal { color: #222 !important; }
+      .num-card .num-badge { background: #eef2f6 !important; border-color: #024c66 !important; color: #024c66 !important; }
+      .num-card .num-body h3, h1.title, .arc-title, .compare li strong { color: #111 !important; }
+      .cal.warn { background: #fff5f5 !important; border-left-color: #b03030 !important; }
+      .cal.tip { background: #f0f6fa !important; border-left-color: #024c66 !important; }
+      .cal.hold { background: #f7f3fb !important; border-left-color: #6a4a8a !important; }
+      .cal.warn .lbl, .cal.warn code { color: #b03030 !important; }
+      .cal.tip .lbl, .cal.tip code, table.rg td code, .arc-intro code { color: #024c66 !important; background: #fff !important; }
+      .cal.hold .lbl, .cal.hold code { color: #6a4a8a !important; }
+      .compare .col.teacher-only { border-left-color: #b88200 !important; }
+      .compare .col.teacher-only .col-lbl { color: #b88200 !important; }
+      .compare .col.student { border-left-color: #2a8a4a !important; }
+      .compare .col.student .col-lbl { color: #2a8a4a !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/index.html"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">RUNNING THE PROGRAM</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<div class="page-shell">
+  <p class="eyebrow"><b>PLAYBOOK</b>Facilitator running guide</p>
+  <h1 class="title">Running the program — 16 days, decision by decision.</h1>
+  <p class="sub">What facilitators actually <em>do</em> across the four weeks — not what's in the code, not the data plumbing, not the deploy pipeline. The operational playbook: when to intervene, when to hold back, what to collect, what to never share with students, and where the failure modes hide. Read this before Week 1; come back to it whenever you're about to do something risky.</p>
+</div>
+
+<div class="toc-wrap">
+  <nav class="toc" aria-label="Page sections">
+    <span class="toc-lbl">Jump to</span>
+    <a href="#mental-model" data-sec="mental-model"><span class="toc-num">01</span>Mental model</a>
+    <a href="#pre-season" data-sec="pre-season"><span class="toc-num">02</span>Pre-season</a>
+    <a href="#daily" data-sec="daily"><span class="toc-num">03</span>Daily rhythm</a>
+    <a href="#match" data-sec="match"><span class="toc-num">04</span>Match days</a>
+    <a href="#rules" data-sec="rules"><span class="toc-num">05</span>Student rules</a>
+    <a href="#evidence" data-sec="evidence"><span class="toc-num">06</span>Evidence</a>
+    <a href="#site" data-sec="site"><span class="toc-num">07</span>Site-specific</a>
+    <a href="#teacher-only" data-sec="teacher-only"><span class="toc-num">08</span>Teacher-only</a>
+    <a href="#hold" data-sec="hold"><span class="toc-num">09</span>When NOT to intervene</a>
+    <a href="#donts" data-sec="donts"><span class="toc-num">10</span>Don'ts</a>
+    <a href="#cohort" data-sec="cohort"><span class="toc-num">11</span>Cohort changes</a>
+    <a href="#escalate" data-sec="escalate"><span class="toc-num">12</span>Escalate</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ── 01 ── -->
+  <section class="arc-section" id="mental-model">
+    <div class="arc-head">
+      <span class="arc-num">01</span>
+      <span class="arc-title">The mental model — what this program actually is.</span>
+    </div>
+    <p class="arc-intro">If you only remember one thing from this page: the bots are a vehicle for the math, not the other way around. Students who leave with a working bot but no math means the program failed.</p>
+
+    <ul class="body-list">
+      <li><strong>It's a math program in a robotics costume.</strong> Proportional reasoning, slope, distance, quadratic, percent change, residuals, systems of inequalities. The 16-day arc walks students from "formulas are recipes" to "formulas are predictions I revise from data."</li>
+      <li><strong>One driving question stays on the wall for 16 days:</strong> "How can you use data, equations, and code to build a robot athlete that wins on math, not luck?"</li>
+      <li><strong>The four Program Goals</strong> — Transfer · Ownership · Failure · Teach — are evidence statements, not slogans. Goal 4 (a stranger completes 3 mini-challenges after a single student explanation) is the summative on Day 16. See the <a href="/resources/teacher-guides/toolkit-facilitator-guide.html#program-goals">Toolkit Guide</a>.</li>
+      <li><strong>The math destination</strong> lives in the <a href="/resources/teacher-guides/math-prebrief.html">Math Pre-Brief</a> — read it once before Week 1. Five mathematical relationships, four understandings to leave with.</li>
+    </ul>
+  </section>
+
+  <!-- ── 02 ── -->
+  <section class="arc-section" id="pre-season">
+    <div class="arc-head">
+      <span class="arc-num">02</span>
+      <span class="arc-title">Before Day 1 — pre-season prep.</span>
+      <span class="arc-when">~3 hours, once</span>
+    </div>
+    <p class="arc-intro">You can't run this program from cold. Three hours of preparation in the days before Week 1 saves the program from the most common failure modes.</p>
+
+    <ul class="body-list">
+      <li><strong>Read the four walkthroughs in order:</strong> <a href="/resources/teacher-guides/math-prebrief.html">Math Pre-Brief</a> → <a href="/resources/teacher-guides/progression-in-context.html">Progression in Context</a> → <a href="/resources/teacher-guides/evidence-in-context.html">Evidence in Context</a> → <a href="/resources/teacher-guides/resources-in-context.html">Resources in Context</a>. The order matters — destination, journey, what to look for, what to reach for.</li>
+      <li><strong>Memorize the Loss Recovery Protocol</strong> word-for-word. You'll use it from Day 7 on. The script only works if you can say it calmly under pressure without improvising.</li>
+      <li><strong>Calculate all four stat formulas for every point value 1–8 by hand, in under 10 seconds each.</strong> Motor% = Speed × 5 · Charge% = Power² · decay rate = (20−E) × 1.5 · turn ratio = 0.2 + T × 0.02. If you hesitate when a student asks mid-match, you become unreliable at the moment that matters most.</li>
+      <li><strong>Lay out the room.</strong> Reserve wall space for: <em>Driving Question</em> · <em>Commissioner's Rules</em> · <em>Bot Names</em> · <em>Leaderboard</em> · <em>Rivalry Cards</em>. Tape the field down with measuring tape.</li>
+      <li><strong>Confirm your site's data infrastructure works</strong> — open the <a href="/resources/teacher-guides/spreadsheets-reference.html">Spreadsheets Reference</a> and check that you can see your per-site sheets. If you can't, escalate <em>now</em>, not on Day 1.</li>
+    </ul>
+  </section>
+
+  <!-- ── 03 ── -->
+  <section class="arc-section" id="daily">
+    <div class="arc-head">
+      <span class="arc-num">03</span>
+      <span class="arc-title">The daily rhythm — every day, in this order.</span>
+      <span class="arc-when">6 blocks · ~3.5 hrs</span>
+    </div>
+    <p class="arc-intro">The math changes day to day. The structure of the day does not. <strong>The predictability is the point</strong> — it lowers cognitive load so students spend it on the math, not on figuring out what's next.</p>
+
+    <div class="table-wrap">
+      <table class="rg">
+        <thead>
+          <tr><th>#</th><th>Block</th><th>Min</th><th>What it is</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num">01</td>
+            <td><strong>Hook</strong></td>
+            <td><code>25</code></td>
+            <td>Physical or kinesthetic. <strong>No formula yet.</strong> Primes the concept.</td>
+          </tr>
+          <tr>
+            <td class="num">02</td>
+            <td><strong>Challenge Block</strong></td>
+            <td><code>55</code></td>
+            <td>Core math instruction. Formula derivation. Error analysis.</td>
+          </tr>
+          <tr>
+            <td class="num">03</td>
+            <td><strong>Snack</strong></td>
+            <td><code>20</code></td>
+            <td>Off-schedule. <strong>Don't talk about math.</strong></td>
+          </tr>
+          <tr>
+            <td class="num">04</td>
+            <td><strong>Match · Build · Make</strong></td>
+            <td><code>90</code></td>
+            <td>Program and test, OR Predict → 3 matches → Loss Recovery. The competitive heart.</td>
+          </tr>
+          <tr>
+            <td class="num">05</td>
+            <td><strong>Open Lab</strong></td>
+            <td><code>30</code></td>
+            <td>Two self-selected tracks. Student-directed time.</td>
+          </tr>
+          <tr>
+            <td class="num">06</td>
+            <td><strong>ENDS</strong></td>
+            <td><code>10</code></td>
+            <td>One reflection prompt. Every student. Every day.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 04 ── -->
+  <section class="arc-section" id="match">
+    <div class="arc-head">
+      <span class="arc-num">04</span>
+      <span class="arc-title">Match days — three non-negotiables.</span>
+      <span class="arc-when">D 06 → D 15</span>
+    </div>
+    <p class="arc-intro">Match days are when the modeling cycle becomes visible. These three rules are how a match stops being drama and starts being data. Hold them like they're load-bearing — because they are.</p>
+
+    <div class="num-grid three">
+      <div class="num-card">
+        <div class="num-badge">01</div>
+        <div class="num-body">
+          <h3>No bot moves until every team has a written, formula-cited prediction.</h3>
+          <p>The rule that turns a match from drama into data. Predict before the bots leave the box. If a team can't state their formula + input + predicted output, they're not ready to run.</p>
+        </div>
+      </div>
+      <div class="num-card">
+        <div class="num-badge">02</div>
+        <div class="num-body">
+          <h3>Residual after every match.</h3>
+          <p>Predicted − actual = a signed number. When the gap is &gt; 20%, the team writes a one-sentence cause naming a specific model parameter. The residual is the math operation that makes Goal 3 (productive failure) real.</p>
+        </div>
+      </div>
+      <div class="num-card">
+        <div class="num-badge">03</div>
+        <div class="num-body">
+          <h3>Loss Recovery for every losing team. Every time.</h3>
+          <p>Not just the visibly upset ones. Especially the team that's "fine." Name feeling → 30s silence → dashboard one stat → write the next change in pen. The team doesn't code for the next match until the plan is on paper.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 ── -->
+  <section class="arc-section" id="rules">
+    <div class="arc-head">
+      <span class="arc-num">05</span>
+      <span class="arc-title">Three rules students must know — by name.</span>
+    </div>
+    <p class="arc-intro">These aren't optional context. Make sure every student can state them by the end of Week 1. The first is the math; the other two are how the game actually works.</p>
+
+    <ul class="body-list">
+      <li><strong>The Budget equation:</strong> <code>S + E + T + P = 20</code>. The <code>=</code> means balance, not arithmetic. Every point given to one stat is a point taken from another. This frame drives every allocation for four weeks.</li>
+      <li><strong>Own goals count.</strong> A ball crossing <em>either</em> goal line scores for that net's attacker. (Surface this on Day 6 before Match Day 1 — otherwise the first own-goal is a long argument instead of a learning moment.) See the <a href="/lessons/match-rules.html">Match Rules</a> page.</li>
+      <li><strong>Robot Off the Field:</strong> facilitator places the bot at the nearest edge, at the center line, facing inward. Referee presses Button B to try to reset the match loop.</li>
+    </ul>
+  </section>
+
+  <!-- ── 06 ── -->
+  <section class="arc-section" id="evidence">
+    <div class="arc-head">
+      <span class="arc-num">06</span>
+      <span class="arc-title">Daily evidence to collect — what you act on the next morning.</span>
+    </div>
+    <p class="arc-intro">What students produce <em>today</em> is what you teach <em>tomorrow</em>. The Evidence in Context walkthrough goes deeper; this is the short list of what to read every evening.</p>
+
+    <div class="table-wrap">
+      <table class="rg">
+        <thead>
+          <tr><th>Evidence</th><th>When</th><th>What "good" looks like</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Exit ticket</strong></td>
+            <td>Every Challenge Block</td>
+            <td>Formula + calculation + plain-language sentence. Push for 80% with all three; if below, hold next AM warm-up for re-teach.</td>
+          </tr>
+          <tr>
+            <td><strong>Dashboard loadout entry</strong></td>
+            <td>Days 1–5</td>
+            <td>Sums to 20. Data Owner named. Three-part gap sentence with a specific number.</td>
+          </tr>
+          <tr>
+            <td><strong>ENDS journal</strong></td>
+            <td>Every day</td>
+            <td>Specific observation + number + hypothesis. <strong>Unique per student</strong>, not copied from a teammate.</td>
+          </tr>
+          <tr>
+            <td><strong>Match prediction</strong></td>
+            <td>Every match · D 06+</td>
+            <td>Formula-backed number, written before the bot moves. No prediction → match doesn't start.</td>
+          </tr>
+          <tr>
+            <td><strong>Match residual</strong></td>
+            <td>After every match</td>
+            <td>Predicted − actual with a single-variable hypothesis when gap &gt; 20%.</td>
+          </tr>
+          <tr>
+            <td><strong>Cold Recall Check</strong></td>
+            <td>Day 10 · 10 min</td>
+            <td>5 questions, individual, no notes. <strong>Q4 (Endurance decay)</strong> is the diagnostic — anyone who misses it gets the Linear Decay concept page assigned in Open Lab.</td>
+          </tr>
+          <tr>
+            <td><strong>Commissioner proposals</strong></td>
+            <td>Day 12</td>
+            <td>2 cited dashboard numbers + percent-change math + impact on last-place team + self-check.</td>
+          </tr>
+          <tr>
+            <td><strong>Visitor Completion Tracker</strong></td>
+            <td>Day 16</td>
+            <td>Did the visitor finish all 3 mini-challenges first-try after a single student explanation? <strong>Goal 4 summative</strong> — binary observable, not a judgment call.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 07 ── -->
+  <section class="arc-section" id="site">
+    <div class="arc-head">
+      <span class="arc-num">07</span>
+      <span class="arc-title">Site-specific knowledge.</span>
+      <span class="arc-when">Know once, use daily</span>
+    </div>
+    <p class="arc-intro">Every pilot site has a code that drives data routing. You don't edit URLs or sheets — but you do need to know what's connected to what, and where your data lives.</p>
+
+    <ul class="body-list">
+      <li><strong>Your site code:</strong> <code>NY1 = Gotham Tech</code> · <code>NY2 = Claremont</code> · <code>NY3 = South Bronx Community Charter</code> · <code>TN = Tennessee</code>. The code shows up in dashboard URLs as <code>cohortTag=NY1</code> etc. If a URL is missing the tag, the data won't route.</li>
+      <li><strong>Five spreadsheets to know exist</strong> (all linked from the <a href="/resources/teacher-guides/spreadsheets-reference.html">Spreadsheets Reference</a> — gated):
+        <ul style="list-style:none; padding-left:14px; margin-top:8px;">
+          <li style="padding:4px 0; color:var(--fg-1);">• <strong>Loadouts</strong> — shared across all sites. Where stat-card lesson submissions land.</li>
+          <li style="padding:4px 0; color:var(--fg-1);">• <strong>Dashboard</strong> (per-site) — where match data lands.</li>
+          <li style="padding:4px 0; color:var(--fg-1);">• <strong>Pre-Task Diagnostic</strong> (per-state) — Day 1 baseline.</li>
+          <li style="padding:4px 0; color:var(--fg-1);">• <strong>Post-Task Diagnostic</strong> (per-state) — Day 15 growth measure.</li>
+          <li style="padding:4px 0; color:var(--fg-1);">• <strong>What-If Analysis</strong> — shared across all sites.</li>
+        </ul>
+      </li>
+      <li><strong>If data isn't landing, it's not your problem to fix.</strong> Note what's missing, when, and from whom — and <a href="#escalate">escalate</a>. Don't try to edit a sheet ID, redeploy anything, or change a URL.</li>
+    </ul>
+  </section>
+
+  <!-- ── 08 ── -->
+  <section class="arc-section" id="teacher-only">
+    <div class="arc-head">
+      <span class="arc-num">08</span>
+      <span class="arc-title">Teacher-only vs. student-facing — don't mix them up.</span>
+    </div>
+    <p class="arc-intro">The student-facing site lives at the same URL minus <code>/teachers</code>. Share the student URL with students; never share <code>teachers.html</code>. Everything below is gated by the same password.</p>
+
+    <div class="compare">
+      <div class="col teacher-only">
+        <div class="col-lbl">Teacher-only — never share</div>
+        <ul>
+          <li><code>/teachers.html</code> and everything linked from it</li>
+          <li>Quick Cards (the pink pills in Teacher Schedule)</li>
+          <li>Facilitator scripts (Google Docs)</li>
+          <li>Student Work Exemplars (the purple <em>Exemplar</em> pills)</li>
+          <li>Match Simulator</li>
+          <li>Launch Strategies + 10-Strategy guide</li>
+          <li>Worksheets &amp; Answer Keys (Drive folder — gated)</li>
+          <li>Spreadsheets Reference</li>
+          <li>This page</li>
+        </ul>
+      </div>
+      <div class="col student">
+        <div class="col-lbl">Student-facing — OK to share</div>
+        <ul>
+          <li><code>/today.html</code> · <code>/schedule.html</code> · <code>/day.html</code></li>
+          <li>Worksheets without answer keys</li>
+          <li>The student day view</li>
+          <li>Lesson pages (the interactive HTMLs)</li>
+          <li>Math concept pages (<code>/activities/math/</code>)</li>
+          <li>The dashboard view (without facilitator URL params)</li>
+          <li>Match Rules</li>
+          <li>The launch sequences <em>students</em> program</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cal tip" style="margin-top:14px;">
+      <span class="lbl">Rule of thumb</span>
+      If the URL is gated behind <code>/teachers.html</code>, students shouldn't see it. The password is the only thing standing between facilitator-only content and the open web — protect it the same way you'd protect an answer key.
+    </div>
+  </section>
+
+  <!-- ── 09 ── -->
+  <section class="arc-section" id="hold">
+    <div class="arc-head">
+      <span class="arc-num">09</span>
+      <span class="arc-title">When <em>not</em> to intervene.</span>
+    </div>
+    <p class="arc-intro">The hardest part of running this program is what you don't say. These are four moments where over-helping breaks the learning.</p>
+
+    <div class="cal hold">
+      <span class="lbl">Days 1–5 stat lessons</span>
+      Don't say "invest more in Power" or "Speed matters most." <strong>Observe and record only.</strong> Let the Season 1 match data answer "does it matter to the score?" — that's the whole point of the modeling cycle. If you reveal the answer, students never get to discover the relationship between stat and outcome.
+    </div>
+
+    <div class="cal hold" style="margin-top:10px;">
+      <span class="lbl">Open Lab — any day</span>
+      One question per stop ("What are you trying?"), then 10 seconds of silence, then move on. <strong>Don't suggest tasks. Don't supervise.</strong> Student-directed time only works if you stay out of the direction.
+    </div>
+
+    <div class="cal hold" style="margin-top:10px;">
+      <span class="lbl">Commissioner's Meeting · Day 12</span>
+      Hold the math standard. "Can anyone verify?" is your move. Dismiss "I don't like it" arguments that don't cite a number and a calculation. <strong>Don't argue the politics</strong> — only hold the line that every claim needs a number.
+    </div>
+
+    <div class="cal hold" style="margin-top:10px;">
+      <span class="lbl">Day 16 Exhibition</span>
+      Redirect visitor confusion <strong>back to the student</strong>. If the student struggles to explain, ask a <em>simpler question to the student</em> — not the visitor. Don't answer for them. The Goal 4 summative depends on a student doing the teaching, not you saving the moment.
+    </div>
+  </section>
+
+  <!-- ── 10 ── -->
+  <section class="arc-section" id="donts">
+    <div class="arc-head">
+      <span class="arc-num">10</span>
+      <span class="arc-title">Critical "don't do this."</span>
+    </div>
+    <p class="arc-intro">Each of these has burned a program before. They're worth memorizing — not just reading.</p>
+
+    <div class="cal warn">
+      <span class="lbl">Don't · Day 1–5</span>
+      Don't tell students which stat to invest in. <strong>Hold judgment.</strong> The Season 1 match data is the answer to "does it matter?" — your job in Week 1 is to make sure that answer is discoverable.
+    </div>
+    <div class="cal warn" style="margin-top:10px;">
+      <span class="lbl">Don't · sharing</span>
+      Don't share the <strong>Worksheets &amp; Answer Keys</strong> Drive folder URL raw. The folder is anyone-with-link viewable; route teachers through the <code>/teachers.html</code> password gate.
+    </div>
+    <div class="cal warn" style="margin-top:10px;">
+      <span class="lbl">Don't · sharing</span>
+      Don't share the <code>/teachers.html</code> URL with students. The student-facing site lives at the same URL minus <code>/teachers</code>. <strong>Use the right one.</strong>
+    </div>
+    <div class="cal warn" style="margin-top:10px;">
+      <span class="lbl">Don't · Day 15 → 16</span>
+      Don't run the Day-15 post-diagnostic on Day 16. <strong>Exhibition energy tanks participation</strong> — and you lose the post-task baseline for measuring growth. The post-diagnostic must run on Day 15.
+    </div>
+    <div class="cal warn" style="margin-top:10px;">
+      <span class="lbl">Don't · match days</span>
+      Don't skip Loss Recovery for a team because they seem "fine." Especially that team. The discipline of the protocol is what makes losing into data instead of failure — and the team that looks fine is often the one quietly disengaging.
+    </div>
+  </section>
+
+  <!-- ── 11 ── -->
+  <section class="arc-section" id="cohort">
+    <div class="arc-head">
+      <span class="arc-num">11</span>
+      <span class="arc-title">Things that change cohort-to-cohort.</span>
+      <span class="arc-when">Re-check each cohort</span>
+    </div>
+    <p class="arc-intro">Read these every time you prep. They're the kind of thing that's correct in this cohort but might be stale by the next one — and the kind of thing that's hardest to catch by re-reading the curriculum.</p>
+
+    <ul class="body-list">
+      <li><strong>Follow-Through formula</strong> changed <code>2026-05-30</code> from <code>P × 80</code> to <code>120 + (Power × 35)</code>. The new ms values run from <strong>155</strong> (P=1) to <strong>540</strong> (P=12). The lesson pages were updated to match — if you find any doc that still says <code>Power × 80</code>, it's stale and worth flagging.</li>
+      <li><strong>Underdog Mechanic</strong> (Day 11): the last-place team gets <strong>2 bonus stat points</strong>, so their four stats sum to 22, not 20. Announce publicly; check the math.</li>
+      <li><strong>The <code>cohortTag</code> in dashboard URLs</strong> determines which site's sheet receives data. If a teacher emails you a dashboard URL missing the tag, data won't route — check this <em>before</em> Day 6.</li>
+      <li><strong>Power² sweet spot</strong> is currently unconfirmed — the old "P9 overshoot" rule was tied to the previous Power × 80 formula. Frame it as a Season 1 question students can investigate, not a known answer.</li>
+    </ul>
+  </section>
+
+  <!-- ── 12 ── -->
+  <section class="arc-section" id="escalate">
+    <div class="arc-head">
+      <span class="arc-num">12</span>
+      <span class="arc-title">When to escalate to the developer.</span>
+    </div>
+    <p class="arc-intro">These are the moments where you stop trying and ping the developer. They're all infrastructure problems, not pedagogy problems — different toolset, different person.</p>
+
+    <ul class="body-list">
+      <li><strong>A submission says "Sent" but no row appears</strong> in the expected sheet.</li>
+      <li><strong>The diagnostic dashboard shows empty data</strong> after the post-task, even though students submitted.</li>
+      <li><strong>Apps Script returns an error in the browser console</strong> when a student submits.</li>
+      <li><strong>A page that worked yesterday is now 404.</strong></li>
+      <li><strong>You want to add a new pilot site</strong> (e.g., NY4) — requires code changes in the API + new env vars + new sheet setup.</li>
+      <li><strong>You think a formula is wrong</strong> on a student-facing page (like the Follow-Through bug that landed wrong values in the Loadouts sheet for months).</li>
+    </ul>
+
+    <div class="cal tip">
+      <span class="lbl">You should never need to</span>
+      Open Vercel · edit <code>config.js</code> · redeploy anything · change a sheet ID · touch an Apps Script · run <code>git push</code>. If someone is asking you to, push back — those are developer tasks, not facilitator tasks. Your job is the room, the math, and the kids.
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Sibling page to the four walkthrough pages on <a href="/teachers.html">teachers.html</a> · <a href="/resources/teacher-guides/math-prebrief.html">Math Pre-Brief</a> (destination) · <a href="/resources/teacher-guides/progression-in-context.html">Progression in Context</a> (why this, why now) · <a href="/resources/teacher-guides/evidence-in-context.html">Evidence in Context</a> (what to look for) · <a href="/resources/teacher-guides/resources-in-context.html">Resources in Context</a> (which tool when). This page is the running playbook — read it last, come back to it most often.
+  </div>
+
+</main>
+
+<script>
+  (function() {
+    const links = document.querySelectorAll('.toc a[data-sec]');
+    const sections = Array.from(document.querySelectorAll('.arc-section[id]'));
+    if (!links.length || !sections.length || !('IntersectionObserver' in window)) return;
+    const byId = {};
+    links.forEach(a => { byId[a.dataset.sec] = a; });
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(a => a.classList.remove('active'));
+          const a = byId[e.target.id];
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+    sections.forEach(s => obs.observe(s));
+  })();
+</script>
+
+</body>
+</html>
