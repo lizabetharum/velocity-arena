@@ -274,7 +274,10 @@ const DAYS_DEFAULT = [
         "block": "Match-Build-Make",
         "description": "Keep programming your bot to navigate to called coordinates using arc approximation and the TURNING formulas (Arc Segments = TURNING, Turn Ratio = 0.2 + TURNING x 0.02). The target: three consecutive successful navigations by end of Day 4. Record every attempt -- the coordinate called, the coordinate reached, and the error distance.",
         "facilitatorDescription": "Start with a launch sequence: teams pick a corner, calculate the straight-line distance to the ball, program a run, then measure how far off they were. Move to an embodied arc simulation where students walk a 2-segment versus 8-segment path to discover that more segments approximate a curve but never equal one. Introduce the turnRatio formula on the worksheet before revealing it on the board; teams calculate for T=5, then draw and compare three arc paths. Send teams to MakeCode for three differential wheel-speed configurations, predicting each arc shape before the run and mapping where the bot stops with colored stickers. Run the coverage challenge at T=2, 5, and 10, then debrief and finalize the Turning allocation.",
-        "script": "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link",
+        "script": [
+          {url: "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link", label: "Script"},
+          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+        ],
         "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
        "makecode":"https://makecode.microbit.org/S79542-10060-01167-82601",
          "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Arc_Approximation_Turning.html",
@@ -869,7 +872,10 @@ const DAYS_DEFAULT = [
         "block": "Challenge Block",
         "description": "Three coordinate positions anchor the whole activity: A = (4,2) tip-off, G = (8,2) goal center, B = your team's estimated ball-landing point from a Season 1 match. Using d = sqrt((x2-x1)^2 + (y2-y1)^2), calculate three distances: A to G (set up the formula, then confirm the horizontal shortcut gives the same answer), A to B (full formula), B to G (estimate first, then calculate). Then: write a one-sentence comparison of movement vs. useful progress, calculate your efficiency ratio (useful progress divided by total movement), use it to estimate the minimum number of charges needed to score from A, and write one sentence naming which stat allocation drove that number.",
         "facilitatorDescription": "Students use the distance formula to measure their best charge from Season 1: ball starts at A (4,2), goal at G (8,2), team estimates ball-landing point B. Work through a 10-step worksheet to calculate A→B, A→G, and B→G, an efficiency ratio (how much movement actually shortened the distance to the goal), and the theoretical minimum kicks to score. After a 5-minute launch and hard stop, teams work for about 20 minutes while you circulate, watching for the common errors (squaring the sum instead of each difference, skipping the final square root, inverting the ratio) and flagging any team whose ball ended up farther from the goal. In summary, three teams share in order: why the A-to-G shortcut works algebraically, a counter-intuitive case, and the efficiency ratio and minimum kicks. Close with the Big Idea: hitting farther doesn't always help. Non-optional exit ticket required.",
-         "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing",
+         "script": [
+          {url: "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing", label: "Script"},
+          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+        ],
         "worksheet": "https://drive.google.com/file/d/1reQoXFXaUQ-FidUnysXkSfSf9mAlaiz0/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D10_Distance_Formula_Shortest_Path.html",
