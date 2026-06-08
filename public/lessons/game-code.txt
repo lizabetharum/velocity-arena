@@ -1,0 +1,528 @@
+/**
+ * ══════════════════════════════════════════════════════════════════════
+ *  VELOCITY ARENA — MATCH CODE TEMPLATE
+ * ══════════════════════════════════════════════════════════════════════
+ *
+ *  HOW TO USE THIS FILE
+ *  ─────────────────────
+ *  1. Find the sections marked  ★ STUDENT ZONE ★
+ *  2. Read the instructions in each zone carefully
+ *  3. Add your team's code where it says  // ← YOUR CODE HERE
+ *  4. Leave everything else exactly as-is — it controls match timing,
+ *     border detection, and ball tracking
+ *
+ *  There are TWO student zones in this file:
+ *    A. Stat Allocation  (bottom of file, easy to find)
+ *    B. Launch Sequence  (your bot's opening move)
+ *
+ * ══════════════════════════════════════════════════════════════════════
+ */
+
+
+// ── Launch sequence ───────────────────────────────────────────────────
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE B — LAUNCH SEQUENCE ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  This function runs once when the match starts (Button A).        ║
+ * ║  Program your bot's opening move here.                            ║
+ * ║                                                                   ║
+ * ║  RULES:                                                           ║
+ * ║  • Do NOT delete the launchActive lines — they protect your       ║
+ * ║    bot from false border triggers during turns.                   ║
+ * ║  • Your bot starts at your goal line facing the field.            ║
+ * ║  • Ball detection turns ON automatically after this function ends.║
+ * ║                                                                   ║
+ * ║  USEFUL COMMANDS (copy exactly as shown):                         ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 90)    ║
+ * ║    → spins left 90° in place                                      ║
+ * ║  • CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)   ║
+ * ║    → spins right 90° in place                                     ║
+ * ║  • CutebotPro.pwmCruiseControl(currentPower, currentPower)        ║
+ * ║    → drives forward at your bot's roam speed                      ║
+ * ║  • CutebotPro.runBlockCnt(2)                                      ║
+ * ║    → drives exactly 2 units (27 cm each), then stops             ║
+ * ║  • CutebotPro.stopImmediately(CutebotProMotors.ALL)               ║
+ * ║    → stops all motors                                             ║
+ * ║  • basic.pause(500)                                               ║
+ * ║    → waits 500 milliseconds (0.5 seconds)                        ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+function launchSequence() {
+    launchActive = true   // ← DO NOT DELETE — disables border check during turns
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES BELOW THIS LINE ───────────────
+
+    // ← YOUR CODE HERE
+
+
+
+
+    // ── YOUR LAUNCH SEQUENCE CODE GOES ABOVE THIS LINE ───────────────
+
+    launchActive = false  // ← DO NOT DELETE — re-enables border check after turns
+}
+
+
+// ── Start match ───────────────────────────────────────────────────────
+input.onButtonPressed(Button.A, function () {
+    if (!(matchRunning)) {
+        if (SPEED + ENDURANCE + TURNING + POWER != 20) {
+            basic.showString("ERR")
+            basic.pause(1000)
+            basic.clearScreen()
+            return
+        }
+        computeStats()
+        matchTime = 0
+        matchStartTime = input.runningTime()
+        matchRunning = true
+        ballDetected = false
+        consecutiveBorderHits = 0
+        showPhase("\"GO\"")
+        launchSequence()
+        isRoaming = true
+        matchLoop()
+    }
+})
+
+
+// ── Endurance bar on LED ──────────────────────────────────────────────
+function showEnduranceBar(num: number) {
+    rows = Math.round(num * 5)
+    basic.clearScreen()
+    for (let index = 0; index <= 4; index++) {
+        if (index >= 5 - rows) {
+            led.plot(2, index)
+        }
+    }
+}
+
+
+// ── Border detection ──────────────────────────────────────────────────
+function checkBorder() {
+    CutebotPro.trackbitStateValue()
+    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
+    if (sensor1State > BORDER_THRESHOLD) {
+        return 1
+    } else if (sensor4State > BORDER_THRESHOLD) {
+        return 2
+    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
+        return 3
+    }
+    return 0
+}
+
+
+// ── Main match loop ───────────────────────────────────────────────────
+function matchLoop() {
+    while (matchRunning) {
+        matchTime = (input.runningTime() - matchStartTime) / 1000
+        if (matchTime >= 180) {
+            endMatch()
+            break;
+        }
+        // ── 30s warning flash ──
+        if (matchTime >= 150 && matchTime < 151) {
+            basic.showLeds(`
+                # # # # #
+                # . . . #
+                # . # . #
+                # . . . #
+                # # # # #
+                `)
+            basic.pause(400)
+            basic.clearScreen()
+        }
+        if (ballDetected) {
+            isRoaming = false
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(200)
+            if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+            } else {
+                CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+            }
+            basic.pause(150)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(300)
+            basic.showLeds(`
+                . . # . .
+                . # # # .
+                # # # # #
+                . # # # .
+                . . # . .
+                `)
+            chargeAndFollowThrough()
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            basic.pause(500)
+            dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+            if (dist <= CONTACT_CM || dist > BALL_DETECT_CM) {
+                CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+                basic.pause(200)
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            }
+            ballDetected = false
+            consecutiveBorderHits = 0
+            isRoaming = true
+            continue;
+        }
+        motorPower = SPEED * 100 / 20
+        endurancePercent = 100 - DECAY_RATE * matchTime / 40
+        endurancePercent = Math.max(endurancePercent, 20)
+        enduranceFactor = endurancePercent / 100
+        currentPower = Math.round(motorPower * enduranceFactor)
+        let powerFloor = Math.max(Math.round(motorPower * 0.20), 10)
+        currentPower = Math.max(currentPower, powerFloor)
+        effectiveDuration = thisDuration
+        lastTurnWasLeft = !(lastTurnWasLeft)
+        for (let index = 0; index < TURNING; index++) {
+            if (TURNING == 1) {
+                CutebotPro.pwmCruiseControl(currentPower, currentPower)
+            } else if (lastTurnWasLeft) {
+                CutebotPro.pwmCruiseControl(currentPower * (1 - turnRatio), currentPower * (1 + turnRatio))
+            } else {
+                CutebotPro.pwmCruiseControl(currentPower * (1 + turnRatio), currentPower * (1 - turnRatio))
+            }
+            driveAndWatch(effectiveDuration)
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            if (watchResult == 1) {
+                consecutiveBorderHits += 1
+                if (consecutiveBorderHits >= 2) {
+                    lastTurnWasLeft = !(lastTurnWasLeft)
+                    consecutiveBorderHits = 0
+                }
+                handleBorder()
+                break;
+            }
+            if (watchResult == 2) {
+                ballDetected = true
+                consecutiveBorderHits = 0
+                break;
+            }
+            if (watchResult == 3) {
+                consecutiveBorderHits = 0
+                handleStuck()
+                break;
+            }
+        }
+        if (!(ballDetected)) {
+            showEnduranceBar(enduranceFactor)
+        }
+    }
+}
+
+
+// ── Charge + Follow-Through ───────────────────────────────────────────
+function chargeAndFollowThrough() {
+    chargeHitBorder = false
+    let effectiveCharge = Math.round(chargePower * enduranceFactor)
+    effectiveCharge = Math.max(effectiveCharge, 15)
+    basic.showString("C")
+    CutebotPro.pwmCruiseControl(effectiveCharge, effectiveCharge)
+    let contactCount = 0
+    let contactMade = false
+    while (!(chargeHitBorder) && !(contactMade)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            chargeHitBorder = true
+            basic.showString("B")
+            break;
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist <= CONTACT_CM) {
+            contactCount += 1
+            if (contactCount >= 2) {
+                contactMade = true
+            }
+        } else {
+            contactCount = 0
+        }
+        basic.pause(CHARGE_CHECK_MS)
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    if (!(chargeHitBorder)) {
+        basic.showString("F")
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        followStart = input.runningTime()
+        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
+            borderSide = checkBorder()
+            if (borderSide > 0) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                handleBorder()
+                break;
+            }
+            basic.pause(CHARGE_CHECK_MS)
+        }
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        CutebotPro.pwmCruiseControl(-1 * currentPower, -1 * currentPower)
+        basic.pause(300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    }
+}
+
+
+// ── Drive + watch for border, ball, and stuck ─────────────────────────
+function driveAndWatch(ms: number) {
+    watchResult = 0
+    elapsed = 0
+    stuckCount = 0
+    while (elapsed < ms) {
+        halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(halfChunk)
+        elapsed += halfChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        if (elapsed >= ms) {
+            return
+        }
+        remainChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
+        basic.pause(remainChunk)
+        elapsed += remainChunk
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 1
+            return
+        }
+        dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (dist > CONTACT_CM && dist < BALL_DETECT_CM) {
+            stuckCount = 0
+            CutebotPro.stopImmediately(CutebotProMotors.ALL)
+            watchResult = 2
+            return
+        } else if (dist <= CONTACT_CM) {
+            stuckCount += 1
+            if (stuckCount >= STUCK_HITS) {
+                CutebotPro.stopImmediately(CutebotProMotors.ALL)
+                watchResult = 3
+                return
+            }
+        } else {
+            stuckCount = 0
+        }
+    }
+}
+
+
+// ── Stuck recovery ────────────────────────────────────────────────────
+function handleStuck() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (lastTurnWasLeft) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        lastTurnWasLeft = false
+    } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        lastTurnWasLeft = true
+    }
+    basic.pause(STUCK_PIVOT_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    isRoaming = true
+}
+
+
+// ── Emergency stop ────────────────────────────────────────────────────
+input.onButtonPressed(Button.AB, function () {
+    matchRunning = false
+    isRoaming = false
+    ballDetected = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #
+        `)
+    basic.pause(500)
+    basic.clearScreen()
+})
+
+
+// ── Compute stats from 20-point budget ───────────────────────────────
+function computeStats() {
+    currentPower = SPEED * 100 / 20
+    chargePower = Math.min(POWER * POWER, 100)
+    FOLLOW_THROUGH_MS = POWER * 200
+    totalArcTime = BASE_SEGMENT_MS * 12
+    thisDuration = Math.round(totalArcTime / TURNING)
+    turnRatio = 0.2 + TURNING * 0.02
+    turnRatio = Math.min(turnRatio, 0.4)
+    DECAY_RATE = 20 - ENDURANCE
+}
+
+
+// ── Handle border ─────────────────────────────────────────────────────
+function handleBorder() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    isRoaming = false
+    basic.pause(50)
+    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+    basic.pause(BACKUP_MS)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    if (borderSide == 1) {
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = false
+    } else if (borderSide == 2) {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
+        lastTurnWasLeft = true
+    } else {
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS + 300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS * 2)
+        lastTurnWasLeft = false
+    }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+    recheck = checkBorder()
+    if (recheck > 0) {
+        borderSide = recheck
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
+        basic.pause(BACKUP_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
+        basic.pause(BORDER_PIVOT_MS)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(100)
+    }
+    isRoaming = true
+}
+
+
+// ── Show phase label ──────────────────────────────────────────────────
+function showPhase(text: string) {
+    basic.showString(text)
+    basic.pause(300)
+    basic.clearScreen()
+}
+
+
+// ── End match ─────────────────────────────────────────────────────────
+function endMatch() {
+    matchRunning = false
+    isRoaming = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+
+// ── Variable declarations ─────────────────────────────────────────────
+let recheck = 0
+let totalArcTime = 0
+let dist = 0
+let remainChunk = 0
+let halfChunk = 0
+let elapsed = 0
+let FOLLOW_THROUGH_MS = 0
+let followStart = 0
+let chargePower = 0
+let chargeHitBorder = false
+let turnRatio = 0
+let lastTurnWasLeft = false
+let thisDuration = 0
+let effectiveDuration = 0
+let enduranceFactor = 0
+let endurancePercent = 0
+let motorPower = 0
+let currentPower = 0
+let borderSide = 0
+let sensor4State = 0
+let sensor3State = 0
+let sensor2State = 0
+let sensor1State = 0
+let rows = 0
+let ballDetected = false
+let matchStartTime = 0
+let matchTime = 0
+let isRoaming = false
+let matchRunning = false
+let watchResult = 0
+let msPerUnit = 0
+let launchActive = false
+let DECAY_RATE = 0
+let stuckCount = 0
+let consecutiveBorderHits = 0
+let POWER = 0
+let TURNING = 0
+let ENDURANCE = 0
+let SPEED = 0
+
+
+// ── System constants (do not change) ─────────────────────────────────
+let BORDER_CHECK_MS = 60
+let CHARGE_CHECK_MS = 20
+let BORDER_PIVOT_MS = 400
+let BORDER_PIVOT_POWER = 50
+let BACKUP_MS = 600
+let BALL_DETECT_CM = 40
+let BASE_SEGMENT_MS = 1800
+let BORDER_THRESHOLD = 200
+let UNIT_CM = 27
+let LAUNCH_RIGHT_TURN = 85
+let CONTACT_CM = 5
+let STUCK_HITS = 3
+let STUCK_PIVOT_MS = 600
+
+
+/**
+ * ╔═══════════════════════════════════════════════════════════════════╗
+ * ║              ★ STUDENT ZONE A — STAT ALLOCATION ★                ║
+ * ╠═══════════════════════════════════════════════════════════════════╣
+ * ║  Set your four stats below. They MUST add up to exactly 20.       ║
+ * ║  Each stat must be between 1 and 17 (you need at least 1 in each).║
+ * ║                                                                   ║
+ * ║  SPEED     → how fast your bot roams the field                    ║
+ * ║  ENDURANCE → how well your bot maintains speed late in the match  ║
+ * ║  TURNING   → how tightly your bot arcs when searching             ║
+ * ║  POWER     → how hard your bot charges when it sees the ball      ║
+ * ╚═══════════════════════════════════════════════════════════════════╝
+ */
+SPEED = 5        // ← YOUR VALUE HERE  (current total: 20)
+ENDURANCE = 5    // ← YOUR VALUE HERE
+TURNING = 5      // ← YOUR VALUE HERE
+POWER = 5        // ← YOUR VALUE HERE
+// ─────────────────────────────────────────────────────────────────────
+
+
+// ── Init ──────────────────────────────────────────────────────────────
+DECAY_RATE = 20 - ENDURANCE
+
+
+// ── Forever loop: safety-net border check during roaming ──────────────
+basic.forever(function () {
+    if (matchRunning && isRoaming && !(launchActive)) {
+        borderSide = checkBorder()
+        if (borderSide > 0) {
+            handleBorder()
+        }
+        basic.pause(30)
+    }
+})
