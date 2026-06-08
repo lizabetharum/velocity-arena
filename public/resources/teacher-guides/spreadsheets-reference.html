@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spreadsheets Reference · Velocity Arena</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: var(--bg-1); color: var(--fg-0); min-height: 100vh; padding-bottom: 5rem; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-bright); text-decoration: underline; }
+
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    .page-shell { max-width: 1100px; margin: 0 auto; padding: 48px 24px 0; }
+    .eyebrow { font: 600 11px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 12px; }
+    .eyebrow b { color: var(--accent); margin-right: 8px; font-weight: 600; }
+    h1.title { font: 800 34px/1.05 var(--font-sans); letter-spacing: -.02em; color: var(--fg-0); margin: 0 0 12px; }
+    p.sub { font: 400 15px/1.6 var(--font-sans); color: var(--fg-1); max-width: 72ch; margin: 0; }
+    p.sub strong { color: var(--fg-0); }
+    p.sub code { font: 600 13px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 2px 5px; border-radius: 3px; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    .sec-head { display: flex; align-items: baseline; gap: 14px; margin: 44px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+    .sec-num { font: 800 11px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .sec-title { font: 700 18px/1.2 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .sec-tag { margin-left: auto; font: 500 10px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .04em; text-transform: uppercase; }
+    .sec-sub { font: 400 13.5px/1.55 var(--font-sans); color: var(--fg-1); max-width: 68ch; margin: 0 0 16px; }
+    .sec-sub code { font: 600 12px/1 var(--font-mono); color: var(--accent); }
+
+    /* file-list table */
+    .file-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--line-strong); margin-bottom: 16px; }
+    table.file-table { width: 100%; border-collapse: collapse; background: var(--bg-2); }
+    table.file-table th, table.file-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); font: 400 13px/1.5 var(--font-sans); }
+    table.file-table th { background: var(--bg-3); font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--line-strong); }
+    table.file-table td { color: var(--fg-1); vertical-align: top; }
+    table.file-table tr:last-child td { border-bottom: 0; }
+    table.file-table td.path { font: 600 12.5px/1.5 var(--font-mono); color: var(--fg-0); white-space: normal; word-break: break-all; }
+    table.file-table td.path a { color: var(--fg-0); text-decoration: none; }
+    table.file-table td.path a:hover { color: var(--accent); text-decoration: underline; }
+    table.file-table td code { font: 600 11.5px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.06); padding: 1px 4px; border-radius: 3px; }
+
+    /* facilitator-action callout */
+    .action { padding: 14px 18px; background: rgba(0,229,255,.04); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; font: 400 13.5px/1.6 var(--font-sans); color: var(--fg-1); }
+    .action strong { color: var(--fg-0); }
+    .action .lbl { display: block; font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; }
+    .action code { font: 600 12.5px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.08); padding: 2px 5px; border-radius: 3px; }
+
+    /* summary table */
+    .summary-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--line-strong); margin-top: 16px; }
+    table.summary { width: 100%; border-collapse: collapse; background: var(--bg-2); }
+    table.summary th, table.summary td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); font: 400 13px/1.5 var(--font-sans); vertical-align: top; }
+    table.summary th { background: var(--bg-3); font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--line-strong); }
+    table.summary td { color: var(--fg-1); }
+    table.summary tr:last-child td { border-bottom: 0; }
+    table.summary td.num { font: 800 16px/1 var(--font-mono); color: var(--accent); text-align: center; width: 38px; }
+    table.summary td strong { color: var(--fg-0); }
+    table.summary td code { font: 600 11.5px/1 var(--font-mono); color: var(--accent); }
+
+    .footer-note { max-width: 1100px; margin: 56px auto 0; padding: 18px 24px; font: 400 12.5px/1.6 var(--font-sans); color: var(--fg-2); border-top: 1px solid var(--line); }
+    .footer-note code { font: 600 12px/1 var(--font-mono); color: var(--accent); }
+
+    @media print {
+      body { background: #fff; color: #111; padding: 0; }
+      .topnav, .footer-note { display: none; }
+      a { color: #111; text-decoration: underline; }
+      table.file-table, table.summary { background: #fff; border-color: #bbb; }
+      table.file-table th, table.summary th { background: #eef2f6 !important; color: #024c66 !important; }
+      table.file-table td, table.summary td { color: #222 !important; border-bottom-color: #ddd !important; }
+      table.file-table td.path, table.summary td strong { color: #000 !important; }
+      .action { background: #f0f6fa !important; border-left-color: #024c66 !important; color: #222; page-break-inside: avoid; }
+      .action .lbl { color: #024c66 !important; }
+      .action strong { color: #000 !important; }
+      .action code, table.file-table td code, table.summary td code, p.sub code { color: #024c66 !important; background: #fff !important; }
+      h1.title, .sec-title { color: #111; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/index.html"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">SPREADSHEETS · REFERENCE</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<div class="page-shell">
+  <p class="eyebrow"><b>REFERENCE</b>Facilitator data infrastructure</p>
+  <h1 class="title">Spreadsheets that power Velocity Arena.</h1>
+  <p class="sub">Five distinct Google Sheets integrations move data between students, facilitators, and the dashboard. This page lists every file that writes to or reads from a Google Sheet, what each one needs from the facilitator, and where to look when something stops working. <strong>One file rules them all: <code>config.js</code></strong> — every endpoint URL lives there.</p>
+</div>
+
+<main>
+
+  <!-- ── SECTION 01 ────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <span class="sec-title">Student lesson submissions.</span>
+    <span class="sec-tag">1 shared sheet</span>
+  </div>
+  <p class="sec-sub">Six lesson pages POST student work to the same Apps Script web app (<code>AKfycbzV0_UPT…</code>). Every student response across these six lessons lands in <strong>one shared spreadsheet</strong>, one row per submission.</p>
+
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>What it writes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path"><a href="/lessons/speed-stat.html" target="_blank" rel="noopener">lessons/speed-stat.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 1 Speed-stat lesson answers</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/endurance-stat.html" target="_blank" rel="noopener">lessons/endurance-stat.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 2 Endurance-stat lesson answers</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/endurance-discovery.html" target="_blank" rel="noopener">lessons/endurance-discovery.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 2 Endurance discovery responses</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/power.html" target="_blank" rel="noopener">lessons/power.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 4 Power lesson answers</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/power-stat-challenge.html" target="_blank" rel="noopener">lessons/power-stat-challenge.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 4 Power-challenge answers</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/prove-your-build.html" target="_blank" rel="noopener">lessons/prove-your-build.html</a> <span style="color:var(--fg-2);">(+ <code>es/</code>)</span></td>
+          <td>Day 5 Prove-Your-Build commitment</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action">
+    <span class="lbl">Facilitator action</span>
+    Open <strong>the shared lesson-submissions spreadsheet</strong> to see who completed which lesson, with what answers. One sheet is the source of truth across all six lessons. If a row is missing, check the student's browser console — the form will <code>console.error</code> on failure.
+  </div>
+
+  <!-- ── SECTION 02 ────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <span class="sec-title">Live Dashboard + Leaderboard.</span>
+    <span class="sec-tag">Per-site sheet</span>
+  </div>
+  <p class="sec-sub">The match dashboard and leaderboard route to different spreadsheets <em>per pilot site</em>. Each site has its own Apps Script web app that writes to its own sheet, keyed by the <code>cohortTag</code> in the URL.</p>
+
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Sites it routes to</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path"><a href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank" rel="noopener">activities/dashboard/velocity-arena-dashboard.html</a></td>
+          <td>Tennessee · NYC1 (Gotham Tech) · NYC2 (Claremont) · NYC3 (South Bronx)</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/activities/dashboard/leaderboard.html" target="_blank" rel="noopener">activities/dashboard/leaderboard.html</a></td>
+          <td>Tennessee (reads from the same per-site routing)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action">
+    <span class="lbl">Facilitator action</span>
+    Match data lands in <strong>the per-site sheet</strong> matched by the <code>cohortTag</code>. If your site shows empty data, three things to check: (1) the right <code>cohortTag</code> is in the URL, (2) the site's Apps Script web app is deployed and <em>redeployed</em> after any code changes, (3) the URL in <code>config.js</code> matches the deployed web app's <code>/exec</code> endpoint exactly.
+  </div>
+
+  <!-- ── SECTION 03 ────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <span class="sec-title">Pre-Task Diagnostic (Day 1).</span>
+    <span class="sec-tag">Per-state sheet</span>
+  </div>
+  <p class="sec-sub">Each state pilot site (MI, NY, RI, TN) has its own diagnostic spreadsheet. The student-facing diagnostic page writes through a <strong>service account</strong> (not via Apps Script), and the growth dashboard reads from those sheets to produce the per-concept comparison.</p>
+
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path"><a href="/activities/diagnostic/SETUP.md" target="_blank" rel="noopener">activities/diagnostic/SETUP.md</a></td>
+          <td><strong>The setup walkthrough.</strong> Step-by-step instructions for creating a state-specific Google Sheet, a Google Cloud service account, and connecting them. ~15-minute one-time setup per state.</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/activities/diagnostic/" target="_blank" rel="noopener">activities/diagnostic/index.html</a></td>
+          <td>Where students take the Day 1 pre-task — writes through the service account</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/activities/diagnostic-post/" target="_blank" rel="noopener">activities/diagnostic-post/index.html</a></td>
+          <td>Where students take the Day 15 post-task — same sheet, marked "post"</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/activities/diagnostic-dashboard/" target="_blank" rel="noopener">activities/diagnostic-dashboard/index.html</a></td>
+          <td>Anonymized per-concept growth comparison, pre vs. post</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action">
+    <span class="lbl">Facilitator action</span>
+    Every state pilot needs <strong>its own sheet configured per <code>SETUP.md</code></strong> before Day 1. Without it, the diagnostic UI submits but no row lands anywhere — you'll lose your baseline. The Day 15 post-task uses the same sheet; the dashboard only shows growth when both rows exist for the same student.
+  </div>
+
+  <!-- ── SECTION 04 ────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <span class="sec-title">What-If Loadout Analysis.</span>
+    <span class="sec-tag">1 sheet · CSV + Apps Script</span>
+  </div>
+  <p class="sec-sub">The Week 3 What-If analysis reads loadout data from a Google Sheet <strong>published to web as CSV</strong>, and writes lock-ins back via an Apps Script publish endpoint.</p>
+
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path"><a href="/lessons/what-if/index.html" target="_blank" rel="noopener">lessons/what-if/index.html</a></td>
+          <td>Facilitator setup instructions — how to publish the spreadsheet as CSV and where to paste the URL</td>
+        </tr>
+        <tr>
+          <td class="path"><a href="/lessons/what-if-analysis.html" target="_blank" rel="noopener">lessons/what-if-analysis.html</a></td>
+          <td>The student-facing lesson that reads the published CSV at run time</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action">
+    <span class="lbl">Facilitator action</span>
+    The spreadsheet must be <strong>File → Share → Publish to web → CSV</strong> <em>before</em> the student page can read it. Paste the CSV URL into <code>config.js</code> under <code>whatIfSheetCsvUrl</code>. The student page caches the CSV — if you update the sheet, give it a minute to propagate, or have students hard-refresh.
+  </div>
+
+  <!-- ── SECTION 05 ────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <span class="sec-title">Central config — one file for every endpoint.</span>
+    <span class="sec-tag">Edit here, not elsewhere</span>
+  </div>
+  <p class="sec-sub"><code>config.js</code> is the only file where endpoint URLs live. Lesson pages, dashboards, and analysis pages all import their URLs from here.</p>
+
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>What it defines</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path"><a href="/config.js" target="_blank" rel="noopener">config.js</a></td>
+          <td><code>whatIfSheetCsvUrl</code> (per-site overrides supported) · <code>whatIfLockinsCsvUrl</code> · <code>whatIfPublishEndpoint</code> · per-site Apps Script web app URLs for the dashboard / leaderboard.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action">
+    <span class="lbl">Facilitator action</span>
+    Whenever a sheet changes — new URL, new tab, new state added, new Apps Script deployment — <strong>this is the only file to edit</strong>. All the lesson pages and dashboards read from here. Update once, redeploy to Vercel, every page picks up the new endpoint.
+  </div>
+
+  <!-- ── SUMMARY ───────────────────────────────── -->
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <span class="sec-title">Summary — five spreadsheet groups at a glance.</span>
+  </div>
+
+  <div class="summary-table-wrap">
+    <table class="summary">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Spreadsheet group</th>
+          <th>Writes from</th>
+          <th>Reads to</th>
+          <th>Facilitator setup</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">01</td>
+          <td><strong>Lesson submissions</strong> <small style="color:var(--fg-2);">(1 shared)</small></td>
+          <td>6 lesson pages</td>
+          <td>The sheet directly</td>
+          <td>Just open the sheet to see student work</td>
+        </tr>
+        <tr>
+          <td class="num">02</td>
+          <td><strong>Match dashboard</strong> <small style="color:var(--fg-2);">(per-site)</small></td>
+          <td>Dashboard UI</td>
+          <td>Dashboard + Leaderboard</td>
+          <td>Deploy site's Apps Script web app, paste URL into <code>config.js</code></td>
+        </tr>
+        <tr>
+          <td class="num">03</td>
+          <td><strong>Pre/Post Diagnostic</strong> <small style="color:var(--fg-2);">(per-state)</small></td>
+          <td>Diagnostic UI</td>
+          <td>Growth Dashboard</td>
+          <td>Follow <code>SETUP.md</code> once per state</td>
+        </tr>
+        <tr>
+          <td class="num">04</td>
+          <td><strong>What-If analysis</strong> <small style="color:var(--fg-2);">(1 sheet, multi-tab)</small></td>
+          <td>Apps Script publish endpoint</td>
+          <td>What-If lesson</td>
+          <td>Publish sheet as CSV, paste URLs into <code>config.js</code></td>
+        </tr>
+        <tr>
+          <td class="num">05</td>
+          <td><strong>Central config</strong> <small style="color:var(--fg-2);">(the router)</small></td>
+          <td>—</td>
+          <td>All of the above</td>
+          <td>Edit <code>config.js</code> whenever any of the above changes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    If a spreadsheet integration breaks, start at <code>config.js</code> — the endpoint URL is almost always the cause. For Apps Script web apps specifically: editing the script does not redeploy it. Use <strong>Deploy → Manage deployments → Edit → New version → Deploy</strong> after any script change, or the old code keeps running at the old URL.
+  </div>
+
+</main>
+
+</body>
+</html>
