@@ -226,49 +226,242 @@
 
   <div class="code-card">
     <div class="code-head">
-      <span class="filename">launchSequence.ts</span>
+      <span class="filename">launch-kick-test.ts</span>
       <span class="lang">JavaScript / MakeCode</span>
       <button class="copy-btn" id="copy-btn" type="button" onclick="copyCode()">Copy</button>
     </div>
-<pre class="code" id="code-block"><span class="k">function</span> <span class="f">launchSequence</span>() {
+<pre class="code" id="code-block"><span class="c">/**
+ * ============================================================
+ * LAUNCH + KICK TEST  (left-turn-first, your stats)
+ * ------------------------------------------------------------
+ * Place bot in its corner facing the goal, ball ahead &amp; LEFT.
+ * Press A  -&gt; run launchSequence + kick
+ * Press B  -&gt; emergency stop
+ * Yes icon -&gt; ball found &amp; kicked    No icon -&gt; ball not reached
+ * ============================================================
+ */</span>
+
+<span class="c">// ── Your stats ─────────────────────────────────────────────</span>
+<span class="k">let</span> SPEED = <span class="n">0</span>
+<span class="k">let</span> POWER = <span class="n">0</span>
+<span class="k">let</span> TURNING = <span class="n">0</span>
+<span class="k">let</span> ENDURANCE = <span class="n">0</span>
+
+<span class="c">// ── Launch tunables (plug in your tuned diagonal value) ─────</span>
+<span class="k">let</span> LAUNCH_OFFSET_TURN_DEG = <span class="n">35</span>
+<span class="k">let</span> LAUNCH_OFFSET_DRIVE_MS = <span class="n">2500</span>   <span class="c">// ← set this to your tuned diagonal value</span>
+<span class="k">let</span> LAUNCH_SQUARE_TURN_DEG = <span class="n">35</span>     <span class="c">// keep equal to OFFSET_TURN_DEG</span>
+<span class="k">let</span> LAUNCH_APPROACH_MS = <span class="n">600</span>    <span class="c">// max forward time to reach the ball</span>
+
+<span class="c">// ── Field constants ────────────────────────────────────────</span>
+<span class="k">let</span> BORDER_THRESHOLD = <span class="n">130</span>
+<span class="k">let</span> BALL_DETECT_CM = <span class="n">40</span>
+
+<span class="c">// ── State ──────────────────────────────────────────────────</span>
+<span class="k">let</span> motorPower = <span class="n">0</span>
+<span class="k">let</span> currentPower = <span class="n">0</span>
+<span class="k">let</span> chargePower = <span class="n">0</span>
+<span class="k">let</span> FOLLOW_THROUGH_MS = <span class="n">0</span>
+<span class="k">let</span> minWheelSpeed = <span class="n">0</span>
+<span class="k">let</span> enduranceFactor = <span class="n">0</span>
+<span class="k">let</span> effectiveCharge = <span class="n">0</span>
+<span class="k">let</span> dynamicCharge = <span class="n">0</span>
+<span class="k">let</span> actualFollowThrough = <span class="n">0</span>
+<span class="k">let</span> launchActive = <span class="k">false</span>
+<span class="k">let</span> matchRunning = <span class="k">false</span>
+<span class="k">let</span> ballDetected = <span class="k">false</span>
+<span class="k">let</span> strip: neopixel.Strip = <span class="k">null</span>
+
+<span class="c">// ============================================================
+// HELPERS
+// ============================================================</span>
+<span class="k">function</span> <span class="f">motorStop</span>() {
+    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
+    basic.<span class="f">pause</span>(<span class="n">10</span>)
+    CutebotPro.<span class="f">pwmCruiseControl</span>(<span class="n">0</span>, <span class="n">0</span>)
+    basic.<span class="f">pause</span>(<span class="n">10</span>)
+    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
+}
+
+<span class="k">function</span> <span class="f">computeStats</span>() {
+    motorPower = SPEED * <span class="n">100</span> / <span class="n">20</span>
+    currentPower = motorPower
+    chargePower = Math.<span class="f">min</span>(POWER * POWER, <span class="n">100</span>)
+    FOLLOW_THROUGH_MS = <span class="n">120</span> + POWER * <span class="n">35</span>
+    minWheelSpeed = Math.<span class="f">max</span>(<span class="n">20</span>, Math.<span class="f">round</span>(motorPower * <span class="n">0.25</span>))
+}
+
+<span class="k">function</span> <span class="f">flashHeadlights</span>() {
+    CutebotPro.<span class="f">singleHeadlights</span>(CutebotProRGBLight.RGBA, <span class="n">255</span>, <span class="n">255</span>, <span class="n">255</span>)
+    basic.<span class="f">pause</span>(<span class="n">30</span>)
+    CutebotPro.<span class="f">singleHeadlights</span>(CutebotProRGBLight.RGBA, <span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>)
+}
+
+<span class="c">// Simple border check (any sensor over threshold). Disabled during launch shimmy/kick.</span>
+<span class="k">function</span> <span class="f">checkBorder</span>(): number {
+    <span class="k">if</span> (launchActive) { <span class="k">return</span> <span class="n">0</span> }
+    CutebotPro.<span class="f">trackbitStateValue</span>()
+    <span class="k">let</span> s1 = CutebotPro.<span class="f">trackbitgetGray</span>(TrackbitChannel.One)
+    <span class="k">let</span> s2 = CutebotPro.<span class="f">trackbitgetGray</span>(TrackbitChannel.Two)
+    <span class="k">let</span> s3 = CutebotPro.<span class="f">trackbitgetGray</span>(TrackbitChannel.Three)
+    <span class="k">let</span> s4 = CutebotPro.<span class="f">trackbitgetGray</span>(TrackbitChannel.Four)
+    <span class="k">if</span> (s1 &gt; BORDER_THRESHOLD || s2 &gt; BORDER_THRESHOLD ||
+        s3 &gt; BORDER_THRESHOLD || s4 &gt; BORDER_THRESHOLD) { <span class="k">return</span> <span class="n">1</span> }
+    <span class="k">return</span> <span class="n">0</span>
+}
+
+<span class="k">function</span> <span class="f">confirmBall</span>(): boolean {
+    <span class="f">motorStop</span>()
+    basic.<span class="f">pause</span>(<span class="n">40</span>)
+    <span class="k">let</span> hits = <span class="n">0</span>
+    <span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i++) {
+        <span class="k">if</span> (i &gt; <span class="n">0</span>) { basic.<span class="f">pause</span>(<span class="n">30</span>) }
+        <span class="k">let</span> dist = CutebotPro.<span class="f">ultrasonic</span>(SonarUnit.Centimeters)
+        <span class="k">if</span> (dist &gt; <span class="n">3</span> &amp;&amp; dist &lt; BALL_DETECT_CM) { hits += <span class="n">1</span> }
+    }
+    <span class="k">if</span> (hits &gt;= <span class="n">2</span>) { <span class="f">flashHeadlights</span>(); <span class="k">return</span> <span class="k">true</span> }
+    <span class="k">return</span> <span class="k">false</span>
+}
+
+<span class="c">// Drive forward until the ball is confirmed ahead, or maxMs elapses.</span>
+<span class="k">function</span> <span class="f">driveUntilBall</span>(maxMs: number): boolean {
+    <span class="k">let</span> t0 = input.<span class="f">runningTime</span>()
+    CutebotPro.<span class="f">pwmCruiseControl</span>(currentPower, currentPower)
+    <span class="k">while</span> (input.<span class="f">runningTime</span>() - t0 &lt; maxMs) {
+        <span class="k">if</span> (!matchRunning) { <span class="k">return</span> <span class="k">false</span> }
+        <span class="k">if</span> (<span class="f">checkBorder</span>() &gt; <span class="n">0</span>) { <span class="f">motorStop</span>(); <span class="k">return</span> <span class="k">false</span> }
+        <span class="k">let</span> d = CutebotPro.<span class="f">ultrasonic</span>(SonarUnit.Centimeters)
+        <span class="k">if</span> (d &gt; <span class="n">4</span> &amp;&amp; d &lt; BALL_DETECT_CM) {
+            <span class="f">motorStop</span>()
+            <span class="k">if</span> (<span class="f">confirmBall</span>()) { <span class="k">return</span> <span class="k">true</span> }
+            CutebotPro.<span class="f">pwmCruiseControl</span>(currentPower, currentPower)   <span class="c">// false alarm, resume</span>
+        }
+        basic.<span class="f">pause</span>(<span class="n">5</span>)
+    }
+    <span class="f">motorStop</span>()
+    <span class="k">return</span> <span class="k">false</span>
+}
+
+<span class="c">// ============================================================
+// CHARGE + FOLLOW THROUGH  (both fixes applied)
+// ============================================================</span>
+<span class="k">function</span> <span class="f">chargeAndFollowThrough</span>() {
+    <span class="f">flashHeadlights</span>()
+    strip.<span class="f">showColor</span>(neopixel.<span class="f">colors</span>(NeoPixelColors.Yellow))
+
+    <span class="c">// Fix #2: guard against enduranceFactor = 0 so the kick fires full power.</span>
+    <span class="k">let</span> factor = enduranceFactor &gt; <span class="n">0</span> ? enduranceFactor : <span class="n">1</span>
+    effectiveCharge = Math.<span class="f">min</span>(Math.<span class="f">max</span>(Math.<span class="f">round</span>(chargePower * factor), <span class="n">25</span>), <span class="n">100</span>)
+    dynamicCharge = Math.<span class="f">max</span>(effectiveCharge, <span class="n">30</span>)
+    actualFollowThrough = Math.<span class="f">min</span>(FOLLOW_THROUGH_MS, <span class="n">500</span>)
+
+    <span class="k">while</span> (ballDetected) {
+        <span class="k">if</span> (!matchRunning) { <span class="f">motorStop</span>(); <span class="k">return</span> }
+        <span class="k">if</span> (<span class="f">checkBorder</span>() &gt; <span class="n">0</span>) { <span class="f">motorStop</span>(); ballDetected = <span class="k">false</span>; <span class="k">return</span> }
+
+        CutebotPro.<span class="f">pwmCruiseControl</span>(dynamicCharge, dynamicCharge)
+        <span class="k">let</span> chargeStart = input.<span class="f">runningTime</span>()
+        <span class="k">while</span> (input.<span class="f">runningTime</span>() - chargeStart &lt; actualFollowThrough) {
+            <span class="k">if</span> (!matchRunning) { <span class="f">motorStop</span>(); <span class="k">return</span> }
+            <span class="k">if</span> (<span class="f">checkBorder</span>() &gt; <span class="n">0</span>) { <span class="f">motorStop</span>(); ballDetected = <span class="k">false</span>; <span class="k">return</span> }
+            basic.<span class="f">pause</span>(<span class="n">5</span>)
+        }
+
+        <span class="k">let</span> f = CutebotPro.<span class="f">ultrasonic</span>(SonarUnit.Centimeters)
+        <span class="k">if</span> (f &gt; <span class="n">5</span> &amp;&amp; f &lt; BALL_DETECT_CM) {
+            ballDetected = <span class="k">true</span>            <span class="c">// still in contact — keep driving through</span>
+        } <span class="k">else</span> {
+            <span class="c">// Fix #1: COMMIT a follow-through drive after the ball leaves the
+            // sensor, instead of braking the instant contact is lost.</span>
+            <span class="k">let</span> ftStart = input.<span class="f">runningTime</span>()
+            CutebotPro.<span class="f">pwmCruiseControl</span>(dynamicCharge, dynamicCharge)
+            <span class="k">while</span> (input.<span class="f">runningTime</span>() - ftStart &lt; actualFollowThrough) {
+                <span class="k">if</span> (!matchRunning) { <span class="f">motorStop</span>(); <span class="k">return</span> }
+                <span class="k">if</span> (<span class="f">checkBorder</span>() &gt; <span class="n">0</span>) { <span class="f">motorStop</span>(); ballDetected = <span class="k">false</span>; <span class="k">return</span> }
+                basic.<span class="f">pause</span>(<span class="n">5</span>)
+            }
+            <span class="f">motorStop</span>()
+            ballDetected = <span class="k">false</span>
+        }
+    }
+}
+
+<span class="c">// ============================================================
+// LAUNCH SEQUENCE  (left turn first, dead reckoned)
+// ============================================================</span>
+<span class="k">function</span> <span class="f">launchSequence</span>() {
+    matchRunning = <span class="k">true</span>
+    ballDetected = <span class="k">false</span>
+    enduranceFactor = <span class="n">1</span>
     launchActive = <span class="k">true</span>
     <span class="k">let</span> powerScale = <span class="n">30</span> / Math.<span class="f">max</span>(<span class="n">1</span>, motorPower)
-    <span class="c">// ── Step 1: Turn LEFT from corner ────────────────────────</span>
-    CutebotPro.<span class="f">trolleySteering</span>(CutebotProTurn.LeftInPlace, <span class="n">45</span>)
-    basic.<span class="f">pause</span>(<span class="n">300</span>)
-    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
-    basic.<span class="f">pause</span>(<span class="n">150</span>)
 
-    <span class="c">// ── Step 2: Drive diagonally toward centre line ───────────</span>
+    <span class="c">// Step 1: angle LEFT toward the center line</span>
+    CutebotPro.<span class="f">trolleySteering</span>(CutebotProTurn.LeftInPlace, LAUNCH_OFFSET_TURN_DEG)
+    basic.<span class="f">pause</span>(<span class="n">300</span>); <span class="f">motorStop</span>(); basic.<span class="f">pause</span>(<span class="n">120</span>)
+
+    <span class="c">// Step 2: diagonal onto the ball→goal axis</span>
     CutebotPro.<span class="f">pwmCruiseControl</span>(currentPower, currentPower)
-    basic.<span class="f">pause</span>(Math.<span class="f">round</span>(<span class="n">2200</span> * powerScale))
-    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
-    basic.<span class="f">pause</span>(<span class="n">150</span>)
+    basic.<span class="f">pause</span>(Math.<span class="f">round</span>(LAUNCH_OFFSET_DRIVE_MS * powerScale))
+    <span class="f">motorStop</span>(); basic.<span class="f">pause</span>(<span class="n">120</span>)
 
-    <span class="c">// ── Step 3: Turn RIGHT to face up the centre ─────────────</span>
-    CutebotPro.<span class="f">trolleySteering</span>(CutebotProTurn.RightInPlace, <span class="n">45</span>)
-    basic.<span class="f">pause</span>(<span class="n">300</span>)
-    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
-    basic.<span class="f">pause</span>(<span class="n">150</span>)
+    <span class="c">// Step 3: re-square RIGHT to face straight down-field</span>
+    CutebotPro.<span class="f">trolleySteering</span>(CutebotProTurn.RightInPlace, LAUNCH_SQUARE_TURN_DEG)
+    basic.<span class="f">pause</span>(<span class="n">300</span>); <span class="f">motorStop</span>(); basic.<span class="f">pause</span>(<span class="n">120</span>)
 
-    <span class="c">// ── Step 4: Drive straight to the ball ───────────────────</span>
-    CutebotPro.<span class="f">pwmCruiseControl</span>(currentPower, currentPower)
-    basic.<span class="f">pause</span>(Math.<span class="f">round</span>(<span class="n">1200</span> * powerScale))
-    CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
-    basic.<span class="f">pause</span>(<span class="n">200</span>)
-
-    <span class="c">// ── Re-enable border detection ────────────────────────────</span>
-    resetRequested = <span class="k">false</span>
     launchActive = <span class="k">false</span>
     basic.<span class="f">pause</span>(<span class="n">30</span>)
-    <span class="k">if</span> (<span class="f">checkBorder</span>() &gt; <span class="n">0</span>) { <span class="f">handleBorder</span>() }
-    basic.<span class="f">pause</span>(<span class="n">200</span>)
+    <span class="k">if</span> (!matchRunning) { <span class="f">motorStop</span>(); <span class="k">return</span> }
 
-    <span class="c">// ── lookForBall at mid-field ──────────────────────────────</span>
-    <span class="k">if</span> (!ballDetected &amp;&amp; matchRunning) {
-        <span class="f">lookForBall</span>()
+    <span class="c">// Step 4: roll forward until the ball is captured</span>
+    <span class="k">if</span> (<span class="f">driveUntilBall</span>(Math.<span class="f">round</span>(LAUNCH_APPROACH_MS * powerScale))) {
+        ballDetected = <span class="k">true</span>
+        <span class="c">// Step 5: kick straight through into the goal</span>
+        <span class="k">if</span> (matchRunning &amp;&amp; <span class="f">confirmBall</span>()) {
+            launchActive = <span class="k">true</span>            <span class="c">// ignore goal-line border during the kick</span>
+            <span class="f">chargeAndFollowThrough</span>()
+            launchActive = <span class="k">false</span>
+        }
+        basic.<span class="f">showIcon</span>(IconNames.Yes)      <span class="c">// reached &amp; kicked</span>
+    } <span class="k">else</span> {
+        basic.<span class="f">showIcon</span>(IconNames.No)       <span class="c">// never reached the ball</span>
     }
-}</pre>
+
+    <span class="f">motorStop</span>()
+    matchRunning = <span class="k">false</span>
+    basic.<span class="f">pause</span>(<span class="n">800</span>)
+    basic.<span class="f">clearScreen</span>()
+}
+
+<span class="c">// ============================================================
+// BUTTONS
+// ============================================================</span>
+input.<span class="f">onButtonPressed</span>(Button.A, <span class="k">function</span> () {
+    <span class="f">computeStats</span>()
+    basic.<span class="f">showIcon</span>(IconNames.Target)
+    basic.<span class="f">pause</span>(<span class="n">500</span>)
+    basic.<span class="f">clearScreen</span>()
+    <span class="f">launchSequence</span>()
+})
+
+input.<span class="f">onButtonPressed</span>(Button.B, <span class="k">function</span> () {
+    matchRunning = <span class="k">false</span>
+    ballDetected = <span class="k">false</span>
+    <span class="f">motorStop</span>()
+    basic.<span class="f">showIcon</span>(IconNames.No)
+    basic.<span class="f">pause</span>(<span class="n">400</span>)
+    basic.<span class="f">clearScreen</span>()
+})
+
+<span class="c">// ============================================================
+// INIT
+// ============================================================</span>
+strip = neopixel.<span class="f">create</span>(DigitalPin.P15, <span class="n">8</span>, NeoPixelMode.RGB)
+strip.<span class="f">setBrightness</span>(<span class="n">255</span>)
+CutebotPro.<span class="f">stopImmediately</span>(CutebotProMotors.ALL)
+CutebotPro.<span class="f">pwmCruiseControl</span>(<span class="n">0</span>, <span class="n">0</span>)
+basic.<span class="f">pause</span>(<span class="n">100</span>)
+basic.<span class="f">showIcon</span>(IconNames.SmallSquare)</pre>
   </div>
 
   <div class="section-label">
