@@ -22,7 +22,7 @@
 //
 // Required env vars:
 //   ANTHROPIC_API_KEY
-//   GOOGLE_SHEET_ID_NEW_YORK_1 / _2 / _TN and their _POST counterparts
+//   GOOGLE_SHEET_ID_NEW_YORK_1 / _2 / _3 / _TN and their _POST counterparts
 //   GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY
 
 export const config = { runtime: 'edge' };
@@ -30,11 +30,13 @@ export const config = { runtime: 'edge' };
 const PRE_SHEETS = {
   NY1: 'GOOGLE_SHEET_ID_NEW_YORK_1',
   NY2: 'GOOGLE_SHEET_ID_NEW_YORK_2',
+  NY3: 'GOOGLE_SHEET_ID_NEW_YORK_3',
   TN:  'GOOGLE_SHEET_ID_TN',
 };
 const POST_SHEETS = {
   NY1: 'GOOGLE_SHEET_ID_NEW_YORK_1_POST',
   NY2: 'GOOGLE_SHEET_ID_NEW_YORK_2_POST',
+  NY3: 'GOOGLE_SHEET_ID_NEW_YORK_3_POST',
   TN:  'GOOGLE_SHEET_ID_TN_POST',
 };
 

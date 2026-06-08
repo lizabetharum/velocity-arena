@@ -5,9 +5,10 @@
 //
 // Required environment variables in Vercel:
 //
-//   Per-site Post Sheet IDs (three pilot sites):
+//   Per-site Post Sheet IDs (four pilot sites):
 //     GOOGLE_SHEET_ID_NEW_YORK_1_POST  — New York 1
 //     GOOGLE_SHEET_ID_NEW_YORK_2_POST  — New York 2
+//     GOOGLE_SHEET_ID_NEW_YORK_3_POST  — New York 3
 //     GOOGLE_SHEET_ID_TN_POST          — Tennessee
 //
 //   Shared credentials (reused from the pre-test — same service account):
@@ -30,6 +31,7 @@ export default async function handler(req) {
   const sheetIds = {
     NY1: process.env.GOOGLE_SHEET_ID_NEW_YORK_1_POST,
     NY2: process.env.GOOGLE_SHEET_ID_NEW_YORK_2_POST,
+    NY3: process.env.GOOGLE_SHEET_ID_NEW_YORK_3_POST,
     TN:  process.env.GOOGLE_SHEET_ID_TN_POST,
   };
 
