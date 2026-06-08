@@ -3,388 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cutebot Pro Soccer — Match Simulator</title>
+<title>Velocity Arena — Match Simulator (v2)</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 24px; }
+  h1 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .subtitle { font-size: 0.85rem; color: #718096; margin-bottom: 24px; }
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1240px; margin: 0 auto; }
+  .panel { background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px; padding: 18px; }
+  .panel-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; margin-bottom: 14px; }
 
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #0f1117;
-    color: #e2e8f0;
-    min-height: 100vh;
-    padding: 24px;
-  }
+  .bot-block { margin-bottom: 18px; }
+  .bot-label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; }
+  .bot-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .budget { margin-left:auto; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:10px; }
+  .budget.ok  { color:#9ae6b4; background:rgba(72,187,120,0.12); }
+  .budget.bad { color:#feb2b2; background:rgba(252,129,129,0.14); }
 
-  h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 4px;
-  }
-  .subtitle {
-    font-size: 0.85rem;
-    color: #718096;
-    margin-bottom: 24px;
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  /* ── PANEL ── */
-  .panel {
-    background: #1a1d27;
-    border: 1px solid #2d3148;
-    border-radius: 12px;
-    padding: 18px;
-  }
-  .panel-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #718096;
-    margin-bottom: 14px;
-  }
-
-  /* ── BOT STAT BLOCK ── */
-  .bot-block { margin-bottom: 20px; }
-  .bot-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
-  .bot-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .opt-toggle {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #fbd38d;
-    cursor: pointer;
-    user-select: none;
-  }
-  .opt-toggle input { cursor: pointer; accent-color: #ecc94b; }
-  input[type=range]:disabled { opacity: 0.45; cursor: not-allowed; }
-  .fout { font-size:0.63rem; color:#4a5568; padding:1px 0 5px 0; line-height:1.4; }
-  .fout em { color:#a0aec0; font-style:normal; }
-  .preset-select {
-    width:100%; margin-bottom:8px; padding:4px 8px;
-    background:#1a1d27; border:1px solid #2d3148; border-radius:6px;
-    color:#a0aec0; font-size:0.72rem; cursor:pointer; font-family:inherit;
-  }
+  .preset-select { width:100%; margin-bottom:10px; padding:5px 8px; background:#0f1117; border:1px solid #2d3148; border-radius:6px; color:#a0aec0; font-size:0.72rem; cursor:pointer; font-family:inherit; }
   .preset-select:focus { outline:none; border-color:#4a5568; }
 
-  .stat-row {
-    display: grid;
-    grid-template-columns: 80px 1fr 28px;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .stat-name {
-    font-size: 0.78rem;
-    color: #a0aec0;
-  }
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 4px;
-    border-radius: 2px;
-    background: #2d3148;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  .slider-a::-webkit-slider-thumb { background: #63b3ed; }
-  .slider-b::-webkit-slider-thumb { background: #fc8181; }
-  .slider-a { accent-color: #63b3ed; }
-  .slider-b { accent-color: #fc8181; }
+  .stat-row { display: grid; grid-template-columns: 78px 1fr 24px; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .stat-name { font-size: 0.78rem; color: #a0aec0; }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #2d3148; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; cursor: pointer; }
+  .slider-a::-webkit-slider-thumb { background: #63b3ed; } .slider-b::-webkit-slider-thumb { background: #fc8181; }
+  .slider-a { accent-color: #63b3ed; } .slider-b { accent-color: #fc8181; }
+  .stat-val { font-size: 0.78rem; font-weight: 700; text-align: right; color: #e2e8f0; }
+  .fout { font-size:0.62rem; color:#4a5568; padding:0 0 8px 0; line-height:1.4; }
+  .fout em { color:#a0aec0; font-style:normal; }
 
-  .stat-val {
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-align: right;
-    color: #e2e8f0;
-    min-width: 18px;
-  }
-
-  /* ── BUTTONS ── */
-  .btn-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 4px;
-  }
-  button {
-    flex: 1;
-    padding: 9px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+  button { flex: 1; padding: 9px 0; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s, background 0.15s; }
   button:hover { opacity: 0.88; transform: translateY(-1px); }
-  button:active { transform: translateY(0); }
-  #btnStart {
-    background: linear-gradient(135deg, #4299e1, #667eea);
-    color: #fff;
-  }
-  #btnPause {
-    background: #2d3148;
-    color: #a0aec0;
-  }
-  #btnReset {
-    background: #2d3148;
-    color: #a0aec0;
-  }
+  button:disabled { cursor: progress; opacity: 0.95; transform: none; }
+  #btnStart { background: linear-gradient(135deg, #4299e1, #667eea); color: #fff; }
+  #btnPause, #btnReset { background: #2d3148; color: #a0aec0; }
 
-  /* ── SPEED CONTROL ── */
-  .speed-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    margin-bottom: 0;
-  }
-  .speed-label { font-size: 0.78rem; color: #718096; }
-  .speed-btns { display: flex; gap: 4px; }
-  .speed-btn {
-    flex: none;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    border-radius: 6px;
-    background: #2d3148;
-    color: #a0aec0;
-    border: 1px solid #3d4168;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .speed-btn.active {
-    background: #4a5568;
-    color: #fff;
-    border-color: #718096;
-  }
+  .speed-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .speed-label { font-size: 0.78rem; color: #718096; width: 100%; }
+  .speed-btns { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
+  .speed-btn { flex: 1 0 auto; min-width: 38px; text-align: center; padding: 5px 0; font-size: 0.74rem; border-radius: 6px; background: #2d3148; color: #a0aec0; border: 1px solid #3d4168; cursor: pointer; }
+  .speed-btn.active { background: #4a5568; color: #fff; border-color: #718096; }
 
-  /* ── MATCH CLOCK ── */
-  .clock-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .clock {
-    font-size: 1.6rem;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-    color: #fff;
-    letter-spacing: 0.04em;
-  }
-  .score-display {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-  .score-bot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-  }
-  .score-num {
-    font-size: 1.3rem;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-  }
+  .toggle-row { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.78rem; color:#a0aec0; user-select:none; margin-top:8px; }
+  .toggle-row input { width:14px; height:14px; cursor:pointer; }
 
-  /* ── FIELD CANVAS ── */
-  .field-wrap {
-    position: relative;
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f5f0e8;
-    border: 3px solid #2d3148;
-  }
-  canvas#fieldCanvas {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+  .clock-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .clock { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; color: #fff; letter-spacing: 0.04em; }
+  .score-display { display: flex; gap: 16px; align-items: center; }
+  .score-bot { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; }
+  .score-num { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-  /* ── STATUS CHIPS ── */
-  .status-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .chip {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #1a1d27;
-    border: 1px solid #2d3148;
-  }
-  .chip-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-  }
+  .field-wrap { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #f5f0e8; border: 3px solid #2d3148; }
+  canvas#fieldCanvas { display: block; width: 100%; height: auto; }
 
-  /* ── STATS TABLE ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 14px;
-  }
-  .stat-card {
-    background: #0f1117;
-    border-radius: 8px;
-    padding: 10px 12px;
-    border: 1px solid #2d3148;
-  }
-  .stat-card-label {
-    font-size: 0.7rem;
-    color: #718096;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .stat-card-vals {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-  .stat-card-val {
-    font-size: 1.05rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
+  .status-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #1a1d27; border: 1px solid #2d3148; }
+  .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  /* ── EVENT LOG ── */
-  .event-log {
-    margin-top: 14px;
-    max-height: 120px;
-    overflow-y: auto;
-    font-size: 0.73rem;
-    color: #718096;
-    line-height: 1.6;
-  }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .stat-card { background: #0f1117; border-radius: 8px; padding: 10px 12px; border: 1px solid #2d3148; }
+  .stat-card-label { font-size: 0.7rem; color: #718096; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-card-vals { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat-card-val { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .event-log { margin-top: 14px; max-height: 130px; overflow-y: auto; font-size: 0.73rem; color: #718096; line-height: 1.6; }
   .event-log::-webkit-scrollbar { width: 4px; }
-  .event-log::-webkit-scrollbar-track { background: transparent; }
   .event-log::-webkit-scrollbar-thumb { background: #2d3148; border-radius: 2px; }
   .log-entry { padding: 1px 0; }
-  .log-entry span { font-weight: 600; }
 
-  /* ── FORMULA PANEL ── */
-  .formula-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    font-size: 0.73rem;
-  }
-  .formula-item {
-    background: #0f1117;
-    border-radius: 6px;
-    padding: 7px 10px;
-    border: 1px solid #2d3148;
-    color: #a0aec0;
-    font-family: 'Courier New', monospace;
-  }
+  .formula-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.72rem; }
+  .formula-item { background: #0f1117; border-radius: 6px; padding: 7px 10px; border: 1px solid #2d3148; color: #a0aec0; font-family: 'Courier New', monospace; }
   .formula-item strong { color: #63b3ed; display: block; margin-bottom: 2px; font-family: inherit; }
-
-  .divider {
-    height: 1px;
-    background: #2d3148;
-    margin: 16px 0;
-  }
-
-  @media (max-width: 780px) {
-    .layout { grid-template-columns: 1fr; }
-  }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:10px; font-size:0.7rem; color:#a0aec0; }
+  .legend span { display:flex; align-items:center; gap:5px; }
+  .legend i { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .divider { height: 1px; background: #2d3148; margin: 14px 0; }
+  @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div style="max-width:1200px;margin:0 auto">
-  <h1>⚽ Cutebot Pro Soccer — Match Simulator</h1>
-  <p class="subtitle">8 × 4 ft field · White floor / Black border · 3-minute match · Adjust stats and run a simulation match</p>
+<div style="max-width:1240px;margin:0 auto">
+  <h1>⚽ Velocity Arena — Match Simulator <span style="font-size:0.9rem;color:#4299e1;">v2.2</span></h1>
+  <p class="subtitle">8 × 4 ft field · 20-pt budget · goal-seeking dribble · own goals count · 60× speed · 1000-sim batch. Models the current match code.</p>
 </div>
 
 <div class="layout">
 
-  <!-- LEFT PANEL: controls -->
+  <!-- LEFT: controls -->
   <div>
     <div class="panel">
-      <div class="panel-title">Bot Stats</div>
+      <div class="panel-title">Bot Stats <span style="font-weight:400;text-transform:none;letter-spacing:0;">(each 1–10, total = 20)</span></div>
 
       <!-- Bot A -->
       <div class="bot-block">
         <div class="bot-label">
-          <div class="bot-dot" style="background:#63b3ed"></div>
-          Bot A — Blue
-          <label class="opt-toggle" title="20-pt budget: SPEED 5 (max power, no charge penalty) · POWER 8 (caps charge push) · TURNING 3 (saturates turn rate) · ENDURANCE 4">
-            <input type="checkbox" id="aOptimal"> ⚡ Optimal
-          </label>
+          <div class="bot-dot" style="background:#63b3ed"></div> Bot A — Blue
+          <span class="budget ok" id="aBudget">20 / 20</span>
         </div>
         <select class="preset-select" onchange="applyPreset('a',this.value);this.value=''">
-          <option value="">— Load preset —</option>
-          <option value="7,10,2,1">Optimal S7·P10·E2·T1</option>
-          <option value="7,9,3,1">Near-optimal S7·P9·E3·T1</option>
-          <option value="10,5,3,2">Sprinter S10</option>
-          <option value="5,10,2,3">Charger P10</option>
-          <option value="6,4,8,2">Marathon E8</option>
-          <option value="5,5,5,5">Balanced</option>
-          <option value="6,7,4,3">Class Default</option>
+          <option value="">— Load a build —</option>
+          <option value="6,8,4,2">Sniper  S6·P8·E4·T2</option>
+          <option value="10,4,3,3">Speedster  S10·P4·E3·T3</option>
+          <option value="4,4,9,3">Tank  S4·P4·E9·T3</option>
+          <option value="4,5,3,8">Ninja  S4·P5·E3·T8</option>
+          <option value="5,5,5,5">Balanced  5·5·5·5</option>
+          <option value="5,5,8,2">Marathon  S5·P5·E8·T2</option>
         </select>
-        <div class="stat-row">
-          <span class="stat-name">Speed</span>
-          <input type="range" min="1" max="10" value="6" id="aSpeed" class="slider-a">
-          <span class="stat-val" id="aSpeedVal">6</span>
-        </div>
-        <div class="fout" id="aSpeedOut"><em>Motor Power:</em> 30%</div>
-        <div class="stat-row">
-          <span class="stat-name">Power</span>
-          <input type="range" min="1" max="10" value="7" id="aPower" class="slider-a">
-          <span class="stat-val" id="aPowerVal">7</span>
-        </div>
-        <div class="fout" id="aPowerOut"><em>Charge:</em> 49% · <em>Follow:</em> 365ms</div>
-        <div class="stat-row">
-          <span class="stat-name">Endurance</span>
-          <input type="range" min="1" max="10" value="4" id="aEndurance" class="slider-a">
-          <span class="stat-val" id="aEnduranceVal">4</span>
-        </div>
-        <div class="fout" id="aEnduranceOut"><em>Decay:</em> 24/min · <em>Floor at</em> 3.3min</div>
-        <div class="stat-row">
-          <span class="stat-name">Turning</span>
-          <input type="range" min="1" max="10" value="3" id="aTurning" class="slider-a">
-          <span class="stat-val" id="aTurningVal">3</span>
-        </div>
-        <div class="fout" id="aTurningOut"><em>Ratio:</em> 0.26 · <em>AlignMs:</em> 172ms</div>
+        <div class="stat-row"><span class="stat-name">Speed</span><input type="range" min="1" max="10" value="6" id="aSpeed" class="slider-a"><span class="stat-val" id="aSpeedVal">6</span></div>
+        <div class="fout" id="aSpeedOut"></div>
+        <div class="stat-row"><span class="stat-name">Power</span><input type="range" min="1" max="10" value="8" id="aPower" class="slider-a"><span class="stat-val" id="aPowerVal">8</span></div>
+        <div class="fout" id="aPowerOut"></div>
+        <div class="stat-row"><span class="stat-name">Endurance</span><input type="range" min="1" max="10" value="4" id="aEndurance" class="slider-a"><span class="stat-val" id="aEnduranceVal">4</span></div>
+        <div class="fout" id="aEnduranceOut"></div>
+        <div class="stat-row"><span class="stat-name">Turning</span><input type="range" min="1" max="10" value="2" id="aTurning" class="slider-a"><span class="stat-val" id="aTurningVal">2</span></div>
+        <div class="fout" id="aTurningOut"></div>
       </div>
 
       <div class="divider"></div>
@@ -392,46 +127,26 @@
       <!-- Bot B -->
       <div class="bot-block">
         <div class="bot-label">
-          <div class="bot-dot" style="background:#fc8181"></div>
-          Bot B — Red
-          <label class="opt-toggle" title="20-pt budget: SPEED 5 (max power, no charge penalty) · POWER 8 (caps charge push) · TURNING 3 (saturates turn rate) · ENDURANCE 4">
-            <input type="checkbox" id="bOptimal"> ⚡ Optimal
-          </label>
+          <div class="bot-dot" style="background:#fc8181"></div> Bot B — Red
+          <span class="budget ok" id="bBudget">20 / 20</span>
         </div>
-        <div class="stat-row">
-          <span class="stat-name">Speed</span>
-          <input type="range" min="1" max="10" value="6" id="bSpeed" class="slider-b">
-          <span class="stat-val" id="bSpeedVal">6</span>
-        </div>
-        <select class="preset-select" style="margin-top:2px;" onchange="applyPreset('b',this.value);this.value=''">
-          <option value="">— Load preset —</option>
-          <option value="7,10,2,1">Optimal S7·P10·E2·T1</option>
-          <option value="7,9,3,1">Near-optimal S7·P9·E3·T1</option>
-          <option value="10,5,3,2">Sprinter S10</option>
-          <option value="5,10,2,3">Charger P10</option>
-          <option value="6,4,8,2">Marathon E8</option>
-          <option value="5,5,5,5">Balanced</option>
-          <option value="6,7,4,3">Class Default</option>
+        <select class="preset-select" onchange="applyPreset('b',this.value);this.value=''">
+          <option value="">— Load a build —</option>
+          <option value="6,8,4,2">Sniper  S6·P8·E4·T2</option>
+          <option value="10,4,3,3">Speedster  S10·P4·E3·T3</option>
+          <option value="4,4,9,3">Tank  S4·P4·E9·T3</option>
+          <option value="4,5,3,8">Ninja  S4·P5·E3·T8</option>
+          <option value="5,5,5,5">Balanced  5·5·5·5</option>
+          <option value="5,5,8,2">Marathon  S5·P5·E8·T2</option>
         </select>
-        <div class="fout" id="bSpeedOut"><em>Motor Power:</em> 30%</div>
-        <div class="stat-row">
-          <span class="stat-name">Power</span>
-          <input type="range" min="1" max="10" value="7" id="bPower" class="slider-b">
-          <span class="stat-val" id="bPowerVal">7</span>
-        </div>
-        <div class="fout" id="bPowerOut"><em>Charge:</em> 49% · <em>Follow:</em> 365ms</div>
-        <div class="stat-row">
-          <span class="stat-name">Endurance</span>
-          <input type="range" min="1" max="10" value="4" id="bEndurance" class="slider-b">
-          <span class="stat-val" id="bEnduranceVal">4</span>
-        </div>
-        <div class="fout" id="bEnduranceOut"><em>Decay:</em> 24/min · <em>Floor at</em> 3.3min</div>
-        <div class="stat-row">
-          <span class="stat-name">Turning</span>
-          <input type="range" min="1" max="10" value="3" id="bTurning" class="slider-b">
-          <span class="stat-val" id="bTurningVal">3</span>
-        </div>
-        <div class="fout" id="bTurningOut"><em>Ratio:</em> 0.26 · <em>AlignMs:</em> 172ms</div>
+        <div class="stat-row"><span class="stat-name">Speed</span><input type="range" min="1" max="10" value="10" id="bSpeed" class="slider-b"><span class="stat-val" id="bSpeedVal">10</span></div>
+        <div class="fout" id="bSpeedOut"></div>
+        <div class="stat-row"><span class="stat-name">Power</span><input type="range" min="1" max="10" value="4" id="bPower" class="slider-b"><span class="stat-val" id="bPowerVal">4</span></div>
+        <div class="fout" id="bPowerOut"></div>
+        <div class="stat-row"><span class="stat-name">Endurance</span><input type="range" min="1" max="10" value="3" id="bEndurance" class="slider-b"><span class="stat-val" id="bEnduranceVal">3</span></div>
+        <div class="fout" id="bEnduranceOut"></div>
+        <div class="stat-row"><span class="stat-name">Turning</span><input type="range" min="1" max="10" value="3" id="bTurning" class="slider-b"><span class="stat-val" id="bTurningVal">3</span></div>
+        <div class="fout" id="bTurningOut"></div>
       </div>
 
       <div class="divider"></div>
@@ -443,9 +158,8 @@
       </div>
 
       <div class="speed-row">
-        <span class="speed-label">Sim speed:</span>
+        <span class="speed-label">Sim speed</span>
         <div class="speed-btns">
-          <button class="speed-btn" data-speed="0.25">¼×</button>
           <button class="speed-btn" data-speed="0.5">½×</button>
           <button class="speed-btn active" data-speed="1">1×</button>
           <button class="speed-btn" data-speed="2">2×</button>
@@ -455,74 +169,46 @@
         </div>
       </div>
 
-      <div class="speed-row" style="margin-top:10px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:#a0aec0;user-select:none;">
-          <input type="checkbox" id="launchToggle" style="accent-color:#4299e1;width:14px;height:14px;cursor:pointer;">
-          <span>Launch sequence</span>
-        </label>
-      </div>
-      <div class="speed-row" style="margin-top:6px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:#a0aec0;user-select:none;">
-          <input type="checkbox" id="aimToggle" style="accent-color:#e53e3e;width:14px;height:14px;cursor:pointer;">
-          <span>🎯 Aimed charging</span>
-        </label>
-      </div>
-      <div class="speed-row" style="margin-top:6px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:#a0aec0;user-select:none;">
-          <input type="checkbox" id="heatToggle" style="accent-color:#ed8936;width:14px;height:14px;cursor:pointer;" onchange="toggleHeatMap(this.checked)">
-          <span>🔥 Ball heat map</span>
-        </label>
-        </label>
-      </div>
+      <label class="toggle-row"><input type="checkbox" id="dribbleToggle" checked style="accent-color:#48bb78"><span>🎯 Goal-seeking dribble (on by default in the code)</span></label>
+      <label class="toggle-row"><input type="checkbox" id="repoToggle" checked style="accent-color:#9f7aea"><span>🏠 Drop back &amp; look down-field</span></label>
+      <label class="toggle-row"><input type="checkbox" id="launchToggle" style="accent-color:#4299e1"><span>🚀 Diagonal launch from corners</span></label>
+      <label class="toggle-row"><input type="checkbox" id="heatToggle" onchange="toggleHeatMap(this.checked)" style="accent-color:#ed8936"><span>🔥 Ball heat map</span></label>
 
-      <div style="margin-top:12px;">
-        <button id="btnOptimize" style="width:100%;padding:9px 0;background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:opacity 0.15s;">📊 Find Optimal (1000 sims)</button>
+      <div style="margin-top:14px;">
+        <button id="btnBatch" style="width:100%;padding:9px 0;background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">🧪 Run 1000 sims (A vs B)</button>
       </div>
     </div>
 
-    <div class="panel" id="optimizePanel" style="margin-top:16px;display:none;">
-      <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleOptPanel()">
-        <span>Optimization Results</span>
-        <span style="display:flex;align-items:center;gap:8px;"><span id="optProgress" style="font-size:0.7rem;color:#718096;font-weight:400;"></span><span id="optChevron" style="font-size:0.85rem;color:#a0aec0;margin-left:4px;">&#9660;</span></span>
+    <div class="panel" id="batchPanel" style="margin-top:16px;display:none;">
+      <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>1000-Sim Results</span><span id="batchProg" style="font-size:0.7rem;color:#718096;font-weight:400;"></span>
       </div>
-      <div id="optBody">
-        <div id="optProgressBar" style="height:4px;background:#2d3148;border-radius:2px;margin-bottom:10px;display:none;">
-          <div id="optBar" style="height:100%;background:linear-gradient(90deg,#2d6a4f,#52b788);border-radius:2px;width:0%;transition:width 0.3s;"></div>
-        </div>
-        <div id="optResults" style="font-size:0.75rem;"></div>
-      </div>
+      <div id="batchBar" style="height:6px;background:#2d3148;border-radius:3px;margin-bottom:12px;display:none;"><div id="batchBarFill" style="height:100%;background:linear-gradient(90deg,#2d6a4f,#52b788);border-radius:3px;width:0%;transition:width 0.15s;"></div></div>
+      <div id="batchResults" style="font-size:0.78rem;"></div>
     </div>
 
     <div class="panel" style="margin-top:16px">
-      <div class="panel-title">Stat Formulas</div>
+      <div class="panel-title">Stat Formulas (current code)</div>
       <div class="formula-grid">
         <div class="formula-item"><strong>motorPower</strong>SPEED × 100 / 20</div>
         <div class="formula-item"><strong>turnRatio</strong>0.2 + TURNING × 0.02</div>
-        <div class="formula-item"><strong>chargePower</strong>POWER² (max 100)</div>
-        <div class="formula-item"><strong>followThru</strong>POWER × 80 ms</div>
+        <div class="formula-item"><strong>chargePower</strong>min(POWER², 100)</div>
+        <div class="formula-item"><strong>followThru</strong>120 + POWER × 35 ms</div>
         <div class="formula-item"><strong>decayRate</strong>20 − ENDURANCE</div>
-        <div class="formula-item"><strong>scanAt</strong>8 arcs (4 low-power)</div>
+        <div class="formula-item"><strong>endurance%</strong>100 − decay × t/40</div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL: field + stats -->
+  <!-- RIGHT: field + stats -->
   <div>
     <div class="panel">
       <div class="clock-bar">
         <div class="clock" id="clockDisplay">0:00</div>
         <div class="score-display">
-          <div class="score-bot">
-            <div class="bot-dot" style="background:#63b3ed;width:10px;height:10px"></div>
-            <span style="color:#718096;font-size:0.78rem">Bot A</span>
-            <span class="score-num" style="color:#63b3ed" id="scoreA">0</span>
-          </div>
+          <div class="score-bot"><div class="bot-dot" style="background:#63b3ed;width:10px;height:10px"></div><span style="color:#718096;font-size:0.78rem">Bot A</span><span class="score-num" style="color:#63b3ed" id="scoreA">0</span></div>
           <span style="color:#4a5568;font-size:1.2rem">–</span>
-          <div class="score-bot">
-            <span class="score-num" style="color:#fc8181" id="scoreB">0</span>
-            <span style="color:#718096;font-size:0.78rem">Bot B</span>
-            <div class="bot-dot" style="background:#fc8181;width:10px;height:10px"></div>
-          </div>
+          <div class="score-bot"><span class="score-num" style="color:#fc8181" id="scoreB">0</span><span style="color:#718096;font-size:0.78rem">Bot B</span><div class="bot-dot" style="background:#fc8181;width:10px;height:10px"></div></div>
         </div>
       </div>
 
@@ -535,1897 +221,853 @@
         <div class="chip"><div class="chip-dot" id="stateColorB" style="background:#fc8181"></div><span id="stateTextB">Waiting</span></div>
         <div class="chip" style="margin-left:auto"><span id="ballChip" style="color:#fbd38d">⚽ Ball: center</span></div>
       </div>
+
+      <div class="legend">
+        <span><i style="background:#63b3ed"></i>roam</span>
+        <span><i style="background:#f6e05e"></i>scan / charge</span>
+        <span><i style="background:#00e5ff"></i>aim</span>
+        <span><i style="background:#9f7aea"></i>drop back</span>
+        <span><i style="background:#fc8181"></i>border / low power</span>
+        <span><i style="background:#f6ad55"></i>unstick</span>
+        <span><i style="background:#a0aec0"></i>launch</span>
+      </div>
     </div>
 
     <div class="panel" style="margin-top:16px">
       <div class="panel-title">Match Stats</div>
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card-label">Border hits</div>
-          <div class="stat-card-vals">
-            <span class="stat-card-val" style="color:#63b3ed" id="statBorderA">0</span>
-            <span class="stat-card-val" style="color:#fc8181" id="statBorderB">0</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Ball contacts</div>
-          <div class="stat-card-vals">
-            <span class="stat-card-val" style="color:#63b3ed" id="statContactA">0</span>
-            <span class="stat-card-val" style="color:#fc8181" id="statContactB">0</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Scans done</div>
-          <div class="stat-card-vals">
-            <span class="stat-card-val" style="color:#63b3ed" id="statScanA">0</span>
-            <span class="stat-card-val" style="color:#fc8181" id="statScanB">0</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Cur. power</div>
-          <div class="stat-card-vals">
-            <span class="stat-card-val" style="color:#63b3ed" id="statPowerA">—</span>
-            <span class="stat-card-val" style="color:#fc8181" id="statPowerB">—</span>
-          </div>
-        </div>
+        <div class="stat-card"><div class="stat-card-label">Border hits</div><div class="stat-card-vals"><span class="stat-card-val" style="color:#63b3ed" id="statBorderA">0</span><span class="stat-card-val" style="color:#fc8181" id="statBorderB">0</span></div></div>
+        <div class="stat-card"><div class="stat-card-label">Ball contacts</div><div class="stat-card-vals"><span class="stat-card-val" style="color:#63b3ed" id="statContactA">0</span><span class="stat-card-val" style="color:#fc8181" id="statContactB">0</span></div></div>
+        <div class="stat-card"><div class="stat-card-label">Scans done</div><div class="stat-card-vals"><span class="stat-card-val" style="color:#63b3ed" id="statScanA">0</span><span class="stat-card-val" style="color:#fc8181" id="statScanB">0</span></div></div>
+        <div class="stat-card"><div class="stat-card-label">Cur. power</div><div class="stat-card-vals"><span class="stat-card-val" style="color:#63b3ed" id="statPowerA">—</span><span class="stat-card-val" style="color:#fc8181" id="statPowerB">—</span></div></div>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
         <div class="panel-title" style="margin-top:0">Event Log</div>
-        <button onclick="exportCSV()" style="font-size:0.68rem;padding:3px 10px;background:#2d3148;color:#a0aec0;border:1px solid #4a5568;border-radius:5px;cursor:pointer;" title="Download match log as CSV">⬇ CSV</button>
+        <button onclick="exportCSV()" style="flex:none;font-size:0.68rem;padding:3px 10px;background:#2d3148;color:#a0aec0;border:1px solid #4a5568;border-radius:5px;cursor:pointer;">⬇ CSV</button>
       </div>
-      <div class="event-log" id="eventLog">
-        <div class="log-entry" style="color:#4a5568;font-style:italic">Press Start to begin simulation…</div>
-      </div>
+      <div class="event-log" id="eventLog"><div class="log-entry" style="color:#4a5568;font-style:italic">Press Start to begin…</div></div>
     </div>
   </div>
-
 </div>
 
 <script>
 // ============================================================
-// SIMULATION ENGINE — mirrors v12 logic faithfully
+// VELOCITY ARENA SIMULATION v2 — mirrors the current match code
 // ============================================================
 
-const FIELD_W_CM = 244;  // 8 ft
-const FIELD_H_CM = 122;  // 4 ft
-const BORDER_TAPE = 15;  // cm — sensor trigger distance (real bot fires ~15cm from tape)
-const MATCH_DURATION = 180; // seconds
-const BALL_DETECT_CM = 40;  // firmware v5.1: wider detection range
-const BOT_RADIUS = 7;         // ~7cm bot body radius for contact detection
-const BALL_SCAN_CM = 45;
-const BASE_SEGMENT_MS = 300;  // firmware BASE_SEGMENT_MS — totalArcTime = 300 * 12 = 3600
+const FIELD_W_CM = 244, FIELD_H_CM = 122;
+const BORDER_TAPE = 15;        // cm — sensors trip ~15cm from the tape
+const MATCH_DURATION = 180;    // seconds
+const BOT_RADIUS = 7;
 
-// Goals: left goal = x<10, right goal = x>234
-const GOAL_DEPTH = 10;
+// Detection ranges — match the code's INITIALIZATION block
+const BALL_DETECT_CM = 40;     // commit-to-charge range
+const BALL_SEE_CM    = 45;     // home-in-while-driving range
+const BALL_SCAN_CM   = 50;     // stationary scan range
+const CONTACT_CM     = 15;     // dribble-curve kicks in this close
+const BASE_SEGMENT_MS = 300;
+const REPOSITION_AFTER_SCANS = 3;
+const REPOSITION_MS = 2200;
+const GOAL_DRIBBLE_BLEND = 0.45;  // how hard the in-contact push curves toward goal
 
-// ── Sim timing
-let SIM_SPEED = 1;
-let simRunning = false;
-let simPaused = false;
-let animFrame = null;
-let lastRealTime = null;
-let simTime = 0; // seconds of match time elapsed
+// movement tuning (kept from v1 — looks right on this field)
+const CM_PER_POWER_MS = 0.0005;
+const DEG_PER_DIFF_MS = 0.0010;
+const SIM_TICK = 50;
 
-// ── Ball
-const ball = {
-  x: FIELD_W_CM / 2,
-  y: FIELD_H_CM / 2,
-  vx: 0, vy: 0,
-  friction: 0.96,  // per tick (50ms) — increased so ball travels field-length distances
-  r: 5,
-  trail: [], trailMax: 80  // for goal replay
-};
+// ── sim timing
+let SIM_SPEED = 1, simRunning = false, simPaused = false, animFrame = null, lastRealTime = null, simTime = 0;
+let headless = false;   // true while a batch runs (suppresses DOM + logging)
 
-// ── Scores
+// ── ball
+const ball = { x: FIELD_W_CM/2, y: FIELD_H_CM/2, vx:0, vy:0, friction:0.96, r:5, trail:[], trailMax:80, lastTouch:null };
 let scoreA = 0, scoreB = 0;
+let ownGoalA = 0, ownGoalB = 0;   // own goals committed (knocked into own net)
 
-// ── Bot state machine states
-const S_ROAM = 'roam';
-const S_SCAN = 'scan';
-const S_CHARGE = 'charge';
-const S_BORDER = 'border';
-const S_LAUNCH = 'launch';
-const S_UNSTICK = 'unstick';
-const S_ALIGN   = 'align';
+// ── states
+const S_ROAM='roam', S_SCAN='scan', S_SEEK='seek', S_ALIGN='align', S_CHARGE='charge',
+      S_BORDER='border', S_UNSTICK='unstick', S_LAUNCH='launch', S_REPO='repo';
 
-// ── Bot factory
-function makeBot(id, color, startX, startY, stats) {
-  const s = computeStats(stats);
+// ── feature toggles
+let dribbleEnabled = true, repoEnabled = true;
+
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function randFloat(a,b){return Math.random()*(b-a)+a;}
+function deg2rad(d){return d*Math.PI/180;}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function angDiff(target,cur){return ((target-cur+540)%360)-180;}   // signed −180..180
+
+// ── derive runtime values from stats (matches computeStats())
+function computeStats(st){
+  const motorPower = st.speed*100/20;
   return {
-    id, color,
-    x: startX, y: startY,
-    heading: 0, // degrees, 0=right
-    state: S_SCAN,   // skip launch — start scanning immediately
-    stateTimer: 0,       // ms remaining in current state
-    roamCounter: 0,
-    lastTurnWasLeft: id === 'A',
-    sameDirectionCount: 0,
-    maxSameDirection: randInt(1, 2),
-    borderSide: 0,
-    ballDetected: false,
-    stats: stats,
-    computed: s,
-    // match stats
-    borderHits: 0,
-    ballContacts: 0,
-    scans: 0,
-    // current power (endurance)
-    currentPower: s.motorPower,
-    lowPowerActive: false,
-    // arc segment params
-    segDuration: 0,
-    lSpeed: 0, rSpeed: 0,
-    // launch phase
-    launchPhase: 0,
-    launchTimer: 0,
-    // scan phase
-    scanLeg: 0,
-    scanTimer: 0,
-    // border phase
-    borderPhase: 0,
-    borderTimer: 0,
-    borderAttempt: 0,
-    // bot-bot collision / unstick (mirrors firmware unstick())
-    contactTimer: 0,
-    unstickPhase: 0,
-    unstickTimer: 0,
-    ballInContact: false,
-    // v5 align state
-    ballHeading: 0,       // -1=found left, 0=centered, 1=found right
-    alignTimer: 0, alignAttempt: 0, alignTotalTime: 0,
-    // charge phase
-    chargeTimer: 0,
-    followPhase: 0,    // 0=driving burst, 1=checking if ball still ahead
-    followTimer: 0,    // ms into current follow phase
-    // trail
-    trail: [],
-    trailMax: 120,
+    motorPower,
+    turnRatio: 0.2 + st.turning*0.02,
+    chargePower: Math.min(st.power*st.power, 100),
+    followThroughMs: 120 + st.power*35,
+    decayRate: 20 - st.endurance,
+    minWheelSpeed: Math.max(20, Math.round(motorPower*0.25)),
+    thisDuration: Math.min(Math.round(BASE_SEGMENT_MS*12/st.turning), 600),
   };
 }
 
-function computeStats(stats) {
-  const motorPower = stats.speed * 100 / 20;
-  const turnRatio = 0.2 + stats.turning * 0.02;
-  const chargePower = Math.min(stats.power * stats.power, 100);
-  const followThroughMs = stats.power * 80;
-  const decayRate = 20 - stats.endurance;
-  const thisDuration = Math.min(Math.round(BASE_SEGMENT_MS * 12 / stats.turning), 600);
-  return { motorPower, turnRatio, chargePower, followThroughMs, decayRate, thisDuration };
+// ── endurance-scaled power  (matches matchLoop / driveAndWatch)
+function getEndurancePower(bot){
+  const s = bot.computed;
+  const endurancePercent = 100 - s.decayRate*simTime/40;
+  const factor = Math.max(endurancePercent/100, 0.2);
+  return Math.max(Math.round(s.motorPower*factor), s.minWheelSpeed);
 }
 
-function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
-function randFloat(a, b) { return Math.random() * (b - a) + a; }
-function deg2rad(d) { return d * Math.PI / 180; }
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+// ── goal geometry. Bot A attacks the RIGHT goal, Bot B the LEFT.
+function goalHeadingFor(bot){ return bot.id==='A' ? 0 : 180; }
+function ownGoalHeadingFor(bot){ return bot.id==='A' ? 180 : 0; }
+function goalPointFor(bot){ return { x: bot.id==='A' ? FIELD_W_CM : 0, y: FIELD_H_CM/2 }; }
+function ownGoalX(bot){ return bot.id==='A' ? 0 : FIELD_W_CM; }
 
-// ── Compute endurance-scaled power for a bot at current simTime
-function getEndurancePower(bot, t) {
-  const s = bot.computed;
-  const endurancePercent = 100 - s.decayRate * t / 40;
-  const factor = Math.max(endurancePercent / 100, 0.2);
-  const raw = Math.round(s.motorPower * factor);
-  return Math.max(raw, 20);  // field-test firmware: SPEED uncapped, floor 20 (was clamp 20..25)
+function makeBot(id,color,startX,startY,stats){
+  const s = computeStats(stats);
+  return {
+    id, color, x:startX, y:startY, heading: id==='A'?0:180,
+    state: S_SCAN, stateTimer:0,
+    roamCounter:0, lostScans:0,
+    lastTurnWasLeft: id==='A', sameDirectionCount:0, maxSameDirection: randInt(1,2),
+    borderSide:0, ballDetected:false, ballHeading:0,
+    stats, computed:s,
+    borderHits:0, ballContacts:0, scans:0,
+    currentPower:s.motorPower, lowPowerActive:false,
+    lSpeed:0, rSpeed:0, segDuration:0,
+    launchPhase:0, launchTimer:0,
+    scanLeg:0, scanTimer:0,
+    borderPhase:0, borderTimer:0,
+    repoPhase:0, repoTimer:0,
+    contactTimer:0, unstickPhase:0, unstickTimer:0, ballInContact:false,
+    alignTimer:0, alignAttempt:0, alignTotalTime:0,
+    chargeTimer:0, followPhase:0, followTimer:0,
+    trail:[], trailMax:120,
+  };
 }
 
-// ── Bot arc speeds given current heading direction
-function arcSpeeds(bot) {
-  const s = bot.computed;
-  const ratio = clamp(s.turnRatio + randFloat(-0.08, 0.08), 0.10, 0.45);
+// ── arc wheel speeds (roam)
+function arcSpeeds(bot){
+  const ratio = clamp(bot.computed.turnRatio + randFloat(-0.08,0.08), 0.10, 0.45);
   const cp = bot.currentPower;
-  let lSpeed, rSpeed;
-  if (bot.lastTurnWasLeft) {
-    lSpeed = Math.round(cp * (1 - ratio));
-    rSpeed = Math.round(cp * (1 + ratio));
-  } else {
-    lSpeed = Math.round(cp * (1 + ratio));
-    rSpeed = Math.round(cp * (1 - ratio));
-  }
-  lSpeed = Math.max(lSpeed, 18);
-  rSpeed = Math.max(rSpeed, 18);
-  return { lSpeed, rSpeed };
+  let l,r;
+  if (bot.lastTurnWasLeft){ l=Math.round(cp*(1-ratio)); r=Math.round(cp*(1+ratio)); }
+  else { l=Math.round(cp*(1+ratio)); r=Math.round(cp*(1-ratio)); }
+  return { lSpeed:Math.max(l,bot.computed.minWheelSpeed), rSpeed:Math.max(r,bot.computed.minWheelSpeed) };
 }
+function headingRate(l,r){ return (r-l)*DEG_PER_DIFF_MS; }
+function forwardSpeed(l,r){ return ((l+r)/2)*CM_PER_POWER_MS; }
 
-// ── Translate differential drive to heading change rate (deg/ms)
-// Field is 122cm wide, bot wheelbase ~10cm
-const CM_PER_POWER_MS = 0.0005; // forward speed: 30 * 0.0005 * 300ms ≈ 4.5cm per segment — staccato, realistic
-// Turn rate uses a separate constant so arc curvature stays reasonable
-// regardless of CM_PER_POWER_MS. Tuned so a default-stat bot sweeps ~30-60°
-// per 300ms arc segment — gentle curves, not circles.
-const DEG_PER_DIFF_MS = 0.0010; // deg/ms per unit of (rSpeed - lSpeed) — tuned for 150ms segments
-function headingRate(lSpeed, rSpeed) {
-  // positive = turning right
-  const diff = rSpeed - lSpeed;
-  return diff * DEG_PER_DIFF_MS;
-}
-function forwardSpeed(lSpeed, rSpeed) {
-  return ((lSpeed + rSpeed) / 2) * CM_PER_POWER_MS;
-}
-
-// ── Check if bot is on border
-// The trackbit line-sensor array sits at the FRONT edge of the chassis, not
-// the center, so the real bot trips the border while driving toward a wall
-// before its body fully reaches the tape. Sense from a point BOT_RADIUS
-// ahead of center along the heading.
-function onBorder(bot) {
-  const x = bot.x + Math.cos(deg2rad(bot.heading)) * BOT_RADIUS;
-  const y = bot.y + Math.sin(deg2rad(bot.heading)) * BOT_RADIUS;
-  if (x <= BORDER_TAPE) return 1;   // left
-  if (x >= FIELD_W_CM - BORDER_TAPE) return 2; // right
-  if (y <= BORDER_TAPE || y >= FIELD_H_CM - BORDER_TAPE) return 3; // top/bottom
+// ── border sense from a point at the FRONT of the chassis
+function onBorder(bot){
+  const x = bot.x + Math.cos(deg2rad(bot.heading))*BOT_RADIUS;
+  const y = bot.y + Math.sin(deg2rad(bot.heading))*BOT_RADIUS;
+  if (x <= BORDER_TAPE) return 1;
+  if (x >= FIELD_W_CM-BORDER_TAPE) return 2;
+  if (y <= BORDER_TAPE || y >= FIELD_H_CM-BORDER_TAPE) return 3;
   return 0;
 }
 
-// ── Forward sonar model.
-// The real ultrasonic returns the nearest object in front — it CANNOT tell
-// the ball from the opponent bot. So both are candidates and the NEARER one
-// is what gets 'seen' (natural occlusion: a bot in the way hides the ball
-// behind it, and the seeker charges the bot instead).
-function nearestForwardTarget(bot, range, halfCone) {
-  const candidates = [{ x: ball.x, y: ball.y }];
-  const opp = bot === botA ? botB : botA;
-  if (opp && opp.state !== S_LAUNCH) candidates.push({ x: opp.x, y: opp.y });
-
-  let best = null;
-  for (const c of candidates) {
-    const dx = c.x - bot.x, dy = c.y - bot.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > range) continue;
-    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-    const diff = ((ang - bot.heading + 540) % 360) - 180;
-    if (Math.abs(diff) < halfCone) {
-      if (!best || dist < best.dist) best = { dist, diff };
-    }
+// ── forward sonar: nearest of {ball, opponent} inside cone+range. Can't tell them apart.
+function nearestForwardTarget(bot, range, halfCone){
+  const opp = bot===botA?botB:botA;
+  const candidates = [{x:ball.x,y:ball.y,isBall:true}];
+  if (opp && opp.state!==S_LAUNCH) candidates.push({x:opp.x,y:opp.y,isBall:false});
+  let best=null;
+  for (const c of candidates){
+    const dx=c.x-bot.x, dy=c.y-bot.y, dist=Math.hypot(dx,dy);
+    if (dist>range) continue;
+    const ang=Math.atan2(dy,dx)*180/Math.PI;
+    const diff=angDiff(ang,bot.heading);
+    if (Math.abs(diff)<halfCone && (!best||dist<best.dist)) best={dist,diff,isBall:c.isBall};
   }
   return best;
 }
+function seeWhileDriving(bot){ return nearestForwardTarget(bot, BALL_SEE_CM, 25); }   // home-in cone
+function seeWhileScanning(bot){ return nearestForwardTarget(bot, BALL_SCAN_CM, 55); }  // wide stationary cone
+function ballAhead(bot){ return nearestForwardTarget(bot, BALL_DETECT_CM, 22); }       // tight commit cone
 
-// duringRoam=true  — single forward ping, narrow ~20° cone, BALL_DETECT_CM (35) range
-// duringRoam=false — stopped scan sweep, wider ~60° cone, BALL_SCAN_CM (45) range
-function canSeeBall(bot, duringRoam = false) {
-  const range = duringRoam ? BALL_DETECT_CM : BALL_SCAN_CM;
-  const halfCone = duringRoam ? 20 : 60;
-  return nearestForwardTarget(bot, range, halfCone) !== null;
-}
-
-// ── Event log
+// ── log
 const logEl = document.getElementById('eventLog');
-function logEvent(msg, color) {
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  const t = simTime;
-  const min = Math.floor(t / 60);
-  const sec = Math.floor(t % 60).toString().padStart(2, '0');
-  entry.innerHTML = `<span style="color:#4a5568">${min}:${sec}</span> ${msg}`;
-  logEl.insertBefore(entry, logEl.firstChild);
-  if (logEl.children.length > 60) logEl.removeChild(logEl.lastChild);
+function logEvent(msg){
+  if (headless) return;
+  const e=document.createElement('div'); e.className='log-entry';
+  const m=Math.floor(simTime/60), s=Math.floor(simTime%60).toString().padStart(2,'0');
+  e.innerHTML=`<span style="color:#4a5568">${m}:${s}</span> ${msg}`;
+  logEl.insertBefore(e, logEl.firstChild);
+  if (logEl.children.length>60) logEl.removeChild(logEl.lastChild);
 }
 
-// ── Bot state colors
-const stateColors = {
-  [S_ROAM]: null,   // set per bot direction
-  [S_SCAN]: '#f6e05e',
-  [S_CHARGE]: '#f6e05e',
-  [S_BORDER]: '#fc8181',
-  [S_LAUNCH]: '#a0aec0',
-};
+// ── rotate heading toward a target heading; returns true when aligned
+function rotateToward(bot, target, dtMs, tol){
+  const err = angDiff(target, bot.heading);
+  if (Math.abs(err) <= (tol||8)){ bot.heading = target; return true; }
+  const step = 0.14*dtMs;
+  bot.heading += Math.sign(err)*Math.min(Math.abs(err), step);
+  return false;
+}
 
-// ── Update bot for dt milliseconds
-function updateBot(bot, dtMs) {
-  if (simTime >= MATCH_DURATION) return;
+// ============================================================
+// PER-BOT UPDATE
+// ============================================================
+function updateBot(bot,dtMs){
+  if (simTime>=MATCH_DURATION) return;
+  bot.currentPower = getEndurancePower(bot);
+  bot.lowPowerActive = bot.currentPower <= bot.computed.minWheelSpeed;
 
-  bot.currentPower = getEndurancePower(bot, simTime);
-  bot.lowPowerActive = bot.currentPower <= 18;  // firmware: threshold 18 (below floor 20 → effectively disabled)
-
-  switch (bot.state) {
-    case S_LAUNCH: updateLaunch(bot, dtMs); break;
-    case S_ROAM:   updateRoam(bot, dtMs); break;
-    case S_SCAN:   updateScan(bot, dtMs); break;
-    case S_CHARGE: updateCharge(bot, dtMs); break;
-    case S_BORDER: updateBorder(bot, dtMs); break;
-    case S_UNSTICK: updateUnstick(bot, dtMs); break;
-    case S_ALIGN:   updateAlign(bot, dtMs);   break;
+  switch(bot.state){
+    case S_LAUNCH:  updateLaunch(bot,dtMs); break;
+    case S_ROAM:    updateRoam(bot,dtMs);   break;
+    case S_SCAN:    updateScan(bot,dtMs);   break;
+    case S_SEEK:    updateSeek(bot,dtMs);   break;
+    case S_ALIGN:   updateAlign(bot,dtMs);  break;
+    case S_CHARGE:  updateCharge(bot,dtMs); break;
+    case S_BORDER:  updateBorder(bot,dtMs); break;
+    case S_UNSTICK: updateUnstick(bot,dtMs);break;
+    case S_REPO:    updateRepo(bot,dtMs);   break;
   }
-
-  // Keep bot inside field (hard clamp)
-  bot.x = clamp(bot.x, 0, FIELD_W_CM);
-  bot.y = clamp(bot.y, 0, FIELD_H_CM);
-
-  // Record trail
-  bot.trail.push({x: bot.x, y: bot.y});
-  if (bot.trail.length > bot.trailMax) bot.trail.shift();
+  bot.x = clamp(bot.x,0,FIELD_W_CM);
+  bot.y = clamp(bot.y,0,FIELD_H_CM);
+  bot.trail.push({x:bot.x,y:bot.y});
+  if (bot.trail.length>bot.trailMax) bot.trail.shift();
 }
 
-// ── LAUNCH: drive to center in ~2s
-function updateLaunch(bot, dtMs) {
+// ── LAUNCH: diagonal shimmy toward the center line, then hand off to seek/scan
+function updateLaunch(bot,dtMs){
   bot.launchTimer += dtMs;
-  const fwd = bot.id === 'A' ? 0 : 180; // A from left, B from right
-  bot.heading = fwd;
-  const spd = bot.currentPower * CM_PER_POWER_MS * dtMs;
-  bot.x += Math.cos(deg2rad(bot.heading)) * spd;
-  bot.y += Math.sin(deg2rad(bot.heading)) * spd;
-
-  if (bot.launchTimer > 1800) {
-    bot.state = S_ROAM;
-    bot.roamCounter = 0;
-    startForwardSeg(bot);
-    logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> launched`, bot.color);
+  // aim diagonally toward the centre of the field
+  const target = { x: FIELD_W_CM/2, y: FIELD_H_CM/2 };
+  const desired = Math.atan2(target.y-bot.y, target.x-bot.x)*180/Math.PI;
+  rotateToward(bot, desired, dtMs, 6);
+  const spd = bot.currentPower*CM_PER_POWER_MS*dtMs;
+  bot.x += Math.cos(deg2rad(bot.heading))*spd;
+  bot.y += Math.sin(deg2rad(bot.heading))*spd;
+  const distToCenter = Math.hypot(target.x-bot.x, target.y-bot.y);
+  if (bot.launchTimer>2200 || distToCenter < 35){
+    bot.heading = goalHeadingFor(bot);   // re-square to the goal
+    bot.state = S_SCAN; bot.scanLeg=0; bot.scanTimer=0;
+    logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> finished launch`);
   }
 }
 
-// ── ROAM: arc movement
-// Mirrors real robot: scan every 8 segments (4 when low power), not every segment
-function startRoamSeg(bot) {
-  const scanThresh = bot.lowPowerActive ? 5 : Math.max(6, 8 + Math.round(bot.stats.turning / 2));
-  if (bot.roamCounter >= scanThresh) {
-    bot.roamCounter = 0;
-    bot.state = S_SCAN;
-    bot.scanLeg = 0;
-    bot.scanTimer = 0;
-    bot.scans++;
-  } else {
-    // not time to scan yet — go straight to next forward segment
-    startForwardSeg(bot);
-  }
-}
-
-function startForwardSeg(bot) {
+// ── ROAM: goal-biased arc + home-in-on-sight
+function startForwardSeg(bot){
   const s = bot.computed;
+  // goal-biased direction change: ~70% steer the arc toward the goal
+  if (bot.sameDirectionCount >= bot.maxSameDirection){
+    bot.sameDirectionCount = 0; bot.maxSameDirection = randInt(1,2);
+    const towardGoal = angDiff(goalHeadingFor(bot), bot.heading); // + => goal is clockwise (turn right)
+    if (Math.abs(towardGoal) > 12 && Math.random() < 0.7){
+      bot.lastTurnWasLeft = towardGoal < 0;   // turn the way that points at the goal
+    } else {
+      bot.lastTurnWasLeft = !bot.lastTurnWasLeft;
+    }
+  } else bot.sameDirectionCount++;
 
-  // direction flip logic
-  if (bot.sameDirectionCount >= bot.maxSameDirection) {
-    bot.lastTurnWasLeft = !bot.lastTurnWasLeft;
-    bot.sameDirectionCount = 0;
-    bot.maxSameDirection = randInt(1, 2);
-  } else {
-    bot.sameDirectionCount++;
-  }
-
-  const spds = arcSpeeds(bot);
-  bot.lSpeed = spds.lSpeed;
-  bot.rSpeed = spds.rSpeed;
-
-  const speedBonus = bot.stats.speed * 12;
-  const base = bot.lowPowerActive
-    ? clamp(s.thisDuration / 2 + randFloat(-50, 50), 150, 300)
-    : clamp(s.thisDuration + speedBonus + randFloat(-50, 50), 150, 550);
-  bot.segDuration = base;
-  bot.stateTimer = base;
+  const spds = arcSpeeds(bot); bot.lSpeed=spds.lSpeed; bot.rSpeed=spds.rSpeed;
+  const bonus = bot.stats.speed*12;
+  bot.segDuration = bot.lowPowerActive
+    ? clamp(s.thisDuration/2 + randFloat(-50,50), 150, 300)
+    : clamp(s.thisDuration + bonus + randFloat(-50,50), 150, 550);
+  bot.stateTimer = bot.segDuration;
 }
 
-function updateRoam(bot, dtMs) {
-  // move
-  const fwdSpd = forwardSpeed(bot.lSpeed, bot.rSpeed) * dtMs;
-  const turnDeg = headingRate(bot.lSpeed, bot.rSpeed) * dtMs;
-  bot.heading += turnDeg;
-  bot.x += Math.cos(deg2rad(bot.heading)) * fwdSpd;
-  bot.y += Math.sin(deg2rad(bot.heading)) * fwdSpd;
+function toScan(bot){ bot.state=S_SCAN; bot.scanLeg=0; bot.scanTimer=0; bot.scans++; }
 
-  // border check
+function updateRoam(bot,dtMs){
+  const fwd = forwardSpeed(bot.lSpeed,bot.rSpeed)*dtMs;
+  bot.heading += headingRate(bot.lSpeed,bot.rSpeed)*dtMs;
+  bot.x += Math.cos(deg2rad(bot.heading))*fwd;
+  bot.y += Math.sin(deg2rad(bot.heading))*fwd;
+
   const bs = onBorder(bot);
-  if (bs > 0) {
-    bot.borderSide = bs;
-    bot.borderHits++;
-    bot.state = S_BORDER;
-    bot.borderPhase = 0;
-    bot.borderTimer = 0;
-    bot.borderAttempt = 0;
-    logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> hit border`);
-    return;
-  }
+  if (bs>0){ enterBorder(bot,bs); return; }
 
-  // ball detection during roam — narrow forward cone only (matches driveAndWatch sonar)
-  if (canSeeBall(bot, true)) {
-    bot.ballDetected = true;
-    bot.ballHeading = 99; // found while driving — normalize in align
-    bot.state = S_ALIGN;
-    bot.alignTimer = 0; bot.alignAttempt = 0; bot.alignTotalTime = 0;
-    logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> <span style="color:#fbd38d">locked on target</span>`);
+  // home-in-on-sight: if we glimpse the ball while driving, chase it straight in
+  const seen = seeWhileDriving(bot);
+  if (seen){
+    bot.ballDetected=true; bot.ballHeading=99; bot.lostScans=0;
+    bot.state=S_SEEK;
+    logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> <span style="color:#fbd38d">spotted the ball</span>`);
     return;
   }
 
   bot.stateTimer -= dtMs;
-  if (bot.stateTimer <= 0) {
+  if (bot.stateTimer<=0){
     bot.roamCounter++;
-    startRoamSeg(bot);
+    const scanLimit = bot.lowPowerActive ? 2 : Math.max(3, 3+Math.round(bot.stats.turning/2));
+    if (bot.roamCounter>=scanLimit){ bot.roamCounter=0; toScan(bot); }
+    else startForwardSeg(bot);
   }
 }
 
-// ── SCAN: 4-leg sweep
-function updateScan(bot, dtMs) {
-  bot.scanTimer += dtMs;
-  const legDuration = 150;
-  const scanPwr = 25 * CM_PER_POWER_MS * dtMs;
+// ── SEEK: drive straight at a sighted ball until it's in commit range
+function updateSeek(bot,dtMs){
+  const seen = seeWhileDriving(bot);
+  if (!seen){ // lost it — go back to roaming
+    bot.ballDetected=false; bot.state=S_ROAM; startForwardSeg(bot); return;
+  }
+  // steer toward it
+  bot.heading += clamp(seen.diff, -0.14*dtMs, 0.14*dtMs);
+  const spd = bot.currentPower*CM_PER_POWER_MS*dtMs;
+  bot.x += Math.cos(deg2rad(bot.heading))*spd;
+  bot.y += Math.sin(deg2rad(bot.heading))*spd;
 
-  // rotate in place for each leg
-  if (bot.scanLeg < 4) {
-    const dir = (bot.scanLeg % 2 === 0) ? -1 : 1;
-    bot.heading += dir * 120 * (dtMs / legDuration);
-    if (canSeeBall(bot)) {
-      bot.ballDetected = true;
-      // leg 0=left sweep(-1), leg 1=return(0), leg 2=right sweep(1), leg 3=return(0)
-      bot.ballHeading = [-1, 0, 1, 0][bot.scanLeg] !== undefined ? [-1, 0, 1, 0][bot.scanLeg] : 0;
-      bot.state = S_ALIGN;
-      bot.alignTimer = 0; bot.alignAttempt = 0; bot.alignTotalTime = 0;
-      logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> <span style="color:#fbd38d">locked on in scan</span>`);
+  if (onBorder(bot)>0){ enterBorder(bot,onBorder(bot)); return; }
+
+  const close = ballAhead(bot);
+  if (close && close.dist < BALL_DETECT_CM){
+    bot.ballHeading = 99; bot.state=S_ALIGN;
+    bot.alignTimer=0; bot.alignAttempt=0; bot.alignTotalTime=0;
+  }
+}
+
+// ── SCAN: 4-leg step-scan; track fruitless scans -> drop back
+function updateScan(bot,dtMs){
+  bot.scanTimer += dtMs;
+  const legDuration = 170;   // slower step-scan
+  if (bot.scanLeg < 4){
+    const dir = (bot.scanLeg%2===0) ? -1 : 1;
+    bot.heading += dir*120*(dtMs/legDuration);
+    if (seeWhileScanning(bot)){
+      bot.ballDetected=true; bot.lostScans=0;
+      bot.ballHeading=[-1,0,1,0][bot.scanLeg];
+      bot.state=S_ALIGN; bot.alignTimer=0; bot.alignAttempt=0; bot.alignTotalTime=0;
+      logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> <span style="color:#fbd38d">found it in scan</span>`);
       return;
     }
-    if (bot.scanTimer >= legDuration) {
-      bot.scanLeg++;
-      bot.scanTimer = 0;
-    }
+    if (bot.scanTimer>=legDuration){ bot.scanLeg++; bot.scanTimer=0; }
   } else {
-    // scan complete, no ball found
-    // Force direction flip after scan so bot doesn't retrace its path
-    bot.ballDetected = false;
-    bot.lastTurnWasLeft = !bot.lastTurnWasLeft;
-    bot.sameDirectionCount = 0;
-    bot.state = S_ROAM;
-    startForwardSeg(bot);
+    bot.ballDetected=false;
+    bot.lostScans++;
+    if (repoEnabled && bot.lostScans>=REPOSITION_AFTER_SCANS && !bot.lowPowerActive){
+      bot.lostScans=0; enterRepo(bot); return;
+    }
+    bot.lastTurnWasLeft=!bot.lastTurnWasLeft; bot.sameDirectionCount=0;
+    bot.state=S_ROAM; startForwardSeg(bot);
   }
 }
 
-// ── CHARGE: mirrors chargeAndFollowThrough on real bot
-// Phase 0: drive straight for actualFollowThrough ms (heading locked at detection)
-// Phase 1: brief check — is ball still roughly ahead? If yes, repeat. If no, roam.
-function updateCharge(bot, dtMs) {
-  const s = bot.computed;
+// ── REPOSITION: drop back to our side, then face down the field and scan
+function enterRepo(bot){ bot.state=S_REPO; bot.repoPhase=0; bot.repoTimer=0;
+  logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> <span style="color:#b794f4">dropping back</span>`); }
 
-  // actualFollowThrough: same cap as real robot
-  // v5.1 formula: 120 + POWER×35, hardcap 500ms
-  // P=1→155ms  P=5→295ms  P=10→470ms
-  let actualFollowThrough = Math.min(120 + bot.stats.power * 35, 500);
+function updateRepo(bot,dtMs){
+  bot.repoTimer += dtMs;
+  if (bot.repoPhase===0){                 // face our own side
+    if (rotateToward(bot, ownGoalHeadingFor(bot), dtMs, 12)){ bot.repoPhase=1; bot.repoTimer=0; }
+  } else if (bot.repoPhase===1){          // drive home (ignore the ball on the way)
+    const spd = bot.currentPower*CM_PER_POWER_MS*dtMs;
+    bot.x += Math.cos(deg2rad(bot.heading))*spd;
+    bot.y += Math.sin(deg2rad(bot.heading))*spd;
+    const nearHome = Math.abs(bot.x - ownGoalX(bot)) < 40;
+    if (nearHome || onBorder(bot)>0 || bot.repoTimer>REPOSITION_MS){ bot.repoPhase=2; bot.repoTimer=0; }
+  } else {                                 // turn to look down the field, then scan
+    if (rotateToward(bot, goalHeadingFor(bot), dtMs, 12)){ toScan(bot); }
+  }
+}
 
-  bot.followTimer += dtMs;
-  bot.chargeTimer  += dtMs;
+// ── ALIGN: pivot toward the ball, then charge.  maxAttempts floored at 2.
+function updateAlign(bot,dtMs){
+  if (bot.ballHeading===99) bot.ballHeading=0;
+  const alignPower = Math.max(22, Math.min(45, 18+bot.stats.turning*3));
+  const alignMs    = Math.max(60, 220-bot.stats.turning*16);
+  const maxAttempts= Math.max(2, Math.round(bot.stats.turning/2));
 
-  // safety timeout (3s total charge)
-  if (bot.chargeTimer > 3000) {
-    bot.ballDetected = false;
-    bot.state = S_ROAM;
-    startForwardSeg(bot);
+  bot.alignTotalTime += dtMs;
+  if (bot.alignTotalTime>2000 || onBorder(bot)>0){
+    bot.ballDetected=false; bot.ballHeading=0; bot.state=S_ROAM; startForwardSeg(bot); return;
+  }
+  if (bot.ballHeading===0){
+    if (ballAhead(bot)){ bot.state=S_CHARGE; bot.chargeTimer=0; bot.followPhase=0; bot.followTimer=0; }
+    else { bot.ballDetected=false; bot.state=S_ROAM; startForwardSeg(bot); }
     return;
   }
-
-  if (bot.followPhase === 0) {
-    // ── DRIVE BURST: straight ahead at locked heading
-    let effectiveCharge = Math.max(Math.round(s.chargePower * Math.max((100 - s.decayRate * simTime / 40) / 100, 0.2)), 25);
-    effectiveCharge = clamp(effectiveCharge, 25, 80);
-    let dynamicCharge = Math.max(effectiveCharge, 30);
-
-    const spd = dynamicCharge * CM_PER_POWER_MS * dtMs;
-    bot.x += Math.cos(deg2rad(bot.heading)) * spd;
-    bot.y += Math.sin(deg2rad(bot.heading)) * spd;
-
-    // Ball contact is no longer an instant kick — physical pushing/dribbling
-    // is resolved by resolveBallBotCollision() every sim step. The charging
-    // bot just keeps driving; the ball rides in front of its body while the
-    // contact holds, and rolls free under friction once the bot turns away.
-
-    // border check
-    if (onBorder(bot) > 0) {
-      bot.borderHits++;
-      bot.ballDetected = false;
-      bot.state = S_BORDER;
-      bot.borderPhase = 0;
-      bot.borderTimer = 0;
-      bot.borderAttempt = 0;
-      return;
-    }
-
-    // burst complete — move to check phase
-    if (bot.followTimer >= actualFollowThrough) {
-      bot.followPhase = 1;
-      bot.followTimer = 0;
-    }
-
+  bot.alignTimer += dtMs;
+  if (bot.alignTimer < alignMs){
+    const l = bot.ballHeading<0 ? -alignPower : alignPower;
+    const r = bot.ballHeading<0 ?  alignPower : -alignPower;
+    bot.heading += headingRate(l,r)*dtMs;
   } else {
-    // ── CHECK PHASE: bot is stopped, simulate sonar ping (~40ms pause)
-    if (bot.followTimer >= 40) {
-      // Is ball still roughly ahead? Use narrow roam cone (real sonar is forward-only)
-      if (canSeeBall(bot, true)) {
-        // Ball still detected — drive another burst
-        bot.followPhase = 0;
-        bot.followTimer = 0;
-      } else {
-        // Ball gone — back to roam
-        bot.ballDetected = false;
-        bot.lastTurnWasLeft = !bot.lastTurnWasLeft;
-        bot.state = S_ROAM;
-        startForwardSeg(bot);
-      }
+    if (seeWhileScanning(bot)){ bot.ballHeading=0; bot.state=S_CHARGE; bot.chargeTimer=0; bot.followPhase=0; bot.followTimer=0; }
+    else { bot.alignAttempt++; bot.alignTimer=0;
+      if (bot.alignAttempt>=maxAttempts){ bot.ballDetected=false; bot.ballHeading=0; bot.state=S_ROAM; startForwardSeg(bot); } }
+  }
+}
+
+// ── CHARGE / DRIBBLE: drive at the ball; dribble it forward; chase it.
+function chargeDrive(bot){
+  const s=bot.computed;
+  let ec = Math.max(Math.round(s.chargePower*Math.max((100-s.decayRate*simTime/40)/100,0.2)),25);
+  ec = clamp(ec,25,100);
+  return Math.max(ec,30);
+}
+function updateCharge(bot,dtMs){
+  const actualFollow = Math.min(120+bot.stats.power*35, 500);
+  bot.followTimer += dtMs; bot.chargeTimer += dtMs;
+  if (bot.chargeTimer>3000){ bot.ballDetected=false; bot.state=S_ROAM; startForwardSeg(bot); return; }
+
+  if (bot.followPhase===0){
+    const spd = chargeDrive(bot)*CM_PER_POWER_MS*dtMs;
+    bot.x += Math.cos(deg2rad(bot.heading))*spd;
+    bot.y += Math.sin(deg2rad(bot.heading))*spd;
+    if (onBorder(bot)>0){ enterBorder(bot,onBorder(bot)); bot.ballDetected=false; return; }
+    if (bot.followTimer>=actualFollow){ bot.followPhase=1; bot.followTimer=0; }
+  } else {
+    if (bot.followTimer>=40){
+      if (seeWhileDriving(bot)){ bot.followPhase=0; bot.followTimer=0; }   // still ahead -> keep dribbling
+      else { bot.ballDetected=false; bot.lastTurnWasLeft=!bot.lastTurnWasLeft; bot.state=S_ROAM; startForwardSeg(bot); }
     }
   }
 }
 
-// ── Current forward drive speed of a bot (cm/ms) for ball-push physics
-function botDriveSpeed(bot) {
-  if (bot.state === S_ROAM) return forwardSpeed(bot.lSpeed, bot.rSpeed);
-  if (bot.state === S_LAUNCH) return bot.currentPower * CM_PER_POWER_MS;
-  if (bot.state === S_BORDER && bot.borderPhase === 1) return bot.currentPower * CM_PER_POWER_MS;
-  if (bot.state === S_UNSTICK && bot.unstickPhase === 1) return bot.currentPower * CM_PER_POWER_MS;
-  if (bot.state === S_CHARGE && bot.followPhase === 0) {
-    const s = bot.computed;
-    let ec = Math.max(Math.round(s.chargePower * Math.max((100 - s.decayRate * simTime / 40) / 100, 0.2)), 25);
-    ec = clamp(ec, 25, 80);
-    return Math.max(ec, 30) * CM_PER_POWER_MS;
-  }
+// ── drive speed used by ball-push physics
+function botDriveSpeed(bot){
+  if (bot.state===S_ROAM) return forwardSpeed(bot.lSpeed,bot.rSpeed);
+  if (bot.state===S_SEEK || bot.state===S_LAUNCH) return bot.currentPower*CM_PER_POWER_MS;
+  if (bot.state===S_REPO && bot.repoPhase===1) return bot.currentPower*CM_PER_POWER_MS;
+  if (bot.state===S_BORDER && bot.borderPhase===1) return bot.currentPower*CM_PER_POWER_MS;
+  if (bot.state===S_UNSTICK && bot.unstickPhase===1) return bot.currentPower*CM_PER_POWER_MS;
+  if (bot.state===S_CHARGE && bot.followPhase===0) return chargeDrive(bot)*CM_PER_POWER_MS;
   return 0;
 }
 
-// ── Bot pushes / dribbles the ball on body contact (replaces instant kick).
-// Reality: no kicker — the bot shoves the ball with its chassis, so the ball
-// leaves along the CONTACT NORMAL (dead-on hits go straight, glancing hits
-// squirt off to the side) at roughly the bot's drive speed, then coasts under
-// friction. While the bot keeps driving into it, the ball rides in front =
-// dribbling.
-function resolveBallBotCollision(bot, dtMs) {
-  const dx = ball.x - bot.x;
-  const dy = ball.y - bot.y;
-  let dist = Math.sqrt(dx * dx + dy * dy);
-  const minDist = BOT_RADIUS + ball.r;
-  if (dist >= minDist) { bot.ballInContact = false; return; }
+// ── ball–bot contact: push the ball. Goal-seeking dribble curves it toward goal
+//    while in contact (the core new behavior). Otherwise it leaves along the normal.
+function resolveBallBotCollision(bot,dtMs){
+  const dx=ball.x-bot.x, dy=ball.y-bot.y; let dist=Math.hypot(dx,dy);
+  const minDist=BOT_RADIUS+ball.r;
+  if (dist>=minDist){ bot.ballInContact=false; return; }
+  if (dist<0.001) dist=0.001;
+  const nx=dx/dist, ny=dy/dist;
+  ball.x=bot.x+nx*minDist; ball.y=bot.y+ny*minDist;   // ride in front of the body
 
-  if (dist < 0.001) { dist = 0.001; }
-  const nx = dx / dist, ny = dy / dist;
-
-  // pin the ball to the bot's surface so it rides in front of the body
-  ball.x = bot.x + nx * minDist;
-  ball.y = bot.y + ny * minDist;
-
-  // velocity transfer: more head-on => more speed, along the contact normal
-  const hx = Math.cos(deg2rad(bot.heading));
-  const hy = Math.sin(deg2rad(bot.heading));
-  const headOn = Math.max(0, hx * nx + hy * ny);  // 1 = ball dead ahead
-  const drive = botDriveSpeed(bot);
-  const speed = drive * (1 + headOn);             // up to ~2x drive on a clean hit
-  if (speed > 0) {
-    if (aimingEnabled) {
-      const goalX = bot.id === 'A' ? FIELD_W_CM : 0;
-      const goalY = FIELD_H_CM / 2;
-      let gx = goalX - ball.x, gy = goalY - ball.y;
-      const gl = Math.hypot(gx, gy) || 1; gx /= gl; gy /= gl;
-      const blend = 0.7;
-      let dirx = nx*(1-blend) + gx*blend;
-      let diry = ny*(1-blend) + gy*blend;
-      const dl = Math.hypot(dirx, diry) || 1;
-      ball.vx = dirx/dl * speed; ball.vy = diry/dl * speed;
-    } else {
-      ball.vx = nx * speed;
-      ball.vy = ny * speed;
-    }
+  const hx=Math.cos(deg2rad(bot.heading)), hy=Math.sin(deg2rad(bot.heading));
+  const headOn=Math.max(0, hx*nx+hy*ny);
+  const drive=botDriveSpeed(bot);
+  const speed=drive*(1+headOn);
+  if (speed>0){
+    const charging = bot.state===S_CHARGE || bot.state===S_SEEK || bot.state===S_LAUNCH;
+    if (dribbleEnabled && charging){
+      const g=goalPointFor(bot);
+      let gx=g.x-ball.x, gy=g.y-ball.y; const gl=Math.hypot(gx,gy)||1; gx/=gl; gy/=gl;
+      let dirx=nx*(1-GOAL_DRIBBLE_BLEND)+gx*GOAL_DRIBBLE_BLEND;
+      let diry=ny*(1-GOAL_DRIBBLE_BLEND)+gy*GOAL_DRIBBLE_BLEND;
+      const dl=Math.hypot(dirx,diry)||1;
+      ball.vx=dirx/dl*speed; ball.vy=diry/dl*speed;
+    } else { ball.vx=nx*speed; ball.vy=ny*speed; }
   }
-
-  if (!bot.ballInContact) {
-    bot.ballContacts++;
-    bot.ballInContact = true;
-  }
+  ball.lastTouch = bot.id;
+  if (!bot.ballInContact){ bot.ballContacts++; bot.ballInContact=true; }
 }
 
-// ── BORDER: back up, snap-turn, drive forward — mirrors trolleySteering on real bot
-function updateBorder(bot, dtMs) {
+// ── BORDER recovery
+function enterBorder(bot,bs){
+  bot.borderSide=bs; bot.borderHits++; bot.state=S_BORDER;
+  bot.borderPhase=0; bot.borderTimer=0;
+  logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> hit border`);
+}
+function updateBorder(bot,dtMs){
   bot.borderTimer += dtMs;
-  const backupTime = 250 + Math.max(bot.stats.speed - 4, 0) * 20 + (bot.lowPowerActive ? 80 : 0);
-  const fwdTime = 300;
-
-  if (bot.borderPhase === 0) {
-    // Phase 0: back up straight
-    const backSpd = (40 + Math.max(bot.stats.speed - 4, 0) * 5) * CM_PER_POWER_MS * dtMs;
-    bot.x -= Math.cos(deg2rad(bot.heading)) * backSpd;
-    bot.y -= Math.sin(deg2rad(bot.heading)) * backSpd;
-    if (bot.borderTimer >= backupTime) {
-      // Snap heading away from wall
-      const bs = bot.borderSide;
-      const angle = bot.lowPowerActive ? 150 : 115;
-      if (bs === 1) {
-        bot.heading = -angle / 2 + randFloat(-10, 10);
-        bot.lastTurnWasLeft = false;
-      } else if (bs === 2) {
-        bot.heading = 180 + angle / 2 + randFloat(-10, 10);
-        bot.lastTurnWasLeft = true;
-      } else {
-        const headOnAngle = (bs === 4 ? 150 : 130) + randFloat(0, 20);
-        if (bot.lastTurnWasLeft) {
-          bot.heading += headOnAngle;
-          bot.lastTurnWasLeft = false;
-        } else {
-          bot.heading -= headOnAngle;
-          bot.lastTurnWasLeft = true;
-        }
-      }
-      bot.borderPhase = 1;
-      bot.borderTimer = 0;
+  const backupTime = 250 + Math.max(bot.stats.speed-4,0)*20 + (bot.lowPowerActive?80:0);
+  if (bot.borderPhase===0){
+    const back=(40+Math.max(bot.stats.speed-4,0)*5)*CM_PER_POWER_MS*dtMs;
+    bot.x -= Math.cos(deg2rad(bot.heading))*back;
+    bot.y -= Math.sin(deg2rad(bot.heading))*back;
+    if (bot.borderTimer>=backupTime){
+      const bs=bot.borderSide, angle=bot.lowPowerActive?150:115;
+      if (bs===1){ bot.heading=-angle/2+randFloat(-10,10); bot.lastTurnWasLeft=false; }
+      else if (bs===2){ bot.heading=180+angle/2+randFloat(-10,10); bot.lastTurnWasLeft=true; }
+      else { const a=130+randFloat(0,20); if (bot.lastTurnWasLeft){bot.heading+=a;bot.lastTurnWasLeft=false;} else {bot.heading-=a;bot.lastTurnWasLeft=true;} }
+      bot.borderPhase=1; bot.borderTimer=0;
     }
   } else {
-    // Phase 1: drive forward to clear border zone
-    const fwdSpd = bot.currentPower * CM_PER_POWER_MS * dtMs;
-    bot.x += Math.cos(deg2rad(bot.heading)) * fwdSpd;
-    bot.y += Math.sin(deg2rad(bot.heading)) * fwdSpd;
-    if (bot.borderTimer >= fwdTime) {
-      bot.sameDirectionCount = 0;
-      bot.state = S_ROAM;
-      startForwardSeg(bot);
-      logEvent(`<span style="color:${bot.color}">Bot ${bot.id}</span> cleared border`);
-    }
+    const f=bot.currentPower*CM_PER_POWER_MS*dtMs;
+    bot.x += Math.cos(deg2rad(bot.heading))*f;
+    bot.y += Math.sin(deg2rad(bot.heading))*f;
+    if (bot.borderTimer>=300){ bot.sameDirectionCount=0; bot.state=S_ROAM; startForwardSeg(bot); }
   }
-
-  // Hard clamp — bot stays inside field
-  bot.x = clamp(bot.x, BORDER_TAPE, FIELD_W_CM - BORDER_TAPE);
-  bot.y = clamp(bot.y, BORDER_TAPE, FIELD_H_CM - BORDER_TAPE);
+  bot.x=clamp(bot.x,BORDER_TAPE,FIELD_W_CM-BORDER_TAPE);
+  bot.y=clamp(bot.y,BORDER_TAPE,FIELD_H_CM-BORDER_TAPE);
 }
 
-// ── ALIGN: v5.1 alignBeforeCharge — pivot toward ball before charging
-// alignPower scales with TURNING. alignMs DECREASES with TURNING:
-// high TURNING = fast snap = more charges per match.
-// 99 = found while driving (heading unreliable, normalise to 0).
-function updateAlign(bot, dtMs) {
-  if (bot.ballHeading === 99) bot.ballHeading = 0;
-
-  const alignPower  = Math.max(18, Math.min(45, 15 + bot.stats.turning * 3));
-  const alignMs     = Math.max(20, 220 - bot.stats.turning * 20);
-  const maxAttempts = Math.max(1, Math.round(bot.stats.turning / 3));
-
-  bot.alignTotalTime += dtMs;
-  if (bot.alignTotalTime > 2000 || onBorder(bot) > 0) {
-    bot.ballDetected = false; bot.ballHeading = 0;
-    bot.state = S_ROAM; startForwardSeg(bot);
-    return;
-  }
-
-  if (bot.ballHeading === 0) {
-    // prepareShot: micro back-up then confirm (mirrors firmware -25,-25 50ms)
-    const backSpd = 25 * CM_PER_POWER_MS * dtMs;
-    bot.x -= Math.cos(deg2rad(bot.heading)) * backSpd;
-    bot.y -= Math.sin(deg2rad(bot.heading)) * backSpd;
-    if (canSeeBall(bot, true)) {
-      bot.state = S_CHARGE;
-      bot.chargeTimer = 0; bot.followPhase = 0; bot.followTimer = 0;
-    } else {
-      bot.ballDetected = false; bot.ballHeading = 0;
-      bot.state = S_ROAM; startForwardSeg(bot);
-    }
-    return;
-  }
-
-  bot.alignTimer += dtMs;
-  if (bot.alignTimer < alignMs) {
-    const lSpd = bot.ballHeading < 0 ? -alignPower :  alignPower;
-    const rSpd = bot.ballHeading < 0 ?  alignPower : -alignPower;
-    bot.heading += headingRate(lSpd, rSpd) * dtMs;
-  } else {
-    if (canSeeBall(bot, false)) {
-      bot.ballHeading = 0;
-      bot.state = S_CHARGE;
-      bot.chargeTimer = 0; bot.followPhase = 0; bot.followTimer = 0;
-    } else {
-      bot.alignAttempt++;
-      bot.alignTimer = 0;
-      if (bot.alignAttempt >= maxAttempts) {
-        bot.ballDetected = false; bot.ballHeading = 0;
-        bot.state = S_ROAM; startForwardSeg(bot);
-      }
-    }
-  }
-}
-
-// ── UNSTICK: mirrors firmware unstick() — back up, snap-turn ~100°, drive forward
-function updateUnstick(bot, dtMs) {
+// ── UNSTICK (jam recovery): randomized reverse + big turn
+function updateUnstick(bot,dtMs){
   bot.unstickTimer += dtMs;
-
-  if (bot.unstickPhase === 0) {
-    // back up straight (firmware: pwmCruiseControl(-55,-55) for ~280ms)
-    const backSpd = 55 * CM_PER_POWER_MS * dtMs;
-    bot.x -= Math.cos(deg2rad(bot.heading)) * backSpd;
-    bot.y -= Math.sin(deg2rad(bot.heading)) * backSpd;
-    if (bot.unstickTimer >= 280) {
-      // snap-turn ~100° away, opposite of last turn (firmware trolleySteering)
-      const turn = 100 + randFloat(-15, 15);
-      if (bot.lastTurnWasLeft) { bot.heading += turn; bot.lastTurnWasLeft = false; }
-      else { bot.heading -= turn; bot.lastTurnWasLeft = true; }
-      bot.unstickPhase = 1;
-      bot.unstickTimer = 0;
+  if (bot.unstickPhase===0){
+    const back=70*CM_PER_POWER_MS*dtMs;
+    bot.x -= Math.cos(deg2rad(bot.heading))*back;
+    bot.y -= Math.sin(deg2rad(bot.heading))*back;
+    if (bot.unstickTimer>=360+randFloat(0,240)){
+      const turn=90+randFloat(25,90);
+      if (bot.lastTurnWasLeft){bot.heading+=turn;bot.lastTurnWasLeft=false;} else {bot.heading-=turn;bot.lastTurnWasLeft=true;}
+      bot.unstickPhase=1; bot.unstickTimer=0;
     }
   } else {
-    // drive forward to clear (firmware: pwmCruiseControl(currentPower) ~350ms)
-    const fwdSpd = bot.currentPower * CM_PER_POWER_MS * dtMs;
-    bot.x += Math.cos(deg2rad(bot.heading)) * fwdSpd;
-    bot.y += Math.sin(deg2rad(bot.heading)) * fwdSpd;
-    const bs = onBorder(bot);
-    if (bs > 0) {
-      // ran into a wall while clearing — hand off to border routine
-      bot.borderSide = bs;
-      bot.borderHits++;
-      bot.state = S_BORDER;
-      bot.borderPhase = 0; bot.borderTimer = 0; bot.borderAttempt = 0;
-      return;
-    }
-    if (bot.unstickTimer >= 350) {
-      bot.ballDetected = false;
-      bot.sameDirectionCount = 0;
-      bot.state = S_ROAM;
-      startForwardSeg(bot);
-    }
+    const f=bot.currentPower*CM_PER_POWER_MS*dtMs;
+    bot.x += Math.cos(deg2rad(bot.heading))*f;
+    bot.y += Math.sin(deg2rad(bot.heading))*f;
+    if (onBorder(bot)>0){ enterBorder(bot,onBorder(bot)); return; }
+    if (bot.unstickTimer>=300){ bot.ballDetected=false; bot.sameDirectionCount=0; bot.state=S_ROAM; startForwardSeg(bot); }
   }
 }
-
-function triggerUnstick(bot) {
-  if (bot.state === S_UNSTICK || bot.state === S_LAUNCH) return;
-  bot.ballDetected = false;
-  bot.state = S_UNSTICK;
-  bot.unstickPhase = 0;
-  bot.unstickTimer = 0;
+function triggerUnstick(bot){
+  if (bot.state===S_UNSTICK || bot.state===S_LAUNCH) return;
+  bot.ballDetected=false; bot.state=S_UNSTICK; bot.unstickPhase=0; bot.unstickTimer=0;
 }
 
-// ── Bot-to-bot collision: de-overlap, push, and stuck->unstick detection
-const STUCK_CONTACT_MS = 900; // bots locked together this long -> both unstick
-function resolveBotCollision(b1, b2, dtMs) {
-  // skip while either is still driving in from launch
-  if (b1.state === S_LAUNCH || b2.state === S_LAUNCH) return;
-
-  const dx = b2.x - b1.x;
-  const dy = b2.y - b1.y;
-  let dist = Math.sqrt(dx * dx + dy * dy);
-  const minDist = BOT_RADIUS * 2;
-  const contactBand = minDist + 4; // still 'in contact' just past touching
-
-  if (dist >= contactBand) {
-    b1.contactTimer = 0;
-    b2.contactTimer = 0;
-    return;
-  }
-
-  if (dist < 0.001) { dist = 0.001; }
-  const nx = dx / dist, ny = dy / dist;
-
-  // de-overlap: shove both apart to exactly touching
-  const overlap = minDist - dist;
-  if (overlap > 0) {
-    b1.x -= nx * overlap / 2;
-    b1.y -= ny * overlap / 2;
-    b2.x += nx * overlap / 2;
-    b2.y += ny * overlap / 2;
-  }
-
-  // push: a charging bot shoves the other along its heading; roaming bots
-  // push more gently. This lets a charging bot drive the other backward.
-  function shove(driver, target) {
-    let factor = 0;
-    if (driver.state === S_CHARGE) factor = 1.4;
-    else if (driver.state === S_ROAM || driver.state === S_BORDER) factor = 0.6;
+// ── bot-bot collision + stuck detection
+const STUCK_CONTACT_MS = 900;
+function resolveBotCollision(b1,b2,dtMs){
+  if (b1.state===S_LAUNCH||b2.state===S_LAUNCH) return;
+  const dx=b2.x-b1.x, dy=b2.y-b1.y; let dist=Math.hypot(dx,dy);
+  const minDist=BOT_RADIUS*2, band=minDist+4;
+  if (dist>=band){ b1.contactTimer=0; b2.contactTimer=0; return; }
+  if (dist<0.001) dist=0.001;
+  const nx=dx/dist, ny=dy/dist, overlap=minDist-dist;
+  if (overlap>0){ b1.x-=nx*overlap/2; b1.y-=ny*overlap/2; b2.x+=nx*overlap/2; b2.y+=ny*overlap/2; }
+  function shove(driver,target){
+    let f=0;
+    if (driver.state===S_CHARGE||driver.state===S_SEEK) f=1.4;
+    else if (driver.state===S_ROAM||driver.state===S_BORDER||driver.state===S_REPO) f=0.6;
     else return;
-    const push = factor * driver.currentPower * CM_PER_POWER_MS * dtMs;
-    target.x += Math.cos(deg2rad(driver.heading)) * push;
-    target.y += Math.sin(deg2rad(driver.heading)) * push;
+    const push=f*driver.currentPower*CM_PER_POWER_MS*dtMs;
+    target.x += Math.cos(deg2rad(driver.heading))*push;
+    target.y += Math.sin(deg2rad(driver.heading))*push;
   }
-  shove(b1, b2);
-  shove(b2, b1);
-
-  // keep both inside the field
-  b1.x = clamp(b1.x, 0, FIELD_W_CM); b1.y = clamp(b1.y, 0, FIELD_H_CM);
-  b2.x = clamp(b2.x, 0, FIELD_W_CM); b2.y = clamp(b2.y, 0, FIELD_H_CM);
-
-  // stuck detection: locked together too long -> both run unstick()
-  b1.contactTimer += dtMs;
-  b2.contactTimer += dtMs;
-  if (b1.contactTimer >= STUCK_CONTACT_MS) {
-    triggerUnstick(b1);
-    triggerUnstick(b2);
-    b1.contactTimer = 0;
-    b2.contactTimer = 0;
-    logEvent(`<span style="color:#f6ad55">Bots stuck</span> — both reversing to unstick`);
+  shove(b1,b2); shove(b2,b1);
+  b1.x=clamp(b1.x,0,FIELD_W_CM); b1.y=clamp(b1.y,0,FIELD_H_CM);
+  b2.x=clamp(b2.x,0,FIELD_W_CM); b2.y=clamp(b2.y,0,FIELD_H_CM);
+  b1.contactTimer+=dtMs; b2.contactTimer+=dtMs;
+  if (b1.contactTimer>=STUCK_CONTACT_MS){
+    triggerUnstick(b1); triggerUnstick(b2); b1.contactTimer=0; b2.contactTimer=0;
+    logEvent(`<span style="color:#f6ad55">Bots stuck</span> — both unsticking`);
   }
 }
 
-// ── Ball physics update
-function updateBall(dtMs) {
-  ball.x += ball.vx * dtMs;
-  ball.y += ball.vy * dtMs;
-  ball.trail.push({x:ball.x, y:ball.y});
-  if (ball.trail.length > ball.trailMax) ball.trail.shift();
-  // Heat map accumulation
-  if (heatEnabled) {
-    const hc = Math.floor(ball.x / FIELD_W_CM * 8);
-    const hr = Math.floor(ball.y / FIELD_H_CM * 4);
-    if (hc>=0&&hc<8&&hr>=0&&hr<4) { heatMap[hr][hc]++; heatTotal++; }
-  }
+// ── BALL physics, goals
+let heatEnabled=false, heatMap=Array.from({length:4},()=>new Array(8).fill(0)), heatTotal=0;
+function updateBall(dtMs){
+  ball.x += ball.vx*dtMs; ball.y += ball.vy*dtMs;
+  ball.trail.push({x:ball.x,y:ball.y}); if (ball.trail.length>ball.trailMax) ball.trail.shift();
+  if (heatEnabled){ const hc=Math.floor(ball.x/FIELD_W_CM*8), hr=Math.floor(ball.y/FIELD_H_CM*4);
+    if (hc>=0&&hc<8&&hr>=0&&hr<4){ heatMap[hr][hc]++; heatTotal++; } }
+  const fr=1-(1-ball.friction)*dtMs/50; ball.vx*=fr; ball.vy*=fr;
 
-  // friction
-  const frictionPerMs = 1 - (1 - ball.friction) * dtMs / 50;
-  ball.vx *= frictionPerMs;
-  ball.vy *= frictionPerMs;
+  const goalYmin=FIELD_H_CM*0.25, goalYmax=FIELD_H_CM*0.75;
+  if (ball.x-ball.r < BORDER_TAPE){
+    if (ball.y>=goalYmin && ball.y<=goalYmax){ scoreB++; const own=(ball.lastTouch==='A'); if(own) ownGoalA++; if(!headless){ document.getElementById('scoreB').textContent=scoreB; logEvent(own ? `🥅 <span style="color:#f6ad55">OWN GOAL!</span> Bot A knocked it in — <span style="color:#fc8181">B +1</span>` : `🥅 <span style="color:#fc8181">Bot B scores!</span>`); triggerGoalReplay(); logMatch(); } resetBall(); }
+    else { ball.x=BORDER_TAPE+ball.r; ball.vx=Math.abs(ball.vx)*0.6; }
+  }
+  if (ball.x+ball.r > FIELD_W_CM-BORDER_TAPE){
+    if (ball.y>=goalYmin && ball.y<=goalYmax){ scoreA++; const own=(ball.lastTouch==='B'); if(own) ownGoalB++; if(!headless){ document.getElementById('scoreA').textContent=scoreA; logEvent(own ? `🥅 <span style="color:#f6ad55">OWN GOAL!</span> Bot B knocked it in — <span style="color:#63b3ed">A +1</span>` : `🥅 <span style="color:#63b3ed">Bot A scores!</span>`); triggerGoalReplay(); logMatch(); } resetBall(); }
+    else { ball.x=FIELD_W_CM-BORDER_TAPE-ball.r; ball.vx=-Math.abs(ball.vx)*0.6; }
+  }
+  if (ball.y-ball.r<BORDER_TAPE){ ball.y=BORDER_TAPE+ball.r; ball.vy=Math.abs(ball.vy)*0.6; }
+  if (ball.y+ball.r>FIELD_H_CM-BORDER_TAPE){ ball.y=FIELD_H_CM-BORDER_TAPE-ball.r; ball.vy=-Math.abs(ball.vy)*0.6; }
+}
+function resetBall(){ ball.x=FIELD_W_CM/2; ball.y=FIELD_H_CM/2; ball.vx=0; ball.vy=0; ball.lastTouch=null; }
 
-  // wall bounces and goal detection
-  // Goal zone = rows 1–3 of the 8×4 grid → y: 25%–75% of field height
-  const goalYmin = FIELD_H_CM * 0.25;
-  const goalYmax = FIELD_H_CM * 0.75;
+// ============================================================
+// RENDER
+// ============================================================
+const canvas=document.getElementById('fieldCanvas'), ctx=canvas.getContext('2d');
+function fieldToCanvas(x,y){ return [x*canvas.width/FIELD_W_CM, y*canvas.height/FIELD_H_CM]; }
+function hexToRgba(hex,a){ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
 
-  if (ball.x - ball.r < BORDER_TAPE) {
-    // Left goal line — check goal FIRST, only bounce if not a goal
-    if (ball.y + ball.r >= goalYmin && ball.y - ball.r <= goalYmax) {
-      scoreB++;
-      document.getElementById('scoreB').textContent = scoreB;
-      logEvent(`🥅 <span style="color:#fc8181">Bot B scores!</span>`);
-      triggerGoalReplay();
-      resetBall();
-    } else {
-      ball.x = BORDER_TAPE + ball.r;
-      ball.vx = Math.abs(ball.vx) * 0.6;
-    }
-  }
-  if (ball.x + ball.r > FIELD_W_CM - BORDER_TAPE) {
-    // Right goal line — check goal FIRST, only bounce if not a goal
-    if (ball.y + ball.r >= goalYmin && ball.y - ball.r <= goalYmax) {
-      scoreA++;
-      document.getElementById('scoreA').textContent = scoreA;
-      logEvent(`🥅 <span style="color:#63b3ed">Bot A scores!</span>`);
-      triggerGoalReplay();
-      logMatch();
-      resetBall();
-    } else {
-      ball.x = FIELD_W_CM - BORDER_TAPE - ball.r;
-      ball.vx = -Math.abs(ball.vx) * 0.6;
-    }
-  }
-  if (ball.y - ball.r < BORDER_TAPE) {
-    ball.y = BORDER_TAPE + ball.r;
-    ball.vy = Math.abs(ball.vy) * 0.6;
-  }
-  if (ball.y + ball.r > FIELD_H_CM - BORDER_TAPE) {
-    ball.y = FIELD_H_CM - BORDER_TAPE - ball.r;
-    ball.vy = -Math.abs(ball.vy) * 0.6;
-  }
+function drawField(){
+  const W=canvas.width,H=canvas.height,sx=W/FIELD_W_CM,sy=H/FIELD_H_CM,bt=BORDER_TAPE*sx,btY=BORDER_TAPE*sy;
+  ctx.fillStyle='#111'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(bt,btY,W-2*bt,H-2*btY);
+  const cellW=(W-2*bt)/8, cellH=(H-2*btY)/4;
+  ctx.strokeStyle='#BABABA'; ctx.lineWidth=1; ctx.setLineDash([]);
+  for (let c=0;c<=8;c++){ const x=bt+c*cellW; ctx.beginPath(); ctx.moveTo(x,btY); ctx.lineTo(x,H-btY); ctx.stroke(); }
+  for (let r=0;r<=4;r++){ const y=btY+r*cellH; ctx.beginPath(); ctx.moveTo(bt,y); ctx.lineTo(W-bt,y); ctx.stroke(); }
+  const midX=bt+4*cellW; ctx.strokeStyle='#8D99AE'; ctx.lineWidth=2; ctx.setLineDash([12,6]);
+  ctx.beginPath(); ctx.moveTo(midX,btY); ctx.lineTo(midX,H-btY); ctx.stroke(); ctx.setLineDash([]);
+  // goals
+  const gXL=bt, gXR=W-bt-cellW, gY=btY+cellH, gW=cellW, gH=2*cellH;
+  function hatch(x,y,w,h,col){ ctx.save(); ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip(); ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.globalAlpha=0.22;
+    for (let d=-(w+h);d<(w+h);d+=8){ ctx.beginPath(); ctx.moveTo(x+d,y); ctx.lineTo(x+d+h,y+h); ctx.stroke(); } ctx.globalAlpha=1; ctx.restore(); }
+  // left net = where Bot B scores (red);  right net = where Bot A scores (blue)
+  hatch(gXL,gY,gW,gH,'#e53e3e'); hatch(gXR,gY,gW,gH,'#3182ce');
+  ctx.lineWidth=2; ctx.setLineDash([10,5]);
+  ctx.strokeStyle='#e53e3e'; ctx.strokeRect(gXL,gY,gW,gH);
+  ctx.strokeStyle='#3182ce'; ctx.strokeRect(gXR,gY,gW,gH); ctx.setLineDash([]);
+  // goal labels (own goals count: any ball entering a net scores for that net's bot)
+  ctx.font=`700 ${Math.round(9*sx)}px system-ui`; ctx.textAlign='center';
+  ctx.fillStyle='#fc8181'; ctx.fillText("B scores →", gXL+gW/2, gY-4);
+  ctx.fillStyle='#63b3ed'; ctx.fillText("← A scores", gXR+gW/2, gY-4);
+  // center mark
+  ctx.strokeStyle='#8D99AE'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(bt+4*cellW,btY+2*cellH,8*sx,0,Math.PI*2); ctx.stroke();
 }
 
-function resetBall() {
-  ball.x = FIELD_W_CM / 2;
-  ball.y = FIELD_H_CM / 2;
-  ball.vx = 0; ball.vy = 0;
-}
-
-// ── RENDERING ──────────────────────────────────────────────────
-const canvas = document.getElementById('fieldCanvas');
-const ctx = canvas.getContext('2d');
-
-// Field scale: canvas is 880×440, field is 244×122 cm
-// → scale = 880/244 ≈ 3.6
-function fieldToCanvas(x, y) {
-  const scaleX = canvas.width / FIELD_W_CM;
-  const scaleY = canvas.height / FIELD_H_CM;
-  return [x * scaleX, y * scaleY];
-}
-
-function drawField() {
-  const W = canvas.width, H = canvas.height;
-  const scaleX = W / FIELD_W_CM;
-  const scaleY = H / FIELD_H_CM;
-  const bTape = BORDER_TAPE * scaleX;
-
-  // ── Black border surface ──
-  ctx.fillStyle = '#111111';
-  ctx.fillRect(0, 0, W, H);
-
-  // ── White playing surface ──
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(bTape, bTape, W - 2*bTape, H - 2*bTape);
-
-  // ── 8×4 grid lines ──
-  // Field is 244 cm wide × 122 cm tall; each cell = 244/8 = 30.5 cm wide, 122/4 = 30.5 cm tall
-  const cellW = (W - 2*bTape) / 8;
-  const cellH = (H - 2*bTape) / 4;
-
-  ctx.strokeStyle = '#BABABA';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([]);
-
-  // Vertical grid lines (9)
-  for (let c = 0; c <= 8; c++) {
-    const x = bTape + c * cellW;
-    ctx.beginPath(); ctx.moveTo(x, bTape); ctx.lineTo(x, H - bTape); ctx.stroke();
-  }
-  // Horizontal grid lines (5)
-  for (let r = 0; r <= 4; r++) {
-    const y = bTape + r * cellH;
-    ctx.beginPath(); ctx.moveTo(bTape, y); ctx.lineTo(W - bTape, y); ctx.stroke();
-  }
-
-  // ── Midfield dashed line (col 4) ──
-  const midX = bTape + 4 * cellW;
-  ctx.strokeStyle = '#8D99AE';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([12, 6]);
-  ctx.beginPath(); ctx.moveTo(midX, bTape); ctx.lineTo(midX, H - bTape); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // ── Goal zones: 1 col wide × 2 rows tall, rows 1–3, centered ──
-  // Left goal: col 0–1, rows 1–3  →  x: bTape, y: bTape+cellH
-  // Right goal: col 7–8, rows 1–3 →  x: W-bTape-cellW, y: bTape+cellH
-  const goalX_L  = bTape;
-  const goalX_R  = W - bTape - cellW;
-  const goalY    = bTape + cellH;
-  const goalW    = cellW;
-  const goalHt   = 2 * cellH;
-
-  // Diagonal hatch fill (red)
-  function drawHatch(x, y, w, h, color) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(x, y, w, h);
-    ctx.clip();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = 0.22;
-    const step = 8;
-    for (let d = -(w + h); d < (w + h); d += step) {
-      ctx.beginPath();
-      ctx.moveTo(x + d, y);
-      ctx.lineTo(x + d + h, y + h);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  }
-
-  drawHatch(goalX_L, goalY, goalW, goalHt, '#EF233C');
-  drawHatch(goalX_R, goalY, goalW, goalHt, '#EF233C');
-
-  // Goal zone outlines (dashed red)
-  ctx.strokeStyle = '#EF233C';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([10, 5]);
-  ctx.strokeRect(goalX_L, goalY, goalW, goalHt);
-  ctx.strokeRect(goalX_R, goalY, goalW, goalHt);
-  ctx.setLineDash([]);
-
-  // ── Grid coordinate labels ON the field ──
-  const fs = Math.max(8, Math.round(10 * scaleX));
-  ctx.font = `700 ${fs}px system-ui, sans-serif`;
-  ctx.fillStyle = '#8D99AE';
-  ctx.textAlign = 'center';
-
-  // Column labels 1–7 at each vertical grid line, just inside top edge
-  for (let c = 1; c <= 7; c++) {
-    const lx = bTape + c * cellW;
-    const ly = bTape + fs + 2;
-    ctx.fillText(String(c), lx, ly);
-  }
-  // Row labels 1–3 at each horizontal grid line, just inside left edge
-  ctx.textAlign = 'left';
-  for (let r = 1; r <= 3; r++) {
-    const lx = bTape + 4;
-    const ly = bTape + r * cellH + fs/2;
-    ctx.fillText(String(r), lx, ly);
-  }
-
-  // ── Ball placement mark at (4, 2) — center ──
-  const cx = bTape + 4 * cellW;
-  const cy = bTape + 2 * cellH;
-  ctx.strokeStyle = '#8D99AE';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(cx, cy, 8 * scaleX, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = '#8D99AE';
-  ctx.beginPath(); ctx.arc(cx, cy, 2.5 * scaleX, 0, Math.PI * 2); ctx.fill();
-
-  // ── Corner starting position markers ──
-  const corners = [
-    [bTape, bTape], [W - bTape, bTape],
-    [bTape, H - bTape], [W - bTape, H - bTape]
-  ];
-  corners.forEach(([cx2, cy2]) => {
-    ctx.strokeStyle = '#FFD166';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 3]);
-    ctx.beginPath(); ctx.arc(cx2, cy2, 16 * scaleX, 0, Math.PI * 2); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(255,209,102,0.55)';
-    ctx.beginPath(); ctx.arc(cx2, cy2, 5 * scaleX, 0, Math.PI * 2); ctx.fill();
-  });
-}
-
-function drawTrail(bot) {
-  if (bot.trail.length < 2) return;
-  const alpha0 = 0.05, alpha1 = 0.25;
-  for (let i = 1; i < bot.trail.length; i++) {
-    const t = i / bot.trail.length;
-    const alpha = alpha0 + (alpha1 - alpha0) * t;
-    const [x1, y1] = fieldToCanvas(bot.trail[i-1].x, bot.trail[i-1].y);
-    const [x2, y2] = fieldToCanvas(bot.trail[i].x, bot.trail[i].y);
-    ctx.strokeStyle = bot.color.replace(')', `,${alpha})`).replace('rgb', 'rgba').replace('#', 'rgba(').replace(/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})\)/, (_, r, g, b) => `${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},${alpha})`);
-
-    // simpler: just draw semi-transparent lines
-    ctx.strokeStyle = hexToRgba(bot.color, alpha);
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+function drawTrail(bot){
+  for (let i=1;i<bot.trail.length;i++){
+    const a=0.05+0.2*(i/bot.trail.length);
+    const [x1,y1]=fieldToCanvas(bot.trail[i-1].x,bot.trail[i-1].y);
+    const [x2,y2]=fieldToCanvas(bot.trail[i].x,bot.trail[i].y);
+    ctx.strokeStyle=hexToRgba(bot.color,a); ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
   }
 }
-
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${alpha})`;
+function botColor(bot){
+  if (bot.state===S_CHARGE||bot.state===S_SCAN) return '#f6e05e';
+  if (bot.state===S_SEEK)   return '#fbd38d';
+  if (bot.state===S_ALIGN)  return '#00e5ff';
+  if (bot.state===S_REPO)   return '#9f7aea';
+  if (bot.state===S_BORDER) return '#fc8181';
+  if (bot.state===S_UNSTICK)return '#f6ad55';
+  if (bot.state===S_LAUNCH) return '#a0aec0';
+  if (bot.lowPowerActive)   return '#fc8181';
+  return bot.color;
 }
-
-function getBotColor(bot) {
-  if (bot.state === S_CHARGE) return '#f6e05e';
-  if (bot.state === S_BORDER) return '#fc8181';
-  if (bot.state === S_SCAN)   return '#f6e05e';
-  if (bot.state === S_LAUNCH) return '#a0aec0';
-  if (bot.state === S_UNSTICK) return '#f6ad55';
-  if (bot.state === S_ALIGN)   return '#00e5ff';
-  if (bot.lowPowerActive) return '#fc8181';
-  return bot.lastTurnWasLeft ? '#63b3ed' : '#68d391';
+function drawBot(bot){
+  const [bx,by]=fieldToCanvas(bot.x,bot.y), sx=canvas.width/FIELD_W_CM, R=7*sx, col=botColor(bot);
+  if (bot.state===S_CHARGE){ const g=ctx.createRadialGradient(bx,by,R,bx,by,R*2.5); g.addColorStop(0,'rgba(246,224,94,0.3)'); g.addColorStop(1,'rgba(246,224,94,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(bx,by,R*2.5,0,Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=col; ctx.beginPath(); ctx.arc(bx,by,R,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=bot.id==='A'?'#2b6cb0':'#c53030'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(bx,by,R,0,Math.PI*2); ctx.stroke();
+  const hx=bx+Math.cos(deg2rad(bot.heading))*R*1.4, hy=by+Math.sin(deg2rad(bot.heading))*R*1.4;
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(hx,hy); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.font=`bold ${7*sx}px system-ui`; ctx.textAlign='center'; ctx.fillText(bot.id,bx,by+3);
 }
-
-function drawBot(bot) {
-  const [bx, by] = fieldToCanvas(bot.x, bot.y);
-  const scaleX = canvas.width / FIELD_W_CM;
-  const R = 7 * scaleX;
-  const color = getBotColor(bot);
-
-  // glow
-  if (bot.state === S_CHARGE) {
-    const g = ctx.createRadialGradient(bx, by, R, bx, by, R * 2.5);
-    g.addColorStop(0, 'rgba(246,224,94,0.3)');
-    g.addColorStop(1, 'rgba(246,224,94,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(bx, by, R * 2.5, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // body
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.fill();
-
-  // border ring
-  ctx.strokeStyle = bot.id === 'A' ? '#2b6cb0' : '#c53030';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.stroke();
-
-  // heading arrow
-  const arrowLen = R * 1.4;
-  const hx = bx + Math.cos(deg2rad(bot.heading)) * arrowLen;
-  const hy = by + Math.sin(deg2rad(bot.heading)) * arrowLen;
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(hx, hy); ctx.stroke();
-
-  // label
-  ctx.fillStyle = '#fff';
-  ctx.font = `bold ${7 * scaleX}px system-ui`;
-  ctx.textAlign = 'center';
-  ctx.fillText(bot.id, bx, by + 3);
+function drawBall(){
+  const [bx,by]=fieldToCanvas(ball.x,ball.y), sx=canvas.width/FIELD_W_CM, R=ball.r*sx;
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(bx+2,by+2,R,R*0.6,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.strokeStyle='#2d3748'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(bx,by,R,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#2d3748'; ctx.beginPath(); ctx.arc(bx,by,R*0.3,0,Math.PI*2); ctx.fill();
 }
-
-function drawBall() {
-  const [bx, by] = fieldToCanvas(ball.x, ball.y);
-  const scaleX = canvas.width / FIELD_W_CM;
-  const R = ball.r * scaleX;
-
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.beginPath(); ctx.ellipse(bx+2, by+2, R, R*0.6, 0, 0, Math.PI*2); ctx.fill();
-
-  // ball
-  ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#2d3748';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2);
-  ctx.fill(); ctx.stroke();
-
-  // soccer pattern
-  ctx.fillStyle = '#2d3748';
-  ctx.beginPath(); ctx.arc(bx, by, R * 0.3, 0, Math.PI * 2); ctx.fill();
+function drawHeatMap(){
+  const W=canvas.width,H=canvas.height,sx=W/FIELD_W_CM,sy=H/FIELD_H_CM,bt=BORDER_TAPE*sx,btY=BORDER_TAPE*sy;
+  const cW=(W-2*bt)/8,cH=(H-2*btY)/4; let mx=1; heatMap.forEach(r=>r.forEach(v=>{if(v>mx)mx=v;}));
+  for (let r=0;r<4;r++) for (let c=0;c<8;c++){ const t=heatMap[r][c]/mx; if(t<0.01)continue; ctx.fillStyle=`hsla(${(1-t)*240},100%,50%,${t*0.45})`; ctx.fillRect(bt+c*cW,btY+r*cH,cW,cH); }
 }
+const goalReplay={active:false,timer:0,trail:[]};
+function triggerGoalReplay(){ goalReplay.active=true; goalReplay.timer=1800; goalReplay.trail=ball.trail.slice(-50).map(p=>({...p})); }
+function drawGoalReplay(){ if(!goalReplay.trail.length)return; const sx=canvas.width/FIELD_W_CM,sy=canvas.height/FIELD_H_CM,fade=Math.max(0,goalReplay.timer/1800);
+  for (let i=1;i<goalReplay.trail.length;i++){ const t=i/goalReplay.trail.length; ctx.strokeStyle=`rgba(255,214,0,${t*fade*0.9})`; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(goalReplay.trail[i-1].x*sx,goalReplay.trail[i-1].y*sy); ctx.lineTo(goalReplay.trail[i].x*sx,goalReplay.trail[i].y*sy); ctx.stroke(); } }
+function toggleHeatMap(on){ heatEnabled=on; if(!on){ heatMap=Array.from({length:4},()=>new Array(8).fill(0)); heatTotal=0; } }
 
-function render() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   drawField();
   if (heatEnabled) drawHeatMap();
-  drawTrail(botA);
-  drawTrail(botB);
-  drawBot(botA);
-  drawBot(botB);
-  drawBall();
+  drawTrail(botA); drawTrail(botB);
+  drawBot(botA); drawBot(botB); drawBall();
   if (goalReplay.active) drawGoalReplay();
 }
 
-// ── HUD updates
-function updateHUD() {
-  const min = Math.floor(simTime / 60);
-  const sec = Math.floor(simTime % 60).toString().padStart(2, '0');
-  document.getElementById('clockDisplay').textContent = `${min}:${sec}`;
-
-  // Bot A state chip
-  const colorA = getBotColor(botA);
-  document.getElementById('stateColorA').style.background = colorA;
-  document.getElementById('stateTextA').textContent = `A: ${botA.state}`
-    + (botA.state === S_ALIGN ? `(h:${botA.ballHeading})` : '')
-    + (botA.lowPowerActive ? ' (low)' : '');
-
-  const colorB = getBotColor(botB);
-  document.getElementById('stateColorB').style.background = colorB;
-  document.getElementById('stateTextB').textContent = `B: ${botB.state}`
-    + (botB.state === S_ALIGN ? `(h:${botB.ballHeading})` : '')
-    + (botB.lowPowerActive ? ' (low)' : '');
-
-  // Ball position
-  const bCol = Math.round(ball.x / FIELD_W_CM * 8);
-  const bRow = Math.round(ball.y / FIELD_H_CM * 4);
-  document.getElementById('ballChip').textContent = `⚽ Ball: ${bCol},${bRow}`;
-
-  // Stats
-  document.getElementById('statBorderA').textContent = botA.borderHits;
-  document.getElementById('statBorderB').textContent = botB.borderHits;
-  document.getElementById('statContactA').textContent = botA.ballContacts;
-  document.getElementById('statContactB').textContent = botB.ballContacts;
-  document.getElementById('statScanA').textContent = botA.scans;
-  document.getElementById('statScanB').textContent = botB.scans;
-  document.getElementById('statPowerA').textContent = botA.currentPower;
-  document.getElementById('statPowerB').textContent = botB.currentPower;
+// ── HUD
+function updateHUD(){
+  document.getElementById('clockDisplay').textContent = `${Math.floor(simTime/60)}:${Math.floor(simTime%60).toString().padStart(2,'0')}`;
+  document.getElementById('stateColorA').style.background=botColor(botA);
+  document.getElementById('stateTextA').textContent=`A: ${botA.state}`+(botA.lowPowerActive?' (low)':'');
+  document.getElementById('stateColorB').style.background=botColor(botB);
+  document.getElementById('stateTextB').textContent=`B: ${botB.state}`+(botB.lowPowerActive?' (low)':'');
+  document.getElementById('ballChip').textContent=`⚽ Ball: ${Math.round(ball.x/FIELD_W_CM*8)},${Math.round(ball.y/FIELD_H_CM*4)}`;
+  document.getElementById('statBorderA').textContent=botA.borderHits;
+  document.getElementById('statBorderB').textContent=botB.borderHits;
+  document.getElementById('statContactA').textContent=botA.ballContacts;
+  document.getElementById('statContactB').textContent=botB.ballContacts;
+  document.getElementById('statScanA').textContent=botA.scans;
+  document.getElementById('statScanB').textContent=botB.scans;
+  document.getElementById('statPowerA').textContent=botA.currentPower;
+  document.getElementById('statPowerB').textContent=botB.currentPower;
 }
 
-// ── Main loop
+// ============================================================
+// MAIN LOOP
+// ============================================================
 let botA, botB;
-const SIM_TICK = 50; // ms of sim time per update step
-
-function initSim() {
-  const statsA = {
-    speed: parseInt(document.getElementById('aSpeed').value),
-    power: parseInt(document.getElementById('aPower').value),
-    endurance: parseInt(document.getElementById('aEndurance').value),
-    turning: parseInt(document.getElementById('aTurning').value),
-  };
-  const statsB = {
-    speed: parseInt(document.getElementById('bSpeed').value),
-    power: parseInt(document.getElementById('bPower').value),
-    endurance: parseInt(document.getElementById('bEndurance').value),
-    turning: parseInt(document.getElementById('bTurning').value),
-  };
-
-  // No launch sequence — bots start at quarter-field positions, immediately roaming
-  const useLaunch = document.getElementById('launchToggle').checked;
-  const startXA = useLaunch ? 10                    : FIELD_W_CM * 0.25;
-  const startXB = useLaunch ? FIELD_W_CM - 10       : FIELD_W_CM * 0.75;
-  botA = makeBot('A', '#63b3ed', startXA, FIELD_H_CM / 2, statsA);
-  botB = makeBot('B', '#fc8181', startXB, FIELD_H_CM / 2, statsB);
-  if (useLaunch) { botA.state = S_LAUNCH; botB.state = S_LAUNCH; }
-  botB.heading = 180;
-
-  resetBall();
-  scoreA = 0; scoreB = 0;
-  simTime = 0;
-  document.getElementById('scoreA').textContent = '0';
-  document.getElementById('scoreB').textContent = '0';
-
-  logEl.innerHTML = '<div class="log-entry" style="color:#4a5568;font-style:italic">Match started…</div>';
+function readStats(p){ return {
+  speed:parseInt(document.getElementById(p+'Speed').value),
+  power:parseInt(document.getElementById(p+'Power').value),
+  endurance:parseInt(document.getElementById(p+'Endurance').value),
+  turning:parseInt(document.getElementById(p+'Turning').value),
+};}
+function initSim(){
+  dribbleEnabled=document.getElementById('dribbleToggle').checked;
+  repoEnabled=document.getElementById('repoToggle').checked;
+  const useLaunch=document.getElementById('launchToggle').checked;
+  const sA=readStats('a'), sB=readStats('b');
+  const ax=useLaunch?BORDER_TAPE+8:FIELD_W_CM*0.22, bx=useLaunch?FIELD_W_CM-BORDER_TAPE-8:FIELD_W_CM*0.78;
+  const ay=useLaunch?FIELD_H_CM-BORDER_TAPE-8:FIELD_H_CM/2, by=useLaunch?BORDER_TAPE+8:FIELD_H_CM/2;
+  botA=makeBot('A','#63b3ed',ax,ay,sA);
+  botB=makeBot('B','#fc8181',bx,by,sB);
+  if (useLaunch){ botA.state=S_LAUNCH; botB.state=S_LAUNCH; botA.launchTimer=0; botB.launchTimer=0; }
+  resetBall(); scoreA=0; scoreB=0; ownGoalA=0; ownGoalB=0; simTime=0;
+  if (!headless){
+    document.getElementById('scoreA').textContent='0'; document.getElementById('scoreB').textContent='0';
+    logEl.innerHTML='<div class="log-entry" style="color:#4a5568;font-style:italic">Match started…</div>';
+  }
 }
-
-function simLoop(timestamp) {
-  if (!simRunning || simPaused) return;
-
-  if (lastRealTime === null) lastRealTime = timestamp;
-  const realDt = Math.min(timestamp - lastRealTime, 100); // cap at 100ms
-  lastRealTime = timestamp;
-
-  // advance sim time
-  const simDtMs = realDt * SIM_SPEED;
-  const steps = Math.max(1, Math.round(simDtMs / SIM_TICK));
-  const stepMs = simDtMs / steps;
-
-  for (let i = 0; i < steps; i++) {
-    simTime += stepMs / 1000;
-    if (simTime >= MATCH_DURATION) {
-      simTime = MATCH_DURATION;
-      simRunning = false;
-      logEvent(`🏁 <span style="color:#e2e8f0">Match over! A ${scoreA} – ${scoreB} B</span>`);
-      logMatch();
-      document.getElementById('btnStart').textContent = '▶ Start';
-      render(); updateHUD();
-      return;
-    }
-    updateBot(botA, stepMs);
-    updateBot(botB, stepMs);
-    resolveBotCollision(botA, botB, stepMs);
-    resolveBallBotCollision(botA, stepMs);
-    resolveBallBotCollision(botB, stepMs);
-    updateBall(stepMs);
-  }
-
-  render();
-  updateHUD();
-  // Goal replay timer
-  if (goalReplay.active) { goalReplay.timer -= realDt * 1000; if (goalReplay.timer <= 0) goalReplay.active = false; }
-  animFrame = requestAnimationFrame(simLoop);
+function stepSim(stepMs){
+  updateBot(botA,stepMs); updateBot(botB,stepMs);
+  resolveBotCollision(botA,botB,stepMs);
+  resolveBallBotCollision(botA,stepMs); resolveBallBotCollision(botB,stepMs);
+  updateBall(stepMs);
 }
-
-// ── Controls
-document.getElementById('btnStart').addEventListener('click', () => {
-  if (!simRunning) {
-    initSim();
-    simRunning = true;
-    simPaused = false;
-    lastRealTime = null;
-    document.getElementById('btnStart').textContent = '⏹ Running';
-    animFrame = requestAnimationFrame(simLoop);
+function simLoop(ts){
+  if (!simRunning||simPaused) return;
+  if (lastRealTime===null) lastRealTime=ts;
+  const realDt=Math.min(ts-lastRealTime,100); lastRealTime=ts;
+  const simDt=realDt*SIM_SPEED, steps=Math.max(1,Math.round(simDt/SIM_TICK)), stepMs=simDt/steps;
+  for (let i=0;i<steps;i++){
+    simTime += stepMs/1000;
+    if (simTime>=MATCH_DURATION){ simTime=MATCH_DURATION; simRunning=false;
+      logEvent(`🏁 <span style="color:#e2e8f0">Match over! A ${scoreA} – ${scoreB} B</span>`); logMatch();
+      document.getElementById('btnStart').textContent='▶ Start'; render(); updateHUD(); return; }
+    stepSim(stepMs);
   }
-});
-
-document.getElementById('btnPause').addEventListener('click', () => {
-  if (!simRunning) return;
-  simPaused = !simPaused;
-  document.getElementById('btnPause').textContent = simPaused ? '▶ Resume' : '⏸ Pause';
-  if (!simPaused) {
-    lastRealTime = null;
-    animFrame = requestAnimationFrame(simLoop);
-  }
-});
-
-document.getElementById('btnReset').addEventListener('click', () => {
-  simRunning = false; simPaused = false;
-  if (animFrame) cancelAnimationFrame(animFrame);
-  initSim();
-  document.getElementById('btnStart').textContent = '▶ Start';
-  document.getElementById('btnPause').textContent = '⏸ Pause';
   render(); updateHUD();
-});
+  if (goalReplay.active){ goalReplay.timer-=realDt*SIM_SPEED; if (goalReplay.timer<=0) goalReplay.active=false; }
+  animFrame=requestAnimationFrame(simLoop);
+}
 
-// Speed buttons
-document.querySelectorAll('.speed-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    SIM_SPEED = parseFloat(btn.dataset.speed);
-    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+// ── controls
+document.getElementById('btnStart').addEventListener('click',()=>{ if(!simRunning){ initSim(); simRunning=true; simPaused=false; lastRealTime=null; document.getElementById('btnStart').textContent='⏹ Running'; animFrame=requestAnimationFrame(simLoop); } });
+document.getElementById('btnPause').addEventListener('click',()=>{ if(!simRunning)return; simPaused=!simPaused; document.getElementById('btnPause').textContent=simPaused?'▶ Resume':'⏸ Pause'; if(!simPaused){ lastRealTime=null; animFrame=requestAnimationFrame(simLoop); } });
+document.getElementById('btnReset').addEventListener('click',()=>{ simRunning=false; simPaused=false; if(animFrame)cancelAnimationFrame(animFrame); initSim(); document.getElementById('btnStart').textContent='▶ Start'; document.getElementById('btnPause').textContent='⏸ Pause'; render(); updateHUD(); });
+document.querySelectorAll('.speed-btn').forEach(b=>b.addEventListener('click',()=>{ SIM_SPEED=parseFloat(b.dataset.speed); document.querySelectorAll('.speed-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }));
+
+// ── sliders + budget + formula readouts
+function updateBudget(p){
+  const tot=['Speed','Power','Endurance','Turning'].reduce((a,n)=>a+(parseInt(document.getElementById(p+n).value)||0),0);
+  const el=document.getElementById(p+'Budget'); el.textContent=`${tot} / 20`;
+  el.className='budget '+(tot===20?'ok':'bad');
+}
+function calcFormulas(p){
+  const sv=+document.getElementById(p+'Speed').value, pv=+document.getElementById(p+'Power').value,
+        ev=+document.getElementById(p+'Endurance').value, tv=+document.getElementById(p+'Turning').value;
+  const motor=sv*100/20, minW=Math.max(20,Math.round(motor*0.25));
+  document.getElementById(p+'SpeedOut').innerHTML=`<em>Motor power:</em> ${motor} · <em>floor:</em> ${minW}`;
+  document.getElementById(p+'PowerOut').innerHTML=`<em>Charge:</em> ${Math.min(pv*pv,100)} · <em>Follow:</em> ${Math.min(120+pv*35,500)}ms`;
+  // low-power onset: currentPower hits the floor when motor*factor <= minW
+  const decay=20-ev;
+  let onset='—';
+  if (decay>0){ const fNeeded=minW/motor; const ePct=fNeeded*100; const t=(100-ePct)*40/decay; onset = t>=180?'never':`${Math.round(t)}s`; }
+  document.getElementById(p+'EnduranceOut').innerHTML=`<em>Decay:</em> ${decay} · <em>Tires at:</em> ${onset}`;
+  const ratio=(0.2+tv*0.02).toFixed(2), aMs=Math.max(60,220-tv*16), tries=Math.max(2,Math.round(tv/2));
+  document.getElementById(p+'TurningOut').innerHTML=`<em>Arc:</em> ${ratio} · <em>Aim:</em> ${aMs}ms ×${tries}`;
+}
+['Speed','Power','Endurance','Turning'].forEach(st=>{
+  ['a','b'].forEach(p=>{
+    const el=document.getElementById(p+st);
+    el.addEventListener('input',()=>{ document.getElementById(p+st+'Val').textContent=el.value; calcFormulas(p); updateBudget(p); });
   });
 });
-
-// Sliders
-['aSpeed','aPower','aEndurance','aTurning','bSpeed','bPower','bEndurance','bTurning'].forEach(id => {
-  const el = document.getElementById(id);
-  const valEl = document.getElementById(id + 'Val');
-  el.addEventListener('input', () => { valEl.textContent = el.value; });
-});
-
-// ── Optimal allocation toggle ─────────────────────────────────────────────
-// Best 20-point spread given the firmware formulas:
-//   SPEED 5     -> currentPower maxes at 25; SPEED>=6 penalizes charging
-//   POWER 8     -> chargePower 64 keeps effectiveCharge pinned at its 55 cap
-//   TURNING 3   -> saturates the 0.25 dynamicRatio turn cap
-//   ENDURANCE 4 -> remainder; slows DECAY_RATE to hold power longer
-const OPTIMAL = { Speed: 7, Power: 9, Endurance: 3, Turning: 1 };  // v5.1 sim-optimal: +217% vs default
-function applyOptimal(prefix, on) {
-  for (const stat of ['Speed', 'Power', 'Endurance', 'Turning']) {
-    const el = document.getElementById(prefix + stat);
-    const valEl = document.getElementById(prefix + stat + 'Val');
-    if (on) {
-      if (el.dataset.prev === undefined) el.dataset.prev = el.value;
-      el.value = OPTIMAL[stat];
-      el.disabled = true;
-    } else {
-      if (el.dataset.prev !== undefined) { el.value = el.dataset.prev; delete el.dataset.prev; }
-      el.disabled = false;
-    }
-    valEl.textContent = el.value;
-  }
+function applyPreset(p,val){ if(!val)return; const [s,pw,e,t]=val.split(',').map(Number);
+  const set=(n,v)=>{ document.getElementById(p+n).value=v; document.getElementById(p+n+'Val').textContent=v; };
+  set('Speed',s); set('Power',pw); set('Endurance',e); set('Turning',t); calcFormulas(p); updateBudget(p);
 }
-document.getElementById('aOptimal').addEventListener('change', e => applyOptimal('a', e.target.checked));
-document.getElementById('bOptimal').addEventListener('change', e => applyOptimal('b', e.target.checked));
+document.getElementById('dribbleToggle').addEventListener('change',e=>dribbleEnabled=e.target.checked);
+document.getElementById('repoToggle').addEventListener('change',e=>repoEnabled=e.target.checked);
 
-// ── NEW FEATURE GLOBALS ────────────────────────────────────────────────
-let aimingEnabled = false;
-let heatEnabled   = false;
-let heatMap       = Array.from({length:4}, () => new Array(8).fill(0));
-let heatTotal     = 0;
-const goalReplay  = { active:false, timer:0, trail:[] };
-let matchLog      = [];
-let matchCounter  = 0;
+// ── CSV log
+let matchLog=[], matchCounter=0;
+function logMatch(){ if(!botA||!botB)return; matchCounter++; matchLog.push({n:matchCounter,gA:scoreA,gB:scoreB,cA:botA.ballContacts,cB:botB.ballContacts,
+  sA:`S${botA.stats.speed}P${botA.stats.power}E${botA.stats.endurance}T${botA.stats.turning}`, sB:`S${botB.stats.speed}P${botB.stats.power}E${botB.stats.endurance}T${botB.stats.turning}`}); }
+function exportCSV(){ if(!matchLog.length){ alert('No matches logged yet. Run a match first.'); return; }
+  const hdr='Match,GoalsA,GoalsB,ContactsA,ContactsB,StatsA,StatsB';
+  const rows=matchLog.map(r=>`${r.n},${r.gA},${r.gB},${r.cA},${r.cB},${r.sA},${r.sB}`).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(hdr+'\n'+rows); a.download='velocity_arena_matches.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); }
 
-// ── Aiming toggle ─────────────────────────────────────────────────────
-document.getElementById('aimToggle').addEventListener('change', e => {
-  aimingEnabled = e.target.checked;
-});
-
-// ── Heat map ──────────────────────────────────────────────────────────
-function toggleHeatMap(on) {
-  heatEnabled = on;
-  if (!on) { heatMap = Array.from({length:4},()=>new Array(8).fill(0)); heatTotal=0; }
-}
-
-function drawHeatMap() {
-  const W = canvas.width, H = canvas.height;
-  const scaleX = W / FIELD_W_CM;
-  const bTape = BORDER_TAPE * scaleX;
-  const cW = (W - 2*bTape) / 8;
-  const cH = (H - 2*(BORDER_TAPE*(H/FIELD_H_CM))) / 4;
-  const bTapeY = BORDER_TAPE * (H/FIELD_H_CM);
-  let maxV = 1;
-  heatMap.forEach(r => r.forEach(v => { if(v>maxV) maxV=v; }));
-  for (let r=0;r<4;r++) for (let c=0;c<8;c++) {
-    const t = heatMap[r][c] / maxV;
-    if (t < 0.01) continue;
-    const hue = (1-t)*240;
-    ctx.fillStyle = `hsla(${hue},100%,50%,${t*0.45})`;
-    ctx.fillRect(bTape+c*cW, bTapeY+r*cH, cW, cH);
-  }
-}
-
-// ── Goal replay ───────────────────────────────────────────────────────
-function triggerGoalReplay() {
-  goalReplay.active = true;
-  goalReplay.timer  = 1800;
-  goalReplay.trail  = ball.trail.slice(-50).map(p => ({...p}));
-}
-
-function drawGoalReplay() {
-  if (!goalReplay.trail.length) return;
-  const scaleX = canvas.width / FIELD_W_CM;
-  const scaleY = canvas.height / FIELD_H_CM;
-  const fade = Math.max(0, goalReplay.timer / 1800);
-  ctx.save();
-  for (let i=1;i<goalReplay.trail.length;i++) {
-    const t = i/goalReplay.trail.length;
-    ctx.strokeStyle = `rgba(255,214,0,${t*fade*0.9})`;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(goalReplay.trail[i-1].x*scaleX, goalReplay.trail[i-1].y*scaleY);
-    ctx.lineTo(goalReplay.trail[i].x*scaleX, goalReplay.trail[i].y*scaleY);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-// ── Formula outputs ───────────────────────────────────────────────────
-function calcFormulas(px) {
-  const sv = parseInt(document.getElementById(px+'Speed').value)||0;
-  const pv = parseInt(document.getElementById(px+'Power').value)||0;
-  const ev = parseInt(document.getElementById(px+'Endurance').value)||0;
-  const tv = parseInt(document.getElementById(px+'Turning').value)||0;
-  document.getElementById(px+'SpeedOut').innerHTML =
-    `<em>Motor Power:</em> ${sv*5}%`;
-  document.getElementById(px+'PowerOut').innerHTML =
-    `<em>Charge:</em> ${Math.min(pv*pv,100)}%  ·  <em>Follow:</em> ${120+pv*35}ms`;
-  const decay = (20-ev)*1.5;
-  const floorT = decay > 0 ? (80/decay).toFixed(1) : '∞';
-  document.getElementById(px+'EnduranceOut').innerHTML =
-    `<em>Decay:</em> ${decay}/min  ·  <em>Floor at</em> ${floorT}min`;
-  const ratio = (0.2+tv*0.02).toFixed(2);
-  const alignMs = Math.max(60,220-tv*16);
-  document.getElementById(px+'TurningOut').innerHTML =
-    `<em>Ratio:</em> ${ratio}  ·  <em>AlignMs:</em> ${alignMs}ms`;
-}
-
-['Speed','Power','Endurance','Turning'].forEach(st => {
-  document.getElementById('a'+st).addEventListener('input', () => calcFormulas('a'));
-  document.getElementById('b'+st).addEventListener('input', () => calcFormulas('b'));
-});
-calcFormulas('a'); calcFormulas('b');
-
-// ── Presets ───────────────────────────────────────────────────────────
-function applyPreset(prefix, val) {
-  if (!val) return;
-  const [sv,pv,ev,tv] = val.split(',').map(Number);
-  const names = ['Speed','Power','Endurance','Turning'];
-  const vals  = [sv, pv, ev, tv];
-  names.forEach((n,i) => {
-    document.getElementById(prefix+n).value = vals[i];
-    document.getElementById(prefix+n+'Val').textContent = vals[i];
-  });
-  if (document.getElementById(prefix+'Optimal')?.checked) {
-    document.getElementById(prefix+'Optimal').checked = false;
-  }
-  calcFormulas(prefix);
-}
-
-// ── CSV export ────────────────────────────────────────────────────────
-function logMatch() {
-  if (!botA || !botB) return;
-  matchCounter++;
-  matchLog.push({
-    n: matchCounter,
-    gA: scoreA, gB: scoreB,
-    cA: botA.ballContacts, cB: botB.ballContacts,
-    bhA: botA.borderHits,  bhB: botB.borderHits,
-    sA: `S${botA.stats.speed}P${botA.stats.power}E${botA.stats.endurance}T${botA.stats.turning}`,
-    sB: `S${botB.stats.speed}P${botB.stats.power}E${botB.stats.endurance}T${botB.stats.turning}`,
-  });
-}
-
-function exportCSV() {
-  if (!matchLog.length) { alert('No matches logged yet. Run a match first.'); return; }
-  const hdr = 'Match,GoalsA,GoalsB,ContactsA,ContactsB,BorderA,BorderB,StatsA,StatsB';
-  const rows = matchLog.map(r =>
-    `${r.n},${r.gA},${r.gB},${r.cA},${r.cB},${r.bhA},${r.bhB},${r.sA},${r.sB}`
-  ).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(hdr+'\n'+rows);
-  a.download = 'velocity_arena_matches.csv';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-}
-
-// Init display
-initSim();
-render();
-updateHUD();
-
-// ── HEADLESS OPTIMIZATION ───────────────────────────────────────────
-function setOptiStats(st) {
-  ['Speed','Power','Endurance','Turning'].forEach((n,i) => {
-    document.getElementById('a'+n).value = String(st[i]);
-    document.getElementById('b'+n).value = String(st[i]);
-  });
-}
-
-function runOneHeadless(stats) {
-  setOptiStats(stats);
+// ── headless batch (1000 sims of the current A vs B loadout) ────────────
+function runHeadlessMatch(){
+  headless = true;
   initSim();
-  simRunning = true; simPaused = false;
-  while (simTime < MATCH_DURATION) {
-    simTime += SIM_TICK / 1000;
+  while (simTime < MATCH_DURATION){
+    simTime += SIM_TICK/1000;
     if (simTime >= MATCH_DURATION) simTime = MATCH_DURATION;
-    updateBot(botA, SIM_TICK);
-    updateBot(botB, SIM_TICK);
-    resolveBotCollision(botA, botB, SIM_TICK);
-    resolveBallBotCollision(botA, SIM_TICK);
-    resolveBallBotCollision(botB, SIM_TICK);
-    updateBall(SIM_TICK);
+    stepSim(SIM_TICK);
   }
-  return scoreA + scoreB;
+  headless = false;
+  return { gA:scoreA, gB:scoreB, cA:botA.ballContacts, cB:botB.ballContacts, ogA:ownGoalA, ogB:ownGoalB };
 }
 
-function avgBuild(stats, n) {
-  let t = 0; for (let i=0;i<n;i++) t += runOneHeadless(stats); return t/n;
+function batchRow(label,a,b){
+  return `<tr style="border-bottom:1px solid rgba(45,49,72,0.5);"><td style="padding:3px 4px;color:#a0aec0;">${label}</td>`
+       + `<td style="padding:3px 4px;text-align:right;font-weight:700;">${a}</td>`
+       + `<td style="padding:3px 4px;text-align:right;font-weight:700;">${b}</td></tr>`;
 }
 
-function toggleOptPanel() {
-  var body = document.getElementById('optBody');
-  var chevron = document.getElementById('optChevron');
-  var collapsed = body.style.display === 'none';
-  body.style.display = collapsed ? 'block' : 'none';
-  chevron.innerHTML = collapsed ? '&#9660;' : '&#9654;';
-}
+let batchRunning = false;
+document.getElementById('btnBatch').addEventListener('click', async ()=>{
+  if (batchRunning) return;       // ignore double-clicks
+  batchRunning = true;
 
-document.getElementById('btnOptimize').addEventListener('click', async () => {
-  const btn = document.getElementById('btnOptimize');
-  const panel = document.getElementById('optimizePanel');
-  const prog = document.getElementById('optProgress');
-  const bar = document.getElementById('optBar');
-  const barWrap = document.getElementById('optProgressBar');
-  const results = document.getElementById('optResults');
+  // stop any live match first
+  simRunning=false; simPaused=false; if(animFrame) cancelAnimationFrame(animFrame);
+  document.getElementById('btnStart').textContent='▶ Start';
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Running…';
-  panel.style.display = 'block';
-  barWrap.style.display = 'block';
-  results.innerHTML = '<span style="color:#718096">Building candidate list…</span>';
+  const btn=document.getElementById('btnBatch');
+  const panel=document.getElementById('batchPanel');
+  const prog=document.getElementById('batchProg');
+  const barWrap=document.getElementById('batchBar');
+  const bar=document.getElementById('batchBarFill');
+  const out=document.getElementById('batchResults');
 
-  // All budget-valid builds: S4-10, P5-10, E1-6, T=remainder 1-10
-  const candidates = [];
-  for (let sv=4;sv<=10;sv++) for (let pv=5;pv<=10;pv++) for (let ev=1;ev<=6;ev++) {
-    const tv = 20-sv-pv-ev;
-    if (tv>=1&&tv<=10) candidates.push([sv,pv,ev,tv]);
-  }
+  // ── INSTANT feedback so you know the click registered ──
+  btn.disabled=true;
+  btn.textContent='⏳ Running 1000 sims…';
+  btn.style.background='linear-gradient(135deg,#b7791f,#d69e2e)';   // amber = busy
+  panel.style.display='block';
+  barWrap.style.display='block';
+  bar.style.width='2%';
+  prog.textContent='starting…';
+  out.innerHTML='<span style="color:#718096">Simulating 1000 matches… (a few seconds)</span>';
+  // Yield once so the browser PAINTS the busy state before the heavy loop begins.
+  await new Promise(res=>setTimeout(res,30));
 
-  const GRID_N = 30, TOP_N = 1000, BATCH = 8;
-  const scored = [];
-  let done = 0;
-  const total = candidates.length;
-
-  // ── Grid search N=30 ──
-  for (let i=0;i<total;i+=BATCH) {
-    const slice = candidates.slice(i, i+BATCH);
-    for (const b of slice) {
-      scored.push({ b, g: avgBuild(b, GRID_N) });
-      done++;
+  const N=1000;
+  let aG=0,bG=0,aW=0,bW=0,dr=0,aC=0,bC=0,aShut=0,bShut=0,maxA=0,maxB=0,aOG=0,bOG=0;
+  for (let i=0;i<N;i++){
+    const r=runHeadlessMatch();
+    aG+=r.gA; bG+=r.gB; aC+=r.cA; bC+=r.cB; aOG+=r.ogA; bOG+=r.ogB;
+    if (r.gA>maxA) maxA=r.gA; if (r.gB>maxB) maxB=r.gB;
+    if (r.gA>r.gB) aW++; else if (r.gB>r.gA) bW++; else dr++;
+    if (r.gB===0) aShut++;   // A held B scoreless
+    if (r.gA===0) bShut++;   // B held A scoreless
+    if (i % 10 === 0){
+      bar.style.width=Math.round(i/N*100)+'%'; prog.textContent=`${i} / ${N}`;
+      await new Promise(res=>setTimeout(res,0));
     }
-    const pct = Math.round(done/total*70);
-    bar.style.width = pct+'%';
-    prog.textContent = `Grid: ${done}/${total} builds`;
-    results.innerHTML = `<span style="color:#718096">Grid search… ${done}/${total} builds</span>`;
-    await new Promise(r => setTimeout(r, 0));
   }
+  bar.style.width='100%'; prog.textContent=`${N} / ${N} ✓`;
 
-  scored.sort((a,b) => b.g - a.g);
+  const sA=readStats('a'), sB=readStats('b');
+  const f=v=>v.toFixed(2), pc=v=>Math.round(v/N*100)+'%';
+  let html='<table style="width:100%;border-collapse:collapse;font-size:0.74rem;">';
+  html+='<tr style="color:#718096;border-bottom:1px solid #2d3148;"><th style="text-align:left;padding:3px 4px;"></th>'
+      + '<th style="text-align:right;padding:3px 4px;color:#63b3ed">Bot A</th>'
+      + '<th style="text-align:right;padding:3px 4px;color:#fc8181">Bot B</th></tr>';
+  html+=batchRow('Build', `S${sA.speed}P${sA.power}E${sA.endurance}T${sA.turning}`, `S${sB.speed}P${sB.power}E${sB.endurance}T${sB.turning}`);
+  html+=batchRow('Wins', `${aW} (${pc(aW)})`, `${bW} (${pc(bW)})`);
+  html+=batchRow('Avg goals', f(aG/N), f(bG/N));
+  html+=batchRow('Best match', maxA, maxB);
+  html+=batchRow('Avg contacts', f(aC/N), f(bC/N));
+  html+=batchRow('Clean sheets', `${aShut} (${pc(aShut)})`, `${bShut} (${pc(bShut)})`);
+  html+=batchRow('Own goals', aOG, bOG);
+  html+='</table>';
+  html+=`<div style="margin-top:8px;font-size:0.72rem;color:#a0aec0;">Draws: <strong>${dr}</strong> (${pc(dr)}) · Avg total goals/match: <strong>${f((aG+bG)/N)}</strong></div>`;
+  html+=`<div style="margin-top:4px;font-size:0.68rem;color:#4a5568;">${N} full 180-second matches · current A vs B builds &amp; toggles · outcomes vary by RNG.</div>`;
+  out.innerHTML=html;
 
-  // ── Verify top 10 at N=1000 ──
-  const top10 = scored.slice(0,10);
-  for (let i=0;i<top10.length;i++) {
-    top10[i].gFinal = avgBuild(top10[i].b, TOP_N);
-    bar.style.width = (70 + Math.round((i+1)/10*30))+'%';
-    prog.textContent = `Verifying ${i+1}/10…`;
-    results.innerHTML = `<span style="color:#718096">Verifying top 10 at N=1000… (${i+1}/10)</span>`;
-    await new Promise(r => setTimeout(r, 0));
-  }
-  top10.sort((a,b) => b.gFinal - a.gFinal);
-
-  // ── Current loadout ──
-  const curStats = [
-    parseInt(document.getElementById('aSpeed').value)||6,
-    parseInt(document.getElementById('aPower').value)||7,
-    parseInt(document.getElementById('aEndurance').value)||4,
-    parseInt(document.getElementById('aTurning').value)||3
-  ];
-  const curG = avgBuild(curStats, TOP_N);
-
-  // ── Render results ──
-  bar.style.width = '100%';
-  prog.textContent = `Done — ${candidates.length} builds tested`;
-  barWrap.style.display = 'none';
-
-  const pct = n => n > 0 ? '+'+Math.round((n-curG)/curG*100)+'%' : '—';
-  const col = n => n > curG*1.1 ? '#52b788' : n >= curG*0.95 ? '#ffd166' : '#fc8181';
-
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:0.72rem;">';
-  html += '<tr style="color:#718096;border-bottom:1px solid #2d3148;">'
-       + '<th style="padding:3px 4px;text-align:left;">Rank</th>'
-       + '<th style="padding:3px 4px;text-align:center;">S</th>'
-       + '<th style="padding:3px 4px;text-align:center;">P</th>'
-       + '<th style="padding:3px 4px;text-align:center;">E</th>'
-       + '<th style="padding:3px 4px;text-align:center;">T</th>'
-       + '<th style="padding:3px 4px;text-align:right;">Goals</th>'
-       + '<th style="padding:3px 4px;text-align:right;">vs now</th>'
-       + '</tr>';
-
-  top10.forEach(({b:[sv,pv,ev,tv],gFinal},i) => {
-    const c = col(gFinal);
-    html += `<tr style="border-bottom:1px solid rgba(45,49,72,0.5);">`
-          + `<td style="padding:3px 4px;color:#718096;">${i+1}</td>`
-          + `<td style="padding:3px 4px;text-align:center;color:#63b3ed;">${sv}</td>`
-          + `<td style="padding:3px 4px;text-align:center;color:#f6ad55;">${pv}</td>`
-          + `<td style="padding:3px 4px;text-align:center;color:#68d391;">${ev}</td>`
-          + `<td style="padding:3px 4px;text-align:center;color:#b794f4;">${tv}</td>`
-          + `<td style="padding:3px 4px;text-align:right;font-weight:700;color:${c};">${gFinal.toFixed(2)}</td>`
-          + `<td style="padding:3px 4px;text-align:right;color:${c};">${pct(gFinal)}</td>`
-          + `</tr>`;
-  });
-
-  // Current loadout row
-  html += `<tr style="border-top:2px solid #4a5568;background:rgba(255,255,255,0.03);">`
-        + `<td style="padding:3px 4px;color:#718096;font-style:italic;">now</td>`
-        + `<td style="padding:3px 4px;text-align:center;color:#63b3ed;">${curStats[0]}</td>`
-        + `<td style="padding:3px 4px;text-align:center;color:#f6ad55;">${curStats[1]}</td>`
-        + `<td style="padding:3px 4px;text-align:center;color:#68d391;">${curStats[2]}</td>`
-        + `<td style="padding:3px 4px;text-align:center;color:#b794f4;">${curStats[3]}</td>`
-        + `<td style="padding:3px 4px;text-align:right;font-weight:700;color:#e2e8f0;">${curG.toFixed(2)}</td>`
-        + `<td style="padding:3px 4px;text-align:right;color:#718096;">—</td>`
-        + `</tr>`;
-
-  html += '</table>';
-  html += `<div style="margin-top:8px;font-size:0.68rem;color:#4a5568;">`
-        + `Grid: N=${GRID_N}/build · Verified top 10: N=${TOP_N}</div>`;
-  results.innerHTML = html;
-
-  btn.disabled = false;
-  btn.textContent = '📊 Find Optimal (1000 sims)';
+  // restore the live display to the configured loadout
+  initSim(); render(); updateHUD();
+  btn.disabled=false;
+  btn.textContent='🧪 Run 1000 sims (A vs B)';
+  btn.style.background='linear-gradient(135deg,#2d6a4f,#40916c)';
+  barWrap.style.display='none';
+  batchRunning=false;
 });
+
+// ── boot
+['a','b'].forEach(p=>{ calcFormulas(p); updateBudget(p); });
+initSim(); render(); updateHUD();
 </script>
-<script data-pplx-inline-edit>
-(function () {
-  if (window === window.top) return;
-
-  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
-  const MAX_FONT_BYTES = 500 * 1024;
-  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
-  let scrollForwarding = false;
-  let scrollRaf = 0;
-  let trustedTopOrigin = null;
-
-  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
-  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
-  // across multiple labels.
-  function matchesAllowedOrigin(origin) {
-    if (!origin) return false;
-    for (const entry of allowedParentOrigins) {
-      if (!entry.includes("*")) {
-        if (entry === origin) return true;
-        continue;
-      }
-      const pattern = new RegExp(
-        "^" +
-          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
-          "$",
-      );
-      if (pattern.test(origin)) return true;
-    }
-    return false;
-  }
-
-  // Trust decision: when the sender is same-origin-visible (event.origin is a
-  // real origin like https://www.perplexity.ai) we trust event.origin directly.
-  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
-  // broker's stamped `parentOrigin` to identify the top window. The fallback
-  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
-  // on the response path (see postToTrustedTop) to ensure replies can't be
-  // delivered to anyone but the actual top window of that claimed origin.
-  function getTrustedParentOrigin(event) {
-    const forwardedParentOrigin =
-      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
-    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
-    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
-  }
-
-  // All responses go to window.top with targetOrigin = the allowlisted origin.
-  // An attacker that iframes us inside their own null-origin broker can claim
-  // any parentOrigin they like, but the browser will drop the reply whenever
-  // the real top's origin doesn't match — so the screenshot never leaves.
-  function postToTrustedTop(message) {
-    if (!trustedTopOrigin) return;
-    try {
-      window.top.postMessage(message, trustedTopOrigin);
-    } catch (_error) {}
-  }
-
-  function inlineAll(original, clone) {
-    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
-
-    try {
-      const computedStyle = getComputedStyle(original);
-      // cssText on a computed style is the serialized declaration in modern
-      // Chromium/Safari — a single read beats enumerating ~400 longhand
-      // properties. Firefox returns "" here, so we fall back on empty.
-      const serialized = computedStyle.cssText;
-      if (serialized) {
-        clone.style.cssText = serialized;
-      } else {
-        const parts = new Array(computedStyle.length);
-        for (let index = 0; index < computedStyle.length; index += 1) {
-          const property = computedStyle[index];
-          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
-        }
-        clone.style.cssText = parts.join("");
-      }
-    } catch (_error) {}
-
-    const originalChildren = original.children;
-    const clonedChildren = clone.children;
-    for (
-      let index = 0;
-      index < originalChildren.length && index < clonedChildren.length;
-      index += 1
-    ) {
-      inlineAll(originalChildren[index], clonedChildren[index]);
-    }
-  }
-
-  function extractFontUrl(srcValue) {
-    const matches = [
-      ...srcValue.matchAll(
-        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
-      ),
-    ];
-    if (matches.length === 0) return null;
-    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
-    if (woff2) return woff2[1];
-    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
-    if (woff) return woff[1];
-    return matches[0][1];
-  }
-
-  // Cache resolved font URL -> data URI across captures. Fonts on a page
-  // essentially never change, and a batch run emits multiple captures back to
-  // back — without this we'd refetch + re-base64 every time.
-  const fontDataUriCache = new Map();
-  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
-
-  async function fetchAsDataUri(url) {
-    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
-    let dataUri = null;
-    try {
-      const response = await fetch(url, { mode: "cors", credentials: "omit" });
-      if (response.ok) {
-        const blob = await response.blob();
-        if (blob.size <= MAX_FONT_BYTES) {
-          dataUri = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () =>
-              resolve(typeof reader.result === "string" ? reader.result : null);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(blob);
-          });
-        }
-      }
-    } catch (_error) {
-      dataUri = null;
-    }
-    fontDataUriCache.set(url, dataUri);
-    return dataUri;
-  }
-
-  function collectFontFaceRuleTexts() {
-    const rules = [];
-    for (const sheet of document.styleSheets) {
-      let cssRules;
-      try {
-        cssRules = sheet.cssRules;
-      } catch (_error) {
-        continue;
-      }
-      if (!cssRules) continue;
-      for (const rule of cssRules) {
-        const cssText = rule.cssText || "";
-        if (cssText.startsWith("@font-face")) rules.push(cssText);
-      }
-    }
-    return rules;
-  }
-
-  async function buildInlinedFontCss() {
-    const ruleTexts = collectFontFaceRuleTexts();
-    if (ruleTexts.length === 0) return null;
-
-    const resolved = ruleTexts.map((cssText) => {
-      if (!SRC_DECLARATION_RE.test(cssText)) return null;
-      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
-      if (!srcMatch) return null;
-      const url = extractFontUrl(srcMatch[1]);
-      if (!url) return null;
-      try {
-        return { cssText, url: new URL(url, document.baseURI).href };
-      } catch (_error) {
-        return null;
-      }
-    });
-
-    const dataUris = await Promise.all(
-      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
-    );
-
-    const inlined = [];
-    let totalBytes = 0;
-    for (let index = 0; index < resolved.length; index += 1) {
-      const entry = resolved[index];
-      const dataUri = dataUris[index];
-      if (!entry || !dataUri) continue;
-      const approxBytes = dataUri.length * 0.75;
-      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
-      totalBytes += approxBytes;
-      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
-    }
-    return inlined.length > 0 ? inlined.join("\n") : null;
-  }
-
-  function stripExternal(clone) {
-    const images = clone.querySelectorAll("img");
-    for (let index = 0; index < images.length; index += 1) {
-      const src = images[index].getAttribute("src");
-      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
-    }
-
-    const elements = clone.querySelectorAll("*");
-    for (let index = 0; index < elements.length; index += 1) {
-      const style = elements[index].style.cssText;
-      if (style && style.includes("url(")) {
-        elements[index].style.cssText = style.replace(
-          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
-          "none",
-        );
-      }
-    }
-  }
-
-  function emitScroll() {
-    scrollRaf = 0;
-    if (!scrollForwarding) return;
-    postToTrustedTop({
-      type: "INLINE_EDIT_SCROLL",
-      scrollX: window.scrollX,
-      scrollY: window.scrollY,
-    });
-  }
-
-  window.addEventListener(
-    "scroll",
-    function () {
-      if (!scrollForwarding || scrollRaf) return;
-      scrollRaf = requestAnimationFrame(emitScroll);
-    },
-    { passive: true, capture: true },
-  );
-
-  async function handleCaptureRequest(event) {
-    const requestId = event.data.requestId;
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    function postResult(dataUrl) {
-      postToTrustedTop({
-        type: "INLINE_EDIT_SCREENSHOT_RESULT",
-        requestId,
-        dataUrl,
-        scrollX,
-        scrollY,
-      });
-    }
-
-    try {
-      // Wait for any pending web fonts to resolve so both inline metrics and
-      // the @font-face inlining below see the same loaded faces.
-      if (document.fonts && document.fonts.ready) {
-        try {
-          await document.fonts.ready;
-        } catch (_error) {}
-      }
-
-      const clone = document.documentElement.cloneNode(true);
-      inlineAll(document.documentElement, clone);
-
-      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
-      for (let index = 0; index < removedNodes.length; index += 1) {
-        removedNodes[index].remove();
-      }
-
-      stripExternal(clone);
-
-      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
-      // can resolve them — external font URLs aren't fetched during
-      // foreignObject rendering, which would otherwise force a fallback face
-      // and change text metrics.
-      const inlinedFontCss = await buildInlinedFontCss();
-      if (inlinedFontCss) {
-        const styleEl = document.createElement("style");
-        styleEl.textContent = inlinedFontCss;
-        const head = clone.querySelector("head");
-        if (head) head.appendChild(styleEl);
-        else clone.insertBefore(styleEl, clone.firstChild);
-      }
-
-      const html = new XMLSerializer().serializeToString(clone);
-      const svg =
-        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
-        '<foreignObject width="100%" height="100%">' +
-        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
-        `<div style="position:relative;left:-${scrollX}px;top:-${scrollY}px">` +
-        html +
-        "</div></div></foreignObject></svg>";
-      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-      const image = new Image();
-      image.onload = function () {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext("2d").drawImage(image, 0, 0);
-        postResult(canvas.toDataURL("image/png"));
-      };
-      image.onerror = function () {
-        postResult(null);
-      };
-      image.src = svgUrl;
-    } catch (_error) {
-      postResult(null);
-    }
-  }
-
-  window.addEventListener("message", function (event) {
-    if (!event.data) return;
-    // Only accept messages from the direct parent frame. Blocks sibling /
-    // unrelated-window postMessage senders that could otherwise reach us.
-    if (event.source !== window.parent) return;
-
-    const trustedParentOrigin = getTrustedParentOrigin(event);
-    if (!trustedParentOrigin) return;
-    trustedTopOrigin = trustedParentOrigin;
-
-    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
-      scrollForwarding = true;
-      emitScroll();
-      return;
-    }
-
-    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
-      scrollForwarding = false;
-      if (scrollRaf) cancelAnimationFrame(scrollRaf);
-      scrollRaf = 0;
-      return;
-    }
-
-    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
-
-    handleCaptureRequest(event);
-  });
-})();
-
-
-</script></body>
+</body>
 </html>
