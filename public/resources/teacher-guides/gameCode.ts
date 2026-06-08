@@ -14,7 +14,7 @@
  *   B   = soft reset (re-center behaviour mid-match)
  *   A+B = stop the match.
  *
- * STUDENT STATS (1-10, must total 20) and all tunable distances/thresholds live
+ * STUDENT STATS (total 20 · Power 1-10 · Speed/Endurance/Turning 1-17) and all tunable distances/thresholds live
  * at the very bottom in the INITIALIZATION block.
  *
  * NONNEGOTIABLE STAT FORMULAS (do not change - students compute these by hand):
@@ -1515,7 +1515,9 @@ basic.clearScreen()
  *  Give your bot its personality. Fill in the four stats below.
  *
  *  RULES:
- *   • Each stat is a whole number from 1 to 10.
+ *   • Each stat is a whole number, at least 1.
+ *   • POWER goes up to 10  (Power² caps the kick at 100 there — more is wasted).
+ *   • SPEED, ENDURANCE, and TURNING go up to 17.
  *   • The four values MUST add up to exactly 20 (your point budget).
  *
  *  WHAT EACH ONE DOES:
