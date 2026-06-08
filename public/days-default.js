@@ -538,7 +538,10 @@ const DAYS_DEFAULT = [
         "block": "Challenge",
         "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
         "facilitatorDescription": "Frame the two-phase programming structure before students open anything: launch sequence runs once and ends at the handoff point, then the match loop takes over. Place worksheets face down and write LAUNCH SEQUENCE → HANDOFF POINT → MATCH LOOP on the board. Walk through the distinction, then give teams 25–30 minutes to work Steps 1–10: choosing candidate handoff points, applying the distance formula to calculate distance from the ball zone at (4, 2), evaluating border risk and arc coverage, committing to a position, and testing it with a live bot run.",
-        "script": "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link",
+        "script": [
+          {url: "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link", label: "Script"},
+          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+        ],
         "worksheet":"https://drive.google.com/file/d/12wQ4G8t6jRv9rQ-ArWou8l2Ety60gRwc/view?usp=drive_link",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Field_Geometry_Worksheet_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-03-field-geometry-approach.html"
@@ -550,7 +553,10 @@ const DAYS_DEFAULT = [
         "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
         "facilitatorDescription": "Teams design two launch strategies on paper before touching MakeCode: turns, drives, and one prediction each. Code and test Strategy A for three trials, then switch to Strategy B for three trials, recording hit rate and post-kick robot position for each. Stop the class at minute 35 to name the accuracy-versus-reliability distinction before teams move into comparison. Teams choose one strategy and justify it in writing using hit rate, approach angle, and post-kick position. Step 8 requires changing one variable only.",
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
-        "script":"https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing",
+        "script":[
+          {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"},
+          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+        ],
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Launch_Sequence_Design.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"
       },
