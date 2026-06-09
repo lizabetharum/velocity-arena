@@ -12,6 +12,7 @@
 const ACTIVITY_LESSONS = {
   'Speed Stat Challenge: What Does Motor Power Actually Mean?': '/lessons/speed-stat.html',
   'Pre-Task Diagnostic: Prior Knowledge Assessment': '/activities/diagnostic/index.html',
+  
   'First Bot Drive: Speed in Real Life': [
     {url: '/lessons/first-bot-drive.html', label: "First Bot Drive Test"},
     {url: "/lessons/speed-test-explainer.html", label: "Speed Test Explainer"}
@@ -22,6 +23,7 @@ const ACTIVITY_LESSONS = {
     {url: '/lessons/endurance-formula-test.html', label: "Endurance Test"},
     {url: "/lessons/endurance-test-explainer.html", label: "Endurance Test Explainer"}
   ],
+  'Bot Naming Ceremony': '/activities/robot-names/',
   'Distance-Time Graphs':'/lessons/coordinate-functions.html',
   'Coordinate Navigation Practice: Arc Approximation':"/lessons/turning-test-explainer.html",
   'Power Stat Challenge: Ratio and Motor Speed': "/lessons/power-stat-challenge.html",
@@ -64,11 +66,10 @@ const ACTIVITY_LESSONS = {
    'Post-Task Diagnostic: Prior Knowledge Reassessment': '/activities/diagnostic-post/index.html',
     'Pre-Match Pitch Rehearsal + Teach the Math': '/lessons/pre-match-pitch.html',
   'Teach the Math': '/lessons/pre-match-pitch-v2.html',
-  'Open Lab: Season 2 Allocation': [{url: '/lessons/what-if/', label: 'What-If? Analysis'},
-  {url: '/lessons/what-if-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
-  'What-If? Analysis':[{url: '/lessons/what-if/', label: 'What-If? Analysis'},
-  {url: '/lessons/what-If-loadout-recalculator.html', label: 'What-If? Facilitator Tool'}],
-  'Official Stat Allocation: Interleaved Problem Set': [
+  'Open Lab: Season 2 Allocation': [{url: '/lessons/what-If-loadout-recalculator.html', label: 'What-If? Facilitator Tool'},
+    {url: '/lessons/what-if/', label: 'What-If? Analysis'}
+  ],
+    'Official Stat Allocation: Interleaved Problem Set': [
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
   ],
