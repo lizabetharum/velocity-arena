@@ -101,10 +101,10 @@ const DAYS_DEFAULT = [
     ],
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall. You have 3 minutes. |",
     "produce": [
-      "Prior knowledge diagnostic — 8 math questions answered individually",
+      "Prior knowledge diagnostic — Math questions answered individually",
       "Stat card — Speed row filled in",
       "Speed Stat Challenge worksheet — motor power percentages for Speed values 1, 3, 5, 6, and 8",
-      "Data dashboard — two distance entries (Speed = 3 and Speed = 6)",
+      "Data dashboard — three distance entries where two double each other (example: Speed = 2, Speed = 3, and Speed = 6)",
       "Written sentence — predicted vs. actual distance compared with calculation"
     ],
     "funElement": "None today. Bot novelty and the two improv activities create psychological safety before any math is introduced. Let students touch the robots before anything else. The first time a bot moves, something shifts in the room.",
@@ -208,7 +208,7 @@ const DAYS_DEFAULT = [
       "Endurance decay worksheet — scaffolded table for E \= 4; independent table for E \= 2", 
       "Paper graph — P(t) plotted across five t-values for team's Endurance allocation", 
       "Endurance bot code — motor power decay programmed in MakeCode", 
-      "Data dashboard — two distance entries (first 30 sec vs. last 30 sec of 2-min run)", 
+      "Four power readings across four match time points (t = 0, 60, 120, 180 seconds)", 
       "Written sentence — formula prediction vs. bot result, gap identified",  
       "Role assignment record — Coder, Fabricator, Analyst roles documented for Week 2",  
       "Wall display — bot name and one-sentence mission statement"
@@ -372,7 +372,7 @@ const DAYS_DEFAULT = [
     ],
     "produce": [
       "Power Stat Challenge worksheet — charge speed (P²) and follow-through (120 + (P × 35)\) for P \= 1, 2, 4, 8; ratios; two ball travel distances",  
-      "Cardboard scoop — built and attached to Cutebot",  
+      "Scoop/Kicker — built and attached to Cutebot",  
       "Scoop testing worksheet — kick distances at three Power settings, 3 shots each",  
       "Written sentence — whether quadrupling charge speed quadrupled kick distance, with reasoning",  
       "Data log entry — which change (scoop or Power value) had bigger effect on kick distance"
@@ -479,7 +479,7 @@ const DAYS_DEFAULT = [
     ],
     "produce": [
       "Two-formula warm-up — Speed and Endurance outputs calculated for one allocation",  
-      "Three stat loadouts — each summing to 20 points; all four formula outputs calculated; recorded in dashboard ", 
+      "Three stat loadouts — each summing to 20 points; all five formula outputs calculated. ", 
       "Written answer — tradeoff shown if Speed \= 8, with all calculations",  
       "Cold Recall Check — five individual math problems on paper (no grade)",  
       "Launch sequence code — JavaScript uploaded to bot",  
@@ -589,12 +589,12 @@ const DAYS_DEFAULT = [
       " Interleaved problem set — 12 problems across six formula types; concept-tag column completed",  
       "Season 1 allocation sheet — four stats locked; sum verified at 20",  
       "Coordinate grid — starting position, tip-off (4,2), and goal (8,2) plotted; approach path drawn",  
-      "Data dashboard — straight-line distance to ball and travel time prediction calculated",  
+      "Straight-line distance to ball and travel time prediction calculated",  
       "Written sentence — approach angle justified with distance or stat value",  
       "Launch sequence — programmed in MakeCode; two test run times logged",  
       "Written sentence — where Speed model broke down (if predicted ≠ actual)",  
       "Run order — final launch sequence committed to and locked for Season 1",  
-      "Dashboard observation — one data-cited claim about each other team's showcase run"
+      "One data-cited claim about each other team's showcase run"
     ],
     "ends": "Write one personal goal and one team goal for this week. Post them on the wall next to your bot's name. You have 3 minutes. |",
     "funElement": "Season 1 begins tomorrow. Anticipation of real matches creates investment in getting the allocation right today.",
@@ -770,8 +770,8 @@ const DAYS_DEFAULT = [
       "Card sort — verbal situations, data tables, and graphs matched",  
       "Linear equation — slope and y-intercept calculated from two scatter plot points; written in slope-intercept form",  
       "Match data log — equation-based prediction before each match; actual result after (two matches)",  
-      "Rivalry card — one trash-talk claim citing a specific stat or dashboard number, posted on wall",  
-      "Dashboard note — one variable the scatter plot equation isn't capturing (Track A)"
+      "Rivalry card — one trash-talk claim citing a specific stat or dashboard number, posted on wall" 
+     
     ],
     "endBufferMins": 10,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for exactly 2 minutes about what happened. You have 5 minutes total. |",
@@ -842,8 +842,7 @@ const DAYS_DEFAULT = [
       "Formula Relay written work — 20 problem cards solved and stamped; error count per formula type",  
       "Pre-match prediction — calculation from weakest formula type logged before match",  
       "Match data log — prediction and actual for each of three matches",  
-      "Written sentence — variable the model missed (for any match \>20% off prediction)",  
-      "Data dashboard — complete, no blanks",  
+      "Written sentence — variable the model missed (for any match \>20% off prediction)",   
       "Dashboard hypothesis entry — stat change, expected outcome, and data justification (Track A)"
     ],
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action\\].\" You have 3 minutes. |",
@@ -933,7 +932,7 @@ const DAYS_DEFAULT = [
       "Distance formula worksheet — three distances calculated on 8×4 field; summary table completed",  
       "Written reflections — charge efficiency, charges-per-goal estimate, formula limits, one stat to adjust with tradeoff",  
       "Cold Recall Check — five individual math problems on paper (no grade)",  
-      "Data dashboard — final Season 1 entries: goals per minute, possession time, win/loss by stat matchup",  
+      "Data dashboard — final Season 1 entries: goals per minute, win/loss by stat matchup",  
       "Season 2 hypothesis entry — one stat change with data justification"
     ],
     "ends": "Describe a mistake your team made this week that led to something better. Be specific: name the mistake, describe what happened because of it, and say exactly what you changed. You have 5 minutes. |",
@@ -1185,8 +1184,7 @@ const DAYS_DEFAULT = [
       "Two residuals — predicted minus actual for two past matches",  
       "Unit rate — Season 1 wins ÷ Speed stat calculated",  
       "Match data log — prediction and ball mode before each match; actual result and residual after",  
-      "Dashboard entry — Season 2 residuals compared to Season 1",  
-      "Skills Card — prediction-actual sentence logged; Skill Badge earned"
+      "Dashboard entry — Season 2 residuals compared to Season 1"
     ],
     "endBufferMins": 5,
     "ends": "Each person rates today's team collaboration 1--3. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes. You have 5 minutes. |",
@@ -1259,8 +1257,7 @@ const DAYS_DEFAULT = [
       "Percent change worksheet — (new − old) / old × 100 calculated for all four stats",  
       "Written sentence — which ball mode team expects to perform best in, citing stat percent change",  
       "Match data log — prediction before each of three matches; actual result after ", 
-      "Written sentence — missing variable identified for any match \>20% off ", 
-      "Data dashboard — fully updated",  
+      "Written sentence — missing variable identified for any match \>20% off ",  
       "Dashboard hypothesis — revised equation with new variable (Track A); or Skills Card prediction-actual logged (Track B)"
     ],
     "ends": "Write: \"The skill I used today was \\[name it specifically\\] and I will use it tomorrow by \\[name the exact moment and exact action in tomorrow's schedule\\].\" You have 3 minutes. |",
