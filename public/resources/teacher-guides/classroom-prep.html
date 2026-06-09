@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classroom Prep · Velocity Arena</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: var(--bg-1); color: var(--fg-0); min-height: 100vh; padding-bottom: 6rem; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(0,229,255,.35); text-underline-offset: 3px; }
+    a:hover { color: var(--accent-bright); text-decoration-color: var(--accent); }
+
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    .page-shell { max-width: 760px; margin: 0 auto; padding: 64px 28px 0; position: relative; }
+    .eyebrow { font: 600 12px/1 var(--font-sans); letter-spacing: .18em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 16px; }
+    .eyebrow b { color: var(--accent); margin-right: 10px; font-weight: 700; }
+    h1.title { font: 800 42px/1.1 var(--font-sans); letter-spacing: -.025em; color: var(--fg-0); margin: 0 0 18px; }
+    p.sub { font: 400 17px/1.7 var(--font-sans); color: var(--fg-1); max-width: 60ch; margin: 0; }
+    p.sub strong { color: var(--fg-0); font-weight: 600; }
+    p.sub em { color: var(--fg-0); font-style: normal; font-weight: 500; }
+    p.sub code { font: 600 14px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.07); padding: 2px 6px; border-radius: 4px; }
+
+    main { max-width: 760px; margin: 0 auto; padding: 0 28px; }
+
+    .arc-section { margin-top: 72px; scroll-margin-top: 120px; }
+    .arc-section:first-of-type { margin-top: 56px; }
+    .arc-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+    .arc-num { font: 800 12px/1 var(--font-mono); color: var(--accent); letter-spacing: .18em; }
+    .arc-title { font: 700 24px/1.25 var(--font-sans); color: var(--fg-0); letter-spacing: -.015em; flex: 1; min-width: 0; }
+    .arc-when { font: 500 11px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .08em; text-transform: uppercase; }
+    .arc-intro { font: 400 16.5px/1.75 var(--font-sans); color: var(--fg-1); max-width: 60ch; margin: 0 0 28px; }
+    .arc-intro strong { color: var(--fg-0); font-weight: 600; }
+    .arc-intro em { color: var(--fg-0); font-style: italic; }
+    .arc-intro code { font: 600 14px/1 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.07); padding: 2px 6px; border-radius: 4px; }
+
+    /* day card — a labelled block of materials for one day */
+    .day { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; margin-bottom: 18px; }
+    .day .day-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .day .day-num { font: 800 12px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .day .day-title { font: 700 17px/1.3 var(--font-sans); color: var(--fg-0); flex: 1; min-width: 0; letter-spacing: -.005em; }
+    .day .day-tag { font: 600 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-2); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+
+    .item-list { list-style: none; padding: 0; margin: 0; }
+    .item-list li { display: grid; grid-template-columns: 22px 1fr auto; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); font: 400 15.5px/1.55 var(--font-sans); color: var(--fg-1); }
+    .item-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .item-list li:first-child { padding-top: 0; }
+    .item-list li .chk { width: 16px; height: 16px; border: 1.5px solid var(--fg-2); border-radius: 4px; align-self: center; flex-shrink: 0; }
+    .item-list li .item-name { color: var(--fg-1); }
+    .item-list li .item-name strong { color: var(--fg-0); font-weight: 600; }
+    .item-list li .item-name .key { color: var(--fg-2); font-style: italic; font-size: 14px; display: block; margin-top: 3px; }
+    .item-list li .item-qty { font: 600 12px/1.4 var(--font-mono); color: var(--accent); white-space: nowrap; text-align: right; letter-spacing: .04em; }
+
+    /* setup card — for the one-time pre-program tasks */
+    .setup-card { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 24px 28px; display: flex; gap: 20px; align-items: flex-start; margin-bottom: 14px; }
+    .setup-card .setup-icon { flex-shrink: 0; width: 44px; height: 44px; border-radius: 10px; background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.32); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+    .setup-card .setup-icon svg { width: 22px; height: 22px; }
+    .setup-card .setup-body { flex: 1; min-width: 0; }
+    .setup-card .setup-body h3 { font: 700 18px/1.3 var(--font-sans); color: var(--fg-0); margin: 4px 0 8px; letter-spacing: -.01em; }
+    .setup-card .setup-body p { font: 400 15.5px/1.7 var(--font-sans); color: var(--fg-1); margin: 0; }
+    .setup-card .setup-body strong { color: var(--fg-0); font-weight: 600; }
+
+    /* callouts — same pattern as running-the-program */
+    .cal { padding: 22px 26px; border-radius: 12px; background: var(--bg-2); border: 1px solid var(--line); border-left-width: 4px; font: 400 16px/1.7 var(--font-sans); color: var(--fg-1); margin-top: 14px; }
+    .cal .lbl { display: block; font: 700 11px/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; margin-bottom: 12px; }
+    .cal strong { color: var(--fg-0); font-weight: 600; }
+    .cal em { color: var(--fg-0); font-style: italic; }
+    .cal code { font: 600 14px/1 var(--font-mono); padding: 2px 6px; border-radius: 4px; }
+    .cal.info { border-left-color: var(--accent); }
+    .cal.info .lbl { color: var(--accent); }
+    .cal.info code { color: var(--accent); background: rgba(0,229,255,.07); }
+    .cal.warn { border-left-color: var(--warn); }
+    .cal.warn .lbl { color: var(--warn); }
+
+    /* week label */
+    .week-label { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .week-label .num { font: 800 11px/1 var(--font-mono); color: var(--accent); letter-spacing: .16em; background: rgba(0,229,255,.06); border: 1px solid rgba(0,229,255,.28); border-radius: 4px; padding: 5px 9px; }
+    .week-label .nm { font: 700 13.5px/1 var(--font-sans); color: var(--fg-1); letter-spacing: -.005em; }
+
+    .footer-note { max-width: 760px; margin: 96px auto 0; padding: 24px 28px; font: 400 14px/1.7 var(--font-sans); color: var(--fg-2); border-top: 1px solid var(--line); }
+    .footer-note a { color: var(--accent); }
+
+    .print-link { position: absolute; top: 64px; right: 28px; display: inline-flex; align-items: center; gap: 7px; font: 600 11px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-2); border: 1px solid var(--line-strong); border-radius: 6px; padding: 9px 13px; text-decoration: none; transition: color .15s, border-color .15s, background .15s; cursor: pointer; background: transparent; font-family: var(--font-sans); }
+    .print-link:hover { color: var(--fg-0); border-color: var(--accent); background: rgba(0,229,255,.05); text-decoration: none; }
+    .print-link svg { width: 13px; height: 13px; }
+    @media (max-width: 780px) { .print-link { position: static; display: inline-flex; margin-top: 18px; } }
+
+    @page { size: letter portrait; margin: 0.55in; }
+    @media print {
+      body { background: #fff !important; color: #111 !important; padding: 0; font-size: 10pt; }
+      .topnav, .print-link, .footer-note { display: none !important; }
+      .page-shell, main { max-width: none; padding: 0; }
+      h1.title { color: #111; font-size: 22pt; }
+      .eyebrow, .arc-when, .day .day-tag { color: #555; }
+      .eyebrow b { color: #000; }
+      p.sub, .arc-intro, .item-list li, .setup-card .setup-body p, .cal { color: #222; }
+      .arc-title, .day .day-title, .setup-card .setup-body h3 { color: #111; }
+      .arc-section { page-break-inside: avoid; }
+      .day, .setup-card, .cal { background: #fff !important; border-color: #bbb !important; page-break-inside: avoid; }
+      .arc-num, .day .day-num, .week-label .num, .item-list li .item-qty { color: #024c66 !important; }
+      .setup-card .setup-icon { background: #f0f6fa !important; border-color: #024c66 !important; color: #024c66 !important; }
+      .item-list li .chk { border-color: #555 !important; }
+      .cal.info { border-left-color: #024c66 !important; background: #f0f6fa !important; }
+      .cal.info .lbl, .cal.info code { color: #024c66 !important; background: #fff !important; }
+      .cal.warn { border-left-color: #b88200 !important; background: #fffdf4 !important; }
+      .cal.warn .lbl { color: #b88200 !important; }
+      a { color: #024c66 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="row">
+    <a class="brand" href="/index.html"><span class="mark"></span> VELOCITY ARENA</a>
+    <nav>
+      <a href="/today.html">Today</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/activities/dashboard/velocity-arena-dashboard.html">Dashboard</a>
+      <a href="/activities/math/index.html">Math Concepts</a>
+      <a href="/makecode.html">MakeCode</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/teachers.html" class="active">Teacher Resources</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <span class="util">CLASSROOM PREP</span>
+  </div>
+  <div class="accent-rule"></div>
+</header>
+
+<div class="page-shell">
+  <button class="print-link" type="button" onclick="window.print()" title="Print this checklist">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print / Save as PDF
+  </button>
+  <p class="eyebrow"><b>CHECKLIST</b>Classroom &amp; materials prep</p>
+  <h1 class="title">What to set up, print, and stage.</h1>
+  <p class="sub">Everything physical you need to do before students walk in on Day 1, plus the per-day print jobs across all 16 days. Worksheets go to <strong>students</strong> and <strong>teams</strong>; answer keys go only to <em>facilitators</em>. Print this page out and check items off as you complete them.</p>
+</div>
+
+<main>
+
+  <!-- ── 01 BEFORE DAY 1 ───────────────────────── -->
+  <section class="arc-section" id="before">
+    <div class="arc-head">
+      <span class="arc-num">01</span>
+      <span class="arc-title">Before Day 1 — one-time setup.</span>
+      <span class="arc-when">~3 hrs · 1–2 days before camp</span>
+    </div>
+    <p class="arc-intro">These are the four things that have to happen before students touch a bot. <strong>Do them 1–2 days before Day 1</strong>, not the morning of — the bot-training step alone takes time you won't have on opening day.</p>
+
+    <div class="setup-card">
+      <div class="setup-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="7" width="14" height="10" rx="2"/><line x1="19" y1="11" x2="22" y2="11"/><line x1="19" y1="13" x2="22" y2="13"/><line x1="8" y1="11" x2="12" y2="13"/><line x1="12" y1="11" x2="8" y2="13"/></svg>
+      </div>
+      <div class="setup-body">
+        <h3>Insert batteries into the bots</h3>
+        <p>One battery per bot — same direction every time, label side up. <strong>Charge the batteries the night before</strong> so you're not waiting on partial charges as students arrive.</p>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 8 11 13 6 18 11 21 8"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </div>
+      <div class="setup-body">
+        <h3>Train every bot to recognize its lines</h3>
+        <p>Each bot needs its line-following sensors calibrated to the field tape <em>and</em> its compass tilt-calibrated. Plan ~5 minutes per bot — for 12 bots, that's an hour. See the line-training notes in the Match Code lesson.</p>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="7" y1="10" x2="17" y2="10"/></svg>
+      </div>
+      <div class="setup-body">
+        <h3>Charge every device</h3>
+        <p>Laptops or tablets for every team, fully charged. The MakeCode editor runs in-browser — you don't need anything installed beyond a working USB connection.</p>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><circle cx="12" cy="16" r="3"/></svg>
+      </div>
+      <div class="setup-body">
+        <h3>Create teams of 3</h3>
+        <p>Each team has three roles: <strong>Coder</strong>, <strong>Fabricator</strong>, <strong>Analyst</strong>. Roles rotate weekly from Week 2 on, so every student holds every role by Week 4. <strong>Decide the team rosters before Day 1</strong> — not in the room — so the Day 1 launch isn't competing with cliques and conversation.</p>
+      </div>
+    </div>
+
+    <div class="cal info">
+      <span class="lbl">Tip</span>
+      Bot batteries are the single biggest source of "why isn't this working?" frustration. <strong>Plug everything in to charge the night before Day 1</strong> and you'll skip the most common opening-day failure mode.
+    </div>
+  </section>
+
+  <!-- ── 02 WEEK 1 ─────────────────────────────── -->
+  <section class="arc-section" id="week-1">
+    <div class="arc-head">
+      <span class="arc-num">02</span>
+      <span class="arc-title">Week 1 · Days 1–5 — Play Lab materials.</span>
+      <span class="arc-when">Print before Day 1</span>
+    </div>
+    <p class="arc-intro">Every worksheet listed below has a matching answer key. Worksheets go to <strong>every student or every team</strong>; answer keys go only to facilitators. Pre-print and sort by day into folders or trays so the day's stack is ready to grab.</p>
+
+    <div class="week-label">
+      <span class="num">WK 1</span>
+      <span class="nm">Play Lab — one stat per day</span>
+    </div>
+
+    <!-- Day 1 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 01</span>
+        <span class="day-title">Speed introduction · First bot drive</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Stat Card</strong> <span class="key">Page 1</span></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Speed Stat Challenge</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">Speed Stat Challenge — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>First Bot Drive</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">First Bot Drive — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 02</span>
+        <span class="day-title">Endurance formula · Bot Naming</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Stat Card</strong> <span class="key">Page 2</span></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Endurance Formula Test</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">Endurance Formula Test — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 03</span>
+        <span class="day-title">Turning · Distance-Time graphs · Arc approximation</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Navigation Challenge Record</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Card A</strong> <span class="key">Half the class gets A, alternate by group</span></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Card B</strong> <span class="key">The other half gets B</span></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Arc Approximation</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Arc Approximation — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 4 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 04</span>
+        <span class="day-title">Power² · Scoop build</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Power Stat Challenge</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Power Stat Challenge — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Scoop Build &amp; Ratio Testing</strong></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 05</span>
+        <span class="day-title">Budget constraint · Recall · Paper dashboard</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Budget Constraints</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Budget Constraints — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Recall Check</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">Recall Check — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Velocity Arena Paper Dashboard</strong></span><span class="item-qty">1 / student</span></li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ── 03 WEEK 2 ─────────────────────────────── -->
+  <section class="arc-section" id="week-2">
+    <div class="arc-head">
+      <span class="arc-num">03</span>
+      <span class="arc-title">Week 2 · Days 6–10 — Season 1 materials.</span>
+      <span class="arc-when">Print before Day 6</span>
+    </div>
+    <p class="arc-intro">Season 1 starts mid-week. Days 7–8–9 are match days, so the per-team data logs and matching cards get heavy use. <strong>Day 9 has a "create" task too</strong> — the Formula Race Cards aren't a print job, they're a stack of physical cards you build from the printed set.</p>
+
+    <div class="week-label">
+      <span class="num">WK 2</span>
+      <span class="nm">Season 1 — first matches</span>
+    </div>
+
+    <!-- Day 6 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 06</span>
+        <span class="day-title">Interleaved problems · Field geometry · Launch sequence</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Day 6 Cards A and B</strong></span><span class="item-qty">4 / class</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Interleaved Problem Set</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">Interleaved — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Field Geometry &amp; Approach Planning</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Field Geometry — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Launch Sequence</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Launch Sequence — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Launch Showcase</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Launch Showcase — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Pre-match Checklist</strong></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 7 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 07</span>
+        <span class="day-title">Endurance decay · Season 1 Match Day 1</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Endurance Decay Worksheet</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Endurance Decay — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Match Data Log</strong></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 8 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 08</span>
+        <span class="day-title">Matching situations · Season 1 Match Day 2 · Rivalry Cards</span>
+        <span class="day-tag">Print &amp; Create</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Matching Situations</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Matching Cards</strong> <span class="key">V / T / G card sets — sort into team packets before class</span></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Matching Situations — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Math Scavenger Hunt</strong> <span class="key">Build the hunt cards on Day 7 evening — references previous-day leaderboard</span></span><span class="item-qty">1 set</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 9 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 09</span>
+        <span class="day-title">Formula Relay · Season 1 Match Day 3</span>
+        <span class="day-tag">Create</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Formula Race Cards</strong> <span class="key">Build a deck of 20 cards covering all 5 formula types. See the <a href="/resources/formula-race-cards.html">printable kit</a></span></span><span class="item-qty">1 set</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 10 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 10</span>
+        <span class="day-title">Distance formula deep dive · Cold Recall · Season 1 Final</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Distance Formula</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Distance Formula — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Cold Recall</strong></span><span class="item-qty">1 / student</span></li>
+        <li><span class="chk"></span><span class="item-name">Cold Recall — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ── 04 WEEK 3 ─────────────────────────────── -->
+  <section class="arc-section" id="week-3">
+    <div class="arc-head">
+      <span class="arc-num">04</span>
+      <span class="arc-title">Week 3 · Days 11–12 — Commissioner's Week.</span>
+      <span class="arc-when">Print before Day 11</span>
+    </div>
+    <p class="arc-intro">Two of the busiest days for paper. The Commissioner's Meeting (Day 12) needs three different worksheets per team — proposal, meeting log, and math verification. <strong>Pre-print all of Week 3 together</strong> — Day 12 isn't a day you want to be making copies.</p>
+
+    <div class="week-label">
+      <span class="num">WK 3</span>
+      <span class="nm">Commissioner's Week</span>
+    </div>
+
+    <!-- Day 11 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 11</span>
+        <span class="day-title">Percent change · Underdog reveal · Practice matches</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Commissioner Proposal</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Commissioner Proposal — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Loadout Capture</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Practice Matches</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Practice Matches — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 12 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 12</span>
+        <span class="day-title">Commissioner's Meeting &amp; Vote · Season 2 begins</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Presentation Worksheet</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Presentation Worksheet — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Commissioner Meeting Log</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Commissioner Meeting Log — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Math Verification Sheet</strong></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 05 WEEK 4 ─────────────────────────────── -->
+  <section class="arc-section" id="week-4">
+    <div class="arc-head">
+      <span class="arc-num">05</span>
+      <span class="arc-title">Week 4 · Days 13–16 — Season 2 + Exhibition.</span>
+      <span class="arc-when">Print before Day 13</span>
+    </div>
+    <p class="arc-intro">The closing arc. Day 13 and Day 15 reuse the Prediction Tracker (same sheet — print enough for both days at once). Day 16 has materials sized to the <strong>number of visitors</strong>, not the number of students, so check the guest list before printing.</p>
+
+    <div class="week-label">
+      <span class="num">WK 4</span>
+      <span class="nm">Season 2 + Community Exhibition</span>
+    </div>
+
+    <!-- Day 13 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 13</span>
+        <span class="day-title">Linear equations · Predicting win %</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Predicting Win %</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Predicting Win % — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Building &amp; Solving Linear Equations</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name">Building &amp; Solving Linear Equations — <em>Answer Key</em></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 14 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 14</span>
+        <span class="day-title">Percent change applied · Chaos mode</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Prediction Tracker</strong> <span class="key">Used again on Day 15 — print enough for both days</span></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 15 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 15</span>
+        <span class="day-title">Teach the Math · Pitch prep · Post-Diagnostic</span>
+        <span class="day-tag">Print</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Pitch Card</strong></span><span class="item-qty">1 / team</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Prediction Tracker</strong> <span class="key">Same sheet as Day 14 — refresh quantity if any teams used both sides</span></span><span class="item-qty">1 / team</span></li>
+      </ul>
+    </div>
+
+    <!-- Day 16 -->
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY 16</span>
+        <span class="day-title">Community Exhibition · Awards</span>
+        <span class="day-tag">Print · sized to visitors</span>
+      </div>
+      <ul class="item-list">
+        <li><span class="chk"></span><span class="item-name"><strong>Visitor Challenge Cards</strong></span><span class="item-qty">Enough for each visitor</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Ballots</strong></span><span class="item-qty">Enough for each visitor</span></li>
+        <li><span class="chk"></span><span class="item-name"><strong>Visitor Tracker</strong></span><span class="item-qty">1 / facilitator</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 06 PAPER MATH ─────────────────────────── -->
+  <section class="arc-section" id="paper-math">
+    <div class="arc-head">
+      <span class="arc-num">06</span>
+      <span class="arc-title">Paper math — how much you'll actually need.</span>
+    </div>
+    <p class="arc-intro">A quick reference for ordering paper or scheduling time at the copier. These are rough estimates for a class of <strong>12 students = 4 teams of 3</strong>, the program's reference cohort size. Scale linearly with your class.</p>
+
+    <div class="cal info">
+      <span class="lbl">For a 12-student cohort</span>
+      <strong>~280 single-sided student copies</strong> across all 16 days (every-student worksheets + stat cards + recall checks + diagnostics).<br>
+      <strong>~95 single-sided team copies</strong> (4 teams × the per-team worksheets that show up Days 3 onward).<br>
+      <strong>~35 facilitator copies</strong> (one of each answer key, kept in your binder).<br>
+      <strong>Plus visitor materials on Day 16</strong> — sized to your guest list, not the cohort.
+    </div>
+
+    <div class="cal warn">
+      <span class="lbl">Don't print just-in-time</span>
+      Several days (6, 11, 12, 16) have <em>multiple</em> worksheets each. If you wait to print the morning of, you'll lose 20–30 minutes of facilitation time waiting on the copier. <strong>Pre-print the whole 16 days before Day 1</strong>, sort into labelled folders or trays, and you'll never lose a class to a paper jam.
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Companion to the <a href="/resources/facilitator-prep-checklist.html">Facilitator Prep Checklist</a> (pedagogical prep: formulas memorized, loss-recovery script practiced) and the <a href="/resources/teacher-guides/running-the-program.html">Running the Program</a> playbook. This page is the <strong>physical-materials</strong> side of getting ready — the other two are the <em>moves</em> side.
+  </div>
+
+</main>
+
+</body>
+</html>
