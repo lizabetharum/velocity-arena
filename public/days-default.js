@@ -190,9 +190,8 @@ const DAYS_DEFAULT = [
         "block": "Match-Build-Make",
         "description": "Your team names your bot. Then you write exactly one sentence explaining what it is fighting for. The name and sentence go on the wall right now and stay there for all four weeks.",
         "facilitatorDescription": "Run a three-formula sequence that generates a unique bot name from each student's inputs: letters in first name (x), birth month (y), and team number (z). Demonstrate the tool live with your own values, then work all three formulas on the board with shared sample values (x=4, y=3, z=2), requiring students to calculate by hand before anyone opens the digital tool. Once teams have traced the math themselves, release them to plug in real inputs, generate the name, post it, and write one sentence about it. Do not rush; teams who invest in a bot name stay engaged through later losses.",
-        "link": "/activities/robot-names/index.html",
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/robot-names/index.html",
         "script": "https://docs.google.com/document/d/1Ki8OW7XWCVaRnMMvXk0Guxgh3DN2GZP4NRWGJ4UyoWU/edit?usp=drivesdk",
-        "webpage": "https://velocity-arena-bsowh3els-nycfirsts-projects.vercel.app/activities/robot-names/index.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-07-bot-naming-ceremony.html"
       },
       {
