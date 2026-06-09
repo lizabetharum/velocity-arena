@@ -1003,7 +1003,7 @@ const DAYS_DEFAULT = [
         "description": "No formal scoring. You program and test adjusted loadout ideas and record observations as 'hypothesis' entries, clearly labeled so you can compare to Season 2 actuals.",
         "facilitatorDescription": "Tell teams their Season 2 allocation locks Monday, so today's runs are their only chance to test it. There's no scoring; every run is a hypothesis test. Read the format on the board and confirm the rule: write the hypothesis before the run, then record result and conclusion after. If they run without writing the hypothesis first, the run doesn't count. Before saying go, walk the room and make sure every team has circled the stat their Commissioner proposal is about so their first run tests that stat. Give about 50 minutes for four runs. Before each run, have one person read the hypothesis aloud (which stat, changing from what to what, expected outcome, Season 1 evidence). As soon as a run ends, have them record the result, then circle whether the result supports or changes their proposal. Watch for vague hypotheses, teams confirming after one run and stopping, and teams that have run twice but written nothing. At the 5-minute warning, fill in the Commissioner Proposal box at the bottom of page 2. Every team needs at least two complete entries.",
         "script": "https://docs.google.com/document/d/1QK0sXYtio3-xe9AvlD6CAjnb8aiU7-ySLg4f0y5ZYp8/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1pItb3fZdZ8cUOn0rbo2xBQuszboddc8JLooLeVEJMgU/edit?usp=sharing",
+        "worksheet": "https://drive.google.com/file/d/1cfqrijvga8RXYGEP_Pa8DeN5Pv3CXZlf/view?usp=drive_link",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D11_PracticeMatches_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-04-practice-matches.html"
       },
@@ -1084,7 +1084,7 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/1XRI6UGVz5gP-G1TY3OUG_GfU_hDZR-HMRoM6AKoUqnk/edit?usp=sharing", label: "Reference"}
         ],
         "worksheet": [
-          {url: "https://docs.google.com/document/d/16xwHol7asWVYVx_E85lYN2gLzvIM7xBOM6q1QxeA1eE/edit?usp=sharing", label: "Commissioner Meeting Log"},
+          {url: "https://drive.google.com/file/d/1m0dKkHePqrGNFBBbIB9WW59vyzQxcy6q/view?usp=drive_link", label: "Commissioner Meeting Log"},
           {url: "https://drive.google.com/file/d/1QdinXdgVyujgEAWQbub73XnA1iUFN0Wx/view?usp=drive_link", label: "Math Verication"}
         ],
        "exemplar":[{url:"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D12-math-verification-exemplars.html", label: "Math Verification Exemplar"}],
@@ -1164,7 +1164,7 @@ const DAYS_DEFAULT = [
         "description": "First matches under the new Commissioner-approved rules. Before your first match, log your equation-based prediction. After each match, record the actual. Loss-recovery for every losing team. Compare today's prediction residuals to your Season 1 residuals. Is your model improving?",
         "facilitatorDescription": "Run three rounds of commissioner-governed matches across 90 minutes. Open by naming the four things that change in Season 2: teams use their equation to predict real match outcomes, the ball changes each round, the commissioner rules are binding, and after a loss a team must pick which of three reasons explains the miss. Before every match, run the prediction ritual: each team reads its equation, plugs in the opponent's stat value, and writes a win-probability number. After each match, have everyone record the result; the losing team runs loss recovery by naming one of three reasons the prediction missed (wrong slope, wrong x estimate, or the ball mode changed what wins) — the ball-mode reason is only valid in Rounds 2 and 3. Announce the ball mode before Rounds 2 and 3, not after: ping pong rewards Turning, tennis rewards Power. Call any commissioner-rule violation as you see it. Close by reading the prediction market aloud against each team's card. Non-optional exit ticket: round, prediction direction, which of the three reasons explains the miss.",
         "script": "https://docs.google.com/document/d/18HoVS51dmWMg0yHU5rjWg6EY7Uz4MAjbJ-cPaOmZavU/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1cGFkZDRtoV8mLz6rQKcN1fHR2zSfHnl7/view?usp=drive_link",
+        "worksheet": "https://drive.google.com/file/d/1PyvRiYtekLjuZ6AQ8Lm18YR3p5kkEQ_y/view?usp=drive_link",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W4_D13_LinearEquations_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day13-03-s2-match-day-1.html"
       },
