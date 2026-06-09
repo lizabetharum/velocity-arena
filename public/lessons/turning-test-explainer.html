@@ -408,20 +408,20 @@
   <section>
     <div class="section-label">Overview</div>
     <h2>What does this program do?</h2>
-    <p>This program tests how your bot <strong>moves in arcs</strong> based on your TURNING stat. While driving, it continuously watches the track sensors and recovers if it hits the border. You can change the arc style mid-session and simulate different points in a match to see how ENDURANCE affects speed.</p>
-    <p>The key idea: your TURNING stat doesn't just control whether you turn — it controls the <em>shape</em> of the pattern your bot traces around the ring. Testing it here tells you what to expect in a real match.</p>
+    <p>This program tests how your bot <strong>roams in arcs</strong> based on your TURNING stat — and the roam logic here is <strong>identical to the match program's roam loop</strong>. What you see on the floor in this test is what you'll see during real matches. While driving, the bot continuously polls the track sensors at two thresholds (hard hit + soft warning), recovers if it hits the border, and adapts its driving as ENDURANCE decays.</p>
+    <p>The key idea: your TURNING stat doesn't just control whether you turn — it controls the <em>shape</em> of the pattern your bot traces around the ring. Higher TURNING → sharper, shorter segments (stays local). Lower TURNING → gentler, longer segments (covers more). Testing it here tells you what to expect in a real match.</p>
 
     <div class="callout warn">
       <div class="callout-icon">⚠️</div>
       <div class="callout-text">
-        <strong>Before running:</strong> Set <code>SPEED</code>, <code>ENDURANCE</code>, and <code>TURNING</code> in the <strong>on start</strong> block to your character's actual stats. All three start at zero — leave them there and the bot won't move.
+        <strong>Set the stats and the border threshold before running.</strong> Defaults are <code>SPEED = 6</code>, <code>ENDURANCE = 4</code>, <code>TURNING = 3</code> — edit to match your character. Also: <code>BORDER_THRESHOLD</code> must match whatever value your <em>match</em> program calibrates to, or border behavior won't be consistent between test and match.
       </div>
     </div>
 
     <div class="callout alert">
       <div class="callout-icon">🔄</div>
       <div class="callout-text">
-        <strong>Button roles changed from the Endurance Test.</strong> Button B now cycles the simulated match time (0 → 60 → 120 → 180 → 0s). Button A+B is the emergency stop — press both buttons together to cut motors immediately. Set the TURNING value in the on start block before uploading.
+        <strong>Button roles, same as the Endurance Test.</strong> A = run a 15-second roam test (use for the Coverage Challenge). B = cycle simulated match time (0 → 60 → 120 → 180), and shows the resulting decayed power on screen. A+B = emergency stop.
       </div>
     </div>
   </section>
@@ -433,18 +433,18 @@
     <div class="btn-grid">
       <div class="btn-card a">
         <div class="btn-badge a">A</div>
-        <h3>Run the Test</h3>
-        <p>Calculates power and arc settings from your stats, then drives the full arc pattern for TEST_DURATION_MS. Watch the shape it traces and how it reacts at the border.</p>
+        <h3>Run the Roam Test</h3>
+        <p>Calculates power + arc settings from your stats, then roams for 15 seconds using the same motion model as the match program. Watch the floor pattern and the RGB strip — blue/green = full power, red = low-power state.</p>
       </div>
       <div class="btn-card b">
         <div class="btn-badge b">B</div>
-        <h3>Cycle Simulated Match Time</h3>
-        <p>Cycles through 0 → 60 → 120 → 180 → 0 seconds. Shows the time as text on the LED screen. Use this to simulate how endurance decay affects the arc at different points in a match.</p>
+        <h3>Cycle Match Time + Show Power</h3>
+        <p>Cycles through 0 → 60 → 120 → 180 → 0 seconds. Flashes the time, <strong>then the resulting decayed wheel power</strong> ("P38" for power = 38) so you can see how a tired bot's power drops without running a test.</p>
       </div>
       <div class="btn-card ab">
         <div class="btn-badge ab">A+B</div>
         <h3>Emergency Stop</h3>
-        <p>Press both buttons together to cut motors immediately and show an X on the LED screen. Use this whenever the bot heads somewhere it shouldn't.</p>
+        <p>Press both buttons together to cut motors immediately. Clears the RGB strip and shows an X on the LED screen. Use this whenever the bot heads somewhere it shouldn't.</p>
       </div>
     </div>
   </section>
@@ -464,36 +464,37 @@
         <div class="blocks-render-area" id="render-onstart">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-let TURNING = 0
-let TEST_DURATION_MS = 20000
-let BORDER_CHECK_MS = 60
-let BORDER_PIVOT_MS = 400
-let BORDER_PIVOT_POWER = 50
-let BACKUP_MS = 600
-let BASE_SEGMENT_MS = 1800
-let BORDER_THRESHOLD = 200
-let SPEED = 0
-let ENDURANCE = 0
+let SPEED = 6
+let ENDURANCE = 4
+let TURNING = 3
+let TEST_DURATION_MS = 15000
+let BASE_SEGMENT_MS = 300
+let BORDER_THRESHOLD = 130
+const BORDER_POLL_MS = 12
           </pre>
         </div>
         <div class="block-explain">
-          <p>Runs once when the micro:bit powers on. Fills in all the starting values before any button is pressed.</p>
+          <p>Runs once when the micro:bit powers on. The defaults already work — you change them to <strong>compare</strong> different TURNING values, not to "fill in zero." Press A to run with the current values.</p>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-text"><code class="gold">TURNING = 0</code> — <strong style="color:#f59e0b;">Fill this in</strong> with your character's actual stat before uploading. Try 2 for a gentle arc pattern, 5 for medium, or 10 for the sharpest possible.</div>
+              <div class="step-text"><code class="gold">SPEED = 6</code>, <code class="gold">ENDURANCE = 4</code>, <code class="gold">TURNING = 3</code> — Default starting stats. Edit these to match your character, then re-flash to compare. The Coverage Challenge specifically asks you to run with <strong>T = 2, 5, and 10</strong>.</div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-text"><code class="gold">TEST_DURATION_MS = 20000</code> — Each test runs for 20 seconds (20,000ms). Increase this for longer observation time.</div>
+              <div class="step-text"><code class="gold">TEST_DURATION_MS = 15000</code> — Each test runs for 15 seconds. This matches the Coverage Challenge length — long enough to see the arc pattern develop and recover from at least one border hit.</div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <div class="step-text"><code class="gold">BASE_SEGMENT_MS = 1800</code> — New in this program. Controls the "base length" of each arc segment before it's divided by TURNING. 1800ms × 12 = 21.6 seconds of total arc time per cycle.</div>
+              <div class="step-text"><code class="gold">BASE_SEGMENT_MS = 300</code> — The base length of each arc segment, before TURNING shrinks it. With TURNING = 3, each segment runs for about 100ms before the bot considers a direction flip.</div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-text"><code class="gold">SPEED = 0</code>, <code class="gold">ENDURANCE = 0</code>, and <code class="gold">TURNING = 0</code> — <strong style="color:#f59e0b;">Fill these in</strong> with your character's actual stats before uploading. All three start at zero — leave them and the bot won't move.</div>
+              <div class="step-text"><code class="gold">BORDER_THRESHOLD = 130</code> — Sensor reading above this counts as a border hit. <strong>Set this to whatever your match program calibrates to</strong> — it must match the match program or border behavior will be inconsistent between test and match.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text"><code class="purple">BORDER_POLL_MS = 12</code> — How often the bot reads the sensors during a segment. 12ms means roughly 80 sensor reads per second — fast enough to react before the bot drives past the white edge.</div>
             </div>
           </div>
         </div>
@@ -512,70 +513,41 @@ let ENDURANCE = 0
           <pre class="blocks">
 input.onButtonPressed(Button.A, function () {
     computeStats()
-    basic.showString("" + (TURNING))
+    sameDirectionCount = 0
+    maxSameDirection = Math.randomRange(1, 2)
+    lastTurnWasLeft = false
     running = true
     testStart = input.runningTime()
     while (running && input.runningTime() - testStart < TEST_DURATION_MS) {
-        lastTurnWasLeft = !(lastTurnWasLeft)
-        for (let index = 0; index < TURNING; index++) {
-            if (input.runningTime() - testStart >= TEST_DURATION_MS) {
-                running = false
-                break
-            }
-            if (TURNING == 1) {
-                CutebotPro.pwmCruiseControl(currentPower, currentPower)
-            } else if (lastTurnWasLeft) {
-                CutebotPro.pwmCruiseControl(Math.round(currentPower * (1 - turnRatio)), currentPower)
-            } else {
-                CutebotPro.pwmCruiseControl(currentPower, Math.round(currentPower * (1 - turnRatio)))
-            }
-            driveAndWatch(thisDuration)
-            if (watchResult == 1) {
-                handleBorder()
-                break
-            }
-            basic.pause(80)
-        }
+        roamStep()
     }
+    motorStop()
     running = false
-    basic.showLeds(`
-        # . . . #
-        . # . # .
-        . . # . .
-        . # . # .
-        # . . . #
-        `)
+    strip.clear()
+    basic.showString("DONE")
     basic.pause(500)
     basic.clearScreen()
 })
           </pre>
         </div>
         <div class="block-explain">
-          <p>The main test loop. This is the most complex block in the program — it has a loop inside a loop. Here's how to read it:</p>
+          <p>The main loop became much shorter. All the arc-drawing logic moved into a new function called <code class="teal">roamStep</code> — Button A just calls it over and over until time runs out. This is the same shape as the match program's roam loop, so what you see here is what you'll see in matches.</p>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-text"><strong>call computeStats</strong> → calculates <code class="purple">currentPower</code>, <code class="purple">turnRatio</code>, and <code class="purple">thisDuration</code> from your stats. Then displays the current TURNING value on screen.</div>
+              <div class="step-text"><strong>computeStats</strong> → calculates <code class="purple">motorPower</code>, <code class="purple">turnRatio</code>, <code class="purple">thisDuration</code>, and the endurance-decayed <code class="purple">currentPower</code> from your stats and the current simulated match time.</div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-text"><strong>outer while loop</strong> — keeps running until time expires. Each iteration: flip direction (<code>lastTurnWasLeft</code>), then run one full set of TURNING segments.</div>
+              <div class="step-text"><strong>Direction setup</strong> — reset the direction counter (<code>sameDirectionCount = 0</code>), pick how many segments to keep the same direction before flipping (<code>maxSameDirection</code> is 1 or 2, random), and start arcing right (<code>lastTurnWasLeft = false</code>).</div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <div class="step-text"><strong>inner for loop</strong> — runs TURNING times. Each pass checks if time is up, sets wheel speeds based on the current direction, calls <code class="teal">driveAndWatch</code>, then pauses 80ms between segments.</div>
+              <div class="step-text"><strong>The roam loop</strong> — keep calling <code class="teal">roamStep</code> until either someone presses A+B (which sets <code>running = false</code>) or 15 seconds elapse. Each <code>roamStep</code> drives one arc segment, polls the border, and may flip direction or recover from an edge.</div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-text"><strong>Wheel speed logic:</strong> If <code>lastTurnWasLeft</code> is true → left wheel slower, right wheel faster (arcs left). If false → left faster, right slower (arcs right). The difference is controlled by <code class="purple">turnRatio</code>.</div>
-            </div>
-            <div class="step">
-              <div class="step-num">5</div>
-              <div class="step-text">If <code class="teal">driveAndWatch</code> sets <code>watchResult = 1</code> (border hit), call <code>handleBorder</code> and <strong>break</strong> out of the inner loop to restart the outer loop from a fresh direction.</div>
-            </div>
-            <div class="step">
-              <div class="step-num">6</div>
-              <div class="step-text">When time expires: stop all motors, show an ✕ on the LED screen, then clear it.</div>
+              <div class="step-text"><strong>Cleanup</strong> — when the loop exits, fully stop the motors, clear the RGB strip, and show "DONE" on the LED screen.</div>
             </div>
           </div>
         </div>
@@ -593,30 +565,39 @@ input.onButtonPressed(Button.A, function () {
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
 input.onButtonPressed(Button.B, function () {
-    if (simulatedMatchTime == 0) {
-        simulatedMatchTime = 60
-        basic.showString("60s")
-    } else if (simulatedMatchTime == 60) {
-        simulatedMatchTime = 120
-        basic.showString("120s")
-    } else if (simulatedMatchTime == 120) {
-        simulatedMatchTime = 180
-        basic.showString("180s")
-    } else {
-        simulatedMatchTime = 0
-        basic.showString("0s")
-    }
-    basic.pause(500)
+    if (simulatedMatchTime == 0) { simulatedMatchTime = 60 }
+    else if (simulatedMatchTime == 60) { simulatedMatchTime = 120 }
+    else if (simulatedMatchTime == 120) { simulatedMatchTime = 180 }
+    else { simulatedMatchTime = 0 }
+    computeStats()
+    basic.showString(simulatedMatchTime + "s")
+    basic.pause(300)
+    basic.showString("P" + currentPower)
+    basic.pause(400)
     basic.clearScreen()
 })
           </pre>
         </div>
         <div class="block-explain">
-          <p>Cycles the simulated match time: <strong>0 → 60 → 120 → 180 → 0</strong>. The current time shows as text on the LED screen (e.g. "60s"). This feeds into <code>computeStats</code> to apply endurance decay — so you can feel how a tired bot arcs differently at the end of a match.</p>
+          <p>Cycles the simulated match time: <strong>0 → 60 → 120 → 180 → 0</strong>. After cycling, this version <strong>also calls <code>computeStats</code></strong> and shows the resulting decayed power on screen — so you can see how a tired bot's actual motor power drops without having to run a test.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Cycle the time</strong> — bumps the simulated match time to the next stop in the cycle.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Refresh power</strong> — calls <code>computeStats</code> immediately so <code>currentPower</code> reflects the new time.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Show both numbers</strong> — flashes the time (e.g. "120s"), then the decayed wheel power (e.g. "P38"), so you can read the effect in one button press.</div>
+            </div>
+          </div>
           <div class="callout tip" style="margin-top: 12px;">
             <div class="callout-icon">✅</div>
             <div class="callout-text">
-              <strong>Set time before pressing A.</strong> Press B to advance the simulated match time, then press A to run with that decay applied. Compare 0s vs. 180s with the same TURNING value to see how a tired bot's arc shape changes.
+              <strong>Set time before pressing A.</strong> Press B until you see the match time you want, then A to roam at that decay level. Compare 0s vs. 180s on the same TURNING value to feel how a tired bot's arc loses its bite.
             </div>
           </div>
         </div>
@@ -635,7 +616,8 @@ input.onButtonPressed(Button.B, function () {
           <pre class="blocks">
 input.onButtonPressed(Button.AB, function () {
     running = false
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    motorStop()
+    strip.clear()
     basic.showLeds(`
         # . . . #
         . # . # .
@@ -649,7 +631,7 @@ input.onButtonPressed(Button.AB, function () {
           </pre>
         </div>
         <div class="block-explain">
-          <p>Press both buttons together to cut motors immediately. Sets <code>running = false</code> so any in-progress test loop exits, calls <code>stopImmediately</code> to kill power to both wheels, and flashes an <strong>X</strong> on the LED screen to confirm the stop.</p>
+          <p>Press both buttons together to cut motors immediately. Sets <code>running = false</code> so any in-progress roam loop exits at the next safety check, calls <code>motorStop</code> for a clean wheel cut, clears the RGB strip, and flashes an <strong>X</strong> on the LED screen to confirm the stop.</p>
           <div class="callout tip" style="margin-top: 12px;">
             <div class="callout-icon">🛑</div>
             <div class="callout-text">
@@ -670,42 +652,49 @@ input.onButtonPressed(Button.AB, function () {
         <div class="blocks-render-area" id="render-computeStats">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-function computeStats () {
-    currentPower = SPEED * 100 / 20
-    totalArcTime = BASE_SEGMENT_MS * 12
-    thisDuration = Math.round(totalArcTime / TURNING)
+function computeStats() {
+    motorPower = SPEED * 100 / 20
     turnRatio = 0.2 + TURNING * 0.02
-    turnRatio = Math.min(turnRatio, 0.4)
+    totalArcTime = BASE_SEGMENT_MS * 12
+    thisDuration = Math.min(Math.round(totalArcTime / Math.max(1, TURNING)), 600)
     DECAY_RATE = 20 - ENDURANCE
+    minWheelSpeed = Math.max(20, Math.round(motorPower * 0.25))
+    lowPowerThreshold = minWheelSpeed
+
     endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
-    endurancePercent = Math.max(endurancePercent, 20)
-    enduranceFactor = endurancePercent / 100
-    currentPower = Math.round(currentPower * enduranceFactor)
-    currentPower = Math.max(currentPower, 15)
+    enduranceFactor = Math.max(endurancePercent / 100, 0.2)
+    currentPower = Math.max(Math.round(motorPower * enduranceFactor), minWheelSpeed)
+    lowPowerActive = currentPower <= lowPowerThreshold
 }
           </pre>
         </div>
         <div class="block-explain">
-          <p>This function calculates everything before any motor turns. It does two jobs: sets the arc shape (turnRatio and thisDuration) and applies endurance decay to currentPower.</p>
+          <p>This function calculates everything before any motor turns — the arc shape, the endurance-decayed power, and a <strong>"low-power" flag</strong> the rest of the code uses to swap in gentler driving when the bot is tired.</p>
           <div class="formula-box">
-            currentPower = SPEED × 100 ÷ 20   <span class="comment">← converts stat to motor %</span><br>
-            totalArcTime = BASE_SEGMENT_MS × 12 <span class="comment">← 1800 × 12 = 21,600ms total</span><br>
-            thisDuration = totalArcTime ÷ TURNING <span class="comment">← time per segment</span><br>
-            turnRatio = 0.2 + TURNING × 0.02     <span class="comment">← arc sharpness (max 0.40)</span><br>
-            currentPower × enduranceFactor        <span class="comment">← decay applied last</span>
+            motorPower = SPEED × 100 ÷ 20      <span class="comment">← fresh power (before decay)</span><br>
+            turnRatio = 0.2 + TURNING × 0.02   <span class="comment">← arc sharpness, no cap</span><br>
+            thisDuration = totalArcTime ÷ TURNING  <span class="comment">← capped at 600ms</span><br>
+            minWheelSpeed = max(20, motorPower × 0.25)  <span class="comment">← floor</span><br>
+            enduranceFactor = max(endurancePercent/100, 0.2)  <span class="comment">← decay, min 20%</span><br>
+            currentPower = max(motorPower × factor, minWheelSpeed)<br>
+            lowPowerActive = currentPower ≤ lowPowerThreshold
           </div>
           <div class="steps">
             <div class="step">
               <div class="step-num">📐</div>
-              <div class="step-text"><strong>thisDuration example:</strong> With TURNING = 5 → <code>21600 ÷ 5 = 4320ms</code> per segment. With TURNING = 10 → <code>21600 ÷ 10 = 2160ms</code> per segment. More segments = shorter each.</div>
+              <div class="step-text"><strong>thisDuration example:</strong> With TURNING = 5 and BASE_SEGMENT_MS = 300, total time = 3600ms, per segment = 720ms — capped at <strong>600ms</strong>. With TURNING = 10 → 360ms per segment. The cap keeps any one arc segment from running too long without a sensor check.</div>
             </div>
             <div class="step">
               <div class="step-num">〰️</div>
-              <div class="step-text"><strong>turnRatio example:</strong> TURNING = 2 → ratio = 0.24 (gentle arc). TURNING = 10 → ratio = 0.40 (capped, sharpest possible). The cap prevents the wheels from running backward.</div>
+              <div class="step-text"><strong>turnRatio example:</strong> TURNING = 2 → 0.24 (gentle arc). TURNING = 10 → 0.40 (sharp). The cap from the old version is gone — instead, <code class="teal">roamStep</code> clamps the ratio between 0.10 and 0.45 with jitter for variation.</div>
             </div>
             <div class="step">
               <div class="step-num">⬇️</div>
-              <div class="step-text"><strong>Endurance decay:</strong> Same math as the Endurance Test — power fades based on ENDURANCE stat and simulatedMatchTime. A bot with low ENDURANCE will arc more slowly at 180s than at 0s.</div>
+              <div class="step-text"><strong>Endurance decay:</strong> Same shape as before — power fades based on ENDURANCE stat and simulatedMatchTime, with a 20% floor so the bot can always crawl. The match program uses identical math, so testing here predicts late-match behavior.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">🐢</div>
+              <div class="step-text"><strong>Low-power tracking (new):</strong> If <code>currentPower</code> drops to the minimum wheel speed, <code>lowPowerActive = true</code>. The rest of the program reads this flag to use a softer sensor threshold, shorter backup, sharper recovery turn, and the RGB strip shows red instead of blue/green.</div>
             </div>
           </div>
         </div>
@@ -722,59 +711,73 @@ function computeStats () {
         <div class="blocks-render-area" id="render-driveAndWatch">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-function driveAndWatch (ms: number) {
-    watchResult = 0
-    elapsed = 0
-    while (elapsed < ms) {
-        halfChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
-        basic.pause(halfChunk)
-        elapsed += halfChunk
-        borderSide = checkBorder()
-        if (borderSide > 0) {
-            CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            watchResult = 1
-            return
+function driveAndWatch(ms: number, lSpeed: number, rSpeed: number) {
+    if (!running) { return }
+    let watchStart = input.runningTime()
+    let lastBorderPoll = 0
+    let lastMotorRefresh = input.runningTime()
+
+    while (input.runningTime() - watchStart < ms) {
+        if (!running) { return }
+
+        if (input.runningTime() - lastBorderPoll >= BORDER_POLL_MS) {
+            lastBorderPoll = input.runningTime()
+            readTrackbit()
+
+            let hardSide = borderSideFrom(BORDER_THRESHOLD)
+            if (hardSide > 0) {
+                borderSide = hardSide
+                CutebotPro.pwmCruiseControl(-60, -60)
+                basic.pause(70)
+                motorStop()
+                borderHandledInSeg = true
+                handleBorder()
+                return
+            }
+
+            let softThresh = Math.round(BORDER_THRESHOLD * (lowPowerActive ? 0.65 : 0.75))
+            let softSide = borderSideFrom(softThresh)
+            if (softSide > 0) {
+                softEvade(softSide)
+                return
+            }
         }
-        if (elapsed >= ms) {
-            return
+
+        // Motor keep-alive every 200ms
+        if (input.runningTime() - lastMotorRefresh > 200) {
+            lastMotorRefresh = input.runningTime()
+            CutebotPro.pwmCruiseControl(lSpeed, rSpeed)
         }
-        remainChunk = Math.min(BORDER_CHECK_MS, ms - elapsed)
-        basic.pause(remainChunk)
-        elapsed += remainChunk
-        borderSide = checkBorder()
-        if (borderSide > 0) {
-            CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            watchResult = 1
-            return
-        }
+
+        basic.pause(5)
     }
 }
           </pre>
         </div>
         <div class="block-explain">
-          <p>This is a <strong>new function</strong> not in the Endurance Test. Instead of driving for a full segment and <em>then</em> checking the sensors, this function checks the sensors <em>during</em> the drive — up to twice per 60ms window. That means the bot can react to the border in the middle of a segment rather than waiting until it's over.</p>
+          <p>The new <code class="teal">driveAndWatch</code> does three jobs at once: <strong>polls the border sensors</strong> every 12ms, <strong>resends the motor command</strong> every 200ms so the driver doesn't latch, and <strong>checks two separate sensor thresholds</strong> — a hard one for a real border hit, and a soft one for an early warning.</p>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-text">Sets <code>watchResult = 0</code> (no border) and <code>elapsed = 0</code> (time used so far). The motors are already running — the calling code set wheel speeds before calling this function.</div>
+              <div class="step-text"><strong>Three timers</strong> — <code>watchStart</code> tracks how long the segment has been running, <code>lastBorderPoll</code> rate-limits sensor reads, and <code>lastMotorRefresh</code> rate-limits the motor keep-alive command.</div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-text"><strong>while loop</strong> — keeps going until <code>elapsed ≥ ms</code>. Each pass: wait a small chunk of time, add it to elapsed, check sensors. Two sensor checks per iteration for faster reaction.</div>
+              <div class="step-text"><strong>Hard threshold</strong> — if any sensor reads above <code>BORDER_THRESHOLD</code> (130), the bot is on white. Brake at −60 PWM for 70ms, full stop, set <code>borderHandledInSeg = true</code>, and call <code>handleBorder</code> for the full recovery sequence. Then exit the segment.</div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <div class="step-text"><code>halfChunk = Math.min(BORDER_CHECK_MS, ms − elapsed)</code> — this prevents overshooting the target time. If less than 60ms remains, it waits only the remainder, not a full 60ms.</div>
+              <div class="step-text"><strong>Soft threshold (new)</strong> — if no hard hit, check a softer threshold at 75% of the hard value (or 65% when low-power). This catches the edge of the white zone before the bot is fully on it, and triggers <code class="teal">softEvade</code> — a lighter recovery than the full handleBorder.</div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-text">If <code>checkBorder()</code> returns anything other than 0 → set <code>watchResult = 1</code> and <strong>return immediately</strong>. The calling code (Button A loop) sees <code>watchResult = 1</code> and calls <code>handleBorder</code>.</div>
+              <div class="step-text"><strong>Motor keep-alive (new)</strong> — every 200ms, resend the same wheel-speed command. This is a workaround for a Cutebot Pro driver quirk where motors can stop responding to long uninterrupted commands. The bot would otherwise stop driving partway through long segments.</div>
             </div>
           </div>
           <div class="callout info" style="margin-top: 12px;">
             <div class="callout-icon">💡</div>
             <div class="callout-text">
-              <strong>Why not just pause the full segment?</strong> If the bot drove for 4,320ms without checking sensors, it could go deep into the white border before reacting. This function checks every 60ms, so at full speed it stops within 1–2 sensor cycles of hitting the edge.
+              <strong>Two thresholds, two recoveries.</strong> Hard hit (already on white) → full <code>handleBorder</code> with backup, multi-attempt turn, and recheck. Soft hit (about to be on white) → quick <code>softEvade</code> with shorter backup and one turn. Together, the bot rarely gets fully stuck on the edge.
             </div>
           </div>
         </div>
@@ -791,35 +794,63 @@ function driveAndWatch (ms: number) {
         <div class="blocks-render-area" id="render-checkBorder">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-function checkBorder () {
-    if (sensor1State > BORDER_THRESHOLD) {
-        return 1
-    } else if (sensor4State > BORDER_THRESHOLD) {
-        return 2
-    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
-        return 3
-    }
+function readTrackbit() {
+    CutebotPro.trackbitStateValue()
+    tb1 = CutebotPro.trackbitgetGray(TrackbitChannel.One)
+    tb2 = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
+    tb3 = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
+    tb4 = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
+}
+
+// 1 = left-front  2 = right-front  3 = center  4 = both outer (head-on)  0 = clear
+function borderSideFrom(threshold: number): number {
+    if (tb1 > threshold && tb4 > threshold) { return 4 }
+    if (tb1 > threshold) { return 1 }
+    if (tb4 > threshold) { return 2 }
+    if (tb2 > threshold || tb3 > threshold) { return 3 }
     return 0
+}
+
+function checkBorder(): number {
+    readTrackbit()
+    let side = borderSideFrom(BORDER_THRESHOLD)
+    if (side > 0) { borderSide = side }
+    return side
 }
           </pre>
         </div>
         <div class="block-explain">
-          <p>Same as the Endurance Test — reads four sensors and returns a number based on which side (if any) detected the white border.</p>
+          <p>Border detection splits into three helpers now. <code class="teal">readTrackbit</code> reads all four sensors into shared variables. <code class="teal">borderSideFrom</code> classifies which side of the bot is on white, given any threshold. <code class="teal">checkBorder</code> uses the hard threshold and is what other functions call.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>readTrackbit</strong> — call <code>trackbitStateValue</code> once to refresh, then read each sensor (1–4) into <code>tb1</code>, <code>tb2</code>, <code>tb3</code>, <code>tb4</code>. Other functions read those variables instead of re-calling the sensor API.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>borderSideFrom (new — takes a threshold)</strong> — adds a <code>4 = head-on</code> case for when <em>both</em> outer sensors fire. This is critical because a head-on hit needs a much harder recovery (bigger turn) than a single-side hit.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>checkBorder</strong> — uses the hard <code>BORDER_THRESHOLD</code> and stores the result in the global <code>borderSide</code> so <code>handleBorder</code> knows which way to turn.</div>
+            </div>
+          </div>
           <div class="sensor-diagram">
             <div class="sensor-label">↑ Front of robot</div>
             <div class="sensor-row">
-              <div class="sensor-box left"><span class="snum">S1</span><span class="slabel">left</span></div>
-              <div class="sensor-box mid"><span class="snum">S2</span><span class="slabel">mid</span></div>
-              <div class="sensor-box mid"><span class="snum">S3</span><span class="slabel">mid</span></div>
-              <div class="sensor-box right"><span class="snum">S4</span><span class="slabel">right</span></div>
+              <div class="sensor-box left"><span class="snum">tb1</span><span class="slabel">left</span></div>
+              <div class="sensor-box mid"><span class="snum">tb2</span><span class="slabel">mid</span></div>
+              <div class="sensor-box mid"><span class="snum">tb3</span><span class="slabel">mid</span></div>
+              <div class="sensor-box right"><span class="snum">tb4</span><span class="slabel">right</span></div>
             </div>
             <div class="bot-body">BOT BODY</div>
             <div class="sensor-label">↓ Back of robot</div>
             <div class="sensor-legend">
-              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>S1 fires → returns 1 (left)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>S4 fires → returns 2 (right)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>S2 or S3 → returns 3 (head-on)</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>All clear → returns 0</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>tb1 only → 1 (left)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>tb4 only → 2 (right)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>tb2 or tb3 → 3 (center / head-on)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>tb1 + tb4 → 4 (full head-on, new)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div>All clear → 0</div>
             </div>
           </div>
         </div>
@@ -836,65 +867,259 @@ function checkBorder () {
         <div class="blocks-render-area" id="render-handleBorder">
           <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
           <pre class="blocks">
-function handleBorder () {
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    basic.pause(50)
-    CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-    basic.pause(BACKUP_MS)
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    basic.pause(100)
-    if (borderSide == 1) {
-        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
-        lastTurnWasLeft = false
-    } else if (borderSide == 2) {
-        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS + Math.randomRange(-80, 80))
-        lastTurnWasLeft = true
-    } else {
-        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-        basic.pause(BACKUP_MS + 300)
+function handleBorder() {
+    if (!running) { return }
+    hardStop()
+    if (!running) { return }
+
+    speedExtra = Math.max(SPEED - 4, 0)
+    backupPower = lowPowerActive ? -25 : (0 - 40 - speedExtra * 5)
+    backupTime = lowPowerActive ? 130 : (250 + speedExtra * 20)
+
+    let attempts = 0
+    while (attempts < 3) {
+        attempts += 1
+        let side = borderSide
+        borderSide = 0
+
+        CutebotPro.pwmCruiseControl(backupPower, backupPower)
+        basic.pause(backupTime)
         CutebotPro.stopImmediately(CutebotProMotors.ALL)
-        basic.pause(100)
-        CutebotPro.pwmCruiseControl(BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS * 2)
-        lastTurnWasLeft = false
+        basic.pause(80)
+        if (!running) { return }
+
+        let angle: number
+        if (side == 1 || side == 2) {
+            angle = lowPowerActive ? 150 : 115
+        } else {
+            angle = side == 4 ? 150 + Math.randomRange(0, 20) : 130
+            if (lowPowerActive) { angle = Math.min(angle + 30, 180) }
+        }
+        turnAwayFrom(side, angle)
+        if (!running) { return }
+
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(40)
+        CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        basic.pause(300)
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.pause(40)
+
+        if (checkBorder() == 0) { break }
     }
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    basic.pause(100)
-    recheck = checkBorder()
-    if (recheck > 0) {
-        borderSide = recheck
-        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, -1 * BORDER_PIVOT_POWER)
-        basic.pause(BACKUP_MS)
-        CutebotPro.stopImmediately(CutebotProMotors.ALL)
-        basic.pause(100)
-        CutebotPro.pwmCruiseControl(-1 * BORDER_PIVOT_POWER, BORDER_PIVOT_POWER)
-        basic.pause(BORDER_PIVOT_MS)
-        CutebotPro.stopImmediately(CutebotProMotors.ALL)
-        basic.pause(100)
+    sameDirectionCount = 0
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Recovery is now a <strong>3-attempt loop</strong>. Each attempt: back up, turn away, drive forward briefly, then re-check the border. If the bot is still on white, the loop tries again — up to 3 times. The backup distance, turn angle, and direction logic all <strong>scale with SPEED and low-power state</strong>.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Hard stop</strong> — <code class="teal">hardStop</code> reverses at −80 PWM for a brake time that grows with SPEED. A fast bot takes longer to stop, so it brakes harder.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Backup tuning</strong> — <code>speedExtra = SPEED − 4</code>. Fast bots back up further with more power. Low-power bots back up just 130ms at −25 PWM (no wasted energy when the bot is tired).</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Turn angle by side</strong> — single-side hit (1 or 2): 115°. Head-on (3 or 4): 130–150° with a random nudge. Low-power: +30° wider so the bot doesn't get stuck pivoting back into the wall.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>turnAwayFrom (new helper)</strong> — pivots in place. side 1 → right, side 2 → left, head-on → alternates based on which way it last turned (so consecutive head-ons don't oscillate).</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text"><strong>Drive forward, then re-check</strong> — 300ms forward at <code>currentPower</code> to get clear of the edge, then call <code>checkBorder</code> again. If clear, <code>break</code> out of the loop. If still on white, the next attempt starts.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div class="step-text"><strong>Reset segment counter</strong> — <code>sameDirectionCount = 0</code> so the next <code>roamStep</code> picks a fresh direction streak length.</div>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top: 12px;">
+            <div class="callout-icon">🔁</div>
+            <div class="callout-text">
+              <strong>3 attempts, not 1.</strong> A single recovery sometimes fails — backing up onto a different white edge, or turning into another corner. Looping three times is the difference between "bot got stuck in the corner" and "bot escaped within 2 seconds."
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROAM STEP -->
+    <div class="block-section">
+      <div class="block-header" style="color: #00d4ff;">
+        <div class="block-dot" style="background: #00d4ff;"></div>
+        function roamStep — One Arc Segment (the motion model)
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-roamStep">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function roamStep() {
+    if (!running) { return }
+
+    // Flip direction every 1–2 segments (random)
+    if (sameDirectionCount >= maxSameDirection) {
+        lastTurnWasLeft = !lastTurnWasLeft
+        sameDirectionCount = 0
+        maxSameDirection = Math.randomRange(1, 2)
+    } else {
+        sameDirectionCount += 1
+    }
+
+    let dynamicRatio = Math.max(0.10, Math.min(0.45,
+        turnRatio + Math.randomRange(-8, 8) / 100))
+
+    let speedDurationBonus = SPEED * 12
+    let dynamicDuration = lowPowerActive
+        ? Math.max(Math.min(thisDuration / 2 + Math.randomRange(-50, 50), 300), 150)
+        : Math.max(Math.min(thisDuration + speedDurationBonus + Math.randomRange(-50, 50), 550), 150)
+
+    let lSpeed: number
+    let rSpeed: number
+    if (lastTurnWasLeft) {
+        lSpeed = Math.round(currentPower * (1 - dynamicRatio))
+        rSpeed = Math.round(currentPower * (1 + dynamicRatio))
+        strip.showColor(lowPowerActive ? neopixel.colors(NeoPixelColors.Red)
+            : neopixel.colors(NeoPixelColors.Blue))
+    } else {
+        lSpeed = Math.round(currentPower * (1 + dynamicRatio))
+        rSpeed = Math.round(currentPower * (1 - dynamicRatio))
+        strip.showColor(lowPowerActive ? neopixel.colors(NeoPixelColors.Red)
+            : neopixel.rgb(0, 255, 0))
+    }
+
+    lSpeed = Math.max(lSpeed, minWheelSpeed)
+    rSpeed = Math.max(rSpeed, minWheelSpeed)
+
+    borderHandledInSeg = false
+    CutebotPro.pwmCruiseControl(lSpeed, rSpeed)
+    driveAndWatch(dynamicDuration, lSpeed, rSpeed)
+
+    if (!borderHandledInSeg) {
+        CutebotPro.pwmCruiseControl(-40, -40)
+        basic.pause(40)
+    }
+    motorStop()
+
+    if (running) {
+        basic.pause(40)
+        if (checkBorder() > 0) { handleBorder() }
     }
 }
           </pre>
         </div>
         <div class="block-explain">
-          <p>Same recovery sequence as the Endurance Test — stop, back up, pivot based on which side hit the border. One new addition in this version: <code>lastTurnWasLeft</code> gets set based on the recovery direction, so the arc pattern resumes with the correct orientation after a border event.</p>
+          <p>This is where the bot's actual motion happens. Each call to <code>roamStep</code> drives <strong>one arc segment</strong>: pick a direction (maybe flip), pick speeds for left and right wheels, drive while watching the border, brake, and check the border one more time. The match program uses the same function — so the arc patterns you observe here are the patterns the bot draws in real matches.</p>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-text"><strong>Stop and back up</strong> for BACKUP_MS (600ms) to clear the border zone.</div>
+              <div class="step-text"><strong>Flip direction every 1–2 segments</strong> — track how many segments have used the same direction (<code>sameDirectionCount</code>). When it hits <code>maxSameDirection</code>, flip. This is why the bot zig-zags instead of looping cleanly in one direction.</div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-text"><strong>Pivot away</strong> based on <code>borderSide</code>. Left danger → pivot right. Right danger → pivot left. Head-on → extra backup + bigger turn.</div>
+              <div class="step-text"><strong>Add jitter to turnRatio</strong> — <code>dynamicRatio = turnRatio + random(−0.08, 0.08)</code>, clamped between 0.10 and 0.45. Two segments with the same TURNING never trace exactly the same arc.</div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <div class="step-text"><strong>Reset arc direction:</strong> After recovering left (pivoting right), set <code>lastTurnWasLeft = false</code> so the next segment arcs right — away from the side that was just hit.</div>
+              <div class="step-text"><strong>SPEED stretches segments</strong> — <code>speedDurationBonus = SPEED × 12</code> ms is added to each segment's duration. High-SPEED bots cover more ground per segment before flipping. Low-power state halves the duration instead — tired bots take shorter, gentler steps.</div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-text"><strong>Recheck</strong> — if still on white, does one more backup-and-turn before resuming the main loop.</div>
+              <div class="step-text"><strong>Wheel speed math</strong> — <code>currentPower × (1 − ratio)</code> for the inside wheel, <code>currentPower × (1 + ratio)</code> for the outside wheel. Inside wheel slows, outside wheel goes <em>faster than currentPower</em>. Each wheel floored at <code>minWheelSpeed</code> so the inside wheel never stalls.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-text"><strong>RGB feedback</strong> — left turns show <span style="color:#3b82f6;">blue</span>, right turns show <span style="color:#22c55e;">green</span>, and the low-power state shows <span style="color:#ef4444;">red</span> regardless of direction. The strip is a visual reading of the bot's internal state.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">6</div>
+              <div class="step-text"><strong>Drive, brake, recheck</strong> — call <code>driveAndWatch</code> with the chosen wheel speeds for the chosen duration. If it returned without a border hit (<code>!borderHandledInSeg</code>), do a firm active brake at −40 PWM. Then check the border one more time — sometimes the bot rolls onto a line during the brake.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELPERS -->
+    <div class="block-section">
+      <div class="block-header" style="color: #14b8a6;">
+        <div class="block-dot" style="background: #14b8a6;"></div>
+        Small helpers — motorStop, hardStop, softEvade, turnAwayFrom
+      </div>
+      <div class="block-body">
+        <div class="blocks-render-area" id="render-helpers">
+          <div class="blocks-loading"><div class="spinner"></div>Loading blocks from MakeCode…</div>
+          <pre class="blocks">
+function motorStop() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(10)
+    CutebotPro.pwmCruiseControl(0, 0)
+    basic.pause(10)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+function hardStop() {
+    let brakeTime = 160 + Math.max(SPEED - 5, 0) * 35
+    CutebotPro.pwmCruiseControl(-80, -80)
+    basic.pause(brakeTime)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+function turnAwayFrom(side: number, angle: number) {
+    if (side == 1) {
+        CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, angle)
+        lastTurnWasLeft = false
+    } else if (side == 2) {
+        CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, angle)
+        lastTurnWasLeft = true
+    } else if (lastTurnWasLeft) {
+        CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, angle)
+        lastTurnWasLeft = false
+    } else {
+        CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, angle)
+        lastTurnWasLeft = true
+    }
+}
+
+function softEvade(side: number) {
+    motorStop()
+    basic.pause(20)
+    let backMs = lowPowerActive ? 130 : 200
+    let backPwr = lowPowerActive ? -25 : -30
+    CutebotPro.pwmCruiseControl(backPwr, backPwr)
+    basic.pause(backMs)
+    motorStop()
+    basic.pause(40)
+    turnAwayFrom(side, lowPowerActive ? 130 : 90)
+    motorStop()
+    borderHandledInSeg = true
+    borderSide = 0
+}
+          </pre>
+        </div>
+        <div class="block-explain">
+          <p>Four short helper functions that the bigger functions call. Each does one job cleanly so the recovery logic stays readable.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">🛑</div>
+              <div class="step-text"><strong>motorStop</strong> — a clean motor cut. Three commands with 10ms pauses, because the driver sometimes ignores a single stop command when it's mid-PWM. Used by every other recovery function.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">🚨</div>
+              <div class="step-text"><strong>hardStop</strong> — reverse at −80 PWM for a brake time that grows with SPEED. A bot at SPEED 8 takes longer to stop than a bot at SPEED 4, so the brake time has to compensate or the bot overshoots into white.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">↪️</div>
+              <div class="step-text"><strong>turnAwayFrom</strong> — pivots in place by the given angle. Side 1 (left hit) → turn right. Side 2 (right hit) → turn left. Side 3 or 4 (head-on) → alternate based on which way it last turned, so consecutive head-ons don't oscillate.</div>
+            </div>
+            <div class="step">
+              <div class="step-num">🪶</div>
+              <div class="step-text"><strong>softEvade</strong> — the lighter recovery for the soft (warning) threshold. Short backup (130–200ms) and a single turn (90–130°), no recheck loop. Used when the bot is approaching white but isn't on it yet — fast and out of the way.</div>
             </div>
           </div>
         </div>
@@ -907,56 +1132,84 @@ function handleBorder () {
   <section>
     <div class="section-label">Variables</div>
     <h2>What every variable means</h2>
-    <p>Gold = you set it. Cyan = calculated automatically. Purple = fixed constant. Green = new in this program.</p>
+    <p>Gold = you set it. Cyan = calculated automatically. Purple = fixed constant.</p>
 
     <div class="var-grid">
       <div class="var-row">
         <div class="var-name you-set">SPEED <span class="tag you-set">You Set</span></div>
-        <div class="var-desc"><strong>Your character's speed stat</strong>Sets the base motor power. Used to calculate <code style="font-size:11px;">currentPower</code> before decay is applied.</div>
+        <div class="var-desc"><strong>Your character's speed stat</strong>Default <code style="font-size:11px;">6</code>. Sets the base motor power. Also affects segment duration (longer at higher SPEED) and recovery brake time (harder at higher SPEED).</div>
       </div>
       <div class="var-row">
         <div class="var-name you-set">ENDURANCE <span class="tag you-set">You Set</span></div>
-        <div class="var-desc"><strong>Your character's endurance stat</strong>Controls how much motor power fades over simulated match time. Low ENDURANCE = noticeable slowdown at 180s.</div>
+        <div class="var-desc"><strong>Your character's endurance stat</strong>Default <code style="font-size:11px;">4</code>. Controls how much motor power fades over <code style="font-size:11px;">simulatedMatchTime</code>. Low ENDURANCE = noticeable slowdown at 180s.</div>
       </div>
       <div class="var-row">
         <div class="var-name you-set">TURNING <span class="tag you-set">You Set</span></div>
-        <div class="var-desc"><strong>Number of arc segments per driving cycle</strong>Set in the on start block before uploading. Try 2, 5, or 10. Controls both the segment count and the arc sharpness (via turnRatio).</div>
+        <div class="var-desc"><strong>Your character's turning stat</strong>Default <code style="font-size:11px;">3</code>. The Coverage Challenge asks for T = 2, 5, and 10. Drives both the arc sharpness (via <code style="font-size:11px;">turnRatio</code>) and the segment length (via <code style="font-size:11px;">thisDuration</code>).</div>
       </div>
       <div class="var-row">
-        <div class="var-name new">turnRatio <span class="tag new-tag">New</span></div>
-        <div class="var-desc"><strong>Wheel speed difference that creates the arc</strong>Calculated as <code style="font-size:11px;">0.2 + TURNING × 0.02</code>, capped at 0.40. The higher this is, the tighter each arc curves.</div>
-      </div>
-      <div class="var-row">
-        <div class="var-name new">thisDuration <span class="tag new-tag">New</span></div>
-        <div class="var-desc"><strong>How long each individual arc segment lasts (ms)</strong>Calculated as <code style="font-size:11px;">totalArcTime ÷ TURNING</code>. More segments = shorter each.</div>
-      </div>
-      <div class="var-row">
-        <div class="var-name new">totalArcTime <span class="tag new-tag">New</span></div>
-        <div class="var-desc"><strong>Total time budget for one full arc cycle (ms)</strong>Always <code style="font-size:11px;">BASE_SEGMENT_MS × 12 = 21,600ms</code>. Divided among all segments to get thisDuration.</div>
-      </div>
-      <div class="var-row">
-        <div class="var-name new">lastTurnWasLeft <span class="tag new-tag">New</span></div>
-        <div class="var-desc"><strong>Tracks which direction the last arc went</strong>Flips each outer loop iteration so arcs alternate left/right. Also reset by handleBorder to resume in the correct direction after recovery.</div>
-      </div>
-      <div class="var-row">
-        <div class="var-name new">watchResult <span class="tag new-tag">New</span></div>
-        <div class="var-desc"><strong>Output from driveAndWatch</strong>0 = segment completed cleanly. 1 = border was hit mid-segment. The main loop checks this after each call to driveAndWatch.</div>
+        <div class="var-name computed">motorPower <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Fresh motor power before decay</strong>Calculated as <code style="font-size:11px;">SPEED × 100 ÷ 20</code>. The starting point for power calculations. Endurance decay is applied to this to produce <code style="font-size:11px;">currentPower</code>.</div>
       </div>
       <div class="var-row">
         <div class="var-name computed">currentPower <span class="tag auto">Auto</span></div>
-        <div class="var-desc"><strong>Actual motor power sent to wheels (0–100)</strong>Calculated from SPEED, then reduced by endurance decay. Minimum is 15 in this program (slightly different from the Endurance Test's 20% floor).</div>
+        <div class="var-desc"><strong>Actual motor power sent to wheels (after decay)</strong><code style="font-size:11px;">motorPower × enduranceFactor</code>, floored at <code style="font-size:11px;">minWheelSpeed</code>. This is what the wheels actually do.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">turnRatio <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Wheel speed difference that creates the arc</strong><code style="font-size:11px;">0.2 + TURNING × 0.02</code>, no hard cap here — <code class="teal">roamStep</code> clamps it to 0.10–0.45 with jitter for variation.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">thisDuration <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Base segment duration in ms</strong><code style="font-size:11px;">totalArcTime ÷ TURNING</code>, capped at <code style="font-size:11px;">600ms</code>. <code class="teal">roamStep</code> adds SPEED bonus and random jitter before driving.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">totalArcTime <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Total time budget for one arc cycle</strong>Always <code style="font-size:11px;">BASE_SEGMENT_MS × 12</code> = 3,600ms in this version. Divided among segments to get <code style="font-size:11px;">thisDuration</code>.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">minWheelSpeed <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Floor for any single wheel</strong><code style="font-size:11px;">max(20, motorPower × 0.25)</code>. Each wheel is clamped to at least this — keeps the inside wheel of an arc from stalling completely.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">enduranceFactor <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Decay multiplier (0.2–1.0)</strong><code style="font-size:11px;">endurancePercent ÷ 100</code>, never below 0.20. Multiplied with <code style="font-size:11px;">motorPower</code> to get <code style="font-size:11px;">currentPower</code>.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">lowPowerActive <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Tired-bot flag</strong>True when <code style="font-size:11px;">currentPower ≤ minWheelSpeed</code>. Triggers softer thresholds, shorter backups, wider recovery turns, and a red RGB strip instead of blue/green.</div>
       </div>
       <div class="var-row">
         <div class="var-name computed">simulatedMatchTime <span class="tag auto">Auto</span></div>
-        <div class="var-desc"><strong>Fake "time into the match" for endurance testing</strong>Set by pressing Button B. 0 = start, 180 = near the end. Passed to computeStats to apply decay.</div>
+        <div class="var-desc"><strong>Fake match clock for endurance testing</strong>Set by pressing Button B. 0 → 60 → 120 → 180. Drives the decay calculation in <code class="teal">computeStats</code>.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">borderSide <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Which side of the bot last hit a border</strong>1 = left, 2 = right, 3 = center, 4 = both outer (head-on). Drives the turn direction in <code class="teal">handleBorder</code> and <code class="teal">turnAwayFrom</code>.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">lastTurnWasLeft <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>Which direction the last arc went</strong>Flipped every 1–2 segments to make the bot zig-zag. Also updated by <code class="teal">handleBorder</code> so recovery resumes facing the right direction.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name computed">sameDirectionCount <span class="tag auto">Auto</span></div>
+        <div class="var-desc"><strong>How many segments the bot has used the same direction</strong>When it hits <code style="font-size:11px;">maxSameDirection</code> (1 or 2, random), flip. This is why the bot zig-zags instead of clean looping.</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">TEST_DURATION_MS <span class="tag constant">Constant</span></div>
+        <div class="var-desc"><strong>How long each test run lasts</strong>Default <code style="font-size:11px;">15000</code> (15 seconds). Matches the Coverage Challenge — enough time to see the arc pattern develop and recover from at least one border hit.</div>
       </div>
       <div class="var-row">
         <div class="var-name constant">BASE_SEGMENT_MS <span class="tag constant">Constant</span></div>
-        <div class="var-desc"><strong>Base arc segment length before dividing by TURNING</strong>Set to 1800ms. Change this to make all segments longer or shorter without touching TURNING.</div>
+        <div class="var-desc"><strong>Base segment length before dividing by TURNING</strong>Default <code style="font-size:11px;">300</code>. Multiplied by 12 to get <code style="font-size:11px;">totalArcTime</code>. Change this to make all segments shorter or longer.</div>
       </div>
       <div class="var-row">
         <div class="var-name constant">BORDER_THRESHOLD <span class="tag constant">Constant</span></div>
-        <div class="var-desc"><strong>Sensor brightness cutoff for border detection</strong>Set to 200. Sensor readings above this = white border detected.</div>
+        <div class="var-desc"><strong>Sensor reading cutoff for border detection</strong>Default <code style="font-size:11px;">130</code>. <strong>Set this to whatever your match program uses</strong> — they must match. The soft threshold is automatically 75% of this (or 65% when low-power).</div>
+      </div>
+      <div class="var-row">
+        <div class="var-name constant">BORDER_POLL_MS <span class="tag constant">Constant</span></div>
+        <div class="var-desc"><strong>Sensor poll interval inside driveAndWatch</strong>Default <code style="font-size:11px;">12</code>. Roughly 80 reads per second — fast enough to react before the bot drives past a white edge.</div>
       </div>
     </div>
   </section>
@@ -968,33 +1221,33 @@ function handleBorder () {
     <div class="tips-grid">
       <div class="tip-card">
         <div class="tip-number">01</div>
-        <h3>Set stats before uploading</h3>
-        <p>Find <code style="font-size:11px;">SPEED = 0</code>, <code style="font-size:11px;">ENDURANCE = 0</code>, and <code style="font-size:11px;">TURNING = 0</code> in the on start block. Replace all three zeros with your character's actual values — leave any at zero and nothing will move.</p>
+        <h3>Edit your stats, re-flash</h3>
+        <p>Defaults are <code style="font-size:11px;">SPEED = 6</code>, <code style="font-size:11px;">ENDURANCE = 4</code>, <code style="font-size:11px;">TURNING = 3</code>. The defaults work — change to your character's stats and re-flash to compare. There's nothing to "fill in from zero" anymore.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">02</div>
-        <h3>Try all three TURNING values</h3>
-        <p>Run with TURNING = 2, 5, and 10 in sequence. Watch the floor pattern each one traces. The difference is especially visible at high SPEED stats.</p>
+        <h3>Run the Coverage Challenge sequence</h3>
+        <p>Re-flash with TURNING = 2, then 5, then 10. Watch the floor pattern each one traces. The Day 3 Coverage Challenge asks exactly this — high TURNING = sharper, shorter segments (stays local). Low TURNING = gentler, longer segments (covers more).</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">03</div>
-        <h3>Combine TURNING + match time</h3>
-        <p>Set match time to 180s with Button B, then run your chosen TURNING value. Compare to 0s. If the arcs are noticeably tighter or slower, ENDURANCE is affecting your arc style.</p>
+        <h3>Match the BORDER_THRESHOLD</h3>
+        <p>Set <code style="font-size:11px;">BORDER_THRESHOLD</code> to whatever value your <em>match</em> program calibrates to. If they don't match, the bot will react to the white border differently in tests than in matches.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">04</div>
-        <h3>Watch the border recovery</h3>
-        <p>Use a longer TEST_DURATION_MS (e.g. 30000 = 30s) to give the bot more time to hit the border and recover. See how handleBorder adjusts the arc direction after each incident.</p>
+        <h3>Use Button B before A</h3>
+        <p>Press B to advance the simulated match time, watch the "P" value drop, then press A. Comparing TURNING = 5 at 0s vs. 180s shows how a tired bot's arcs flatten — and you can predict it from the P number before running.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">05</div>
-        <h3>Adjust BASE_SEGMENT_MS</h3>
-        <p>Lowering BASE_SEGMENT_MS makes all segments shorter. Raising it makes them longer. Try 900 for half-length arcs or 3600 for double — observe how this changes coverage without touching TURNING.</p>
+        <h3>Watch the RGB strip</h3>
+        <p>Blue = arcing left at full power. Green = arcing right at full power. Red = the bot has hit low-power state — softer recovery, shorter segments, wider turns. If you see red early in a 15-second test, your ENDURANCE allocation may be too low.</p>
       </div>
       <div class="tip-card">
         <div class="tip-number">06</div>
         <h3>Keep A+B within reach</h3>
-        <p>A+B is the emergency stop. Stay close to the bot, and press both buttons together the moment it heads somewhere it shouldn't. The X on the LED screen confirms motors are off.</p>
+        <p>A+B is the emergency stop. Stay close, and press both buttons together the moment the bot heads somewhere it shouldn't. The X on the LED screen confirms motors are off.</p>
       </div>
     </div>
   </section>
