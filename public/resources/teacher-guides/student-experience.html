@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maya · One Student's Velocity Arena · 16 Days</title>
+  <link rel="stylesheet" href="/styles/va-tokens.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-1);
+      color: var(--fg-0);
+      min-height: 100vh;
+      padding-bottom: 6rem;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "ss01", "cv11";
+    }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+    a { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(0,229,255,.35); text-underline-offset: 3px; }
+    a:hover { color: var(--accent-bright); text-decoration-color: var(--accent); }
+
+    /* ── topnav ─────────────────────────────────────────── */
+    .topnav { position: sticky; top: 0; z-index: 10; background: var(--bg-0); border-bottom: 1px solid var(--line-strong); padding: 14px 32px 0; }
+    .topnav .row { display: flex; align-items: center; gap: 28px; max-width: 1400px; margin: 0 auto; }
+    .topnav .brand { font: 800 13px/1 var(--font-sans); letter-spacing: .04em; color: var(--fg-0); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .topnav .brand .mark { width: 18px; height: 18px; background: var(--accent); display: inline-block; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+    .topnav nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .topnav nav a { font: 600 11.5px/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; color: var(--fg-2); padding: 14px; text-decoration: none; position: relative; white-space: nowrap; }
+    .topnav nav a:hover { color: var(--fg-0); text-decoration: none; }
+    .topnav nav a.active { color: var(--accent); }
+    .topnav nav a.active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); }
+    .topnav .util { font: 600 11px/1 var(--font-mono); color: var(--fg-1); letter-spacing: .04em; padding-bottom: 14px; }
+    .topnav .accent-rule { height: 1px; background: var(--line-cyan); margin: 0 -32px; }
+    @media (max-width: 780px) { .topnav nav { display: none; } }
+
+    /* ── page header ────────────────────────────────────── */
+    .page-shell { max-width: 760px; margin: 0 auto; padding: 64px 28px 0; position: relative; }
+    .eyebrow { font: 600 12px/1 var(--font-sans); letter-spacing: .18em; text-transform: uppercase; color: var(--fg-2); margin: 0 0 16px; }
+    .eyebrow b { color: var(--accent); margin-right: 10px; font-weight: 700; }
+    h1.title { font: 800 42px/1.1 var(--font-sans); letter-spacing: -.025em; color: var(--fg-0); margin: 0 0 18px; }
+    p.sub { font: 400 17px/1.7 var(--font-sans); color: var(--fg-1); max-width: 60ch; margin: 0; }
+    p.sub strong { color: var(--fg-0); font-weight: 600; }
+    p.sub em { color: var(--fg-0); font-style: italic; }
+
+    main { max-width: 760px; margin: 0 auto; padding: 0 28px; }
+
+    /* ── persona intro ──────────────────────────────────── */
+    .persona { margin-top: 48px; padding: 26px 28px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; border-left: 4px solid var(--accent); }
+    .persona-lbl { font: 700 11px/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: block; }
+    .persona p { font: 400 16.5px/1.75 var(--font-sans); color: var(--fg-1); margin-bottom: 12px; }
+    .persona p:last-child { margin-bottom: 0; }
+    .persona p strong { color: var(--fg-0); font-weight: 600; }
+    .persona p em { color: var(--fg-0); font-style: italic; }
+
+    /* ── day sections ───────────────────────────────────── */
+    .day-section { margin-top: 72px; scroll-margin-top: 80px; }
+    .day-head { display: flex; align-items: baseline; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid var(--line-strong); margin-bottom: 26px; flex-wrap: wrap; }
+    .day-num { font: 800 14px/1 var(--font-mono); color: var(--accent); letter-spacing: .14em; }
+    .day-title { font: 700 26px/1.25 var(--font-sans); color: var(--fg-0); letter-spacing: -.015em; flex: 1; min-width: 0; }
+    .day-sub { font: 500 11px/1 var(--font-mono); color: var(--fg-2); letter-spacing: .1em; text-transform: uppercase; }
+    .day-arc { font: 400 16px/1.7 var(--font-sans); color: var(--fg-1); font-style: italic; margin-bottom: 28px; padding-left: 14px; border-left: 2px solid var(--accent); }
+    .day-arc strong { color: var(--fg-0); font-style: normal; font-weight: 600; }
+
+    /* ── activity blocks ────────────────────────────────── */
+    .activity { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px dashed var(--line); }
+    .activity:last-child { border-bottom: 0; padding-bottom: 0; }
+    .act-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .act-block { font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-2); border: 1px solid var(--line); border-radius: 4px; padding: 4px 7px; }
+    .act-title { font: 700 17px/1.3 var(--font-sans); color: var(--fg-0); letter-spacing: -.005em; }
+    .scene { font: 400 16px/1.75 var(--font-sans); color: var(--fg-1); margin-bottom: 14px; }
+    .scene strong { color: var(--fg-0); font-weight: 600; }
+    .scene em { color: var(--fg-0); font-style: italic; }
+
+    /* ── exemplar boxes ─────────────────────────────────── */
+    .exemplar { padding: 16px 20px; background: rgba(0,229,255,.04); border: 1px solid rgba(0,229,255,.18); border-radius: 8px; }
+    .ex-lbl { font: 700 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 10px; }
+    .ex-body { font: 400 15px/1.7 var(--font-sans); color: var(--fg-1); }
+    .ex-body p { margin-bottom: 8px; }
+    .ex-body p:last-child { margin-bottom: 0; }
+    .ex-body code { font: 600 13px/1.5 var(--font-mono); color: var(--accent); background: rgba(0,229,255,.07); padding: 2px 6px; border-radius: 4px; }
+    .ex-body pre { font: 500 13px/1.55 var(--font-mono); color: var(--fg-0); background: rgba(255,255,255,.02); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin: 8px 0; overflow-x: auto; }
+    .ex-body strong { color: var(--fg-0); font-weight: 600; }
+    .ex-body em { color: var(--fg-0); font-style: italic; }
+    .ex-body table { border-collapse: collapse; width: 100%; margin: 8px 0; font: 500 13.5px/1.5 var(--font-mono); }
+    .ex-body th, .ex-body td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+    .ex-body th { color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+    .ex-body td { color: var(--fg-0); }
+    .ex-body blockquote { padding-left: 14px; border-left: 2px solid var(--accent); color: var(--fg-0); font-style: italic; margin: 6px 0; }
+
+    /* ── feeling cards (no artifact) ────────────────────── */
+    .feeling { padding: 14px 18px; background: rgba(255,255,255,.025); border: 1px dashed var(--line); border-radius: 8px; color: var(--fg-2); font: 400 14.5px/1.65 var(--font-sans); }
+    .feeling::before { content: "Felt sense — "; font-weight: 700; color: var(--fg-1); font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+
+    footer { max-width: 760px; margin: 80px auto 0; padding: 24px 28px; border-top: 1px solid var(--line); font: 400 13.5px/1.6 var(--font-sans); color: var(--fg-2); }
+    footer a { color: var(--accent); }
+
+    /* ── progress sidebar (sticky day jump) ─────────────── */
+    .toc-wrap { position: sticky; top: 70px; z-index: 5; margin: 40px auto 0; max-width: 760px; padding: 0 28px; }
+    .toc { background: rgba(7,16,28,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font: 600 11px/1 var(--font-sans); letter-spacing: .08em; text-transform: uppercase; }
+    .toc .toc-lbl { color: var(--fg-2); font-family: var(--font-mono); letter-spacing: .14em; margin-right: 6px; }
+    .toc a { color: var(--fg-1); text-decoration: none; padding: 7px 9px; border-radius: 6px; border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; font-family: var(--font-mono); }
+    .toc a:hover { color: var(--fg-0); border-color: var(--line-strong); background: rgba(255,255,255,.03); text-decoration: none; }
+    @media (max-width: 780px) { .toc-wrap { position: static; } .toc { font-size: 10.5px; padding: 10px 12px; } .toc .toc-lbl { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="row">
+    <a href="/teachers.html" class="brand"><span class="mark"></span>VELOCITY ARENA</a>
+    <nav>
+      <a href="/teachers.html">Teachers</a>
+      <a href="/teacher-schedule.html">Schedule</a>
+      <a href="/resources/teacher-guides/classroom-prep.html">Classroom Prep</a>
+      <a href="/resources/teacher-guides/running-the-program.html">Running the Program</a>
+      <a href="/resources/teacher-guides/student-experience.html" class="active">Student Experience</a>
+    </nav>
+    <div class="util">NARRATIVE</div>
+  </div>
+  <div class="accent-rule"></div>
+</nav>
+
+<div class="page-shell">
+  <div class="eyebrow"><b>Narrative</b> One student · all 16 days · every activity</div>
+  <h1 class="title">Maya's<br>Velocity Arena</h1>
+  <p class="sub">A single student walks through every activity from Day 1 to Day 16. Every scene shows what she did and felt in the room; every <em>exemplar</em> box shows the actual artifact she produced — a worksheet row, a code snippet, a sentence on a sticky note. This is what the program looks like from inside one kid's hands.</p>
+</div>
+
+<div class="toc-wrap">
+  <div class="toc">
+    <span class="toc-lbl">Days</span>
+    <a href="#day-1">01</a><a href="#day-2">02</a><a href="#day-3">03</a><a href="#day-4">04</a>
+    <a href="#day-5">05</a><a href="#day-6">06</a><a href="#day-7">07</a><a href="#day-8">08</a>
+    <a href="#day-9">09</a><a href="#day-10">10</a><a href="#day-11">11</a><a href="#day-12">12</a>
+    <a href="#day-13">13</a><a href="#day-14">14</a><a href="#day-15">15</a><a href="#day-16">16</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── PERSONA ─────────────────────────────────────────── -->
+  <section class="persona" id="meet-maya">
+    <span class="persona-lbl">Meet Maya</span>
+    <p>Maya is fourteen. She just finished eighth grade and starts high school in September — a new school, bigger and louder than the middle school she just left, in a building she has never set foot in before. Her parents enrolled her in this summer program at the new school because her older sister told them <em>she would have loved this at her age</em>. Her sister is going to college in the fall as a physics major. Maya loves her sister. Maya is not her sister.</p>
+    <p><strong>Maya does not like math.</strong> Something stopped clicking around fifth grade and never started clicking again. Her last report card had a C+ in pre-algebra and she felt good about the plus. Algebra 1 is on her schedule for the fall — she is dreading it. She has spent the last four years making sure adults know she is "not a math kid," because if she names it first, no one else gets to name it for her. She is not afraid of numbers. She is afraid of <strong>being asked to be wrong in front of people</strong>.</p>
+    <p>On Day 1 she walks into a classroom in the high school she will attend in the fall — a room that does not look like a classroom. Robots on every small group table. The walls have a few areas taped off and labeled but empty — <em>Leaderboard</em>, <em>Bot Names</em>, <em>Rivalry Cards</em> — as if the room is waiting for something to happen in it. She has no idea what any of those words mean yet. The teacher waves everyone over and asks them to form a circle. Within five minutes Maya is standing in that circle, and the teacher is explaining how to play <strong>Circle Pass</strong>.</p>
+  </section>
+
+  <!-- ── DAY 1 ────────────────────────────────────────────── -->
+  <section class="day-section" id="day-1">
+    <div class="day-head">
+      <span class="day-num">DAY 01</span>
+      <h2 class="day-title">Speed · Welcome · The First Bot Drive</h2>
+      <span class="day-sub">Week 1 · Play Lab + Boot Camp</span>
+    </div>
+    <div class="day-arc"><strong>Maya's arc today:</strong> Outsider in a room of strangers → has a team → has touched a robot → has done one piece of real math in front of people who didn't laugh.</div>
+
+    <!-- Circle Pass + Mirror Pairs -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Sound and Movement: Circle Pass + Mirror Pairs</h3>
+      </div>
+      <p class="scene">When Maya's turn arrives she claps once and lifts her left foot. The girl to her left copies it exactly, then adds a snap. By the third lap around the circle the room is loud and uncoordinated and nobody is performing — they are just <em>doing it</em>. In Mirror Pairs she gets matched with a boy named Devon who moves slowly enough that she can keep up; she moves slower for him on the swap. Nobody mentions math. Nothing is graded. Maya notices that her shoulders are no longer at her ears.</p>
+      <div class="feeling">She has not said her name yet, but she has been copied by another person three times. That counts as something.</div>
+    </div>
+
+    <!-- Name + One Word -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Name + One Word</h3>
+      </div>
+      <p class="scene">The teacher asks everyone back into the circle. <em>"Go around. Say your name and one word that describes how you feel right now."</em> Maya can hear other kids saying things like "excited" and "good" and "ready." She does not feel those things. She is third from the end. By the time her turn comes she has decided to tell the truth.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">What Maya said out loud — first time in the room</span>
+        <div class="ex-body">
+          <blockquote>"Maya. Tired."</blockquote>
+          <p>The teacher nods once and moves on without commenting. Nobody laughs. Nobody asks why. Maya realizes she just <em>said her own name</em> in front of nineteen strangers and survived.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pre-Task Diagnostic -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Pre-Task Diagnostic — Prior Knowledge Assessment</h3>
+      </div>
+      <p class="scene">The framing the teacher gives is the only reason Maya is still in her seat: <em>"This is not a test. There is no grade. I am filling this out so I know what you already know."</em> Maya answers what she knows, writes "not yet" on three of the eight questions, and moves on. She does not look up. Nobody else looks up either.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Diagnostic — partial transcript</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Q</th><th>Question (paraphrased)</th><th>Maya's answer</th></tr>
+            <tr><td>1</td><td>If 3 apples cost $1.20, what does 1 apple cost?</td><td><code>$0.40</code></td></tr>
+            <tr><td>2</td><td>Plot (3, 5) on a coordinate grid.</td><td>(plotted correctly)</td></tr>
+            <tr><td>3</td><td>What is the slope of a line through (0, 0) and (2, 6)?</td><td>not yet</td></tr>
+            <tr><td>4</td><td>If a battery starts at 100% and drops 15% per minute, what is the charge at minute 3?</td><td>not yet</td></tr>
+            <tr><td>5</td><td>Find the distance between (1, 1) and (4, 5).</td><td>not yet</td></tr>
+          </table>
+          <p><em>Maya answers 4 of 8. The three she leaves are slope, linear decay, and the distance formula — every one of which she will be able to do by Day 5.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Driving Question + Team Formation -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">REVEAL</span>
+        <h3 class="act-title">Driving Question Reveal + Team Formation</h3>
+      </div>
+      <p class="scene">The teacher walks to one of the blank wall sections and unrolls a poster. Big block letters, large enough to read from the back of the room: <em>"How can you use data, equations, and code to build a robot athlete that wins on math, not luck?"</em> She reads it aloud once, slowly, and tapes it to the wall. <em>Math, not luck.</em> Maya reads it twice, the second time without meaning to. The teacher does not explain it. Then she points to the team rosters on the wall. Maya is on a team with Devon (from Mirror Pairs) and a girl named Iris who has bright orange shoelaces. The three of them walk over to their table together. Their bot is sitting in the middle of it, <strong>cute and small</strong> — not what Maya thinks a robot is supposed to look like. Iris pokes it. It does not move.</p>
+      <div class="feeling">Team. She has a team. The word still feels strange in her head. So does <em>"math, not luck."</em></div>
+    </div>
+
+    <!-- Stat Card Distribution -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Stat Card Distribution</h3>
+      </div>
+      <p class="scene">Each student gets a paper card with four rows: Speed, Endurance, Turning, Power. All four start blank. Today they will only fill in the first one.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Stat Card — Maya's, end of Day 1</span>
+        <div class="ex-body">
+<pre>STAT CARD · Maya · Team: Iris/Devon/Maya
+─────────────────────────────────────
+SPEED       __6__   ← filled today
+ENDURANCE   _____
+TURNING     _____
+POWER       _____
+─────────────────────────────────────
+Total / 20:  6 of 20 allocated</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speed Stat Challenge -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Speed Stat Challenge — What Does Motor Power Actually Mean?</h3>
+      </div>
+      <p class="scene">The formula goes on the board: <code>Motor Power % = Speed × 100 ÷ 20</code>. The teacher asks the class what 100% means in everyday life. A boy says "phone battery." A girl says "health bar in a video game." The teacher nods and points to the formula. Before anyone calculates anything, every student writes a prediction for Speed = 10. Maya writes <em>50%</em> — not because she did the formula, but because 10 is half of 20, and half of 100 is 50. She treats the answer like a guess. She is right and assumes she got lucky. <br />
+     <br  /> The teacher directs the students to a website and a webpage with the speed activity. They are told to work on their own devices, but that teams can work together.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Speed Stat Challenge worksheet — Maya's row</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Speed</th><th>Maya's calc</th><th>Motor Power %</th></tr>
+            <tr><td>1</td><td>1 × 100 ÷ 20</td><td>5%</td></tr>
+            <tr><td>3</td><td>3 × 100 ÷ 20</td><td>15%</td></tr>
+            <tr><td>5</td><td>5 × 100 ÷ 20</td><td>25%</td></tr>
+            <tr><td>6</td><td>6 × 100 ÷ 20</td><td><strong>30%</strong></td></tr>
+            <tr><td>8</td><td>8 × 100 ÷ 20</td><td>40%</td></tr>
+          </table>
+          <p>Sentence at the bottom: <em>"Every 1 of Speed adds 5%. I can just multiply by 5 instead of doing the whole formula every time. Easier."</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- First Bot Drive -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">MATCH-BUILD-MAKE</span>
+        <h3 class="act-title">First Bot Drive — Speed in Real Life</h3>
+      </div>
+      <p class="scene">The central question on the board and on the next webpage: <em>does doubling your Speed double the distance the bot travels in 2 seconds?</em> Before anyone touches a robot, Maya circles "yes — proportional" on her worksheet, because that's what the formula says. 
+        She does the same on the webpage. Then Iris uploads the code, Devon hits go, and they measure with <strong>masking tape and a tape measure</strong> — a starting line, a finish mark, and the actual cm read off the tape. At Speed = 3, the bot moves <strong>18 cm</strong> in 3 seconds. At Speed = 6, it moves <strong>44.6 cm</strong>. Maya wrote down 36 as the prediction. The actual is almost 9 cm farther. <em>The formula was wrong.</em> Or the bot was. Maya looks up from the worksheet and notices, against her will, that she wants to know which.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Data dashboard — Maya's team, Day 1 entries</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Speed</th><th>Predicted (2s)</th><th>Actual (cm)</th><th>Ratio vs. Speed 3</th></tr>
+            <tr><td>3</td><td>18 cm</td><td>18.0 cm</td><td>1.00×</td></tr>
+            <tr><td>6</td><td>36 cm</td><td><strong>44.6 cm</strong></td><td><strong>2.48×</strong></td></tr>
+          </table>
+          <p>Maya's written sentence at the bottom of the worksheet:</p>
+          <blockquote>"Doubling Speed should have doubled the distance. It didn't — it went 2.48 times as far, not 2 times. The formula is close but not exact. The bot is doing more than the math said it would. I don't know why yet."</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Lab -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">OPEN LAB</span>
+        <h3 class="act-title">Free Code Time</h3>
+      </div>
+      <p class="scene">For 45 minutes the teacher says nothing useful. She circles the room and asks one question per table: <em>"What are you trying?"</em> Maya's team tries to make the bot do a tight figure-eight, partly because Iris said it out loud first and Devon shrugged and Maya didn't want to be the one who killed the idea. It does not work. They try again with different numbers. It still does not work. Maya does not feel discouraged. She feels something closer to <em>annoyed</em> — annoyed in the way you get when a puzzle is right there and the answer is hiding. She has not felt that in school in a long time.</p>
+      <div class="feeling">She leaves without finishing the figure-eight. She decides she will come back to it tomorrow. The decision feels like hers, not assigned. That is also new.</div>
+    </div>
+
+    <!-- ENDS -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">ENDS</span>
+        <h3 class="act-title">Goals Wall — Personal + Team</h3>
+      </div>
+      <p class="scene">Three minutes to write one personal goal and one team goal. Post them on the wall. Maya writes hers in small block letters.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Goals wall — Maya's two sticky notes</span>
+        <div class="ex-body">
+          <blockquote><strong>Personal:</strong> Talk in front of the team at least once this week without my voice shaking.</blockquote>
+          <blockquote><strong>Team:</strong> Finish the figure-eight.</blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DAY 2 ────────────────────────────────────────────── -->
+  <section class="day-section" id="day-2">
+    <div class="day-head">
+      <span class="day-num">DAY 02</span>
+      <h2 class="day-title">Endurance · Decay · Naming the Bot</h2>
+      <span class="day-sub">Week 1 · Play Lab + Boot Camp</span>
+    </div>
+    <div class="day-arc"><strong>Maya's arc today:</strong> Makes a mistake on purpose in front of 19 people and gets cheered for it → graphs her first real linear decay → has a role (Analyst) → has a bot with a name.</div>
+
+    <!-- Failure Bow -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Failure Bow</h3>
+      </div>
+      <p class="scene">The teacher goes first: she trips on purpose, takes an exaggerated bow, and the room erupts. <em>Real or fake, big or small, doesn't matter.</em> Maya's turn is fourth. She drops her pencil on purpose, bends to pick it up, and gives a very small bow. The room cheers anyway — loud, generous, not at her, with her. Something inside her unclenches one click.</p>
+      <div class="feeling">She made a mistake on purpose and was rewarded for it. The shield she has been carrying for four years has a crack in it that wasn't there yesterday.</div>
+    </div>
+
+    <!-- Slow Down -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Slow Down, Slow Down</h3>
+      </div>
+      <p class="scene">The teacher calls a tempo and the room matches it. Slower. Slower. Slower than Maya thought a group of 18 teenagers could go. By the time they're moving in slow motion she can hear the fan.</p>
+      <div class="feeling">The room is calmer than any classroom she has ever been in.</div>
+    </div>
+
+    <!-- Endurance Stat Challenge -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Endurance Stat Challenge — Drawing the Decay</h3>
+      </div>
+      <p class="scene">Each student opens the <a href="https://velocity-arena-gold.vercel.app/lessons/endurance-discovery.html" target="_blank" rel="noopener"><strong>Endurance Discovery</strong></a> interactive lesson on a device. Eight slides. The first one shows an animated power bar draining out of the lesson's sample bot — called <strong>Bot #14</strong>, with Endurance = 6 — and only the first three minutes of data. The mission card says one sentence: <em>"Figure out what rule controls this battery."</em> On the Notice slide the full data appears: the bot loses exactly <strong>21% per minute for three minutes</strong>, then suddenly stops dropping at 20%, even though the pattern says it should keep falling. Maya types what she sees. By the Model slide the lesson has revealed the rule — both the linear drop <em>and</em> the floor. By the Explore slide she is plugging her team's E = 4 into the same formula on paper. On the Lock In slide she writes <strong>Endurance = 4</strong> on her stat card and confirms.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Maya's typed observation — Slide 2 (Notice)</span>
+        <div class="ex-body">
+          <blockquote>"It drops the same amount every minute — 21%. But then it just stops at 20%. Like the battery has a floor. Even the formula isn't allowed to go below it, because then the bot would stop moving completely."</blockquote>
+        </div>
+      </div>
+      <div class="exemplar" style="margin-top:10px;">
+        <span class="ex-lbl">Maya's paper table — Slide 6 (Explore), her own team's E = 4</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>t (min)</th><th>(20−E) × 1.5 × t</th><th>Raw P(t)</th><th>After floor</th></tr>
+            <tr><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>
+            <tr><td>1</td><td>24</td><td>76%</td><td>76%</td></tr>
+            <tr><td>2</td><td>48</td><td>52%</td><td>52%</td></tr>
+            <tr><td>3</td><td>72</td><td>28%</td><td>28%</td></tr>
+            <tr><td>4</td><td>96</td><td>4%</td><td><strong>20% (floor)</strong></td></tr>
+            <tr><td>5</td><td>120</td><td>−20%</td><td><strong>20% (floor)</strong></td></tr>
+          </table>
+          <p>Maya's sentence under the table:</p>
+          <blockquote>"It loses the same 24% every minute — that's the slope. Our line is steeper than Bot #14's because our Endurance is lower. We also hit the floor a minute earlier. (I think the floor is the program saying *the bot still has to move even when it's tired*.)"</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Program Endurance Into Your Bot -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">MATCH-BUILD-MAKE</span>
+        <h3 class="act-title">Program Endurance Into Your Bot</h3>
+      </div>
+      <p class="scene">Iris uploads the starter code with the formula plugged in. Devon places Patience on the masking-tape start line. <strong>Each press of Button B fires one burst</strong> — the bot drives for a fixed window of time at whatever power the decay formula says is left, then stops and waits for the next press. Devon presses B four times, one burst at a time. Maya stands at the start line with the tape measure and records the distance after each burst. They get smaller. The bot is tired. Maya watches the numbers fall and feels exactly what the graph predicted — except the bot does it <em>faster</em> than the formula said it would.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">4-Burst Endurance Test — Maya's data log</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Burst #</th><th>Predicted (cm)</th><th>Actual (cm)</th><th>Gap</th></tr>
+            <tr><td>1</td><td>44.6</td><td>44.2</td><td>−0.4</td></tr>
+            <tr><td>2</td><td>33.9</td><td>30.1</td><td>−3.8</td></tr>
+            <tr><td>3</td><td>23.2</td><td>17.5</td><td>−5.7</td></tr>
+            <tr><td>4</td><td>12.5</td><td>5.0</td><td>−7.5</td></tr>
+          </table>
+          <p>Gap sentence at the bottom:</p>
+          <blockquote>"The formula said the bot would decay linearly. It did, but faster than the line. Maybe the motor loses more than 24% per round because of something the formula doesn't include — friction? heat? I don't know yet."</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Role Rotation Briefing -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">TRANSITION</span>
+        <h3 class="act-title">Role Rotation Briefing</h3>
+      </div>
+      <p class="scene">Three roles on the board: <strong>Coder</strong>, <strong>Fabricator</strong>, <strong>Analyst</strong>. Iris claims Coder before anyone else can speak — she has been holding the device for two days. Devon picks Fabricator (he likes physical stuff). Maya gets Analyst by default, which she didn't expect to want but does. Her job: watch what the bot does, record the data, and tell the Coder what to change. The teacher writes the rotation rule on the board: <em>each week, starting next week, every role shifts forward.</em> Coder becomes Fabricator. Fabricator becomes Analyst. Analyst becomes Coder. The week after that, shift again. By Week 4 every student has held every role at least once. This week, everyone shares the roles. 
+        Maya does the math in her head and realizes she will be the <strong>Coder</strong> by Week 3 — the one driving the actual MakeCode, not just recording what comes out of it. She did not expect that to feel like something to look forward to.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Team role card — full 4-week rotation</span>
+        <div class="ex-body">
+<pre>TEAM ROLES · 4-WEEK ROTATION
+──────────────────────────────────────────────
+          Week 2     Week 3     Week 4     
+──────────────────────────────────────────────
+Iris      Coder    → Fabric.  → Analyst  
+Devon     Fabric.  → Analyst  → Coder    
+Maya      Analyst  → Coder    → Fabric   ← me
+──────────────────────────────────────────────
+Shift happens Monday of each new week.
+Every student holds every role at least once.</pre>
+          <p><em>The Analyst's data tells the Coder what to change. The Fabricator's setup determines whether the data is accurate. Maya re-reads her Week 1 job description twice. That one is hers next Monday.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bot Naming Ceremony -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">MATCH-BUILD-MAKE</span>
+        <h3 class="act-title">Bot Naming Ceremony — Generated by the Math</h3>
+      </div>
+      <p class="scene">The teacher opens the <a href="https://velocity-arena-gold.vercel.app/activities/robot-names/" target="_blank" rel="noopener"><strong>Robot Team Name Generator</strong></a> on the projector and says one sentence: <em>"The math will generate your bot's name. Not random — determined."</em> The I-Do takes four minutes. The We-Do walks the whole class through sample inputs <code>x = 4, y = 3, z = 2</code>, working three formulas in sequence — <code>a = 2x + y − 1</code>, <code>b = (a + z) mod 12</code>, <code>n = 3z² − x</code> — and landing on <em>Kinetic Falcons #8</em>. This is where Maya catches both gotchas: she almost writes <code>2x</code> as <code>2 + x</code>, then catches herself; and when the teacher writes <code>3z²</code> on the board she has to remember it means <code>3 × (z²)</code>, not <code>(3z)²</code>. Then it is the You-Do, and every student plugs in their own values. Maya works on paper before touching the tool: <code>x = 4</code> (M-A-Y-A), <code>y = 5</code> (May), <code>z = 3</code> (their team number). While she is double-checking, she notices Devon writing <code>(3 × 3)² = 81</code> next to her arm. She does not say anything. She just slides her paper toward him with the order of operations written out. He looks, says <em>"oh,"</em> and re-does it. They post all three of the team's calculated names on the wall. Iris reads them aloud. Maya's name is <strong>"Patient Foxes #23"</strong>. Iris says, <em>"Patient Foxes. I like it. Fits the Endurance build."</em> Devon shrugs and nods. They write the full name on the sticky note, then shorten it for everyday use: <strong>Patience</strong>.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Maya's Bot Naming worksheet — her own inputs</span>
+        <div class="ex-body">
+<pre>INPUTS         x = 4  (letters in "Maya")
+               y = 5  (May)
+               z = 3  (Team #3)
+
+ADJECTIVE      a = 2x + y − 1
+                 = 2(4) + 5 − 1
+                 = 8 + 5 − 1
+                 = 12             → adjective[12] = "Patient"
+
+ANIMAL         b = (a + z) mod 12
+                 = (12 + 3) mod 12
+                 = 15 mod 12
+                 = 3              → animal[3]    = "Foxes"
+
+TEAM NUMBER    n = 3z² − x
+                 = 3(3²) − 4
+                 = 3(9) − 4
+                 = 27 − 4
+                 = 23
+
+GENERATED      Patient Foxes #23   ←  nickname: Patience</pre>
+          <p>Sticky note on the Bot Names wall:</p>
+          <blockquote><strong>PATIENCE</strong> · Patient Foxes #23 · Team 3: Iris / Devon / Maya · Endurance focus</blockquote>
+          <p><em>Yesterday Maya almost said "Patience" out loud as a guess. Today the math gave it back to her. She does not point this out. But she notices.</em></p>
+        </div>
+      </div>
+      <div class="exemplar" style="margin-top:10px;">
+        <span class="ex-lbl">Exit Challenge — 3 minutes on paper, no tool</span>
+        <div class="ex-body">
+          <p>Inputs: <code>x = 2, y = 5, z = 3</code>. Compute <code>n = 3z² − x</code>.</p>
+<pre>Maya's work:
+  n = 3(3²) − 2
+    = 3(9) − 2
+    = 27 − 2
+    = 25
+
+  Answer: n = 25.</pre>
+          <p><em>She writes her name on the slip and hands it to the teacher on her way out. Correct. (Three students at the next table wrote 34. The teacher will return to that on Day 3.)</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Lab -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">OPEN LAB</span>
+        <h3 class="act-title">Free Code Time</h3>
+      </div>
+      <p class="scene">Patience completes a figure-eight on the fourth try. Iris cheers. Devon high-fives Maya without thinking about it. Maya does not flinch.</p>
+      <div class="feeling">Figure-eight done. Goal from Day 1: closed.</div>
+    </div>
+
+    <!-- ENDS -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">ENDS</span>
+        <h3 class="act-title">Collaboration Rate — Hold Up Your Number</h3>
+      </div>
+      <p class="scene">Everyone rates today's team collaboration on a 1–3 scale. Hold up your number at the same time. Maya, Iris, and Devon all hold up 3 fingers without checking each other first.</p>
+      <div class="feeling">Three threes. Nobody had to explain anything to anyone.</div>
+    </div>
+  </section>
+
+  <!-- ── DAY 3 ────────────────────────────────────────────── -->
+  <section class="day-section" id="day-3">
+    <div class="day-head">
+      <span class="day-num">DAY 03</span>
+      <h2 class="day-title">Turning · Coordinates · The Distance Formula</h2>
+      <span class="day-sub">Week 1 · Play Lab + Boot Camp</span>
+    </div>
+    <div class="day-arc"><strong>Maya's arc today:</strong> Learns that natural language can't program a robot, learns the distance formula, walks an arc with her own feet, and watches Patience trace the pattern her math predicted.</div>
+
+    <!-- Human Robot -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Human Robot Programming Challenge</h3>
+      </div>
+      <p class="scene">Pairs of students. One plays robot. The other gives instructions. Maya is the robot first; Devon directs her. <em>"Move forward three steps. Turn 90 degrees left. Move forward two steps."</em> She does — but each "step" she takes is a different size, and the 90-degree turn ends up at maybe 70 degrees, and she lands a foot off where Devon wanted her. They swap. Maya is more specific. <em>"Move forward, heel-to-toe, four times. Pivot left until your shoulders face the door."</em> Devon ends up closer. Still not exact.</p>
+      <div class="feeling">Words are not precise enough to drive a robot. That is why formulas exist. Maya did not know that was a problem formulas <em>solved</em>.</div>
+    </div>
+
+    <!-- Distance-Time Graphs + Distance Formula -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Distance-Time Graphs + The Distance Formula</h3>
+      </div>
+      <p class="scene">Two scatter plots side-by-side: Run A and Run B. The teacher says nothing — teams plot, then write one sentence about why the lines look different. Maya writes <em>"Run B was slower."</em> The teacher walks by, taps the paper, and says one word: <em>"Why?"</em> Maya looks again. The slope is shallower. She rewrites: <em>"Run B's Speed allocation was lower — the slope is smaller, so it travels less distance per second."</em> Then comes the distance formula on the arena grid. Maya catches herself adding |x₂ − x₁| + |y₂ − y₁| instead of using the quadratic. The teacher does not correct her. Iris does. Maya redoes it.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Distance worksheet — Maya's calculation</span>
+        <div class="ex-body">
+<pre>Bot starts at (1, 1). Ball at (4, 5).
+What is the straight-line distance?
+
+First attempt (wrong):
+  |4 − 1| + |5 − 1| = 3 + 4 = 7 squares
+
+Iris: "It's not a city grid. Use the c² one."
+
+Corrected:
+  d = √((4 − 1)² + (5 − 1)²)
+    = √(9 + 16)
+    = √25
+    = 5 squares ✓</pre>
+          <p>Sentence underneath: <em>"Walking around the block is not the same as going through it. The Pythagorean way is shorter. Always."</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arc Approximation -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">MATCH-BUILD-MAKE</span>
+        <h3 class="act-title">Coordinate Navigation — Arc Approximation</h3>
+      </div>
+      <p class="scene">First the embodied piece: Maya walks a 2-segment "arc" to a target spot (it looks like a triangle, not a curve), then walks an 8-segment one (it looks like a curve, almost). She gets that more segments approximate a curve but never equal one. Then the turnRatio formula on the board: <code>turnRatio = 0.2 + T × 0.02</code>. For Turning = 5 their team's number, the ratio is <strong>0.30</strong>. She codes three different wheel-speed configurations and the team predicts where the bot will stop before each run. They run the Coverage Challenge at T = 2, 5, 10.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Coverage Challenge — Patience at three Turning values</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>T</th><th>turnRatio</th><th>Arc style</th><th>Squares covered (15s)</th></tr>
+            <tr><td>2</td><td>0.24</td><td>Gentle, long arcs</td><td>22</td></tr>
+            <tr><td>5</td><td>0.30</td><td>Medium</td><td>18</td></tr>
+            <tr><td>10</td><td>0.40</td><td>Sharp, short</td><td>11</td></tr>
+          </table>
+          <p>Maya's synthesis sentence:</p>
+          <blockquote>"Lower Turning covers more squares — bigger arcs. Higher Turning stays local — tighter, but doesn't go anywhere. We picked 5 to be middle. But maybe 3 would be better for chasing the ball across the whole arena."</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Lab -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">OPEN LAB</span>
+        <h3 class="act-title">Free Code Time</h3>
+      </div>
+      <p class="scene">Maya pulls up the data dashboard and writes one full row by herself for the first time. She is not asking Iris if it's right. She just enters the number.</p>
+      <div class="feeling">She put data in a spreadsheet without asking anyone to check it first.</div>
+    </div>
+
+    <!-- ENDS -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">ENDS</span>
+        <h3 class="act-title">Goals Wall — Update</h3>
+      </div>
+      <p class="scene">The teacher asks for two-minute updates on Day 1 personal goals. Maya re-reads hers from the wall: <em>"Talk in front of the team at least once this week without my voice shaking."</em></p>
+      <div class="exemplar">
+        <span class="ex-lbl">Maya's goal note — annotated</span>
+        <div class="ex-body">
+          <blockquote><strong>Personal:</strong> Talk in front of the team at least once this week without my voice shaking. <strong>← done. Day 2. Picked the bot's name.</strong></blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DAY 4 ────────────────────────────────────────────── -->
+  <section class="day-section" id="day-4">
+    <div class="day-head">
+      <span class="day-num">DAY 04</span>
+      <h2 class="day-title">Power · The Quadratic Surprise · Build a Scoop</h2>
+      <span class="day-sub">Week 1 · Play Lab + Boot Camp</span>
+    </div>
+    <div class="day-arc"><strong>Maya's arc today:</strong> Discovers that not all formulas are lines — Power² breaks her intuition wide open. Then her hands build something that kicks a ball.</div>
+
+    <!-- Finger Speed-Sums -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">HOOK</span>
+        <h3 class="act-title">Finger Speed-Sums</h3>
+      </div>
+      <p class="scene">Five rounds, fast. Students hold up fingers, first to call the total wins. Maya wins round three out of nowhere — she shouts "<em>twelve</em>" before she has finished registering she said it. Iris laughs. Maya laughs.</p>
+      <div class="feeling">She laughed in front of the team. With them, not at herself.</div>
+    </div>
+
+    <!-- Power Stat Challenge -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">CHALLENGE</span>
+        <h3 class="act-title">Power Stat Challenge — Ratio and Motor Speed</h3>
+      </div>
+      <p class="scene">The formula goes on the board: <strong>Charge Speed % = Power²</strong>. The teacher asks for a gut prediction for Power = 8 before anyone calculates. Maya writes <em>40</em> — she assumed it would be linear like Speed was, so eight times five. Then she does the math: 8² = <strong>64</strong>. The teacher pushes the comparison: P = 4 gives 16. P = 8 gives 64. <em>Doubling Power quadrupled charge speed.</em> This is not how Speed worked. Maya stares at her worksheet for a long second.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Power Stat Challenge worksheet — Maya's row</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Power</th><th>Linear guess</th><th>Power² (actual)</th><th>Ratio vs. P=1</th></tr>
+            <tr><td>1</td><td>—</td><td>1%</td><td>1×</td></tr>
+            <tr><td>2</td><td>10</td><td>4%</td><td>4×</td></tr>
+            <tr><td>4</td><td>20</td><td>16%</td><td>16×</td></tr>
+            <tr><td>8</td><td>40</td><td>64%</td><td>64×</td></tr>
+          </table>
+          <p>Maya's sentence under the table:</p>
+          <blockquote>"Power isn't proportional. It's squared. Doubling Power doesn't double the kick — it quadruples it. That changes how I'd allocate. One extra point of Power is worth way more than one extra point of Speed at high values."</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat Card Fill-In -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">TRANSITION</span>
+        <h3 class="act-title">Power Allocation — Stat Card Fill-In</h3>
+      </div>
+      <p class="scene">Three rows filled in now. Speed = 6, Endurance = 4, Power = 3. Twelve points used, eight to go. The team agrees: save the rest for Turning tomorrow and Budget on Day 5.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Stat Card — Maya, end of Day 4</span>
+        <div class="ex-body">
+<pre>STAT CARD · Maya · Team Patience
+─────────────────────────────────
+SPEED       __6__
+ENDURANCE   __4__
+TURNING     _____   ← Day 5
+POWER       __3__   ← filled today
+─────────────────────────────────
+Total / 20:  13 of 20 allocated</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoop Build + Ratio Testing -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">MATCH-BUILD-MAKE</span>
+        <h3 class="act-title">Scoop Build + Ratio Testing</h3>
+      </div>
+      <p class="scene">Devon does most of the cutting. Iris does the hot glue. Maya holds the cardboard steady and takes the measurements. They attach the scoop to Patience's front bumper. Then three kick-distance trials at Power = 2, 4, and 8. Maya records.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Scoop kick distances — Team Patience</span>
+        <div class="ex-body">
+          <table>
+            <tr><th>Power</th><th>Formula prediction (P²)</th><th>Avg kick (3 shots, cm)</th></tr>
+            <tr><td>2</td><td>4</td><td>9 cm</td></tr>
+            <tr><td>4</td><td>16</td><td>34 cm</td></tr>
+            <tr><td>8</td><td>64</td><td>128 cm</td></tr>
+          </table>
+          <p>Sentence at the bottom:</p>
+          <blockquote>"The formula said going from Power 4 to Power 8 would multiply the kick by 4×. The actual was 128 ÷ 34 = 3.8×. Close but not exact — like before. The scoop probably wobbles at high power. Devon wants to reinforce it with tape."</blockquote>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Lab -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">OPEN LAB</span>
+        <h3 class="act-title">Free Code Time</h3>
+      </div>
+      <p class="scene">Maya re-reads her notes from all four days laid out next to each other. Four formulas. Four shapes. She makes a small chart on the back of her stat card.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Maya's back-of-card chart — "How each stat behaves"</span>
+        <div class="ex-body">
+<pre>SPEED      proportional (×5)        line
+ENDURANCE  linear decay over time   line that drops
+TURNING    ratio + jitter           curves of different sharpness
+POWER      squared                  hockey-stick curve
+
+So three of them are lines and one is a curve.
+The curve one is the most punishing.</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDS -->
+    <div class="activity">
+      <div class="act-head">
+        <span class="act-block">ENDS</span>
+        <h3 class="act-title">Skill Bridge — Today's Skill, Tomorrow's Use</h3>
+      </div>
+      <p class="scene">Three minutes. Write one specific skill you used today and one specific moment you'll use it tomorrow.</p>
+      <div class="exemplar">
+        <span class="ex-lbl">Maya's Skill Bridge entry</span>
+        <div class="ex-body">
+          <blockquote>"Today I figured out Power² is way bigger than I thought. Tomorrow when we budget the four stats together, I'll know that one extra Power point at the high end is worth more than one extra Speed point. I'll argue for that with my team."</blockquote>
+          <p><em>She underlined the word <strong>argue</strong>. She has not argued for a math claim out loud in four years.</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong>Maya's Velocity Arena</strong> · A student-experience narrative for facilitators. Days 2–16 to be added. · Companion to the <a href="/resources/teacher-guides/running-the-program.html">Running the Program</a> guide and the <a href="/resources/teacher-guides/classroom-prep.html">Classroom Prep</a> page.</p>
+</footer>
+
+</body>
+</html>
