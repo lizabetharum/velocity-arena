@@ -156,6 +156,16 @@ const DAY_15_INLINE = {
         "description": "What will you tell someone tomorrow at the Exhibition about what you learned? You have 5 minutes.",
         "facilitatorDescription": "Closing reflection. Each student names a moment where data changed their mind, with a specific number or calculation cited."
       }
+    ],
+    "produce": [
+      "Bot lore — one new sentence added to team's bot origin story; posted on wall",
+      "Teach the Math card — one formula chosen, calculated with team's actual stat numbers; plain-language explanation written; three Ready Check items completed",
+      "Pre-match prediction (×3) — equation-based win probability logged before each of three Season 2 final matches; ball mode (foam/ping-pong/tennis) recorded",
+      "Match data log — predicted vs. actual recorded for each match; residual calculated",
+      "Loss-recovery entry — one of four causes named for any losing match (slope error, x-variable choice, model drift, environmental sensitivity)",
+      "Residual comparison — Season 2 prediction accuracy compared against Season 1; one written sentence naming what changed",
+      "Post-task diagnostic — math questions answered individually, parallel form to Day 1 pre-task",
+      "Pitch rehearsal — every claim in the Community Exhibition pitch annotated with a specific number"
     ]
 };
 
@@ -236,6 +246,15 @@ const DAY_16_INLINE = {
         "description": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes.",
         "facilitatorDescription": "Final ENDS reflection. Each student writes what they learned about themselves as a problem solver. Name one specific moment from this program where you solved something you thought you could not. What did you do differently than you would have done before camp? You have 5 minutes."
       }
+    ],
+    "produce": [
+      "Station display — scouting report, bot, coordinate grid, and data dashboard arranged for visitors",
+      "Teaching goal — one sentence written: what the team wants every visitor to understand before they leave",
+      "Visitor mini-challenge facilitation — each visitor guided through unit rate calculation, coordinate distance, and proportional scaling explanation",
+      "Visitor tracker — completion logged for every visitor across all three mini-challenges",
+      "Best Teacher ballots — collected from visitors for the award tally",
+      "Revised explanation — one teaching point that did not land identified and rewritten",
+      "Final journal entry — individual reflection on what you learned about yourself as a problem solver; one specific moment you solved something you thought you could not"
     ]
 };
 
