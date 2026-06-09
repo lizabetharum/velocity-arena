@@ -165,7 +165,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html",
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D2-endurance-exemplars.html",
-        "makecode": "https://makecode.microbit.org/S45510-32034-77170-26887"
+        "makecode": "https://makecode.microbit.org/S13709-03394-48320-85992"
       },
       {
         "name": "Break",
@@ -181,6 +181,7 @@ const DAYS_DEFAULT = [
         "description": "Your facilitator explains the three team roles -- Coder, Fabricator, Analyst -- that rotate weekly. Your team decides who starts in each role next week.",
         "facilitatorDescription": "Introduce the three roles (Coder, Fabricator, Analyst) and explain that teams rotate weekly so every student holds every role by Week 4. Make the connections explicit: the Analyst's data tells the Coder what to change, and the Fabricator's setup determines whether that data is accurate. Give teams five minutes to decide Week 2 roles; step back, set a timer, and use scripted prompts only with teams that are visibly stuck.",
         "script": "https://docs.google.com/document/d/1PiKGa7FdUtdhcvAF49XXecY_2bKQXI3KeV03aEmA-ZE/edit?usp=drivesdk",
+        "worksheet": "https://drive.google.com/file/d/1VauLDwyfrlpgBAb8FuguhAUeRMr5d7fF/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-06-role-rotation.html"
       },
       {
