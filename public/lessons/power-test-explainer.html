@@ -68,6 +68,25 @@
     }
     .page-sub { font-size: .9375rem; color: var(--muted); line-height: 1.6; max-width: 620px; }
 
+    .makecode-link {
+      display: inline-flex; align-items: center; gap: .5rem;
+      margin-top: 1.125rem;
+      padding: .625rem 1rem;
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 6px;
+      color: var(--orange);
+      font-size: .8125rem; font-weight: 700;
+      letter-spacing: .04em;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .makecode-link:hover {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.7);
+    }
+    .makecode-link svg { width: 14px; height: 14px; }
+
     .section { margin-top: 2.75rem; }
     .section-label {
       font-size: .625rem; font-weight: 800; letter-spacing: .14em;
@@ -486,7 +505,11 @@
   <div class="header-inner">
     <div class="eyebrow">Code Explainer · BBC micro:bit + Cutebot Pro</div>
     <h1 class="page-title">Power Test Program</h1>
-    <p class="page-sub">This program tests your bot's charge-and-push behavior. You position the bot, press A to arm it, and it waits for a ball to enter range — then charges at full power, makes contact, and drives through for a set duration before reversing out.</p>
+    <p class="page-sub">This program tests how POWER and ENDURANCE shape your bot's kick. Place a ball about 40 cm in front, press A, and the bot scans, charges forward, strikes the ball, pauses briefly, follows through, and stops. Flash with <code>POWER = 4</code>, measure how far the ball rolls. Reflash with <code>POWER = 8</code> and measure again. The ratio of ball travel is your evidence for how the <strong>chargePower = POWER²</strong> formula behaves with a bare bumper.</p>
+    <a class="makecode-link" href="https://makecode.microbit.org/S77134-15689-32757-79747" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Open the Power Test in MakeCode
+    </a>
   </div>
 </div>
 
@@ -498,14 +521,17 @@
     <div class="grid-2">
       <div class="btn-card">
         <div class="btn-badge a">Button A</div>
-        <h3>Arm + Charge</h3>
-        <p>Computes stats, then waits for a ball within 70 cm. When detected, pauses briefly and fires the charge sequence.</p>
+        <h3>Scan, Charge, Strike, Follow Through</h3>
+        <p>Computes <code>chargePower</code> from POWER² and waits for a ball within <code>BALL_DETECT_CM</code> (50 cm). Once it sees the ball, pauses 300 ms (so you can step back), then fires the full kick sequence.</p>
       </div>
       <div class="btn-card">
         <div class="btn-badge b">Button B</div>
         <h3>Cycle match time</h3>
-        <p>Steps through 0 → 60 → 120 → 180 seconds of simulated match time. Higher values apply stronger endurance decay to every charge.</p>
+        <p>Steps through 0 → 60 → 120 → 180 seconds of simulated match time. Higher values reduce <code>enduranceFactor</code>, which then shrinks <code>effectiveCharge</code> on the next press of A.</p>
       </div>
+    </div>
+    <div style="margin-top:.875rem;padding:.875rem 1rem;background:rgba(255,76,106,.06);border:1px solid rgba(255,76,106,.32);border-radius:6px;font-size:.875rem;color:var(--muted);">
+      <strong style="color:var(--red);">Button A + B together</strong> · Emergency stop. Cuts all motors immediately and shows an <strong>X</strong> on the display.
     </div>
   </div>
 
@@ -519,23 +545,19 @@
       </div>
       <div class="led-item">
         <div class="led-char ring">○</div>
-        <div class="led-desc"><strong>Circle</strong><br>Ball detected — charge about to begin</div>
+        <div class="led-desc"><strong>Hollow square</strong><br>Ball detected — 300 ms pause before charging</div>
       </div>
       <div class="led-item">
         <div class="led-char">C</div>
-        <div class="led-desc"><strong>C</strong><br>Charging at effective charge power</div>
+        <div class="led-desc"><strong>C</strong><br>Charging — driving forward until contact</div>
+      </div>
+      <div class="led-item">
+        <div class="led-char" style="color:var(--yellow)">K</div>
+        <div class="led-desc"><strong>K</strong><br>Kicked — visible only when <code>STOP_PAUSE_MS &gt; 0</code></div>
       </div>
       <div class="led-item">
         <div class="led-char">F</div>
-        <div class="led-desc"><strong>F</strong><br>Follow-through — sustained push after contact</div>
-      </div>
-      <div class="led-item">
-        <div class="led-char" style="color:var(--red)">B</div>
-        <div class="led-desc"><strong>B</strong><br>Border hit — charge or follow-through stopped</div>
-      </div>
-      <div class="led-item">
-        <div class="led-char" style="color:var(--yellow)">R</div>
-        <div class="led-desc"><strong>R</strong><br>Reversing — 300 ms retreat after follow-through</div>
+        <div class="led-desc"><strong>F</strong><br>Follow-through — extra push after the strike</div>
       </div>
       <div class="led-item">
         <div class="led-char" style="color:var(--green);font-size:1rem;">OK</div>
@@ -557,68 +579,64 @@
       <div class="flow-step">
         <div class="flow-icon">🔍</div>
         <div class="flow-name">Scan</div>
-        <div class="flow-desc">Poll ultrasonic every 50 ms, show dot</div>
+        <div class="flow-desc">Poll ultrasonic every 50 ms · show dot</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(0,229,255,.3)">
         <div class="flow-icon">⚽</div>
         <div class="flow-name">Ball in</div>
-        <div class="flow-desc">Distance &lt; 70 cm — show circle, pause 500 ms</div>
+        <div class="flow-desc">Distance &lt; <code>BALL_DETECT_CM</code> (50 cm) · show square · pause 300 ms</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(255,140,66,.4)">
         <div class="flow-icon">⚡</div>
         <div class="flow-name">Charge</div>
-        <div class="flow-desc">Full chargePower until border or contact (2× sonar ≤ 5 cm)</div>
+        <div class="flow-desc">Drive at <code>dynamicCharge</code> until distance ≤ <code>CONTACT_CM</code> (8 cm) · show C</div>
       </div>
       <div class="flow-arrow">→</div>
-      <div class="flow-branch">
-        <div class="branch-label" style="color:var(--red)">Border hit</div>
-        <div class="flow-step" style="min-width:90px;border-color:rgba(255,76,106,.3)">
-          <div class="flow-icon">🛑</div>
-          <div class="flow-name">Stop</div>
-          <div class="flow-desc">Show B · done</div>
-        </div>
-        <div class="branch-label" style="color:var(--cyan)">Contact</div>
-        <div class="flow-step" style="min-width:90px;border-color:rgba(0,229,255,.3)">
-          <div class="flow-icon">💥</div>
-          <div class="flow-name">Follow</div>
-          <div class="flow-desc">Push at currentPower for FOLLOW_THROUGH_MS</div>
-        </div>
+      <div class="flow-step" style="border-color:rgba(255,76,106,.4)">
+        <div class="flow-icon">💥</div>
+        <div class="flow-name">Strike</div>
+        <div class="flow-desc">Keep driving for <code>KICK_MS</code> (250 ms) — this is what actually hits the ball</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(255,209,102,.3)">
-        <div class="flow-icon">↩️</div>
-        <div class="flow-name">Reverse</div>
-        <div class="flow-desc">300 ms retreat · show R</div>
+        <div class="flow-icon">⏸️</div>
+        <div class="flow-name">Pause</div>
+        <div class="flow-desc">If <code>STOP_PAUSE_MS &gt; 0</code> · stop · show K · pause (visual diagnostic only)</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,229,255,.3)">
+        <div class="flow-icon">🚀</div>
+        <div class="flow-name">Follow</div>
+        <div class="flow-desc">Resume at <code>dynamicCharge</code> for <code>actualFollowThrough</code> ms · show F</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step" style="border-color:rgba(0,201,122,.3)">
         <div class="flow-icon">✅</div>
         <div class="flow-name">OK</div>
-        <div class="flow-desc">Sequence complete</div>
+        <div class="flow-desc">Stop · show OK</div>
       </div>
     </div>
 
     <div style="margin-top:1rem;">
       <div class="phase-row">
         <div class="phase-box">
-          <div class="phase-box-title charge">Charge Phase</div>
+          <div class="phase-box-title charge">Charge + Strike</div>
           <ul>
-            <li>Runs at <strong style="color:var(--orange)">effectiveCharge</strong> (chargePower reduced by endurance)</li>
-            <li>Polls border sensors + sonar every 20 ms</li>
-            <li>Ends on border hit OR confirmed contact</li>
-            <li>Two consecutive sonar reads ≤ 5 cm = contact</li>
+            <li>Runs at <strong style="color:var(--orange)">dynamicCharge</strong> (chargePower × enduranceFactor, floored at <code>CHARGE_FLOOR</code>)</li>
+            <li>Polls sonar every <code>CHARGE_CHECK_MS</code> (15 ms)</li>
+            <li>Charge ends when sonar ≤ 8 cm (or after <code>CHARGE_MAX_MS</code> safety timeout)</li>
+            <li>Strike = additional 250 ms of drive through the ball (so the bot actually hits it, not just touches it)</li>
           </ul>
         </div>
         <div class="phase-box">
           <div class="phase-box-title followthru">Follow-Through Phase</div>
           <ul>
-            <li>Only runs if contact was made (not border hit)</li>
-            <li>Switches to <strong style="color:var(--cyan)">currentPower</strong> (cruise speed)</li>
-            <li>Duration = 120 + (POWER × 35) ms</li>
-            <li>Still checks border — stops immediately if hit</li>
-            <li>Reverses 300 ms then stops</li>
+            <li>Duration = <code>120 + (POWER × 35)</code> ms, capped at 500 ms</li>
+            <li>Drives at the same <strong style="color:var(--cyan)">dynamicCharge</strong> (no slow-down)</li>
+            <li>Ends with a hard motor stop and <code>OK</code> on the display</li>
+            <li>This is the push that does most of the work on the ball after contact</li>
           </ul>
         </div>
       </div>
@@ -642,15 +660,15 @@
             <div class="blocks-render-area">
               <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
               <pre class="blocks">
-let SPEED = 0
-let ENDURANCE = 0
-let TURNING = 0
-let POWER = 0
+SPEED = 6
+TURNING = 6
+ENDURANCE = 4
+POWER = 4
               </pre>
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>The four numbers you edit before every test.</strong> These must total 20. Enter your real <code>TURNING</code> value — it counts toward the total — but the power test doesn't use it. Only <code>SPEED</code>, <code>ENDURANCE</code>, and <code>POWER</code> affect what happens on the field.
+            <strong>The two stats that matter for this test.</strong> Only <code>POWER</code> drives the kick (via <code>chargePower = POWER²</code>) and <code>ENDURANCE</code> controls how much that kick decays as <code>simulatedMatchTime</code> grows. <code>SPEED</code> and <code>TURNING</code> are declared so the four-stat budget total stays consistent with your stat card, but neither one is read by <code>computeStats</code> in this program. To compare power values, flash with <code>POWER = 4</code>, measure the ball roll, then reflash with <code>POWER = 8</code> and measure again.
           </div>
         </div>
       </div>
@@ -674,14 +692,21 @@ function chargeAndFollowThrough() {}
 input.onButtonPressed(Button.A, function () {
     computeStats()
     waitForBall()
-    basic.pause(500)
+    basic.pause(300)
     chargeAndFollowThrough()
+})
+
+input.onButtonPressed(Button.AB, function () {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showString("X")
+    basic.pause(400)
+    basic.clearScreen()
 })
               </pre>
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>Three steps in sequence.</strong> First, <code>computeStats()</code> converts your stats into working motor values. Then <code>waitForBall()</code> holds the bot in place until something enters range. After a 500 ms pause (so you can step back), <code>chargeAndFollowThrough()</code> fires the full charge sequence.
+            <strong>Press A to arm and kick.</strong> Three steps run in order: <code>computeStats()</code> converts the stats into working motor values, <code>waitForBall()</code> holds the bot in scan mode until something enters range, and after a 300 ms pause (so you can step back), <code>chargeAndFollowThrough()</code> fires the full charge → strike → follow-through sequence. <strong>Press A + B together at any time</strong> for an emergency stop — it cuts the motors immediately and shows an X.
           </div>
         </div>
       </div>
@@ -739,32 +764,27 @@ input.onButtonPressed(Button.B, function () {
             <div class="blocks-render-area">
               <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
               <pre class="blocks">
-let SPEED = 0
 let ENDURANCE = 0
 let POWER = 0
 let simulatedMatchTime = 0
-let currentPower = 0
 let chargePower = 0
 let FOLLOW_THROUGH_MS = 0
 let DECAY_RATE = 0
 let endurancePercent = 0
 let enduranceFactor = 0
 function computeStats () {
-    currentPower = SPEED * 100 / 20
     chargePower = Math.min(POWER * POWER, 100)
     FOLLOW_THROUGH_MS = 120 + POWER * 35
     DECAY_RATE = 20 - ENDURANCE
     endurancePercent = 100 - DECAY_RATE * simulatedMatchTime / 40
     endurancePercent = Math.max(endurancePercent, 20)
     enduranceFactor = endurancePercent / 100
-    currentPower = Math.round(currentPower * enduranceFactor)
-    currentPower = Math.max(currentPower, 15)
 }
               </pre>
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>Everything derived from your four stats happens here.</strong> <code>currentPower</code> is your cruise speed — used during follow-through. <code>chargePower</code> is POWER squared, capped at 100. <code>FOLLOW_THROUGH_MS</code> is 120 + (POWER × 35) ms. Then endurance decay shrinks all power values based on how far into the match you are. Both floors out at 15% minimum.
+            <strong>Three values come out of this function, all driven by POWER and ENDURANCE.</strong> <code>chargePower</code> is <code>POWER × POWER</code>, capped at 100 — so P = 4 produces 16, P = 8 produces 64, P = 10 produces 100. <code>FOLLOW_THROUGH_MS</code> is <code>120 + (POWER × 35)</code> — a linear-with-intercept formula that gives every kick a 120 ms minimum push regardless of POWER. The endurance block computes <code>enduranceFactor</code> from <code>simulatedMatchTime</code> (set by Button B); at 180 s the factor can drop to 0.2 (the 20% floor). <code>chargeAndFollowThrough</code> multiplies <code>chargePower</code> by <code>enduranceFactor</code> when it runs, so a tired bot kicks weaker.
           </div>
         </div>
       </div>
@@ -802,7 +822,7 @@ function waitForBall () {
                 # . . . #
                 . # # # .
                 `)
-            basic.pause(300)
+            basic.pause(250)
             basic.clearScreen()
             return
         }
@@ -813,7 +833,7 @@ function waitForBall () {
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>Polls the ultrasonic sensor every 50 ms.</strong> The dot on the LED means it's scanning. When something enters range (<code>dist &lt; BALL_DETECT_CM</code>, default 70 cm), it shows the circle and returns — handing control back to Button A, which then waits 500 ms and fires the charge. The <code>dist &gt; 0</code> check filters out the 0 cm noise reads you get when the sensor is too close to get a clean ping.
+            <strong>Polls the ultrasonic sensor every 50 ms.</strong> The dot on the LED means it's scanning. When something enters range (<code>dist &lt; BALL_DETECT_CM</code>, default <strong>50 cm</strong>), it shows the hollow square pattern, pauses 250 ms (so the student sees "detected"), clears the screen, and returns. Button A then waits another 300 ms before firing the charge — that combined ~550 ms gap is meant to give the student time to step back. The <code>dist &gt; 0</code> check filters out the noise reads that come back as 0 when the sensor can't get a clean ping.
           </div>
         </div>
       </div>
@@ -831,64 +851,54 @@ function waitForBall () {
             <div class="blocks-render-area">
               <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
               <pre class="blocks">
-let chargeHitBorder = false
 let chargePower = 0
-let enduranceFactor = 0
+let enduranceFactor = 1
 let effectiveCharge = 0
-let borderSide = 0
-let dist = 0
-let contactCount = 0
-let contactMade = false
-let currentPower = 0
-let followStart = 0
+let dynamicCharge = 0
+let actualFollowThrough = 0
 let FOLLOW_THROUGH_MS = 0
+let chargeStart = 0
+let dist = 0
+let CHARGE_FLOOR = 0
+let CHARGE_MAX_MS = 0
 let CHARGE_CHECK_MS = 0
-function checkBorder() { return 0 }
+let CONTACT_CM = 0
+let KICK_MS = 0
+let STOP_PAUSE_MS = 0
 function chargeAndFollowThrough () {
-    chargeHitBorder = false
-    effectiveCharge = Math.round(chargePower * enduranceFactor)
-    effectiveCharge = Math.max(effectiveCharge, 15)
+    let factor = enduranceFactor > 0 ? enduranceFactor : 1
+    effectiveCharge = Math.max(Math.round(chargePower * factor), CHARGE_FLOOR)
+    effectiveCharge = Math.min(effectiveCharge, 100)
+    dynamicCharge = Math.max(effectiveCharge, CHARGE_FLOOR)
+    actualFollowThrough = Math.min(FOLLOW_THROUGH_MS, 500)
+
+    // PHASE 1 — CHARGE: drive forward until we reach the ball.
     basic.showString("C")
-    CutebotPro.pwmCruiseControl(effectiveCharge, effectiveCharge)
-    while (!(chargeHitBorder) && !(contactMade)) {
-        borderSide = checkBorder()
-        if (borderSide > 0) {
-            CutebotPro.stopImmediately(CutebotProMotors.ALL)
-            chargeHitBorder = true
-            basic.showString("B")
-            break
-        }
+    CutebotPro.pwmCruiseControl(dynamicCharge, dynamicCharge)
+    chargeStart = input.runningTime()
+    while (input.runningTime() - chargeStart < CHARGE_MAX_MS) {
         dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
-        if (dist <= 5) {
-            contactCount += 1
-            if (contactCount >= 2) {
-                contactMade = true
-            }
-        } else {
-            contactCount = 0
-        }
+        if (dist > 0 && dist <= CONTACT_CM) { break; }
         basic.pause(CHARGE_CHECK_MS)
     }
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    if (!(chargeHitBorder)) {
-        basic.showString("F")
-        CutebotPro.pwmCruiseControl(currentPower, currentPower)
-        followStart = input.runningTime()
-        while (input.runningTime() - followStart < FOLLOW_THROUGH_MS) {
-            borderSide = checkBorder()
-            if (borderSide > 0) {
-                CutebotPro.stopImmediately(CutebotProMotors.ALL)
-                basic.showString("B")
-                break
-            }
-            basic.pause(CHARGE_CHECK_MS)
-        }
+
+    // STRIKE: keep driving through contact so the bot actually HITS the ball.
+    basic.pause(KICK_MS)
+
+    // Optional visible STOP — happens AFTER the ball is struck.
+    if (STOP_PAUSE_MS > 0) {
         CutebotPro.stopImmediately(CutebotProMotors.ALL)
-        basic.showString("R")
-        CutebotPro.pwmCruiseControl(-1 * currentPower, -1 * currentPower)
-        basic.pause(300)
-        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.showString("K")
+        basic.pause(STOP_PAUSE_MS)
     }
+
+    // PHASE 2 — FOLLOW-THROUGH: a further push for the POWER-based window.
+    basic.showString("F")
+    CutebotPro.pwmCruiseControl(dynamicCharge, dynamicCharge)
+    basic.pause(actualFollowThrough)
+
+    // STOP — done.
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
     basic.showString("OK")
     basic.pause(500)
     basic.clearScreen()
@@ -897,49 +907,15 @@ function chargeAndFollowThrough () {
             </div>
           </div>
           <div class="block-entry-explain">
-            <strong>Two phases back-to-back.</strong> The charge phase drives at <code>effectiveCharge</code> (chargePower reduced by endurance) and checks sensors every 20 ms. It exits on border hit OR two consecutive sonar reads ≤ 5 cm. If contact was made and no border was hit, the follow-through phase runs — pushing at <code>currentPower</code> for <code>FOLLOW_THROUGH_MS</code>. Then reverses 300 ms and shows OK.
-          </div>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:1.25rem 0;"></div>
-
-      <!-- CHECK BORDER -->
-      <div class="block-entry">
-        <div class="block-entry-header">
-          <div class="block-entry-dot" style="background:var(--slate);"></div>
-          <span style="color:var(--slate);">checkBorder — Read the Line Sensors</span>
-        </div>
-        <div class="block-entry-body">
-          <div>
-            <div class="blocks-render-area">
-              <div class="blocks-loading"><div class="spinner"></div>Loading blocks…</div>
-              <pre class="blocks">
-let sensor1State = 0
-let sensor2State = 0
-let sensor3State = 0
-let sensor4State = 0
-let BORDER_THRESHOLD = 0
-function checkBorder () {
-    CutebotPro.trackbitStateValue()
-    sensor1State = CutebotPro.trackbitgetGray(TrackbitChannel.One)
-    sensor2State = CutebotPro.trackbitgetGray(TrackbitChannel.Two)
-    sensor3State = CutebotPro.trackbitgetGray(TrackbitChannel.Three)
-    sensor4State = CutebotPro.trackbitgetGray(TrackbitChannel.Four)
-    if (sensor1State > BORDER_THRESHOLD) {
-        return 1
-    } else if (sensor4State > BORDER_THRESHOLD) {
-        return 2
-    } else if (sensor2State > BORDER_THRESHOLD || sensor3State > BORDER_THRESHOLD) {
-        return 3
-    }
-    return 0
-}
-              </pre>
-            </div>
-          </div>
-          <div class="block-entry-explain">
-            <strong>Reads all four sensors and returns a direction code.</strong> Called inside the charge and follow-through loops every 20 ms. Returns 0 if all sensors are clear. Returns 1 (left), 2 (right), or 3 (head-on) when the white border is detected. The calling code stops the motors immediately on any non-zero return.
+            <strong>The whole kick is one function with four beats:</strong> charge, strike, optional pause, follow-through. The first lines compute <code>dynamicCharge</code> — the actual PWM value sent to the motors — by multiplying <code>chargePower</code> by <code>enduranceFactor</code> and clamping the result between <code>CHARGE_FLOOR</code> (20) and 100. <code>actualFollowThrough</code> caps the push duration at 500 ms so no kick runs longer than that no matter how high POWER goes.
+            <br><br>
+            <strong>Phase 1 — Charge:</strong> drive forward at <code>dynamicCharge</code> while the sonar keeps watch. As soon as the reading drops to <code>CONTACT_CM</code> (8 cm) the loop exits. A <code>CHARGE_MAX_MS</code> timeout (1.2 s) catches the case where the ball rolled away before the charge started.
+            <br><br>
+            <strong>Strike:</strong> the bot keeps driving for another <code>KICK_MS</code> (250 ms) after the loop exits. Without this beat, the bot would stop just short of the ball and only the follow-through would touch it — defeating the whole purpose of testing impact. The strike is what actually hits.
+            <br><br>
+            <strong>Pause (optional):</strong> if <code>STOP_PAUSE_MS &gt; 0</code>, the bot stops, shows <code>K</code>, and pauses. This is a visual diagnostic — useful when teaching the sequence in class. <strong>Set <code>STOP_PAUSE_MS = 0</code> when measuring ball travel</strong> so the kick stays continuous and the data is clean.
+            <br><br>
+            <strong>Phase 2 — Follow-through:</strong> resume driving at <code>dynamicCharge</code> for <code>actualFollowThrough</code> ms. This is the push that does most of the work on the ball after impact. Higher POWER → longer follow-through (<code>120 + POWER × 35</code>), so the kick lasts longer and pushes the ball farther.
           </div>
         </div>
       </div>
@@ -947,81 +923,27 @@ function checkBorder () {
     </div>
   </div>
 
-  <!-- BORDER SENSOR MAP -->
-  <div class="section">
-    <div class="section-label">Border Sensors</div>
-    <div class="grid-2">
-      <div class="sensor-strip">
-        <div style="font-size:.6875rem;color:var(--slate);text-transform:uppercase;letter-spacing:.08em;font-weight:700;">Front of bot (direction of travel)</div>
-        <div class="sensor-row">
-          <div class="sensor-dot s1">S1</div>
-          <div class="sensor-dot s2">S2</div>
-          <div class="sensor-dot s3">S3</div>
-          <div class="sensor-dot s4">S4</div>
-        </div>
-        <div class="sensor-legend">
-          <span class="sleg s1">S1 = far left</span>
-          <span class="sleg s2">S2 = center-left</span>
-          <span class="sleg s3">S3 = center-right</span>
-          <span class="sleg s4">S4 = far right</span>
-        </div>
-      </div>
-      <div class="card" style="padding:0;overflow:hidden;">
-        <table class="sensor-return-table">
-          <thead>
-            <tr>
-              <th>Return</th>
-              <th>Meaning</th>
-              <th>Triggered by</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="ret-badge ret-0">0</span></td>
-              <td>Clear</td>
-              <td>No sensor over threshold</td>
-            </tr>
-            <tr>
-              <td><span class="ret-badge ret-1">1</span></td>
-              <td>Left border</td>
-              <td>S1 &gt; 200</td>
-            </tr>
-            <tr>
-              <td><span class="ret-badge ret-2">2</span></td>
-              <td>Right border</td>
-              <td>S4 &gt; 200</td>
-            </tr>
-            <tr>
-              <td><span class="ret-badge ret-3">3</span></td>
-              <td>Head-on</td>
-              <td>S2 or S3 &gt; 200</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="callout info" style="margin-top:.75rem;">
-      <span class="callout-icon">ℹ️</span>
-      <div>The border check during charging stops the bot regardless of which side triggers. It doesn't steer around borders — it just stops and shows "B".</div>
-    </div>
-  </div>
 
   <!-- CONTACT DETECTION -->
   <div class="section">
     <div class="section-label">Contact Detection</div>
-    <p style="font-size:.8875rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem;">The ultrasonic sensor can give a reading of 0 when it's too close to get a clean ping — but a single 0 can be noise. The program confirms contact with two consecutive low reads.</p>
+    <p style="font-size:.8875rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem;">The bot decides it has "reached" the ball based on a single ultrasonic read against <code>CONTACT_CM</code>. The check runs every <code>CHARGE_CHECK_MS</code> (15 ms) during the charge loop. After contact, the bot keeps driving for <code>KICK_MS</code> (250 ms) — that's the <strong>strike</strong> — before pausing or following through. This is a deliberately simple model: no multi-read confirmation, no noise filtering. The ball is foam and the contact distance is generous enough (8 cm) that false positives are rare.</p>
     <div class="contact-steps">
       <div class="contact-step">
         <div class="contact-num">1</div>
-        <div class="contact-text">Ultrasonic reads ≤ 5 cm — <strong>contactCount increments to 1</strong>. Not confirmed yet.</div>
+        <div class="contact-text">Inside the charge loop, <strong>poll the sonar every 15 ms</strong> (<code>CHARGE_CHECK_MS</code>).</div>
       </div>
       <div class="contact-step">
         <div class="contact-num">2</div>
-        <div class="contact-text">Next read (20 ms later) is still ≤ 5 cm — <strong>contactCount = 2</strong>. Contact confirmed, charge loop exits.</div>
+        <div class="contact-text">When <code>dist &gt; 0 && dist ≤ CONTACT_CM</code> (8 cm), <strong>exit the charge loop immediately</strong>. No second read required.</div>
       </div>
       <div class="contact-step">
-        <div class="contact-num">✕</div>
-        <div class="contact-text">If any read is &gt; 5 cm, <strong>contactCount resets to 0</strong>. The sequence treats it as noise and keeps charging.</div>
+        <div class="contact-num">3</div>
+        <div class="contact-text">After exit, <strong>keep driving for <code>KICK_MS</code></strong> (250 ms). This is the strike — without it, the bot would stop at the ball instead of hitting it.</div>
+      </div>
+      <div class="contact-step">
+        <div class="contact-num">⏱️</div>
+        <div class="contact-text">Safety: if the loop runs longer than <code>CHARGE_MAX_MS</code> (1.2 s) without seeing the ball, the charge ends anyway and the sequence continues. This catches the case where the ball was placed but rolled away before the press of A.</div>
       </div>
     </div>
   </div>
@@ -1031,41 +953,35 @@ function checkBorder () {
     <div class="section-label">Stats &amp; Formulas</div>
 
     <div class="formula-box">
-      <div class="formula-label">Current Power (cruise speed)</div>
-      <div class="formula-eq">currentPower = SPEED × 5  (% motor power)</div>
-      <div class="formula-note">Then scaled by endurance: <strong>currentPower × enduranceFactor</strong>. Minimum 15%.</div>
-    </div>
-
-    <div class="formula-box">
       <div class="formula-label">Charge Power</div>
       <div class="formula-eq">chargePower = min(POWER², 100)</div>
-      <div class="formula-note"><strong>POWER is squared</strong> — small increases at high values have a huge effect. POWER=5→25%, POWER=8→64%, POWER=10→100%. Then scaled by enduranceFactor during the charge.</div>
+      <div class="formula-note"><strong>POWER is squared.</strong> POWER = 4 → 16, POWER = 8 → 64, POWER = 10 → 100. Every point you add is worth more than the last one. This program uses <code>chargePower</code> as the PWM value during both the charge and the follow-through (no separate cruise speed).</div>
     </div>
 
     <div class="formula-box">
       <div class="formula-label">Follow-Through Duration</div>
       <div class="formula-eq">FOLLOW_THROUGH_MS = 120 + POWER × 35 ms</div>
-      <div class="formula-note">Higher POWER gives both a harder initial hit <em>and</em> a longer sustained push after contact.</div>
+      <div class="formula-note">Linear with a 120 ms intercept — so every kick has a baseline push regardless of POWER. POWER = 4 → 260 ms. POWER = 8 → 400 ms. POWER = 10 → 470 ms. Then capped at <strong>500 ms</strong> (<code>actualFollowThrough = min(FOLLOW_THROUGH_MS, 500)</code>) so the high end doesn't run away.</div>
     </div>
 
     <div class="formula-box">
       <div class="formula-label">Endurance Decay</div>
       <div class="formula-eq">decayRate = 20 − ENDURANCE</div>
       <div class="formula-eq">endurancePercent = max(100 − decayRate × time / 40,  20)</div>
+      <div class="formula-eq">enduranceFactor = endurancePercent / 100</div>
       <div class="formula-note">
-        Lower ENDURANCE = higher decayRate = faster power loss over time. Floor is 20% — the bot never goes completely dead.
-        <strong>ENDURANCE=20 means decayRate=0 — no decay at all.</strong>
+        Lower ENDURANCE = higher decayRate = faster power loss over time. The floor is <strong>20%</strong> — the bot never goes completely dead. Inside <code>chargeAndFollowThrough</code>, the actual PWM is <code>dynamicCharge = max(chargePower × enduranceFactor, CHARGE_FLOOR)</code> — so a tired bot still meets the 20% floor.
       </div>
     </div>
 
     <div class="power-quad-note">
-      <p>⚡ <strong>POWER is quadratic.</strong> Going from POWER=5 to POWER=6 adds 11 percentage points of charge power (<code>36−25=11</code>). Going from POWER=9 to POWER=10 adds 19 points (<code>100−81=19</code>). Every POWER point you add is worth more than the last. Investing heavily in POWER has sharply increasing returns — but costs stat budget that can't go to SPEED or ENDURANCE.</p>
-      <p><strong>One open question:</strong> the previous follow-through formula made the bot overshoot at high POWER, capping the practical sweet spot at P9. The new formula, <code>120 + (POWER × 35)</code>, produces much shorter follow-throughs at every P (P9 → 435 ms, P10 → 470 ms). Whether overshoot still bites at the top of the range — or whether the sweet spot has moved — is a Season 1 question. Compare your kick distances at each POWER value and let the match data decide.</p>
+      <p>⚡ <strong>POWER is quadratic; the floor matters.</strong> Going from POWER = 5 to POWER = 6 adds 11 percentage points of charge power (<code>36 − 25 = 11</code>). Going from POWER = 9 to POWER = 10 adds 19 points (<code>100 − 81 = 19</code>). Every point you add is worth more than the last. But: without a scoop, the ball's response to higher chargePower has diminishing returns — the bare bumper can only transfer so much energy. The Scoop Build activity is where the POWER² investment starts to pay off proportionally.</p>
+      <p><strong>To run the comparison cleanly:</strong> keep simulated match time at <code>0 s</code>, set <code>STOP_PAUSE_MS = 0</code> in the constants block, flash with <code>POWER = 4</code>, measure how far the ball rolls, then reflash with <code>POWER = 8</code> and measure again. The ratio is your evidence for how the formula behaves on the physical bot.</p>
     </div>
 
     <div class="callout warn" style="margin-top:.75rem;">
       <span class="callout-icon">⚠️</span>
-      <div><strong>TURNING is declared but not used.</strong> Enter your real TURNING value so the four stats still total 20 — but it has zero effect on this test. No need to set it to 0 or adjust your build around it.</div>
+      <div><strong>SPEED and TURNING are declared but not used.</strong> The program reads them so the four-stat total matches your stat card, but <code>computeStats</code> only uses <code>POWER</code> and <code>ENDURANCE</code>. Changing SPEED or TURNING in the on-start block will have no effect on this test.</div>
     </div>
   </div>
 
@@ -1084,7 +1000,7 @@ function checkBorder () {
             <span class="slider-val" style="color:var(--cyan)" id="val-speed">8</span>
           </div>
           <input type="range" class="s-speed" id="sl-speed" min="0" max="20" value="8" oninput="recalc()" />
-          <div class="slider-sub">Cruise motor power = SPEED × 5%</div>
+          <div class="slider-sub">Not used by this test — declared for budget consistency only</div>
         </div>
         <div class="slider-group">
           <div class="slider-top">
@@ -1181,34 +1097,44 @@ function checkBorder () {
         </thead>
         <tbody>
           <tr>
-            <td class="const-name">BORDER_THRESHOLD</td>
-            <td class="const-val">200</td>
-            <td class="const-note">Grayscale value above which a sensor reports "white border"</td>
+            <td class="const-name">BALL_DETECT_CM</td>
+            <td class="const-val">50</td>
+            <td class="const-note">Max distance (cm) for ball detection during the scan phase. Ball is placed ~40 cm in front.</td>
           </tr>
           <tr>
-            <td class="const-name">BALL_DETECT_CM</td>
-            <td class="const-val">70</td>
-            <td class="const-note">Max distance (cm) for ball detection during scan phase</td>
+            <td class="const-name">CONTACT_CM</td>
+            <td class="const-val">8</td>
+            <td class="const-note">Distance at which the bot has "reached" the ball — exits the charge loop</td>
+          </tr>
+          <tr>
+            <td class="const-name">KICK_MS</td>
+            <td class="const-val">250</td>
+            <td class="const-note">Extra drive after contact — the strike. Without this the bot stops at the ball instead of hitting it.</td>
+          </tr>
+          <tr>
+            <td class="const-name">CHARGE_MAX_MS</td>
+            <td class="const-val">1200</td>
+            <td class="const-note">Safety timeout — charge loop ends after 1.2 s even if no ball is detected</td>
           </tr>
           <tr>
             <td class="const-name">CHARGE_CHECK_MS</td>
+            <td class="const-val">15</td>
+            <td class="const-note">Polling interval during the charge loop</td>
+          </tr>
+          <tr>
+            <td class="const-name">CHARGE_FLOOR</td>
             <td class="const-val">20</td>
-            <td class="const-note">Polling interval during charge and follow-through loops</td>
+            <td class="const-note">Minimum PWM for the kick. Lower = bigger P4 vs P8 spread, but too low and the motors stall.</td>
           </tr>
           <tr>
-            <td class="const-name">CHARGE_DURATION_MS</td>
-            <td class="const-val">800</td>
-            <td class="const-note">Declared but not used — legacy constant from earlier version</td>
+            <td class="const-name">STOP_PAUSE_MS</td>
+            <td class="const-val">300</td>
+            <td class="const-note">Pause between strike and follow-through. Set to <strong>0</strong> for a continuous kick when measuring ball travel; non-zero is a visual diagnostic for class.</td>
           </tr>
           <tr>
-            <td class="const-name">Contact confirm count</td>
-            <td class="const-val">2</td>
-            <td class="const-note">Consecutive sonar reads ≤ 5 cm required to confirm contact</td>
-          </tr>
-          <tr>
-            <td class="const-name">Min motor power</td>
-            <td class="const-val">15%</td>
-            <td class="const-note">Floor for both currentPower and effectiveCharge</td>
+            <td class="const-name">Follow-through cap</td>
+            <td class="const-val">500 ms</td>
+            <td class="const-note"><code>actualFollowThrough = min(FOLLOW_THROUGH_MS, 500)</code> — high-POWER kicks don't run away</td>
           </tr>
           <tr>
             <td class="const-name">Endurance floor</td>
@@ -1216,14 +1142,9 @@ function checkBorder () {
             <td class="const-note">endurancePercent never drops below 20% regardless of time or ENDURANCE value</td>
           </tr>
           <tr>
-            <td class="const-name">Post-scan pause</td>
-            <td class="const-val">500 ms</td>
-            <td class="const-note">Delay between ball detection and charge start</td>
-          </tr>
-          <tr>
-            <td class="const-name">Reverse duration</td>
+            <td class="const-name">Post-detect pause</td>
             <td class="const-val">300 ms</td>
-            <td class="const-note">How long the bot reverses after completing follow-through</td>
+            <td class="const-note">Delay between ball detection and start of charge — student step-back time</td>
           </tr>
         </tbody>
       </table>
@@ -1237,29 +1158,33 @@ function checkBorder () {
       <ol style="list-style:none;display:flex;flex-direction:column;gap:.875rem;">
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">1</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Set your stats in the code.</strong> Edit SPEED, ENDURANCE, POWER, and TURNING at the bottom of the file. All four must total 20 — enter your real TURNING value even though this test doesn't use it. Re-flash the micro:bit.</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Set POWER and ENDURANCE in the code.</strong> Edit the on-start block. Flash with <code>POWER = 4</code> first. Leave SPEED and TURNING as they are — they're declared for budget consistency but the program doesn't read them.</span>
         </li>
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">2</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Press B to set match time.</strong> If you want to test late-match behavior, press B to cycle to 120 s or 180 s before arming.</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">For clean measurement: set <code>STOP_PAUSE_MS = 0</code>.</strong> The 300 ms default is for teaching the sequence visually in class. When measuring how far the ball rolls, you want the strike and follow-through to be continuous.</span>
         </li>
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">3</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Position the bot on the field, facing the target zone.</strong> Leave clear space ahead — it will charge straight forward.</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Place the ball ~40 cm in front of the bot.</strong> Leave clear space ahead for the charge + strike + follow-through. Tape a start line and a meter stick on the floor for ball-roll measurements.</span>
         </li>
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">4</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Press A to arm.</strong> The dot appears. Roll the ball toward the bot from ahead until it's within 70 cm.</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Press A.</strong> The scanning dot appears. When the bot sees the ball, it shows the square, pauses 300 ms (your cue to step back), then runs: <code>C</code> → strike → <code>F</code> → <code>OK</code>. Measure how far the ball rolled from where the bot first touched it.</span>
         </li>
         <li style="display:flex;gap:.875rem;align-items:flex-start;">
           <span style="width:24px;height:24px;border-radius:50%;background:rgba(0,201,122,.15);color:var(--green);border:1px solid rgba(0,201,122,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">5</span>
-          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Watch the sequence.</strong> Circle → C → F (or B) → R → OK. Check how far the ball moved and whether the bot stopped cleanly.</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Reflash with <code>POWER = 8</code>, repeat.</strong> Run three trials at each POWER value to average out noise. Compare ball roll: how does the ratio of distances compare to the ratio of <code>chargePower</code> values (16 vs 64, or 4×)?</span>
+        </li>
+        <li style="display:flex;gap:.875rem;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:rgba(255,209,102,.15);color:var(--yellow);border:1px solid rgba(255,209,102,.3);font-size:.6875rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;">B</span>
+          <span style="font-size:.875rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text);">Optional — endurance lesson.</strong> Press B before A to cycle simulated match time to 60, 120, or 180 s. The same POWER value will kick weaker as time grows (because <code>enduranceFactor</code> drops). At 180 s with low ENDURANCE, the floor (20%) takes over and the kick stops scaling with POWER entirely.</span>
         </li>
       </ol>
     </div>
     <div class="callout danger" style="margin-top:.75rem;">
       <span class="callout-icon">⛔</span>
-      <div><strong>This program charges on detection.</strong> Once you press A and a ball (or any object) enters 70 cm range, the bot will drive forward at full charge power. Keep hands and feet clear of its path.</div>
+      <div><strong>The bot charges on detection.</strong> Once you press A and any object enters <code>BALL_DETECT_CM</code> (50 cm) range, the bot drives forward at full charge power and keeps driving for the strike + follow-through. Keep hands and feet clear of its path. Use <strong>Button A + B</strong> together for emergency stop.</div>
     </div>
   </div>
 
