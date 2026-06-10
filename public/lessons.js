@@ -46,7 +46,14 @@ const ACTIVITY_LESSONS = {
   'Day 8 Open Lab':
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Prepare Formula Race Cards"}],
 
-'Formula Relay: All Five Types in One Race':
+'Field Geometry + Approach Planning':[
+  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
+  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
+'Launch Sequence Programming + Testing':[
+  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
+  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
+
+  'Formula Relay: All Five Types in One Race':
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Formula Race Cards"}],
   'Season 1 Match Day 3': {url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'},
   "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],

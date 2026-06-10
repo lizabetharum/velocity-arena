@@ -279,7 +279,7 @@ const DAYS_DEFAULT = [
           {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
         ],
         "worksheet": [{url:"https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",label:"Arc Approximation: Introducing Turning Worksheet"},
-          {url: "/resources/launch-sequence-help.html.", label: "Launch Sequence Help"}],
+          {url: "/resources/launch-sequence-help.html", label: "Launch Sequence Help"}],
      
        "makecode":"https://makecode.microbit.org/S79542-10060-01167-82601",
          "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Arc_Approximation_Turning.html",
