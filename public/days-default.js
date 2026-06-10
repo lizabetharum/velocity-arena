@@ -278,7 +278,9 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/1ZWl_I7dNZRKr3c4pMbAnz7vCyE8L1it5qpo-X_37qZc/edit?usp=drive_link", label: "Script"},
           {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
         ],
-        "worksheet": "https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",
+        "worksheet": [{url:"https://drive.google.com/file/d/1NCR1-2-ASqbQNvBeXOKvx67YOQHpbv1y/view?usp=drive_link",label:"Arc Approximation: Introducing Turning Worksheet"},
+          {url: "/resources/launch-sequence-help.html.", label: "Launch Sequence Help"}],
+     
        "makecode":"https://makecode.microbit.org/S79542-10060-01167-82601",
          "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D3_Arc_Approximation_Turning.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day03-03-arc-approximation.html"
@@ -332,7 +334,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Launch by connecting to the three linear stats students already know, then display Charge Speed % = Power² and ask teams to write a gut prediction for Power 8 before calculating anything; this surfaces the linear misconception on paper. During Explore, teams complete the ratio table, run bot trials, and compare predictions to actual results. This activity uses a worksheet, a web page, and MakeCode.",
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1VYv53hKADZFrZ6SdqIb_1KwrQ6NnYTm8/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S25978-40655-36880-19976",
+        "makecode":"https://makecode.microbit.org/S03123-05017-49984-47905",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4_Power_Stat_Challenge.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
@@ -540,8 +542,7 @@ const DAYS_DEFAULT = [
         "description": "Plot your starting position, the tip-off point, and the goal on the coordinate grid. Draw your approach path and calculate how far your bot needs to travel. Use your Speed allocation to predict how many seconds that distance takes. Write the calculation in your dashboard. Then write one sentence justifying your approach angle -- it must cite a distance or a stat value.",
         "facilitatorDescription": "Frame the two-phase programming structure before students open anything: launch sequence runs once and ends at the handoff point, then the match loop takes over. Place worksheets face down and write LAUNCH SEQUENCE → HANDOFF POINT → MATCH LOOP on the board. Walk through the distinction, then give teams 25–30 minutes to work Steps 1–10: choosing candidate handoff points, applying the distance formula to calculate distance from the ball zone at (4, 2), evaluating border risk and arc coverage, committing to a position, and testing it with a live bot run.",
         "script": [
-          {url: "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link", label: "Script"},
-          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+          {url: "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link", label: "Script"}
         ],
         "worksheet":"https://drive.google.com/file/d/12wQ4G8t6jRv9rQ-ArWou8l2Ety60gRwc/view?usp=drive_link",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Field_Geometry_Worksheet_Exemplars.html",
@@ -555,8 +556,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams design two launch strategies on paper before touching MakeCode: turns, drives, and one prediction each. Code and test Strategy A for three trials, then switch to Strategy B for three trials, recording hit rate and post-kick robot position for each. Stop the class at minute 35 to name the accuracy-versus-reliability distinction before teams move into comparison. Teams choose one strategy and justify it in writing using hit rate, approach angle, and post-kick position. Step 8 requires changing one variable only.",
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
         "script":[
-          {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"},
-          {url: "https://velocity-arena-gold.vercel.app/resources/teacher-guides/launch-strategies.html", label: "Launch Strategies"}
+          {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"}
         ],
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Launch_Sequence_Design.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-04-launch-sequence-programming.html"

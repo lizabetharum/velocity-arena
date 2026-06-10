@@ -396,13 +396,53 @@
   <!-- Run it -->
   <div class="card">
     <div class="section-label">Run the match</div>
-    <h3 class="section-heading">Launch and observe</h3>
+    <h3 class="section-heading">After the code downloads — the full startup sequence</h3>
     <div class="muted">
-      Download the program to your micro:bit. Place the bot on your goal line facing the field.
-      Press <kbd>A</kbd> to start the match. Press <kbd>A + B</kbd> together at any time to
-      emergency-stop. The match auto-ends after 3 minutes (180 seconds).
+      Downloading the code is not the last step. Before you press A to start the match, the bot has
+      to <strong>calibrate three things</strong>: its own compass, the light/dark threshold of the field,
+      and the heading to your goal. Follow this sequence in order.
     </div>
-    <div class="muted" style="margin-top:.75rem;">
+
+    <ol class="muted" style="margin-top:1rem; padding-left:1.25rem; line-height:1.75;">
+      <li style="margin-bottom:.875rem;">
+        <strong>Compass calibration.</strong> The first time the bot powers on after a fresh download,
+        the micro:bit asks for a compass calibration. <strong>Rotate the bot in 3D space</strong> —
+        tilt and turn it in all directions — <strong>until every LED on the 5×5 display lights up.</strong>
+        When the full square is filled, calibration is done and a smiley face appears. You only do this once
+        per fresh flash.
+      </li>
+      <li style="margin-bottom:.875rem;">
+        <strong>Enter setup mode.</strong> Press <kbd>A</kbd>. The bot computes stats and enters
+        calibration. It will guide you through three steps using single-letter prompts on the LED display.
+      </li>
+      <li style="margin-bottom:.875rem;">
+        <strong>White threshold ("W").</strong> When you see <kbd>W</kbd> on the LEDs, place the bot
+        on the <em>darkest white square</em> on the field — the area between border lines.
+        Press <kbd>B</kbd>. Wait for the LED flash that confirms the read.
+      </li>
+      <li style="margin-bottom:.875rem;">
+        <strong>Black threshold ("B").</strong> When you see <kbd>B</kbd> on the LEDs, move the bot
+        so its sensors are over the <em>black border tape</em>. Press <kbd>B</kbd>.
+        Wait for the LED flash that confirms the read.
+      </li>
+      <li style="margin-bottom:.875rem;">
+        <strong>Goal heading ("G").</strong> When you see <kbd>G</kbd> on the LEDs, move the bot to its
+        <em>starting position</em> and rotate it so it faces your goal. Press <kbd>B</kbd>.
+        The bot stores this as the direction it will return to during the match.
+      </li>
+      <li style="margin-bottom:.875rem;">
+        <strong>Ready check.</strong> When calibration finishes you'll see a small shape on the
+        LEDs — the "ready" target. That means all three calibrations are stored and the bot is waiting.
+      </li>
+      <li>
+        <strong>Start the match.</strong> Press <kbd>A</kbd> again. The bot runs the scripted launch kick,
+        then enters the main match loop. The match auto-ends after 3 minutes (180 seconds).
+        Press <kbd>A + B</kbd> together at any time for an emergency stop. Press <kbd>B</kbd> alone
+        mid-match for a soft reset that re-centers the bot's behaviour.
+      </li>
+    </ol>
+
+    <div class="muted" style="margin-top:1rem;">
       Record what you see in your match log: how long did Endurance hold? Did your launch put
       you in a good position? Did the 5 Turning value make your arcs feel too tight or too wide?
       You'll adjust for tomorrow's matches — but your Week 1 loadout itself is locked.
@@ -1632,17 +1672,25 @@ function handleBorder(depth: number = 0, scanAfter: boolean = true) {
 
 // Derive all runtime values from the four student stats. (See the nonnegotiable
 // formulas at the top of the file.)
+
+
 function computeStats() {
     motorPower = SPEED * 100 / 20
     currentPower = motorPower
     chargePower = Math.min(POWER * POWER, 100)
     FOLLOW_THROUGH_MS = 120 + POWER * 35
-    totalArcTime = BASE_SEGMENT_MS * 12
-    thisDuration = Math.min(Math.round(totalArcTime / TURNING), 600)
+
+    // Arc approximation: a curve is built from `arcSegments` short straight pieces.
+    // TURNING IS that segment count — more segments = smoother arc, each piece shorter.
+    totalArcTime = BASE_SEGMENT_MS * 12          // time to sweep one arc
+    arcSegments  = TURNING                         // ← curriculum's "Arc Segments = T"
+    thisDuration = Math.min(Math.round(totalArcTime / arcSegments), 600)
+
     turnRatio = 0.2 + TURNING * 0.02
     DECAY_RATE = 20 - ENDURANCE
     minWheelSpeed = Math.max(20, Math.round(motorPower * 0.25))
     lowPowerThreshold = minWheelSpeed
+}
 }
 
 // Quick white blink of the front headlights (used to flag a confirmed ball).
@@ -1805,6 +1853,7 @@ let sameDirectionCount = 0
 let maxSameDirection = 0
 let lastTurnWasLeft = false
 let borderHandledInSeg = false
+let arcSegments = 0
 
 // --- Power / endurance (derived from stats each loop) ---
 let motorPower = 0
