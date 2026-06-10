@@ -323,14 +323,7 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1JNyyLnY61I0ZFGAbaiF8hfYKNHLkampIQiTAsIgHMC4/edit?usp=drive_link",
         "quickCard": "/resources/quick-cards/activity-card-day04-01-finger-speed-sums.html"
       },
-      {
-        "name": "Power Allocation: Stat Card Fill-In",
-        "mins": 3,
-        "block": "Transition",
-        "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
-        "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
-      },
+      
       {
         "name": "Power Stat Challenge: Ratio and Motor Speed",
         "mins": 50,
@@ -342,6 +335,14 @@ const DAYS_DEFAULT = [
         "makecode":"https://makecode.microbit.org/S25978-40655-36880-19976",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4_Power_Stat_Challenge.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
+      },
+      {
+        "name": "Power Allocation: Stat Card Fill-In",
+        "mins": 3,
+        "block": "Transition",
+        "description": "Write your Power allocation on your stat card. Power is not a free choice: it is whatever points remain after Speed, Endurance, and Turning. Calculate 20 minus your three allocated stats and write that number in the Power row. If your three stats already sum to 20, you have no points for Power and need to revise one prior stat before the block begins.",
+        "facilitatorDescription": "Students fill in the Power row of the stat card. Power is not a free choice -- it is whatever remains after Speed + Endurance + Turning. Teams calculate 20 minus their three allocated stats. If the three already sum to 20, they have zero Power and must revise one prior stat before the Challenge Block starts. Check every card before releasing to the block.",
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day04-02-power-allocation.html"
       },
       {
         "name": "Lunch / Snack Break",
@@ -358,7 +359,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Open by activating the Power² formula from the morning session and have teams write a prediction on the worksheet before anyone touches materials. Teams build and attach a cardboard scoop, passing a three-condition checklist before they can test. Run two settings: three shots at Power 4, then three at Power 8; teams record averages, calculate the charge speed ratio algebraically, measure the distance ratio from actual results, and complete the efficiency section. The charge speed ratio will be exact (4.0); the distance ratio will be lower, and that gap is the point. Facilitate a whole-class share in a planned sequence, then close with the required exit ticket: each team chooses Power, shows the Power² calculation, and confirms the 20-point total.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S63963-81221-45609-58211",
+        "makecode":"https://makecode.microbit.org/S77134-15689-32757-79747",
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4-scoop-build-ratio-testing-exemplars.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
