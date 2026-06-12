@@ -124,9 +124,9 @@ const DAY_15_INLINE = {
         "name": "Match Day 3",
         "mins": 90,
         "block": "Match-Build-Make",
-        "description": "Three rounds of round-robin play. Equation prediction ritual before every match; loss-recovery for every losing team after. Day 15 alternates ball modes — one match Standard (tennis), one Chaos (ping pong), one Endurance (weighted ball). Record the ball mode used with each prediction and result on the Prediction Tracker. After all three matches, compare Season 2 residuals against Season 1 — which stat changes produced proportional results?",
-        "facilitatorDescription": "Before the activity, set up three ball types — foam for Round 1, ping pong for Round 2, tennis for Round 3 — and post the ball mode chart. Fill in every team's Prediction Market row through Match Day 2 before students arrive. Confirm every team has a written linear equation from Day 12. Open by having everyone look at Match Day 1 and 2 residuals for 20 seconds, then ask whether their equation got more accurate, less accurate, or stayed the same — hold the question. Run the MY EQUATION check: every team fills in slope, intercept, equation, x-variable, and prediction card goal before Match 1; do not start until every team has a written equation. Before every match, announce the ball mode and have teams log it before they predict — the ball mode is a transfer test, not a surprise. Run the Prediction Ritual and three rounds with loss recovery between losses. In Summary, read the Prediction Market in miss-to-hit order and name the Best Prediction distinction. Run the Retrospective: push students to name which of four causes explains their residual pattern (slope error, x-variable choice, model drift, environmental sensitivity). After the exit ticket, run the Bracket Reveal.",
-        "script": "https://docs.google.com/document/d/1VRuoTtA4ZSBNUsULeeu-7rSjM_GTGBJSNVQUZu5C-Wc/edit?usp=sharing",
+        "description": "Three rounds of round-robin play. Equation prediction ritual before every match; loss-recovery for every losing team after. Day 15 alternates ball modes — Round 1 Standard (foam), Round 2 Speed Ball (dog ball), Round 3 Endurance Ball (rubber ball). Record the ball mode used with each prediction and result on the Prediction Tracker. After all three matches, compare Season 2 residuals against Season 1 — which stat changes produced proportional results?",
+"facilitatorDescription": "Before the activity, set up three ball types — foam for Round 1, dog ball for Round 2, rubber ball for Round 3 — and post the ball mode chart. Fill in every team's Prediction Market row through Match Day 2 before students arrive. Confirm every team has a written linear equation from Day 12. Open by having everyone look at Match Day 1 and 2 residuals for 20 seconds, then ask whether their equation got more accurate, less accurate, or stayed the same — hold the question. Run the MY EQUATION check: every team fills in slope, intercept, equation, x-variable, and prediction card goal before Match 1; do not start until every team has a written equation. Before every match, announce the ball mode and have teams log it before they predict — the ball mode is a transfer test, not a surprise. Run the Prediction Ritual and three rounds with loss recovery between losses. In Summary, read the Prediction Market in miss-to-hit order and name the Best Prediction distinction. Run the Retrospective: push students to name which of four causes explains their residual pattern (slope error, x-variable choice, model drift, environmental sensitivity). After the exit ticket, run the Bracket Reveal.",
+  "script": "https://docs.google.com/document/d/1VRuoTtA4ZSBNUsULeeu-7rSjM_GTGBJSNVQUZu5C-Wc/edit?usp=sharing",
         "worksheet": "https://drive.google.com/file/d/1B3wx_eZdLcpXvfKFcWDbhrGj3OJ6YzVN/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day15-03-match-day-3.html"
       },
@@ -159,7 +159,7 @@ const DAY_15_INLINE = {
     ],
     "produce": [
       "Bot lore — one new sentence added to team's bot origin story; posted on wall",
-      "Teach the Math card — one formula chosen, calculated with team's actual stat numbers; plain-language explanation written; three Ready Check items completed",
+      "Teach the Math card — one formula chosen, calculated with team's actual stat numbers; plain-language explanation written",
       "Pre-match prediction (×3) — equation-based win probability logged before each of three Season 2 final matches; ball mode (foam/ping-pong/tennis) recorded",
       "Match data log — predicted vs. actual recorded for each match; residual calculated",
       "Loss-recovery entry — one of four causes named for any losing match (slope error, x-variable choice, model drift, environmental sensitivity)",
@@ -250,10 +250,9 @@ const DAY_16_INLINE = {
     "produce": [
       "Station display — scouting report, bot, coordinate grid, and data dashboard arranged for visitors",
       "Teaching goal — one sentence written: what the team wants every visitor to understand before they leave",
-      "Visitor mini-challenge facilitation — each visitor guided through unit rate calculation, coordinate distance, and proportional scaling explanation",
+      "Visitor mini-challenge facilitation — each visitor guided through budget allocation, linear vs quadratic, and percent change explanation",
       "Visitor tracker — completion logged for every visitor across all three mini-challenges",
       "Best Teacher ballots — collected from visitors for the award tally",
-      "Revised explanation — one teaching point that did not land identified and rewritten",
       "Final journal entry — individual reflection on what you learned about yourself as a problem solver; one specific moment you solved something you thought you could not"
     ]
 };

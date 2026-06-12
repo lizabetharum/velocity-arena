@@ -25,7 +25,8 @@ const ACTIVITY_LESSONS = {
   ],
   'Bot Naming Ceremony': '/activities/robot-names/',
   'Distance-Time Graphs':'/lessons/coordinate-functions.html',
-  'Coordinate Navigation Practice: Arc Approximation':"/lessons/turning-test-explainer.html",
+  'Coordinate Navigation Practice: Arc Approximation':[{ url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template"},
+    {url: "/lessons/turning-test-explainer.html", label: "Turning Test Explainer"}],
   'Power Stat Challenge: Ratio and Motor Speed': "/lessons/power-stat-challenge.html",
   'Scoop Build + Ratio Testing':"/lessons/power-test-explainer.html",
   'The Budget Constraint: Speed + Power + Turning + Endurance = 20': [
@@ -47,16 +48,20 @@ const ACTIVITY_LESSONS = {
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Prepare Formula Race Cards"}],
 
 'Field Geometry + Approach Planning':[
+  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template"},
+ 
   {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
   {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
 'Launch Sequence Programming + Testing':[
-  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
+  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template"},
+ 
+ {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
   {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
 
   'Formula Relay: All Five Types in One Race':
-[{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Formula Race Cards"}],
+[{url: "/lessons/formula-race-cards.html", label:"Formula Race Cards"}],
   'Season 1 Match Day 3': {url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'},
-  "Leaderboard Reveal + Open Lab":[{url:"https://velocity-arena-gold.vercel.app/resources/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
+  "Leaderboard Reveal + Open Lab":[{url:"/lessons/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
   'Season 1 Final Round':{url:'/lessons/analysis-block.html', label: 'Season 1 Analysis Block'},
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
   'Proportional Scaling: Scaling Your Stats + Commissioner Proposal Prep': [
