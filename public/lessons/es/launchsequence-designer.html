@@ -1,0 +1,695 @@
+u<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diseñador de Secuencia de Lanzamiento · Velocity Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:        #0D0D1A;
+      --navy2:       #161A2E;
+      --navy3:       #1E2240;
+      --cyan:        #00E5FF;
+      --teal:        #007A99;
+      --slate:       #8899AA;
+      --card-border: #222840;
+      --card-bg:     #161A2E;
+      --green:       #00C97A;
+      --red:         #FF4D6A;
+      --yellow:      #FFD166;
+      --purple:      #9B8AFF;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter',sans-serif;
+      background: var(--navy); color: #E8EAF2;
+      min-height: 100vh; padding-bottom: 5rem;
+    }
+
+    /* Header */
+    .page-header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .page-header .back-link {
+      color: var(--slate); text-decoration: none;
+      font-size: .8125rem; font-weight: 500; letter-spacing: .04em;
+    }
+    .page-header .back-link:hover { color: var(--cyan); }
+    .page-header .divider { color: var(--card-border); }
+    .page-header h1 { font-size: .9375rem; font-weight: 700; letter-spacing: .01em; }
+    .page-header .day-tag {
+      margin-left: auto; font-size: .75rem; font-weight: 700;
+      color: var(--cyan); background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2); border-radius: 4px;
+      padding: .2em .6em; letter-spacing: .06em; text-transform: uppercase;
+    }
+
+    main { max-width: 820px; margin: 2rem auto 0; padding: 0 1.25rem; }
+
+    .hero {
+      border-left: 4px solid var(--cyan);
+      padding: 0 0 1.25rem 1.25rem; margin-bottom: 2rem;
+    }
+    .hero .eyebrow {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .5rem;
+    }
+    .hero h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -.01em; margin-bottom: .5rem; }
+    .hero p { font-size: 1rem; color: #C8CDD8; line-height: 1.65; max-width: 60ch; }
+
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .section-label {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .75rem;
+    }
+    .section-heading { font-size: 1.125rem; font-weight: 800; margin-bottom: .75rem; }
+    .muted { font-size: .875rem; color: var(--slate); line-height: 1.65; }
+
+    /* Step list */
+    .step-list { counter-reset: step; list-style: none; padding: 0; }
+    .step-list > li {
+      counter-increment: step;
+      display: grid; grid-template-columns: 2.75rem 1fr;
+      gap: 1rem; align-items: flex-start;
+      padding: 1rem 0; border-bottom: 1px solid var(--card-border);
+    }
+    .step-list > li:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-list > li::before {
+      content: counter(step);
+      width: 2.25rem; height: 2.25rem; border-radius: 50%;
+      background: rgba(0,229,255,.1); border: 2px solid var(--cyan); color: var(--cyan);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem; flex-shrink: 0;
+    }
+    .step-list .step-title { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+    .step-list .step-body { font-size: .9rem; color: #C8CDD8; line-height: 1.6; }
+    .step-list .step-body a {
+      color: var(--cyan); text-decoration: none; font-weight: 700; border-bottom: 1px dashed var(--cyan);
+    }
+    .step-list .step-body a:hover { border-bottom-style: solid; }
+    .step-list .step-body ol {
+      list-style: lower-alpha; padding-left: 1.5rem;
+      margin: .5rem 0; font-size: .875rem; color: #C8CDD8; line-height: 1.65;
+    }
+    .step-list .step-body ol li { margin-bottom: .375rem; }
+    .step-list code, .muted code, .zone-callout code, .reminder code {
+      font-family: 'JetBrains Mono', monospace; font-size: .8125rem;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 4px; padding: .15em .4em;
+    }
+    .step-list kbd, .muted kbd {
+      font-family: inherit; font-size: .75rem; font-weight: 700;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-bottom-width: 2px; border-radius: 4px;
+      padding: .15em .5em; color: #E8EAF2;
+    }
+
+    /* Code block */
+    .code-wrap {
+      background: #0A0A14; border: 1px solid var(--card-border);
+      border-radius: 10px; overflow: hidden; margin-top: 1rem;
+    }
+    .code-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .625rem 1rem; background: var(--navy2);
+      border-bottom: 1px solid var(--card-border); gap: .75rem; flex-wrap: wrap;
+    }
+    .code-title {
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .copy-group { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'Inter',sans-serif; font-size: .8125rem; font-weight: 700;
+      padding: .45rem .9rem; border-radius: 6px; border: 1px solid var(--teal);
+      background: transparent; color: var(--cyan); cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s, transform .1s;
+    }
+    .btn-copy:hover { background: rgba(0,229,255,.08); }
+    .btn-copy:active { transform: scale(.97); }
+    .btn-copy.primary { background: var(--cyan); color: var(--navy); border-color: var(--cyan); }
+    .btn-copy.primary:hover { opacity: .88; }
+    .btn-copy.copied { background: var(--green); color: var(--navy); border-color: var(--green); }
+    pre.code-block {
+      margin: 0; padding: 1.25rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .75rem; line-height: 1.6; color: #D4D8E0;
+      background: #0A0A14; max-height: 560px; overflow: auto; white-space: pre;
+    }
+    pre.code-block::-webkit-scrollbar { width: 10px; height: 10px; }
+    pre.code-block::-webkit-scrollbar-track { background: #0A0A14; }
+    pre.code-block::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+    /* Zone callouts */
+    .zone-callout {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 1rem; align-items: start;
+      background: rgba(255,209,102,.06);
+      border: 1px solid rgba(255,209,102,.25);
+      border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+    }
+    .zone-callout .zc-badge { font-size: 1.75rem; line-height: 1; padding-top: .15rem; }
+    .zone-callout h4 { font-size: 1rem; font-weight: 800; color: var(--yellow); margin-bottom: .375rem; }
+    .zone-callout p { font-size: .875rem; color: #C8CDD8; line-height: 1.6; }
+    .zone-callout p + p { margin-top: .5rem; }
+    .zone-callout strong { color: var(--yellow); }
+
+    /* Green "copy this" callout variant */
+    .zone-callout.go { background: rgba(0,201,122,.07); border-color: rgba(0,201,122,.3); }
+    .zone-callout.go h4 { color: var(--green); }
+    .zone-callout.go strong { color: var(--green); }
+
+    /* Reminder row */
+    .reminder {
+      background: rgba(255,77,106,.05);
+      border: 1px solid rgba(255,77,106,.2);
+      border-radius: 8px; padding: .875rem 1.125rem;
+      font-size: .875rem; color: #C8CDD8; line-height: 1.55; margin-bottom: 1rem;
+    }
+    .reminder strong { color: var(--red); }
+
+    /* Tuning reference table */
+    .tune-table { width: 100%; border-collapse: collapse; margin-top: .5rem; font-size: .875rem; }
+    .tune-table th, .tune-table td {
+      text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--card-border);
+      vertical-align: top;
+    }
+    .tune-table th { color: var(--slate); font-size: .6875rem; text-transform: uppercase; letter-spacing: .08em; }
+    .tune-table td:first-child {
+      font-family: 'JetBrains Mono', monospace; color: var(--cyan); white-space: nowrap; font-size: .8125rem;
+    }
+    .tune-table td { color: #C8CDD8; line-height: 1.5; }
+    .tune-table tr:last-child td { border-bottom: none; }
+
+    /* LED key chips */
+    .led-key { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+    .led-chip {
+      display: inline-flex; align-items: center; gap: .45rem;
+      background: var(--navy3); border: 1px solid var(--card-border);
+      border-radius: 6px; padding: .35rem .7rem; font-size: .8125rem; color: #C8CDD8;
+    }
+    .led-chip b {
+      font-family: 'JetBrains Mono', monospace; color: var(--cyan);
+      background: rgba(0,229,255,.08); border-radius: 3px; padding: 0 .35em;
+    }
+
+    @media (max-width: 540px) {
+      pre.code-block { font-size: .7rem; padding: 1rem; }
+    }
+  </style>
+  <style>
+    /* EN/ES language toggle */
+    .lang-toggle{position:fixed;top:.625rem;right:.875rem;z-index:1000;display:flex;gap:.25rem;font-size:.6875rem;font-weight:700;font-family:'Inter','Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;background:rgba(15,29,49,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.25rem;}
+    .lang-toggle a{padding:.25rem .5rem;border-radius:4px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s,background .15s;}
+    .lang-toggle a:hover{color:#fff;}
+    .lang-toggle a.active{background:rgba(0,229,255,.18);color:#00E5FF;}
+  </style>
+</head>
+<body>
+<!-- Language toggle -->
+<nav class="lang-toggle" aria-label="Cambiar idioma">
+  <a href="/lessons/launchsequence-designer.html">EN</a>
+  <a href="/lessons/es/launchsequence-designer.html" class="active">ES</a>
+</nav>
+
+<!-- vla-lesson-nav:start -->
+<div style="background:#0D0D1A;border-bottom:1px solid #222840;padding:10px 20px;font-family: 'Inter',system-ui,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;gap:18px;align-items:center;">
+  <a href="/today.html" style="color:#8899AA;text-decoration:none;">Hoy</a>
+  <a href="/schedule.html" style="color:#8899AA;text-decoration:none;">Horario</a>
+  <a href="/teachers.html" style="color:#8899AA;text-decoration:none;">Recursos para docentes</a>
+  <a href="/tools.html" style="color:#8899AA;text-decoration:none;">Herramientas</a>
+  <a href="/activities/math/index.html" style="color:#8899AA;text-decoration:none;">Conceptos matemáticos</a>
+</div>
+<!-- vla-lesson-nav:end -->
+
+<header class="page-header">
+  <a href="/today.html" class="back-link">← Hoy</a>
+  <span class="divider">|</span>
+  <h1>Diseñador de Secuencia de Lanzamiento</h1>
+  <span class="day-tag">Lab de Lanzamiento</span>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="eyebrow">Construye y prueba tu jugada inicial</div>
+    <h2>Diseña tu secuencia de lanzamiento por separado.</h2>
+    <p>
+      El lanzamiento es la primera tarea de tu robot en cada partido: llegar a la pelota y patearla hacia la
+      portería. Esta herramienta ejecuta <strong>solo tu lanzamiento</strong> — sin patrullar, sin el bucle del
+      partido — para que puedas ajustarlo rápido. Coloca una pelota, presiona un botón, observa qué pasa, cambia
+      cuatro números e inténtalo de nuevo. Cuando funcione, copia un bloque marcado en el código de tu juego.
+    </p>
+  </section>
+
+  <!-- Preparación -->
+  <div class="card">
+    <div class="section-label">Preparación</div>
+    <h3 class="section-heading">Abre MakeCode y carga el diseñador</h3>
+    <ol class="step-list">
+      <li>
+        <div>
+          <div class="step-title">Abre MakeCode para micro:bit</div>
+          <div class="step-body">
+            Ve a <a href="https://makecode.microbit.org" target="_blank" rel="noopener">makecode.microbit.org</a>.
+            No necesitas iniciar sesión.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Proyecto nuevo + extensión Cutebot Pro</div>
+          <div class="step-body">
+            Haz clic en <strong>New Project</strong> y nómbralo <code>launch-designer</code>. Luego haz clic en el
+            ícono de engranaje → <strong>Extensions</strong>, busca <code>cutebot pro</code> y agrégala.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Cambia a JavaScript</div>
+          <div class="step-body">
+            En la parte superior del editor haz clic en <kbd>JavaScript</kbd>. Selecciona todo el código
+            predeterminado (<kbd>⌘ A</kbd> / <kbd>Ctrl A</kbd>), elimínalo, luego presiona
+            <strong>Copiar diseñador</strong> abajo y pega.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Configura tus estadísticas</div>
+          <div class="step-body">
+            Cerca del final, ajusta <code>SPEED</code> y <code>POWER</code> a los valores de
+            <strong>tu robot</strong> para que el tiempo de manejo y la fuerza del pateo coincidan con tu robot real.
+            Descarga al robot.
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- El código del diseñador -->
+  <div class="card">
+    <div class="section-label">Programa del diseñador</div>
+    <h3 class="section-heading">El código</h3>
+    <div class="muted" style="margin-bottom:.5rem;">
+      Todo lo que está entre los marcadores verdes <code>COPY INTO YOUR GAME CODE</code> es lo que moverás a tu
+      juego más tarde. Todo lo que está debajo de la línea <code>TEST HARNESS</code> solo permite que el lanzamiento
+      se ejecute por sí solo — no copies esa parte.
+    </div>
+    <div class="code-wrap">
+      <div class="code-toolbar">
+        <span class="code-title">launch-designer.ts</span>
+        <div class="copy-group">
+          <button class="btn-copy primary" id="copy-raw-btn" onclick="copyTemplate()">Copiar diseñador</button>
+        </div>
+      </div>
+      <pre class="code-block" id="code-display"></pre>
+    </div>
+  </div>
+
+  <!-- El ciclo de diseño -->
+  <div class="card">
+    <div class="section-label">Prueba y ajusta</div>
+    <h3 class="section-heading">El ciclo de diseño</h3>
+    <ol class="step-list">
+      <li>
+        <div>
+          <div class="step-title">Coloca la pelota</div>
+          <div class="step-body">
+            Pon tu robot en su <strong>esquina de inicio real</strong> y coloca la pelota donde debe terminar tu
+            lanzamiento (cerca del centro del campo). Deja al robot al menos un metro de pista despejada al frente.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Presiona <kbd>A</kbd> para ejecutar el lanzamiento</div>
+          <div class="step-body">
+            El robot ejecuta tu lanzamiento una vez: se desplaza hacia la línea central, se alinea con la portería,
+            avanza hacia la pelota y patea. Observa dónde termina la pelota.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Cambia los cuatro números, vuelve a descargar, repite</div>
+          <div class="step-body">
+            Ajusta los valores <code>LAUNCH_</code> (ver la tabla abajo), descarga y ejecuta de nuevo. Presiona
+            <kbd>B</kbd> en cualquier momento para mostrar tus cuatro valores actuales. Presiona <kbd>A + B</kbd>
+            para una parada de emergencia.
+          </div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="step-title">Revisa la pantalla LED en cada ejecución</div>
+          <div class="step-body">
+            El micro:bit te indica en qué fase está:
+            <div class="led-key">
+              <span class="led-chip"><b>GO</b> lanzamiento iniciado</span>
+              <span class="led-chip"><b>K</b> pateando</span>
+              <span class="led-chip"><b>OK</b> terminado</span>
+              <span class="led-chip"><b>NO BALL</b> no llegó a la pelota</span>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Los cuatro números -->
+  <div class="card">
+    <div class="section-label">Qué cambiar</div>
+    <h3 class="section-heading">Los cuatro números de lanzamiento</h3>
+    <p class="muted" style="margin-bottom:.25rem;">
+      Ajústalos aproximadamente en este orden. Mantén los dos ángulos de giro <strong>iguales</strong> para que el
+      robot termine mirando de nuevo hacia la portería después de la diagonal.
+    </p>
+    <table class="tune-table">
+      <thead>
+        <tr><th>Variable</th><th>Qué controla</th><th>Si está mal…</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>LAUNCH_OFFSET_TURN_DEG</td>
+          <td>Cuánto gira el robot hacia la línea central al inicio.</td>
+          <td>El robot apunta demasiado abierto o demasiado cerrado antes de la diagonal.</td>
+        </tr>
+        <tr>
+          <td>LAUNCH_OFFSET_DRIVE_MS</td>
+          <td>Cuánto dura el manejo diagonal (qué tan lejos llega de lado).</td>
+          <td>El robot se detiene al lado de la pelota en vez de alineado con ella.</td>
+        </tr>
+        <tr>
+          <td>LAUNCH_SQUARE_TURN_DEG</td>
+          <td>El giro que vuelve a apuntar a la portería. <strong>Mantenlo igual al giro inicial.</strong></td>
+          <td>El robot termina apuntando fuera del objetivo, así que el pateo falla la portería.</td>
+        </tr>
+        <tr>
+          <td>LAUNCH_APPROACH_MS</td>
+          <td>Cuánto avanza en línea recta para llegar a la pelota.</td>
+          <td>Muy corto → <code>NO BALL</code>; muy largo → se pasa / se cae de la mesa.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted" style="margin-top:.75rem;">
+      <strong style="color:#E8EAF2;">¿Esquina invertida?</strong> Si tu pelota está a la <em>derecha</em> de tu
+      inicio, intercambia <code>LeftInPlace</code> y <code>RightInPlace</code> en los Pasos 1 y 3 — igual que harás
+      en el juego.
+    </p>
+  </div>
+
+  <!-- Cuando funcione -->
+  <div class="card">
+    <div class="section-label">Cuando funcione</div>
+    <h3 class="section-heading">Muévelo al código de tu juego</h3>
+
+    <div class="zone-callout go">
+      <div class="zc-badge">✓</div>
+      <div>
+        <h4>Copia el bloque marcado</h4>
+        <p>
+          En tu proyecto <code>launch-designer</code> ya ajustado, selecciona todo lo que está entre
+          <code>COPY INTO YOUR GAME CODE — START</code> y <code>— END</code> — eso es tus cuatro variables
+          <code>LAUNCH_</code> y toda la función <code>launchSequence()</code> — y cópialo
+          (<kbd>⌘ C</kbd> / <kbd>Ctrl C</kbd>).
+        </p>
+        <p>
+          Abre tu proyecto del juego, <strong>elimina tu <code>launchSequence()</code> anterior</strong> y pega el
+          tuyo en su lugar. Si tu juego ya tiene las variables <code>LAUNCH_</code>, solo actualiza sus números —
+          no pegues un segundo <code>let</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="reminder">
+      <strong>No copies el banco de pruebas (test harness).</strong> Todo lo que está debajo de la línea
+      <code>TEST HARNESS — DO NOT COPY</code> (<code>checkBorder</code>, <code>confirmBall</code>,
+      <code>chargeAndFollowThrough</code>, las estadísticas, etc.) ya existe en el código de tu juego. Copiarlo
+      encima crearía funciones duplicadas y errores.
+    </div>
+
+    <div class="zone-callout">
+      <div class="zc-badge">!</div>
+      <div>
+        <h4>Una diferencia con el juego real</h4>
+        <p>
+          El diseñador <strong>apaga la detección de borde</strong> para que tu lanzamiento nunca se interrumpa en
+          una mesa vacía — por eso debes supervisar y atrapar el robot. En el juego completo, la seguridad de borde
+          está activada y el mismo lanzamiento se detendrá en el borde del campo. Tus números ajustados se trasladan
+          sin cambios.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Code source (read by the copy button + rendered into the page). Kept in
+     English: this is the actual MakeCode that students paste into their bot. -->
+<script id="code-source" type="text/plain">
+/**
+ * ════════════════════════════════════════════════════════════════════
+ *  LAUNCH SEQUENCE DESIGNER
+ * ════════════════════════════════════════════════════════════════════
+ *  HOW TO USE
+ *   1. Set SPEED / POWER below to match your bot (bottom of file).
+ *   2. Place the ball where your launch should end up (about center field).
+ *   3. Press A  -> the bot runs ONLY your launch: shimmy -> approach -> kick.
+ *   4. Tune the 4 LAUNCH_ numbers until it reaches the ball and kicks it
+ *      toward the goal. Press B to show your current values.
+ *   5. When it works, copy the block between the COPY markers into your
+ *      game code (replace your old launchSequence + launch variables).
+ *
+ *  Buttons:  A = run launch   B = show your 4 values   A+B = stop
+ * ════════════════════════════════════════════════════════════════════
+ */
+
+
+// ===================== COPY INTO YOUR GAME CODE — START =====================
+//  (If your game already has these LAUNCH_ variables, just update the numbers
+//   -- do NOT paste a second `let`. Replace your old launchSequence.)
+
+let LAUNCH_OFFSET_TURN_DEG = 35     // Step 1: turn LEFT toward center
+let LAUNCH_OFFSET_DRIVE_MS = 2500   // Step 2: diagonal onto the goal axis
+let LAUNCH_SQUARE_TURN_DEG = 35     // Step 3: turn RIGHT to face the goal (= Step 1)
+let LAUNCH_APPROACH_MS     = 600    // Step 4: forward time to reach the ball
+
+function launchSequence() {
+    launchActive = true
+    let powerScale = 30 / Math.max(1, motorPower)
+
+    // Step 1 - angle LEFT toward the center line
+    CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, LAUNCH_OFFSET_TURN_DEG)
+    basic.pause(300); motorStop(); basic.pause(120)
+
+    // Step 2 - drive the diagonal onto the ball-to-goal axis
+    CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    basic.pause(Math.round(LAUNCH_OFFSET_DRIVE_MS * powerScale))
+    motorStop(); basic.pause(120)
+
+    // Step 3 - re-square RIGHT to point straight at the goal
+    CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, LAUNCH_SQUARE_TURN_DEG)
+    basic.pause(300); motorStop(); basic.pause(120)
+
+    // Re-enable border sensing, then roll forward to the ball
+    launchActive = false
+    basic.pause(30)
+    if (checkBorder() > 0) { handleBorder(); return }
+    if (!matchRunning) { return }
+
+    if (driveUntilBall(Math.round(LAUNCH_APPROACH_MS * powerScale))) {
+        ballDetected = true
+        if (matchRunning && confirmBall(true)) {
+            launchActive = true            // ignore goal-line border during the kick
+            chargeAndFollowThrough()
+            launchActive = false
+        }
+    } else {
+        // Ball not where expected - hand off to the normal pipeline.
+        if (matchRunning && !ballDetected) { lookForBall() }
+        if (ballDetected) { tryAimThenCharge() }
+    }
+
+    if (!matchRunning) { return }
+    motorStop(); basic.pause(60)
+    if (checkBorder() > 0) { handleBorder() }
+}
+
+// ===================== COPY INTO YOUR GAME CODE — END =======================
+
+
+// ----------------------------------------------------------------------
+//  TEST HARNESS - DO NOT COPY. (Simple stand-ins for functions your game
+//  code already has, so the launch can run by itself.)
+// ----------------------------------------------------------------------
+
+function motorStop() {
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(10)
+    CutebotPro.pwmCruiseControl(0, 0)
+    basic.pause(10)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+// No border detection in the designer - the real game has the full version.
+function checkBorder(): number { return 0 }
+function handleBorder() { motorStop() }
+
+function confirmBall(alreadyStopped: boolean = false): boolean {
+    if (!alreadyStopped) { motorStop(); basic.pause(50) } else { basic.pause(30) }
+    let hits = 0
+    for (let i = 0; i < 3; i++) {
+        if (i > 0) { basic.pause(30) }
+        let d = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (d > 3 && d < BALL_DETECT_CM) { hits += 1 }
+    }
+    return hits >= 2
+}
+
+function driveUntilBall(maxMs: number): boolean {
+    let t0 = input.runningTime()
+    CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    while (input.runningTime() - t0 < maxMs) {
+        let d = CutebotPro.ultrasonic(SonarUnit.Centimeters)
+        if (d > 4 && d < BALL_DETECT_CM) {
+            motorStop()
+            if (confirmBall(true)) { return true }
+            CutebotPro.pwmCruiseControl(currentPower, currentPower)
+        }
+        basic.pause(5)
+    }
+    motorStop()
+    return false
+}
+
+// Simple kick (POWER-based) - enough to see the launch deliver a shot.
+function chargeAndFollowThrough() {
+    let factor = enduranceFactor > 0 ? enduranceFactor : 1
+    effectiveCharge = Math.max(Math.round(chargePower * factor), 25)
+    effectiveCharge = Math.min(effectiveCharge, 100)
+    dynamicCharge = Math.max(effectiveCharge, 30)
+    actualFollowThrough = Math.min(FOLLOW_THROUGH_MS, 500)
+    basic.showString("K")
+    CutebotPro.pwmCruiseControl(dynamicCharge, dynamicCharge)
+    basic.pause(actualFollowThrough)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    ballDetected = false
+}
+
+// In the designer, "ball not found" just reports it (no scanning).
+function lookForBall() { basic.showString("NO BALL"); basic.pause(500); basic.clearScreen() }
+function tryAimThenCharge() { if (ballDetected) { chargeAndFollowThrough() } }
+
+function computeStats() {
+    motorPower = SPEED * 100 / 20
+    currentPower = motorPower
+    chargePower = Math.min(POWER * POWER, 100)
+    FOLLOW_THROUGH_MS = 120 + POWER * 35
+    enduranceFactor = 1                       // fresh bot for design/testing
+}
+
+// ---- Buttons ----
+input.onButtonPressed(Button.A, function () {
+    computeStats()
+    matchRunning = true
+    ballDetected = false
+    launchActive = false
+    lastTurnWasLeft = false
+    basic.showString("GO")
+    launchSequence()
+    matchRunning = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showString("OK")
+    basic.pause(400)
+    basic.clearScreen()
+})
+
+input.onButtonPressed(Button.B, function () {
+    basic.showString("L" + LAUNCH_OFFSET_TURN_DEG + " D" + LAUNCH_OFFSET_DRIVE_MS + " A" + LAUNCH_APPROACH_MS)
+    basic.clearScreen()
+})
+
+input.onButtonPressed(Button.AB, function () {
+    matchRunning = false
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showString("X")
+    basic.pause(400)
+    basic.clearScreen()
+})
+
+// ---- Variables (harness - your game code already has these) ----
+let matchRunning = false
+let launchActive = false
+let ballDetected = false
+let ballHeading = 0
+let motorPower = 0
+let currentPower = 0
+let enduranceFactor = 1
+let chargePower = 0
+let FOLLOW_THROUGH_MS = 0
+let effectiveCharge = 0
+let dynamicCharge = 0
+let actualFollowThrough = 0
+let lastTurnWasLeft = false
+let BALL_DETECT_CM = 0
+
+// ---- Your stats (set to match your bot) ----
+let SPEED = 6
+let POWER = 7
+let ENDURANCE = 4
+let TURNING = 3
+
+// ---- Init ----
+BALL_DETECT_CM = 45        // detects the ball as the bot rolls up to it
+CutebotPro.stopImmediately(CutebotProMotors.ALL)
+CutebotPro.pwmCruiseControl(0, 0)
+basic.pause(100)
+basic.showIcon(IconNames.SmallSquare)
+</script>
+
+<script>
+// Render the code block to the page.
+document.getElementById('code-display').textContent = document.getElementById('code-source').textContent;
+
+// Copy handler.
+async function copyTemplate() {
+  const src = document.getElementById('code-source').textContent;
+  const btn = document.getElementById('copy-raw-btn');
+  try {
+    await navigator.clipboard.writeText(src);
+  } catch (_e) {
+    const ta = document.createElement('textarea');
+    ta.value = src;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (_ignored) {}
+    document.body.removeChild(ta);
+  }
+  const originalText = btn.textContent;
+  btn.textContent = '✓ Copiado';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.classList.remove('copied');
+  }, 1600);
+}
+</script>
+
+</body>
+</html>
