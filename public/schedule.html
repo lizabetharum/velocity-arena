@@ -149,43 +149,7 @@ body{
     <span class="meta">07 BLOCKS</span>
   </div>
 
-  <div class="structure-grid">
-    <div class="struct-block">
-      <div class="sb-time">10:00</div>
-      <div class="sb-name">Arrival</div>
-      <div class="sb-dur">5 min</div>
-    </div>
-    <div class="struct-block">
-      <div class="sb-time">10:05</div>
-      <div class="sb-name">Hook</div>
-      <div class="sb-dur">25 min</div>
-    </div>
-    <div class="struct-block">
-      <div class="sb-time">10:30</div>
-      <div class="sb-name">Challenge Block</div>
-      <div class="sb-dur">65 min</div>
-    </div>
-    <div class="struct-block">
-      <div class="sb-time">11:35</div>
-      <div class="sb-name" id="break-block-name">Lunch</div>
-      <div class="sb-dur">60 min</div>
-    </div>
-    <div class="struct-block">
-      <div class="sb-time">12:35</div>
-      <div class="sb-name">Match · Build · Make</div>
-      <div class="sb-dur">90 min</div>
-    </div>
-    <div class="struct-block">
-      <div class="sb-time">2:05</div>
-      <div class="sb-name">Open Lab</div>
-      <div class="sb-dur">35 min</div>
-    </div>
-    <div class="struct-block accent">
-      <div class="sb-time">2:45</div>
-      <div class="sb-name">ENDS Ritual</div>
-      <div class="sb-dur">15 min</div>
-    </div>
-  </div>
+  <div class="structure-grid" id="structure-grid"></div>
 
   <div class="explain-grid">
     <div class="explain-card">
@@ -238,10 +202,45 @@ const weeks = [1, 2, 3, 4].map(num => {
   // 16 days → 4 cols, 20 days → 5 cols (default)
   const cols = TOTAL_DAYS === 16 ? 4 : 5;
   document.documentElement.style.setProperty('--days-per-week', cols);
-  // TN/Crosstown runs an 8:05–12:00 day with a snack break, not lunch.
-  if (TOTAL_DAYS === 16) {
-    const b = document.getElementById('break-block-name');
-    if (b) b.textContent = 'Snack';
+  // Site-aware daily structure: Crosstown runs 8:05–12:00 with a 20-min snack break;
+  // NYC sites run 10:00–2:45 with a 60-min lunch.
+  const siteCode = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  const isTN = siteCode === 'TN';
+  const fmt = (mins) => {
+    let h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h > 12) h -= 12;
+    if (h === 0) h = 12;
+    return `${h}:${String(m).padStart(2,'0')}`;
+  };
+  const blocks = isTN
+    ? [
+        { name: 'Arrival',            dur: 5,  start: 8*60 + 5  },
+        { name: 'Hook',               dur: 20, start: 8*60 + 10 },
+        { name: 'Challenge Block',    dur: 55, start: 8*60 + 30 },
+        { name: 'Snack',              dur: 20, start: 9*60 + 25 },
+        { name: 'Match · Build · Make', dur: 75, start: 9*60 + 45 },
+        { name: 'Open Lab',           dur: 25, start: 11*60     },
+        { name: 'ENDS Ritual',        dur: 15, start: 11*60 + 25, accent: true },
+      ]
+    : [
+        { name: 'Arrival',            dur: 5,  start: 10*60      },
+        { name: 'Hook',               dur: 25, start: 10*60 + 5  },
+        { name: 'Challenge Block',    dur: 65, start: 10*60 + 30 },
+        { name: 'Lunch',              dur: 60, start: 11*60 + 35 },
+        { name: 'Match · Build · Make', dur: 90, start: 12*60 + 35 },
+        { name: 'Open Lab',           dur: 35, start: 14*60 + 5  },
+        { name: 'ENDS Ritual',        dur: 15, start: 14*60 + 45, accent: true },
+      ];
+  const grid = document.getElementById('structure-grid');
+  if (grid) {
+    grid.innerHTML = blocks.map(b => `
+      <div class="struct-block${b.accent ? ' accent' : ''}">
+        <div class="sb-time">${fmt(b.start)}</div>
+        <div class="sb-name">${b.name}</div>
+        <div class="sb-dur">${b.dur} min</div>
+      </div>
+    `).join('');
   }
 })();
 
