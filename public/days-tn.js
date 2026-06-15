@@ -2,7 +2,7 @@
 // Loaded on every page. All four pilot sites except none use this shape;
 // the only outlier was the default 20-day program which currently has no
 // active pilot site assigned:
-//   - TN  (Crosstown)                  — 8:05 AM start, compressed activity timings, snack break
+//   - TN  (Crosstown)                  — 8:00 AM start, compressed activity timings, snack break
 //   - NY1 (Gotham Tech)                — Mon–Thu 10:00–3:00, full-length activities, lunch
 //   - NY2 (Claremont International HS) — Mon–Thu 10:00–3:00, same as Gotham
 //   - NY3 (South Bronx Community)      — Mon–Thu 10:00–3:00, same as Gotham
@@ -42,7 +42,7 @@ const TN_OVERRIDES = (typeof DAYS_DEFAULT !== 'undefined') ? {
 } : {};
 
 // ── TN per-activity patches ───────────────────────────────────
-// TN runs a shorter day (8:05–12:00 ≈ 3h55m vs default 10:00–2:45 ≈ 4h45m),
+// TN runs a shorter day (8:00–12:00 = 4h vs default 10:00–2:45 ≈ 4h45m),
 // so many activities need shorter durations or different labels.
 //
 // Values may be a NUMBER (shorthand for { mins: N }) or an OBJECT with any
@@ -144,7 +144,7 @@ const DAY_15_INLINE = {
         "name": "Open Lab: Reflection Time",
         "mins": 30,
         "block": "Open Lab",
-        "description": "Rehearse your pitch one more time as a team. Add specific numbers to any claim that is still vague. Every claim in the pitch needs a number next to it before tomorrow.",
+        "description": "Prepare your Community Exhibition presentation using your Bot Identity card. Every team must be ready to explain their bot's name and allocation, compute one formula from their actual numbers, state their biggest prediction gap from either season, and describe one change from Season 1 to Season 2 and why. Rehearse with a teammate as the stand-in guest. The Skill Bridge closing ritual ends the day.",
         "facilitatorDescription": "Direct teams to prepare their Community Exhibition presentation using their Bot Identity card. Each team must be able to explain their bot's name and allocation, compute one formula using their actual numbers, recite their biggest gap sentence from either season, and describe one change they made from Season 1 to Season 2 and why. Run a quick rehearsal with a teammate as the stand-in guest. The Skill Bridge closing ritual ends the day.",
         "script": "https://docs.google.com/document/d/1yro_I-SJCEKRtNaY2TEFO6QQgdoiMeQ-ZGt4bh59DRU/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day17-05-open-lab-pitch-bot-prep.html"
