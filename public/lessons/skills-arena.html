@@ -1884,26 +1884,29 @@ async function saveCardFields(cardId){
     else delete local[cardId];
     localStorage.setItem('va_skills_fields', JSON.stringify(local));
   } catch(e){}
-  if (!id || !endpoint) return;
+  if (!id) { console.log('[skills] save skipped: no team identity set'); return; }
+  if (!endpoint) { console.log('[skills] save skipped: no endpoint for current site'); return; }
   showSaveIndicator('', 'saving…');
+  const payload = {
+    action: 'skills_state_save',
+    team: id.team,
+    name: id.name,
+    challenge: cardId,
+    fields: state,
+    ts: new Date().toISOString()
+  };
+  console.log('[skills] POST card ' + cardId + ' state →', endpoint, payload);
   try {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'skills_state_save',
-        team: id.team,
-        name: id.name,
-        challenge: cardId,
-        fields: state,
-        ts: new Date().toISOString()
-      })
-    });
-    const json = await res.json();
+    const res = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+    const text = await res.text();
+    console.log('[skills] response ' + res.status + ':', text);
+    let json;
+    try { json = JSON.parse(text); } catch(_) { json = null; }
     if (json && json.ok) showSaveIndicator('ok', 'saved');
-    else showSaveIndicator('err', 'error');
+    else showSaveIndicator('err', 'error: ' + (json && json.error ? json.error : 'no ok'));
   } catch(err){
     showSaveIndicator('err', 'offline');
-    console.warn('Skills card field save failed', err);
+    console.warn('[skills] fetch threw', err);
   }
 }
 
