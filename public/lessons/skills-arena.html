@@ -1550,11 +1550,19 @@ function buildCard(s){
 
 // Build grid
 document.getElementById('grid').innerHTML = SKILLS.map(buildCard).join('');
-document.querySelectorAll('.card').forEach((c,i)=>{ c.style.animationDelay=`${i*60}ms`; });
+document.querySelectorAll('.card').forEach((c,i)=>{
+  c.style.animationDelay=`${i*60}ms`;
+  const cardId = parseInt(c.id.replace('card',''), 10);
+  if (!isNaN(cardId)) {
+    tagCardFields(c);
+    wireCardInputs(c, cardId);
+  }
+});
 
 // Wire team identity + load any prior progress (local + sheet).
 renderTeamIdUI();
 loadSkillsProgress();
+loadCardFields();
 
 // ── CODE TOGGLE ─────────────────────────────────────────────────────────────
 function toggleCode(id){
@@ -1640,6 +1648,7 @@ function submitTeamId(ev){
   setTeamId(team, name);
   renderTeamIdUI();
   loadSkillsProgress();
+  loadCardFields();
   return false;
 }
 function resetTeamId(){
@@ -1752,6 +1761,168 @@ function markDone(id, btn){
   btn.innerHTML = done ? I.undo+' Undo' : I.check+' Done';
   updateEarnedCount();
   saveSkillsProgress(id, done);
+}
+
+// ── CARD FIELD SYNC ─────────────────────────────────────────────────────────
+// Each card's blanks, choices, yes/no, and badge checks get stable data-field
+// keys (p0, r2.b1, r3.choice, r0.yn, g1, c2). On every input change we collect
+// the full card snapshot, debounce ~900ms, then UPSERT a single row per
+// (team, name, challenge) in the Apps Script "Card State" sheet. Sheet truth
+// wins on page load (loadCardFields), localStorage caches as offline fallback.
+
+const _saveTimers = {};
+
+function tagCardFields(cardEl){
+  // Prediction template blanks → p0, p1, ...
+  cardEl.querySelectorAll('.pred-text .blank').forEach((el, i) => {
+    el.setAttribute('data-field', 'p' + i);
+  });
+  // Run rows
+  cardEl.querySelectorAll('.run-list .run-item').forEach((row, ri) => {
+    // yn checkbox pair: both share field r{ri}.yn; data-value captures which one
+    row.querySelectorAll('.run-yn input[type=checkbox]').forEach((cb, i) => {
+      cb.setAttribute('data-field', 'r' + ri + '.yn');
+      cb.setAttribute('data-value', i === 0 ? 'yes' : 'no');
+    });
+    // Fill blanks within run-val → r{ri}.b0, r{ri}.b1, ...
+    row.querySelectorAll('.run-val .blank').forEach((b, bi) => {
+      b.setAttribute('data-field', 'r' + ri + '.b' + bi);
+    });
+    // Radio-chip choices → r{ri}.choice, data-value = label text
+    row.querySelectorAll('.run-val .chip-opt input[type=radio]').forEach(rd => {
+      rd.setAttribute('data-field', 'r' + ri + '.choice');
+      const labelSpan = rd.parentElement.querySelector('span');
+      if (labelSpan) rd.setAttribute('data-value', labelSpan.textContent.trim());
+    });
+  });
+  // Gap sentence blanks → g0, g1, ...
+  cardEl.querySelectorAll('.gap-text .blank').forEach((el, i) => {
+    el.setAttribute('data-field', 'g' + i);
+  });
+  // Badge check items → c0, c1, ...
+  cardEl.querySelectorAll('.badge-checks input[type=checkbox]').forEach((el, i) => {
+    el.setAttribute('data-field', 'c' + i);
+  });
+}
+
+function wireCardInputs(cardEl, cardId){
+  cardEl.querySelectorAll('.blank[data-field]').forEach(el => {
+    el.addEventListener('input', () => scheduleCardSave(cardId));
+    el.addEventListener('blur',  () => scheduleCardSave(cardId));
+  });
+  cardEl.querySelectorAll('input[type=checkbox][data-field], input[type=radio][data-field]').forEach(el => {
+    el.addEventListener('change', () => scheduleCardSave(cardId));
+  });
+}
+
+function collectCardState(cardId){
+  const card = document.getElementById('card' + cardId);
+  if (!card) return {};
+  const out = {};
+  // Blanks: take trimmed text content.
+  card.querySelectorAll('.blank[data-field]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) out[el.getAttribute('data-field')] = v;
+  });
+  // Checkboxes / radios with data-value: only record the checked ones.
+  card.querySelectorAll('input[type=checkbox][data-field], input[type=radio][data-field]').forEach(el => {
+    if (!el.checked) return;
+    const key = el.getAttribute('data-field');
+    const dval = el.getAttribute('data-value');
+    if (dval) {
+      // yn allows both → join with '+' if collision; choice is mutex by radio name.
+      if (out[key] && out[key] !== dval) out[key] = out[key] + '+' + dval;
+      else out[key] = dval;
+    } else {
+      out[key] = true;
+    }
+  });
+  return out;
+}
+
+function restoreCardState(cardId, state){
+  if (!state) return;
+  const card = document.getElementById('card' + cardId);
+  if (!card) return;
+  Object.entries(state).forEach(([key, value]) => {
+    // Editable blank
+    const blank = card.querySelector('.blank[data-field="' + key + '"]');
+    if (blank) { blank.textContent = String(value); return; }
+    // Checkboxes / radios — handle data-value match and plain boolean.
+    const inputs = card.querySelectorAll('input[data-field="' + key + '"]');
+    if (!inputs.length) return;
+    const want = String(value);
+    const wantParts = want.split('+');
+    inputs.forEach(inp => {
+      const dval = inp.getAttribute('data-value');
+      if (dval) inp.checked = wantParts.indexOf(dval) !== -1;
+      else inp.checked = (value === true || value === 'true' || value === 1);
+    });
+  });
+}
+
+function scheduleCardSave(cardId){
+  clearTimeout(_saveTimers[cardId]);
+  _saveTimers[cardId] = setTimeout(() => saveCardFields(cardId), 900);
+}
+
+async function saveCardFields(cardId){
+  const id = getTeamId();
+  const endpoint = currentEndpoint();
+  const state = collectCardState(cardId);
+  // Local cache always.
+  try {
+    const local = JSON.parse(localStorage.getItem('va_skills_fields') || '{}');
+    if (Object.keys(state).length) local[cardId] = state;
+    else delete local[cardId];
+    localStorage.setItem('va_skills_fields', JSON.stringify(local));
+  } catch(e){}
+  if (!id || !endpoint) return;
+  showSaveIndicator('', 'saving…');
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'skills_state_save',
+        team: id.team,
+        name: id.name,
+        challenge: cardId,
+        fields: state,
+        ts: new Date().toISOString()
+      })
+    });
+    const json = await res.json();
+    if (json && json.ok) showSaveIndicator('ok', 'saved');
+    else showSaveIndicator('err', 'error');
+  } catch(err){
+    showSaveIndicator('err', 'offline');
+    console.warn('Skills card field save failed', err);
+  }
+}
+
+async function loadCardFields(){
+  // Local cache restore first so something shows even if the sheet is unreachable.
+  try {
+    const local = JSON.parse(localStorage.getItem('va_skills_fields') || '{}');
+    Object.entries(local).forEach(([cid, st]) => restoreCardState(parseInt(cid, 10), st));
+  } catch(e){}
+  // Sheet load — overwrites local for this team+name.
+  const id = getTeamId();
+  const endpoint = currentEndpoint();
+  if (!id || !endpoint) return;
+  try {
+    const url = endpoint + '?action=skills_state_load'
+      + '&team=' + encodeURIComponent(id.team)
+      + '&name=' + encodeURIComponent(id.name);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      Object.entries(data).forEach(([cid, st]) => restoreCardState(parseInt(cid, 10), st));
+      localStorage.setItem('va_skills_fields', JSON.stringify(data));
+    }
+  } catch(err){
+    console.warn('Skills card field load failed', err);
+  }
 }
 
 // ── TEMPLATE CODE ───────────────────────────────────────────────────────────
