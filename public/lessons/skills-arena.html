@@ -113,10 +113,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .run-item{display:flex;align-items:center;gap:10px;font-size:.8rem;line-height:1.5;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border);}
 .run-item:last-child{border-bottom:none;}
 .run-label{flex:1;}
-.run-val{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--dim);min-width:90px;text-align:right;}
+.run-val{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--muted);min-width:90px;text-align:right;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px;}
+.run-val .blank{min-width:36px;}
 .run-yn{display:flex;gap:14px;flex-shrink:0;}
 .yn-opt{display:flex;align-items:center;gap:4px;font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.04em;cursor:pointer;}
 .yn-opt input{width:13px;height:13px;accent-color:var(--cc,#4ade80);cursor:pointer;}
+.chip-opt{display:inline-flex;align-items:center;gap:4px;font-family:'Chakra Petch',sans-serif;font-size:.7rem;font-weight:600;color:var(--muted);cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.02);}
+.chip-opt:hover{color:var(--text);border-color:var(--cc,#4ade80);}
+.chip-opt input{width:11px;height:11px;accent-color:var(--cc,#4ade80);cursor:pointer;margin:0;}
+.chip-opt:has(input:checked){color:var(--text);border-color:var(--cc,#4ade80);background:rgba(74,222,128,.08);}
 .run2-note{font-size:.75rem;color:var(--dim);font-style:italic;padding:8px 10px;border:1px dashed var(--border);border-radius:6px;}
 
 /* gap */
@@ -1403,6 +1408,32 @@ function cornerKickLeft(): void {
 // ── CARD BUILDER ───────────────────────────────────────────────────────────
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// Convert the static `fill` template into actual student inputs:
+//   "_____" runs  →  inline editable blank spans
+//   "A / B / C"   →  radio chips (when there are no underscores to fill)
+// Everything else stays as plain text so labels like "( " and " , 1 )" still render around the inputs.
+function renderFill(text){
+  if(!text) return '';
+  // Sequences of 3+ underscores → editable spans.
+  if(/_{3,}/.test(text)){
+    return text.replace(/_{3,}/g, () =>
+      '<span class="blank" contenteditable="true" data-ph="___"></span>'
+    );
+  }
+  // No underscores but slash-separated options → mutually-exclusive radio chips.
+  if(/\s\/\s/.test(text)){
+    const opts = text.split(/\s*\/\s*/).map(o => o.trim()).filter(Boolean);
+    if(opts.length >= 2){
+      const uid = 'rd' + Math.random().toString(36).slice(2,7);
+      return opts.map((o,i) =>
+        `<label class="chip-opt"><input type="radio" name="${uid}"><span>${o}</span></label>`
+      ).join('');
+    }
+  }
+  // Fallback: render the whole fill as an editable blank prompted with the original text.
+  return `<span class="blank" contenteditable="true" data-ph="${text.replace(/"/g,'&quot;')}"></span>`;
+}
+
 function renderRun(items){
   return items.map(item => {
     if(item.yn){
@@ -1417,7 +1448,7 @@ function renderRun(items){
     }
     return `<div class="run-item">
       <span class="run-label">${item.label}</span>
-      <span class="run-val">${item.fill}</span>
+      <span class="run-val">${renderFill(item.fill)}</span>
     </div>`;
   }).join('');
 }
