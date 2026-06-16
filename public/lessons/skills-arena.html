@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Skills Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080d;--surface:#0d0f17;--surface2:#12141d;
+  --border:#1c1e2d;--text:#e2e8f0;--muted:#64748b;--dim:#3a3f5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:100;background:rgba(7,8,13,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 24px 12px;}
+.header-inner{max-width:1360px;margin:0 auto;}
+.header-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{display:flex;align-items:center;animation:bounce 2.8s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(0deg);}40%{transform:translateY(-4px) rotate(-3deg);}60%{transform:translateY(-2px) rotate(2deg);}}
+.logo-text{display:flex;flex-direction:column;gap:1px;}
+.logo-eyebrow{font-family:'Chakra Petch',sans-serif;font-size:.58rem;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;}
+.logo-title{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:.04em;}
+.logo-title span{color:#00E5FF;}
+.header-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.72rem;color:var(--muted);}
+.pill.live{display:flex;align-items:center;gap:7px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,.5);}50%{opacity:.7;box-shadow:0 0 0 5px rgba(74,222,128,0);}}
+.tab-bar{display:flex;gap:6px;flex-wrap:wrap;}
+.tab-btn{font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .16s;}
+.tab-btn:hover{color:var(--text);border-color:var(--dim);}
+.tab-btn.a-all{background:var(--surface2);color:var(--text);}
+.tab-btn.a-navigate{background:rgba(74,222,128,.12);color:#4ade80;border-color:rgba(74,222,128,.35);}
+.tab-btn.a-strike{background:rgba(96,165,250,.12);color:#60a5fa;border-color:rgba(96,165,250,.35);}
+.tab-btn.a-chain{background:rgba(251,146,60,.12);color:#fb923c;border-color:rgba(251,146,60,.35);}
+.tab-btn.a-advanced{background:rgba(232,121,249,.12);color:#e879f9;border-color:rgba(232,121,249,.35);}
+
+/* ── GRID ── */
+.grid{position:relative;z-index:1;max-width:1360px;margin:0 auto;padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:20px;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--ccb,var(--border));border-radius:14px;padding:0;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.4);animation:cardIn .4s ease both;transition:box-shadow .2s,transform .2s;}
+.card:hover{box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px var(--cc,transparent);transform:translateY(-1px);}
+.card.complete{opacity:.5;filter:saturate(.35);}
+.card.hidden{display:none;}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.wm{position:absolute;right:12px;top:6px;font-family:'Chakra Petch',sans-serif;font-size:8rem;font-weight:700;line-height:1;color:rgba(255,255,255,.025);pointer-events:none;z-index:0;}
+
+/* card top */
+.card-top{padding:16px 20px 12px;border-bottom:1px solid var(--border);position:relative;z-index:1;}
+.card-row1{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;}
+.card-num{font-family:'Chakra Petch',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;color:var(--cc,var(--dim));opacity:.8;}
+.card-name{font-family:'Chakra Petch',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.02em;color:var(--text);}
+.badges{display:flex;gap:7px;flex-wrap:wrap;}
+.badge{font-family:'Chakra Petch',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;}
+.badge::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;animation:dotPulse 2.2s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.b-navigate{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25);}
+.b-navigate::before{background:#4ade80;}
+.b-strike{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25);}
+.b-strike::before{background:#60a5fa;}
+.b-chain{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.25);}
+.b-chain::before{background:#fb923c;}
+.b-time{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.b-time::before{display:none;}
+
+/* goal strip */
+.goal-strip{padding:9px 20px;background:var(--ccdb,rgba(255,255,255,.02));border-bottom:1px solid var(--border);font-size:.82rem;font-weight:700;color:var(--text);position:relative;z-index:1;line-height:1.45;}
+.goal-strip em{font-style:italic;color:var(--muted);font-weight:400;}
+
+/* card body */
+.card-body{padding:16px 20px;display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;}
+
+/* section label */
+.sec-label{font-family:'Chakra Petch',sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.sec-label svg{flex-shrink:0;opacity:.75;}
+
+/* steps */
+.steps{list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:3px;}
+.step-item{font-size:.8rem;line-height:1.5;color:var(--text);padding:5px 8px 5px 30px;border-radius:6px;position:relative;cursor:pointer;transition:background .15s;counter-increment:step;}
+.step-item::before{content:counter(step);position:absolute;left:6px;top:6px;font-family:'Chakra Petch',sans-serif;font-size:.58rem;font-weight:700;width:16px;height:16px;border-radius:4px;background:var(--surface2);color:var(--dim);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.step-item:hover{background:rgba(255,255,255,.03);}
+.step-item.done{color:var(--muted);text-decoration:line-through;}
+.step-item.done::before{content:'✓';background:rgba(74,222,128,.15);color:#4ade80;}
+
+/* goal text */
+.goal-text{font-size:.82rem;line-height:1.6;color:var(--text);}
+.goal-list{padding-left:18px;display:flex;flex-direction:column;gap:4px;margin-top:5px;}
+.goal-list li{font-size:.82rem;line-height:1.5;}
+
+/* constraints */
+.c-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.c-list li{font-size:.8rem;line-height:1.5;color:var(--text);padding:3px 8px 3px 20px;position:relative;}
+.c-list li::before{content:'';position:absolute;left:5px;top:9px;width:7px;height:7px;border-radius:1px;background:var(--cc,var(--dim));opacity:.5;transform:rotate(45deg);}
+
+/* prediction box */
+.pred-box{background:var(--ccdb,var(--surface2));border:1px solid var(--ccb,var(--border));border-radius:8px;padding:12px 14px;}
+.pred-text{font-size:.84rem;line-height:1.9;color:var(--text);}
+.blank{display:inline-block;min-width:42px;border-bottom:1.5px solid var(--cc,#4ade80);vertical-align:bottom;margin:0 2px;color:var(--text);font-size:.82rem;cursor:text;padding:0 2px;outline:none;}
+.blank:focus{border-bottom-color:var(--cc,#4ade80);background:rgba(74,222,128,.07);}
+.blank:empty::before{content:attr(data-ph);color:var(--dim);pointer-events:none;}
+.pred-task{font-size:.72rem;color:var(--dim);font-style:italic;margin-top:8px;padding:5px 10px;border-left:2px solid var(--ccb,var(--border));}
+
+/* run items */
+.run-list{display:flex;flex-direction:column;gap:1px;}
+.run-item{display:flex;align-items:center;gap:10px;font-size:.8rem;line-height:1.5;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border);}
+.run-item:last-child{border-bottom:none;}
+.run-label{flex:1;}
+.run-val{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--dim);min-width:90px;text-align:right;}
+.run-yn{display:flex;gap:14px;flex-shrink:0;}
+.yn-opt{display:flex;align-items:center;gap:4px;font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.04em;cursor:pointer;}
+.yn-opt input{width:13px;height:13px;accent-color:var(--cc,#4ade80);cursor:pointer;}
+.run2-note{font-size:.75rem;color:var(--dim);font-style:italic;padding:8px 10px;border:1px dashed var(--border);border-radius:6px;}
+
+/* gap */
+.gap-text{font-size:.84rem;line-height:1.9;color:var(--text);font-style:italic;}
+
+/* badge box */
+.badge-box{border:1.5px solid var(--ccb,var(--border));border-radius:10px;background:var(--ccdb,var(--surface2));padding:12px 14px;}
+.badge-title{font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cc,var(--dim));display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.badge-title svg{flex-shrink:0;}
+.badge-checks{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.badge-item{display:flex;align-items:flex-start;gap:9px;font-size:.8rem;color:var(--text);}
+.badge-item input{width:15px;height:15px;margin-top:1px;accent-color:var(--cc,#4ade80);cursor:pointer;flex-shrink:0;}
+.fac-line{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:.7rem;color:var(--dim);display:flex;align-items:center;gap:8px;}
+.fac-blank{flex:1;border-bottom:1px solid var(--dim);}
+
+/* code accordion */
+.code-toggle{width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--dim);font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .15s;}
+.code-toggle:hover{border-color:var(--dim);color:var(--text);}
+.code-toggle.open{border-color:var(--cc);color:var(--cc);}
+.code-toggle .chv{transition:transform .2s;}
+.code-toggle.open .chv{transform:rotate(180deg);}
+.code-wrap{display:none;margin-top:8px;}
+.code-wrap.open{display:block;}
+.code-note{font-size:.72rem;color:var(--dim);font-style:italic;padding:5px 10px;border-left:2px solid var(--border);margin-bottom:6px;line-height:1.5;}
+.copy-btn{float:right;background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-family:'Chakra Petch',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.05em;color:var(--dim);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
+.copy-btn:hover{border-color:var(--dim);color:var(--text);}
+.copy-btn.copied{color:#4ade80;border-color:rgba(74,222,128,.4);}
+pre.code-block{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.7;color:#c0cce0;overflow-x:auto;white-space:pre;clear:both;}
+
+/* footer */
+.card-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
+.coord-hint{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--dim);}
+.footer-btns{display:flex;gap:8px;}
+.done-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.done-btn:hover{border-color:rgba(74,222,128,.4);color:#4ade80;}
+.timer-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--ccb,var(--border));background:var(--ccdb,transparent);color:var(--cc,var(--muted));font-family:'Chakra Petch',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.timer-btn:hover{box-shadow:0 0 16px var(--cctg,transparent);}
+.footer-btns svg{vertical-align:middle;flex-shrink:0;}
+
+/* ── TIMER OVERLAY ── */
+.t-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(7,8,13,.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+.t-overlay.open{display:flex;}
+.t-overlay.flash{animation:flash .8s ease 5;}
+@keyframes flash{0%,100%{background:rgba(7,8,13,.97);}50%{background:rgba(251,146,60,.2);}}
+.t-name{font-family:'Chakra Petch',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;}
+.t-ring-wrap{position:relative;width:270px;height:270px;}
+.t-ring-svg{width:100%;height:100%;transform:rotate(-90deg);}
+.t-ring-bg{fill:none;stroke:var(--surface2);stroke-width:12;}
+.t-ring-fg{fill:none;stroke:#4ade80;stroke-width:12;stroke-dasharray:722.57;stroke-dashoffset:0;stroke-linecap:round;transition:stroke-dashoffset .9s ease,stroke .5s;}
+.t-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.t-display{font-family:'Chakra Petch',sans-serif;font-size:3.6rem;font-weight:700;letter-spacing:.04em;color:var(--text);transition:color .3s;}
+.t-display.warn{color:#fb923c;}
+.t-sub{font-family:'Chakra Petch',sans-serif;font-size:.6rem;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-top:5px;}
+.t-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;}
+.tb{font-family:'Chakra Petch',sans-serif;padding:11px 28px;border-radius:10px;border:none;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:all .16s;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.tb.start{background:#4ade80;color:#070a0d;}
+.tb.start:hover{box-shadow:0 0 22px rgba(74,222,128,.4);transform:scale(1.03);}
+.tb.pause{background:#60a5fa;color:#fff;}
+.tb.pause:hover{box-shadow:0 0 22px rgba(96,165,250,.4);transform:scale(1.03);}
+.tb.reset{background:rgba(255,255,255,.09);color:var(--text);}
+.tb.close{background:transparent;color:var(--muted);border:1px solid var(--border);padding:10px 18px;}
+.t-mute{font-family:'Chakra Petch',sans-serif;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--dim);font-size:.72rem;cursor:pointer;font-weight:700;letter-spacing:.04em;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.t-mute:hover{border-color:var(--dim);color:var(--text);}
+.t-mute.muted{color:#fb923c;border-color:rgba(251,146,60,.35);}
+.tb svg,.t-mute svg{vertical-align:middle;flex-shrink:0;}
+
+@media(max-width:600px){.header{padding:12px 14px 10px;}.grid{padding:0 10px;gap:12px;grid-template-columns:1fr;}.wm{font-size:6rem;}}
+
+/* ── SETUP PANEL ─────────────────────────────────────────────────────────── */
+.setup-panel{position:relative;z-index:1;max-width:1360px;margin:20px auto 0;padding:0 24px;}
+.setup-card{background:var(--surface);border:1px solid rgba(0,229,255,.2);border-radius:14px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,.4);}
+.setup-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;border-bottom:1px solid rgba(0,229,255,.1);user-select:none;}
+.setup-hdr-left{display:flex;align-items:center;gap:12px;}
+.setup-hdr-label{font-family:"Chakra Petch",sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.setup-hdr-title{font-family:"Chakra Petch",sans-serif;font-size:1rem;font-weight:700;color:var(--text);}
+.setup-hdr-title span{color:#00E5FF;}
+.setup-toggle{font-family:"Chakra Petch",sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#00E5FF;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);border-radius:6px;padding:5px 13px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;flex-shrink:0;}
+.setup-toggle:hover{background:rgba(0,229,255,.14);}
+.setup-toggle .chv{transition:transform .2s;display:inline-block;}
+.setup-toggle.open .chv{transform:rotate(180deg);}
+.setup-body{padding:20px;display:flex;flex-direction:column;gap:20px;}
+@media(max-width:860px){.setup-top-row{grid-template-columns:1fr;}}
+.setup-col-title{font-family:"Chakra Petch",sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#00E5FF;opacity:.85;margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+.setup-col-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(0,229,255,.22),transparent);}
+.setup-steps{list-style:none;counter-reset:sstep;display:flex;flex-direction:column;gap:7px;}
+.setup-step{counter-increment:sstep;padding:9px 12px 9px 40px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:.81rem;line-height:1.6;color:var(--text);position:relative;}
+.setup-step::before{content:counter(sstep);position:absolute;left:10px;top:10px;font-family:"Chakra Petch",sans-serif;font-size:.58rem;font-weight:700;width:18px;height:18px;border-radius:5px;background:rgba(0,229,255,.12);color:#00E5FF;display:flex;align-items:center;justify-content:center;}
+.setup-step strong{color:var(--text);}
+.setup-step code{font-family:"JetBrains Mono",monospace;font-size:.74rem;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.15);border-radius:4px;padding:1px 5px;color:#7dd3fc;}
+.setup-step .s-note{display:block;margin-top:5px;font-size:.73rem;color:var(--muted);font-style:italic;line-height:1.5;}
+.how-block{display:flex;flex-direction:column;gap:16px;}
+.how-sub{font-family:"Chakra Petch",sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+.how-table{width:100%;border-collapse:collapse;}
+.how-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;font-size:.8rem;line-height:1.45;}
+.how-table tr:last-child td{border-bottom:none;}
+.how-key{font-family:"Chakra Petch",sans-serif;font-size:.75rem;font-weight:700;color:#00E5FF;background:rgba(0,229,255,.09);border:1px solid rgba(0,229,255,.22);border-radius:5px;padding:2px 9px;white-space:nowrap;}
+.how-desc{color:var(--text);padding-left:8px;}
+.fn-list{display:flex;flex-direction:column;gap:6px;}
+.fn-row{display:flex;align-items:baseline;gap:10px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;}
+.fn-chip{font-family:"JetBrains Mono",monospace;font-size:.73rem;color:#7dd3fc;white-space:nowrap;flex-shrink:0;}
+.fn-desc{font-size:.78rem;color:var(--muted);line-height:1.45;}
+.startup-note{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:8px;padding:10px 14px;font-size:.78rem;line-height:1.6;color:var(--text);}
+.startup-note .sn-key{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:#00E5FF;}
+@media(max-width:600px){.setup-panel{padding:0 10px;}.setup-body{padding:14px;gap:12px;}.setup-top-row{grid-template-columns:1fr;}}
+
+.setup-top-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.template-section{border-top:1px solid var(--border);padding-top:18px;}
+.template-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px;}
+.template-bar-left{display:flex;align-items:center;gap:10px;}
+.template-label{font-family:"Chakra Petch",sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.template-note{font-size:.74rem;color:var(--muted);margin-top:2px;}
+.template-copy-btn{font-family:"Chakra Petch",sans-serif;font-size:.76rem;font-weight:700;letter-spacing:.06em;padding:9px 22px;border-radius:8px;background:rgba(0,229,255,.1);border:1.5px solid rgba(0,229,255,.35);color:#00E5FF;cursor:pointer;transition:all .16s;display:inline-flex;align-items:center;gap:7px;flex-shrink:0;}
+.template-copy-btn:hover{background:rgba(0,229,255,.18);box-shadow:0 0 22px rgba(0,229,255,.2);transform:translateY(-1px);}
+.template-copy-btn.copied{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.4);color:#4ade80;transform:none;}
+pre.template-code{background:#0a0b12;border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:"JetBrains Mono",monospace;font-size:.69rem;line-height:1.75;color:#c0cce0;overflow-x:auto;white-space:pre;max-height:340px;overflow-y:auto;margin-top:0;}
+pre.template-code::-webkit-scrollbar{width:5px;height:5px;}
+pre.template-code::-webkit-scrollbar-track{background:transparent;}
+pre.template-code::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px;}
+
+/* ── Team identity banner ─────────────────────────────────────── */
+.team-id-banner{position:relative;z-index:1;max-width:1360px;margin:18px auto 0;padding:0 24px;}
+.team-id-inner{display:flex;align-items:center;gap:24px;background:linear-gradient(180deg,rgba(0,229,255,.06),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.28);border-radius:10px;padding:14px 18px;flex-wrap:wrap;}
+.team-id-left{flex:1;min-width:240px;}
+.team-id-title{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:.92rem;color:#e8edf3;letter-spacing:.01em;}
+.team-id-sub{font-size:.76rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+.team-id-form{display:flex;gap:8px;flex-wrap:wrap;}
+.team-id-form input{background:#0a0b12;border:1px solid var(--border);color:#e8edf3;font-family:"Chakra Petch",sans-serif;font-size:.82rem;padding:8px 12px;border-radius:6px;min-width:140px;}
+.team-id-form input:focus{outline:none;border-color:#00E5FF;}
+.team-id-form button{font-family:"Chakra Petch",sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.04em;padding:8px 18px;border-radius:6px;background:#00E5FF;border:none;color:#0a0b12;cursor:pointer;}
+.team-id-form button:hover{background:#5af0ff;}
+.team-id-status{max-width:1360px;margin:18px auto 0;padding:0 24px;font-size:.74rem;color:var(--muted);display:flex;justify-content:flex-end;align-items:center;gap:10px;}
+.team-id-status button{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:"Chakra Petch",sans-serif;font-size:.7rem;padding:4px 10px;border-radius:4px;cursor:pointer;}
+.team-id-status button:hover{color:#e8edf3;border-color:rgba(0,229,255,.4);}
+.save-indicator{display:inline-block;margin-left:8px;font-size:.7rem;color:var(--muted);opacity:0;transition:opacity .25s;}
+.save-indicator.show{opacity:1;}
+.save-indicator.ok{color:#4ade80;}
+.save-indicator.err{color:#f87171;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-eyebrow">Velocity Arena</span>
+          <span class="logo-title">Skills <span>Arena</span></span>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="pill">Navigate · Strike · Chain · Advanced</span>
+        <span class="pill">Earn skill badges</span>
+        <span class="pill live"><span class="live-dot"></span><span id="progressCount">0 / 6 earned</span></span>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn a-all" onclick="filter('all')">All 10</button>
+      <button class="tab-btn" onclick="filter('navigate')">Navigate</button>
+      <button class="tab-btn" onclick="filter('strike')">Strike</button>
+      <button class="tab-btn" onclick="filter('chain')">Chain</button>
+      <button class="tab-btn" onclick="filter('advanced')">Advanced</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEAM IDENTITY BANNER ─────────────────────────────────────────────────
+     Shown until the kid enters team + first name. Once filled in, hides itself
+     and unlocks per-challenge "Done" tracking to the site's facilitator sheet. -->
+<div id="teamIdBanner" class="team-id-banner" style="display:none;">
+  <div class="team-id-inner">
+    <div class="team-id-left">
+      <div class="team-id-title">Track your progress</div>
+      <div class="team-id-sub">Tell your facilitator who's working. Your "Done" checks will save to the team sheet.</div>
+    </div>
+    <form id="teamIdForm" class="team-id-form" onsubmit="return submitTeamId(event)">
+      <input type="text" id="teamIdTeam" placeholder="Team name" maxlength="40" required>
+      <input type="text" id="teamIdName" placeholder="First name" maxlength="20" required>
+      <button type="submit">Start</button>
+    </form>
+  </div>
+</div>
+<div id="teamIdStatus" class="team-id-status" style="display:none;">
+  <span id="teamIdStatusText"></span>
+  <button type="button" onclick="resetTeamId()">Change</button>
+</div>
+
+<div class="setup-panel">
+  <div class="setup-card">
+
+    <div class="setup-hdr" onclick="toggleSetup()">
+      <div class="setup-hdr-left">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <div>
+          <div class="setup-hdr-label">Before you start</div>
+          <div class="setup-hdr-title">Setting up in <span>MakeCode</span></div>
+        </div>
+      </div>
+      <button class="setup-toggle open" id="setupToggleBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+        <span class="chv" id="setupChv">Hide</span>
+      </button>
+    </div>
+
+    <div class="setup-body" id="setupBody">
+
+      <div class="setup-top-row">
+
+      <!-- LEFT: step-by-step setup -->
+      <div>
+        <div class="setup-col-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Setup steps
+        </div>
+        <ol class="setup-steps">
+          <li class="setup-step">
+            <strong>Set up the field.</strong> Lay the Velocity Arena mat on a flat, hard surface. You'll need: your Cutebot Pro, a micro:bit, the <strong>squeaky ball</strong>, and the <strong>rubber ball</strong>. Keep both on the field — the rubber ball is used in Challenge&nbsp;3 and will play a bigger role in Season&nbsp;2.
+          </li>
+          <li class="setup-step">
+            <strong>Open MakeCode.</strong> Go to <code>makecode.microbit.org</code> in a browser. Click <strong>New Project</strong> and name it <code>SkillsArena</code>.
+          </li>
+          <li class="setup-step">
+            <strong>Add the Cutebot Pro extension.</strong> Click the <strong>Extensions</strong> tile in the block toolbox (or gear&nbsp;&#9881; → Extensions). Type <code>cutebot</code> in the search bar and click the <strong>Cutebot Pro</strong> card to add it.
+            <span class="s-note">You only need to do this once per project. After adding it, a Cutebot Pro category will appear in the toolbox.</span>
+          </li>
+          <li class="setup-step">
+            <strong>Switch to JavaScript.</strong> Click the <strong>JavaScript</strong> slider in the top toolbar (next to the Blocks label). This switches the editor to text mode.
+          </li>
+          <li class="setup-step">
+            <strong>Delete the default code.</strong> Click inside the editor, press <code>Ctrl+A</code> (or <code>&#8984;A</code> on Mac) to select all, then press <code>Delete</code>.
+          </li>
+          <li class="setup-step">
+            <strong>Paste the starter code.</strong> Click the <strong style="color:#00E5FF">Copy Template</strong> button below — it copies the full starter code to your clipboard in one click. Then paste into MakeCode with <code>Ctrl+V</code> (or <code>&#8984;V</code> on Mac).
+            <span class="s-note">All four stats will be 0 — that is expected. You'll fill them in during the next step.</span>
+          </li>
+          <li class="setup-step">
+            <strong>Enter your team stats.</strong> Near the top of the code, find the <strong>STUDENT ZONE A</strong> block. Replace each <code>0</code> with your team's real values. SPEED + POWER + ENDURANCE + TURNING must equal exactly 20.
+          </li>
+          <li class="setup-step">
+            <strong>Flash to the micro:bit.</strong> Click <strong>Download</strong> and follow the prompts to copy the file to your micro:bit. The LED will scroll your <code>motorPower</code> and <code>chargePower</code>, then show <code>1</code> — you are ready.
+            <span class="s-note">Re-flash every time you change the code. Stats only take effect after a fresh flash.</span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- RIGHT: how the program works -->
+      <div class="how-block">
+
+        <div>
+          <div class="setup-col-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            How the program works
+          </div>
+          <div class="how-sub">Buttons</div>
+          <table class="how-table">
+            <tr>
+              <td><span class="how-key">B</span></td>
+              <td class="how-desc">Cycle through challenges 1 → 2 → 3 → 4 → 5 → 6 → 1&hellip;<br><span style="font-size:.74rem;color:var(--muted)">The number appears on the LED so you know which one is selected.</span></td>
+            </tr>
+            <tr>
+              <td><span class="how-key">A</span></td>
+              <td class="how-desc">Run the selected challenge function.<br><span style="font-size:.74rem;color:var(--muted)">An arrow flashes, the code runs, then a ✓ appears when it finishes.</span></td>
+            </tr>
+            <tr>
+              <td><span class="how-key">A&thinsp;+&thinsp;B</span></td>
+              <td class="how-desc"><strong>Emergency stop</strong> — motors cut immediately and an X appears on the LED.<br><span style="font-size:.74rem;color:var(--muted)">Use this any time the bot goes off course.</span></td>
+            </tr>
+          </table>
+        </div>
+
+        <div>
+          <div class="how-sub">Startup LED sequence</div>
+          <div class="startup-note">
+            On every flash, the bot shows: <span class="sn-key">P&thinsp;[motorPower]</span> &rarr; <span class="sn-key">K&thinsp;[chargePower]</span> &rarr; <span class="sn-key">1</span><br>
+            This confirms your stats loaded correctly. <em>P</em> is drive power, <em>K</em> is kick force.<br>
+            If you see <code>P0</code>, go back and fill in your stats in Zone A.
+          </div>
+        </div>
+
+        <div>
+          <div class="how-sub">Your job — Zone B helper functions</div>
+          <div class="fn-list">
+            <div class="fn-row">
+              <span class="fn-chip">drive(n)</span>
+              <span class="fn-desc">Move straight forward exactly <em>n</em> grid squares. 1 square&nbsp;≈&nbsp;27&nbsp;cm.</span>
+            </div>
+            <div class="fn-row">
+              <span class="fn-chip">turnRight()</span>
+              <span class="fn-desc">Rotate 90° clockwise. Facing toward y=0 → now facing toward x=8.</span>
+            </div>
+            <div class="fn-row">
+              <span class="fn-chip">turnLeft()</span>
+              <span class="fn-desc">Rotate 90° counterclockwise. Facing toward y=0 → now facing toward x=0.</span>
+            </div>
+            <div class="fn-row">
+              <span class="fn-chip">kick()</span>
+              <span class="fn-desc">Fire a power burst using your Power stat. Force&nbsp;=&nbsp;POWER². Then stops.</span>
+            </div>
+          </div>
+          <p style="font-size:.75rem;color:var(--muted);margin-top:10px;line-height:1.5;">Find the empty function for your challenge in <strong style="color:var(--text)">STUDENT ZONE B</strong> and fill it in using these four helpers. Flash after every change and press&nbsp;A to test.</p>
+        </div>
+
+
+      </div><!-- /setup-top-row -->
+
+      <!-- FULL WIDTH: starter code ──────────────────────────────────── -->
+      <div class="template-section">
+        <div class="template-bar">
+          <div class="template-bar-left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <div>
+              <div class="template-label">Starter Code — skillsCode.ts</div>
+              <div class="template-note">Paste this entire block into the MakeCode JavaScript editor. Then replace the 0s with your team stats in STUDENT ZONE A.</div>
+            </div>
+          </div>
+          <button class="template-copy-btn" id="templateCopyBtn" onclick="copyTemplate()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Template
+          </button>
+        </div>
+        <pre class="template-code">/**
+ * ═══════════════════════════════════════════════════════════════
+ *  VELOCITY ARENA — Skills Arena Base Program
+ *  micro:bit + Cutebot Pro   |   8×4 ft field   |   8×4 grid
+ * ═══════════════════════════════════════════════════════════════
+ *
+ *  HOW TO USE
+ *  ───────────
+ *  1. Enter your team stats in STUDENT ZONE A below.
+ *     S + P + E + T must add up to exactly 20.
+ *
+ *  2. Write your code inside the challenge function you are
+ *     working on in STUDENT ZONE B below.
+ *
+ *  3. Flash the program to your micro:bit.
+ *
+ *  4. Press B to select a challenge (the number shows on screen).
+ *     Press A to run it.
+ *     Press A+B at any time for an emergency stop.
+ *
+ *  HELPER FUNCTIONS (call these inside your challenge functions)
+ *  ─────────────────────────────────────────────────────────────
+ *  drive(n)       move straight forward exactly n grid squares
+ *                 1 grid square = 10.75 in = ~27 cm = 1 block
+ *
+ *  turnRight()    rotate exactly 90° clockwise in place
+ *  turnLeft()     rotate exactly 90° counter-clockwise in place
+ *
+ *  kick()         burst of power from your Power stat, then stop
+ *                 force = chargePower = POWER²  (0–100)
+ *
+ *  FIELD COORDINATE SYSTEM
+ *  ────────────────────────
+ *  x: 0 (left wall) → 8 (right wall)       8 columns
+ *  y: 0 (top edge)  → 4 (bottom edge)      4 rows
+ *  Labels on mat:  x = 1–7,  y = 1–3  (interior grid lines)
+ *  Left  goal zone: x = 0–1, y = 1–3
+ *  Right goal zone: x = 7–8, y = 1–3
+ *  Ball at center:  (4, 2)
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  ★  STUDENT ZONE A  ★   ENTER YOUR TEAM STATS HERE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//
+//  RULES:  each stat ≥ 1  |  POWER ≤ 10  |  S + P + E + T = 20
+//
+//  SPEED      how fast the bot drives
+//  POWER      how hard it kicks  (chargePower = POWER²)
+//  ENDURANCE  how long it stays fast in a match
+//  TURNING    how sharply it steers in a match
+//
+let SPEED     = 0   // ← YOUR VALUE HERE
+let POWER     = 0   // ← YOUR VALUE HERE
+let ENDURANCE = 0   // ← YOUR VALUE HERE
+let TURNING   = 0   // ← YOUR VALUE HERE
+// ── CHECK: SPEED + POWER + ENDURANCE + TURNING must equal 20 ──
+
+
+// ── CALCULATED VALUES  (read-only — do not change) ─────────────
+let motorPower  = SPEED * 100 / 20             // drive speed %   (0–85)
+let chargePower = Math.min(POWER * POWER, 100) // kick force %    (0–100)
+let alignMs     = Math.max(60, 220 - TURNING * 16) // aim time ms
+let DECAY_RATE  = 20 - ENDURANCE               // endurance decay rate
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  DRIVE TUNING
+//  Every drive() call spends ~100–150 ms overcoming static friction
+//  and ramping to full speed before the bot moves a meaningful distance.
+//  That startup overhead is constant — independent of how far you drive.
+//  startupMs compensates for it.  unitMs controls speed per square.
+//
+//  Why tune startupMs FIRST?
+//  drive(1) = 1 × unitMs + startupMs — startupMs dominates a short run,
+//  so drive(1) isolates it cleanly.  Once startupMs is fixed, unitMs
+//  only scales the per-square portion and drive(6) is easy to dial in.
+//
+//  Tuning order:
+//    1. Run drive(1) (challenge 1, press B). Short? +20 to startupMs.
+//       Overshot? −20.  Repeat until it lands on exactly 1 square.
+//    2. Run drive(6). Short? +20 to unitMs.  Overshot? −20.
+//       You'll land around unitMs = 590–620.
+//    3. Test drive(4) and drive(2) — they should now land without re-tuning.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let unitMs    = 600   // ← tune SECOND with drive(6) — expect 590–620
+let startupMs = 100   // ← tune FIRST with drive(1)  — expect 80–140
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CHALLENGE SELECTOR
+//  B = next challenge (1 → 2 → … → 9 → 1 → ...)
+//  A = run the selected challenge
+//
+//  CHALLENGE 7 — POWER CONTROL LAB has a built-in power menu:
+//    Press A on #7  →  enters power-select mode (LED shows "3")
+//    Press B        →  cycles: 3 → 6 → 9 → your POWER → 3 …
+//    Press A        →  runs the kick at the displayed power
+//    Press A+B      →  emergency stop / exit power-select mode
+//
+//  CHALLENGE 8 — PRECISION PARKING has two variants:
+//    Press A on #8  →  runs Precision Parking (variant 1, default)
+//    Press B on #8  →  switches to variant 2 (LED shows "P2")
+//    Press A        →  runs Precision Parking 2
+//    Press B again  →  advances to challenge 9 (resets to variant 1)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let currentChallenge = 1
+let inLabSelect = false   // true while choosing power for challenge 7
+let labPowerIdx = 0       // 0=P3  1=P6  2=P9  3=your POWER
+let parkVariant = 1       // challenge 8: 1=precisionParking  2=precisionParking2
+
+// Returns the kick POWER value for the currently selected lab trial.
+function labPowerValue(): number {
+    if (labPowerIdx === 0) { return 3 }
+    if (labPowerIdx === 1) { return 6 }
+    if (labPowerIdx === 2) { return 9 }
+    return POWER  // 4th option restores your actual stat
+}
+
+input.onButtonPressed(Button.B, function () {
+    if (inLabSelect) {
+        // Challenge 7: cycle through lab power options
+        labPowerIdx = (labPowerIdx + 1) % 4
+        basic.showNumber(labPowerValue())
+    } else if (currentChallenge === 8 && parkVariant === 1) {
+        // Challenge 8: switch to variant 2
+        parkVariant = 2
+        basic.showString("P2")
+    } else {
+        // Normal challenge cycling (also exits #8 variant 2 back to variant 1)
+        if (currentChallenge === 8) { parkVariant = 1 }
+        currentChallenge = (currentChallenge % 9) + 1
+        basic.showNumber(currentChallenge)
+    }
+})
+
+input.onButtonPressed(Button.A, function () {
+    // ── Challenge 7: enter power-select mode on first press ──────
+    if (currentChallenge === 7 && !inLabSelect) {
+        inLabSelect = true
+        basic.showNumber(labPowerValue())   // show current selection
+        return
+    }
+    // ── Challenge 7: run at selected power on second press ───────
+    if (inLabSelect) {
+        inLabSelect = false
+        let p = labPowerValue()
+        let savedCharge = chargePower
+        chargePower = Math.min(p * p, 100)  // apply POWER² to lab value
+        basic.showArrow(ArrowNames.East)
+        powerControlLab()
+        chargePower = savedCharge           // restore team's real chargePower
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.showIcon(IconNames.Yes)
+        return
+    }
+    // ── Challenge 8: run variant 1 or 2 ─────────────────────────
+    if (currentChallenge === 8) {
+        basic.showArrow(ArrowNames.East)
+        if (parkVariant === 2) {
+            precisionParking2()
+        } else {
+            precisionParking()
+        }
+        parkVariant = 1                         // reset to default after each run
+        CutebotPro.stopImmediately(CutebotProMotors.ALL)
+        basic.showIcon(IconNames.Yes)
+        return
+    }
+    // ── All other challenges ─────────────────────────────────────
+    basic.showArrow(ArrowNames.East)
+    if      (currentChallenge === 1) { deadStraight()    }
+    else if (currentChallenge === 2) { rightAngle()      }
+    else if (currentChallenge === 3) { straightShot()    }
+    else if (currentChallenge === 4) { cornerKickLeft()  }
+    else if (currentChallenge === 5) { cornerKickRight() }
+    else if (currentChallenge === 6) { twoBallCombo()    }
+    else if (currentChallenge === 9) { bossLevel()        }
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showIcon(IconNames.Yes)
+})
+
+// A + B  →  emergency stop (works at any time; also exits power-select mode)
+input.onButtonPressed(Button.AB, function () {
+    inLabSelect = false
+    parkVariant = 1
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    CutebotPro.pwmCruiseControl(0, 0)
+    basic.showLeds(`
+        # . . . #
+        . # . # .
+        . . # . .
+        . # . # .
+        # . . . #`)
+})
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  HELPER FUNCTIONS
+//  Call these inside your challenge functions below.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/**
+ * drive(n)
+ * Move straight forward for n grid squares.
+ * Speed comes from your SPEED stat (motorPower).
+ * Total motor-on time = unitMs × n + startupMs milliseconds.
+ * Tune both values in the DRIVE TUNING section above.
+ *
+ * Example:  drive(3) with unitMs=500, startupMs=0  →  1500 ms
+ */
+function drive(units: number): void {
+    CutebotPro.pwmCruiseControl(motorPower, motorPower)
+    basic.pause(unitMs * units + startupMs)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.pause(100)
+}
+
+/**
+ * turnRight()
+ * Rotate the bot 90° clockwise (viewed from above).
+ *
+ * Facing toward y=0 (-y)  →  now facing toward x=8 (+x)
+ * Facing toward x=8 (+x)  →  now facing toward y=4 (+y)
+ * Facing toward y=4 (+y)  →  now facing toward x=0 (-x)
+ * Facing toward x=0 (-x)  →  now facing toward y=0 (-y)
+ */
+function turnRight(): void {
+    CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)
+    basic.pause(150)
+}
+
+/**
+ * turnLeft()
+ * Rotate the bot 90° counterclockwise (viewed from above).
+ *
+ * Facing toward y=0 (-y)  →  now facing toward x=0 (-x)
+ * Facing toward x=0 (-x)  →  now facing toward y=4 (+y)
+ * Facing toward y=4 (+y)  →  now facing toward x=8 (+x)
+ * Facing toward x=8 (+x)  →  now facing toward y=0 (-y)
+ */
+function turnLeft(): void {
+    CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 90)
+    basic.pause(150)
+}
+
+/**
+ * kick()
+ * Fire a power burst toward whatever the bot is facing.
+ * Force comes from your POWER stat:  chargePower = POWER²
+ *
+ * Example:  POWER = 7  →  chargePower = 49%
+ *           POWER = 10 →  chargePower = 100%  (max)
+ */
+function kick(): void {
+    CutebotPro.pwmCruiseControl(chargePower, chargePower)
+    basic.pause(400)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  ★  STUDENT ZONE B  ★   WRITE YOUR CHALLENGE FUNCTIONS BELOW
+//
+//  Each function is called when you press A with that challenge
+//  selected. Fill in the body using drive(), turnLeft(),
+//  turnRight(), and kick().
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+// ── Challenge 1 — DEAD STRAIGHT ──────────────────────────────────
+//  Start:  (1, 0)  facing right (+x direction)
+//  Target: (7, 0)
+//  Task:   Drive 6 grid squares in a straight line.  No turns.
+//
+function deadStraight(): void {
+    // YOUR CODE HERE
+    // Hint: call drive(?) — how many squares to the target?
+
+}
+
+
+// ── Challenge 2 — RIGHT ANGLE ─────────────────────────────────────
+//  Start:  (1, 0)  facing down (+y direction)
+//  Target: (6, 3)
+//  Task:   Drive 3 squares → turn right 90° → drive 5 squares.
+//
+function rightAngle(): void {
+    // YOUR CODE HERE
+    // Hint: drive(?) → turnRight() → drive(?)
+
+}
+
+
+// ── Challenge 3 — STRAIGHT SHOT ──────────────────────────────────
+//  Start:  (6, 2)  facing LEFT (toward x = 0)
+//  Ball:   (4, 2)  — already lined up with the bot
+//  Goal:   Left goal zone  (x = 0–1, y = 1–3)
+//  Task:   Drive to the ball, then kick it into the left goal.
+//          No turns needed — the shot is already aligned.
+//
+function straightShot(): void {
+    // YOUR CODE HERE
+    // Hint: drive(?) to reach the ball, then kick()
+
+}
+
+
+// ── Challenge 4 — CORNER KICK: LEFT TURN ──────────────────────────
+//  Start:  (3, 4)  facing (3, 0)
+//  Ball:   (2, 2)
+//  Goal:   Left goal zone  (x = 0–1, y = 1–3)
+//  Leg 1 is fixed: drive(2) — Δy = 4−2 = 2 squares.
+//  Leg 2 is the variable: stop SHORT of the ball and let
+//  kick() close the gap. Try drive(0.5), drive(0.7), etc.
+//  Too close → overshoots past x=0. Too far → falls short of x=1.
+//
+function cornerKickLeft(): void {
+    // YOUR CODE HERE
+    // drive(2) → turnLeft() → drive(???) → kick()
+
+}
+
+
+// ── Challenge 5 — CORNER KICK: RIGHT SIDE ────────────────────────
+//  Start:  (4, 0)  facing down (+y direction)
+//  Ball:   (6, 2)
+//  Goal:   Right goal zone  (x = 7–8, y = 1–3)
+//  Task:   Navigate to the ball from an angle, then kick right.
+//
+function cornerKickRight(): void {
+    // YOUR CODE HERE
+    // Hint: drive(?) → turnRight() → drive(?) → kick()
+
+}
+
+
+// ── Challenge 6 — TWO-BALL COMBO ─────────────────────────────────
+//  Start:  (4, 0)  facing south (+y direction)
+//  Ball A: (2, 2)  → left  goal zone (x = 0–1, y = 1–3)
+//  Ball B: (6, 2)  → right goal zone (x = 7–8, y = 1–3)
+//  Task:   In one program, kick Ball A into the left goal and
+//          Ball B into the right goal. No hints — plan your
+//          own route and decide which ball you kick first.
+//
+function twoBallCombo(): void {
+    // YOUR CODE HERE
+    // Plan on paper first. Ball A at (2,2), Ball B at (6,2).
+    // Hint: there is no single correct route — choose your order,
+    // draw the path, count every square, count every turn.
+
+}
+
+
+// ── Challenge 7 — POWER CONTROL LAB ──────────────────────────────
+//  Start:  (3, 2)  facing west (toward x = 0)
+//  Ball:   (2, 2)  — reset before every run
+//  Task:   Run the same drive(1) + kick() three times using
+//          POWER = 3, POWER = 6, and POWER = 9.
+//          Record ball distance each time. Is it linear?
+//
+function powerControlLab(): void {
+    // YOUR CODE HERE
+    // Hint: drive(1) to the ball, then kick()
+    // Change POWER in STUDENT ZONE A and re-flash between runs.
+
+}
+
+
+// ── Challenge 8 — PRECISION PARKING ──────────────────────────────
+//  Start:  (0, 0)  facing east (+x direction)
+//  Target: taped box at (5, 3), final facing = WEST
+//  Task:   Navigate to the box by any route. Stop inside it
+//          facing exactly west. Sketch your path first —
+//          mark your facing direction after every call.
+//
+function precisionParking(): void {
+    // YOUR CODE HERE
+    // No hint sequence — your path is your design.
+    // Remember: to end up facing WEST you must plan the
+    // approach direction and your final turn carefully.
+
+}
+
+
+// ── Challenge 8 variant 2 — PRECISION PARKING 2 ───────────────────
+//  Same concept as Precision Parking — different start, target, or
+//  constraint. Define your own variant here.
+//
+function precisionParking2(): void {
+    // YOUR CODE HERE
+
+}
+
+
+// ── Challenge 9 — BOSS LEVEL ─────────────────────────────────────
+//  Start:  (4, 0)  facing south (+y direction)
+//  Ball:   (4, 2)  — center of field
+//  Cone:   (4, 1)  — directly in the way; CANNOT pass through
+//  Task:   Route around the cone, reach the ball, kick it into
+//          either goal, then drive to the parking zone at
+//          x = 0–1, y = 0. Score: 1 pt per phase (max 3).
+//
+function bossLevel(): void {
+    // YOUR CODE HERE
+    // Write your plan in 4 phases before you code:
+    //   Phase 1 — detour around cone at (4,1)
+    //   Phase 2 — navigate to ball at (4,2)
+    //   Phase 3 — kick into left or right goal
+    //   Phase 4 — drive to parking zone (x=0–1, y=0)
+
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  STARTUP
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CutebotPro.stopImmediately(CutebotProMotors.ALL)
+CutebotPro.pwmCruiseControl(0, 0)
+basic.pause(100)
+
+// Show a quick stat summary: motorPower then chargePower
+basic.showString(&quot;P&quot; + motorPower)
+basic.pause(400)
+basic.showString(&quot;K&quot; + chargePower)
+basic.pause(400)
+
+// Show which challenge is loaded
+basic.showNumber(currentChallenge)
+</pre>
+      </div>
+
+    </div><!-- /setup-body -->
+  </div><!-- /setup-card -->
+</div><!-- /setup-panel -->
+
+<div class="grid" id="grid"></div>
+
+<div class="t-overlay" id="tOverlay">
+  <div class="t-name" id="tName">Skill</div>
+  <div class="t-ring-wrap">
+    <svg class="t-ring-svg" viewBox="0 0 270 270">
+      <circle class="t-ring-bg" cx="135" cy="135" r="115"/>
+      <circle class="t-ring-fg" id="tRingFg" cx="135" cy="135" r="115"/>
+    </svg>
+    <div class="t-center">
+      <div class="t-display" id="tDisplay">10:00</div>
+      <div class="t-sub" id="tSub">remaining</div>
+    </div>
+  </div>
+  <div class="t-controls">
+    <button class="tb start" id="tbStart" onclick="tStartPause()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start
+    </button>
+    <button class="tb reset" onclick="tReset()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reset
+    </button>
+    <button class="t-mute" id="tMuteBtn" onclick="toggleMute()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Sound
+    </button>
+    <button class="tb close" onclick="tClose()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="/site.js"></script>
+<script>
+// ── SVG ICONS ──────────────────────────────────────────────────────────────
+function ico(d,s=12){
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}
+const I = {
+  setup:   ico('<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><line x1="13" y1="8" x2="21" y2="8"/><line x1="13" y1="16" x2="21" y2="16"/>'),
+  goal:    ico('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+  rules:   ico('<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'),
+  pred:    ico('<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
+  run:     ico('<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>'),
+  gap:     ico('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),
+  badge:   ico('<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',13),
+  check:   ico('<polyline points="20 6 9 17 4 12"/>'),
+  clock:   ico('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+  copy:    ico('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+  undo:    ico('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>'),
+};
+
+// ── CATEGORY VARS ──────────────────────────────────────────────────────────
+const CVARS = {
+  navigate: '--cc:#4ade80;--ccb:rgba(74,222,128,.25);--ccdb:rgba(74,222,128,.06);--cctg:rgba(74,222,128,.35)',
+  strike:   '--cc:#60a5fa;--ccb:rgba(96,165,250,.25);--ccdb:rgba(96,165,250,.06);--cctg:rgba(96,165,250,.35)',
+  chain:    '--cc:#fb923c;--ccb:rgba(251,146,60,.25);--ccdb:rgba(251,146,60,.06);--cctg:rgba(251,146,60,.35)',
+  advanced: '--cc:#e879f9;--ccb:rgba(232,121,249,.25);--ccdb:rgba(232,121,249,.06);--cctg:rgba(232,121,249,.35)',
+};
+const TIER_COLORS = { navigate:'#4ade80', strike:'#60a5fa', chain:'#fb923c', advanced:'#e879f9' };
+
+// ── SKILL DATA ──────────────────────────────────────────────────────────────
+const SKILLS = [
+
+{
+  id:1, name:'Dead Straight', badge:'STRAIGHT SHOOTER',
+  cat:'navigate', minutes:20, start:'(1, 1)', target:'(7, 1)',
+  tagline:'Drive 6 grid squares in a perfectly straight line and stop on target. No turns.',
+  setup:[
+    'Clear the mat. No ball needed for this challenge.',
+    'Place your bot at grid coordinate (1, 1) — one unit from the left wall, on the top edge (y = 1).',
+    'Your bot should be facing right (down field) toward x = 7.',
+    'Mark the target at (7, 1) with a piece of tape (aligned with the grid line), or use the goal line as your guide.',
+  ],
+  goal:'Drive from (1, 1) to (7, 1) — 6 grid squares — in a straight line. Stop right before the  1 grid square of the target. <em>No turns allowed. Just pure straight-line control.</em>',
+  constraints:[
+    'Write exactly one <code>drive(6)</code> call inside <code>deadStraight()</code> — no turns.',
+    '<strong>Step 1 — tune startupMs with drive(1):</strong> run just 1 square. Short? Increase <code>startupMs</code> by +20. Overshot? Decrease by −20. Repeat until drive(1) lands cleanly on 1 square. (Tip: startupMs is the constant ramp-up overhead — drive(1) isolates it best.)',
+    '<strong>Step 2 — tune unitMs with drive(6):</strong> once drive(1) is clean, run drive(6). Short? Increase <code>unitMs</code> by +20. Overshot? Decrease by −20. You\'ll land around unitMs = 590–620.',
+    'Step 3 — verify: run drive(4) and drive(2). They should land correctly without any further tuning.',
+    'Re-flash after every change. Press B to select challenge 1, then A to run.',
+  ],
+  pred:{
+    template:`From (1,&thinsp;1) to (7,&thinsp;1) is <span class="blank" contenteditable="true" data-ph="___"></span> grid squares, so we will call <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. With <code>unitMs = <span class="blank" contenteditable="true" data-ph="___"></span></code> and <code>startupMs = <span class="blank" contenteditable="true" data-ph="___"></span></code>, motor-on time = (unitMs &times; 6) + startupMs = <span class="blank" contenteditable="true" data-ph="___"></span> ms.`,
+    task:'Fill in all five blanks before your first run. Mark the expected stop on the mat.',
+  },
+  run:[
+    {label:'Bot stayed near the top edge (y = 1) — no sideways drift?', yn:true},
+    {label:'Bot stopped at coordinate',fill:'( ___ , 1 )'},
+    {label:'Distance from target (7, 1)',fill:'___ grid squares'},
+    {label:'Bot veered:',fill:'Left  /  Right  /  Straight'},
+    {label:'unitMs value used this run',fill:'___ ms'},
+    {label:'startupMs value used this run',fill:'___ ms'},
+  ],
+  gap:`Final values: unitMs = <span class="blank" contenteditable="true" data-ph="___"></span>, startupMs = <span class="blank" contenteditable="true" data-ph="___"></span>. The bot stopped <span class="blank" contenteditable="true" data-ph="___"></span> cm from (7,&thinsp;1). Next run we will adjust <span class="blank" contenteditable="true" data-ph="unitMs / startupMs"></span> to <span class="blank" contenteditable="true" data-ph="___"></span> because <span class="blank" contenteditable="true" data-ph="it overshot / it stopped short"></span>.`,
+  checks:['Bot stopped within 5 cm of (7, 1)','All four prediction blanks filled in before the first run','Gap sentence records both unitMs and startupMs, and names which one to adjust next'],
+  codeNote:'The number inside drive() is always the square count (7 − 1 = 6). drive() timing = unitMs × squares + startupMs. startupMs is the constant ramp-up overhead — tune it first with drive(1) because the short run makes it easy to see. Then tune unitMs with drive(6). Once both are set, every other challenge inherits the same values automatically.',
+  code:
+`// ── DRIVE TUNING — start here ────────────────────────────────────
+let unitMs    = 600   // ← tune SECOND with drive(6)
+let startupMs = 100   // ← tune FIRST  with drive(1)
+
+// ── STUDENT ZONE B — fill in deadStraight() ────────────────────
+function deadStraight(): void {
+    drive(6)   // 6 squares: from x=1 to x=7  (7 − 1 = 6)
+}
+
+// ── Tuning order ───────────────────────────────────────────────
+// 1. Run drive(1). Short?  → increase startupMs (+20)
+//                  Overshot? → decrease startupMs (−20)
+//    Get drive(1) landing cleanly on 1 square.
+//
+// 2. Run drive(6). Short?  → increase unitMs (+20)
+//                  Overshot? → decrease unitMs (−20)
+//    You'll land around unitMs = 590–620.
+//
+// 3. Test drive(4) and drive(2) — should land without re-tuning.`,
+},
+
+{
+  id:2, name:'Right Angle', badge:'ANGLE MASTER',
+  cat:'navigate', minutes:12, start:'(1, 0)', target:'(6, 3)',
+  tagline:'Your unitMs is calibrated. Now prove it: an L-shaped path, one perfect 90° turn.',
+  setup:[
+    'Dead Straight must be completed first — your unitMs must be calibrated.',
+    'Clear the mat. No ball needed.',
+    'Place your bot at (1, 0) facing south (toward 1,4).',
+    'Mark the corner waypoint at (1, 3) with tape and the final target at (6, 3) with a sticky note.',
+  ],
+  goal:'Drive from (1, 0) to the corner at (1, 3), make one 90° left turn, then drive to (6, 3). Stop within 5 cm of the target. <em>The turn is automatic — your job is counting squares correctly.</em>',
+  constraints:[
+    'Exactly two <code>drive()</code> calls and one <code>turnLeft()</code> inside <code>rightAngle()</code>.',
+    'No extra corrections or turns between segments.',
+    'unitMs must be set before running — carry it over from Dead Straight.',
+  ],
+  pred:{
+    template:`Leg 1: from (1,&thinsp;0) to (1,&thinsp;3) is <span class="blank" contenteditable="true" data-ph="___"></span> squares &rarr; <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. Leg 2: from (1,&thinsp;3) to (6,&thinsp;3) is <span class="blank" contenteditable="true" data-ph="___"></span> squares &rarr; <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. We predict the final stop will be within <span class="blank" contenteditable="true" data-ph="___"></span> cm of (6,&thinsp;3).`,
+    task:'Count both legs on the mat and fill in all blanks before opening MakeCode.',
+  },
+  run:[
+    {label:'Bot passed through the corner at (1, 3)?', yn:true},
+    {label:'Turn looked like a clean 90° left turn?', yn:true},
+    {label:'Final stop coordinate',fill:'( ___ , ___ )'},
+    {label:'Distance from target (6, 3)',fill:'___ cm'},
+  ],
+  gap:`The bot stopped <span class="blank" contenteditable="true" data-ph="___"></span> cm from (6,&thinsp;3). Leg <span class="blank" contenteditable="true" data-ph="1 / 2"></span> was the bigger error. We think it happened because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:['Bot stopped within 5 cm of (6, 3)','Both leg distances written as predictions before first run','Gap sentence identifies which leg drifted and why'],
+  codeNote:'turnLeft() rotates the bot exactly 90° — no tuning needed. Your only job is the square count for each leg. Leg 1: Δy = 3 − 0. Leg 2: Δx = 6 − 1. If the bot overshoots the corner, your unitMs may need a small adjustment.',
+  code:
+`// In STUDENT ZONE B, fill in rightAngle():
+function rightAngle(): void {
+    drive(?)     // Leg 1: (1,0) → (1,3)  — how many squares?
+    turnRight()  // exact 90° left turn — faces toward (6,3)
+    drive(?)     // Leg 2 east:  (1,3) → (6,3)  — how many squares?
+}
+
+// Hint — count the distances:
+//   Leg 1: Δy = 3 − 0 = ??? squares
+//   Leg 2: Δx = 6 − 1 = ??? squares`,
+},
+
+{
+  id:3, name:'Straight Shot', badge:'STRAIGHT SHOT SPECIALIST',
+  cat:'strike', minutes:15, start:'(6, 2)', target:'left goal (x=0–1)',
+  tagline:'Same code. Same Power. Three different balls. Rank them — and explain why.',
+  setup:[
+    'Have all three balls ready: standard (foam), squeaky, and rubber.',
+    'Place the starting ball at (4, 2) — already on the same line as the bot.',
+    'Place your bot at (6, 2) facing left (toward x = 0, the left goal).',
+    'Mark the left goal zone: x = 0–1, y = 1–3.',
+    'Use your real Speed and Power stats — do not change them between runs.',
+    'Reset the ball to (4, 2) before every run.',
+  ],
+  goal:'Drive from (6,&thinsp;2) to the ball at (4,&thinsp;2), then fire <code>kick()</code>. Run it three times — once per ball type. <em>Same code, same POWER, same position every time. The only variable is which ball you place on the mat. Rank all three.</em>',
+  constraints:[
+    'Exactly one <code>drive()</code> and one <code>kick()</code> — no turns, no stat changes.',
+    'Do not change your POWER stat between runs.',
+    'Reset ball to (4, 2) before each run. Measure from the kick point (x = 4 grid line) to where the ball stops.',
+  ],
+  pred:{
+    template:`Our POWER stat is <span class="blank" contenteditable="true" data-ph="___"></span>, so chargePower = POWER&sup2; = <span class="blank" contenteditable="true" data-ph="___"></span>%. We predict the ranking will be <span class="blank" contenteditable="true" data-ph="1st ___&nbsp;&nbsp;2nd ___&nbsp;&nbsp;3rd ___"></span> (standard / squeaky / rubber) because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+    task:'Calculate chargePower before you run. Commit to a full 1-2-3 ranking and write a reason for your top pick.',
+  },
+  run:[
+    {label:'Standard ball — scored into goal (x = 0–1, y = 1–3)?', yn:true},
+    {label:'Standard ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Standard ball — distance from kick point',fill:'___ cm'},
+    {label:'Squeaky ball — scored into goal?', yn:true},
+    {label:'Squeaky ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Squeaky ball — distance from kick point',fill:'___ cm'},
+    {label:'Rubber ball — scored into goal?', yn:true},
+    {label:'Rubber ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Rubber ball — distance from kick point',fill:'___ cm'},
+    {label:'Actual ranking (furthest → shortest)',fill:'1st ___  2nd ___  3rd ___'},
+    {label:'Biggest surprise vs. your prediction',fill:'_______________'},
+  ],
+  run2:'Run 2 (if time): try a different POWER stat with all three balls. Does the gap between them grow, shrink, or stay the same at higher power?',
+  gap:`Standard traveled <span class="blank" contenteditable="true" data-ph="___"></span> cm. Squeaky traveled <span class="blank" contenteditable="true" data-ph="___"></span> cm. Rubber traveled <span class="blank" contenteditable="true" data-ph="___"></span> cm. Ranking: 1st <span class="blank" contenteditable="true" data-ph="___"></span>, 2nd <span class="blank" contenteditable="true" data-ph="___"></span>, 3rd <span class="blank" contenteditable="true" data-ph="___"></span>. The <span class="blank" contenteditable="true" data-ph="standard / squeaky / rubber"></span> ball went furthest because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:[
+    'All three ball types tested with distances measured in cm',
+    'chargePower = POWER² calculated before running',
+    'Gap sentence gives a full 1-2-3 ranking and a physical reason for the winner',
+  ],
+  codeNote:'The code is identical for all three runs. Standard foam balls compress slightly but are light. Squeaky balls deform the most on impact — they absorb energy rather than transferring it. Rubber balls are the densest — they deform less and transfer the kick impulse most efficiently, typically traveling furthest. Real result depends on your specific balls, so measure and let the data speak.',
+  code:
+`// In STUDENT ZONE B, fill in straightShot():
+function straightShot(): void {
+    drive(2)   // (6,2) → (4,2): 6 − 4 = 2 squares to the ball
+    kick()     // fires at chargePower = POWER²  (set by your POWER stat)
+}
+
+// Run this three times — standard ball, squeaky ball, rubber ball.
+// No code changes between runs. Just swap the ball and re-run.
+//
+// Key calculation — do this BEFORE you run:
+//   chargePower = POWER × POWER = ???%`
+},
+
+{
+  id:4, name:'Corner Kick: Left Turn', badge:'CORNER KICK SPECIALIST',
+  cat:'strike', minutes:15, start:'(3, 4)', target:'goal (x=0–1)',
+  tagline:'Navigate to the ball — but stop short. Let the kick do the work. Too close and it overshoots. Too far and it falls short.',
+  setup:[
+    'Place the standard ball at (2, 2).',
+    'Place your bot at (3, 4) facing (3, 0).',
+    'Use the goal zone: x = 0–1, y = 1–3.',
+    'Use your real Speed and Power stats — do not change them between attempts.',
+  ],
+  goal:'Drive from (3, 4), turn left, then stop <em>short of the ball</em> at (2, 2). Fire <code>kick()</code> — it will close the gap, contact the ball, and push it toward x=0. Your job: find the Leg 2 distance that lands the ball <strong>inside the goal zone (x = 0–1)</strong> — not past x=0, not short of x=1.',
+  constraints:[
+    'Exactly <code>drive()</code>, <code>turnLeft()</code>, <code>drive()</code>, <code>kick()</code> — in that order.',
+    'Leg 1 is fixed: the bot must reach y=2. Calculate it from coordinates.',
+    'Leg 2 must be <em>less than</em> the full distance to the ball — stop short so kick() does the work. Fractional values expected: try drive(0.5), drive(0.7), etc.',
+    'Do not change your POWER stat between attempts — the right Leg 2 value is specific to your chargePower.',
+  ],
+  pred:{
+    template:`Leg 1: from (3, 4) to y=2 is <span class="blank" contenteditable="true" data-ph="___"></span> squares → <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. chargePower = POWER&sup2; = <span class="blank" contenteditable="true" data-ph="___"></span>%. For Leg 2, we will try <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code> first because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+    task:'Calculate Leg 1 from coordinates. Commit to a specific Leg 2 starting value and explain your reasoning before you flash.',
+  },
+  run:[
+    {label:'Attempt 1 — Leg 2 value',fill:'drive( ___ )'},
+    {label:'Attempt 1 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 1 — result',fill:'Short of goal / In goal / Past goal'},
+    {label:'Attempt 2 — Leg 2 adjusted to',fill:'drive( ___ )'},
+    {label:'Attempt 2 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 2 — result',fill:'Short of goal / In goal / Past goal'},
+    {label:'Attempt 3 — Leg 2 adjusted to',fill:'drive( ___ )'},
+    {label:'Attempt 3 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 3 — result',fill:'Short of goal / In goal / Past goal'},
+  ],
+  run2:'Keep iterating. Most teams find the sweet spot in 3–5 attempts. Record every try.',
+  gap:`Final Leg 2 value that scored: <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. chargePower = <span class="blank" contenteditable="true" data-ph="___"></span>%. Stopping <span class="blank" contenteditable="true" data-ph="___"></span> squares short of the ball meant kick() spent part of its 400 ms closing the gap before contact. Teams with higher chargePower need to stop <span class="blank" contenteditable="true" data-ph="further / closer"></span> because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:[
+    'Ball stopped inside goal zone (x = 0–1) at least once',
+    'At least 3 attempts recorded with different Leg 2 values',
+    'Gap sentence names the winning drive() value and explains why stopping distance affects kick strength',
+  ],
+  codeNote:'Leg 1 is always drive(2) — Δy = 4−2 = 2. turnLeft() from facing (3,0) points the bot toward x=0. Then: stop short of the ball at (2,2). kick() runs motors at chargePower for 400 ms — if you are 0.5 squares away, the first ~200 ms closes the gap before contact; the remaining ~200 ms actually pushes the ball. Stop closer = more push = ball travels farther. Stop farther = less push = gentler. The right stopping distance is unique to each team\'s chargePower.',
+  code:
+`// In STUDENT ZONE B, fill in cornerKickLeft():
+function cornerKickLeft(): void {
+    drive(2)     // (3,4) → (3,2): Leg 1 is fixed — Δy = 4−2 = 2
+    turnLeft()   // now pointed toward x=0
+    drive(???)   // stop SHORT of ball at (2,2) — try 0.3, 0.5, 0.7 ...
+                 // too close → ball overshoots past x=0
+                 // too far  → ball stops short of x=1
+    kick()       // closes the gap, contacts ball, pushes toward x=0
+}
+
+// The right drive(?) depends on YOUR chargePower = POWER²
+// Higher chargePower → stop further back
+// Lower chargePower  → stop closer to the ball`
+},
+
+{
+  id:5, name:'Corner Kick: Right‑Side Specialist', badge:'RIGHT CORNER SPECIALIST',
+  cat:'strike', minutes:8, start:'(4, 0)', target:'right goal zone (x=7–8)',
+  tagline:'Same stop-short mechanic as #4. Same turn function too. Does your Leg 2 value transfer to the other side?',
+  setup:[
+    'Place the standard ball at (6, 2).',
+    'Place your bot at (4, 0) facing (4, 4).',
+    'Use the goal zone: x = 7–8, y = 1–3.',
+    'Use your real Speed and Power stats — do not change them between attempts.',
+  ],
+  goal:'Drive from (4, 0), turn left, then stop <em>short of the ball</em> at (6, 2). Fire <code>kick()</code> — it will close the gap and push the ball toward x=8. Find the Leg 2 distance that lands the ball <strong>inside the right goal zone (x = 7–8)</strong> — not past x=8, not short of x=7.',
+  constraints:[
+    'Exactly <code>drive()</code>, <code>turnLeft()</code>, <code>drive()</code>, <code>kick()</code> — in that order.',
+    'Leg 1 is fixed: the bot must reach y=2. Calculate it from coordinates.',
+    'Leg 2 must be <em>less than</em> the full distance to the ball — stop short so kick() does the work. Fractional values expected.',
+    'Do not change your POWER stat between attempts.',
+  ],
+  pred:{
+    template:`Leg 1: from (4, 0) to y=2 is <span class="blank" contenteditable="true" data-ph="___"></span> squares → <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. chargePower = POWER&sup2; = <span class="blank" contenteditable="true" data-ph="___"></span>%. Our Card 4 winning Leg 2 was <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. We predict Leg 2 here will be <span class="blank" contenteditable="true" data-ph="the same / different"></span> because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+    task:'Calculate Leg 1 from coordinates. Use your Card 4 Leg 2 result as your first guess — and write a reason for whether you expect it to transfer.',
+  },
+  run:[
+    {label:'Attempt 1 — Leg 2 value',fill:'drive( ___ )'},
+    {label:'Attempt 1 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 1 — result',fill:'Short of goal / In goal / Past goal'},
+    {label:'Attempt 2 — Leg 2 adjusted to',fill:'drive( ___ )'},
+    {label:'Attempt 2 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 2 — result',fill:'Short of goal / In goal / Past goal'},
+    {label:'Attempt 3 — Leg 2 adjusted to',fill:'drive( ___ )'},
+    {label:'Attempt 3 — ball stopped at',fill:'( ___ , ___ )'},
+    {label:'Attempt 3 — result',fill:'Short of goal / In goal / Past goal'},
+  ],
+  run2:'Keep iterating if needed. Did your Card 4 Leg 2 value work here, or did you need to adjust?',
+  gap:`Final Leg 2 value that scored: <code>drive(<span class="blank" contenteditable="true" data-ph="___"></span>)</code>. This was <span class="blank" contenteditable="true" data-ph="the same as / different from"></span> Card 4’s winning value. That makes sense because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:[
+    'Ball stopped inside right goal zone (x = 7–8) at least once',
+    'At least 3 attempts recorded with different Leg 2 values',
+    'Gap sentence compares the winning Leg 2 value to Card 4 and explains why',
+  ],
+  codeNote:'Leg 1 is always drive(2) — Δy = 2−0 = 2. Both Challenge 4 and 5 use turnLeft(). In #4 the bot starts facing toward y=0 (up) — turnLeft() (CCW) → faces toward x=0. In #5 the bot starts facing toward y=4 (down) — turnLeft() (CCW) → faces toward x=8. Same function, opposite starting direction, opposite field outcome. The stop-short mechanic is identical — chargePower is the same, so your Card 4 Leg 2 value is a strong first guess.',
+  code:
+`function cornerKickRight(): void {
+    drive(2)     // (4,0) → (4,2): Leg 1 is fixed — Δy = 2−0 = 2
+    turnLeft()   // facing toward y=4 → CCW → now facing toward x=8
+    drive(???)   // stop SHORT of ball at (6,2) — start with your Card 4 value
+                 // too close → ball overshoots past x=8
+                 // too far  → ball stops short of x=7
+    kick()       // closes the gap, contacts ball, pushes toward x=8
+}
+
+// Why turnLeft() goes RIGHT here:
+//   #4: facing toward y=0 (UP)   → turnLeft (CCW) → toward x=0 (LEFT)
+//   #5: facing toward y=4 (DOWN) → turnLeft (CCW) → toward x=8 (RIGHT)
+//   Same function. Opposite starting direction. Opposite field outcome.
+// The right drive(?) depends on YOUR chargePower = POWER²`,
+},
+
+{
+  id:6, name:'Two-Ball Combo', badge:'COMBO STRIKER',
+  cat:'advanced', minutes:20, start:'(4, 0)', target:'left goal + right goal',
+  tagline:'One program. Two balls. Two goals. Your route is your choice.',
+  setup:[
+    'Place Ball A at (2, 2) — left-center of the field.',
+    'Place Ball B at (6, 2) — right-center of the field.',
+    'Place your bot at (4, 0) facing (4,4).',
+    'Use bothgoal zone (x = 0–1, y = 1–3) and  (x = 7–8, y = 1–3).',
+    'Decide BEFORE you code: which ball do you kick first, and why?',
+  ],
+  goal:'In one continuous program, kick Ball A into the goal AND Ball B into the othergoal. No touching either ball or bot once the run starts. <em>Your route is completely open — there is no single correct path. Plan it before you code.</em>',
+  constraints:[
+    'No touching the bot or balls once the program starts.',
+    'Each ball must be kicked exactly once.',
+    'Do not change stats between attempts.',
+  ],
+  pred:{
+    template:`We will kick Ball <span class="blank" contenteditable="true" data-ph="A / B"></span> first. Route to Ball A: <span class="blank" contenteditable="true" data-ph="_______________"></span>. Route to Ball B: <span class="blank" contenteditable="true" data-ph="_______________"></span>. We predict Ball A <span class="blank" contenteditable="true" data-ph="will / will not"></span> score and Ball B <span class="blank" contenteditable="true" data-ph="will / will not"></span> score.`,
+    task:'Draw the FULL path on paper — both legs, both kicks, the transition between them — before opening MakeCode.',
+  },
+  run:[
+    {label:'Ball A scored into goal (x = 0–1, y = 1–3)?', yn:true},
+    {label:'Ball B scored into goal (x = 7–8, y = 1–3)?', yn:true},
+    {label:'Ball A stopped at',fill:'( ___ , ___ )'},
+    {label:'Ball B stopped at',fill:'( ___ , ___ )'},
+    {label:'Did your path match the drawing?', yn:true},
+  ],
+  run2:'Attempt 2: swap the order — kick Ball B first, then Ball A. Write a new path prediction before re-coding.',
+  gap:`We kicked Ball <span class="blank" contenteditable="true" data-ph="A / B"></span> first. The hardest transition was <span class="blank" contenteditable="true" data-ph="_______________"></span> because <span class="blank" contenteditable="true" data-ph="_______________"></span>. The total function call count was <span class="blank" contenteditable="true" data-ph="___"></span>.`,
+  checks:['Both balls scored in their respective goals at least once','Full path drawn on paper before writing a single line of code','Gap sentence explains the hardest transition between the two kicks'],
+  codeNote:'No sequence hints on this one — you own the route. The tricky part is the transition: after kicking the first ball, what direction are you facing and where do you need to go next? Ball A is at (2,2), Ball B is at (6,2), they are 4 squares apart. Count every leg.',
+  code:
+`function twoBallCombo(): void {
+    // Your path here — plan on paper first, then translate.
+    // Ball A at (2,2) → kick into left goal  (x = 0–1)
+    // Ball B at (6,2) → kick into right goal (x = 7–8)
+    //
+    // No hints. Your drawing IS the spec.
+}`,
+},
+
+{
+  id:7, name:'Power Control Lab', badge:'DATA SCIENTIST',
+  cat:'advanced', minutes:20, start:'(3, 2)', target:'left goal (x=0–1)',
+  tagline:'Same shot. Three POWER settings. Does doubling POWER double the distance?',
+  setup:[
+    'Place Ball at (2, 2) before EVERY run — reset it each time.',
+    'Place your bot at (3, 2) facing (0,2).',
+    'Keep SPEED, ENDURANCE, and TURNING the same across all 3 runs.',
+    'Place ball at (2, 2) and bot at (3, 2) facing west before each run.',
+    'Press A on challenge 7 to enter power-select mode — LED shows the selected POWER value.',
+    'Press B to cycle: 3 → 6 → 9 → your POWER stat. Press A to run at the displayed value.',
+    'Measure ball travel distance in cm from the (2, 2) grid line after each kick.',
+  ],
+  goal:'Run the same one-square approach and kick three times — only your POWER stat changes. Record where the ball stops each time. Then decide: is the relationship between POWER and kick distance <strong>linear or non-linear?</strong>',
+  constraints:[
+    'SPEED, ENDURANCE, and TURNING must not change across all 3 runs.',
+    'Ball must be reset to (2, 2) before each run.',
+    'Measure from the (2, 2) grid line to where the ball stops — in cm, not squares.',
+  ],
+  pred:{
+    template:`chargePower values: P=3 → <span class="blank" contenteditable="true" data-ph="___"></span>%, P=6 → <span class="blank" contenteditable="true" data-ph="___"></span>%, P=9 → <span class="blank" contenteditable="true" data-ph="___"></span>%. From P=3 to P=6, chargePower jumps <span class="blank" contenteditable="true" data-ph="___"></span>%. From P=6 to P=9, it jumps <span class="blank" contenteditable="true" data-ph="___"></span>%. We predict each distance increase will be <span class="blank" contenteditable="true" data-ph="the same / bigger / smaller"></span> because <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+    task:'Calculate all three chargePower values before running anything. The formula is POWER². Commit to a prediction and explain it.',
+  },
+  run:[
+    {label:'POWER = 3 → ball stopped at',fill:'( ___ , ___ )'},
+    {label:'POWER = 3 → distance traveled',fill:'___ cm'},
+    {label:'POWER = 6 → ball stopped at',fill:'( ___ , ___ )'},
+    {label:'POWER = 6 → distance traveled',fill:'___ cm'},
+    {label:'POWER = 9 → ball stopped at',fill:'( ___ , ___ )'},
+    {label:'POWER = 9 → distance traveled',fill:'___ cm'},
+  ],
+  gap:`From P=3 to P=6, distance increased by <span class="blank" contenteditable="true" data-ph="___"></span> cm. From P=6 to P=9, it increased by <span class="blank" contenteditable="true" data-ph="___"></span> cm. The second jump was <span class="blank" contenteditable="true" data-ph="bigger / smaller / the same"></span>. This means the relationship is <span class="blank" contenteditable="true" data-ph="linear / non-linear"></span> because <span class="blank" contenteditable="true" data-ph="chargePower = POWER&sup2; — squaring a number is not a linear operation"></span>.`,
+  checks:['All 3 runs completed with measurements in cm','chargePower calculated for each POWER value before running','Gap sentence states whether the pattern is linear or non-linear AND explains why using the formula'],
+  codeNote:'The function itself is simple — drive(1) then kick(). The program sets chargePower to the lab value (3², 6², or 9²) automatically before each run, then restores your real chargePower after. You never need to re-flash. Key insight: POWER² means equal POWER steps produce unequal kick jumps. P=3→6 adds 27 to chargePower (9→36). P=6→9 adds 45 (36→81). The relationship is accelerating — not linear.',
+  code:
+`function powerControlLab(): void {
+    drive(1)   // (3,2) → (2,2): 1 square west to the ball
+    kick()     // fires at whatever chargePower is set to right now
+               // the program sets this for you — no re-flashing needed
+}
+
+// HOW TO RUN ALL 3 TRIALS WITHOUT RE-FLASHING:
+//   1. Select challenge 7 (press B until LED shows 7)
+//   2. Press A  →  LED shows the selected POWER value (starts at 3)
+//   3. Press B  →  cycles: 3 → 6 → 9 → your POWER stat → 3 → …
+//   4. Press A  →  runs the kick at that power, then restores your stat
+//   5. Reset ball to (2,2). Repeat from step 2 for next trial.
+//
+// chargePower for each trial:
+//   P = 3  →  3² = 9%
+//   P = 6  →  6² = 36%
+//   P = 9  →  9² = 81%
+`,
+},
+
+{
+  id:8, name:'Precision Parking', badge:'PRECISION PILOT',
+  cat:'advanced', minutes:15, start:'(0, 0)', target:'box at (5, 3) facing (5,0)',
+  tagline:'Any path. One requirement: stop inside the box, facing (5,0).',
+  setup:[
+    'Tape a 1-square box on the mat centered at (5, 3) — roughly 11 × 11 inches.',
+    'Place your bot at (0, 0) facing (0,4).',
+    'No ball. No obstacles. Pure navigation and spatial planning.',
+    'The required final facing direction is (x,0). Plan your route BACKWARD from the target — how do you arrive facing (x,0)?',
+  ],
+  goal:'Navigate from (0, 0) to the taped box at (5, 3) and stop inside it facing <strong>(x,0)</strong>. Any route is valid. <em>Half credit for stopping inside the box. Full badge for inside AND facing (5,0).</em> No trial-and-error — plan the whole path before you flash.',
+  constraints:[
+    'No touching the bot or repositioning after the program ends.',
+    'Final facing must be (5,0).',
+    'Any valid path to the box is allowed — but you must sketch it first.',
+  ],
+  pred:{
+    template:`Path from (0,0) to box at (5,3): <span class="blank" contenteditable="true" data-ph="_______________"></span>. We will approach from the <span class="blank" contenteditable="true" data-ph="north / south / east / west"></span> side. Turn used to achieve WEST facing: <span class="blank" contenteditable="true" data-ph="turnRight() / turnLeft() / two turns"></span>. Total <code>drive()</code> calls: <span class="blank" contenteditable="true" data-ph="___"></span>. Total turn calls: <span class="blank" contenteditable="true" data-ph="___"></span>.`,
+    task:'Sketch the path on graph paper. Mark the facing direction after every single call — not just the last one.',
+  },
+  run:[
+    {label:'Bot stopped inside the taped box?', yn:true},
+    {label:'Bot facing (5,0) when stopped?', yn:true},
+    {label:'Estimated stop coordinate',fill:'( ___ , ___ )'},
+    {label:'Final position error',fill:'___ cm from box center'},
+  ],
+  run2:'Attempt 2: find a DIFFERENT valid path to the same box with the same final facing. At least one leg must be different.',
+  gap:`Our bot stopped at approximately (<span class="blank" contenteditable="true" data-ph="___"></span>, <span class="blank" contenteditable="true" data-ph="___"></span>) facing <span class="blank" contenteditable="true" data-ph="___"></span>. The hardest part was <span class="blank" contenteditable="true" data-ph="_______________"></span>. To arrive facing west from our route, we needed to <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:['Bot stopped inside taped box AND facing west at least once','Path sketched with facing direction marked at every waypoint before coding','Attempt 2 uses a genuinely different route'],
+  codeNote:'To end up facing (x,0), you have options: (1) arrive from the east — drive west into the box; (2) arrive from another direction and turn to face west. From (0,0) facing east: drive east, turn at some column, drive forwardto y=3, then turn to face west. The exact column you turn on changes your Leg 2 length. Many valid solutions exist.',
+  code:
+`function precisionParking(): void {
+    // Start: (0,0) facing EAST
+    // Target: inside box at (5,3), facing WEST
+    //
+    // Write your facing direction as a comment after every call:
+    //   drive(?) // → still facing east
+    //   turnRight() // → now facing south
+    //   drive(?) // → still facing south
+    //   turnRight() // → now facing west
+    //   drive(?) // → now facing west, arriving at target
+}
+`,
+},
+
+{
+  id:9, name:'Boss Level', badge:'MATCH COMMANDER',
+  cat:'advanced', minutes:30, start:'(4, 0)', target:'score + park at (0–1, 0)',
+  tagline:'Cone in the way. Score the ball. Park at base. One program. No second chances.',
+  setup:[
+    'Place Ball at (4, 2) — dead center.',
+    'Place a cone or small obstacle at (4, 1) — directly between your start and the ball.',
+    'Place your bot at (4, 0) facing (4,4).',
+    'Tape a parking zone at (0, 0) to (1, 0) — top-left corner of the field.',
+    'You cannot pass through (4, 1). You MUST route around the cone.',
+  ],
+  goal:'Without touching the cone or bot: navigate around the cone, reach the ball at (4, 2), kick it into either goal, then drive to the parking zone at x = 0–1, y = 0. <strong>Score: 1 pt for cone avoidance + 1 pt for scoring + 1 pt for parking = 3 pts max.</strong>',
+  constraints:[
+    'Cannot pass through coordinate (4, 1) — the cone is there.',
+    'Ball must cross a goal line: x = 0 or x = 8, within y = 1–3.',
+    'Bot must end the program inside the parking zone (x = 0–1, y = 0).',
+  ],
+  pred:{
+    template:`Cone detour: go around the <span class="blank" contenteditable="true" data-ph="left / right"></span> side. Detour route: <span class="blank" contenteditable="true" data-ph="_______________"></span>. We will score into the <span class="blank" contenteditable="true" data-ph="left / right"></span> goal. Route to parking zone after scoring: <span class="blank" contenteditable="true" data-ph="_______________"></span>. Estimated total function calls: <span class="blank" contenteditable="true" data-ph="___"></span>.`,
+    task:'Write your complete plan in order: cone detour, approach to ball, kick direction, then parking route. A plan that is written is a program that is half written.',
+  },
+  run:[
+    {label:'Avoided the cone — no contact?', yn:true},
+    {label:'Ball scored — crossed goal line?', yn:true},
+    {label:'Bot ended in parking zone (x = 0–1, y = 0)?', yn:true},
+    {label:'Score',fill:'___ / 3 points'},
+  ],
+  run2:'Attempt 2: try the OPPOSITE detour side, OR aim for the other goal. Write a new plan before re-coding.',
+  gap:`We scored <span class="blank" contenteditable="true" data-ph="___"></span> / 3. The point we missed was <span class="blank" contenteditable="true" data-ph="cone / score / park"></span> because <span class="blank" contenteditable="true" data-ph="_______________"></span>. Our detour went <span class="blank" contenteditable="true" data-ph="left / right"></span> — next attempt we would <span class="blank" contenteditable="true" data-ph="_______________"></span>.`,
+  checks:['Score 2/3 or higher at least once','Full plan (detour + kick direction + park route) written before coding','Gap sentence identifies each point earned or missed and explains why'],
+  codeNote:'No function hints. You own the whole sequence: route around the cone, navigate to the ball, choose your goal (whichever is easier from where you arrive after kicking), then drive to the parking zone. Break the program into 4 phases on paper first. The bot has no sensors — it follows whatever path you code, exactly.',
+  code:
+`function bossLevel(): void {
+    // PHASE 1 — Route around cone at (4,1):
+    //   Go left (toward x=3) or right (toward x=5) first.
+
+    // PHASE 2 — Navigate to ball at (4,2):
+    //   Count your legs carefully after the detour.
+
+    // PHASE 3 — Kick into left (x=0–1) or right (x=7–8) goal:
+    //   Choose the goal that makes sense from where you arrive.
+
+    // PHASE 4 — Drive to parking zone (x=0–1, y=0):
+    //   Navigate back to the top-left corner.
+}
+`,
+},
+
+]; // end SKILLS
+
+// ── CARD BUILDER ───────────────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderRun(items){
+  return items.map(item => {
+    if(item.yn){
+      const uid = 'yn'+Math.random().toString(36).slice(2,7);
+      return `<div class="run-item">
+        <span class="run-label">${item.label}</span>
+        <div class="run-yn">
+          <label class="yn-opt"><input type="checkbox"> Yes</label>
+          <label class="yn-opt"><input type="checkbox"> No</label>
+        </div>
+      </div>`;
+    }
+    return `<div class="run-item">
+      <span class="run-label">${item.label}</span>
+      <span class="run-val">${item.fill}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderChecks(checks, id){
+  return checks.map((text,i) =>
+    `<li class="badge-item"><input type="checkbox" id="bc${id}_${i}"><label for="bc${id}_${i}">${text}</label></li>`
+  ).join('');
+}
+
+function buildCard(s){
+  const cv = CVARS[s.cat];
+  const catLabel = {navigate:'Navigate',strike:'Strike',chain:'Chain',advanced:'Advanced'}[s.cat];
+
+  const run2Html = s.run2
+    ? `<div class="run2-note">${I.run} <strong>Run 2 (if time):</strong> ${s.run2}</div>`
+    : '';
+
+  return `
+<div class="card" id="card${s.id}" data-cat="${s.cat}" style="${cv}">
+  <div class="wm">${s.id}</div>
+
+  <div class="card-top">
+    <div class="card-row1">
+      <div class="card-num">#${s.id}</div>
+      <div class="card-name">${s.name}</div>
+    </div>
+    <div class="badges">
+      <span class="badge b-${s.cat}">${catLabel}</span>
+      <span class="badge b-time">${I.clock} ${s.minutes} min</span>
+    </div>
+  </div>
+
+  <div class="goal-strip">${s.tagline}</div>
+
+  <div class="card-body">
+
+    <div>
+      <div class="sec-label">${I.setup} Setup — click to check off</div>
+      <ul class="steps">${s.setup.map(t=>`<li class="step-item" onclick="this.classList.toggle('done')">${t}</li>`).join('')}</ul>
+    </div>
+
+    <div>
+      <div class="sec-label">${I.goal} Goal</div>
+      <div class="goal-text">${s.goal}</div>
+    </div>
+
+    <div>
+      <div class="sec-label">${I.rules} Constraints</div>
+      <ul class="c-list">${s.constraints.map(c=>`<li>${c}</li>`).join('')}</ul>
+    </div>
+
+    <div>
+      <div class="sec-label">${I.pred} Before You Run — Prediction</div>
+      <div class="pred-box">
+        <div class="pred-text">${s.pred.template}</div>
+        <div class="pred-task">${s.pred.task}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">${I.run} Run 1 — Observe</div>
+      <div class="run-list">${renderRun(s.run)}</div>
+      ${run2Html}
+    </div>
+
+    <div>
+      <div class="sec-label">${I.gap} Gap Sentence</div>
+      <div class="gap-text">${s.gap}</div>
+    </div>
+
+    <div>
+      <div class="badge-box">
+        <div class="badge-title">${I.badge} Skill Badge: ${s.badge}</div>
+        <ul class="badge-checks">${renderChecks(s.checks, s.id)}</ul>
+        <div class="fac-line">Facilitator initial: <span class="fac-blank"></span></div>
+      </div>
+    </div>
+
+    <div>
+      <button class="code-toggle" id="ctog${s.id}" onclick="toggleCode(${s.id})">
+        Sample MakeCode <span class="chv">&#9660;</span>
+      </button>
+      <div class="code-wrap" id="cwrap${s.id}">
+        <div class="code-note">${s.codeNote}</div>
+        <button class="copy-btn" id="cpbtn${s.id}" onclick="copyCode(${s.id})">${I.copy} Copy</button>
+        <pre class="code-block" id="cpre${s.id}">${esc(s.code)}</pre>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card-footer">
+    <span class="coord-hint">start ${s.start} → target ${s.target}</span>
+    <div class="footer-btns">
+      <button class="done-btn" onclick="markDone(${s.id},this)">${I.check} Done</button>
+      <button class="timer-btn" onclick="openTimer(${s.id})">${I.clock} ${s.minutes}:00</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// Build grid
+document.getElementById('grid').innerHTML = SKILLS.map(buildCard).join('');
+document.querySelectorAll('.card').forEach((c,i)=>{ c.style.animationDelay=`${i*60}ms`; });
+
+// Wire team identity + load any prior progress (local + sheet).
+renderTeamIdUI();
+loadSkillsProgress();
+
+// ── CODE TOGGLE ─────────────────────────────────────────────────────────────
+function toggleCode(id){
+  const tog = document.getElementById('ctog'+id);
+  const wrap = document.getElementById('cwrap'+id);
+  tog.classList.toggle('open');
+  wrap.classList.toggle('open');
+}
+
+// ── COPY CODE ───────────────────────────────────────────────────────────────
+function copyCode(id){
+  const s = SKILLS.find(x=>x.id===id);
+  if(!s||!navigator.clipboard) return;
+  navigator.clipboard.writeText(s.code).then(()=>{
+    const btn = document.getElementById('cpbtn'+id);
+    if(!btn) return;
+    btn.innerHTML = I.check + ' Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.innerHTML = I.copy + ' Copy'; btn.classList.remove('copied'); }, 2200);
+  });
+}
+
+// ── SHEET ENDPOINTS ─────────────────────────────────────────────────────────
+// Same per-site Google Apps Script web apps used by velocity-arena-dashboard.html.
+// Each script must implement actions: skills_save (POST), skills_load (GET).
+// See bottom of file (or docs/skills-arena-apps-script.md) for the code to paste
+// into each site's project. Sites with no endpoint configured fall back to
+// localStorage-only mode.
+const SHEET_ENDPOINTS = {
+  tennessee: 'https://script.google.com/macros/s/AKfycbwuAQZBqAMfnEH7m__UeHGss1fbnoZ8QILjJLa9w-XHPDRA1ATkjqKwn3E7W7cI4UYT/exec',
+  nyc_1:     'https://script.google.com/macros/s/AKfycbzpB-aM00B0fHwA0yxE2nvHz5dIo5XzUr1bo-CmsWmrZ7VqXM2U3LH-EkhNX-QNgnALwA/exec',
+  nyc_2:     'https://script.google.com/macros/s/AKfycbxfYS4UaA4_XRkP-J0-SKFCwc7tlBCgyyF_k-RVmIPrUCMGBfOlOng_Qhe6pgfOQaw7/exec',
+  nyc_3:     'https://script.google.com/macros/s/AKfycbxU4U7p7mSJvstqD68Pf7PBmfhLV0JM2XwpaMpkjK1oTQAwK2_b3FCdVgBfJcReCBrz/exec'
+};
+const _SITE_TO_DASH = { NY1: 'nyc_1', NY2: 'nyc_2', NY3: 'nyc_3', TN: 'tennessee' };
+
+function currentSiteKey(){
+  const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  return code ? _SITE_TO_DASH[code] : null;
+}
+function currentEndpoint(){
+  const k = currentSiteKey();
+  return k ? SHEET_ENDPOINTS[k] : null;
+}
+
+// ── TEAM IDENTITY ───────────────────────────────────────────────────────────
+const TEAM_ID_KEY = 'va_skills_team_id'; // {team, name}
+function getTeamId(){
+  try { return JSON.parse(localStorage.getItem(TEAM_ID_KEY) || 'null'); } catch(e){ return null; }
+}
+function setTeamId(team, name){
+  localStorage.setItem(TEAM_ID_KEY, JSON.stringify({team, name}));
+}
+function clearTeamId(){ localStorage.removeItem(TEAM_ID_KEY); }
+
+function renderTeamIdUI(){
+  const id = getTeamId();
+  const banner = document.getElementById('teamIdBanner');
+  const status = document.getElementById('teamIdStatus');
+  const stText = document.getElementById('teamIdStatusText');
+  if (id && id.team && id.name) {
+    banner.style.display = 'none';
+    status.style.display = 'flex';
+    const siteLabel = (function(){
+      const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+      if (!code) return 'no site selected';
+      const labels = { NY1: 'Gotham Tech', NY2: 'Claremont', NY3: 'South Bronx', TN: 'Crosstown' };
+      return labels[code] || code;
+    })();
+    const sheetMode = currentEndpoint() ? 'saving to ' + siteLabel + ' sheet' : 'local only (no sheet configured)';
+    stText.textContent = id.name + ' · ' + id.team + ' · ' + sheetMode;
+  } else {
+    banner.style.display = '';
+    status.style.display = 'none';
+  }
+}
+function submitTeamId(ev){
+  ev.preventDefault();
+  const team = document.getElementById('teamIdTeam').value.trim();
+  const name = document.getElementById('teamIdName').value.trim();
+  if (!team || !name) return false;
+  setTeamId(team, name);
+  renderTeamIdUI();
+  loadSkillsProgress();
+  return false;
+}
+function resetTeamId(){
+  if (!confirm('Clear team and name? Your local checkmarks stay; sheet history is preserved.')) return;
+  clearTeamId();
+  renderTeamIdUI();
+}
+
+// ── SAVE / LOAD PROGRESS ────────────────────────────────────────────────────
+function showSaveIndicator(state, text){
+  let el = document.getElementById('saveInd');
+  if (!el) {
+    el = document.createElement('span');
+    el.id = 'saveInd';
+    el.className = 'save-indicator';
+    const status = document.getElementById('teamIdStatusText');
+    if (status) status.appendChild(el);
+  }
+  el.className = 'save-indicator show ' + (state || '');
+  el.textContent = text;
+  if (state === 'ok') setTimeout(() => { el.classList.remove('show'); }, 1800);
+}
+
+async function saveSkillsProgress(challengeId, done){
+  const id = getTeamId();
+  const endpoint = currentEndpoint();
+  // Always persist locally regardless of sheet status.
+  const localKey = 'va_skills_progress';
+  let local = {};
+  try { local = JSON.parse(localStorage.getItem(localKey) || '{}'); } catch(e){}
+  if (done) local[challengeId] = true;
+  else delete local[challengeId];
+  localStorage.setItem(localKey, JSON.stringify(local));
+
+  if (!id || !endpoint) return; // no sheet sync
+  showSaveIndicator('', 'saving…');
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'skills_save',
+        team: id.team,
+        name: id.name,
+        challenge: challengeId,
+        status: done ? 'completed' : 'undone',
+        ts: new Date().toISOString()
+      })
+    });
+    const json = await res.json();
+    if (json && json.ok) showSaveIndicator('ok', 'saved');
+    else showSaveIndicator('err', 'error');
+  } catch(err) {
+    showSaveIndicator('err', 'offline');
+    console.warn('Skills Arena save failed', err);
+  }
+}
+
+async function loadSkillsProgress(){
+  // Restore from localStorage first (always available).
+  let local = {};
+  try { local = JSON.parse(localStorage.getItem('va_skills_progress') || '{}'); } catch(e){}
+  Object.keys(local).forEach(idStr => applyDoneState(parseInt(idStr, 10), true));
+  updateEarnedCount();
+
+  // Then try the sheet for this team — overwrites local if the sheet says so.
+  const id = getTeamId();
+  const endpoint = currentEndpoint();
+  if (!id || !endpoint) return;
+  try {
+    const url = endpoint + '?action=skills_load&team=' + encodeURIComponent(id.team) + '&name=' + encodeURIComponent(id.name);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      // Sheet returns array of {challenge, status} rows; latest wins.
+      const merged = {};
+      data.forEach(row => { merged[row.challenge] = row.status === 'completed'; });
+      // Reset all card visual state then re-apply from sheet truth.
+      document.querySelectorAll('.card.complete').forEach(c => c.classList.remove('complete'));
+      Object.keys(merged).forEach(c => applyDoneState(parseInt(c, 10), merged[c]));
+      localStorage.setItem('va_skills_progress', JSON.stringify(
+        Object.fromEntries(Object.entries(merged).filter(([_, v]) => v))
+      ));
+      updateEarnedCount();
+    }
+  } catch(err) {
+    console.warn('Skills Arena load failed (using local only)', err);
+  }
+}
+
+function applyDoneState(id, done){
+  const card = document.getElementById('card'+id);
+  if (!card) return;
+  card.classList.toggle('complete', !!done);
+  const btn = card.querySelector('.done-btn');
+  if (btn) btn.innerHTML = done ? I.undo+' Undo' : I.check+' Done';
+}
+
+function updateEarnedCount(){
+  const earned = document.querySelectorAll('.card.complete').length;
+  const el = document.getElementById('progressCount');
+  if(el) el.textContent = `${earned} / ${SKILLS.length} earned`;
+}
+
+// ── MARK DONE ───────────────────────────────────────────────────────────────
+function markDone(id, btn){
+  const card = document.getElementById('card'+id);
+  if(!card) return;
+  card.classList.toggle('complete');
+  const done = card.classList.contains('complete');
+  btn.innerHTML = done ? I.undo+' Undo' : I.check+' Done';
+  updateEarnedCount();
+  saveSkillsProgress(id, done);
+}
+
+// ── TEMPLATE CODE ───────────────────────────────────────────────────────────
+const TEMPLATE_CODE = "/**\n * \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n *  VELOCITY ARENA \u2014 Skills Arena Base Program\n *  micro:bit + Cutebot Pro   |   8\u00d74 ft field   |   8\u00d74 grid\n * \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n *\n *  HOW TO USE\n *  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n *  1. Enter your team stats in STUDENT ZONE A below.\n *     S + P + E + T must add up to exactly 20.\n *\n *  2. Write your code inside the challenge function you are\n *     working on in STUDENT ZONE B below.\n *\n *  3. Flash the program to your micro:bit.\n *\n *  4. Press B to select a challenge (the number shows on screen).\n *     Press A to run it.\n *     Press A+B at any time for an emergency stop.\n *\n *  HELPER FUNCTIONS (call these inside your challenge functions)\n *  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n *  drive(n)       move straight forward exactly n grid squares\n *                 1 grid square = 10.75 in = ~27 cm = 1 block\n *\n *  turnRight()    rotate exactly 90\u00b0 clockwise in place\n *  turnLeft()     rotate exactly 90\u00b0 counter-clockwise in place\n *\n *  kick()         burst of power from your Power stat, then stop\n *                 force = chargePower = POWER\u00b2  (0\u2013100)\n *\n *  FIELD COORDINATE SYSTEM\n *  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n *  x: 0 (left wall) \u2192 8 (right wall)       8 columns\n *  y: 0 (top edge)  \u2192 4 (bottom edge)      4 rows\n *  Labels on mat:  x = 1\u20137,  y = 1\u20133  (interior grid lines)\n *  Left  goal zone: x = 0\u20131, y = 1\u20133\n *  Right goal zone: x = 7\u20138, y = 1\u20133\n *  Ball at center:  (4, 2)\n * \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n */\n\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  \u2605  STUDENT ZONE A  \u2605   ENTER YOUR TEAM STATS HERE\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//\n//  RULES:  each stat \u2265 1  |  POWER \u2264 10  |  S + P + E + T = 20\n//\n//  SPEED      how fast the bot drives\n//  POWER      how hard it kicks  (chargePower = POWER\u00b2)\n//  ENDURANCE  how long it stays fast in a match\n//  TURNING    how sharply it steers in a match\n//\nlet SPEED     = 0   // \u2190 YOUR VALUE HERE\nlet POWER     = 0   // \u2190 YOUR VALUE HERE\nlet ENDURANCE = 0   // \u2190 YOUR VALUE HERE\nlet TURNING   = 0   // \u2190 YOUR VALUE HERE\n// \u2500\u2500 CHECK: SPEED + POWER + ENDURANCE + TURNING must equal 20 \u2500\u2500\n\n\n// \u2500\u2500 CALCULATED VALUES  (read-only \u2014 do not change) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nlet motorPower  = SPEED * 100 / 20             // drive speed %   (0\u201385)\nlet chargePower = Math.min(POWER * POWER, 100) // kick force %    (0\u2013100)\nlet alignMs     = Math.max(60, 220 - TURNING * 16) // aim time ms\nlet DECAY_RATE  = 20 - ENDURANCE               // endurance decay rate\n\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  DRIVE TUNING\n//  unitMs = how many milliseconds your bot takes to travel\n//  exactly 1 grid square at YOUR motorPower setting.\n//\n//  How to tune:\n//    1. Start with unitMs = 500.\n//    2. Run challenge 1 (Dead Straight) \u2014 press B until LED shows 1,\n//       then press A.\n//    3. Bot stopped short?  \u2192  increase unitMs (try +100 at a time).\n//       Bot overshot?       \u2192  decrease unitMs (try \u2212100 at a time).\n//    4. When drive(6) lands the bot on (7, 0), you are calibrated.\n//       All other challenges use the same unitMs automatically.\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nlet unitMs = 500   // \u2190 TUNE THIS first (ms per 1 grid square)\n\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  CHALLENGE SELECTOR\n//  B = next challenge (1 \u2192 2 \u2192 \u2026 \u2192 10 \u2192 1 \u2192 ...)\n//  A = run the selected challenge\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nlet currentChallenge = 1\n\ninput.onButtonPressed(Button.B, function () {\n    currentChallenge = (currentChallenge % 9) + 1\n    basic.showNumber(currentChallenge)\n})\n\ninput.onButtonPressed(Button.A, function () {\n    basic.showArrow(ArrowNames.East)\n    if      (currentChallenge === 1) { deadStraight()    }\n    else if (currentChallenge === 2) { rightAngle()      }\n    else if (currentChallenge === 3) { straightShot()    }\n    else if (currentChallenge === 4) { cornerKickLeft()  }\n    else if (currentChallenge === 5) { cornerKickRight() }\n    else if (currentChallenge === 6) { lawnmower()       }\n    else if (currentChallenge === 7) { twoBallCombo()    }\n    else if (currentChallenge === 8) { powerControlLab() }\n    else if (currentChallenge === 9) { precisionParking() }\n    else if (currentChallenge === 10){ bossLevel()        }\n    CutebotPro.stopImmediately(CutebotProMotors.ALL)\n    basic.showIcon(IconNames.Yes)\n})\n\n// A + B  \u2192  emergency stop (works at any time)\ninput.onButtonPressed(Button.AB, function () {\n    CutebotPro.stopImmediately(CutebotProMotors.ALL)\n    CutebotPro.pwmCruiseControl(0, 0)\n    basic.showLeds(`\n        # . . . #\n        . # . # .\n        . . # . .\n        . # . # .\n        # . . . #`)\n})\n\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  HELPER FUNCTIONS\n//  Call these inside your challenge functions below.\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n/**\n * drive(n)\n * Move straight forward for n grid squares.\n * Speed comes from your SPEED stat (motorPower).\n * Distance is controlled by unitMs \u2014 tune that variable until\n * drive(1) travels exactly 1 grid square on your bot.\n *\n * Example:  drive(3)   \u2192  motors run for unitMs \u00d7 3 ms, then stop\n */\nfunction drive(units: number): void {\n    CutebotPro.pwmCruiseControl(motorPower, motorPower)\n    basic.pause(unitMs * units)\n    CutebotPro.stopImmediately(CutebotProMotors.ALL)\n    basic.pause(100)\n}\n\n/**\n * turnRight()\n * Rotate exactly 90\u00b0 clockwise in place (turns the bot to the right).\n *\n * Facing down (+y) \u2192 now facing right (+x)\n * Facing right (+x) \u2192 now facing up (-y)\n */\nfunction turnRight(): void {\n    CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)\n    basic.pause(150)\n}\n\n/**\n * turnLeft()\n * Rotate exactly 90\u00b0 counter-clockwise in place (turns the bot to the left).\n *\n * Facing down (+y) \u2192 now facing left (-x)\n * Facing left (-x) \u2192 now facing up (-y)\n */\nfunction turnLeft(): void {\n    CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 90)\n    basic.pause(150)\n}\n\n/**\n * kick()\n * Fire a power burst toward whatever the bot is facing.\n * Force comes from your POWER stat:  chargePower = POWER\u00b2\n *\n * Example:  POWER = 7  \u2192  chargePower = 49%\n *           POWER = 10 \u2192  chargePower = 100%  (max)\n */\nfunction kick(): void {\n    CutebotPro.pwmCruiseControl(chargePower, chargePower)\n    basic.pause(400)\n    CutebotPro.stopImmediately(CutebotProMotors.ALL)\n}\n\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  \u2605  STUDENT ZONE B  \u2605   WRITE YOUR CHALLENGE FUNCTIONS BELOW\n//\n//  Each function is called when you press A with that challenge\n//  selected. Fill in the body using drive(), turnLeft(),\n//  turnRight(), and kick().\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\n// \u2500\u2500 Challenge 1 \u2014 DEAD STRAIGHT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (1, 0)  facing right (+x direction)\n//  Target: (7, 0)\n//  Task:   Drive 6 grid squares in a straight line.  No turns.\n//\nfunction deadStraight(): void {\n    // YOUR CODE HERE\n    // Hint: call drive(?) \u2014 how many squares to the target?\n\n}\n\n\n// \u2500\u2500 Challenge 2 \u2014 RIGHT ANGLE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (1, 0)  facing down (+y direction)\n//  Target: (6, 3)\n//  Task:   Drive 3 squares \u2192 turn right 90\u00b0 \u2192 drive 5 squares.\n//\nfunction rightAngle(): void {\n    // YOUR CODE HERE\n    // Hint: drive(?) \u2192 turnRight() \u2192 drive(?)\n\n}\n\n\n// \u2500\u2500 Challenge 3 \u2014 STRAIGHT SHOT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (6, 2)  facing LEFT (toward x = 0)\n//  Ball:   (4, 2)  \u2014 already lined up with the bot\n//  Goal:   Left goal zone  (x = 0\u20131, y = 1\u20133)\n//  Task:   Drive to the ball, then kick it into the left goal.\n//          No turns needed \u2014 the shot is already aligned.\n//\nfunction straightShot(): void {\n    // YOUR CODE HERE\n    // Hint: drive(?) to reach the ball, then kick()\n\n}\n\n\n// \u2500\u2500 Challenge 4 \u2014 CORNER KICK: LEFT SIDE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (3, 0)  facing down (+y direction)\n//  Ball:   (1, 2)\n//  Goal:   Left goal zone  (x = 0\u20131, y = 1\u20133)\n//  Task:   Navigate to the ball from an angle, then kick left.\n//\nfunction cornerKickLeft(): void {\n    // YOUR CODE HERE\n    // Hint: drive(?) \u2192 turnLeft() \u2192 drive(?) \u2192 kick()\n\n}\n\n\n// \u2500\u2500 Challenge 5 \u2014 CORNER KICK: RIGHT SIDE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (4, 0)  facing down (+y direction)\n//  Ball:   (6, 2)\n//  Goal:   Right goal zone  (x = 7\u20138, y = 1\u20133)\n//  Task:   Navigate to the ball from an angle, then kick right.\n//\nfunction cornerKickRight(): void {\n    // YOUR CODE HERE\n    // Hint: drive(?) \u2192 turnRight() \u2192 drive(?) \u2192 kick()\n\n}\n\n\n// \u2500\u2500 Challenge 6 \u2014 THE LAWNMOWER \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (0, 0)  facing down (+y direction)\n//  Task:   Sweep the full field in a lawnmower pattern.\n//          Cover all 4 rows \u2014 8 straight segments, 7 turns.\n//\n//  Path (as grid coordinates):\n//    (0,0)\u2192(0,4)  turn right  \u2192(8,4)  turn right  \u2192(8,3)\n//    turn right   \u2192(0,3)  turn left   \u2192(0,2)  turn left\n//    \u2192(8,2)  turn right  \u2192(8,1)  turn right  \u2192(0,1)\n//\nfunction lawnmower(): void {\n    // YOUR CODE HERE\n    // Hint: use drive() and turnLeft() / turnRight()\n    // Each row is 8 squares wide.\n    // Vertical steps between rows are 1 square.\n    // Count your turns: there should be exactly 7.\n\n}\n\n\n// \u2500\u2500 Challenge 7 \u2014 TWO-BALL COMBO \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (4, 0)  facing south (+y direction)\n//  Ball A: (2, 2)  \u2192 left  goal zone (x = 0\u20131, y = 1\u20133)\n//  Ball B: (6, 2)  \u2192 right goal zone (x = 7\u20138, y = 1\u20133)\n//  Task:   In one program, kick Ball A into the left goal and\n//          Ball B into the right goal. No hints \u2014 plan your\n//          own route and decide which ball you kick first.\n//\nfunction twoBallCombo(): void {\n    // YOUR CODE HERE\n    // Plan on paper first. Ball A at (2,2), Ball B at (6,2).\n    // Hint: there is no single correct route \u2014 choose your order,\n    // draw the path, count every square, count every turn.\n\n}\n\n\n// \u2500\u2500 Challenge 8 \u2014 POWER CONTROL LAB \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (3, 2)  facing west (toward x = 0)\n//  Ball:   (2, 2)  \u2014 reset before every run\n//  Task:   Run the same drive(1) + kick() three times using\n//          POWER = 3, POWER = 6, and POWER = 9.\n//          Record ball distance each time. Is it linear?\n//\nfunction powerControlLab(): void {\n    // YOUR CODE HERE\n    // Hint: drive(1) to the ball, then kick()\n    // Change POWER in STUDENT ZONE A and re-flash between runs.\n\n}\n\n\n// \u2500\u2500 Challenge 9 \u2014 PRECISION PARKING \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (0, 0)  facing east (+x direction)\n//  Target: taped box at (5, 3), final facing = WEST\n//  Task:   Navigate to the box by any route. Stop inside it\n//          facing exactly west. Sketch your path first \u2014\n//          mark your facing direction after every call.\n//\nfunction precisionParking(): void {\n    // YOUR CODE HERE\n    // No hint sequence \u2014 your path is your design.\n    // Remember: to end up facing WEST you must plan the\n    // approach direction and your final turn carefully.\n\n}\n\n\n// \u2500\u2500 Challenge 10 \u2014 BOSS LEVEL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//  Start:  (4, 0)  facing south (+y direction)\n//  Ball:   (4, 2)  \u2014 center of field\n//  Cone:   (4, 1)  \u2014 directly in the way; CANNOT pass through\n//  Task:   Route around the cone, reach the ball, kick it into\n//          either goal, then drive to the parking zone at\n//          x = 0\u20131, y = 0. Score: 1 pt per phase (max 3).\n//\nfunction bossLevel(): void {\n    // YOUR CODE HERE\n    // Write your plan in 4 phases before you code:\n    //   Phase 1 \u2014 detour around cone at (4,1)\n    //   Phase 2 \u2014 navigate to ball at (4,2)\n    //   Phase 3 \u2014 kick into left or right goal\n    //   Phase 4 \u2014 drive to parking zone (x=0\u20131, y=0)\n\n}\n\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n//  STARTUP\n// \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nCutebotPro.stopImmediately(CutebotProMotors.ALL)\nCutebotPro.pwmCruiseControl(0, 0)\nbasic.pause(100)\n\n// Show a quick stat summary: motorPower then chargePower\nbasic.showString(\"P\" + motorPower)\nbasic.pause(400)\nbasic.showString(\"K\" + chargePower)\nbasic.pause(400)\n\n// Show which challenge is loaded\nbasic.showNumber(currentChallenge)\n";
+
+function copyTemplate(){
+  if(!navigator.clipboard) return;
+  const pre = document.querySelector('pre.template-code');
+  const tplText = pre ? pre.textContent : TEMPLATE_CODE;
+  navigator.clipboard.writeText(tplText).then(()=>{
+    const btn = document.getElementById('templateCopyBtn');
+    if(!btn) return;
+    btn.innerHTML = `<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"/></svg> Copied!`;
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.innerHTML = `<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\" ry=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg> Copy Template`;
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+
+// ── SETUP PANEL TOGGLE ──────────────────────────────────────────────────────
+function toggleSetup(){
+  const body = document.getElementById("setupBody");
+  const btn  = document.getElementById("setupToggleBtn");
+  const chv  = document.getElementById("setupChv");
+  if(!body) return;
+  const open = body.style.display !== "none";
+  body.style.display = open ? "none" : "";
+  btn.classList.toggle("open", !open);
+  if(chv) chv.textContent = open ? "Show" : "Hide";
+}
+
+// ── FILTER ──────────────────────────────────────────────────────────────────
+const TCLS = {all:'a-all',navigate:'a-navigate',strike:'a-strike',chain:'a-chain',advanced:'a-advanced'};
+function filter(cat){
+  document.querySelectorAll('.card').forEach(c=>{
+    c.classList.toggle('hidden', cat!=='all' && c.dataset.cat!==cat);
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn,i)=>{
+    btn.className='tab-btn';
+    if(['all','navigate','strike','chain','advanced'][i]===cat) btn.classList.add(TCLS[cat]);
+  });
+}
+
+// ── WEB AUDIO ───────────────────────────────────────────────────────────────
+let audioCtx=null, soundMuted=false;
+function getAudio(){ if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+function beep(freq,dur,vol,type='sine'){ if(soundMuted) return; try{ const ctx=getAudio(),osc=ctx.createOscillator(),g=ctx.createGain(); osc.connect(g); g.connect(ctx.destination); osc.type=type; osc.frequency.value=freq; g.gain.setValueAtTime(vol,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); osc.start(); osc.stop(ctx.currentTime+dur+0.01); }catch(e){} }
+function tickSound(){ beep(1000,.04,.07); }
+function warnSound(){ beep(1200,.07,.12); }
+function alarmSound(){ beep(880,.13,.35,'square'); setTimeout(()=>beep(660,.13,.35,'square'),190); setTimeout(()=>beep(880,.13,.35,'square'),380); setTimeout(()=>beep(1100,.28,.42,'sine'),570); }
+
+const I_VOL  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+const I_MUTE = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+const I_PLAY  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+const I_PAUSE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+
+function toggleMute(){
+  soundMuted=!soundMuted;
+  const btn=document.getElementById('tMuteBtn');
+  if(btn){ btn.innerHTML=soundMuted?I_MUTE+' Muted':I_VOL+' Sound'; btn.classList.toggle('muted',soundMuted); }
+}
+
+// ── TIMER ───────────────────────────────────────────────────────────────────
+const CIRC=722.57;
+let tSec=0,tTotal=0,tRunning=false,tInterval=null,tTierColor='#4ade80';
+
+function openTimer(id){
+  const s=SKILLS.find(x=>x.id===id);
+  if(!s) return;
+  tTotal=s.minutes*60; tSec=tTotal; tRunning=false;
+  clearInterval(tInterval);
+  tTierColor=TIER_COLORS[s.cat]||'#4ade80';
+  document.getElementById('tRingFg').style.stroke=tTierColor;
+  document.getElementById('tName').textContent=`#${s.id} — ${s.name}`;
+  document.getElementById('tbStart').innerHTML=I_PLAY+' Start';
+  document.getElementById('tbStart').className='tb start';
+  tUpdate();
+  document.getElementById('tOverlay').className='t-overlay open';
+}
+function tClose(){ clearInterval(tInterval); tRunning=false; document.getElementById('tOverlay').className='t-overlay'; }
+
+function tUpdate(){
+  const m=Math.floor(tSec/60), s=(tSec%60).toString().padStart(2,'0');
+  const d=document.getElementById('tDisplay');
+  d.textContent=`${m}:${s}`;
+  const warn=tSec<=30&&tSec>0;
+  d.className='t-display'+(warn?' warn':'');
+  const fg=document.getElementById('tRingFg');
+  if(fg){
+    fg.style.strokeDashoffset=tTotal>0?CIRC*(1-tSec/tTotal):CIRC;
+    fg.style.stroke=tSec<=30&&tSec>0?'#fb923c':tSec<=0?'#ef4444':tTierColor;
+  }
+  const sub=document.getElementById('tSub');
+  if(sub){ sub.textContent=tSec<=0?"TIME'S UP":tSec<=10?'HURRY!':tSec<=30?'ALMOST DONE':'REMAINING'; }
+}
+
+function tStartPause(){
+  if(tSec<=0){ tReset(); return; }
+  tRunning=!tRunning;
+  const btn=document.getElementById('tbStart');
+  if(tRunning){
+    btn.innerHTML=I_PAUSE+' Pause'; btn.className='tb pause';
+    tInterval=setInterval(()=>{
+      if(!tRunning){ clearInterval(tInterval); return; }
+      tSec--; tUpdate();
+      if(tSec<=10&&tSec>0) warnSound(); else if(tSec>0) tickSound();
+      if(tSec<=0){
+        clearInterval(tInterval); tRunning=false;
+        btn.innerHTML=I_PLAY+' Restart'; btn.className='tb start';
+        alarmSound();
+        const ov=document.getElementById('tOverlay');
+        ov.classList.add('flash'); setTimeout(()=>ov.classList.remove('flash'),4000);
+      }
+    },1000);
+  } else {
+    clearInterval(tInterval);
+    btn.innerHTML=I_PLAY+' Resume'; btn.className='tb start';
+  }
+}
+
+function tReset(){
+  clearInterval(tInterval); tRunning=false; tSec=tTotal;
+  document.getElementById('tbStart').innerHTML=I_PLAY+' Start';
+  document.getElementById('tbStart').className='tb start';
+  document.getElementById('tRingFg').style.stroke=tTierColor;
+  tUpdate();
+}
+</script>
+</body>
+</html>
