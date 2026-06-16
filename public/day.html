@@ -232,13 +232,18 @@ if (!day) {
     scheduleRows.push({ time: cursor, label: a.name, mins: a.mins || 0 });
     cursor += (a.mins || 0);
   });
-  cursor += (day.endBufferMins || 0);
   // Skip auto-appending an ENDS row if the day's last activity is already an ENDS block
   // (some days — e.g. Days 15, 16 in DAYS_TN — include ENDS in their activities array).
   const lastAct = (day.activities || [])[(day.activities || []).length - 1];
   const lastIsEnds = lastAct && (lastAct.block || '').toLowerCase() === 'ends';
+  const endsMins = (typeof day.endsMins === 'number') ? day.endsMins : 15;
+  // Pad silently to the site's end time (TN 12:00, NYC 3:00) so the day lands on target
+  // regardless of what endBufferMins the data file sets. If activities overflow the
+  // window, the day just runs late — no row is shown for the buffer either way.
+  const targetEndMins = siteCode === 'TN' ? (12 * 60) : (15 * 60);
+  const padToTarget = targetEndMins - cursor - (lastIsEnds ? 0 : endsMins);
+  cursor += Math.max(0, padToTarget);
   if (!lastIsEnds) {
-    const endsMins = (typeof day.endsMins === 'number') ? day.endsMins : 15;
     scheduleRows.push({ time: cursor, label: 'ENDS Closing Ritual', mins: endsMins });
     cursor += endsMins;
   }
