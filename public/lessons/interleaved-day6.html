@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Day 6 Interleaved Problem Set · Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:10.5pt;color:#000;background:#fff;}
+
+/* ── Page layout ── */
+@page{size:letter portrait;margin:.65in .7in .6in .7in;}
+.page{width:100%;max-width:7.1in;margin:0 auto;padding:.5in .6in .5in .6in;}
+.page-break{page-break-before:always;}
+
+/* ── Header ── */
+.hdr-line{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2.5px solid #000;padding-bottom:.3rem;margin-bottom:.52rem;}
+.hdr-left{font-size:7.5pt;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.hdr-right{font-size:7.5pt;font-weight:600;color:#444;}
+.ws-title{font-size:17pt;font-weight:800;line-height:1.2;margin-bottom:.12rem;}
+.ws-sub{font-size:9pt;color:#333;font-style:italic;margin-bottom:.55rem;line-height:1.55;}
+.cont-hdr{font-size:7.5pt;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#555;margin-bottom:.45rem;}
+
+/* ── ID row ── */
+table.id-row{width:100%;border-collapse:collapse;margin-bottom:.6rem;}
+table.id-row td{border:1px solid #000;padding:.28rem .5rem;font-size:9pt;}
+table.id-row .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.07em;background:#f0f0f0;white-space:nowrap;}
+table.id-row input{
+  border:none;background:transparent;font-family:inherit;font-size:10.5pt;font-weight:600;
+  width:100%;outline:none;padding:0;color:#000;
+}
+table.id-row input:focus{background:rgba(0,229,255,.06);}
+
+/* ── Save status banner ── */
+.save-banner{
+  position:sticky;top:0;z-index:50;
+  background:#fff;border:1.5px solid #000;border-radius:.3rem;
+  padding:.32rem .6rem;margin-bottom:.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+  font-size:9pt;font-weight:600;
+}
+.save-banner.warn{border-color:#a04040;background:#fff5f5;}
+.save-banner .label{font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:7.5pt;}
+.save-banner .site-pill{font-weight:700;font-size:8.5pt;background:#eef;border:1px solid #99c;border-radius:.2rem;padding:.08rem .4rem;}
+.save-banner .status{font-style:italic;color:#666;font-size:8.5pt;}
+.save-banner .status.ok{color:#1a7a3e;}
+.save-banner .status.err{color:#a04040;}
+
+/* ── Instructions box ── */
+.instruct-box{border:2.5px solid #000;padding:.42rem .58rem;margin-bottom:.52rem;}
+.instruct-text{font-size:9.5pt;font-weight:700;line-height:1.65;}
+
+/* ── Concept tag reference table ── */
+.tag-ref{width:100%;border-collapse:collapse;margin-bottom:.55rem;}
+.tag-ref thead th{background:#000;color:#fff;font-size:7.5pt;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:.26rem .45rem;text-align:left;}
+.tag-ref tbody td{border:1px solid #ccc;padding:.28rem .45rem;font-size:8.5pt;vertical-align:top;}
+.tag-ref tbody td.tag-name{font-weight:800;width:1.45in;background:#f0f0f0;white-space:nowrap;}
+.tag-ref tbody td.tag-def{font-weight:600;color:#333;font-style:italic;line-height:1.5;}
+.tag-ref tbody tr:nth-child(odd) td.tag-def{background:#fafafa;}
+
+/* ── Two-column problem grid ── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:.38rem .45rem;margin-bottom:.45rem;}
+
+/* ── Individual problem card ── */
+.prob-card{border:1px solid #000;page-break-inside:avoid;}
+.prob-head{background:#f0f0f0;border-bottom:1px solid #000;padding:.22rem .42rem;display:flex;align-items:center;gap:.32rem;}
+.prob-num{font-size:9pt;font-weight:800;min-width:.22in;}
+.prob-q{font-size:8.5pt;font-weight:700;line-height:1.45;flex:1;}
+.prob-body{padding:.3rem .42rem .34rem;}
+.prob-row{display:flex;align-items:center;gap:.32rem;font-size:8.5pt;font-weight:700;margin-bottom:.22rem;}
+.prob-row:last-child{margin-bottom:0;}
+.prob-label{white-space:nowrap;min-width:.85in;flex-shrink:0;}
+.prob-line-input{
+  flex:1;border:none;border-bottom:1.5px solid #000;background:transparent;
+  font-family:inherit;font-size:9pt;font-weight:700;
+  outline:none;padding:.04rem .12rem;color:#000;min-width:0;
+}
+.prob-line-input:focus{background:rgba(0,229,255,.06);}
+.prob-line-short-input{
+  width:.75in;border:none;border-bottom:1.5px solid #000;background:transparent;
+  font-family:inherit;font-size:9pt;font-weight:700;
+  outline:none;padding:.04rem .12rem;color:#000;flex-shrink:0;
+}
+.prob-line-short-input:focus{background:rgba(0,229,255,.06);}
+
+/* ── Minimum standard ── */
+.min-std{background:#000;color:#fff;padding:.38rem .55rem;margin-bottom:.48rem;display:flex;align-items:center;gap:.5rem;}
+.min-std-label{font-size:7.5pt;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.min-std-text{font-size:8.5pt;font-weight:600;line-height:1.5;}
+
+/* ── Record box ── */
+.record-box{border:2.5px solid #000;padding:.42rem .56rem;margin-bottom:.48rem;background:#f0f0f0;page-break-inside:avoid;}
+.record-box-title{font-size:8pt;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;}
+.record-row{display:flex;align-items:center;gap:.5rem;font-size:9.5pt;font-weight:600;margin-bottom:.26rem;}
+.record-row:last-child{margin-bottom:0;}
+.rline-input{
+  flex:1;border:none;border-bottom:1.5px solid #000;background:transparent;
+  font-family:inherit;font-size:10pt;font-weight:700;
+  outline:none;padding:.04rem .12rem;color:#000;
+}
+.rline-input:focus{background:rgba(0,229,255,.06);}
+.problem-num-input{
+  display:inline-block;border:none;border-bottom:1.5px solid #000;background:transparent;
+  font-family:inherit;font-size:10pt;font-weight:700;
+  outline:none;padding:0 .15rem;color:#000;width:.6in;text-align:center;
+}
+.problem-num-input:focus{background:rgba(0,229,255,.06);}
+
+/* ── Submit row ── */
+.submit-row{margin:.6rem 0 .35rem;display:flex;align-items:center;justify-content:flex-end;gap:.75rem;}
+.submit-btn{
+  font-family:'Montserrat',sans-serif;font-size:10pt;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:.5rem 1.4rem;border-radius:4px;border:none;cursor:pointer;
+  background:#000;color:#fff;transition:background .15s,opacity .15s;
+}
+.submit-btn:hover:not(:disabled){background:#1a7a3e;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+.submit-btn.submitted{background:#1a7a3e;}
+.submit-note{font-size:8.5pt;font-weight:600;color:#666;font-style:italic;}
+.submit-note.ok{color:#1a7a3e;}
+
+/* ── Language toggle ── */
+.lang-toggle{
+  position:fixed;top:.6rem;right:.8rem;z-index:101;
+  display:flex;gap:.18rem;font-size:9pt;font-weight:700;
+  font-family:'Montserrat',sans-serif;letter-spacing:.06em;text-transform:uppercase;
+  background:#fff;border:1.5px solid #000;border-radius:4px;padding:.18rem;
+}
+.lang-toggle a{padding:.18rem .42rem;border-radius:3px;color:#666;text-decoration:none;transition:color .15s,background .15s;}
+.lang-toggle a:hover{color:#000;}
+.lang-toggle a.active{background:#000;color:#fff;}
+
+/* ── Footer ── */
+.ws-footer{border-top:1px solid #ccc;margin-top:.52rem;padding-top:.22rem;display:flex;justify-content:space-between;font-size:7pt;color:#666;font-weight:600;letter-spacing:.04em;}
+
+/* ── Print button ── */
+.print-btn{position:fixed;top:.18in;right:3.4in;background:#000;color:#fff;font-family:'Montserrat',sans-serif;font-size:8pt;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:none;padding:.07in .16in;cursor:pointer;border-radius:3px;z-index:999;}
+.print-btn:hover{background:#333;}
+
+@media print{
+  body{background:#fff;}
+  .page{padding:.2in .25in;}
+  .print-btn,.lang-toggle,.save-banner,.submit-row{display:none !important;}
+  table.id-row input,.prob-line-input,.prob-line-short-input,.rline-input,.problem-num-input{
+    background:transparent !important;
+  }
+}
+@media screen{
+  body{background:#c8c8c8;padding:1.5rem 0 3rem;}
+  .page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);border-radius:2px;margin-bottom:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<nav class="lang-toggle" aria-label="Change language">
+  <a href="/lessons/interleaved-day6.html" class="active">EN</a>
+  <a href="/lessons/es/interleaved-day6.html">ES</a>
+</nav>
+
+<button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+
+<!-- ═══════════════ PAGE 1 ═══════════════ -->
+<div class="page">
+
+  <div class="hdr-line">
+    <div class="hdr-left">Velocity Arena &nbsp;·&nbsp; Week 2, Day 6</div>
+    <div class="hdr-right">Interleaved Problem Set</div>
+  </div>
+  <div class="ws-title">Interleaved Problem Set</div>
+  <div class="ws-sub">Challenge Block &nbsp;·&nbsp; Apply the right formula and the right concept tag to each problem. Both must be correct.</div>
+
+  <table class="id-row">
+    <tr>
+      <td class="lbl">First name</td>
+      <td><input type="text" data-field="name" autocomplete="off" placeholder="e.g. Liz"></td>
+      <td class="lbl">Last initial</td>
+      <td style="width:.65in;"><input type="text" data-field="lastInitial" autocomplete="off" maxlength="3" placeholder="A"></td>
+      <td class="lbl">Team</td>
+      <td style="width:1.3in;"><input type="text" data-field="team" autocomplete="off" placeholder="Team name"></td>
+    </tr>
+  </table>
+
+  <!-- Save status -->
+  <div class="save-banner" id="save-banner">
+    <span class="label">Status</span>
+    <span class="site-pill" id="site-pill">no site selected</span>
+    <span class="status" id="save-status">Type your name to start saving.</span>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instruct-box">
+    <div class="instruct-text">
+      Before each calculation, write the <strong>concept tag</strong> that applies to that formula. A wrong tag on a correct answer is still an error. Use the reference below.
+    </div>
+  </div>
+
+  <!-- Concept Tag Reference -->
+  <table class="tag-ref">
+    <thead>
+      <tr><th colspan="2">Concept Tag Reference</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="tag-name">unit rate</td><td class="tag-def">A fixed amount of output per 1 unit of input</td></tr>
+      <tr><td class="tag-name">linear decay</td><td class="tag-def">Output that decreases at a constant rate over time</td></tr>
+      <tr><td class="tag-name">linear function</td><td class="tag-def">Output that increases at a constant rate with a non-zero starting value</td></tr>
+      <tr><td class="tag-name">nonlinear function</td><td class="tag-def">Output that grows by a changing amount as input increases</td></tr>
+      <tr><td class="tag-name">proportional scaling</td><td class="tag-def">Output that scales in direct proportion to input from zero</td></tr>
+      <tr><td class="tag-name">ratio</td><td class="tag-def">A part-to-whole relationship within a fixed total</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Problems 1–6 -->
+  <div class="problem-grid">
+
+    <!-- 1 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">1</div>
+        <div class="prob-q">A bot has Speed stat <strong>S = 6</strong>. Calculate its speed performance percentage.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q1_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q1_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q1_answer"><span style="font-size:8pt;font-weight:700;">%</span></div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">2</div>
+        <div class="prob-q">A bot has Endurance stat <strong>E = 8</strong>. Match lasts <strong>t = 3 min</strong>. What is power output at minute 3?</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q2_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q2_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q2_answer"></div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">3</div>
+        <div class="prob-q">A bot has Turning stat <strong>T = 6</strong>. Calculate its turn ratio.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q3_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q3_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q3_answer"></div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">4</div>
+        <div class="prob-q">A bot has Power stat <strong>P = 4</strong>. Calculate its charge percentage.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q4_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q4_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q4_answer"><span style="font-size:8pt;font-weight:700;">%</span></div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">5</div>
+        <div class="prob-q">A bot has Speed stat <strong>S = 8</strong>. Calculate its speed performance percentage.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q5_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q5_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q5_answer"><span style="font-size:8pt;font-weight:700;">%</span></div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">6</div>
+        <div class="prob-q">Team stats: <strong>S = 4, E = 8, T = 6</strong>. Budget = 20. Find the Power stat.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q6_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q6_work"></div>
+        <div class="prob-row"><span class="prob-label">P =</span><input type="text" class="prob-line-short-input" data-field="q6_answer"></div>
+      </div>
+    </div>
+
+  </div><!-- /problem-grid -->
+
+  <div class="ws-footer">
+    <span>Velocity Arena</span>
+    <span>Week 2, Day 6 &nbsp;·&nbsp; Interleaved Problem Set</span>
+    <span>Page 1 of 2</span>
+  </div>
+
+</div><!-- /page 1 -->
+
+
+<!-- ═══════════════ PAGE 2 ═══════════════ -->
+<div class="page page-break">
+
+  <div class="hdr-line">
+    <div class="hdr-left">Velocity Arena &nbsp;·&nbsp; Week 2, Day 6</div>
+    <div class="hdr-right">Interleaved Problem Set</div>
+  </div>
+  <div class="cont-hdr">Continued &nbsp;·&nbsp; Problems 7–12</div>
+
+  <div class="problem-grid">
+
+    <!-- 7 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">7</div>
+        <div class="prob-q">A bot has Endurance stat <strong>E = 6</strong>. Match lasts <strong>t = 4 min</strong>. What is power output at minute 4?</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q7_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q7_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q7_answer"></div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">8</div>
+        <div class="prob-q">A bot has Power stat <strong>P = 2</strong>. Calculate its follow-through in milliseconds.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q8_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q8_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q8_answer"><span style="font-size:8pt;font-weight:700;">ms</span></div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">9</div>
+        <div class="prob-q">A bot has Turning stat <strong>T = 2</strong>. Calculate its turn ratio.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q9_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q9_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q9_answer"></div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">10</div>
+        <div class="prob-q">A bot has Speed stat <strong>S = 4</strong>. Calculate its speed performance percentage.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q10_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q10_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q10_answer"><span style="font-size:8pt;font-weight:700;">%</span></div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">11</div>
+        <div class="prob-q">A bot has Power stat <strong>P = 6</strong>. Calculate its charge percentage.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q11_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q11_work"></div>
+        <div class="prob-row"><span class="prob-label">Answer:</span><input type="text" class="prob-line-short-input" data-field="q11_answer"><span style="font-size:8pt;font-weight:700;">%</span></div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="prob-card">
+      <div class="prob-head"><div class="prob-num">12</div>
+        <div class="prob-q">Team stats: <strong>S = 8, E = 6, T = 2</strong>. Budget = 20. Find the Power stat.</div></div>
+      <div class="prob-body">
+        <div class="prob-row"><span class="prob-label">Concept Tag:</span><input type="text" class="prob-line-input" data-field="q12_tag"></div>
+        <div class="prob-row"><span class="prob-label">Work:</span><input type="text" class="prob-line-input" data-field="q12_work"></div>
+        <div class="prob-row"><span class="prob-label">P =</span><input type="text" class="prob-line-short-input" data-field="q12_answer"></div>
+      </div>
+    </div>
+
+  </div><!-- /problem-grid -->
+
+
+  <!-- Minimum Standard -->
+  <div class="min-std">
+    <svg viewBox="0 0 22 22" style="width:.26in;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="11" cy="11" r="10" fill="none" stroke="#fff" stroke-width="2"/>
+      <text x="11" y="15.5" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="12" font-weight="800" fill="#fff">✓</text>
+    </svg>
+    <div>
+      <div class="min-std-label">Minimum Standard</div>
+      <div class="min-std-text">All 12 concept tags verified correct &nbsp;·&nbsp; Complete before advancing</div>
+    </div>
+  </div>
+
+
+  <!-- Extra Credit -->
+  <div class="record-box">
+    <div class="record-box-title">Extra Credit</div>
+    <div style="font-size:9pt;font-weight:700;margin-bottom:.32rem;line-height:1.6;">
+      Find the values for the following.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.32rem .7rem;">
+      <div>
+        <div style="font-size:8pt;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.18rem;">Problem # <input type="text" class="problem-num-input" data-field="ec_a_problem"></div>
+        <div class="record-row">Question 6's motor speed %: <input type="text" class="rline-input" data-field="ec_a_value"></div>
+        <div class="record-row">Concept Tag: <input type="text" class="rline-input" data-field="ec_a_tag"></div>
+        <div class="record-row">Answer: <input type="text" class="rline-input" data-field="ec_a_answer"></div>
+      </div>
+      <div>
+        <div style="font-size:8pt;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.18rem;">Problem # <input type="text" class="problem-num-input" data-field="ec_b_problem"></div>
+        <div class="record-row">Question 12's charge power: <input type="text" class="rline-input" data-field="ec_b_value"></div>
+        <div class="record-row">Concept Tag: <input type="text" class="rline-input" data-field="ec_b_tag"></div>
+        <div class="record-row">Answer: <input type="text" class="rline-input" data-field="ec_b_answer"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="submit-row">
+    <span class="submit-note" id="submit-note">Type your name first.</span>
+    <button class="submit-btn" id="submit-btn" onclick="submitAnswers()" disabled>Submit answers</button>
+  </div>
+
+  <div class="ws-footer">
+    <span>Velocity Arena</span>
+    <span>Week 2, Day 6 &nbsp;·&nbsp; Interleaved Problem Set</span>
+    <span>Page 2 of 2 &nbsp;·&nbsp; Keep this sheet — it goes in your data log</span>
+  </div>
+
+</div><!-- /page 2 -->
+
+
+<script src="/site.js"></script>
+<script>
+const SHEET_ENDPOINTS = {
+  tennessee: '',
+  nyc_1:     '',
+  nyc_2:     '',
+  nyc_3:     '',
+};
+const _SITE_TO_KEY = { NY1: 'nyc_1', NY2: 'nyc_2', NY3: 'nyc_3', TN: 'tennessee' };
+const _SITE_LABELS = { tennessee: 'Crosstown', nyc_1: 'Gotham Tech', nyc_2: 'Claremont International', nyc_3: 'South Bronx' };
+
+function currentSiteKey() {
+  const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  return code ? _SITE_TO_KEY[code] : null;
+}
+function currentEndpoint() {
+  const k = currentSiteKey();
+  return k ? SHEET_ENDPOINTS[k] : '';
+}
+
+function renderSitePill() {
+  const pill = document.getElementById('site-pill');
+  const k = currentSiteKey();
+  pill.textContent = k ? _SITE_LABELS[k] : 'no site selected';
+  pill.style.background = k ? '#eef' : '#fde';
+  pill.style.borderColor = k ? '#99c' : '#c99';
+}
+renderSitePill();
+
+function setStatus(state, msg) {
+  const el = document.getElementById('save-status');
+  const banner = document.getElementById('save-banner');
+  el.className = 'status ' + (state || '');
+  el.textContent = msg;
+  banner.classList.toggle('warn', state === 'err');
+}
+
+// Field list — 3 identity + 12 problems × 3 fields + 8 extra credit fields = 47
+const FIELDS = ['name', 'lastInitial', 'team'];
+for (let i = 1; i <= 12; i++) {
+  FIELDS.push('q' + i + '_tag', 'q' + i + '_work', 'q' + i + '_answer');
+}
+['ec_a_problem','ec_a_value','ec_a_tag','ec_a_answer',
+ 'ec_b_problem','ec_b_value','ec_b_tag','ec_b_answer'].forEach(f => FIELDS.push(f));
+
+function getEl(field) { return document.querySelector(`[data-field="${field}"]`); }
+function collect() {
+  const out = {};
+  FIELDS.forEach(f => {
+    const el = getEl(f);
+    if (el) out[f] = el.value;
+  });
+  return out;
+}
+function restore(snap) {
+  if (!snap) return;
+  FIELDS.forEach(f => {
+    const el = getEl(f);
+    if (el && snap[f] !== undefined) el.value = snap[f];
+  });
+}
+
+const LOCAL_KEY = 'va_interleaved_d6';
+function saveLocal() {
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collect())); } catch(e) {}
+}
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (raw) restore(JSON.parse(raw));
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSave() {
+  saveLocal();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveToSheet, 900);
+}
+
+async function saveToSheet() {
+  const snap = collect();
+  const name = (snap.name || '').trim();
+  if (!name) {
+    setStatus('', 'Type your name to start saving.');
+    return;
+  }
+  const endpoint = currentEndpoint();
+  if (!endpoint) {
+    setStatus('err', 'No endpoint for this site — local only.');
+    return;
+  }
+  setStatus('', 'saving…');
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'interleaved_save',
+        sheet: 'Interleaved Day 6',
+        name,
+        lastInitial: (snap.lastInitial || '').trim(),
+        team: snap.team || '',
+        fields: snap,
+        ts: new Date().toISOString()
+      })
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch(_) { json = null; }
+    if (json && json.ok) setStatus('ok', 'saved ' + new Date().toLocaleTimeString());
+    else setStatus('err', 'error: ' + (json && json.error ? json.error : 'no ok'));
+  } catch (err) {
+    setStatus('err', 'offline — answers stored locally');
+    console.warn('[interleaved-d6] fetch threw', err);
+  }
+}
+
+let _loadedFor = null;
+async function tryLoadFromSheet() {
+  const name = (getEl('name').value || '').trim();
+  if (!name) return;
+  const endpoint = currentEndpoint();
+  if (!endpoint) return;
+  const li = (getEl('lastInitial').value || '').trim();
+  const key = currentSiteKey() + '|' + name.toLowerCase() + '|' + li.toLowerCase();
+  if (_loadedFor === key) return;
+  _loadedFor = key;
+  try {
+    const url = endpoint + '?action=interleaved_load'
+      + '&sheet=' + encodeURIComponent('Interleaved Day 6')
+      + '&name=' + encodeURIComponent(name)
+      + '&lastInitial=' + encodeURIComponent(li);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && typeof data === 'object' && !Array.isArray(data) && data.name) {
+      restore(data);
+      setStatus('ok', 'loaded prior answers for ' + name);
+      if (data.submittedAt) {
+        const btn = document.getElementById('submit-btn');
+        const note = document.getElementById('submit-note');
+        if (btn && note) {
+          btn.classList.add('submitted');
+          btn.textContent = '✓ Submitted';
+          btn.disabled = false;
+          const dt = new Date(data.submittedAt);
+          const when = isNaN(dt.getTime()) ? '' : ' at ' + dt.toLocaleString();
+          note.textContent = 'Submitted' + when + ' — keep editing if you need to.';
+          note.className = 'submit-note ok';
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[interleaved-d6] load failed', err);
+  }
+}
+
+function updateSubmitButtonState() {
+  const btn = document.getElementById('submit-btn');
+  const note = document.getElementById('submit-note');
+  const name = (getEl('name').value || '').trim();
+  if (btn.classList.contains('submitted')) return;
+  if (!name) {
+    btn.disabled = true;
+    note.textContent = 'Type your name first.';
+    note.className = 'submit-note';
+  } else {
+    btn.disabled = false;
+    note.textContent = 'Auto-saving as you type.';
+    note.className = 'submit-note';
+  }
+}
+
+async function submitAnswers() {
+  const name = (getEl('name').value || '').trim();
+  if (!name) return;
+  const endpoint = currentEndpoint();
+  const note = document.getElementById('submit-note');
+  const btn = document.getElementById('submit-btn');
+  if (!endpoint) {
+    note.textContent = 'No endpoint for this site — answers saved locally.';
+    note.className = 'submit-note';
+    return;
+  }
+  clearTimeout(_saveTimer);
+  btn.disabled = true;
+  note.textContent = 'Submitting…';
+  note.className = 'submit-note';
+  const snap = collect();
+  const ts = new Date().toISOString();
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'interleaved_save',
+        sheet: 'Interleaved Day 6',
+        name,
+        lastInitial: (snap.lastInitial || '').trim(),
+        team: snap.team || '',
+        fields: snap,
+        ts,
+        submitted: true
+      })
+    });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch(_) { json = null; }
+    if (json && json.ok) {
+      btn.classList.add('submitted');
+      btn.textContent = '✓ Submitted';
+      btn.disabled = false;
+      note.textContent = 'Submitted ' + new Date().toLocaleTimeString() + ' — keep editing if you need to.';
+      note.className = 'submit-note ok';
+      setStatus('ok', 'submitted');
+    } else {
+      btn.disabled = false;
+      note.textContent = 'Error: ' + (json && json.error ? json.error : 'submit failed') + '. Auto-save is still working.';
+      note.className = 'submit-note';
+    }
+  } catch (err) {
+    btn.disabled = false;
+    note.textContent = 'Offline — your answers are still saved locally.';
+    note.className = 'submit-note';
+    console.warn('[interleaved-d6] submit threw', err);
+  }
+}
+
+document.querySelectorAll('[data-field]').forEach(el => {
+  el.addEventListener('input', () => {
+    scheduleSave();
+    if (el.dataset.field === 'name') {
+      updateSubmitButtonState();
+      clearTimeout(el._loadTimer);
+      el._loadTimer = setTimeout(tryLoadFromSheet, 1200);
+    }
+  });
+  el.addEventListener('blur', scheduleSave);
+});
+
+loadLocal();
+updateSubmitButtonState();
+if ((getEl('name').value || '').trim()) tryLoadFromSheet();
+</script>
+</body>
+</html>
