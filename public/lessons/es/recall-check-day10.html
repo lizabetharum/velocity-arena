@@ -147,10 +147,12 @@ table.id-row input:focus{background:rgba(0,229,255,.06);}
 
   <table class="id-row">
     <tr>
-      <td class="lbl">Nombre</td>
-      <td><input type="text" id="name-input" data-field="name" autocomplete="off" placeholder="Tu primer nombre"></td>
+      <td class="lbl">Primer nombre</td>
+      <td><input type="text" id="name-input" data-field="name" autocomplete="off" placeholder="ej. Liz"></td>
+      <td class="lbl">Inicial apellido</td>
+      <td style="width:.65in;"><input type="text" id="lastinit-input" data-field="lastInitial" autocomplete="off" maxlength="3" placeholder="A"></td>
       <td class="lbl">Equipo</td>
-      <td style="width:1.6in;"><input type="text" id="team-input" data-field="team" autocomplete="off" placeholder="Nombre del equipo"></td>
+      <td style="width:1.3in;"><input type="text" id="team-input" data-field="team" autocomplete="off" placeholder="Nombre del equipo"></td>
     </tr>
   </table>
 
@@ -296,7 +298,7 @@ function setStatus(state, msg) {
   banner.classList.toggle('warn', state === 'err');
 }
 
-const FIELDS = ['name', 'team',
+const FIELDS = ['name', 'lastInitial', 'team',
   'q1_work', 'q1_answer',
   'q2_work', 'q2_answer',
   'q3_work', 'q3_answer',
@@ -356,6 +358,7 @@ async function saveToSheet() {
     action: 'recall_save',
     sheet: 'Cold Recall Check Day 10',
     name,
+    lastInitial: (snap.lastInitial || '').trim(),
     team: snap.team || '',
     fields: snap,
     ts: new Date().toISOString()
@@ -385,7 +388,8 @@ async function tryLoadFromSheet() {
   try {
     const url = endpoint + '?action=recall_load'
       + '&sheet=' + encodeURIComponent('Cold Recall Check Day 10')
-      + '&name=' + encodeURIComponent(name);
+      + '&name=' + encodeURIComponent(name)
+      + '&lastInitial=' + encodeURIComponent((getEl('lastInitial').value || '').trim());
     const res = await fetch(url);
     const data = await res.json();
     if (data && typeof data === 'object' && !Array.isArray(data) && data.name) {
@@ -449,7 +453,9 @@ async function submitAnswers() {
       body: JSON.stringify({
         action: 'recall_save',
         sheet: 'Cold Recall Check Day 10',
-        name, team: snap.team || '',
+        name,
+        lastInitial: (snap.lastInitial || '').trim(),
+        team: snap.team || '',
         fields: snap,
         ts,
         submitted: true

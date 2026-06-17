@@ -306,6 +306,7 @@ pre.template-code::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3
     <form id="teamIdForm" class="team-id-form" onsubmit="return submitTeamId(event)">
       <input type="text" id="teamIdTeam" placeholder="Team name" maxlength="40" required>
       <input type="text" id="teamIdName" placeholder="First name" maxlength="20" required>
+      <input type="text" id="teamIdLastInit" placeholder="Last initial" maxlength="3" style="max-width:90px;" required>
       <button type="submit">Start</button>
     </form>
   </div>
@@ -1617,12 +1618,12 @@ function currentEndpoint(){
 }
 
 // ── TEAM IDENTITY ───────────────────────────────────────────────────────────
-const TEAM_ID_KEY = 'va_skills_team_id'; // {team, name}
+const TEAM_ID_KEY = 'va_skills_team_id'; // {team, name, lastInitial}
 function getTeamId(){
   try { return JSON.parse(localStorage.getItem(TEAM_ID_KEY) || 'null'); } catch(e){ return null; }
 }
-function setTeamId(team, name){
-  localStorage.setItem(TEAM_ID_KEY, JSON.stringify({team, name}));
+function setTeamId(team, name, lastInitial){
+  localStorage.setItem(TEAM_ID_KEY, JSON.stringify({team, name, lastInitial: lastInitial || ''}));
 }
 function clearTeamId(){ localStorage.removeItem(TEAM_ID_KEY); }
 
@@ -1641,7 +1642,8 @@ function renderTeamIdUI(){
       return labels[code] || code;
     })();
     const sheetMode = currentEndpoint() ? 'saving to ' + siteLabel + ' sheet' : 'local only (no sheet configured)';
-    stText.textContent = id.name + ' · ' + id.team + ' · ' + sheetMode;
+    const fullName = id.name + (id.lastInitial ? ' ' + id.lastInitial + '.' : '');
+    stText.textContent = fullName + ' · ' + id.team + ' · ' + sheetMode;
   } else {
     banner.style.display = '';
     status.style.display = 'none';
@@ -1651,8 +1653,9 @@ function submitTeamId(ev){
   ev.preventDefault();
   const team = document.getElementById('teamIdTeam').value.trim();
   const name = document.getElementById('teamIdName').value.trim();
-  if (!team || !name) return false;
-  setTeamId(team, name);
+  const lastInitial = document.getElementById('teamIdLastInit').value.trim();
+  if (!team || !name || !lastInitial) return false;
+  setTeamId(team, name, lastInitial);
   renderTeamIdUI();
   loadSkillsProgress();
   loadCardFields();
@@ -1699,6 +1702,7 @@ async function saveSkillsProgress(challengeId, done){
         action: 'skills_save',
         team: id.team,
         name: id.name,
+        lastInitial: id.lastInitial || '',
         challenge: challengeId,
         status: done ? 'completed' : 'undone',
         ts: new Date().toISOString()
@@ -1725,7 +1729,7 @@ async function loadSkillsProgress(){
   const endpoint = currentEndpoint();
   if (!id || !endpoint) return;
   try {
-    const url = endpoint + '?action=skills_load&team=' + encodeURIComponent(id.team) + '&name=' + encodeURIComponent(id.name);
+    const url = endpoint + '?action=skills_load&team=' + encodeURIComponent(id.team) + '&name=' + encodeURIComponent(id.name) + '&lastInitial=' + encodeURIComponent(id.lastInitial || '');
     const res = await fetch(url);
     const data = await res.json();
     if (Array.isArray(data)) {
@@ -1891,6 +1895,7 @@ async function saveCardFields(cardId){
     action: 'skills_state_save',
     team: id.team,
     name: id.name,
+    lastInitial: id.lastInitial || '',
     challenge: cardId,
     fields: state,
     ts: new Date().toISOString()
@@ -1923,7 +1928,8 @@ async function loadCardFields(){
   try {
     const url = endpoint + '?action=skills_state_load'
       + '&team=' + encodeURIComponent(id.team)
-      + '&name=' + encodeURIComponent(id.name);
+      + '&name=' + encodeURIComponent(id.name)
+      + '&lastInitial=' + encodeURIComponent(id.lastInitial || '');
     const res = await fetch(url);
     const data = await res.json();
     if (data && typeof data === 'object' && !Array.isArray(data)) {
