@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Recall Check · Velocity Arena Day 5</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:10.5pt;color:#000;background:#fff;}
+
+@page{size:letter portrait;margin:.65in .7in .6in .7in;}
+.page{width:100%;max-width:7.1in;margin:0 auto;padding:.48in .6in .44in .6in;}
+
+/* ── Header ── */
+.hdr-line{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2.5px solid #000;padding-bottom:.28rem;margin-bottom:.46rem;}
+.hdr-left{font-size:7.5pt;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.hdr-right{font-size:7.5pt;font-weight:600;color:#444;}
+
+/* ── Title row ── */
+.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.38rem;}
+.ws-title{font-size:18pt;font-weight:800;line-height:1.1;}
+.timer-badge{border:2.5px solid #000;border-radius:.3rem;padding:.24rem .7rem;font-size:12pt;font-weight:800;letter-spacing:.04em;display:flex;align-items:center;gap:.36rem;flex-shrink:0;}
+
+/* ── ID row ── */
+table.id-row{width:100%;border-collapse:collapse;margin-bottom:.38rem;}
+table.id-row td{border:1px solid #000;padding:.28rem .5rem;font-size:9pt;}
+table.id-row .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.07em;width:.75in;background:#f0f0f0;}
+table.id-row input{
+  border:none;background:transparent;font-family:inherit;font-size:10.5pt;font-weight:600;
+  width:100%;outline:none;padding:0;color:#000;
+}
+table.id-row input:focus{background:rgba(0,229,255,.06);}
+
+/* ── Directions ── */
+.dir-box{border:2px solid #000;padding:.34rem .52rem;margin-bottom:.42rem;background:#f8f8f8;}
+.dir-main{font-size:9.5pt;font-weight:700;line-height:1.6;margin-bottom:.16rem;}
+.dir-sub{font-size:8pt;font-weight:600;color:#555;font-style:italic;line-height:1.5;}
+
+/* ── Save status banner ── */
+.save-banner{
+  position:sticky;top:0;z-index:50;
+  background:#fff;border:1.5px solid #000;border-radius:.3rem;
+  padding:.32rem .6rem;margin-bottom:.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+  font-size:9pt;font-weight:600;
+}
+.save-banner.warn{border-color:#a04040;background:#fff5f5;}
+.save-banner .label{font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:7.5pt;}
+.save-banner .site-pill{font-weight:700;font-size:8.5pt;background:#eef;border:1px solid #99c;border-radius:.2rem;padding:.08rem .4rem;}
+.save-banner .status{font-style:italic;color:#666;font-size:8.5pt;}
+.save-banner .status.ok{color:#1a7a3e;}
+.save-banner .status.err{color:#a04040;}
+
+/* ── Question blocks ── */
+.q-block{margin-bottom:.34rem;page-break-inside:avoid;}
+.q-row{display:flex;align-items:baseline;gap:.44rem;margin-bottom:.14rem;}
+.q-num{font-size:14pt;font-weight:800;line-height:1;flex-shrink:0;width:.26in;}
+.q-text{font-size:9.5pt;font-weight:700;line-height:1.55;}
+.q-concept{font-size:7.5pt;font-weight:700;color:#666;font-style:italic;letter-spacing:.04em;padding-left:.7in;margin-bottom:.12rem;text-transform:uppercase;}
+
+/* ── Work box ── */
+.work-box{border:1px solid #bbb;background:#f8f8f8;padding:.22rem .38rem .0rem;margin-left:.24rem;}
+.work-area{
+  display:block;width:100%;
+  min-height:.62in;
+  background-image:repeating-linear-gradient(to bottom,transparent,transparent calc(1.55em - 1px),#ddd calc(1.55em - 1px),#ddd 1.55em);
+  background-color:transparent;
+  border:none;outline:none;resize:vertical;
+  font-family:inherit;font-size:9.5pt;line-height:1.55em;
+  color:#000;padding:0;margin:0 0 .04rem 0;
+  overflow:hidden;
+}
+.work-area:focus{background-color:rgba(0,229,255,.04);}
+.work-area.tall{min-height:.9in;}
+.answer-row{border-top:1.5px solid #000;padding:.14rem .1rem .18rem;display:flex;align-items:center;gap:.4rem;font-size:8.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.answer-line-input{
+  flex:1;border:none;border-bottom:1.5px solid #000;background:transparent;
+  font-family:inherit;font-size:10pt;font-weight:700;
+  outline:none;padding:.04rem .12rem;color:#000;
+}
+.answer-line-input:focus{background:rgba(0,229,255,.06);}
+
+/* ── Footer ── */
+.ws-footer{border-top:1px solid #ccc;margin-top:.4rem;padding-top:.18rem;display:flex;justify-content:space-between;font-size:7pt;color:#666;font-weight:600;letter-spacing:.04em;}
+
+@media print{
+  body{background:#fff;}
+  .page{padding:.2in .25in;}
+  .no-print{display:none;}
+  .save-banner{display:none;}
+  /* Print: turn editable fields back into static-looking elements */
+  table.id-row input,.work-area,.answer-line-input{
+    background:transparent !important;
+  }
+  .work-area{border-bottom:none;}
+}
+@media screen{
+  body{background:#c8c8c8;padding:1.5rem 0 3rem;}
+  .page{background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);border-radius:2px;}
+  .print-btn{display:block;margin:0 auto 1.1rem;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:.55rem 1.4rem;background:#000;color:#fff;border:none;border-radius:4px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;}
+}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
+
+<div class="page">
+
+  <div class="hdr-line">
+    <div class="hdr-left">NYC FIRST &nbsp;·&nbsp; Velocity Arena &nbsp;·&nbsp; Week 1, Day 5</div>
+    <div class="hdr-right">Recall Check</div>
+  </div>
+
+  <!-- Title + timer -->
+  <div class="title-row">
+    <div class="ws-title">Recall Check</div>
+    <div class="timer-badge">
+      <svg viewBox="0 0 22 22" style="width:.24in;" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="9.5" fill="none" stroke="#000" stroke-width="2"/>
+        <line x1="11" y1="11" x2="11" y2="5.5" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        <line x1="11" y1="11" x2="15" y2="13.5" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="11" cy="11" r="1.2" fill="#000"/>
+      </svg>
+      10 minutes
+    </div>
+  </div>
+
+  <!-- ID row -->
+  <table class="id-row">
+    <tr>
+      <td class="lbl">Name</td>
+      <td><input type="text" id="name-input" data-field="name" autocomplete="off" placeholder="First name"></td>
+      <td class="lbl">Team</td>
+      <td style="width:1.6in;"><input type="text" id="team-input" data-field="team" autocomplete="off" placeholder="Team name"></td>
+    </tr>
+  </table>
+
+  <!-- Directions -->
+  <div class="dir-box">
+    <div class="dir-main">Work alone. No notes. No devices. Show your work and circle your final answer.</div>
+    <div class="dir-sub">No individual scores. This is a memory probe — your honest best effort gives the class useful data. When time is up, put your pencil down. You'll go through each answer aloud together.</div>
+  </div>
+
+  <!-- Save status -->
+  <div class="save-banner no-print" id="save-banner">
+    <span class="label">Status</span>
+    <span class="site-pill" id="site-pill">no site selected</span>
+    <span class="status" id="save-status">Type your name to start saving.</span>
+  </div>
+
+
+  <!-- Q1 -->
+  <div class="q-block">
+    <div class="q-row">
+      <div class="q-num">1</div>
+      <div class="q-text">A line passes through (0, 4) and (3, 10). What is the slope?</div>
+    </div>
+    <div class="q-concept">Concept: slope from two points</div>
+    <div class="work-box">
+      <textarea class="work-area" data-field="q1_work" placeholder="Show your work…"></textarea>
+      <div class="answer-row">Answer: <input class="answer-line-input" data-field="q1_answer" type="text" autocomplete="off"></div>
+    </div>
+  </div>
+
+
+  <!-- Q2 -->
+  <div class="q-block">
+    <div class="q-row">
+      <div class="q-num">2</div>
+      <div class="q-text">A recipe scales proportionally: 3 cups of flour makes 9 servings. How many cups are needed for 15 servings?</div>
+    </div>
+    <div class="q-concept">Concept: proportional reasoning</div>
+    <div class="work-box">
+      <textarea class="work-area" data-field="q2_work" placeholder="Show your work…"></textarea>
+      <div class="answer-row">Answer: <input class="answer-line-input" data-field="q2_answer" type="text" autocomplete="off"></div>
+    </div>
+  </div>
+
+
+  <!-- Q3 -->
+  <div class="q-block">
+    <div class="q-row">
+      <div class="q-num">3</div>
+      <div class="q-text">A car drives at 75% of its maximum speed. The maximum speed is 120 km/h. What is the car's actual speed?</div>
+    </div>
+    <div class="q-concept">Concept: percent of a quantity</div>
+    <div class="work-box">
+      <textarea class="work-area" data-field="q3_work" placeholder="Show your work…"></textarea>
+      <div class="answer-row">Answer: <input class="answer-line-input" data-field="q3_answer" type="text" autocomplete="off"></div>
+    </div>
+  </div>
+
+
+  <!-- Q4 -->
+  <div class="q-block">
+    <div class="q-row">
+      <div class="q-num">4</div>
+      <div class="q-text">A 20-point budget assigns 7 points to one category and 6 points to another. What percentage of the total budget is still unallocated?</div>
+    </div>
+    <div class="q-concept">Concept: percent of a whole</div>
+    <div class="work-box">
+      <textarea class="work-area" data-field="q4_work" placeholder="Show your work…"></textarea>
+      <div class="answer-row">Answer: <input class="answer-line-input" data-field="q4_answer" type="text" autocomplete="off"></div>
+    </div>
+  </div>
+
+
+  <!-- Q5 -->
+  <div class="q-block">
+    <div class="q-row">
+      <div class="q-num">5</div>
+      <div class="q-text">Calculate the distance from (1, 1) to (4, 5). Show every step.</div>
+    </div>
+    <div class="q-concept">Concept: distance formula</div>
+    <div class="work-box">
+      <textarea class="work-area tall" data-field="q5_work" placeholder="Show your work…"></textarea>
+      <div class="answer-row">Answer: <input class="answer-line-input" data-field="q5_answer" type="text" autocomplete="off"></div>
+    </div>
+  </div>
+
+
+  <div class="ws-footer">
+    <span>NYC FIRST &nbsp;·&nbsp; Velocity Arena</span>
+    <span>Week 1, Day 5 &nbsp;·&nbsp; Recall Check</span>
+    <span>Put pencil down when time is called</span>
+  </div>
+
+</div>
+
+<script src="/site.js"></script>
+<script>
+// ─── Per-site Apps Script endpoints ────────────────────────────────
+// Each of the four sites has its own Recall Check Day 5 spreadsheet
+// with a bound Apps Script web app. Paste each /exec URL below as
+// you deploy them. Sites without a URL fall back to localStorage only.
+const SHEET_ENDPOINTS = {
+  tennessee: '',
+  nyc_1:     '',
+  nyc_2:     '',
+  nyc_3:     '',
+};
+const _SITE_TO_KEY = { NY1: 'nyc_1', NY2: 'nyc_2', NY3: 'nyc_3', TN: 'tennessee' };
+const _SITE_LABELS = { tennessee: 'Crosstown', nyc_1: 'Gotham Tech', nyc_2: 'Claremont International', nyc_3: 'South Bronx' };
+
+function currentSiteKey() {
+  const code = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  return code ? _SITE_TO_KEY[code] : null;
+}
+function currentEndpoint() {
+  const k = currentSiteKey();
+  return k ? SHEET_ENDPOINTS[k] : '';
+}
+
+// ─── Auto-resize textareas to fit content ──────────────────────────
+function autoSize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+document.querySelectorAll('textarea.work-area').forEach(ta => {
+  autoSize(ta);
+  ta.addEventListener('input', () => autoSize(ta));
+});
+
+// ─── Site pill in status banner ────────────────────────────────────
+function renderSitePill() {
+  const pill = document.getElementById('site-pill');
+  const k = currentSiteKey();
+  pill.textContent = k ? _SITE_LABELS[k] : 'no site selected';
+  pill.style.background = k ? '#eef' : '#fde';
+  pill.style.borderColor = k ? '#99c' : '#c99';
+}
+renderSitePill();
+
+// ─── Status indicator ──────────────────────────────────────────────
+function setStatus(state, msg) {
+  const el = document.getElementById('save-status');
+  const banner = document.getElementById('save-banner');
+  el.className = 'status ' + (state || '');
+  el.textContent = msg;
+  banner.classList.toggle('warn', state === 'err');
+}
+
+// ─── Collect / restore ─────────────────────────────────────────────
+const FIELDS = ['name', 'team',
+  'q1_work', 'q1_answer',
+  'q2_work', 'q2_answer',
+  'q3_work', 'q3_answer',
+  'q4_work', 'q4_answer',
+  'q5_work', 'q5_answer'];
+
+function getEl(field) {
+  return document.querySelector(`[data-field="${field}"]`);
+}
+function collect() {
+  const out = {};
+  FIELDS.forEach(f => {
+    const el = getEl(f);
+    if (el) out[f] = el.value;
+  });
+  return out;
+}
+function restore(snap) {
+  if (!snap) return;
+  FIELDS.forEach(f => {
+    const el = getEl(f);
+    if (el && snap[f] !== undefined) el.value = snap[f];
+  });
+  document.querySelectorAll('textarea.work-area').forEach(autoSize);
+}
+
+const LOCAL_KEY = 'va_recall_d5';
+
+// Local cache always — runs even before name is typed.
+function saveLocal() {
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collect())); } catch(e) {}
+}
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (raw) restore(JSON.parse(raw));
+  } catch(e) {}
+}
+
+// ─── Sheet save (debounced) ────────────────────────────────────────
+let _saveTimer = null;
+function scheduleSave() {
+  saveLocal();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveToSheet, 900);
+}
+
+async function saveToSheet() {
+  const snap = collect();
+  const name = (snap.name || '').trim();
+  if (!name) {
+    setStatus('', 'Type your name to start saving.');
+    return;
+  }
+  const endpoint = currentEndpoint();
+  if (!endpoint) {
+    setStatus('err', 'No endpoint for this site — local only.');
+    return;
+  }
+  setStatus('', 'saving…');
+  const payload = {
+    action: 'recall_save',
+    sheet: 'Recall Check Day 5',
+    name,
+    team: snap.team || '',
+    fields: snap,
+    ts: new Date().toISOString()
+  };
+  try {
+    const res = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+    const text = await res.text();
+    let json;
+    try { json = JSON.parse(text); } catch(_) { json = null; }
+    if (json && json.ok) setStatus('ok', 'saved ' + new Date().toLocaleTimeString());
+    else setStatus('err', 'error: ' + (json && json.error ? json.error : 'no ok'));
+  } catch (err) {
+    setStatus('err', 'offline — answers stored locally');
+    console.warn('[recall-d5] fetch threw', err);
+  }
+}
+
+// ─── Sheet load on first identity ──────────────────────────────────
+let _loadedFor = null;
+async function tryLoadFromSheet() {
+  const name = (getEl('name').value || '').trim();
+  if (!name) return;
+  const endpoint = currentEndpoint();
+  if (!endpoint) return;
+  const key = currentSiteKey() + '|' + name.toLowerCase();
+  if (_loadedFor === key) return;
+  _loadedFor = key;
+  try {
+    const url = endpoint + '?action=recall_load'
+      + '&sheet=' + encodeURIComponent('Recall Check Day 5')
+      + '&name=' + encodeURIComponent(name);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && typeof data === 'object' && !Array.isArray(data) && data.name) {
+      restore(data);
+      setStatus('ok', 'loaded prior answers for ' + name);
+    }
+  } catch (err) {
+    console.warn('[recall-d5] load failed', err);
+  }
+}
+
+// ─── Wire inputs ───────────────────────────────────────────────────
+document.querySelectorAll('[data-field]').forEach(el => {
+  el.addEventListener('input', () => {
+    scheduleSave();
+    // After they finish typing their name, also attempt to LOAD any prior answers.
+    if (el.dataset.field === 'name') {
+      clearTimeout(el._loadTimer);
+      el._loadTimer = setTimeout(tryLoadFromSheet, 1200);
+    }
+  });
+  el.addEventListener('blur', scheduleSave);
+});
+
+// ─── Init ──────────────────────────────────────────────────────────
+loadLocal();
+document.querySelectorAll('textarea.work-area').forEach(autoSize);
+// If a name+site was already cached and an endpoint is configured,
+// try loading the server copy (sheet truth wins over local cache).
+if ((getEl('name').value || '').trim()) tryLoadFromSheet();
+</script>
+</body>
+</html>
