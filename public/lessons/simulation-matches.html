@@ -479,12 +479,14 @@
  *   chargePower       = min(POWER * POWER, 100)
  *   FOLLOW_THROUGH_MS = 120 + POWER * 35
  *   DECAY_RATE        = 20 - ENDURANCE
- *   minWheelSpeed     = max(20, round(motorPower * 0.25))
+ *   minWheelSpeed     = max(WHEEL_FLOOR, round(motorPower * 0.25))   // WHEEL_FLOOR = 15
  *   lowPowerThreshold = minWheelSpeed
  *   endurancePercent  = 100 - DECAY_RATE * matchTime / 40
  *
- * POWER FLOOR: minWheelSpeed is the real floor. For SPEED <= 16 the max(20, ...)
- * wins, so currentPower bottoms out at 20 and lowPowerActive (red) fires there.
+ * SPEED FLOOR: minWheelSpeed is the real floor = max(WHEEL_FLOOR, round(motorPower * 0.25)).
+ * For every legal SPEED (1-10) the WHEEL_FLOOR term wins, so currentPower bottoms out at
+ * WHEEL_FLOOR (currently 15) and lowPowerActive (red) fires there. Lower WHEEL_FLOOR = bigger
+ * drainable range (ENDURANCE matters more, fade comes later); too low and the bot stalls when tired.
  * ============================================================
  */
 
@@ -1688,7 +1690,7 @@ function computeStats() {
 
     turnRatio = 0.2 + TURNING * 0.02
     DECAY_RATE = 20 - ENDURANCE
-    minWheelSpeed = Math.max(20, Math.round(motorPower * 0.25))
+    minWheelSpeed = Math.max(WHEEL_FLOOR, Math.round(motorPower * 0.25))
     lowPowerThreshold = minWheelSpeed
 }
 }
@@ -1864,6 +1866,7 @@ let DECAY_RATE = 0
 let minWheelSpeed = 0
 let lowPowerThreshold = 0
 let lowPowerActive = false
+let WHEEL_FLOOR = 15   // min wheel speed
 
 // --- Charge / kick scratch ---
 let chargePower = 0

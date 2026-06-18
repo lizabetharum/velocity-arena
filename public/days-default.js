@@ -444,7 +444,7 @@ const DAYS_DEFAULT = [
         "description": "Five questions, 10 minutes, by yourself, no notes. General math -- slopes, recipes, percentages, distances. No grade. This is just a check on what is sticking after four days.",
         "facilitatorDescription": "Run a silent individual recall check on five math concepts from Days 1–4. Open with the exact framing line ('This is not a test -- I'm using this to figure out what I need to teach differently today'), give students 60 seconds to scan all five questions before the timer starts, then hold 10 minutes of silent individual work while you circulate and tally responses on the monitoring chart. Don't coach during the work period. Run a whole-class share-out using 'Who got something different?' (not 'Who got it wrong?'), and use errors to build connecting questions to the Budget Constraint.",
         "script": "https://docs.google.com/document/d/1TuqKRSipwR2pC5txnlN7Eh3y-p1Rh2dCIVb8uFO9iKA/edit?usp=drive_link",
-        "worksheet": [{url: "https://drive.google.com/file/d/1t3KadS_ovd8PpUfEzQcN4bXOmzFi8GDn/view?usp=drive_link", label: "Questions"},
+        "worksheet": [{url: "/lessons/recall-check-day5.html", label: "Questions"},
            {url: "https://docs.google.com/document/d/16C_9YMX6Szv5DiSE_71MBRQAclnXx0yRoyBLDajxnfw/edit?usp=sharing", label: "Answers"}
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-04-cold-recall.html"
@@ -456,7 +456,7 @@ const DAYS_DEFAULT = [
         "description": "Teams enter their 20-point stat loadout into the dashboard and learn the Simulation Lab. The dashboard is in pre-trial mode this week — only two sections are visible: Stat Loadout, where teams type in their four stat values and confirm the total equals exactly 20, and Simulation Lab, where teams log a gap sentence for every simulation round. A gap sentence has three parts: what the formula predicted, what the bot actually did, and the gap stated as a number. Every gap sentence logged this week feeds the Friday reflection question: for one simulation round, what was the gap between formula and reality?",
         "facilitatorDescription": "Walk students through their first dashboard entry in two steps: stat loadout, then Simulation Lab. Open the dashboard on the projector before students arrive, pre-filled with a sample loadout and one sample gap sentence so the demo takes under 60 seconds. Launch with two context questions, then have teams call out their four stat values before they touch a device. Once they confirm the total is 20, let them open the dashboard and enter. Model the three-part gap sentence format live (formula predicted / bot did / gap) and assign the Data Owner role before the exit check. The exit check is non-optional: every team confirms loadout total, gap sentence format, and Data Owner name before moving on.",
         "script": "https://docs.google.com/document/d/1HZHM4CU6kodt298jeO6lzRn6O2o0x_n89aCiptxY0xY/edit?usp=sharing",
-        "worksheet":"https://drive.google.com/file/d/1HFMssvjVCafi8mMZP6bqUBooFbcEue1c/view?usp=drive_link",
+        "worksheet":[{"url":"https://drive.google.com/file/d/1HFMssvjVCafi8mMZP6bqUBooFbcEue1c/view?usp=drive_link", label:"Dashboard Introduction"}, {"url":"https://drive.google.com/file/d/1mwWmRex420ZWpt2E1EEmxknTkd9EtR2S/view?usp=drive_link", label:"Make My Prediction"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-05-dashboard-introduction.html"
       },
       
@@ -522,7 +522,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Place the 12-problem set face down on each table before students enter, no formula sheets visible. Introduce the task: tag the formula structure first, then calculate. Do not let students flip until after the comprehension check. Hold 30–35 minutes of individual silent work; circulate with the monitoring chart. Students finish by locking in their stats with the online Prove Your Build. There is an extra-practice HTML worksheet for fast finishers.",
         "script": "https://docs.google.com/document/d/1Y6w0LgGfHSx_5icP4yTCNnHzYIYSofLFxoQVoNdZweY/edit?usp=drive_link",
         "worksheet": [
-          { url: "https://drive.google.com/file/d/1vpbdrqpAyFEU8Rth55wJor90qT1f0SGg/view?usp=drive_link", label: "Questions" },
+          { url: "/lessons/interleaved-day6.html", label: "Questions" },
           { url: "https://drive.google.com/file/d/1HTKprechKjPNoACQ-fWBMvjIPoCIACLS/view?usp=drive_link", label: "Answer Key" }
         ],
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6-interleaved-exemplars.html",
@@ -642,7 +642,7 @@ const DAYS_DEFAULT = [
         "description": "Your team reads your stat allocation out loud -- every formula, every result. Then write one prediction in your match data log: how many goals will your team score in your first match?",
         "facilitatorDescription": "Each team reads their full stat allocation out loud (stat value, formula, output) before writing a prediction. Speed first, then Endurance, Turning, Power. Don't move to prediction writing until every table has stated at least their Speed formula and Endurance equation. Then each team writes one specific goal count in the Match Log, signs it, and cannot revise it. No ranges. Push any team whose prediction doesn't connect to their stats. Close with one consolidation sentence and announce Round 1 pairings.",
         "script": "https://docs.google.com/document/d/1MPHXBv6GjZAw_n43uA1C1gVnbK3Agf-gZQ9qS5WXZiI/edit?usp=drive_link",
-        "worksheet": "https://docs.google.com/document/d/1fJD7t9wsmMYevCajMqQq3RGuLA1IiCm50w4VKBDjLXE/edit?usp=drive_link",
+        "worksheet": [{"url": "https://drive.google.com/file/d/18ukziO44pBk2qOvoce7cZgA-TPX_mrnj/view?usp=sharing", label:"Match Data Log"}, {"url": "https://drive.google.com/file/d/1mwWmRex420ZWpt2E1EEmxknTkd9EtR2S/view?usp=drive_link", label:"Make My Prediction"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-03-pre-match-prediction.html"
       },
       {
@@ -902,7 +902,7 @@ const DAYS_DEFAULT = [
         "description": "Five questions, 10 minutes, individual work, non-bot context, no grade. Write on paper without notes or devices. (1) Percent change in motor power between Speed = 6 and Speed = 9. (2) Slope-intercept form from slope 2 through (1,3). (3) Distance from (2,5) to (7,17). (4) When does P(t) = 100 - 12t reach zero? (5) A bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far at that rate for 8 seconds?",
         "facilitatorDescription": "Distribute the Cold Recall Check and read the framing: five questions, 10 minutes, individual work, no notes, no devices, no grade. Write all five questions on the board. Students work alone for eight minutes with no bot, notes, or devices. Circulate slowly and fill in the monitoring chart, marking any student who leaves a question blank by the five-minute mark; do not answer math questions, even if asked. Call pencils down at minute nine. Students self-check. Read answers to Q1–Q3. Pause on Q4: read the answer, ask one discussion question about how students knew to set the function to zero, name the move as finding a zero of a function, then read Q5. Close with a consolidation line and an open invitation for anyone who struggled with Q4 to find you during Open Lab.",
         "script": "https://docs.google.com/document/d/1024tZLvwZFUNsyWOCjqZPvSyYATN3y7V_JNpg0d78MU/edit?usp=drive_link",
-        "worksheet": "https://drive.google.com/file/d/1vWkVXoyWBPglVvLyA4tca0BKgmr88F6I/view?usp=drive_link",
+        "worksheet": "/lessons/recall-check-day10.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-03-cold-recall-check.html"
       },
    
