@@ -64,16 +64,31 @@ export default async function handler(req) {
     const accessToken = await getAccessToken(serviceEmail, privateKey);
 
     // Pull all 8 source sheets + the Roster in parallel.
+    // Each .catch returns empty rows so one missing tab (e.g. before any
+    // kid has submitted on the new flow) doesn't kill the whole dashboard.
     const fetches = [];
+    const tolerant = (p, fallback) => p.catch(err => {
+      console.warn('Dashboard read fallback:', err.message);
+      return fallback;
+    });
     for (const [state, envVar] of Object.entries(PRE_SHEET_IDS)) {
       const id = process.env[envVar];
-      if (id) fetches.push(readSheet(id, PRE_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'pre', rows })));
+      if (id) fetches.push(tolerant(
+        readSheet(id, PRE_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'pre', rows })),
+        { state, variant: 'pre', rows: [] }
+      ));
     }
     for (const [state, envVar] of Object.entries(POST_SHEET_IDS)) {
       const id = process.env[envVar];
-      if (id) fetches.push(readSheet(id, POST_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'post', rows })));
+      if (id) fetches.push(tolerant(
+        readSheet(id, POST_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'post', rows })),
+        { state, variant: 'post', rows: [] }
+      ));
     }
-    fetches.push(readSheet(rosterId, 'Roster', 'A1:F5000', accessToken).then(rows => ({ roster: true, rows })));
+    fetches.push(tolerant(
+      readSheet(rosterId, 'Roster', 'A1:F5000', accessToken).then(rows => ({ roster: true, rows })),
+      { roster: true, rows: [] }
+    ));
 
     const results = await Promise.all(fetches);
 
