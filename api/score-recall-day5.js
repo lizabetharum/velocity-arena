@@ -186,12 +186,16 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
     scoreRow.push(total.toFixed(1));
     scoreRow.push(new Date().toISOString());
 
-    updates.push({ rowNum: i + 1, values: scoreRow });
+    // If the human Score col O (index 14) is empty, fill it with the AI total.
+    // If the teacher has already typed something there, leave it alone.
+    const existingScore = (row[14] === undefined ? '' : row[14]).toString().trim();
+    const scoreColValue = existingScore || total.toFixed(1);
+    updates.push({ rowNum: i + 1, scoreColValue, aiValues: scoreRow });
     scored++;
   }
 
   for (const u of updates) {
-    await writeRange(target.sheetId, accessToken, `${target.tab}!P${u.rowNum}:AA${u.rowNum}`, [u.values]);
+    await writeRange(target.sheetId, accessToken, `${target.tab}!O${u.rowNum}:AA${u.rowNum}`, [[u.scoreColValue, ...u.aiValues]]);
   }
 
   return scored;
