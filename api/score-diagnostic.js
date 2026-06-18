@@ -2,23 +2,32 @@
 //
 // Claude-graded scoring for the pre-task and post-task diagnostics.
 //
-// Triggered by the growth dashboard. For each unscored row in the six
-// sheets (3 sites × pre/post), it calls the Anthropic API with the
-// question text, the rubric, and the student's eight answers, and
-// writes the resulting 0 / 0.5 / 1 scores + one-sentence rationales
-// back to the sheet as new columns.
+// Triggered by the growth dashboard. For each unscored row in the eight
+// per-site tabs (4 sites × pre/post), calls the Anthropic API with the
+// question text, the rubric, and the student's answers, and writes the
+// resulting 0 / 0.5 / 1 scores + one-sentence rationales back to the sheet.
 //
-// Sheet layout:
-//   A Timestamp | B State | C First | D Last | E-N Q1-Q10 answers
-//   O  Q1_Score | P  Q1_Reason
-//   Q  Q2_Score | R  Q2_Reason
-//   S  Q3_Score | T  Q3_Reason
-//   U  Q4_Score | V  Q4_Reason
-//   W  Q5_Score | X  Q5_Reason
-//   Y  Q6_Score | Z  Q6_Reason
-//   AA Q7_Score | AB Q7_Reason
-//   AC Q8_Score | AD Q8_Reason
-//   AE Total    | AF ScoredAt
+// New sheet layout (tab name "Pre-Task Diagnostic" or "Post-Task Diagnostic"):
+//   A  Timestamp     | B  First Name   | C  Last Initial | D  Team
+//   E  Q1 Answer     | F  Q1 Not Yet
+//   G  Q2 Answer     | H  Q2 Not Yet
+//   I  Q3 Answer     | J  Q3 Not Yet
+//   K  Q4 Answer     | L  Q4 Not Yet
+//   M  Q5 Answer     | N  Q5 Not Yet
+//   O  Q6 Answer     | P  Q6 Not Yet
+//   Q  Q7 Answer     | R  Q7 Not Yet
+//   S  Q8 Answer     | T  Q8 Not Yet
+//   U  Submitted At
+//   V  Score (human-graded — managed by the Anonymizer flow, do not touch)
+//   W  Q1_Score      | X  Q1_Reason     ← AI-graded columns start here
+//   Y  Q2_Score      | Z  Q2_Reason
+//   AA Q3_Score      | AB Q3_Reason
+//   AC Q4_Score      | AD Q4_Reason
+//   AE Q5_Score      | AF Q5_Reason
+//   AG Q6_Score      | AH Q6_Reason
+//   AI Q7_Score      | AJ Q7_Reason
+//   AK Q8_Score      | AL Q8_Reason
+//   AM Total         | AN ScoredAt
 //
 // Required env vars:
 //   ANTHROPIC_API_KEY
@@ -168,11 +177,11 @@ export default async function handler(req) {
     const targets = [];
     for (const [state, envVar] of Object.entries(PRE_SHEETS)) {
       const id = process.env[envVar];
-      if (id) targets.push({ state, variant: 'pre', sheetId: id });
+      if (id) targets.push({ state, variant: 'pre', sheetId: id, tab: 'Pre-Task Diagnostic' });
     }
     for (const [state, envVar] of Object.entries(POST_SHEETS)) {
       const id = process.env[envVar];
-      if (id) targets.push({ state, variant: 'post', sheetId: id });
+      if (id) targets.push({ state, variant: 'post', sheetId: id, tab: 'Post-Task Diagnostic' });
     }
 
     let totalScored = 0;
@@ -205,10 +214,10 @@ export default async function handler(req) {
 
 // ─── PER-SHEET SCORING ─────────────────────────────────────────────────
 async function scoreSheet(target, accessToken, anthropicKey, budget) {
-  // Read the full sheet
-  const range = 'Sheet1!A1:AF1000';
+  // Read the full sheet — tab name has a space, so URL-encode the whole range.
+  const tabRange = `${target.tab}!A1:AN1000`;
   const readRes = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${target.sheetId}/values/${range}`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${target.sheetId}/values/${encodeURIComponent(tabRange)}`,
     { headers: { 'Authorization': `Bearer ${accessToken}` } }
   );
   if (!readRes.ok) {
@@ -218,7 +227,8 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
   const rows = data.values || [];
   if (rows.length < 2) return 0;
 
-  // Row 0 is headers. Ensure scoring-column headers exist.
+  // Row 0 is headers. Ensure AI-scoring column headers exist at W..AN (cols 23-40).
+  // Col V (index 21) is the human Score column — never touch it.
   const header = rows[0];
   const SCORE_HEADERS = [
     'Q1_Score','Q1_Reason','Q2_Score','Q2_Reason',
@@ -227,10 +237,9 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
     'Q7_Score','Q7_Reason','Q8_Score','Q8_Reason',
     'Total','ScoredAt'
   ];
-  // Columns O..AF are indices 14..31. Write header row if missing.
-  const needsHeader = SCORE_HEADERS.some((h, i) => header[14 + i] !== h);
+  const needsHeader = SCORE_HEADERS.some((h, i) => header[22 + i] !== h);
   if (needsHeader) {
-    await writeRange(target.sheetId, accessToken, 'Sheet1!O1:AF1', [SCORE_HEADERS]);
+    await writeRange(target.sheetId, accessToken, `${target.tab}!W1:AN1`, [SCORE_HEADERS]);
   }
 
   const rubric = RUBRIC[target.variant];
@@ -242,25 +251,43 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
   for (let i = 1; i < rows.length; i++) {
     if (scored >= budget) break;
     const row = rows[i];
-    // Row columns: A=ts(0), B=state(1), C=first(2), D=last(3), E-N=Q1-Q10(4-13)
-    // scoring columns start at index 14
-    const alreadyScored = row[14] !== undefined && row[14] !== '' && row[31] !== undefined && row[31] !== '';
+    // Row layout:
+    //   row[0]   Timestamp
+    //   row[1]   First Name
+    //   row[2]   Last Initial
+    //   row[3]   Team
+    //   row[4+q*2]   Q{q+1} Answer
+    //   row[5+q*2]   Q{q+1} Not Yet  (q = 0..7)
+    //   row[20]  Submitted At
+    //   row[21]  Score (human-graded — leave alone)
+    //   row[22]  Q1_Score (AI)
+    //   row[39]  ScoredAt (AI)
+    const alreadyScored = row[22] !== undefined && row[22] !== '' && row[39] !== undefined && row[39] !== '';
     if (alreadyScored) continue;
 
-    const answers = rubric.map((r) => row[4 + (r.q - 1)] || '');
-    // If every answer is empty, skip (likely a stale blank row)
-    if (answers.every(a => !a || !a.toString().trim())) continue;
+    // Only score submitted rows. Draft rows (no Submitted At) get skipped.
+    const submittedAt = (row[20] || '').toString().trim();
+    if (!submittedAt) continue;
+
+    // Extract 8 answers, folding the "Not Yet" flag into the answer text so
+    // Claude treats it as a non-attempt → 0.
+    const answers = [];
+    for (let q = 0; q < 8; q++) {
+      const ans = (row[4 + q * 2] || '').toString();
+      const notYet = (row[5 + q * 2] || '').toString().trim().toUpperCase();
+      answers.push(notYet === 'YES' ? 'Not yet' : ans);
+    }
+    // If every answer is empty, skip (stale blank row).
+    if (answers.every(a => !a.trim())) continue;
 
     let aiResult;
     try {
       aiResult = await scoreSubmission(rubric, answers, anthropicKey);
     } catch (e) {
-      // Log but continue — don't let one bad row halt the whole run
       console.warn(`row ${i + 1} score failed:`, e.message);
       continue;
     }
 
-    // Compose the update row: [s1, r1, s2, r2, ..., s8, r8, total, scoredAt]
     const scoreRow = [];
     let total = 0;
     for (const item of aiResult.scores) {
@@ -275,9 +302,8 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
     scored++;
   }
 
-  // Batch write updates
   for (const u of updates) {
-    await writeRange(target.sheetId, accessToken, `Sheet1!O${u.rowNum}:AF${u.rowNum}`, [u.values]);
+    await writeRange(target.sheetId, accessToken, `${target.tab}!W${u.rowNum}:AN${u.rowNum}`, [u.values]);
   }
 
   return scored;

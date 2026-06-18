@@ -74,14 +74,14 @@ export default async function handler(req) {
     for (const [state, envVar] of Object.entries(PRE_SHEET_IDS)) {
       const id = process.env[envVar];
       if (id) fetches.push(tolerant(
-        readSheet(id, PRE_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'pre', rows })),
+        readSheet(id, PRE_TAB, 'A1:AN2000', accessToken).then(rows => ({ state, variant: 'pre', rows })),
         { state, variant: 'pre', rows: [] }
       ));
     }
     for (const [state, envVar] of Object.entries(POST_SHEET_IDS)) {
       const id = process.env[envVar];
       if (id) fetches.push(tolerant(
-        readSheet(id, POST_TAB, 'A1:U2000', accessToken).then(rows => ({ state, variant: 'post', rows })),
+        readSheet(id, POST_TAB, 'A1:AN2000', accessToken).then(rows => ({ state, variant: 'post', rows })),
         { state, variant: 'post', rows: [] }
       ));
     }
@@ -134,11 +134,19 @@ export default async function handler(req) {
         // Legacy clients expected 10 answers; pad to keep their UI happy.
         while (answers.length < 10) answers.push('');
 
-        // No AI scoring in the new flow yet — null everything until score-diagnostic
-        // gets wired up to write back to the new sheets.
-        const aiScores = new Array(8).fill(null);
-        const aiTotal  = null;
-        const scoredAt = '';
+        // AI scores live at cols W..AN (indices 22..39):
+        //   index 22 Q1_Score | 23 Q1_Reason | 24 Q2_Score | 25 Q2_Reason | …
+        //   index 38 Total    | 39 ScoredAt
+        // Each row may be shorter than 40 cells if scoring hasn't run yet —
+        // the Sheets API truncates trailing empties.
+        const aiScores = [];
+        for (let q = 0; q < 8; q++) {
+          const raw = r[22 + q * 2];
+          aiScores.push(raw === undefined || raw === '' ? null : parseFloat(raw));
+        }
+        const totalRaw = r[38];
+        const aiTotal  = (totalRaw === undefined || totalRaw === '') ? null : parseFloat(totalRaw);
+        const scoredAt = r[39] || '';
 
         records.push({
           pseudonym: token || ('UNK-' + firstName[0].toLowerCase() + lastInitial.toLowerCase()),
