@@ -344,6 +344,8 @@ Student answer: ${student}`;
 
   const prompt = `You are grading a middle-school math diagnostic. Be fair, literal, and generous on minor phrasing issues (e.g. "two hundred" = "200", "cm per second" = "cm/s"). "Not yet" or blank answers must get 0.
 
+**Unit policy**: if the student's numeric answer is correct but they omitted or used a casual unit ("200" instead of "200 miles", "4" instead of "4 cm/s"), award 1.0 — this diagnostic tests math, not unit notation. Only penalize units when the question explicitly tests unit conversion or when the partial-credit criteria specifically call out missing units.
+
 For each question, return a score of exactly 1.0 (correct), 0.5 (partial credit per the criteria below), or 0 (incorrect, blank, or "Not yet"), plus a one-sentence rationale under 120 characters.
 
 ${rubricText}

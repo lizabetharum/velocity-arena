@@ -226,6 +226,8 @@ ${answers[i]}`).join('\n');
 
 Be fair and literal. Generous on minor phrasing/unit issues ("ninety" = "90", "km/h" = "kph"). Blank or "(blank)" answers must get 0.
 
+**Unit policy**: if the student's numeric answer is correct but they omitted or used a casual unit ("90" instead of "90 km/h", "5" instead of "5 cups"), award 1.0 — this recall check tests math, not unit notation. Only penalize units when the question explicitly tests unit conversion or when the partial-credit criteria specifically call out missing units.
+
 For each question, return exactly 1.0 (correct), 0.5 (partial per criteria), or 0 (incorrect/blank), plus a one-sentence rationale under 120 characters.
 
 ${rubricText}

@@ -224,6 +224,8 @@ ${answers[i]}`).join('\n');
 
   const prompt = `You are grading a middle-school math cold recall check given on Day 10 of a robotics camp — students answer from memory without notes. Be fair and literal, generous on minor phrasing/unit issues. Blank or "(blank)" answers must get 0.
 
+**Unit policy**: if the student's numeric answer is correct but they omitted or used a casual unit ("30" instead of "30 cm/s", "13" instead of "13 units"), award 1.0 — this cold recall tests math under memory load, not unit notation. Only penalize units when the question explicitly tests unit conversion or when the partial-credit criteria specifically call out missing units.
+
 For each question, return exactly 1.0 (correct), 0.5 (partial per criteria), or 0 (incorrect/blank), plus a one-sentence rationale under 120 characters.
 
 ${rubricText}

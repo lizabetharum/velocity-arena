@@ -248,6 +248,8 @@ Student response:
 
 Be generous on minor phrasing/unit issues ("30" = "30%", "ms" = "milliseconds"). Tags are case-insensitive.
 
+**Unit policy**: if the student's numeric answer is correct but they omitted or used a casual unit ("30" instead of "30%", "190" instead of "190 ms", "0.32" instead of "0.32 ratio"), treat the answer as correct — don't drop the answer half because of unit notation. The 0.5 (one correct, one wrong) tier should fire on a real tag/answer mismatch, not on missing units alone.
+
 Valid tags: "unit rate", "linear decay", "linear function", "nonlinear function", "proportional scaling", "ratio".
 
 ${rubricText}
