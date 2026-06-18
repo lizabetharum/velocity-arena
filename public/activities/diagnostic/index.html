@@ -158,7 +158,7 @@ body{font-family:'Work Sans',Arial,sans-serif;background:var(--off-white);color:
   <div id="save-banner" style="background:var(--white);border:0.0625rem solid var(--border);border-radius:0.5rem;padding:0.5rem 1rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.8125rem;font-weight:600;">
     <span style="font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:0.6875rem;color:var(--blue-mid);">Status</span>
     <span id="site-pill" style="font-weight:700;font-size:0.75rem;background:#fde;border:1px solid #c99;border-radius:0.2rem;padding:0.1rem 0.4rem;">no site selected</span>
-    <span id="save-status" style="font-style:italic;color:#666;font-size:0.75rem;">Type your name to start saving.</span>
+    <span id="save-status" style="font-style:italic;color:#666;font-size:0.75rem;">Answers stored on this device. Click Hand in to submit.</span>
   </div>
 
   <div class="section-label">Proportional reasoning</div>
@@ -286,7 +286,7 @@ const SHEET_NAME = 'Pre-Task Diagnostic';
 // \u2500\u2500 Per-site Apps Script endpoints (paste /exec URLs once deployed) \u2500\u2500
 const SHEET_ENDPOINTS = {
   tennessee: 'https://script.google.com/macros/s/AKfycbyD6mEawzaJBkggBUaZ9Q_1jYMAPkgR221J1iPEj-8XAPaJRr5TLoxxmrjKpX03VIST/exec', // Crosstown
-  nyc_1:     'https://script.google.com/macros/s/AKfycbzKl52eP9VWn5lXtExnpRsyWBI-Bu_5F3-mEI7xpASImfwSfXNS2LgwXYAM0xuTdpQ8/exec', // Gotham Tech
+  nyc_1:     'https://script.google.com/macros/s/AKfycbyd3AKuoR7cXRupvbFOrCKs3VCrc3CgmtrT4b7nLoM4pwZhgzrTptPSeq8lZVGBBM36/exec', // Gotham Tech
   nyc_2:     'https://script.google.com/macros/s/AKfycbw0mXwoC_NmrLMY81Kpd5Ax4WiLhsGUBu_FgmyejkDFnsJa9dwCfO-UXzETMTqVgjqZ/exec', // Claremont International
   nyc_3:     'https://script.google.com/macros/s/AKfycbzRhEciuftGxPxgSHpH2OPbBHc4HfgiK8y-a5Kpp4LsBeTftURDLNOKyh4AlVDa3Rqh/exec', // South Bronx
 };
@@ -306,7 +306,7 @@ function currentEndpoint() {
 let totalSeconds=12*60,remaining=totalSeconds,interval=null,running=false;
 function toggleTimer(){if(!running){running=true;document.getElementById('timer-btn').textContent='Pause';document.getElementById('timer-btn').classList.add('started');interval=setInterval(tick,1000);}else{clearInterval(interval);running=false;document.getElementById('timer-btn').textContent='Resume';document.getElementById('timer-btn').classList.remove('started');}}
 function tick(){remaining=Math.max(0,remaining-1);const m=Math.floor(remaining/60).toString().padStart(2,'0');const s=(remaining%60).toString().padStart(2,'0');const d=document.getElementById('timer');const f=document.getElementById('timer-fill');d.textContent=m+':'+s;f.style.width=((remaining/totalSeconds)*100)+'%';if(remaining<=180){d.classList.add('warning');f.classList.add('warning');}if(remaining===0){clearInterval(interval);running=false;const b=document.getElementById('timer-btn');b.textContent='Time up';b.disabled=true;}}
-function toggleNotYet(btn){btn.classList.toggle('active');btn.textContent=btn.classList.contains('active')?'\u2713 Not yet':'Not yet';updateCount();scheduleSave();}
+function toggleNotYet(btn){btn.classList.toggle('active');btn.textContent=btn.classList.contains('active')?'\u2713 Not yet':'Not yet';updateCount();saveLocal();}
 
 // \u2500\u2500 Status banner \u2500\u2500
 function renderSitePill() {
@@ -329,12 +329,11 @@ function pickSite(code) {
   if (typeof setSelectedSite === 'function') setSelectedSite(code);
   renderSitePill();
   updateCount();
+  saveLocal();
   // If we already have a name typed, try loading this site's prior answers.
   if (document.getElementById('first-name').value.trim()) {
     _loadedFor = null;  // bust the load-once cache
     tryLoadFromSheet();
-  } else {
-    scheduleSave();  // refresh status banner
   }
 }
 function setStatus(state, msg) {
@@ -512,7 +511,7 @@ function closeModal(){ document.getElementById('submit-modal').classList.remove(
 ['first-name','last-initial','team-name'].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
-  el.addEventListener('input', () => { updateCount(); scheduleSave(); });
+  el.addEventListener('input', () => { updateCount(); saveLocal(); });
   if (id === 'first-name') {
     el.addEventListener('input', () => {
       clearTimeout(el._loadTimer);
@@ -520,7 +519,7 @@ function closeModal(){ document.getElementById('submit-modal').classList.remove(
     });
   }
 });
-document.querySelectorAll('.q-answer').forEach(ta => ta.addEventListener('input', scheduleSave));
+document.querySelectorAll('.q-answer').forEach(ta => ta.addEventListener('input', saveLocal));
 
 // ── Init ──
 loadLocal();
