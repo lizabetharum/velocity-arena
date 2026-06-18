@@ -137,12 +137,19 @@ export default async function handler(req) {
         // AI scores live at cols W..AN (indices 22..39):
         //   index 22 Q1_Score | 23 Q1_Reason | 24 Q2_Score | 25 Q2_Reason | …
         //   index 38 Total    | 39 ScoredAt
-        // Each row may be shorter than 40 cells if scoring hasn't run yet —
-        // the Sheets API truncates trailing empties.
+        // Frontend expects each entry as either null or { score, reason }.
         const aiScores = [];
         for (let q = 0; q < 8; q++) {
-          const raw = r[22 + q * 2];
-          aiScores.push(raw === undefined || raw === '' ? null : parseFloat(raw));
+          const scoreRaw  = r[22 + q * 2];
+          const reasonRaw = r[22 + q * 2 + 1];
+          if (scoreRaw === undefined || scoreRaw === '') {
+            aiScores.push(null);
+          } else {
+            aiScores.push({
+              score: parseFloat(scoreRaw),
+              reason: (reasonRaw || '').toString()
+            });
+          }
         }
         const totalRaw = r[38];
         const aiTotal  = (totalRaw === undefined || totalRaw === '') ? null : parseFloat(totalRaw);
