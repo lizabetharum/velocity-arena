@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.0625rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-rule{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--cyan-soft);font-weight:600;margin-bottom:0.625rem;line-height:1.4;}
+.compare-vals{font-size:0.9375rem;color:var(--ink-soft);line-height:1.65;}
+.compare-tag{display:inline-block;margin-top:0.875rem;font-size:0.8125rem;font-weight:700;color:var(--cyan);letter-spacing:0.05em;text-transform:uppercase;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.rules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-top:1.5rem;}
+.rule{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.5rem;padding:1.125rem 1.25rem;}
+.rule-label{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.rule-text{font-size:1rem;color:var(--ink);font-weight:500;line-height:1.5;}
+@media (max-width:640px){.rules-grid{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.375rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 7 · Match Day 1</div>
+    <h1 class="title huge">Season 1 begins.</h1>
+    <p class="subtitle lead">Predictions get checked. Matches start counting. <em class="emph">The leaderboard goes up tonight.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Trashketball warm-up</b> — solve, shoot, score.</li>
+      <li><b>Endurance decay in slope-intercept form.</b> Rewrite the formula.</li>
+      <li><b>Find your x-intercept.</b> The minute your bot dies.</li>
+      <li><b>Pre-Match Prediction Huddle</b> — write a number.</li>
+      <li><b>Break.</b></li>
+      <li><b>Dashboard + match rules</b> — 3-minute matches, no mid-match changes.</li>
+      <li><b>Three real matches.</b> Predict. Play. Record.</li>
+      <li><b>Leaderboard reveal</b> + Open Lab + closing reflection.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Trashketball ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Warm-up <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Trashketball.</h1>
+    <p class="subtitle lead">Your team solves one equation from your allocation sheet. <strong style="color:var(--cyan);">Get it right.</strong> Earn a shot — crumple paper into a bin.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Make the shot, bonus point. <em class="emph">Quick. Physical. Competitive.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 04 — Endurance Decay intro ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Endurance Decay <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Same decay. New shape.</h1>
+    <p class="subtitle lead">You already know how Endurance works. Today you give the formula a new name — <strong style="color:var(--cyan);">slope-intercept form</strong> — and find one number that tells you everything.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/decay-equations-visual.html" target="_blank">Open the decay equations lesson <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Rewrite the formula ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Same formula. Two shapes.</div>
+    <h1 class="title">Rename the rate of decay.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Day 2 form</div>
+        <div class="compare-stat">The long one</div>
+        <div class="compare-rule">P(t) = 100 − (20 − E) × 1.5 × t</div>
+        <div class="compare-vals">Walks you through the calculation step-by-step.</div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Today's form</div>
+        <div class="compare-stat">Slope-intercept</div>
+        <div class="compare-rule">P(t) = 100 − r·t<br><br>where r = (20 − E) × 1.5</div>
+        <div class="compare-vals">Compact. The whole rate is named: <em class="emph">r</em>.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Calculate r ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Calculate r</div>
+    <h1 class="title">For your bot, what's <span style="color:var(--cyan-soft);">r</span>?</h1>
+    <p class="subtitle lead">Take your Endurance value. <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-soft);color:var(--cyan);padding:0.0625rem 0.4375rem;border-radius:0.25rem;">r = (20 − E) × 1.5</code></p>
+    <p class="subtitle" style="margin-top:1.5rem;color:var(--ink-mute);">If E = 4: r = 16 × 1.5 = <strong style="color:var(--cyan);">24</strong>. Your bot loses 24% power per minute.</p>
+    <p class="subtitle" style="margin-top:1.25rem;"><em class="emph">Write your r in your match data log.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 07 — X-intercept ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">Find your x-intercept</div>
+    <h1 class="title">When does your bot die?</h1>
+    <p class="subtitle lead">Set <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-soft);color:var(--cyan);padding:0.0625rem 0.4375rem;border-radius:0.25rem;">P(t) = 0</code> and solve for <em>t</em>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;color:var(--ink-mute);">For E = 4 (r = 24): 0 = 100 − 24t → t = 100 ÷ 24 ≈ <strong style="color:var(--cyan);">4.17 min</strong>.</p>
+    <div class="challenge">
+      <div class="challenge-label">Log it</div>
+      <p class="challenge-text">Write your <strong>r</strong> and your <strong>x-intercept</strong> in the match data log. <em>You'll predict against these numbers all week.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 08 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">New words for what we just saw</div>
+    <h1 class="title">You used two ideas.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Slope</div>
+        <p class="vocab-def">How fast the line goes up or down — the <strong style="color:var(--cyan);">rate of change</strong>. For your bot, that's <em class="emph">r</em>: how fast you lose power per minute.</p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">X-intercept</div>
+        <p class="vocab-def">The point where the line <strong style="color:var(--cyan);">crosses zero</strong>. For your bot, that's <em class="emph">the minute power runs out</em>.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/slope.html" target="_blank">Play with Slope <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/linear-decay.html" target="_blank">Play with Linear Decay <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/equations.html" target="_blank">Play with Equations <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 09 — Pre-Match Prediction Huddle ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Pre-Match Prediction Huddle <span class="kicker-mins">· 10 min</span></div>
+    <h1 class="title">Read your stats out loud.</h1>
+    <p class="subtitle lead">Every formula. Every output. Speed first, then Endurance, then Turning, then Power.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Then write <strong style="color:var(--cyan);">one prediction</strong> in your match data log: how many goals does your team score in Match 1?</p>
+    <p class="subtitle" style="margin-top:1rem;"><em class="emph">No ranges. One number. Sign it. You can't revise it.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 11 — Match Rules ═══ -->
+<section class="slide">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">Dashboard + Match Rules <span class="kicker-mins">· 15 min</span></div>
+    <h1 class="title">Five rules. Memorize them.</h1>
+    <div class="rules-grid">
+      <div class="rule">
+        <div class="rule-label">Rule 01</div>
+        <div class="rule-text">Each match is <strong style="color:var(--cyan);">3 minutes</strong>.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-label">Rule 02</div>
+        <div class="rule-text">Two bots on a flat field.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-label">Rule 03</div>
+        <div class="rule-text">First bot to push the ball <strong style="color:var(--cyan);">across the opponent's end line</strong> scores.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-label">Rule 04</div>
+        <div class="rule-text"><strong style="color:var(--cyan);">No mid-match code changes.</strong> The code is locked.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-label">Rule 05</div>
+        <div class="rule-text">30-second dispute window after each match — <em class="emph">with evidence</em>.</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/dashboard/dashboard-guide-inseason.html" target="_blank">Dashboard Guide (in-season) <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — The Match Cycle ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">Three rounds · round-robin <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">The Match Cycle.</h1>
+    <ol class="steps">
+      <li><strong style="color:var(--cyan);">Before:</strong> read your prediction aloud. Your opponent hears it.</li>
+      <li><strong style="color:var(--cyan);">Play:</strong> three minutes. No code touching.</li>
+      <li><strong style="color:var(--cyan);">After:</strong> record goals and W/L <em class="emph">immediately</em>. Not later. Right then.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 13 — Loss Recovery ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">If you lose</div>
+    <h1 class="title">Loss recovery — three steps.</h1>
+    <ol class="steps">
+      <li><em class="emph">Feel it.</em> Frustration is real. Your facilitator will say so. Wait 30 seconds.</li>
+      <li><strong style="color:var(--cyan);">Find the gap.</strong> Your model predicted X. You scored Y. Open the dashboard. <em class="emph">Which one stat explains it?</em></li>
+      <li><strong style="color:var(--cyan);">Pick one change</strong> for next round. Write it down. That's your next hypothesis.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 14 — Leaderboard Reveal ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Leaderboard Reveal + Open Lab <span class="kicker-mins">· 30 min</span></div>
+    <h1 class="title">Two ways to top the board.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Column A</div>
+        <div class="compare-stat">Most Wins</div>
+        <div class="compare-vals">Standard competitive ranking. <em class="emph">Whoever wins the most matches.</em></div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Column B</div>
+        <div class="compare-stat">Best Prediction</div>
+        <div class="compare-vals">Average prediction error — <em class="emph">smaller is better</em>. This tracks <strong style="color:var(--cyan);">math accuracy</strong>, not winning.</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/resources/leaderboard-chase-builder.html" target="_blank">Prepare for tomorrow's scavenger hunt <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Open Lab ═══ -->
+<section class="slide">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Track A or Track B.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Track A</div>
+        <div class="compare-stat">Data Dive</div>
+        <div class="compare-vals">Review your dashboard. Look at the gap between every prediction and every result. <em class="emph">What does the data tell you?</em></div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Track B</div>
+        <div class="compare-stat">Bot Lab</div>
+        <div class="compare-vals">Experiment with code or a weird loadout. No required output. <em class="emph">Just bot time.</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 16 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">16</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 4 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">By yourself, then share with a teammate</div>
+      <p class="ends-text">Name <strong>one math concept</strong> you used today. Write the full calculation. Share it with your teammate — and explain what it means for your bot's behavior. <em>Not in formula terms. In bot terms.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 17 — Tomorrow ═══ -->
+<section class="slide hero">
+  <span class="slide-num">17</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">Match Day 2. <span style="color:var(--cyan);">Matching situations.</span></h1>
+    <p class="subtitle lead">More matches. New math: connecting situations, graphs, and equations.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your data log.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
