@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.875rem;margin:2rem 0;}
+.stat-pill{background:var(--bg-soft);border:0.125rem solid var(--border);border-radius:0.625rem;padding:1.25rem 1rem;text-align:center;font-size:0.875rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.1em;text-transform:uppercase;}
+.stat-pill.active{border-color:var(--cyan);color:var(--cyan);background:var(--card);}
+.stat-pill.done{color:var(--cyan-soft);border-color:var(--cyan-dim);opacity:0.7;}
+@media (max-width:640px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+
+.bignum{font-size:11rem;font-weight:900;color:var(--cyan);line-height:1;letter-spacing:-0.03em;margin:1rem 0 1.5rem;}
+.bignum-cap{font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:0.75rem;}
+.bignum-sub{font-size:1.0625rem;color:var(--ink-mute);max-width:42rem;}
+@media (max-width:640px){.bignum{font-size:6rem;}}
+
+.calc-table{width:100%;max-width:38rem;border-collapse:collapse;margin:1.5rem 0;font-size:1.125rem;}
+.calc-table th{background:var(--bg-soft);font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;text-align:left;padding:0.75rem 1.25rem;border:0.0625rem solid var(--border);}
+.calc-table td{padding:0.875rem 1.25rem;border:0.0625rem solid var(--border);font-family:'JetBrains Mono','SF Mono',monospace;color:var(--ink);}
+.calc-table td.input{color:var(--cyan-soft);font-weight:700;}
+.calc-table td.output{color:var(--cyan);font-weight:700;text-align:right;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.125rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-rule{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--cyan-soft);font-weight:600;margin-bottom:0.625rem;}
+.compare-vals{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--ink-soft);line-height:1.65;}
+.compare-tag{display:inline-block;margin-top:0.875rem;font-size:0.8125rem;font-weight:700;color:var(--cyan);letter-spacing:0.05em;text-transform:uppercase;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.625rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 4</div>
+    <h1 class="title huge">Power.</h1>
+    <p class="subtitle lead">The last of the four — and the one that <em class="emph">doesn't behave like the others</em>.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Warm-up</b> — Finger Speed-Sums.</li>
+      <li><b>Power has two rules.</b> Charge speed. Follow-through.</li>
+      <li><b>The contrast.</b> Speed doubles. Power quadruples.</li>
+      <li><b>Lock your stat card.</b> Power is what's left of your 20 points.</li>
+      <li><b>Break.</b></li>
+      <li><b>Build a scoop.</b> Then test if the math predicts how far the ball goes.</li>
+      <li><b>Open Lab</b> + closing reflection.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Finger Speed-Sums ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Warm-up <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Finger Speed-Sums.</h1>
+    <p class="subtitle lead">Face a partner. On three, both throw any number of fingers from <strong style="color:var(--cyan);">0 to 5</strong>. Race to call the sum first. Correct answer = 1 point.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Rotate partners every 90 seconds. <em class="emph">The math is easy. The speed is the game.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 04 — Two rules ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Power Stat Challenge <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Power has two rules.</h1>
+    <p class="subtitle lead">One says how hard you hit the ball. The other says how long the hit lasts.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/power-stat-challenge.html" target="_blank">Power Stat Challenge lesson <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Charge Speed formula ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Rule 1 — how hard</div>
+    <h1 class="title">Charge speed.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Charge Speed</div>
+      <div class="formula">
+        <span class="var">Power</span>²
+      </div>
+      <p class="formula-note">Multiply Power by itself. That's it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Try one ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Try one</div>
+    <h1 class="title">If <span style="color:var(--cyan-soft);">Power = 4</span>, what's the charge speed?</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;color:var(--ink-mute);">4 × 4 = <strong style="color:var(--cyan);">16</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Now what about Power = 8?</em></p>
+  </div>
+</section>
+
+<!-- ═══ 07 — The table ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">The pattern</div>
+    <h1 class="title">Build the table.</h1>
+    <table class="calc-table">
+      <thead>
+        <tr><th>Power</th><th style="text-align:right;">Charge Speed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="input">1</td><td class="output">1</td></tr>
+        <tr><td class="input">2</td><td class="output">4</td></tr>
+        <tr><td class="input">4</td><td class="output">16</td></tr>
+        <tr><td class="input">8</td><td class="output">64</td></tr>
+      </tbody>
+    </table>
+    <p class="subtitle">From <strong style="color:var(--cyan);">2 to 4</strong>, charge speed grew from 4 to <strong style="color:var(--cyan);">16</strong>. <em class="emph">You doubled the input.</em> The output went up <strong style="color:var(--cyan);">4×</strong>.</p>
+  </div>
+</section>
+
+<!-- ═══ 08 — Compare to Speed ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">Day 1 vs. today</div>
+    <h1 class="title">Two stats. Two different patterns.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Day 1</div>
+        <div class="compare-stat">Speed</div>
+        <div class="compare-rule">Motor Power = Speed × 100 ÷ 20</div>
+        <div class="compare-vals">S = 2 → 10%<br>S = 4 → 20%<br>S = 8 → 40%</div>
+        <span class="compare-tag">Double in · double out</span>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Today</div>
+        <div class="compare-stat">Power</div>
+        <div class="compare-rule">Charge Speed = Power²</div>
+        <div class="compare-vals">P = 2 → 4<br>P = 4 → 16<br>P = 8 → 64</div>
+        <span class="compare-tag">Double in · quadruple out</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 09 — Big number echo ═══ -->
+<section class="slide hero">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="bignum-cap">Double the Power. The charge goes up</div>
+    <div class="bignum">4×</div>
+    <p class="bignum-sub" style="margin:0 auto;">Not 2. <em class="emph">Four.</em> Power doesn't behave like Speed.</p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Test it ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Test it · in the room</div>
+    <h1 class="title">Now try it on the floor.</h1>
+    <ol class="steps">
+      <li>Program <strong style="color:var(--cyan-soft);">Power = 4</strong> (charge speed 16). Place the bot exactly <strong>40 cm</strong> from the ball. Drive. Measure how far the ball travels.</li>
+      <li>Program <strong style="color:var(--cyan-soft);">Power = 8</strong> (charge speed 64). Same starting line. Drive. Measure.</li>
+      <li>Did doubling the Power points double the kick distance? <em class="emph">Write the gap.</em></li>
+    </ol>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="https://makecode.microbit.org/S03123-05017-49984-47905" target="_blank">Open the Power Stat Challenge in MakeCode <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Follow-Through formula ═══ -->
+<section class="slide">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">Rule 2 — how long the hit lasts</div>
+    <h1 class="title">Follow-through.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Follow-Through (milliseconds)</div>
+      <div class="formula">
+        120 + (<span class="var">Power</span> × 35)
+      </div>
+      <p class="formula-note">Starts at 120 ms — even Power = 0 follows through a little. Then adds 35 ms per Power point.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — Power Allocation ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">Lock your stat card <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">Power isn't a free choice.</h1>
+    <p class="subtitle lead">It's <em class="emph">whatever is left</em> after Speed, Endurance, and Turning.</p>
+    <div class="formula-card" style="padding:2rem;">
+      <div class="formula" style="font-size:1.875rem;">
+        <span class="var">Power</span> = 20 − Speed − Endurance − Turning
+      </div>
+    </div>
+    <p class="subtitle"><em class="emph">If your three already sum to 20</em>, you have <strong style="color:var(--cyan);">zero</strong> Power. Revise one stat before the next block.</p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">New word for what we just saw</div>
+    <h1 class="title">You used a new idea.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Proportional scaling</div>
+        <p class="vocab-def">When output grows in <strong style="color:var(--cyan);">direct lockstep</strong> with input. Double the input → double the output. Speed does this.</p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">Non-proportional</div>
+        <p class="vocab-def">When output grows <em class="emph">faster</em> than input. Double the input → quadruple the output. <strong style="color:var(--cyan);">Power² does this.</strong></p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/proportional-scaling.html" target="_blank">Play with Proportional Scaling <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/ratio.html" target="_blank">Play with Ratio <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 15 — Build the scoop ═══ -->
+<section class="slide">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Scoop Build + Ratio Testing <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Build a scoop.</h1>
+    <p class="subtitle lead">Cardboard. Tape. Whatever works. One rule: it has to make <strong style="color:var(--cyan);">clean contact with the ball</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Then test how Power² actually translates to kick distance.</p>
+  </div>
+</section>
+
+<!-- ═══ 16 — Test at three Power settings ═══ -->
+<section class="slide">
+  <span class="slide-num">16</span>
+  <div class="slide-inner">
+    <div class="kicker">Three settings · three shots each</div>
+    <h1 class="title">Run the test.</h1>
+    <ol class="steps">
+      <li>Pick three Power settings. Calculate the charge speed (P²) for each before you drive.</li>
+      <li>From the 40 cm start line, run <strong style="color:var(--cyan-soft);">three shots</strong> at each setting. Record every kick distance.</li>
+      <li>Quadrupling charge speed should quadruple kick distance — <em class="emph">if the floor cooperates.</em></li>
+    </ol>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/power-test-explainer.html" target="_blank">Power Test Explainer <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="https://makecode.microbit.org/S77134-15689-32757-79747" target="_blank">Open in MakeCode <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 17 — The conclusion ═══ -->
+<section class="slide">
+  <span class="slide-num">17</span>
+  <div class="slide-inner">
+    <div class="kicker">Write one sentence</div>
+    <h1 class="title">Did quadrupling charge speed quadruple kick distance?</h1>
+    <p class="subtitle lead">Compare your two charge-speed ratios to your kick-distance ratios.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">"Quadrupling charge speed did / did not quadruple kick distance, because…"</em></p>
+  </div>
+</section>
+
+<!-- ═══ 18 — Open Lab ═══ -->
+<section class="slide">
+  <span class="slide-num">18</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab <span class="kicker-mins">· 40 min</span></div>
+    <h1 class="title">Refine.</h1>
+    <p class="subtitle lead">One scoop redesign. One Power value change. Both before time is up.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Which one moved the needle more — the build or the code?</em></p>
+  </div>
+</section>
+
+<!-- ═══ 19 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">19</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">Write and share</div>
+      <p class="ends-text">Finish this sentence: <em>"The skill I used today was <strong>______</strong> (name it specifically, not just 'math') and I will use it tomorrow by <strong>______</strong> (name the exact moment and action)."</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 20 — Tomorrow: Budget ═══ -->
+<section class="slide hero">
+  <span class="slide-num">20</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">All four stats. <span style="color:var(--cyan);">Twenty points.</span> One choice.</h1>
+    <p class="subtitle lead">The budget closes Week 1.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your numbers. Bring your data.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
