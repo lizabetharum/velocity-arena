@@ -71,15 +71,6 @@ body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var
 .phase-context a,.phase-context a:visited{color:var(--cyan);text-decoration:underline;text-decoration-color:rgba(0,180,201,0.4);text-underline-offset:0.2em;}
 .phase-context a:hover{color:var(--cyan-soft);text-decoration-color:var(--cyan-soft);}
 
-/* ─── Facilitator notes (collapsible) ─── */
-.fac-notes{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.375rem 0.375rem 0;margin-bottom:1rem;}
-.fac-notes summary{cursor:pointer;padding:0.625rem 1rem;font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.12em;text-transform:uppercase;list-style:none;display:flex;align-items:center;justify-content:space-between;}
-.fac-notes summary::-webkit-details-marker{display:none;}
-.fac-notes summary::after{content:'+';font-size:1.125rem;font-weight:600;color:var(--amber);}
-.fac-notes[open] summary::after{content:'−';}
-.fac-notes-body{padding:0 1rem 1rem;font-size:0.875rem;color:var(--ink-soft);line-height:1.6;}
-.fac-notes-body em{color:var(--amber);font-style:italic;}
-
 /* ─── Resource cards ─── */
 .resources{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:0.5rem;}
 .resource{display:flex;align-items:flex-start;gap:0.625rem;background:var(--card);border:0.0625rem solid var(--border);border-radius:0.5rem;padding:0.75rem 0.875rem;text-decoration:none;color:inherit;transition:border-color 0.15s,background 0.15s,transform 0.1s;}
@@ -111,7 +102,7 @@ body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var
 
 <div class="header">
   <div class="header-inner">
-    <a href="/teachers.html" class="back-link">← Teacher Resources</a>
+    <a href="/" class="back-link">← Velocity Arena</a>
     <div class="kicker" id="kicker">Velocity Arena · Day</div>
     <h1 class="title" id="title">Loading…</h1>
     <p class="subtitle" id="subtitle"></p>
@@ -128,7 +119,7 @@ body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var
 </div>
 
 <footer class="footer">
-  <p>Velocity Arena · Daily session view · <a href="/pd/project-slice/">Project Slice PD</a> · <a href="/teachers.html">Teacher Resources</a></p>
+  <p>Velocity Arena · <a href="/today.html">Today</a> · <a href="/schedule.html">Schedule</a></p>
 </footer>
 
 <script src="/days-default.js"></script>
@@ -138,26 +129,21 @@ const dayNum = parseInt(dayParam, 10) || 1;
 const days = (typeof DAYS_DEFAULT !== 'undefined') ? DAYS_DEFAULT : [];
 const day = days.find(d => d.day === dayNum);
 
-// Resource icon map — distinguishes resource types at a glance.
+// Resource icon map — STUDENT-FACING only.
+// Deliberately excludes teacher-only keys: quickCard, exemplar, script.
 const RES_ICONS = {
   worksheet:  '↓',
-  script:     '☰',
-  quickCard:  '◇',
-  exemplar:   '★',
   makecode:   '◧',
   template:   '⬚',
   webpage:    '↗',
   link:       '↗',
 };
 const RES_LABELS = {
-  worksheet:  'Worksheet · PDF',
-  script:     'Facilitator script · Doc',
-  quickCard:  'Quick card · activity reference',
-  exemplar:   'Exemplar · what good looks like',
+  worksheet:  'Worksheet',
   makecode:   'MakeCode · starter project',
-  template:   'Template · Doc',
-  webpage:    'Lesson page',
-  link:       'Activity page',
+  template:   'Template',
+  webpage:    'Open the lesson',
+  link:       'Open the activity',
 };
 
 function escapeHTML(s){
@@ -188,14 +174,16 @@ function buildResources(activity) {
     }
   }
 
-  // Simple string fields.
-  const simple = ['script', 'quickCard', 'exemplar', 'makecode', 'webpage', 'link'];
+  // Simple string fields — STUDENT-FACING only.
+  // Deliberately omits 'script' (facilitator-only), 'quickCard' (teacher-only
+  // per project rule), and 'exemplar' (teacher reference of "what good looks like").
+  const simple = ['makecode', 'webpage', 'link'];
   simple.forEach(key => {
     const val = activity[key];
     if (typeof val === 'string' && val) {
       cards.push({
         icon: RES_ICONS[key] || '↗',
-        title: ({script:'Facilitator script', quickCard:'Quick card', exemplar:'Exemplar', makecode:'MakeCode project', webpage:'Lesson page', link:'Activity page'})[key],
+        title: ({makecode:'MakeCode project', webpage:'Lesson page', link:'Activity page'})[key],
         meta: RES_LABELS[key],
         href: val
       });
@@ -222,24 +210,14 @@ function renderResources(cards) {
 function renderPhase(activity, idx) {
   const num = String(idx + 1).padStart(2, '0');
   const cards = buildResources(activity);
-  const hasFac = activity.facilitatorDescription && activity.facilitatorDescription.trim();
   return `
     <section class="phase">
       <div class="phase-head">
         <span class="phase-num">${num}</span>
         <h2 class="phase-title">${escapeHTML(activity.name || '')}</h2>
       </div>
-      <div class="phase-meta">
-        ${activity.block ? `<span class="chip">${escapeHTML(activity.block)}</span>` : ''}
-        ${activity.mins ? `<span class="chip chip-mins">${activity.mins} min</span>` : ''}
-      </div>
+      ${activity.mins ? `<div class="phase-meta"><span class="chip chip-mins">${activity.mins} min</span></div>` : ''}
       ${activity.description ? `<p class="phase-context">${escapeHTML(activity.description)}</p>` : ''}
-      ${hasFac ? `
-        <details class="fac-notes">
-          <summary>Facilitator notes</summary>
-          <div class="fac-notes-body">${escapeHTML(activity.facilitatorDescription)}</div>
-        </details>
-      ` : ''}
       ${renderResources(cards)}
     </section>
   `;
@@ -260,13 +238,13 @@ function renderDay(d) {
         <div class="hero-row">
           ${d.bigMathIdea ? `
             <div class="hero-item">
-              <div class="hero-label">Big math idea</div>
+              <div class="hero-label">Today's math</div>
               <div class="hero-value">${escapeHTML(d.bigMathIdea)}</div>
             </div>
           ` : ''}
           ${d.vocabulary ? `
             <div class="hero-item">
-              <div class="hero-label">Vocabulary</div>
+              <div class="hero-label">New words</div>
               <div class="hero-value">${escapeHTML(d.vocabulary)}</div>
             </div>
           ` : ''}
