@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.125rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-rule{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--cyan-soft);font-weight:600;margin-bottom:0.625rem;}
+.compare-vals{font-size:0.9375rem;color:var(--ink-soft);line-height:1.65;}
+.compare-tag{display:inline-block;margin-top:0.875rem;font-size:0.8125rem;font-weight:700;color:var(--cyan);letter-spacing:0.05em;text-transform:uppercase;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.flow{display:grid;grid-template-columns:1fr auto 1fr;gap:0.75rem;align-items:stretch;margin:1.5rem 0;}
+.flow-step{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.25rem;}
+.flow-step-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;}
+.flow-step-name{font-size:1.0625rem;font-weight:700;color:var(--ink);margin-bottom:0.5rem;}
+.flow-step-body{font-size:0.9375rem;color:var(--ink-soft);line-height:1.55;}
+.flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:1.25rem;font-weight:800;}
+@media (max-width:720px){.flow{grid-template-columns:1fr;} .flow-arrow{transform:rotate(90deg);padding:0.25rem 0;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.375rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 6 · Week 2 begins</div>
+    <h1 class="title huge">Lock in your build.</h1>
+    <p class="subtitle lead">Today the math gets tagged. The allocation gets committed. The launch sequence gets written.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Equation Relay Race</b> — algebra fluency, fast.</li>
+      <li><b>Interleaved Problem Set.</b> 12 shuffled problems. Tag the formula <em>before</em> you calculate.</li>
+      <li><b>Lock your allocation.</b> Last chance.</li>
+      <li><b>Break.</b></li>
+      <li><b>Field Geometry.</b> Plot tip-off and goal. Use the Distance Formula.</li>
+      <li><b>Program your launch sequence.</b> Test twice. Compare prediction to reality.</li>
+      <li><b>Launch Showcase.</b> Watch every team. Write one data-claim per run.</li>
+      <li><b>Open Lab</b> + closing reflection.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Equation Relay Race ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Warm-up <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Equation Relay Race.</h1>
+    <p class="subtitle lead">Your team lines up. First person solves step 1 of a multi-step equation. Tag the next person for step 2. And so on.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">First team to the correct final answer wins.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 04 — Interleaved Problem Set ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Interleaved Problem Set <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Twelve problems. All four stats. Shuffled.</h1>
+    <p class="subtitle lead">No formula sheets visible. The problems are mixed on purpose — <em class="emph">recognizing the type</em> is half the work.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/interleaved-problem-set.html" target="_blank">Open the problem set <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/lessons/prove-your-build.html" target="_blank">Prove your build <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Tag the formula first ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">The move</div>
+    <h1 class="title">Tag the formula <em class="emph">before</em> you calculate.</h1>
+    <p class="subtitle lead">Five options: <strong style="color:var(--cyan);">unit rate</strong>, <strong style="color:var(--cyan);">ratio</strong>, <strong style="color:var(--cyan);">linear decay</strong>, <strong style="color:var(--cyan);">coordinate geometry</strong>, <strong style="color:var(--cyan);">proportional scaling</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Write the tag in the concept column. <em class="emph">Then</em> reach for the formula.</p>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/" target="_blank">Browse all math concepts <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Lock your build ═══ -->
+<section class="slide hero">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">The moment</div>
+    <h1 class="title huge">Lock it.</h1>
+    <p class="subtitle lead">Twenty points. Four stats. <em class="emph">This is the last time you can change them before matches count.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 07 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 08 — Field Geometry ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">Field Geometry + Approach Planning <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Plot your approach.</h1>
+    <p class="subtitle lead">Your starting position. The tip-off point at <strong style="color:var(--cyan-soft);">(4, 2)</strong>. The goal at <strong style="color:var(--cyan-soft);">(8, 2)</strong>. Draw the path.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Calculate how far your bot has to travel. Use the Distance Formula.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/launchsequence-designer.html" target="_blank">Launch Sequence Designer <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/resources/launch-sequence-help.html" target="_blank">Launch Sequence Help <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/resources/launch-sequences.html" target="_blank">Practice Sequences <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 09 — Launch Sequence + Match Loop ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">The two-phase structure</div>
+    <h1 class="title">Launch first. Match loop second.</h1>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-step-label">Phase 1</div>
+        <div class="flow-step-name">Launch Sequence</div>
+        <div class="flow-step-body">Runs once. Your starting routine — turns, drives, and timing — that ends when the bot reaches the <em>handoff point</em>.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-step-label">Phase 2</div>
+        <div class="flow-step-name">Match Loop</div>
+        <div class="flow-step-body">Takes over from the handoff point and runs to the end of the match.</div>
+      </div>
+    </div>
+    <p class="subtitle"><em class="emph">Two phases. One handoff. Don't mix them up.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Program the launch sequence ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Launch Sequence Programming <span class="kicker-mins">· 60 min</span></div>
+    <h1 class="title">Write the code. Test twice.</h1>
+    <ol class="steps">
+      <li>Design two launch strategies on paper before opening MakeCode. Write your <strong style="color:var(--cyan-soft);">predicted time</strong> to reach the ball for each.</li>
+      <li>Code Strategy A. Run three trials. Record actual time and hit rate.</li>
+      <li>Switch to Strategy B. Same drill.</li>
+    </ol>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/launchsequence-designer.html" target="_blank">Launch Sequence Designer <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/resources/launch-sequence-help.html" target="_blank">Launch Sequence Help <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Compare prediction to reality ═══ -->
+<section class="slide">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">After every run</div>
+    <h1 class="title">Did the bot do what the math said?</h1>
+    <p class="subtitle lead">Compare your <em class="emph">predicted</em> time to your <em class="emph">actual</em> time.</p>
+    <div class="challenge">
+      <div class="challenge-label">If they match · log a confirm. If they don't · log a gap.</div>
+      <p class="challenge-text">"Predicted 2.5 s, actual 3.1 s. Gap = <strong>+0.6 s</strong>. The Speed allocation underpredicted because <em>______</em>."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — Launch Showcase ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">Launch Showcase <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Watch every team run.</h1>
+    <p class="subtitle lead">Each team commits to a final sequence and runs it once in front of the room.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">After all teams have run, you get <strong style="color:var(--cyan);">10 minutes</strong> for one final adjustment. Then sequences lock for Season 1.</p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Observe with data ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">While another team runs</div>
+    <h1 class="title">Write one observation. Make it a number.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Not this</div>
+        <div class="compare-stat">"They were fast."</div>
+        <div class="compare-vals">No number. No claim. <em class="emph">Doesn't tell you anything you can use.</em></div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">This</div>
+        <div class="compare-stat">"Their bot reached the ball in under 3 seconds, which suggests their Speed allocation is above 8."</div>
+        <div class="compare-vals">A behavior. A number. A claim about the math.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — Open Lab Track A vs B ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab <span class="kicker-mins">· 15 min</span></div>
+    <h1 class="title">Two tracks. Pick one.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Track A</div>
+        <div class="compare-stat">Data Dive</div>
+        <div class="compare-vals">Check each stat value in your dashboard against the formula output. <em class="emph">Fix any mismatches before tomorrow's first match.</em></div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Track B</div>
+        <div class="compare-stat">Bot Lab</div>
+        <div class="compare-vals">Test a loadout you would <em class="emph">never</em> use competitively. What happens at Speed = 2 with Power = 15?</div>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:1.5rem;">Track choice is your own. <em class="emph">Both are legitimate.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 15 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">By yourself</div>
+      <p class="ends-text">Write <strong>one personal goal</strong> and <strong>one team goal</strong> for this week. Post them on the wall <em>next to your bot's name</em>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 16 — Tomorrow: Match Day 1 ═══ -->
+<section class="slide hero">
+  <span class="slide-num">16</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title"><span style="color:var(--cyan);">Match Day 1.</span></h1>
+    <p class="subtitle lead">The leaderboard goes live. Predictions get checked against actual results. <em class="emph">Bring your data.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
