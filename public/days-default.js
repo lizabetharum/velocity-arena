@@ -642,7 +642,8 @@ const DAYS_DEFAULT = [
         "description": "Your team reads your stat allocation out loud -- every formula, every result. Then write one prediction in your match data log: how many goals will your team score in your first match?",
         "facilitatorDescription": "Each team reads their full stat allocation out loud (stat value, formula, output) before writing a prediction. Speed first, then Endurance, Turning, Power. Don't move to prediction writing until every table has stated at least their Speed formula and Endurance equation. Then each team writes one specific goal count in the Match Log, signs it, and cannot revise it. No ranges. Push any team whose prediction doesn't connect to their stats. Close with one consolidation sentence and announce Round 1 pairings.",
         "script": "https://docs.google.com/document/d/1MPHXBv6GjZAw_n43uA1C1gVnbK3Agf-gZQ9qS5WXZiI/edit?usp=drive_link",
-        "worksheet": [{"url": "https://drive.google.com/file/d/18ukziO44pBk2qOvoce7cZgA-TPX_mrnj/view?usp=sharing", label:"Match Data Log"}, {"url": "https://drive.google.com/file/d/1mwWmRex420ZWpt2E1EEmxknTkd9EtR2S/view?usp=drive_link", label:"Make My Prediction"}],
+        "worksheet": [{"url": "https://drive.google.com/file/d/18ukziO44pBk2qOvoce7cZgA-TPX_mrnj/view?usp=sharing", label:"Match Data Log"}, 
+          {"url": "https://drive.google.com/file/d/1mwWmRex420ZWpt2E1EEmxknTkd9EtR2S/view?usp=drive_link", label:"Make My Prediction"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-03-pre-match-prediction.html"
       },
       {
@@ -667,7 +668,10 @@ const DAYS_DEFAULT = [
         "block": "Match-Build-Make",
         "description": "Three matches, round-robin bracket. Before each match, state your prediction from the data log. After each match, record actual goals and win/loss immediately. Loss-recovery protocol runs for every losing team before the next match -- no skipping it.",
         "facilitatorDescription": "Explain the match cycle once before Round 1 (read prediction aloud, play, record result immediately), then run three rounds. Each round: teams write their prediction before hearing their opponent's, play three minutes, record goals and win/loss in the data log right after. Fill the prediction-accuracy tracking chart across all three rounds. Run the loss recovery protocol between rounds with any team that lost; don't wait until after all three rounds. Close with the leaderboard reveal (best prediction named alongside most wins), then the non-optional exit ticket: prediction, result, gap, and one hypothesis for what caused it.",
-        "script": "https://docs.google.com/document/d/1lroWp1H0Omgc33hkRmZWrzq-DX3_e4t3s-jVibIkh6M/edit?usp=drive_link",
+        "worksheet":[{url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view?usp=drive_link",label:"Live Event Log"},
+          {url:"https://drive.google.com/file/d/1RYwXGMSLKrTY7lIj3_fNufiNjJoOUJ2R/view?usp=drive_link",label:"Example Live Event Log"},
+        {url:"https://drive.google.com/file/d/1x7-E8SWswK7gdlIXXCbdLahyOylb6GkR/view?usp=drive_link",label:"Example Rule Log"}],
+          "script": "https://docs.google.com/document/d/1lroWp1H0Omgc33hkRmZWrzq-DX3_e4t3s-jVibIkh6M/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-04-match-day-1.html"
       },
       {
