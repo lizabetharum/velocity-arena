@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.875rem;margin:2rem 0;}
+.stat-pill{background:var(--bg-soft);border:0.125rem solid var(--border);border-radius:0.625rem;padding:1.25rem 1rem;text-align:center;font-size:0.875rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.1em;text-transform:uppercase;}
+.stat-pill.active{border-color:var(--cyan);color:var(--cyan);background:var(--card);}
+.stat-pill.done{color:var(--cyan-soft);border-color:var(--cyan-dim);opacity:0.7;}
+.stat-pill.dim{opacity:0.35;}
+@media (max-width:640px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+
+.bignum{font-size:11rem;font-weight:900;color:var(--cyan);line-height:1;letter-spacing:-0.03em;margin:1rem 0 1.5rem;}
+.bignum-cap{font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:0.75rem;}
+.bignum-sub{font-size:1.0625rem;color:var(--ink-mute);max-width:42rem;}
+@media (max-width:640px){.bignum{font-size:6rem;}}
+
+.calc-table{width:100%;max-width:38rem;border-collapse:collapse;margin:1.5rem 0;font-size:1.125rem;}
+.calc-table th{background:var(--bg-soft);font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;text-align:left;padding:0.75rem 1.25rem;border:0.0625rem solid var(--border);}
+.calc-table td{padding:0.875rem 1.25rem;border:0.0625rem solid var(--border);font-family:'JetBrains Mono','SF Mono',monospace;color:var(--ink);}
+.calc-table td.input{color:var(--cyan-soft);font-weight:700;}
+.calc-table td.output{color:var(--cyan);font-weight:700;text-align:right;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.5rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 3</div>
+    <h1 class="title huge">Turning.</h1>
+    <p class="subtitle lead">Today the bot has to <em class="emph">go somewhere</em>. Not just move — navigate.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Human Robot warm-up</b> — feel how imprecise words are.</li>
+      <li><b>Plot two bot runs.</b> Why do the lines look different?</li>
+      <li><b>The Distance Formula.</b> How far is it from here to there?</li>
+      <li><b>Today's stat: Turning.</b> A new formula. A new vocabulary.</li>
+      <li><b>Break.</b></li>
+      <li><b>Navigate to a coordinate.</b> Three successes by end of Day 4.</li>
+      <li><b>Open Lab</b> + closing reflection.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Human Robot ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Warm-up <span class="kicker-mins">· 25 min</span></div>
+    <h1 class="title">Human Robot.</h1>
+    <p class="subtitle lead">One of you is the bot. The other two give step-by-step verbal instructions to navigate between two spots. <em class="emph">The bot follows exactly — even if it leads somewhere wrong.</em></p>
+    <p class="subtitle" style="margin-top:1.5rem;">No touching. Watch how hard "turn right" is to define.</p>
+  </div>
+</section>
+
+<!-- ═══ 04 — Plot the data cards ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Distance-Time Graphs <span class="kicker-mins">· Part 1 · 20 min</span></div>
+    <h1 class="title">Plot two bot runs.</h1>
+    <p class="subtitle lead">Your team gets a data card with <strong style="color:var(--cyan);">two bot runs</strong>. Plot both on the same graph.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">One line slopes down. The other stays flat.</em> Figure out why — without asking your facilitator. Then flip the card to see the stats on the back.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/coordinate-functions.html" target="_blank">Open the Distance-Time lesson <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Why different shapes? ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Talk it through</div>
+    <h1 class="title">Why do the lines look different?</h1>
+    <p class="subtitle lead">Not "Run B was slower." <em class="emph">What did the bot do physically</em> to make the line that shape?</p>
+    <p class="subtitle" style="margin-top:1.5rem;">One sentence from your team. Then look at the team next to you — their lines won't match.</p>
+  </div>
+</section>
+
+<!-- ═══ 06 — Arc Approximation intro ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Arc Approximation <span class="kicker-mins">· 10 min</span></div>
+    <h1 class="title">A curve is a lot of small straight lines.</h1>
+    <p class="subtitle lead">Your facilitator draws a smooth curve on the board. Then overlays three straight segments — chords across the curve.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Two questions.</em> Are the segments together longer or shorter than the arc? What happens when you add more, shorter segments?</p>
+  </div>
+</section>
+
+<!-- ═══ 07 — Walk the Plane ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">Walk the Plane <span class="kicker-mins">· 15 min</span></div>
+    <h1 class="title">Step onto the grid.</h1>
+    <p class="subtitle lead">A taped coordinate grid covers the floor. Your facilitator calls coordinates. You walk to them.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><strong style="color:var(--cyan);">Then the big move:</strong> <em class="emph">"Walk from (1,1) to (4,5). Estimate the straight-line distance."</em></p>
+  </div>
+</section>
+
+<!-- ═══ 08 — Distance formula ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">The Distance Formula</div>
+    <h1 class="title">Here's how to measure it.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Distance between two points</div>
+      <div class="formula">
+        d = √(( <span class="var">x₂</span> − <span class="var">x₁</span> )² + ( <span class="var">y₂</span> − <span class="var">y₁</span> )²)
+      </div>
+      <p class="formula-note">Square the gaps. Add them. Take the square root.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 09 — Try one ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Try one</div>
+    <h1 class="title">From <span style="color:var(--cyan-soft);">(1,1)</span> to <span style="color:var(--cyan-soft);">(4,5)</span> — how far?</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;color:var(--ink-mute);">d = √((4 − 1)² + (5 − 1)²) &nbsp; = &nbsp; √(9 + 16) &nbsp; = &nbsp; √25 &nbsp; = &nbsp; <strong style="color:var(--cyan);">5 units</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Verify it on the grid. Walk the diagonal. Count tiles.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Today: Turning ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Today</div>
+    <h1 class="title">Turning.</h1>
+    <p class="subtitle">Speed says how fast. Endurance says how long. Turning says <em class="emph">where</em>.</p>
+    <div class="stat-row">
+      <div class="stat-pill done">Speed ✓</div>
+      <div class="stat-pill done">Endurance ✓</div>
+      <div class="stat-pill active">Turning</div>
+      <div class="stat-pill dim">Power</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Turn Ratio formula ═══ -->
+<section class="slide">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">The rule</div>
+    <h1 class="title">Here's the formula.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Turn Ratio</div>
+      <div class="formula">
+        0.2 + (<span class="var">Turning</span> × 0.02)
+      </div>
+      <p class="formula-note">Start at 0.2 — even T = 0 turns a little. Then add 0.02 for every Turning point.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — The table ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">The pattern</div>
+    <h1 class="title">Build the table.</h1>
+    <table class="calc-table">
+      <thead>
+        <tr><th>Turning (T)</th><th style="text-align:right;">Turn Ratio</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="input">2</td><td class="output">0.24</td></tr>
+        <tr><td class="input">4</td><td class="output">0.28</td></tr>
+        <tr><td class="input">6</td><td class="output">0.32</td></tr>
+        <tr><td class="input">8</td><td class="output">0.36</td></tr>
+      </tbody>
+    </table>
+    <p class="subtitle">Each point adds the same amount: <strong style="color:var(--cyan);">0.02</strong>. <em class="emph">A steady linear gain.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Big number echo ═══ -->
+<section class="slide hero">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="bignum-cap">Each Turning point adds</div>
+    <div class="bignum">0.02</div>
+    <p class="bignum-sub" style="margin:0 auto;">to the turn ratio. <em class="emph">0.02 is a ratio — not a percent.</em> Don't compare it to Speed's 5%.</p>
+  </div>
+</section>
+
+<!-- ═══ 14 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">New words for what we just saw</div>
+    <h1 class="title">You used two ideas.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Coordinate pair</div>
+        <p class="vocab-def">Two numbers in parentheses — <strong style="color:var(--cyan);">(x, y)</strong> — that point at one location on a grid.</p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">Ordered pair</div>
+        <p class="vocab-def">Same thing. <em class="emph">Order matters</em>: (4, 3) and (3, 4) are different spots.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/coordinate-geometry.html" target="_blank">Play with Coordinates <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/arc-approximation.html" target="_blank">Play with Arc Approximation <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 16 — Energy Reset ═══ -->
+<section class="slide">
+  <span class="slide-num">16</span>
+  <div class="slide-inner">
+    <div class="kicker">Energy Reset <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">Stand up.</h1>
+    <ol class="steps">
+      <li>30 seconds of jumping jacks.</li>
+      <li>30 seconds of arm circles.</li>
+      <li>30 seconds of silent stretch.</li>
+    </ol>
+    <p class="subtitle" style="margin-top:1.5rem;">Sit back down.</p>
+  </div>
+</section>
+
+<!-- ═══ 17 — Coord Navigation Practice ═══ -->
+<section class="slide">
+  <span class="slide-num">17</span>
+  <div class="slide-inner">
+    <div class="kicker">Match-Build-Make <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Navigate to a coordinate.</h1>
+    <p class="subtitle lead">Program your bot to drive from <strong style="color:var(--cyan);">(0,0)</strong> to a called coordinate using arc approximation and the Turning formulas.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Record every attempt</em>: the coordinate called, the coordinate reached, the error distance.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/launchsequence-designer.html" target="_blank">Launch Sequence Designer <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/lessons/turning-test-explainer.html" target="_blank">Turning Test Explainer <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="https://makecode.microbit.org/S79542-10060-01167-82601" target="_blank">Open in MakeCode <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 18 — The target ═══ -->
+<section class="slide">
+  <span class="slide-num">18</span>
+  <div class="slide-inner">
+    <div class="kicker">The bar</div>
+    <h1 class="title">Three successes in a row by end of Day 4.</h1>
+    <p class="subtitle lead">Not "close enough." Three consecutive navigations where the bot reaches the called coordinate.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Today: get the first one.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 19 — Open Lab ═══ -->
+<section class="slide">
+  <span class="slide-num">19</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab <span class="kicker-mins">· 35 min</span></div>
+    <h1 class="title">Build intuition.</h1>
+    <p class="subtitle lead">Unstructured navigation practice. Try different coordinate targets. Change your Turning value. Watch what the turn radius does.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">No required output. Just feel.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 20 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">20</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 5 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">Silent rating, then talk if anyone holds up a 1</div>
+      <p class="ends-text">Each person on your team silently rates today's collaboration: <strong>1 = rough, 2 = okay, 3 = solid</strong>. Hold up your number at the same time. If anyone holds up a 1, talk for 2 minutes about what specifically happened.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 21 — Tomorrow: Power ═══ -->
+<section class="slide hero">
+  <span class="slide-num">21</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">Next stat: <span style="color:var(--cyan);">Power.</span></h1>
+    <p class="subtitle lead">The last of the four. <em class="emph">It doesn't behave like the others.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
