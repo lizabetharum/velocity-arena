@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 9 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.0625rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-rule{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--cyan-soft);font-weight:600;margin-bottom:0.625rem;line-height:1.4;}
+.compare-vals{font-size:0.9375rem;color:var(--ink-soft);line-height:1.65;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.bignum{font-size:11rem;font-weight:900;color:var(--cyan);line-height:1;letter-spacing:-0.03em;margin:1rem 0 1.5rem;}
+.bignum-cap{font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:0.75rem;}
+.bignum-sub{font-size:1.0625rem;color:var(--ink-mute);max-width:42rem;}
+@media (max-width:640px){.bignum{font-size:6rem;}}
+
+/* Six-card formula grid */
+.six-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.625rem;margin-top:1.5rem;}
+.six-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.5rem;padding:0.875rem 1rem;}
+.six-card-num{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.625rem;font-weight:700;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.3125rem;}
+.six-card-name{font-size:0.9375rem;font-weight:700;color:var(--ink);margin-bottom:0.3125rem;}
+.six-card-tag{font-size:0.75rem;color:var(--ink-mute);font-style:italic;}
+@media (max-width:720px){.six-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.six-grid{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 9 · Match Day 3</div>
+    <h1 class="title huge">The gap is the data.</h1>
+    <p class="subtitle lead">The formula you got <em class="emph">wrong</em> tells you more than the one you got right.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Rivalry Card Response</b> — check the trash talk's numbers.</li>
+      <li><b>Formula Relay.</b> 20 cards. Six formula types. Find your weakest.</li>
+      <li><b>Today's prediction</b> uses your weakest type.</li>
+      <li><b>Break.</b></li>
+      <li><b>Season 1 Match Day 3.</b> Three matches. The 20% gap rule.</li>
+      <li><b>Open Lab</b> — find a pattern. Write a hypothesis.</li>
+      <li><b>Closing reflection.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Rivalry Card Response ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Warm-up <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Read the card aimed at you.</h1>
+    <p class="subtitle lead">Open the dashboard. <strong style="color:var(--cyan);">Do the cited numbers check out?</strong></p>
+    <ol class="steps">
+      <li>If the trash talk is <em class="emph">factually wrong</em> — sticky note: "check your data," with the correct number.</li>
+      <li>If the trash talk is <em class="emph">accurate</em> — your rival has a point. Name one stat where <strong style="color:var(--cyan);">you</strong> beat them, and how you'll use it today.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 04 — Formula Relay intro ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Formula Relay <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Twenty cards. All five weeks of math. One race.</h1>
+    <p class="subtitle lead">Flip a card. Solve as a team. Bring it for a stamp. <em class="emph">Correct work gets stamped. Wrong work comes back with "check your work."</em></p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/formula-race-cards.html" target="_blank">Open the Formula Race Cards <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Six formula types ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Six types · all shuffled</div>
+    <h1 class="title">Sort your stamped cards into piles.</h1>
+    <div class="six-grid">
+      <div class="six-card">
+        <div class="six-card-num">Type 01</div>
+        <div class="six-card-name">Speed</div>
+        <div class="six-card-tag">unit rate</div>
+      </div>
+      <div class="six-card">
+        <div class="six-card-num">Type 02</div>
+        <div class="six-card-name">Endurance</div>
+        <div class="six-card-tag">linear decay</div>
+      </div>
+      <div class="six-card">
+        <div class="six-card-num">Type 03</div>
+        <div class="six-card-name">Turning</div>
+        <div class="six-card-tag">linear function</div>
+      </div>
+      <div class="six-card">
+        <div class="six-card-num">Type 04</div>
+        <div class="six-card-name">Power · Charge</div>
+        <div class="six-card-tag">quadratic</div>
+      </div>
+      <div class="six-card">
+        <div class="six-card-num">Type 05</div>
+        <div class="six-card-name">Follow-Through</div>
+        <div class="six-card-tag">linear function</div>
+      </div>
+      <div class="six-card">
+        <div class="six-card-num">Type 06</div>
+        <div class="six-card-name">Budget</div>
+        <div class="six-card-tag">ratio · constraint</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Find your weakest type ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">The point of the race</div>
+    <h1 class="title">Count the cards that came back.</h1>
+    <p class="subtitle lead">Whichever pile has the most "check your work" returns — <em class="emph">that's your weakest type</em>.</p>
+    <div class="challenge">
+      <div class="challenge-label">Now use it</div>
+      <p class="challenge-text">Today's Match Day 3 prediction comes from your <strong>weakest formula type</strong>. State the formula. Substitute. Interpret. <em>Logged before the match. No exceptions.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 07 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">New word for what we just saw</div>
+    <h1 class="title">You used one big idea.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Residual</div>
+        <p class="vocab-def">The <strong style="color:var(--cyan);">gap</strong> between what your equation predicted and what actually happened. <em class="emph">Residuals point to variables your model is missing.</em></p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">Why it matters</div>
+        <p class="vocab-def">Match results don't just tell you who won. They tell you <strong style="color:var(--cyan);">where your math model is incomplete</strong> — and what to add to it.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/data.html" target="_blank">Play with Data <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/equations.html" target="_blank">Play with Equations <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 08 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 09 — Match Day 3 intro ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Season 1 Match Day 3 <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Three more matches.</h1>
+    <p class="subtitle lead">Same Match Cycle. Same loss-recovery protocol. <strong style="color:var(--cyan);">One new rule today.</strong></p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/match-day-3.html" target="_blank">The 20% Gap Rule <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 10 — The 20% Gap Rule ═══ -->
+<section class="slide hero">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="bignum-cap">If predicted vs. actual is more than</div>
+    <div class="bignum">±20%</div>
+    <p class="bignum-sub" style="margin:0 auto;">— that's the line. <em class="emph">Inside it</em>, your model is doing its job. <em class="emph">Outside it</em>, your model is missing a variable.</p>
+  </div>
+</section>
+
+<!-- ═══ 11 — Name the missing variable ═══ -->
+<section class="slide">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">When the gap is over 20%</div>
+    <h1 class="title">Write one sentence. <em class="emph">Name what your model missed.</em></h1>
+    <div class="challenge">
+      <div class="challenge-label">Not this</div>
+      <p class="challenge-text" style="color:var(--ink-mute);">"We scored fewer goals than expected."</p>
+    </div>
+    <div class="challenge">
+      <div class="challenge-label">This</div>
+      <p class="challenge-text">"We assumed decay rate r = 24, but the opponent's stalling cost us another 15 seconds at the floor — that's a coefficient the formula doesn't capture."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — Don't throw out the equation ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">The thing to remember</div>
+    <h1 class="title">Don't throw out the equation.</h1>
+    <p class="subtitle lead">Your equation predicted X. The match gave Y. <em class="emph">That's not a failure.</em></p>
+    <p class="subtitle" style="margin-top:1.5rem;">That's your model telling you which variable it's missing. <strong style="color:var(--cyan);">Name it. That goes into the next version.</strong></p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Open Lab ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab <span class="kicker-mins">· 40 min</span></div>
+    <h1 class="title">Track A or Track B.</h1>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Track A</div>
+        <div class="compare-stat">Data Dive</div>
+        <div class="compare-vals">Look at your three match results. Find one pattern. Write one hypothesis in the dashboard:<br><br><em class="emph">"If we change [stat] from X to Y, we expect [outcome] because [cited data]."</em></div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Track B</div>
+        <div class="compare-stat">Bot Lab</div>
+        <div class="compare-vals">Free experimentation. <em class="emph">If you find something useful</em>, it goes in your journal before you leave.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">Write and share</div>
+      <p class="ends-text">Finish this sentence: <em>"The skill I used today was <strong>______</strong> (name it specifically) and I will use it tomorrow by <strong>______</strong> (name the exact moment and exact action)."</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Tomorrow ═══ -->
+<section class="slide hero">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">Season 1 Final. <span style="color:var(--cyan);">Cold Recall.</span> The Distance Formula returns.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Five questions, no notes. Distance deep dive. Then the final round.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your fixed equation.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
