@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 16 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+/* Three numbered challenge cards (visitor mini-challenges) */
+.minichall{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;margin-top:1.5rem;}
+.mini{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;border-left:0.25rem solid var(--cyan);padding:1.5rem 1.25rem;}
+.mini-num{font-family:'JetBrains Mono','SF Mono',monospace;font-size:1.5rem;font-weight:800;color:var(--cyan);margin-bottom:0.625rem;line-height:1;}
+.mini-name{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:0.5rem;}
+.mini-body{font-size:0.875rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.minichall{grid-template-columns:1fr;}}
+
+/* Awards list */
+.awards{list-style:none;padding:0;margin:1.5rem 0;display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;max-width:46rem;}
+.awards li{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.5rem;padding:0.875rem 1.125rem;font-size:1rem;color:var(--ink);font-weight:600;}
+.awards li .crit{display:block;font-size:0.8125rem;color:var(--ink-mute);font-weight:400;font-style:italic;margin-top:0.25rem;}
+@media (max-width:640px){.awards{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 16 · Showcase Week</div>
+    <h1 class="title huge">You are the experts now.</h1>
+    <p class="subtitle lead">Visitors arrive in 40 minutes. <em class="emph">Today you teach the math.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Expert Setup</b> — station ready, teaching rehearsed.</li>
+      <li><b>The Community Exhibition.</b> Visitors complete three mini-challenges with your help.</li>
+      <li><b>Break.</b></li>
+      <li><b>Walk the Wall.</b> Four weeks of work in one room. Quiet.</li>
+      <li><b>Awards Ceremony.</b> Every award announced with the data behind it.</li>
+      <li><b>Final debrief + closing reflection.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Expert Setup ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Expert Setup <span class="kicker-mins">· 40 min</span></div>
+    <h1 class="title">Set the station. Rehearse the teaching.</h1>
+    <p class="subtitle lead">On display: <strong style="color:var(--cyan);">scouting report</strong>, <strong style="color:var(--cyan);">bot</strong>, <strong style="color:var(--cyan);">coordinate grid</strong>, <strong style="color:var(--cyan);">data dashboard</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Then practice teaching the three mini-challenges on a teammate. <em class="emph">If the explanation uses jargon or skips the calculation, revise it.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 04 — The 3 mini-challenges ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">What every visitor will do</div>
+    <h1 class="title">The three mini-challenges.</h1>
+    <div class="minichall">
+      <div class="mini">
+        <div class="mini-num">01</div>
+        <div class="mini-name">Unit rate</div>
+        <div class="mini-body">Calculate a unit rate from scouting data: Season 1 wins ÷ Speed stat. <em class="emph">Wins per 1 Speed point.</em></div>
+      </div>
+      <div class="mini">
+        <div class="mini-num">02</div>
+        <div class="mini-name">Coordinate distance</div>
+        <div class="mini-body">Plot two match coordinates on the arena grid. Calculate the distance between them.</div>
+      </div>
+      <div class="mini">
+        <div class="mini-num">03</div>
+        <div class="mini-name">Proportional scaling</div>
+        <div class="mini-body">Explain in your own words <em class="emph">why Speed and motor power scale proportionally</em>.</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/proportional-scaling.html" target="_blank">Play with Scaling <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/distance.html" target="_blank">Play with Distance <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — One sentence to plan ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Before any visitor arrives</div>
+    <h1 class="title">Write one sentence.</h1>
+    <div class="challenge">
+      <div class="challenge-label">The one thing</div>
+      <p class="challenge-text">"Every visitor will leave this station understanding <strong>______</strong>."</p>
+    </div>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Pin it where your team can see it. Refer back to it after every visitor.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 06 — Exhibition Teaching Begins ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Community Exhibition <span class="kicker-mins">· 70 min</span></div>
+    <h1 class="title">Visitors arrive. <em class="emph">You teach.</em></h1>
+    <p class="subtitle lead">Walk each visitor through all three mini-challenges. <strong style="color:var(--cyan);">The goal: they complete all three independently</strong> after your initial explanation.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Visitors fill out Best Teacher ballots as they leave each station.</p>
+  </div>
+</section>
+
+<!-- ═══ 07 — Hero: facilitator stays out ═══ -->
+<section class="slide hero">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <h1 class="title huge">Student teaching<br>is the point.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Visitor questions get redirected to <strong style="color:var(--cyan);">you</strong>, not to the facilitator.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">"Can you show them the formula on your Bot Identity card?"</em> is the only kind of help you'll get.</p>
+  </div>
+</section>
+
+<!-- ═══ 08 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">Snack Break · 20 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">The afternoon belongs to the ceremony.</p>
+  </div>
+</section>
+
+<!-- ═══ 09 — Walk the Wall ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Walk the Wall: Final Gallery <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">Four weeks. In one room.</h1>
+    <p class="subtitle lead">Every artifact is up: bot origin stories, rivalry cards, the leaderboard, Commissioner proposals, scouting reports, the Day 1 goals.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Walk quietly. No commentary. Look at what four weeks of work looks like.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Awards Ceremony ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Awards Ceremony <span class="kicker-mins">· 60 min</span></div>
+    <h1 class="title">Every award is announced with the data behind it.</h1>
+    <ul class="awards">
+      <li>Best Exhibition <span class="crit">visitor mini-challenge completion rate</span></li>
+      <li>Season 2 Champion <span class="crit">match record across the season</span></li>
+      <li>Best Analyst <span class="crit">residual accuracy across both seasons</span></li>
+      <li>Most Improved <span class="crit">highest % change Season 1 → Season 2</span></li>
+      <li>Best Prediction Market <span class="crit">closest to your posted card</span></li>
+      <li>Best Commissioner Proposal <span class="crit">the rule that passed and held up</span></li>
+      <li>Best Teacher <span class="crit">visitor ballots tallied</span></li>
+    </ul>
+    <div class="cta-row">
+      <a class="cta" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Make the math visible ═══ -->
+<section class="slide hero">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">In the celebration</div>
+    <h1 class="title huge">Make the math visible.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">"You won Most Improved because your percent change from Season 1 to Season 2 win rate was the highest in the class. <em class="emph">Here is the calculation.</em>"</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><strong style="color:var(--cyan);">Then</strong> each student names one program moment and what they learned from it.</p>
+  </div>
+</section>
+
+<!-- ═══ 12 — Open Lab Final Debrief ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab · Final Debrief <span class="kicker-mins">· 10 min</span></div>
+    <h1 class="title">What did visitors get? What confused them?</h1>
+    <ol class="steps">
+      <li>Identify <strong style="color:var(--cyan-soft);">one explanation that didn't land</strong>. Write a revised version.</li>
+      <li>Review the full data dashboard from Day 1 to today.</li>
+      <li>Prepare anything you want to say at the closing.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 13 — ENDS Final Ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">ENDS Closing Ritual <span class="kicker-mins">· 10 min</span></div>
+    <h1 class="title">The final journal entry.</h1>
+    <div class="ends">
+      <div class="ends-label">Write for 5 minutes</div>
+      <p class="ends-text">What did you learn about <strong>yourself as a problem solver</strong>? Name <strong>one specific moment</strong> from this program where you solved something you thought you could not. <em>What did you do differently than you would have done before camp?</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — Closing hero ═══ -->
+<section class="slide hero">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <h1 class="title huge">A room of students<br>who can explain algebra<br><span style="color:var(--cyan);">using their own data.</span></h1>
+    <p class="subtitle lead" style="margin-top:2rem;"><em class="emph">That's what four weeks produced.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
