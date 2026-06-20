@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 15 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+/* Ball-mode row (3 cards) */
+.balls{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;margin-top:1.5rem;}
+.ball{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.25rem 1rem;text-align:center;}
+.ball-num{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.ball-icon{font-size:2.5rem;line-height:1;margin-bottom:0.625rem;}
+.ball-name{font-size:1.0625rem;font-weight:700;color:var(--ink);margin-bottom:0.375rem;}
+.ball-tag{font-size:0.875rem;color:var(--ink-soft);font-style:italic;}
+@media (max-width:640px){.balls{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 15 · Showcase Week</div>
+    <h1 class="title huge">The last day before<br>the Exhibition.</h1>
+    <p class="subtitle lead">Bot identity. The final matches. The bracket. The post-task. <em class="emph">Then tomorrow you teach the room.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Bot Lore Gallery Walk</b> — add one sentence to your bot's story.</li>
+      <li><b>Teach the Math</b> — explain one formula as if a visitor just walked in.</li>
+      <li><b>Break.</b></li>
+      <li><b>Match Day 3.</b> Three rounds. Three different balls.</li>
+      <li><b>The Bracket Reveal.</b> Who you're playing tomorrow.</li>
+      <li><b>Post-Task Diagnostic</b> — same shape as Day 1. You'll notice the difference.</li>
+      <li><b>Open Lab</b> — rehearse your Exhibition pitch.</li>
+      <li><b>Closing reflection.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Bot Lore Gallery Walk ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Bot Lore Gallery Walk <span class="kicker-mins">· 25 min</span></div>
+    <h1 class="title">Walk the wall. Re-read every bot's story.</h1>
+    <p class="subtitle lead">Day 2, you posted your bot's origin. Today, look at every wall card.</p>
+    <div class="challenge">
+      <div class="challenge-label">Then add one sentence</div>
+      <p class="challenge-text">Write one new line to add to <strong>your bot's</strong> lore. Something that <em>only makes sense because you played the matches</em>. Post it next to the original.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 04 — Teach the Math intro ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Teach the Math <span class="kicker-mins">· 45 min</span></div>
+    <h1 class="title">Pick one formula. Explain it.</h1>
+    <p class="subtitle lead">Speed, Endurance, Turning, Power, Budget, Percent Change, Distance, Linear Equation, or Proportional Scaling. <em class="emph">No two students pick the same one.</em></p>
+    <p class="subtitle" style="margin-top:1.5rem;">Then explain it <strong style="color:var(--cyan);">as if a visitor just walked in</strong> and has never seen any of this. <em class="emph">No bot jargon.</em> Plain terms.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/pre-match-pitch-v2.html" target="_blank">Open the Teach the Math lesson <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Two words for tomorrow</div>
+    <h1 class="title">You're about to do both.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Pitch</div>
+        <p class="vocab-def">A <strong style="color:var(--cyan);">2-minute mathematical argument</strong>: claim, evidence, calculation. Every claim has a number next to it.</p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">Scouting report</div>
+        <p class="vocab-def">A document that <strong style="color:var(--cyan);">turns a rival's stat allocation into percentages and equations</strong> you can plan against.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/percent.html" target="_blank">Play with Percent <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/data.html" target="_blank">Play with Data <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown · 20 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 07 — Match Day 3 intro ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">Match Day 3 <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Three rounds. Three ball modes.</h1>
+    <p class="subtitle lead">The ball is announced <em class="emph">before</em> the round — not after. It's a <strong style="color:var(--cyan);">transfer test</strong>, not a surprise.</p>
+    <div class="cta-row">
+      <a class="cta" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 08 — Three balls ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's three modes</div>
+    <h1 class="title">Each round, a different ball.</h1>
+    <div class="balls">
+      <div class="ball">
+        <div class="ball-num">Round 1</div>
+        <div class="ball-icon">⚪</div>
+        <div class="ball-name">Standard</div>
+        <div class="ball-tag">Foam ball. Baseline.</div>
+      </div>
+      <div class="ball">
+        <div class="ball-num">Round 2</div>
+        <div class="ball-icon">🐶</div>
+        <div class="ball-name">Speed Ball</div>
+        <div class="ball-tag">Dog ball. Rewards Speed.</div>
+      </div>
+      <div class="ball">
+        <div class="ball-num">Round 3</div>
+        <div class="ball-icon">⚫</div>
+        <div class="ball-name">Endurance Ball</div>
+        <div class="ball-tag">Rubber ball. Rewards Endurance.</div>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Record the ball mode with every prediction and every result on the Prediction Tracker.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 09 — Equation check before Match 1 ═══ -->
+<section class="slide">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Before Match 1</div>
+    <h1 class="title">Your equation, in writing.</h1>
+    <p class="subtitle lead">Every team fills in <strong style="color:var(--cyan);">slope</strong>, <strong style="color:var(--cyan);">intercept</strong>, the <strong style="color:var(--cyan);">x-variable</strong>, and a <strong style="color:var(--cyan);">prediction card goal</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">If your equation isn't written down, you're not playing yet.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 10 — 4 causes of drift ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">In the retrospective</div>
+    <h1 class="title">Four causes for a residual pattern.</h1>
+    <p class="subtitle">Pick the one that fits your data — not the one that feels right.</p>
+    <ol class="steps">
+      <li><strong style="color:var(--cyan-soft);">Slope error.</strong> Your <em>m</em> doesn't capture how stat translates to wins.</li>
+      <li><strong style="color:var(--cyan-soft);">X-variable choice.</strong> You picked the wrong stat to predict from.</li>
+      <li><strong style="color:var(--cyan-soft);">Model drift.</strong> Your equation was right early but the team has changed since.</li>
+      <li><strong style="color:var(--cyan-soft);">Environmental sensitivity.</strong> The ball mode flipped what mattered.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 11 — Bracket Reveal ═══ -->
+<section class="slide hero">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">After the exit ticket</div>
+    <h1 class="title huge">The bracket goes up.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">You'll see <strong style="color:var(--cyan);">who you're playing</strong> tomorrow at the Exhibition.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Tonight: open the Scouting Report on that team. Turn their stats into percentages.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 12 — Post-Task Diagnostic ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">Post-Task Diagnostic <span class="kicker-mins">· 15 min</span></div>
+    <h1 class="title">Same shape as Day 1.</h1>
+    <p class="subtitle lead">Same concept set. Same kind of contexts. <em class="emph">12 minutes. Individual. The only formal assessment of the day.</em></p>
+    <div class="challenge">
+      <div class="challenge-label">The framing</div>
+      <p class="challenge-text">"On Day 1, you didn't know most of these answers. Today you do. I'm not grading you against anyone else — <strong>I'm comparing you to yourself from four weeks ago.</strong> Every answer you know today that you didn't know on Day 1 is evidence of what happened in this room."</p>
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="/activities/diagnostic-post/index.html" target="_blank">Open the Post-Task Diagnostic <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 13 — Open Lab Reflection ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab · Reflection Time <span class="kicker-mins">· 30 min</span></div>
+    <h1 class="title">Rehearse your Exhibition pitch.</h1>
+    <p class="subtitle lead">Use your Bot Identity card. Every team must be ready to:</p>
+    <ol class="steps">
+      <li>Explain your bot's <strong style="color:var(--cyan-soft);">name and allocation</strong>.</li>
+      <li>Compute <strong style="color:var(--cyan-soft);">one formula</strong> using your actual numbers.</li>
+      <li>Recite your <strong style="color:var(--cyan-soft);">biggest prediction gap</strong> from either season.</li>
+      <li>Describe <strong style="color:var(--cyan-soft);">one change</strong> you made from Season 1 to Season 2 — and why.</li>
+    </ol>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Rehearse with a teammate as the stand-in guest.</em></p>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/lessons/open-lab-reflection.html" target="_blank">Open Lab Reflection lesson <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — ENDS Closing Ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">ENDS Closing Ritual <span class="kicker-mins">· 10 min</span></div>
+    <h1 class="title">Skill Bridge.</h1>
+    <div class="ends">
+      <div class="ends-label">Name a moment</div>
+      <p class="ends-text">Name <strong>a moment where data changed your mind</strong>. Use a specific number or a calculation. Then answer: <em>what will you tell someone tomorrow at the Exhibition about what you learned?</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Tomorrow ═══ -->
+<section class="slide hero">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title"><span style="color:var(--cyan);">The Community Exhibition.</span></h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">You teach the math to visitors. You play the championship matches. The Best Model badge gets named.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your bot, your pitch, and your scouting report.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
