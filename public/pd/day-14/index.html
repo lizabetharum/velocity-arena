@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.vocab{background:var(--card);border:0.0625rem solid var(--border-bright);border-left:0.25rem solid var(--cyan);border-radius:0.625rem;padding:1.5rem 1.5rem;}
+.vocab-word{font-size:1.125rem;font-weight:800;color:var(--cyan);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.625rem;}
+.vocab-def{font-size:1rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.vocab-grid{grid-template-columns:1fr;}}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.125rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-rule{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--cyan-soft);font-weight:600;margin-bottom:0.625rem;line-height:1.4;}
+.compare-vals{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.875rem;color:var(--ink-soft);line-height:1.65;}
+.compare-tag{display:inline-block;margin-top:0.875rem;font-size:0.8125rem;font-weight:700;color:var(--cyan);letter-spacing:0.05em;text-transform:uppercase;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.625rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 14 · Season 2 Match Day 2</div>
+    <h1 class="title huge">The model vs. the match.</h1>
+    <p class="subtitle lead">Percent change tells you <em class="emph">how big the move was</em> — not whether it was worth it.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>Stat Auction</b> — bid math tokens for stat upgrades.</li>
+      <li><b>Percent change.</b> Season 1 → Season 2 allocations, every stat.</li>
+      <li><b>The math trap:</b> percent change ≠ percentage points.</li>
+      <li><b>Break.</b></li>
+      <li><b>Season 2 Match Day 2.</b> Dog ball, all day.</li>
+      <li><b>Best Model badge</b> — closest to your prediction card wins.</li>
+      <li><b>Open Lab</b> — residual analysis. Revise or hold?</li>
+      <li><b>Closing reflection.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Stat Auction ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">Stat Auction <span class="kicker-mins">· 30 min</span></div>
+    <h1 class="title">Bid math tokens for stat upgrades.</h1>
+    <p class="subtitle lead">Three tokens to start. Four for last-place. Earn more by answering formula questions correctly.</p>
+    <div class="challenge">
+      <div class="challenge-label">The catch</div>
+      <p class="challenge-text">To win a bid, you have to <strong>calculate the new formula output out loud</strong>. <em>Wrong math means you lose your tokens.</em></p>
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/stat-auction.html" target="_blank">Open the Stat Auction <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 04 — Percent Change intro ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Percent Change <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Calculate the move from Season 1 to Season 2.</h1>
+    <p class="subtitle lead">For every stat you changed, calculate the percent change — and then ask whether a percent change in your stat produces a percent change in your wins.</p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/percent-change.html" target="_blank">Open the Percent Change lesson <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/percent.html" target="_blank">Play with Percent <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — The formula ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">The formula</div>
+    <h1 class="title">Watch the denominator.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Percent Change</div>
+      <div class="formula">
+        (<span class="var">new</span> − <span class="var">old</span>) ÷ <span class="var">old</span> × 100
+      </div>
+      <p class="formula-note">You always divide by the <em>old</em> value. Not the new. <strong style="color:var(--cyan-soft);">That's the most common error.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 — Hero: ≠ percentage points ═══ -->
+<section class="slide hero">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">The trap</div>
+    <h1 class="title huge">Percent change ≠<br>percentage points.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">A team raised Speed from <strong style="color:var(--cyan);">4 to 7</strong>.</p>
+    <p class="subtitle" style="margin-top:1rem;">That's <strong style="color:var(--cyan);">3 percentage points</strong> different. The percent change is (7 − 4) ÷ 4 × 100 = <strong style="color:var(--cyan);">75%</strong>.</p>
+    <p class="subtitle" style="margin-top:1rem;">Their bot is 75% faster. <em class="emph">Not 3% faster.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 07 — Is percent change proportional? ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">The harder question</div>
+    <h1 class="title">Is percent change proportional?</h1>
+    <p class="subtitle lead">If your Speed goes up 50%, do your wins go up 50%? <em class="emph">Depends on which stat changed.</em></p>
+    <div class="compare">
+      <div class="compare-card linear">
+        <div class="compare-label">Speed (linear)</div>
+        <div class="compare-stat">+50% stat</div>
+        <div class="compare-rule">Motor = (S × 100) / 20</div>
+        <div class="compare-vals">Motor power: <strong style="color:var(--cyan);">+50%</strong></div>
+        <span class="compare-tag">In matches out</span>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Power (quadratic)</div>
+        <div class="compare-stat">+50% stat</div>
+        <div class="compare-rule">Charge = P²</div>
+        <div class="compare-vals">Charge speed: <strong style="color:var(--cyan);">+125%</strong></div>
+        <span class="compare-tag">Out runs ahead</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 08 — Vocabulary ═══ -->
+<section class="slide">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <div class="kicker">New word for what we just saw</div>
+    <h1 class="title">You used one big idea.</h1>
+    <div class="vocab-grid">
+      <div class="vocab">
+        <div class="vocab-word">Percent change</div>
+        <p class="vocab-def">A <strong style="color:var(--cyan);">proportional</strong> comparison relative to the original. <em class="emph">4 → 6 is +50%. 6 → 4 is −33%.</em> The denominator matters.</p>
+      </div>
+      <div class="vocab">
+        <div class="vocab-word">Why it matters</div>
+        <p class="vocab-def">Percent change tells you <strong style="color:var(--cyan);">how big the move was</strong>. It doesn't tell you whether it was <em class="emph">worth it</em>. Today's matches answer that.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta cta-secondary" href="/activities/math/percent.html" target="_blank">Play with Percent <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/proportional-scaling.html" target="_blank">Play with Scaling <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 09 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Match Day 2 ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Season 2 Match Day 2 <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Today's ball: 🐶 the dog ball. <em class="emph">All day.</em></h1>
+    <p class="subtitle lead">Three matches. Same ball every match. <strong style="color:var(--cyan);">No ball-mode excuse for losses today.</strong></p>
+    <div class="challenge">
+      <div class="challenge-label">Before every match</div>
+      <p class="challenge-text">Look at your <strong>last residual</strong>. Decide: does the next prediction go <strong>up</strong>, <strong>down</strong>, or <strong>stay the same</strong>? Estimate the opponent's stat. Write a prediction number.</p>
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Best Model badge ═══ -->
+<section class="slide hero">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">The badge that matters</div>
+    <h1 class="title huge">Best Model.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Goes to whichever team's <strong style="color:var(--cyan);">final record</strong> is closest to their <strong style="color:var(--cyan);">prediction card</strong>.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Not the team with the most wins. The team whose math was right.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 12 — Loss recovery (no ball excuse today) ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">If you lose · pick one</div>
+    <h1 class="title">Three reasons. <em class="emph">No ball excuse today.</em></h1>
+    <ol class="steps">
+      <li><strong style="color:var(--cyan-soft);">Wrong slope.</strong> Your equation's <em>m</em> isn't right for this stat.</li>
+      <li><strong style="color:var(--cyan-soft);">Wrong x estimate.</strong> You misjudged the opponent's stat.</li>
+      <li><strong style="color:var(--cyan-soft);">Auction winners only:</strong> your equation no longer fits — your stats changed, but your line didn't.</li>
+    </ol>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">If you blame the ball, the facilitator will redirect.</em> Same ball every match today.</p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Open Lab Residual Analysis ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab · Residual Analysis <span class="kicker-mins">· 40 min</span></div>
+    <h1 class="title">Revise or hold?</h1>
+    <p class="subtitle">Fill the residual table first. Then walk this decision tree.</p>
+    <ol class="steps">
+      <li>Did the residual <strong style="color:var(--cyan-soft);">direction flip</strong> between Day 13 and Day 14?</li>
+      <li>If <strong>yes</strong> → <em class="emph">not enough evidence</em>. Name the ball mode as the likely cause. <strong style="color:var(--cyan);">Hold.</strong></li>
+      <li>If <strong>no</strong> → look at the residual <strong style="color:var(--cyan-soft);">size column</strong>. Same size every match? → starting number is off. Growing size? → slope is off.</li>
+      <li>Write one sentence: <em class="emph">why does the evidence point at this value rather than the other?</em></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 14 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 3 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">Write and share</div>
+      <p class="ends-text">Finish this sentence: <em>"The skill I used today was <strong>______</strong> (name it specifically) and I will use it tomorrow by <strong>______</strong> (name the exact moment and exact action in tomorrow's schedule)."</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Tomorrow ═══ -->
+<section class="slide hero">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">Scouting reports. Bot lore. <span style="color:var(--cyan);">The championship bracket.</span></h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Teach the math. Write the story. Find out who you're playing.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your revised equation.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
