@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/images/first.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — Velocity Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;scroll-behavior:smooth;scroll-snap-type:y mandatory;}
+:root{
+  --bg:#0d1c2e;
+  --bg-soft:#14283f;
+  --card:#192f4c;
+  --border:#1d3a5c;
+  --border-bright:#2d5482;
+  --cyan:#00B4C9;
+  --cyan-soft:#6FDDEC;
+  --cyan-dim:#005F6B;
+  --ink:#E8F0F4;
+  --ink-soft:#B8C9D6;
+  --ink-mute:#7A8B94;
+  --amber:#F5D799;
+  --amber-bg:#3a2e10;
+}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+.slide{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 2rem 5rem;max-width:64rem;margin:0 auto;scroll-snap-align:start;position:relative;}
+.slide-inner{width:100%;}
+.kicker{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.5rem;}
+.kicker-mins{color:var(--cyan-soft);}
+.title{font-size:3rem;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-0.02em;margin-bottom:1rem;}
+.title.huge{font-size:4.5rem;}
+.subtitle{font-size:1.25rem;color:var(--ink-mute);max-width:48rem;line-height:1.5;}
+.subtitle.lead{font-size:1.5rem;color:var(--ink-soft);}
+.emph{color:var(--cyan-soft);font-style:italic;}
+
+.slide.hero{text-align:center;}
+.slide.hero .title{margin-left:auto;margin-right:auto;}
+.slide.hero .subtitle{margin:0 auto;}
+
+.agenda{list-style:none;padding:0;margin:1.5rem 0;font-size:1.125rem;color:var(--ink-soft);max-width:42rem;}
+.agenda li{padding:0.625rem 0;border-bottom:0.0625rem dashed var(--border);display:flex;align-items:baseline;gap:0.75rem;}
+.agenda li:last-child{border-bottom:none;}
+.agenda li::before{content:'';display:inline-block;width:0.5rem;height:0.5rem;border:0.125rem solid var(--cyan);border-radius:50%;flex-shrink:0;transform:translateY(-0.1875rem);}
+.agenda li b{color:var(--cyan);font-weight:700;}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:1.25rem 0;font-size:1.0625rem;color:var(--ink-soft);max-width:46rem;}
+.steps li{counter-increment:s;padding:0.625rem 0 0.625rem 2.5rem;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0.5rem;width:1.75rem;height:1.75rem;background:var(--cyan-dim);color:var(--cyan);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;font-size:0.8125rem;}
+
+.formula-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:1rem;padding:2.5rem 2.5rem;text-align:center;margin:2rem 0;}
+.formula-label{font-size:0.75rem;font-weight:700;color:var(--cyan);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:1.25rem;}
+.formula{font-family:'JetBrains Mono','SF Mono',monospace;font-size:2.25rem;font-weight:700;color:var(--cyan);line-height:1.3;letter-spacing:-0.01em;}
+.formula .var{color:var(--cyan-soft);}
+.formula-note{font-size:1rem;color:var(--ink-mute);margin-top:1.25rem;font-style:italic;}
+
+.challenge{background:var(--bg-soft);border-left:0.25rem solid var(--cyan-soft);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.challenge-label{font-size:0.75rem;font-weight:700;color:var(--cyan-soft);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.challenge-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.challenge-text strong{color:var(--cyan-soft);font-weight:700;}
+
+.ends{background:var(--bg-soft);border-left:0.25rem solid var(--amber);border-radius:0 0.625rem 0.625rem 0;padding:1.75rem 2rem;margin-top:1.5rem;}
+.ends-label{font-size:0.75rem;font-weight:700;color:var(--amber);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.875rem;}
+.ends-text{font-size:1.1875rem;color:var(--ink);line-height:1.55;font-weight:500;}
+.ends-text strong{color:var(--amber);font-weight:700;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.compare-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.5rem;}
+.compare-card.linear{border-left:0.25rem solid var(--cyan-dim);}
+.compare-card.quad{border-left:0.25rem solid var(--cyan);}
+.compare-label{font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.compare-stat{font-size:1.125rem;font-weight:800;color:var(--ink);margin-bottom:0.875rem;}
+.compare-vals{font-size:0.9375rem;color:var(--ink-soft);line-height:1.65;}
+@media (max-width:640px){.compare{grid-template-columns:1fr;}}
+
+.bignum{font-size:8rem;font-weight:900;color:var(--cyan);line-height:1;letter-spacing:-0.03em;margin:1rem 0 1.5rem;}
+.bignum-cap{font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:0.75rem;}
+.bignum-sub{font-size:1.0625rem;color:var(--ink-mute);max-width:42rem;}
+@media (max-width:640px){.bignum{font-size:5rem;}}
+
+/* 2x2 grid for the four things that change in Season 2 */
+.quad-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.875rem;margin-top:1.5rem;}
+.quad-card{background:var(--card);border:0.0625rem solid var(--border-bright);border-radius:0.625rem;padding:1.25rem 1.25rem;}
+.quad-num{font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.6875rem;font-weight:700;color:var(--cyan);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.quad-head{font-size:1.0625rem;font-weight:700;color:var(--ink);margin-bottom:0.375rem;}
+.quad-body{font-size:0.9375rem;color:var(--ink-soft);line-height:1.55;}
+@media (max-width:640px){.quad-grid{grid-template-columns:1fr;}}
+
+.cta{display:inline-flex;align-items:center;gap:0.5rem;background:var(--cyan);color:var(--bg);font-family:inherit;font-size:1.0625rem;font-weight:700;padding:0.875rem 1.5rem;border-radius:0.5rem;text-decoration:none;margin-top:1.25rem;}
+.cta:hover{background:var(--cyan-soft);}
+.cta-arrow{font-weight:800;}
+.cta-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.25rem;}
+.cta-row .cta{margin-top:0;}
+.cta-secondary{background:transparent;color:var(--cyan);border:0.125rem solid var(--cyan);}
+.cta-secondary:hover{background:var(--cyan-dim);color:var(--cyan-soft);border-color:var(--cyan-soft);}
+
+.accent-strip{position:fixed;top:0;left:0;right:0;height:0.25rem;background:var(--cyan);z-index:50;}
+.progress{position:fixed;top:0.25rem;left:0;height:0.1875rem;background:var(--cyan-soft);z-index:50;width:0;transition:width 0.15s;}
+
+.nav-hint{position:fixed;bottom:1.5rem;right:1.5rem;font-size:0.75rem;color:var(--ink-mute);font-family:'JetBrains Mono','SF Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;background:var(--bg-soft);border:0.0625rem solid var(--border);padding:0.5rem 0.75rem;border-radius:0.375rem;z-index:40;}
+.nav-hint kbd{background:var(--bg);border:0.0625rem solid var(--border-bright);padding:0.0625rem 0.375rem;border-radius:0.25rem;font-family:inherit;font-size:0.6875rem;color:var(--cyan);}
+
+.slide-num{position:absolute;top:1.5rem;right:2rem;font-family:'JetBrains Mono','SF Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--ink-mute);letter-spacing:0.08em;}
+
+@media (max-width:640px){
+  .slide{padding:2.5rem 1.5rem 4rem;}
+  .title{font-size:2.25rem;}
+  .title.huge{font-size:2.75rem;}
+  .subtitle{font-size:1.0625rem;}
+  .subtitle.lead{font-size:1.1875rem;}
+  .formula{font-size:1.625rem;}
+  .nav-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="accent-strip"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ═══ 01 — Welcome ═══ -->
+<section class="slide hero">
+  <span class="slide-num">01</span>
+  <div class="slide-inner">
+    <div class="kicker">Velocity Arena · Day 13 · Season 2 begins</div>
+    <h1 class="title huge">Your win equation.</h1>
+    <p class="subtitle lead">Today you build one yourself. Then you test it on a real match.</p>
+  </div>
+</section>
+
+<!-- ═══ 02 — Today's plan ═══ -->
+<section class="slide">
+  <span class="slide-num">02</span>
+  <div class="slide-inner">
+    <div class="kicker">Today's plan</div>
+    <h1 class="title">Here's what you're doing.</h1>
+    <ul class="agenda">
+      <li><b>The Prediction Market</b> — write your Season 2 win total. Post it publicly.</li>
+      <li><b>Build your own linear equation</b> from class data. No two teams alike.</li>
+      <li><b>Test it</b> on a bot you didn't use.</li>
+      <li><b>Break.</b></li>
+      <li><b>Season 2 Match Day 1.</b> New rules. New ball modes.</li>
+      <li><b>Log every residual.</b> Find the pattern.</li>
+      <li><b>Closing reflection.</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 03 — Prediction Market ═══ -->
+<section class="slide">
+  <span class="slide-num">03</span>
+  <div class="slide-inner">
+    <div class="kicker">The Prediction Market <span class="kicker-mins">· 20 min</span></div>
+    <h1 class="title">One number. On a card. Posted publicly.</h1>
+    <p class="subtitle lead">"We will win <strong style="color:var(--cyan);">X</strong> of <strong style="color:var(--cyan);">Y</strong> matches."</p>
+    <p class="subtitle" style="margin-top:1.5rem;">Not a range. Not a feeling. <em class="emph">A number based on a real Season 1 fact.</em> Win total, win rate, or a stat you changed for Season 2.</p>
+    <p class="subtitle" style="margin-top:1.5rem;">On three, every card goes up at once. You'll revisit these Friday.</p>
+  </div>
+</section>
+
+<!-- ═══ 04 — Building Linear Equations intro ═══ -->
+<section class="slide">
+  <span class="slide-num">04</span>
+  <div class="slide-inner">
+    <div class="kicker">Building &amp; Solving Linear Equations <span class="kicker-mins">· 50 min</span></div>
+    <h1 class="title">Build your own win equation.</h1>
+    <p class="subtitle lead">Class data is on the board: each bot's stat value (x) and its Season 1 <strong style="color:var(--cyan);">Win%</strong> (y). <em class="emph">This is student-generated, not formula-imposed.</em></p>
+    <div class="cta-row">
+      <a class="cta" href="/lessons/day13-linear-equations.html" target="_blank">Open the lesson <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/slope.html" target="_blank">Play with Slope <span class="cta-arrow">→</span></a>
+      <a class="cta cta-secondary" href="/activities/math/equations.html" target="_blank">Play with Equations <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 — Pick two bots ═══ -->
+<section class="slide">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div class="kicker">Part 1 · Pick two bots</div>
+    <h1 class="title">Build the line.</h1>
+    <ol class="steps">
+      <li>Pick <strong style="color:var(--cyan-soft);">two bots</strong> from the class data. (Same stat. Different values.)</li>
+      <li>Calculate slope: <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-soft);color:var(--cyan);padding:0.0625rem 0.4375rem;border-radius:0.25rem;">m = (y₂ − y₁) / (x₂ − x₁)</code></li>
+      <li>Solve for <strong style="color:var(--cyan-soft);">b</strong> using one point.</li>
+      <li>Write your equation: <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-soft);color:var(--cyan);padding:0.0625rem 0.4375rem;border-radius:0.25rem;">y = mx + b</code></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 06 — The formula ═══ -->
+<section class="slide">
+  <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div class="kicker">Your equation</div>
+    <h1 class="title">Win % depends on stat.</h1>
+    <div class="formula-card">
+      <div class="formula-label">Slope-intercept form</div>
+      <div class="formula">
+        <span class="var">Win%</span> = <span class="var">m</span> · (stat) + <span class="var">b</span>
+      </div>
+      <p class="formula-note">Plug in any bot's stat. Get a predicted Win%. <em>That's your model.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 07 — Test on a third bot ═══ -->
+<section class="slide">
+  <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div class="kicker">Part 2 · Test it</div>
+    <h1 class="title">Plug in a third bot. Find the residual.</h1>
+    <ol class="steps">
+      <li>Pick a bot you <strong style="color:var(--cyan-soft);">did not</strong> use to build your line.</li>
+      <li>Plug their stat into your equation. Get <strong style="color:var(--cyan-soft);">predicted</strong> Win%.</li>
+      <li>Compare to <strong style="color:var(--cyan-soft);">actual</strong> Win%.</li>
+      <li>Residual = predicted − actual. <em class="emph">Tells you how well your line fits the world.</em></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══ 08 — Hero: No two equations alike ═══ -->
+<section class="slide hero">
+  <span class="slide-num">08</span>
+  <div class="slide-inner">
+    <h1 class="title huge">No two teams have the<br>same equation.</h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Whichever two bots you picked, you got a different slope and a different intercept.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">That's the point.</em> The class is building <strong style="color:var(--cyan);">many different models of the same world</strong>.</p>
+  </div>
+</section>
+
+<!-- ═══ 09 — Break ═══ -->
+<section class="slide hero">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div class="kicker">Crosstown 20 min &nbsp;·&nbsp; NYC 60 min</div>
+    <h1 class="title huge">Break.</h1>
+    <p class="subtitle lead">Eat, rest, move. Talk about anything except math.</p>
+  </div>
+</section>
+
+<!-- ═══ 10 — Four things change in Season 2 ═══ -->
+<section class="slide">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div class="kicker">Season 2 Match Day 1 <span class="kicker-mins">· 90 min</span></div>
+    <h1 class="title">Four things change in Season 2.</h1>
+    <div class="quad-grid">
+      <div class="quad-card">
+        <div class="quad-num">Change 01</div>
+        <div class="quad-head">You use your equation.</div>
+        <div class="quad-body">Before every match, plug in the opponent's stat. Predict a Win%.</div>
+      </div>
+      <div class="quad-card">
+        <div class="quad-num">Change 02</div>
+        <div class="quad-head">The ball changes.</div>
+        <div class="quad-body">Each round announces a different ball mode. <em class="emph">Different mode rewards different stats.</em></div>
+      </div>
+      <div class="quad-card">
+        <div class="quad-num">Change 03</div>
+        <div class="quad-head">Commissioner rules are binding.</div>
+        <div class="quad-body">Whatever passed yesterday is now the law. Violations called as seen.</div>
+      </div>
+      <div class="quad-card">
+        <div class="quad-num">Change 04</div>
+        <div class="quad-head">A loss has a reason.</div>
+        <div class="quad-body">If you lose, pick one of <strong style="color:var(--cyan);">three reasons</strong> for the miss. (Next slide.)</div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="cta" href="/activities/dashboard/velocity-arena-dashboard.html" target="_blank">Open the Dashboard <span class="cta-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 11 — Ball modes ═══ -->
+<section class="slide hero">
+  <span class="slide-num">11</span>
+  <div class="slide-inner">
+    <div class="kicker">Season 2 · NEW mechanic</div>
+    <h1 class="title huge">Ball modes.</h1>
+    <div class="compare" style="margin-top:2rem;max-width:48rem;margin-left:auto;margin-right:auto;">
+      <div class="compare-card linear">
+        <div class="compare-label">Round 2</div>
+        <div class="compare-stat">🐶 Dog Ball</div>
+        <div class="compare-vals">Rewards <strong style="color:var(--cyan);">Speed</strong>. The faster you reach it, the better the kick lands.</div>
+      </div>
+      <div class="compare-card quad">
+        <div class="compare-label">Round 3</div>
+        <div class="compare-stat">⚪ Rubber Ball</div>
+        <div class="compare-vals">Rewards <strong style="color:var(--cyan);">Endurance</strong>. The bots that don't fade win.</div>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Mode announced before the round. Not after.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 12 — Loss recovery: 3 reasons ═══ -->
+<section class="slide">
+  <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div class="kicker">If you lose · pick one</div>
+    <h1 class="title">Three reasons. Pick the one that explains the miss.</h1>
+    <ol class="steps">
+      <li><strong style="color:var(--cyan-soft);">Wrong slope.</strong> Your equation's <em>m</em> isn't capturing the relationship well.</li>
+      <li><strong style="color:var(--cyan-soft);">Wrong x estimate.</strong> You guessed the opponent's stat — and your guess was off.</li>
+      <li><strong style="color:var(--cyan-soft);">Ball mode flipped what wins.</strong> <em class="emph">(Only valid in Rounds 2 and 3.)</em></li>
+    </ol>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Pick one. Write it in the data log. Then go to the next round.</em></p>
+  </div>
+</section>
+
+<!-- ═══ 13 — Open Lab Residual logging ═══ -->
+<section class="slide">
+  <span class="slide-num">13</span>
+  <div class="slide-inner">
+    <div class="kicker">Open Lab · Residual Logging <span class="kicker-mins">· 35 min</span></div>
+    <h1 class="title">Calculate every residual. Find the pattern.</h1>
+    <ol class="steps">
+      <li>Predicted vs. actual for each of three matches.</li>
+      <li>Residual = predicted − actual. Label the <strong style="color:var(--cyan-soft);">direction</strong> — too high or too low.</li>
+      <li>Write one sentence describing the pattern (or "no clear pattern yet").</li>
+      <li>Write one <strong style="color:var(--cyan-soft);">question</strong> the next match day could answer.</li>
+    </ol>
+    <div class="challenge">
+      <div class="challenge-label">Today is not equation-revision day</div>
+      <p class="challenge-text">Three matches is not enough to change your equation. <em>Revision comes tomorrow with six results.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 14 — ENDS ritual ═══ -->
+<section class="slide">
+  <span class="slide-num">14</span>
+  <div class="slide-inner">
+    <div class="kicker">Closing reflection <span class="kicker-mins">· 5 min</span></div>
+    <h1 class="title">ENDS ritual.</h1>
+    <div class="ends">
+      <div class="ends-label">Silent rating, then talk if anyone holds up a 1</div>
+      <p class="ends-text">Each person rates today's team collaboration: <strong>1 = rough, 2 = okay, 3 = solid</strong>. Hold up your number at the same time. If anyone holds up a <strong>1</strong>, talk for 2 minutes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 15 — Tomorrow ═══ -->
+<section class="slide hero">
+  <span class="slide-num">15</span>
+  <div class="slide-inner">
+    <div class="kicker">Tomorrow</div>
+    <h1 class="title">Season 2 Match Day 2. <span style="color:var(--cyan);">Chaos mode.</span></h1>
+    <p class="subtitle lead" style="margin-top:1.5rem;">Six results in. Time to revise. Percent change applied to the equation that's actually predicting your matches.</p>
+    <p class="subtitle" style="margin-top:1.5rem;"><em class="emph">Bring your residuals.</em></p>
+  </div>
+</section>
+
+<div class="nav-hint"><kbd>↓</kbd> <kbd>↑</kbd> or scroll</div>
+
+<script>
+const progress = document.getElementById('progress');
+function updateProgress() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+  progress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+updateProgress();
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+function jump(dir) {
+  const y = window.scrollY + window.innerHeight / 2;
+  let cur = 0;
+  for (let i = 0; i < slides.length; i++) {
+    if (slides[i].offsetTop <= y) cur = i;
+  }
+  const next = Math.max(0, Math.min(slides.length - 1, cur + dir));
+  slides[next].scrollIntoView({ behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); jump(1); }
+  else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); jump(-1); }
+});
+</script>
+
+</body>
+</html>
