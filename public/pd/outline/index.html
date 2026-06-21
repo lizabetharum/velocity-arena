@@ -28,6 +28,9 @@ h1{font-size:2.75rem;font-weight:800;color:var(--ink);line-height:1.05;letter-sp
 .whoami strong{color:var(--cyan-soft);font-weight:700;}
 .whoami a{color:var(--cyan);text-decoration:none;font-weight:600;}
 .whoami a:hover{text-decoration:underline;}
+#save-notes{font-family:inherit;font-size:0.8125rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:var(--cyan);color:#04222a;border:none;padding:0.4rem 0.9rem;border-radius:0.375rem;cursor:pointer;margin-left:0.5rem;}
+#save-notes:hover:not(:disabled){background:var(--cyan-soft);}
+#save-notes:disabled{opacity:0.4;cursor:default;}
 #save-status{margin-left:0.75rem;font-size:0.8125rem;color:var(--ink-mute);}
 #save-status.saving{color:var(--cyan-soft);}
 #save-status.saved{color:#5fd38a;}
@@ -96,9 +99,9 @@ td.day-error{color:#ff8a8a;}
     <h1>Slide outline — Days 1–16</h1>
     <p class="lede">Every slide across the 16-day curriculum, by day. This list is built live from the day decks, so it always matches what each deck currently contains.</p>
     <div class="legend">
-      <strong>How to use this:</strong> Click any day to expand its slide list — the number, kicker, and title are pulled straight from the deck, so editing a deck updates this page automatically. Click in the <strong>Teacher notes</strong> column to type notes on slides that need rework, that landed well, or where you want to add a teaching move — notes save automatically to the shared notes spreadsheet under your name, so you'll see them on any device. Click <strong>open deck →</strong> to view a deck live in the browser. Print this page (or hit <em>Save as PDF</em>) for a paper version.
+      <strong>How to use this:</strong> Click any day to expand its slide list — the number, kicker, and title are pulled straight from the deck, so editing a deck updates this page automatically. Click in the <strong>Teacher notes</strong> column to type notes on slides that need rework, that landed well, or where you want to add a teaching move, then click <strong>Save notes</strong> to save them to the shared notes spreadsheet under your name — you'll see them on any device. Nothing is saved until you click Save. Click <strong>open deck →</strong> to view a deck live in the browser. Print this page (or hit <em>Save as PDF</em>) for a paper version.
     </div>
-    <div class="whoami">Notes save as <strong id="teacher-name">…</strong> · <a href="#" id="change-name">change</a> <span id="save-status" aria-live="polite"></span></div>
+    <div class="whoami">Notes save as <strong id="teacher-name">…</strong> · <a href="#" id="change-name">change</a> <button id="save-notes" type="button" disabled>Save notes</button> <span id="save-status" aria-live="polite"></span></div>
   </header>
 
   <div id="weeks"></div>
@@ -207,6 +210,7 @@ td.day-error{color:#ff8a8a;}
   var NAME_KEY = 'va-pd-teacher';
   var statusEl = document.getElementById('save-status');
   var nameEl = document.getElementById('teacher-name');
+  var saveBtn = document.getElementById('save-notes');
 
   function cacheKey(t, k){ return 'va-pd-note:' + t + ':' + k; }
   function localGet(t, k){ try { return localStorage.getItem(cacheKey(t,k)); } catch(e){ return null; } }
@@ -241,6 +245,7 @@ td.day-error{color:#ff8a8a;}
         (data.notes || []).forEach(function(n){ map[(n.day||'') + '#' + (n.slide||'')] = n.note || ''; });
         noteCells.forEach(function(cell){
           if(cell === document.activeElement) return;
+          if(dirty[cell._key]) return; // don't overwrite unsaved edits
           var v = map[cell._key] || '';
           cell.textContent = v;
           localSet(teacher, cell._key, v);
@@ -251,34 +256,60 @@ td.day-error{color:#ff8a8a;}
       .catch(function(){ setStatus('Offline — showing notes saved on this device','error'); });
   }
 
-  function saveCell(cell){
-    if(!teacher) return;
-    var note = cell.textContent;
-    localSet(teacher, cell._key, note);
-    setStatus('Saving…','saving');
-    fetch('/api/outline-notes', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ teacher: teacher, day: cell._day, slide: cell._slide, note: note })
-    })
-    .then(function(r){ return r.ok ? r.json() : Promise.reject(r); })
-    .then(function(){
-      setStatus('Saved','saved');
-      setTimeout(function(){ if(statusEl && statusEl.textContent === 'Saved') setStatus(''); }, 1500);
-    })
-    .catch(function(){ setStatus('Save failed — kept on this device','error'); });
+  // Cells edited since the last save/load. Nothing is sent until "Save notes".
+  var dirty = {};
+
+  function refreshSaveBtn(){
+    var n = Object.keys(dirty).length;
+    if(saveBtn){
+      saveBtn.disabled = (n === 0) || !teacher;
+      saveBtn.textContent = n ? ('Save notes (' + n + ')') : 'Save notes';
+    }
   }
 
-  var timers = {};
+  function saveAll(){
+    if(!teacher){
+      var t = askTeacher('');
+      if(!t) return;
+      teacher = t; renderName();
+    }
+    var keys = Object.keys(dirty);
+    if(!keys.length) return;
+    setStatus('Saving…','saving');
+    if(saveBtn) saveBtn.disabled = true;
+    var jobs = keys.map(function(k){
+      var cell = dirty[k];
+      var note = cell.textContent;
+      return fetch('/api/outline-notes', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ teacher: teacher, day: cell._day, slide: cell._slide, note: note })
+      })
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(){ localSet(teacher, k, note); delete dirty[k]; });
+    });
+    Promise.allSettled(jobs).then(function(results){
+      var failed = results.filter(function(r){ return r.status === 'rejected'; }).length;
+      if(failed){
+        setStatus(failed + ' note' + (failed===1?'':'s') + " didn't save — click Save to retry", 'error');
+      } else {
+        setStatus('Saved','saved');
+        setTimeout(function(){ if(statusEl && statusEl.textContent === 'Saved') setStatus(''); }, 1500);
+      }
+      refreshSaveBtn();
+    });
+  }
+
   function wireCells(){
     noteCells.forEach(function(cell){
       cell.setAttribute('contenteditable','true');
       cell.setAttribute('spellcheck','true');
       cell.addEventListener('input', function(){
-        clearTimeout(timers[cell._key]);
-        timers[cell._key] = setTimeout(function(){ saveCell(cell); }, 800);
+        dirty[cell._key] = cell;
+        var n = Object.keys(dirty).length;
+        setStatus(n + ' unsaved change' + (n===1?'':'s') + ' — click Save notes', 'error');
+        refreshSaveBtn();
       });
-      cell.addEventListener('blur', function(){ clearTimeout(timers[cell._key]); saveCell(cell); });
     });
   }
 
@@ -286,6 +317,7 @@ td.day-error{color:#ff8a8a;}
     renderName();
     if(teacher){ populateFromCache(); loadFromServer(); }
     else { setStatus('Set your name to start saving notes','error'); }
+    refreshSaveBtn();
   }
 
   var changeLink = document.getElementById('change-name');
@@ -296,6 +328,13 @@ td.day-error{color:#ff8a8a;}
       if(t){ teacher = t; startNotes(); }
     });
   }
+
+  if(saveBtn){ saveBtn.addEventListener('click', saveAll); }
+
+  // Warn before leaving with unsaved notes.
+  window.addEventListener('beforeunload', function(e){
+    if(Object.keys(dirty).length){ e.preventDefault(); e.returnValue = ''; }
+  });
 
   // Once every day's slides are rendered, wire the notes cells and load them.
   Promise.all(jobs).then(function(){
