@@ -783,6 +783,13 @@ input.onButtonPressed(Button.A, function () {
         ownGoalHeading = (goalHeading + 180) % 360
         readyToLaunch = true
         // showBuildArchetype()      // optional: scroll the build name (SPEEDSTER / SNIPER / TANK / NINJA)
+
+        if (SPEED + ENDURANCE + TURNING + POWER != 20) {
+            basic.showString("ERR")
+            basic.pause(1000)
+            basic.clearScreen()
+            return
+        }
         showStatBars()               // quick 4-stat bar chart
         basic.pause(1200)
         basic.clearScreen()
@@ -1509,7 +1516,7 @@ function driveAndWatch(ms: number, lSpeed: number, rSpeed: number) {
     let lastBorderPoll = 0
     let lastMotorRefresh = input.runningTime()
     let pingInterval = (SPEED >= 6 || lowPowerActive) ? 25 : 40
-    const BORDER_POLL_MS = 12        // throttle trackbit I2C so motor commands aren't starved
+    const BORDER_POLL_MS = 6         // tight cadence: border safety outranks I2C smoothness
 
     while (input.runningTime() - watchStart < ms) {
         if (!matchRunning) { return }
@@ -1576,15 +1583,38 @@ function driveAndWatch(ms: number, lSpeed: number, rSpeed: number) {
             lastPingTime = input.runningTime()
             let dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)
             if (dist > 5 && dist < BALL_DETECT_CM) {
+                // Close enough to commit: stop and confirm.
                 motorStop()
                 if (confirmBall(true)) { ballHeading = 99; ballDetected = true; return }
-                // Glanced it mid-arc — switch the segment to STRAIGHT toward it so
-                // the keep-alive won't revert to the old curve and orbit the ball.
+                // Glanced it mid-arc: switch the segment to STRAIGHT toward it so the
+                // keep-alive won't revert to the old curve and orbit the ball.
                 let straight = Math.max(lSpeed, rSpeed)
                 lSpeed = straight
                 rSpeed = straight
                 CutebotPro.pwmCruiseControl(straight, straight)
                 lastMotorRefresh = input.runningTime()
+            } else if (dist > 5 && dist < BALL_SEE_CM) {
+                // Saw it at range: stop arcing and drive STRAIGHT at it to close the
+                // gap (commit/confirm happens once it's inside BALL_DETECT_CM).
+                let straightSee = Math.max(lSpeed, rSpeed)
+                lSpeed = straightSee
+                rSpeed = straightSee
+                CutebotPro.pwmCruiseControl(straightSee, straightSee)
+                lastMotorRefresh = input.runningTime()
+            }
+
+            // FAILSAFE: the blocking ping can stall border polling long enough to
+            // coast onto the line. Re-read the border the instant the ping returns.
+            if (!launchActive) {
+                readTrackbit()
+                if (borderSideFrom(BORDER_THRESHOLD) > 0) {
+                    CutebotPro.pwmCruiseControl(-60, -60)
+                    basic.pause(70)
+                    motorStop()
+                    borderHandledInSeg = true
+                    handleBorder()
+                    return
+                }
             }
         }
 
@@ -1693,7 +1723,7 @@ function computeStats() {
     minWheelSpeed = Math.max(WHEEL_FLOOR, Math.round(motorPower * 0.25))
     lowPowerThreshold = minWheelSpeed
 }
-}
+
 
 // Quick white blink of the front headlights (used to flag a confirmed ball).
 function flashHeadlights() {
@@ -1922,7 +1952,7 @@ let scanPower = 0
 
 // --- Reposition tunables ---
 let REPOSITION_AFTER_SCANS = 3     // fruitless scans before dropping back to our side
-let REPOSITION_MS = 2200           // how long to drive back toward our own goal
+let REPOSITION_MS = 2400           // how long to drive back toward our own goal
 
 // --- Launch tunables ---
 let LAUNCH_OFFSET_TURN_DEG = 35    // Step 1: turn toward center
