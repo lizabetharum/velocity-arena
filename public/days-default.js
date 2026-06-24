@@ -165,7 +165,7 @@ const DAYS_DEFAULT = [
         "worksheet": "https://drive.google.com/file/d/1lgcCjmpMVtx9Kbz6qOaMgrmwvWhiPCbH/view?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day02-05-program-endurance.html",
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D2-endurance-exemplars.html",
-        "makecode": "https://makecode.microbit.org/S13709-03394-48320-85992"
+        "makecode": "https://makecode.microbit.org/S45510-32034-77170-26887"
       },
       {
         "name": "Break",
@@ -334,7 +334,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Launch by connecting to the three linear stats students already know, then display Charge Speed % = Power² and ask teams to write a gut prediction for Power 8 before calculating anything; this surfaces the linear misconception on paper. During Explore, teams complete the ratio table, run bot trials, and compare predictions to actual results. This activity uses a worksheet, a web page, and MakeCode.",
         "script": "https://docs.google.com/document/d/1KL6r2uOv0aGVn9Vhn5aqp8XL5tYP4LP2dyfvwxIdR8E/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1VYv53hKADZFrZ6SdqIb_1KwrQ6NnYTm8/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S03123-05017-49984-47905",
+        "makecode":"https://makecode.microbit.org/S88814-21105-01240-10287",
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4_Power_Stat_Challenge.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-03-power-stat-challenge.html"
       },
@@ -361,7 +361,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Open by activating the Power² formula from the morning session and have teams write a prediction on the worksheet before anyone touches materials. Teams build and attach a cardboard scoop, passing a three-condition checklist before they can test. Run two settings: three shots at Power 4, then three at Power 8; teams record averages, calculate the charge speed ratio algebraically, measure the distance ratio from actual results, and complete the efficiency section. The charge speed ratio will be exact (4.0); the distance ratio will be lower, and that gap is the point. Facilitate a whole-class share in a planned sequence, then close with the required exit ticket: each team chooses Power, shows the Power² calculation, and confirms the 20-point total.",
         "script": "https://docs.google.com/document/d/13XtjnTDWgTEhslEzgXaXYCs24axXmXC1jTP9B2D7R0A/edit?usp=drive_link",
         "worksheet": "https://drive.google.com/file/d/1lC3k4JUK9NQz0vNuqpKXCko8iUqB8Qgn/view?usp=drive_link",
-        "makecode":"https://makecode.microbit.org/S77134-15689-32757-79747",
+        "makecode":"https://makecode.microbit.org/S90362-23282-09774-95250",
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W1_D4-scoop-build-ratio-testing-exemplars.html",
         "quickCard": "/resources/quick-cards/activity-card-day04-04-scoop-build-ratio.html"
       },
@@ -468,6 +468,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Give teams two minutes to commit to one of their three morning loadouts (no new designs, no deliberation past the buzzer), then move directly into MakeCode setup with all four formulas programmed simultaneously. Circulate during setup using the Setup Monitoring Chart, watching for the most common miscodes: Speed output confused with the stat value, Endurance decay written as E×1.5×t instead of (20−E)×1.5×t, and Power coded linearly instead of quadratically. Run two to three simulation rounds of three minutes each, requiring a gap sentence entry before each new round. Run the post-match debrief in sequence (Endurance, then Turning, then Power) using the five scripted talk moves. Close with the non-optional individual exit ticket.",
         "script": "https://docs.google.com/document/d/1dLE5nbDOkwBGEi6ejIJX1IT48ir071mXRRU2A1_6Kvw/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-simulation-matches.html",
+        "makecode":"https://makecode.microbit.org/S61177-39386-22135-51757",
         "exit": "https://docs.google.com/document/d/1oKYXqje3BTpjz0dP2PdVla2iYO8AsNsje_8kERxn5d0/edit?usp=sharing"
       },
       {
