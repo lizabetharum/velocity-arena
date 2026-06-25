@@ -143,6 +143,15 @@ const DAY_15_INLINE = {
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html"
       },
       {
+        "name": "Post-Reflection: Student Reflection Survey",
+        "mins": 10,
+        "block": "Challenge Block",
+        "description": "A short reflection about how the summer program affected how you feel about math, learning with others, and starting high school. There are no right or wrong answers, and it is not graded.",
+        "facilitatorDescription": "Run right after the Post-Task Diagnostic, paired in the same sitting. Same framing as Day 1: no right or wrong answers, not a grade. Students answer on the website; confirm each selects the correct site and enters first name + last initial + team so responses match the roster and their Day 1 pre-reflection. About 10 minutes.",
+        "link": "/activities/reflection-post/index.html",
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/reflection-post/index.html"
+      },
+      {
         "name": "Open Lab: Reflection Time",
         "mins": 30,
         "block": "Open Lab",

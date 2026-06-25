@@ -40,6 +40,15 @@ const DAYS_DEFAULT = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-03-pre-task-diagnostic.html"
       },
       {
+        "name": "Pre-Reflection: Student Reflection Survey",
+        "mins": 10,
+        "block": "Challenge Block",
+        "description": "A short reflection about how you feel as you begin the summer program and prepare for high school -- math confidence, learning with others, and belonging. There are no right or wrong answers, and it is not graded.",
+        "facilitatorDescription": "Hand out right after the Pre-Task Diagnostic, in the same sitting and with the same framing: there are no right or wrong answers, and it is not a grade. Students answer on the website. Make sure each student selects the correct site and enters first name + last initial + team so responses match the roster. Circulate quietly; do not coach answers. About 10 minutes.",
+        "link": "/activities/reflection/index.html",
+        "webpage": "https://velocity-arena-gold.vercel.app/activities/reflection/index.html"
+      },
+      {
         "name": "Driving Question Reveal + Team Formation",
         "mins": 10,
         "block": "LX Setup",
