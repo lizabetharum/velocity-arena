@@ -341,7 +341,7 @@ function pickLikert(btn) {
   const group = btn.parentElement;
   group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  updateCount(); scheduleSave();
+  updateCount(); saveLocal();
 }
 
 // ── Collect / restore ──
@@ -389,36 +389,8 @@ function restore(snap) {
 function saveLocal() { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collect())); } catch(e){} }
 function loadLocal() { try { const raw = localStorage.getItem(LOCAL_KEY); if (raw) restore(JSON.parse(raw)); } catch(e){} }
 
-let _saveTimer = null;
-function scheduleSave() {
-  saveLocal();
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(saveToSheet, 900);
-}
-async function saveToSheet() {
-  const snap = collect();
-  if (!snap.name) { setStatus('', 'Type your name to start saving.'); return; }
-  const endpoint = currentEndpoint();
-  if (!endpoint) { setStatus('err', 'No endpoint for this site — local only.'); return; }
-  setStatus('', 'saving…');
-  try {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'diagnostic_save', sheet: SHEET_NAME,
-        name: snap.name, lastInitial: snap.lastInitial, team: snap.team,
-        fields: snap, ts: new Date().toISOString()
-      })
-    });
-    const text = await res.text();
-    let json; try { json = JSON.parse(text); } catch(_) { json = null; }
-    if (json && json.ok) setStatus('ok', 'saved ' + new Date().toLocaleTimeString());
-    else setStatus('err', 'error: ' + (json && json.error ? json.error : 'no ok'));
-  } catch (err) {
-    setStatus('err', 'offline — answers stored locally');
-    console.warn('[reflection-post] save threw', err);
-  }
-}
+// Nothing is sent to the spreadsheet until the student clicks "Hand in".
+// Edits are cached locally (saveLocal) so work isn't lost on refresh.
 
 function updateCount() {
   const snap = collect();
@@ -442,7 +414,6 @@ async function submitReflection() {
     document.getElementById('submit-count').textContent = 'No site selected — pick one above.';
     return;
   }
-  clearTimeout(_saveTimer);
   const btn = document.querySelector('.submit-btn');
   btn.textContent = 'Submitting…'; btn.disabled = true;
   try {
@@ -475,9 +446,9 @@ function closeModal(){ document.getElementById('submit-modal').classList.remove(
 // ── Wire inputs to auto-save ──
 ['first-name','last-initial','team-name'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('input', () => { updateCount(); scheduleSave(); });
+  if (el) el.addEventListener('input', () => { updateCount(); saveLocal(); });
 });
-document.querySelectorAll('.q-answer').forEach(ta => ta.addEventListener('input', () => { updateCount(); scheduleSave(); }));
+document.querySelectorAll('.q-answer').forEach(ta => ta.addEventListener('input', () => { updateCount(); saveLocal(); }));
 
 // ── Init ──
 loadLocal();
