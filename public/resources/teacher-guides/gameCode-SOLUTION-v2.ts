@@ -23,14 +23,12 @@
  *   chargePower       = min(POWER * POWER, 100)
  *   FOLLOW_THROUGH_MS = 120 + POWER * 35
  *   DECAY_RATE        = 20 - ENDURANCE
- *   minWheelSpeed     = max(WHEEL_FLOOR, round(motorPower * 0.25))   // WHEEL_FLOOR = 15
+ *   minWheelSpeed     = max(20, round(motorPower * 0.25))
  *   lowPowerThreshold = minWheelSpeed
  *   endurancePercent  = 100 - DECAY_RATE * matchTime / 40
  *
- * SPEED FLOOR: minWheelSpeed is the real floor = max(WHEEL_FLOOR, round(motorPower * 0.25)).
- * For low-to-mid SPEED the WHEEL_FLOOR term wins, so currentPower bottoms out at WHEEL_FLOOR
- * (currently 15) and lowPowerActive (red) fires there. Lower WHEEL_FLOOR = bigger drainable
- * range (ENDURANCE matters more); too low and the bot stalls when tired.
+ * POWER FLOOR: minWheelSpeed is the real floor. For SPEED <= 16 the max(20, ...)
+ * wins, so currentPower bottoms out at 20 and lowPowerActive (red) fires there.
  * ============================================================
  */
 
@@ -338,13 +336,6 @@ input.onButtonPressed(Button.A, function () {
         ownGoalHeading = (goalHeading + 180) % 360
         readyToLaunch = true
         // showBuildArchetype()      // optional: scroll the build name (SPEEDSTER / SNIPER / TANK / NINJA)
-
-        if (SPEED + ENDURANCE + TURNING + POWER != 20) {
-            basic.showString("ERR")
-            basic.pause(1000)
-            basic.clearScreen()
-            return
-        }
         showStatBars()               // quick 4-stat bar chart
         basic.pause(1200)
         basic.clearScreen()
@@ -1268,7 +1259,7 @@ function computeStats() {
     thisDuration = Math.min(Math.round(totalArcTime / TURNING), 600)
     turnRatio = 0.2 + TURNING * 0.02
     DECAY_RATE = 20 - ENDURANCE
-    minWheelSpeed = Math.max(WHEEL_FLOOR, Math.round(motorPower * 0.25))
+    minWheelSpeed = Math.max(20, Math.round(motorPower * 0.25))
     lowPowerThreshold = minWheelSpeed
 }
 
@@ -1442,7 +1433,6 @@ let DECAY_RATE = 0
 let minWheelSpeed = 0
 let lowPowerThreshold = 0
 let lowPowerActive = false
-let WHEEL_FLOOR = 15   // min wheel speed
 
 // --- Charge / kick scratch ---
 let chargePower = 0
@@ -1498,7 +1488,7 @@ let scanPower = 0
 
 // --- Reposition tunables ---
 let REPOSITION_AFTER_SCANS = 3     // fruitless scans before dropping back to our side
-let REPOSITION_MS = 2400           // how long to drive back toward our own goal
+let REPOSITION_MS = 2200           // how long to drive back toward our own goal
 
 // --- Launch tunables ---
 let LAUNCH_OFFSET_TURN_DEG = 35    // Step 1: turn toward center

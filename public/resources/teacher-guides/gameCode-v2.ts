@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * CUTEBOT PRO SOCCER  —  SOLUTION (filled-in reference, not the blank template)
+ * CUTEBOT PRO SOCCER
  * 8' x 4' Field | White Floor | Black Border Tape
  * ============================================================
  *
@@ -191,21 +191,10 @@ function launchSequence() {
     //   Drive from your corner to BEHIND the ball, pointed at the goal.
     // ========================================================================
 
-    // SOLUTION launch -- Diagonal (right-triangle shortcut):
-    // shimmy LEFT onto the ball->goal axis, drive the diagonal, then re-square
-    // RIGHT by the SAME angle so we end up facing straight down the field.
-    CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 35)
-    basic.pause(300)
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    basic.pause(150)
+    // <- YOUR CODE HERE
 
-    CutebotPro.pwmCruiseControl(currentPower, currentPower)
-    basic.pause(Math.round(2520 * powerScale))    // diagonal drive (time-based)
-    CutebotPro.stopImmediately(CutebotProMotors.ALL)
-    basic.pause(150)
 
-    CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 35)
-    basic.pause(300)
+
 
     // ========================================================================
     //   LOCKED -- do not change anything below this line.
@@ -1555,10 +1544,11 @@ basic.clearScreen()
  *  EXAMPLE (a balanced build):  SPEED 5 + TURNING 5 + ENDURANCE 5 + POWER 5 = 20
  * ============================================================================
  */
-SPEED     = 6    // SOLUTION build (SNIPER):  6 + 2 + 4 + 8 = 20
-TURNING   = 2
-ENDURANCE = 4
-POWER     = 8
+SPEED     = 0    // <- YOUR VALUE HERE
+TURNING   = 0    // <- YOUR VALUE HERE
+ENDURANCE = 0    // <- YOUR VALUE HERE
+POWER     = 0    // <- YOUR VALUE HERE
+// CHECK before you run:  SPEED + TURNING + ENDURANCE + POWER  must equal 20
 
 // ── Tunable distances / thresholds ─────────────────────────
 BASE_SEGMENT_MS = 300

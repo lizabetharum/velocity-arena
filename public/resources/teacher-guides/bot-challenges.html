@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velocity Arena — Bot Challenges</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── DESIGN TOKENS ──────────────────────────────────────────────────── */
+:root {
+  --bg:       #07080d;
+  --surface:  #0d0f17;
+  --surface2: #12141d;
+  --border:   #1c1e2d;
+  --text:     #e2e8f0;
+  --muted:    #64748b;
+  --dim:      #3a3f5c;
+  --early:    #4ade80;
+  --early-bg: rgba(74,222,128,0.08);
+  --early-glow: rgba(74,222,128,0.22);
+  --mid:      #60a5fa;
+  --mid-bg:   rgba(96,165,250,0.08);
+  --mid-glow: rgba(96,165,250,0.22);
+  --late:     #fb923c;
+  --late-bg:  rgba(251,146,60,0.08);
+  --late-glow: rgba(251,146,60,0.22);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family: 'Nunito', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── FIELD GRID BACKGROUND ──────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────────── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,8,13,0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px 12px;
+}
+.header-inner { max-width: 1360px; margin: 0 auto; }
+.header-top { display:flex; align-items:center; gap:14px; flex-wrap:wrap; row-gap:8px; margin-bottom:12px; }
+
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { display:flex; align-items:center; animation:botBounce 2.8s ease-in-out infinite; }
+@keyframes botBounce {
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  40%{ transform:translateY(-4px) rotate(-3deg); }
+  60%{ transform:translateY(-2px) rotate(2deg); }
+}
+.logo-text { display:flex; flex-direction:column; gap:1px; }
+.logo-eyebrow {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.58rem; font-weight:600;
+  color:var(--muted); letter-spacing:0.14em; text-transform:uppercase;
+}
+.logo-title {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:1.15rem; font-weight:700; line-height:1;
+  background: linear-gradient(100deg, var(--early) 0%, var(--mid) 50%, var(--late) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.header-meta { display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; align-items:center; }
+.pill {
+  font-size:0.67rem; padding:3px 9px; border-radius:20px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  color:var(--muted); white-space:nowrap;
+}
+.pill.live { border-color:rgba(74,222,128,0.3); color:var(--early); background:rgba(74,222,128,0.06); }
+.live-dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--early); margin-right:4px; vertical-align:middle;
+  animation: liveBlink 2s ease-in-out infinite;
+}
+@keyframes liveBlink {
+  0%,100%{ opacity:1; box-shadow:0 0 5px var(--early); }
+  50%{ opacity:0.4; box-shadow:none; }
+}
+
+/* Tab bar */
+.tab-bar { display:flex; gap:6px; flex-wrap:wrap; }
+.tab-btn {
+  font-family:'Chakra Petch',sans-serif;
+  padding:6px 18px; border-radius:6px;
+  border:1px solid var(--border); background:rgba(255,255,255,0.03);
+  color:var(--muted); font-size:0.78rem; font-weight:600;
+  cursor:pointer; transition:all 0.18s ease;
+  letter-spacing:0.05em; text-transform:uppercase;
+}
+.tab-btn:hover { border-color:var(--dim); color:var(--text); }
+.tab-btn.a-all  { background:rgba(255,255,255,0.07); border-color:#4a5568; color:#fff; }
+.tab-btn.a-early { background:var(--early-bg); border-color:var(--early); color:var(--early); box-shadow:0 0 14px var(--early-glow); }
+.tab-btn.a-mid   { background:var(--mid-bg);   border-color:var(--mid);   color:var(--mid);   box-shadow:0 0 14px var(--mid-glow); }
+.tab-btn.a-late  { background:var(--late-bg);  border-color:var(--late);  color:var(--late);  box-shadow:0 0 14px var(--late-glow); }
+
+/* ── GRID ───────────────────────────────────────────────────────────── */
+.grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(355px, 1fr));
+  gap:18px; max-width:1360px; margin:24px auto; padding:0 18px;
+  position:relative; z-index:1;
+}
+
+/* ── CARD ───────────────────────────────────────────────────────────── */
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.95); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--tc, #2d3148);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+  animation: cardIn 0.48s cubic-bezier(0.22,1,0.36,1) both;
+  transition: transform 0.24s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.24s ease, border-color 0.2s, opacity 0.3s;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.009);
+  border-left-color: var(--tc, #4a5568);
+  box-shadow:
+    0 22px 55px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 50px var(--tg, transparent);
+}
+
+/* Shimmer sweep on hover */
+.card::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(112deg, transparent 30%, rgba(255,255,255,0.028) 50%, transparent 70%);
+  transform: translateX(-130%);
+  transition: transform 0.65s ease;
+  pointer-events:none; z-index:10;
+}
+.card:hover::after { transform: translateX(130%); }
+
+.card.hidden { display:none; }
+.card.complete { opacity:0.38; filter:saturate(0.25) brightness(0.9); }
+.card.complete .done-btn { color:var(--early); border-color:rgba(74,222,128,0.35); background:rgba(74,222,128,0.08); }
+
+/* BIG watermark number behind card content */
+.wm {
+  position:absolute; right:6px; top:-12px;
+  font-family:'Chakra Petch',sans-serif;
+  font-size:8rem; font-weight:700; line-height:1;
+  color:rgba(255,255,255,0.022);
+  pointer-events:none; user-select:none; z-index:0;
+}
+
+/* ── CARD TOP ──────────────────────────────────────────────────────── */
+.card-top {
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  position:relative; z-index:1;
+  background: linear-gradient(160deg, rgba(255,255,255,0.012) 0%, transparent 100%);
+}
+.card-row1 { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+.card-num {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.65rem; font-weight:700;
+  color:var(--tc, var(--dim));
+  background:var(--tdb, rgba(255,255,255,0.05));
+  border:1px solid var(--tcb, var(--border));
+  padding:2px 8px; border-radius:5px; letter-spacing:0.04em;
+  white-space:nowrap;
+}
+.card-name {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:1.05rem; font-weight:700; color:#fff;
+  line-height:1.2; flex:1;
+}
+.badges { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+.badge {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.62rem; font-weight:700;
+  padding:3px 8px; border-radius:5px;
+  letter-spacing:0.05em; white-space:nowrap; text-transform:uppercase;
+}
+.badge::before {
+  content:'';
+  display:inline-block; width:5px; height:5px; border-radius:50%;
+  margin-right:5px; vertical-align:middle;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:0.4; transform:scale(0.6); }
+}
+.b-early { background:var(--early-bg); color:var(--early); border:1px solid rgba(74,222,128,0.3); }
+.b-early::before { background:var(--early); box-shadow:0 0 4px var(--early); }
+.b-mid   { background:var(--mid-bg);   color:var(--mid);   border:1px solid rgba(96,165,250,0.3); }
+.b-mid::before   { background:var(--mid);   box-shadow:0 0 4px var(--mid); }
+.b-late  { background:var(--late-bg);  color:var(--late);  border:1px solid rgba(251,146,60,0.3); }
+.b-late::before  { background:var(--late);  box-shadow:0 0 4px var(--late); }
+.b-time  { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
+.b-time::before { display:none; }
+
+/* ── PROGRAM BADGE ─────────────────────────────────────────────────── */
+.prog-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.62rem; font-weight:700;
+  padding:3px 9px; border-radius:5px;
+  letter-spacing:0.04em; text-transform:uppercase;
+}
+.prog-speed     { background:rgba(251,211,141,0.10); color:#fbd38d; border:1px solid rgba(251,211,141,0.25); }
+.prog-endurance { background:rgba(252,129,129,0.10); color:#fc8181; border:1px solid rgba(252,129,129,0.25); }
+.prog-turning   { background:rgba(159,122,234,0.10); color:#b794f4; border:1px solid rgba(159,122,234,0.25); }
+.prog-charge    { background:rgba(237,137,54,0.10);  color:#f6ad55; border:1px solid rgba(237,137,54,0.25); }
+.prog-power     { background:rgba(237,100,54,0.10);  color:#fc8181; border:1px solid rgba(237,100,54,0.25); }
+.prog-match     { background:rgba(96,165,250,0.10);  color:#60a5fa; border:1px solid rgba(96,165,250,0.25); }
+.prog-custom    { background:rgba(72,210,190,0.10);  color:#4fd1c5; border:1px solid rgba(72,210,190,0.25); }
+
+/* ── ROLES ──────────────────────────────────────────────────────────── */
+.roles {
+  display:flex; gap:14px; flex-wrap:wrap;
+  padding:7px 16px;
+  background:rgba(0,0,0,0.22); border-bottom:1px solid var(--border);
+}
+.role { font-size:0.68rem; color:var(--muted); display:flex; align-items:center; gap:4px; }
+
+/* ── CARD BODY ──────────────────────────────────────────────────────── */
+.card-body {
+  padding:14px 16px; flex:1;
+  display:flex; flex-direction:column; gap:13px;
+  position:relative; z-index:1;
+}
+
+.sec-label {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.6rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.12em;
+  color:var(--dim); margin-bottom:6px;
+  display:flex; align-items:center; gap:7px;
+}
+.sec-label::after {
+  content:''; flex:1; height:1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ── CONTROLS ───────────────────────────────────────────────────────── */
+.controls-box {
+  background:#070910;
+  border:1px solid var(--border);
+  border-top:2px solid var(--tc, var(--border));
+  border-radius:0 0 9px 9px; padding:10px 13px;
+}
+.ctrl-label {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.58rem; font-weight:700;
+  color:var(--tc, #b794f4);
+  text-transform:uppercase; letter-spacing:0.1em; margin-bottom:7px;
+}
+.ctrl-row {
+  font-family:'JetBrains Mono','Courier New',monospace;
+  font-size:0.68rem; color:#7a8aaa; line-height:1.8;
+}
+.ctrl-row strong {
+  color:#e2e8f0;
+  background:rgba(255,255,255,0.07);
+  padding:1px 5px; border-radius:3px; font-size:0.63rem;
+  margin-right:3px;
+}
+
+/* ── SETUP STEPS (interactive) ──────────────────────────────────────── */
+.steps { list-style:none; display:flex; flex-direction:column; gap:5px; }
+.step-item {
+  font-size:0.78rem; color:#a0aec0;
+  padding:5px 10px 5px 34px;
+  position:relative; line-height:1.45;
+  border-radius:7px; cursor:pointer;
+  transition:background 0.15s, opacity 0.22s;
+}
+.step-item:hover { background:rgba(255,255,255,0.03); }
+.step-item::before {
+  content:attr(data-n);
+  position:absolute; left:7px; top:6px;
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.56rem; font-weight:700;
+  background:var(--tdb, var(--border));
+  color:var(--tc, var(--muted));
+  width:19px; height:19px; border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--tcb, var(--border));
+  transition:background 0.15s, color 0.15s;
+}
+.step-item.done { opacity:0.4; text-decoration:line-through; text-decoration-color:rgba(255,255,255,0.15); }
+.step-item.done::before { content:'✓'; background:rgba(74,222,128,0.12); color:var(--early); border-color:rgba(74,222,128,0.4); }
+
+/* ── CHALLENGE TEXT ─────────────────────────────────────────────────── */
+.challenge-text {
+  font-size:0.8rem; color:#b0bcd4; line-height:1.6;
+}
+.challenge-text strong { color:#e2e8f0; }
+.challenge-text em { color:#6b7c99; font-style:normal; }
+.challenge-text code {
+  background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;
+  font-family:'JetBrains Mono',monospace; font-size:0.76em; color:#fbd38d;
+}
+
+/* ── STARTER CODE BOX ───────────────────────────────────────────────── */
+.starter-box {
+  background:#05060b;
+  border:1px solid var(--border);
+  border-left:3px solid #4fd1c5;
+  border-radius:0 9px 9px 0; overflow:hidden;
+}
+.starter-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 12px;
+  background:rgba(79,209,197,0.06);
+  border-bottom:1px solid rgba(79,209,197,0.14);
+}
+.starter-lang {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.6rem; font-weight:700;
+  color:#4fd1c5; text-transform:uppercase; letter-spacing:0.08em;
+}
+.copy-btn {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.59rem; font-weight:700;
+  color:var(--muted); background:rgba(255,255,255,0.05);
+  border:1px solid var(--border); border-radius:4px;
+  padding:2px 9px; cursor:pointer; transition:all 0.15s;
+  letter-spacing:0.04em;
+}
+.copy-btn:hover { background:rgba(255,255,255,0.10); color:var(--text); }
+.copy-btn.copied { color:var(--early); border-color:rgba(74,222,128,0.4); background:rgba(74,222,128,0.08); }
+.starter-box pre {
+  font-family:'JetBrains Mono','Courier New',monospace;
+  font-size:0.68rem; color:#5e6e88; white-space:pre; line-height:1.72;
+  margin:0; padding:10px 13px; overflow-x:auto;
+}
+.starter-box .ph { color:#f6ad55; font-weight:700; }
+.starter-note {
+  padding:5px 12px 7px;
+  font-size:0.62rem; color:rgba(246,173,85,0.7);
+  font-family:'Chakra Petch',sans-serif; letter-spacing:0.04em;
+}
+
+/* ── FORMULA BOX ────────────────────────────────────────────────────── */
+.formula-box {
+  background:#05060b;
+  border:1px solid var(--border);
+  border-left:3px solid #4ade80;
+  border-radius:0 9px 9px 0; padding:10px 13px;
+}
+.fl {
+  font-family:'JetBrains Mono','Courier New',monospace;
+  font-size:0.7rem; color:#505e7a; line-height:1.9;
+}
+.fl strong { color:#4ade80; }
+.fl em { color:#9ae6b4; font-style:normal; }
+
+/* ── MAKECODE BLOCKS ────────────────────────────────────────────────── */
+pre.blocks {
+  background:rgba(255,255,255,0.025);
+  border:1px dashed var(--border); border-radius:8px;
+  padding:9px 12px; font-size:0.7rem;
+  font-family:'JetBrains Mono',monospace; color:var(--dim);
+  white-space:pre; margin:0; line-height:1.6;
+}
+pre.blocks::after { content:' — rendering…'; font-size:0.58rem; color:#1e2235; font-style:italic; }
+.blocks-section img {
+  max-width:100%; border-radius:8px;
+  box-shadow:0 4px 22px rgba(0,0,0,0.7);
+  display:block; background:#fff;
+}
+
+/* ── RECORD SECTION ─────────────────────────────────────────────────── */
+.record-rows { display:flex; flex-direction:column; gap:7px; }
+.rrow { display:flex; align-items:center; gap:7px; font-size:0.76rem; color:#8898b0; }
+.rrow span { white-space:nowrap; }
+.rline { flex:1; border-bottom:1px dashed var(--dim); min-width:20px; }
+.runit { font-size:0.65rem; color:var(--dim); white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+.rblock {
+  background:rgba(255,255,255,0.02); border:1px dashed var(--dim);
+  border-radius:6px; padding:8px 10px; font-size:0.72rem;
+  color:var(--dim); font-style:italic; min-height:38px; line-height:1.4;
+}
+.rrow-label { font-size:0.74rem; color:#7a8aaa; margin-bottom:3px; }
+
+table.rtbl { width:100%; border-collapse:collapse; font-size:0.72rem; }
+table.rtbl th {
+  background:var(--tdb, rgba(0,0,0,0.3));
+  color:var(--tc, var(--muted));
+  font-weight:700; padding:6px 8px; text-align:left;
+  border:1px solid var(--border);
+  font-family:'Chakra Petch',sans-serif; font-size:0.6rem;
+  text-transform:uppercase; letter-spacing:0.07em;
+}
+table.rtbl td { border:1px solid var(--border); padding:6px 8px; color:#8898b0; }
+table.rtbl td.blank { background:rgba(255,255,255,0.015); color:var(--dim); font-style:italic; }
+
+/* ── REFLECT ────────────────────────────────────────────────────────── */
+.reflect {
+  border-radius:0 10px 10px 0; padding:11px 14px 13px;
+  position:relative; overflow:hidden;
+}
+.reflect.early { border-left:3px solid var(--early); background:rgba(74,222,128,0.05); }
+.reflect.mid   { border-left:3px solid var(--mid);   background:rgba(96,165,250,0.05); }
+.reflect.late  { border-left:3px solid var(--late);  background:rgba(251,146,60,0.05); }
+.reflect::before {
+  content:'?';
+  position:absolute; right:8px; bottom:-12px;
+  font-family:'Chakra Petch',sans-serif;
+  font-size:5rem; font-weight:700; line-height:1;
+  opacity:0.035; color:#fff; pointer-events:none;
+}
+.ref-lbl {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.6rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em; margin-bottom:5px;
+  display:flex; align-items:center; gap:6px;
+}
+.reflect.early .ref-lbl { color:var(--early); }
+.reflect.mid   .ref-lbl { color:var(--mid); }
+.reflect.late  .ref-lbl { color:var(--late); }
+.ref-q { font-size:0.79rem; color:#c0cce0; line-height:1.5; font-style:italic; }
+
+/* ── CARD FOOTER ────────────────────────────────────────────────────── */
+.card-footer {
+  padding:9px 16px; border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(0,0,0,0.18); gap:8px;
+}
+.stat-hint {
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.61rem; color:var(--dim);
+}
+.footer-btns { display:flex; gap:6px; }
+.timer-btn {
+  font-family:'Chakra Petch',sans-serif;
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  color:var(--text); padding:5px 12px; border-radius:7px;
+  font-size:0.72rem; font-weight:700; cursor:pointer;
+  transition:all 0.18s; letter-spacing:0.03em;
+}
+.timer-btn:hover {
+  background:var(--tdb, rgba(255,255,255,0.09));
+  border-color:var(--tc, var(--dim)); color:var(--tc, #fff);
+  box-shadow:0 0 12px var(--tg, transparent);
+}
+.done-btn {
+  font-family:'Chakra Petch',sans-serif;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  color:var(--dim); padding:5px 10px; border-radius:7px;
+  font-size:0.67rem; font-weight:700; cursor:pointer;
+  transition:all 0.2s; letter-spacing:0.04em; text-transform:uppercase;
+}
+.done-btn:hover { background:rgba(74,222,128,0.08); border-color:rgba(74,222,128,0.35); color:var(--early); }
+
+/* ── TIMER OVERLAY ──────────────────────────────────────────────────── */
+.t-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(5,6,10,0.96);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  z-index:999; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:22px; padding:20px;
+}
+.t-overlay.open { display:flex; }
+.t-overlay.flash { animation: tflash 0.55s 6; }
+@keyframes tflash {
+  0%,100%{ background:rgba(5,6,10,0.96); }
+  50%{ background:rgba(251,146,60,0.18); }
+}
+
+.t-name {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.76rem; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:0.14em; text-align:center;
+}
+
+/* SVG ring */
+.t-ring-wrap { position:relative; width:270px; height:270px; }
+.t-ring-svg { width:270px; height:270px; transform:rotate(-90deg); }
+.t-ring-bg { fill:none; stroke:#161926; stroke-width:12; }
+.t-ring-fg {
+  fill:none; stroke:#4ade80; stroke-width:12; stroke-linecap:round;
+  stroke-dasharray: 722.57;   /* 2 * pi * 115 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.t-center {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.t-display {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:clamp(56px,14vw,102px); font-weight:700;
+  color:#fff; letter-spacing:0.02em; line-height:1;
+  transition:color 0.3s;
+}
+.t-display.warn {
+  color:var(--late);
+  animation: urgentPulse 0.65s ease-in-out infinite;
+}
+@keyframes urgentPulse {
+  0%,100%{ text-shadow:none; }
+  50%{ text-shadow:0 0 24px rgba(251,146,60,0.7); }
+}
+.t-sub {
+  font-family:'Chakra Petch',sans-serif;
+  font-size:0.6rem; color:var(--dim);
+  letter-spacing:0.12em; text-transform:uppercase; margin-top:5px;
+}
+.t-controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; }
+.tb {
+  font-family:'Chakra Petch',sans-serif;
+  padding:11px 28px; border-radius:10px; border:none;
+  font-size:0.88rem; font-weight:700; cursor:pointer;
+  letter-spacing:0.05em; transition:all 0.16s; text-transform:uppercase;
+}
+.tb.start { background:var(--early); color:#070a0d; }
+.tb.start:hover { box-shadow:0 0 22px var(--early-glow); transform:scale(1.03); }
+.tb.pause { background:var(--mid); color:#fff; }
+.tb.pause:hover { box-shadow:0 0 22px var(--mid-glow); transform:scale(1.03); }
+.tb.reset { background:rgba(255,255,255,0.09); color:var(--text); }
+.tb.close { background:transparent; color:var(--muted); border:1px solid var(--border); padding:10px 18px; }
+.tb.close:hover { color:var(--text); border-color:var(--dim); }
+.t-mute {
+  font-family:'Chakra Petch',sans-serif;
+  background:transparent; border:1px solid var(--border);
+  border-radius:8px; padding:9px 14px; color:var(--dim);
+  font-size:0.72rem; cursor:pointer; font-weight:700;
+  letter-spacing:0.04em; transition:all 0.15s;
+}
+.t-mute:hover { border-color:var(--dim); color:var(--text); }
+.t-mute.muted { color:var(--late); border-color:rgba(251,146,60,0.35); background:rgba(251,146,60,0.06); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .header { padding:12px 14px 10px; }
+  .grid { padding:0 10px; gap:12px; grid-template-columns:1fr; }
+  .wm { font-size:6rem; }
+}
+
+/* ── SVG ICON ALIGNMENT ────────────────────────────────────────────────── */
+.sec-label svg { flex-shrink:0; opacity:0.75; vertical-align:middle; }
+.ref-lbl svg { flex-shrink:0; opacity:0.75; margin-right:2px; vertical-align:middle; }
+.role svg { flex-shrink:0; opacity:0.65; vertical-align:middle; }
+.done-btn svg, .timer-btn svg { vertical-align:middle; margin-right:2px; flex-shrink:0; }
+.copy-btn svg { vertical-align:middle; flex-shrink:0; }
+.tb svg { vertical-align:middle; margin-right:4px; flex-shrink:0; }
+.t-mute svg { vertical-align:middle; margin-right:3px; flex-shrink:0; }
+.tb.close svg { margin-right:0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo">
+        <div class="logo-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><path d="M12 11V7"/><circle cx="12" cy="5" r="2"/><path d="M3 16H2m21-1h-1"/></svg></div>
+        <div class="logo-text">
+          <span class="logo-eyebrow">Velocity Arena</span>
+          <span class="logo-title">Bot Challenges</span>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="pill">Teams of 3</span>
+        <span class="pill">8×4 ft field</span>
+        <span class="pill">Stats total 20</span>
+        <span class="pill live"><span class="live-dot"></span><span id="progressCount">0 / 12 done</span></span>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn a-all"  onclick="filter('all')">All 12</button>
+      <button class="tab-btn"        onclick="filter('early')">Early</button>
+      <button class="tab-btn"        onclick="filter('mid')">Mid</button>
+      <button class="tab-btn"        onclick="filter('late')">Late</button>
+    </div>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="t-overlay" id="tOverlay">
+  <div class="t-name" id="tName">Challenge</div>
+  <div class="t-ring-wrap">
+    <svg class="t-ring-svg" viewBox="0 0 270 270">
+      <circle class="t-ring-bg" cx="135" cy="135" r="115"/>
+      <circle class="t-ring-fg" id="tRingFg" cx="135" cy="135" r="115"/>
+    </svg>
+    <div class="t-center">
+      <div class="t-display" id="tDisplay">5:00</div>
+      <div class="t-sub" id="tSub">remaining</div>
+    </div>
+  </div>
+  <div class="t-controls">
+    <button class="tb start" id="tbStart" onclick="tStartPause()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start</button>
+    <button class="tb reset" onclick="tReset()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reset</button>
+    <button class="t-mute" id="tMuteBtn" onclick="toggleMute()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Sound</button>
+    <button class="tb close" onclick="tClose()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+</div>
+
+<script>
+// ── STARTER CODE ─────────────────────────────────────────────────────
+const CODE = {};
+const CODE_HL = {};
+
+CODE[1] =
+`let SPEED = 6
+let motorPower = 0
+
+input.onButtonPressed(Button.A, function () {
+    basic.showNumber(motorPower)
+    CutebotPro.pwmCruiseControl(motorPower, motorPower)
+    basic.pause(1500)
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    SPEED = SPEED + 1
+    if (SPEED > 10) { SPEED = 1 }
+    motorPower = 0
+    basic.showNumber(SPEED)
+})`;
+CODE_HL[1] = new Set([1, 13]);
+
+CODE[3] =
+`let TURNING = 5
+
+input.onButtonPressed(Button.A, function () {
+    if (TURNING > 7) {
+        basic.showArrow(ArrowNames.North)
+        CutebotPro.pwmCruiseControl(40, -40)
+        basic.pause(300)
+    } else {
+        basic.showArrow(ArrowNames.South)
+        CutebotPro.pwmCruiseControl(40, 40)
+        basic.pause(800)
+    }
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    TURNING = TURNING + 1
+    if (TURNING > 10) { TURNING = 1 }
+    basic.showNumber(TURNING)
+})`;
+CODE_HL[3] = new Set([3, 4, 8]);
+
+CODE[4] =
+`let ENDURANCE = 5
+let decayRate = 0
+
+input.onButtonPressed(Button.A, function () {
+    basic.showNumber(decayRate)
+    CutebotPro.pwmCruiseControl(30, 30)
+    basic.pause(500)
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    ENDURANCE = ENDURANCE + 1
+    if (ENDURANCE > 10) { ENDURANCE = 1 }
+    decayRate = 0
+    basic.showNumber(ENDURANCE)
+})`;
+CODE_HL[4] = new Set([1, 13]);
+
+CODE[5] =
+`let SPEED_A = 3
+let SPEED_B = 9
+let powerA = SPEED_A * 0
+let powerB = SPEED_B * 0
+
+input.onButtonPressed(Button.A, function () {
+    let ratio = powerB / powerA
+    basic.showNumber(Math.round(ratio * 10))
+    basic.pause(1000)
+    CutebotPro.pwmCruiseControl(powerA, powerA)
+    basic.pause(1500)
+    CutebotPro.pwmCruiseControl(powerB, powerB)
+    basic.pause(1500)
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    SPEED_A = SPEED_A + 1
+    if (SPEED_A >= SPEED_B) { SPEED_A = 1 }
+    powerA = SPEED_A * 0
+    basic.showNumber(SPEED_A)
+})`;
+CODE_HL[5] = new Set([2, 3, 19]);
+
+CODE[7] =
+`let TURNING = 5
+let segMs = 0
+let expected = 0
+
+input.onButtonPressed(Button.A, function () {
+    basic.showNumber(expected)
+    CutebotPro.pwmCruiseControl(25, -25)
+    basic.pause(segMs)
+    CutebotPro.pwmCruiseControl(-25, 25)
+    basic.pause(segMs)
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    TURNING = TURNING + 1
+    if (TURNING > 10) { TURNING = 1 }
+    segMs = 0
+    expected = 0
+    basic.showNumber(TURNING)
+})`;
+CODE_HL[7] = new Set([1, 2, 16, 17]);
+
+CODE[8] =
+`let SPEED = 6
+let ENDURANCE = 5
+let matchTime = 0
+
+let basePower = SPEED * 5
+let decayRate = 20 - ENDURANCE
+let endurancePct = 100
+let currentPower = 0
+
+input.onButtonPressed(Button.A, function () {
+    basic.showNumber(currentPower)
+    CutebotPro.pwmCruiseControl(currentPower, currentPower)
+    basic.pause(1500)
+    CutebotPro.pwmCruiseControl(0, 0)
+})
+input.onButtonPressed(Button.B, function () {
+    matchTime = matchTime + 60
+    if (matchTime > 180) { matchTime = 0 }
+    endurancePct = 100
+    currentPower = 0
+    basic.showNumber(matchTime)
+})`;
+CODE_HL[8] = new Set([6, 7, 19, 20]);
+
+const NEW_CODE_SETUP = [
+  'Open MakeCode → <strong>New Project</strong> → clear any existing code.',
+  'Click <strong>Extensions</strong> → search <strong>"Cutebot Pro"</strong> → add it.',
+  'Type the starter code below exactly, then flash to your bot.',
+];
+
+const MATCH_CTRL = [
+  ['A (1st)','calibrate: "W" = white floor → press B  ·  "B" = black tape → press B  ·  "G" = point at goal → press B'],
+  ['A (2nd)','start the match'],
+  ['B (match)','soft reset'],
+  ['A+B','emergency stop'],
+];
+
+// Base setup steps shared by all MATCH PROGRAM challenges
+const MS = [
+  'Open <strong>Match Program</strong>. Scroll to bottom — find <strong>Student Stats</strong>. Set your build (must total <strong>20</strong>). Flash.',
+  'Press A. Shows <strong>"W"</strong> — sensors on white floor → press B.',
+  'Shows <strong>"B"</strong> — sensors on tape → press B.',
+  'Shows <strong>"G"</strong> — point at goal → press B. Stat bars appear.',
+];
+
+// ── CHALLENGES ────────────────────────────────────────────────────────
+const CHALLENGES = [
+// ────────── EARLY ─────────────────────────────────────────────────────
+{
+  id:1, tier:'early', name:'3× Lie Detector', minutes:7,
+  program:'SPEED TEST', progClass:'prog-speed',
+  controls:[
+    ['A','run for 1.5 s at current SPEED'],
+    ['B','cycle SPEED 1 → 10'],
+    ['A+B','emergency stop'],
+  ],
+  setup:[
+    'Load the <strong>Speed Test</strong> program.',
+    'Clear at least 1.5 m of floor space ahead of the bot.',
+    'Put a strip of tape at the start position.',
+    '<strong>Everyone writes their bet first:</strong> does S=9 travel 3× as far as S=3, more than 3×, or less?',
+  ],
+  codeId: null,
+  challenge:`The formula says SPEED=9 gives 3× the motor power of SPEED=3 — so the bot should go 3× as far in the same time.<br><br>Write your bet <em>before</em> you run anything. Everyone commits to a number.<br><br>Run SPEED=3. Mark where it stops with tape. Run SPEED=9. Mark where it stops. Measure both. Calculate the actual ratio.<br><br>Who predicted closest?`,
+  formula:{ lines:[
+    `motorPower = SPEED × 5`,
+    `S=3 → motorPower = <strong>15</strong>`,
+    `S=9 → motorPower = <strong>45</strong>`,
+    `Formula ratio = 45 ÷ 15 = <strong>3.0×</strong> ← does the bot agree?`,
+  ]},
+  blocksCode: null,
+  record:{ type:'rows', rows:[
+    {l:'S=3 drive distance', u:'cm'},
+    {l:'S=9 drive distance', u:'cm'},
+    {l:'Actual ratio (S9 ÷ S3)', u:'×'},
+    {l:'Closest prediction', u:'(name)'},
+  ]},
+  reflect:`It was not exactly 3×. Where did the missing power go? Is that a bug in the formula, or is the formula just describing something different from physical distance?`
+},
+{
+  id:2, tier:'early', name:'Shot Clock', minutes:6,
+  program:'CHARGE TEST', progClass:'prog-charge',
+  controls:[
+    ['A','detect ball → charge → kick'],
+    ['B','cycle POWER 1 → 10'],
+    ['A+B','emergency stop'],
+  ],
+  setup:[
+    'Load the <strong>Charge Test</strong> program.',
+    'Lay a tape measure flat along the floor from the ball position.',
+    '<strong>Before any kicks:</strong> each person writes their prediction for how far P=9 will send the ball.',
+  ],
+  codeId: null,
+  challenge:`Three POWER levels. One tape measure. Every kick from center position.<br><br>Before the first kick — each person writes their P=9 prediction. No changing it after.<br><br>Reset the ball to center between kicks. Mark where the ball <em>stops</em> each time with a piece of tape. Give each POWER a different color tape if you have it.<br><br>chargePower = POWER². P=3 → 9. P=6 → 36. P=9 → 81. The jump from P=6 to P=9 is much bigger than P=3 to P=6. Does the tape map show that?`,
+  formula:{ lines:[
+    `chargePower = POWER²`,
+    `P=3 → chargePower = <strong>9</strong>`,
+    `P=6 → chargePower = <strong>36</strong>  (4× bigger than P=3)`,
+    `P=9 → chargePower = <strong>81</strong>  (2.25× bigger than P=6)`,
+  ]},
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['POWER','Predicted distance','Actual distance','chargePower (P²)'],
+    rows:[['3','___  cm','','9'],['6','___  cm','','36'],['9','___  cm','','81']]
+  },
+  reflect:`chargePower goes 9 → 36 → 81. Did the ball distance curve match that pattern? Is the distance proportional to chargePower, or is something else going on?`
+},
+{
+  id:3, tier:'early', name:'Fix It to Win', minutes:8,
+  program:'NEW CODE', progClass:'prog-custom',
+  controls:[
+    ['A','display shows motorPower → bot drives 1.5 s at that power → stops'],
+    ['B','cycle SPEED 1 → 10'],
+    ['A+B','emergency stop'],
+  ],
+  setup: NEW_CODE_SETUP,
+  codeId: 1,
+  challenge:`The code is broken in exactly <strong>two places</strong>. Fix both and the bot drives at whatever speed you type. Fix only one and it will act like everything is fine — but drive the <em>exact same speed every single time</em>, no matter what SPEED says.<br><br><strong>How you know you got it:</strong> press B until SPEED shows <strong>7</strong>. The display should show <strong>35</strong>. Press A — bot drives. Then try SPEED=3. It should be noticeably slower than SPEED=9.<br><br>If SPEED=3 and SPEED=9 feel the same — one line is still broken.`,
+  formula:{ lines:[
+    `motorPower = SPEED × 5`,
+    `S=3 → display shows <strong>15</strong>`,
+    `S=7 → display shows <strong>35</strong>`,
+    `S=9 → display shows <strong>45</strong>`,
+  ]},
+  blocksCode: 'let motorPower = SPEED * 5',
+  record:{ type:'table',
+    headers:['SPEED','Expected display','Actual display','Speed felt different?'],
+    rows:[['3','15','','baseline'],['7','35','','Y / N'],['9','45','','Y / N']]
+  },
+  reflect:`There were two broken lines, and fixing just one made the code look fine — it still ran, it just lied. Where else does "it runs without errors but gives the wrong answer" cause problems in real code?`
+},
+{
+  id:4, tier:'early', name:'The Fade', minutes:12,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Run 1: set <strong>S=6 P=6 E=2 T=6</strong>. Run 2: set <strong>S=6 P=6 E=9 T=5</strong>.',
+    '<strong>Before Run 1:</strong> everyone writes their timestamp — at what minute:second will E=2 visibly slow down?',
+  ]),
+  codeId: null,
+  challenge:`ENDURANCE=2 and ENDURANCE=9 start the match looking identical. One of them does not end the same way.<br><br>Write your timestamp bet <em>before the first run</em> — at what minute:second will you first notice E=2 slowing down? Sign your name.<br><br>Run E=2 for the full 3 minutes. Count goals per minute. Rerun with E=9. Compare.<br><br>decayRate = 20 − ENDURANCE. E=2 has decay=18. By 90 seconds it has lost 40% of its motor power.`,
+  formula:{ lines:[
+    `decayRate = 20 − ENDURANCE`,
+    `E=2 → decay=18  (power gone fast)`,
+    `E=9 → decay=11  (power holds longer)`,
+    `At 90s: E=2 is at <strong>59%</strong> power. E=9 is at <strong>75%</strong>.`,
+  ]},
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['Build','Goals 0–1 min','Goals 1–2 min','Goals 2–3 min'],
+    rows:[['E=2 (decay=18)','','',''],['E=9 (decay=11)','','','']]
+  },
+  reflect:`If the match was only 60 seconds long, would ENDURANCE matter at all? What about in a 10-minute match? Where is the crossover point?`
+},
+
+// ────────── MID ───────────────────────────────────────────────────────
+{
+  id:5, tier:'mid', name:'The Spy', minutes:12,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Team A: pick any 20-point build, flash in secret while Team B faces away.',
+    'Team B: you have <strong>30 seconds to watch</strong>, then 2 minutes to design and flash a counter-build.',
+  ]),
+  codeId: null,
+  challenge:`Team A runs their mystery bot for 30 seconds. Team B watches silently — no talking, no guessing out loud.<br><br>After 30 seconds: Team B has <strong>2 minutes</strong> to discuss and flash a counter-build. No seeing Team A's stats.<br><br>Both bots run for 2 full minutes. Which scored more?<br><br><em>What to watch in those 30 seconds:</em> fast cross-field = high SPEED · ball flies far = high POWER · still moving strong at the end = high ENDURANCE · lots of direction changes = high TURNING`,
+  formula: null,
+  blocksCode: null,
+  record:{ type:'rows', rows:[
+    {l:'Team A build (revealed after both runs)', u:'S__ P__ E__ T__'},
+    {l:'Team A goals (2 min)', u:'goals'},
+    {l:'Team B counter-build', u:'S__ P__ E__ T__'},
+    {l:'Team B goals (2 min)', u:'goals'},
+    {l:'What gave Team A away in the first 30 seconds', u:''},
+  ]},
+  reflect:`What is the hardest stat to diagnose just from watching? Is it possible to design a build that looks like something it is not?`
+},
+{
+  id:6, tier:'mid', name:'Stat Wars', minutes:15,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Each person picks one stat to max: SPEED, POWER, or TURNING.',
+    'Rule: put 10 in your stat, split the remaining 10 across the other three (min 1 each).',
+    '<strong>Class votes before any run.</strong>',
+  ]),
+  codeId: null,
+  challenge:`One stat per person. No overlapping. Each person has <strong>60 seconds</strong> to argue why their stat wins in a real match.<br><br>After the arguments, the class votes on who they think will score the most goals. Votes are locked in before anyone runs.<br><br>Run all three builds for 2 minutes each. Did the class get it right?<br><br><em>Reminder: POWER is capped at 10. Budget: S+P+E+T = 20. Minimum 1 in everything.</em>`,
+  formula: null,
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['Stat maxed','Build (S P E T)','Class vote rank','Actual goals'],
+    rows:[['SPEED (S=10)','','1st / 2nd / 3rd',''],['POWER (P=10)','','1st / 2nd / 3rd',''],['TURNING (T=10)','','1st / 2nd / 3rd','']]
+  },
+  reflect:`The winning stat — did it win because the formula gives it an advantage, because of how the 8×4 field is sized, or for some other reason? Could the result change on a bigger or smaller field?`
+},
+{
+  id:7, tier:'mid', name:'How Many Zigzags?', minutes:10,
+  program:'NEW CODE', progClass:'prog-custom',
+  controls:[
+    ['A','display shows predicted arc count → bot does one arc cycle'],
+    ['B','cycle TURNING 1 → 10'],
+    ['A+B','emergency stop'],
+  ],
+  setup: NEW_CODE_SETUP,
+  codeId: 7,
+  challenge:`Type the formula. Predict the number. Watch the bot prove you right — or wrong — in real time.<br><br>The code is broken (both values = 0, so the bot will not even move on A press). Fix both broken lines.<br><br>Then: set TURNING=5, calculate the expected arc count, write it on a sticky note face-down. Press A — the display shows your formula's answer. The bot does one arc so you can see what "one zigzag" looks like.<br><br>Load <strong>Turning Test</strong> and count the actual arcs at T=5 over 15 seconds. Flip the sticky notes. Who was closest?`,
+  formula:{ lines:[
+    `segMs = min(3600 ÷ TURNING, 600)  [ms per arc direction]`,
+    `T=5: min(720, 600) = <strong>600 ms</strong>`,
+    `expected = round(15000 ÷ segMs) = round(15000 ÷ 600) = <strong>25 arcs</strong>`,
+    `<em>(Real count varies ±30% — arc timing has jitter)</em>`,
+  ]},
+  blocksCode: 'let segMs = Math.min(3600 / TURNING, 600)\nlet expected = Math.round(15000 / segMs)',
+  record:{ type:'rows', rows:[
+    {l:'Formula prediction at T=5', u:'arcs in 15 s'},
+    {l:'Turning Test actual count', u:'arcs'},
+    {l:'Difference', u:'arcs'},
+    {l:'Closest prediction (name)', u:''},
+  ]},
+  reflect:`The formula gave you an exact number. The actual count was different. Was the formula wrong, or did something outside the formula cause the gap?`
+},
+{
+  id:8, tier:'mid', name:'Last Minute', minutes:12,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Design two builds: your "normal" build and a "late game" build optimized for minutes 2–3.',
+    'Run each for the full 3 minutes. Only count goals scored <strong>after the 2-minute mark</strong>.',
+  ]),
+  codeId: null,
+  challenge:`Build for the last 60 seconds — not the first. Most builds go fast early and fade.<br><br>Design a build optimized for minutes 2–3. Run both your normal build and your late-game build for the full 3 minutes, but only count goals scored <em>after</em> the 2-minute mark.<br><br>The question: does investing in ENDURANCE actually change the last-minute score? Or does something else matter more?`,
+  formula:{ lines:[
+    `endurancePct = 100 − decayRate × matchTime ÷ 40`,
+    `At 2 min (120s): E=4 → decay=16 → pct = 100−52 = <strong>48%</strong>`,
+    `At 2 min (120s): E=8 → decay=12 → pct = 100−36 = <strong>64%</strong>`,
+    `currentPower = round(basePower × endurancePct ÷ 100)`,
+  ]},
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['Build','S P E T','Total goals','Goals after 2:00'],
+    rows:[['Normal build','','',''],['Late-game build','','',' ']]
+  },
+  reflect:`Is there a build where spending on ENDURANCE is not worth it? When does it stop mattering versus just putting those points into SPEED or POWER?`
+},
+
+// ────────── LATE ──────────────────────────────────────────────────────
+{
+  id:9, tier:'late', name:'Build the Loser', minutes:12,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Design the worst 20-point build you can. Write your failure reasoning <strong>before</strong> running.',
+    'Another team predicts how many goals your loser accidentally scores.',
+  ]),
+  codeId: null,
+  challenge:`Design the most useless robot soccer player possible. Write exactly why each stat choice guarantees failure — <em>before</em> you run it.<br><br>The catch: another team predicts how many goals your loser accidentally scores. If your bot beats their prediction, you have failed at failing.<br><br>All loser builds run. The team whose bot scores the <em>most</em> goals despite trying to fail loses the challenge. The team whose bot scores <em>zero</em> wins.`,
+  formula: null,
+  blocksCode: null,
+  record:{ type:'rows', rows:[
+    {l:'Loser build: S__ P__ E__ T__', u:'total = 20'},
+    {l:'Why it should fail (one reason per stat)', u:''},
+    {l:'Other team\'s accidental-goal prediction', u:'goals'},
+    {l:'Actual accidental goals scored', u:'goals'},
+    {l:'Successfully failed?', u:'Y / N'},
+  ]},
+  reflect:`You now know the worst build. Flip every decision — is that guaranteed to be the best build? Or does the worst build tell you something more subtle?`
+},
+{
+  id:10, tier:'late', name:'The $20 Build', minutes:15,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'You have 5 minutes to design your best 20-point build. Write your reasoning for each stat first.',
+    'Run v1. Then make one revision (±3 on any stat). Run v2.',
+  ]),
+  codeId: null,
+  challenge:`You know the formulas. You know the field. Design the best 20-point build you can in <strong>5 minutes</strong> — and write down your reasoning for every stat before you run.<br><br>Run for 2 minutes. Count goals.<br><br>Then one revision: change one stat by up to ±3 points. Run again. Did the revision help?<br><br><em>The test: did you actually understand the system, or did you just get lucky on the first run?</em>`,
+  formula: null,
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['Run','Build (S P E T)','Goals','Change made'],
+    rows:[['v1','','','— (first run)'],['v2','','','+/− which stat and why']]
+  },
+  reflect:`Your first build or your revised build — which was better? Did running the bot teach you something that pure reasoning could not?`
+},
+{
+  id:11, tier:'late', name:'Stripped Down', minutes:15,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    '<strong>Lock SPEED=1 and TURNING=1.</strong> You have 18 points to split between POWER and ENDURANCE only.',
+    'Test three splits. 2 minutes each. Predict the winner before any run.',
+  ]),
+  codeId: null,
+  challenge:`SPEED=1. TURNING=1. Locked. 18 points to split between POWER and ENDURANCE only.<br><br>Three splits. Predict the winner <em>before</em> any run — everyone writes their pick on paper.<br><br>Run all three, 2 minutes each, count goals. Then run the winner one more time and count <em>only</em> the goals in the last 60 seconds. Does the winner hold up?`,
+  formula:{ lines:[
+    `SPEED=1, TURNING=1 (locked) → 18 pts left`,
+    `Split A: P=<strong>16</strong>  E=<strong>2</strong>   chargePower = 256`,
+    `Split B: P=<strong>9</strong>   E=<strong>9</strong>   chargePower = 81`,
+    `Split C: P=<strong>2</strong>   E=<strong>16</strong>  chargePower = 4`,
+  ]},
+  blocksCode: 'SPEED = 1\nPOWER = 16\nENDURANCE = 2\nTURNING = 1',
+  record:{ type:'table',
+    headers:['Split','P','E','Predicted?','Goals (2 min)'],
+    rows:[['A — All Power','16','2','',''],['B — Balanced','9','9','',''],['C — All Endurance','2','16','','']]
+  },
+  reflect:`In this stripped-down version, which stat dominated? Does that change how you think about building for the full match — where SPEED and TURNING are not locked at 1?`
+},
+{
+  id:12, tier:'late', name:'Last Bot Standing', minutes:20,
+  program:'MATCH PROGRAM', progClass:'prog-match',
+  controls: MATCH_CTRL,
+  setup: MS.concat([
+    'Three runs, 2 minutes each. You may change your build between runs.',
+    'Between runs 1 and 2: you may watch <strong>one other team</strong> run.',
+    'After run 3: present your final build and what you learned.',
+  ]),
+  codeId: null,
+  challenge:`Three runs. 2 minutes each. Change your build between every run.<br><br>Between your first and second run, you can watch one other team's run — choose wisely.<br><br>Rules: you must change at least one stat between every run. After your final run, present your build to the class — what you started with, what you changed, and why your last build was your best.<br><br>This is everything you know about the system. Use it.`,
+  formula: null,
+  blocksCode: null,
+  record:{ type:'table',
+    headers:['Run','Build (S P E T)','Goals','What you changed and why'],
+    rows:[['1','','','— first attempt'],['2','','',''],['3','','','']]
+  },
+  reflect:`Across all 12 challenges — what is the single most useful thing you learned about building a winning bot? What would you tell someone starting their first tournament today?`
+},
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function highlightCode(id){
+  if (!CODE[id]) return '';
+  const lines = CODE[id].split('\n');
+  const hlSet = CODE_HL[id] || new Set();
+  return lines.map((line, i) => {
+    if (line === ' ') return '';
+    const safe = esc(line);
+    return hlSet.has(i) ? `<span class="ph">${safe}</span>` : safe;
+  }).join('\n');
+}
+
+function renderRecord(r){
+  if (!r) return '';
+  if (r.type==='table'){
+    const ths = r.headers.map(h=>`<th>${h}</th>`).join('');
+    const trs = r.rows.map(row=>`<tr>${row.map((c,i)=>{
+      const blank = i>0 && (c===''||c.includes('___')||c.includes('Y / N')||c.includes('—'));
+      return `<td class="${blank?'blank':''}">${c||'&nbsp;'}</td>`;
+    }).join('')}</tr>`).join('');
+    return `<div style="overflow-x:auto"><table class="rtbl"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div>`;
+  }
+  if (r.type==='rows'){
+    return `<div class="record-rows">${r.rows.map(row=>{
+      if (row.u===''){
+        return `<div><div class="rrow-label">${row.l}</div><div class="rblock"></div></div>`;
+      }
+      return `<div class="rrow"><span>${row.l}:</span><div class="rline"></div><span class="runit">${row.u}</span></div>`;
+    }).join('')}</div>`;
+  }
+  return '';
+}
+
+// ── CARD BUILDER ────────────────────────────────────────────────────
+const TVARS = {
+  early: '--tc:#4ade80;--tg:rgba(74,222,128,0.22);--tdb:rgba(74,222,128,0.08);--tcb:rgba(74,222,128,0.30)',
+  mid:   '--tc:#60a5fa;--tg:rgba(96,165,250,0.22);--tdb:rgba(96,165,250,0.08);--tcb:rgba(96,165,250,0.30)',
+  late:  '--tc:#fb923c;--tg:rgba(251,146,60,0.22);--tdb:rgba(251,146,60,0.08);--tcb:rgba(251,146,60,0.30)',
+};
+
+function buildCard(c){
+  const tv = TVARS[c.tier];
+  const tierLabel = {early:'Early',mid:'Mid',late:'Late'}[c.tier];
+  const controls = c.controls.map(([key,desc])=>
+    `<div class="ctrl-row"><strong>${key}</strong> ${desc}</div>`).join('');
+  const steps = c.setup.map((s,i)=>
+    `<li class="step-item" data-n="${i+1}" onclick="this.classList.toggle('done')">${s}</li>`).join('');
+
+  const starterHtml = c.codeId ? `
+    <div>
+      <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Starter Code</div>
+      <div class="starter-box">
+        <div class="starter-header">
+          <span class="starter-lang">TypeScript · MakeCode</span>
+          <button class="copy-btn" id="cpbtn${c.codeId}" onclick="copyCode(${c.codeId})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+        </div>
+        <pre>${highlightCode(c.codeId)}</pre>
+        <div class="starter-note">↳ Orange lines are broken — fix them</div>
+      </div>
+    </div>` : '';
+
+  const formula = c.formula
+    ? `<div>
+        <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg> Formula</div>
+        <div class="formula-box"><div class="fl">${c.formula.lines.join('<br>')}</div></div>
+       </div>`
+    : '';
+
+  const blocksHtml = c.blocksCode
+    ? `<div class="blocks-section">
+        <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Fixed code in blocks</div>
+        <pre class="blocks">${esc(c.blocksCode)}</pre>
+       </div>`
+    : '';
+
+  const rec = renderRecord(c.record);
+
+  return `
+<div class="card" id="card${c.id}" data-tier="${c.tier}" style="${tv}">
+  <div class="wm">${c.id}</div>
+  <div class="card-top">
+    <div class="card-row1">
+      <div class="card-num">#${c.id}</div>
+      <div class="card-name">${c.name}</div>
+    </div>
+    <div class="badges">
+      <span class="badge b-${c.tier}">${tierLabel}</span>
+      <span class="badge b-time">${c.minutes} min</span>
+      <span class="prog-badge ${c.progClass}">${c.program}</span>
+    </div>
+  </div>
+
+  <div class="roles">
+    <span class="role"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> <strong>Programmer</strong></span>
+    <span class="role"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> <strong>Field Tech</strong></span>
+    <span class="role"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <strong>Recorder</strong></span>
+  </div>
+
+  <div class="card-body">
+
+    <div>
+      <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Controls</div>
+      <div class="controls-box">
+        <div class="ctrl-label">${c.program}</div>
+        ${controls}
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><line x1="13" y1="8" x2="21" y2="8"/><line x1="13" y1="16" x2="21" y2="16"/></svg> Setup — click steps to check off</div>
+      <ul class="steps">${steps}</ul>
+    </div>
+
+    ${starterHtml}
+
+    <div>
+      <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Mission</div>
+      <div class="challenge-text">${c.challenge}</div>
+    </div>
+
+    ${formula}
+    ${blocksHtml}
+
+    <div>
+      <div class="sec-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Record It</div>
+      ${rec}
+    </div>
+
+    <div class="reflect ${c.tier}">
+      <div class="ref-lbl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Reflect</div>
+      <div class="ref-q">${c.reflect}</div>
+    </div>
+
+  </div>
+
+  <div class="card-footer">
+    <span class="stat-hint">S+P+E+T = 20 · min 1 each</span>
+    <div class="footer-btns">
+      <button class="done-btn" onclick="markDone(${c.id},this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Done</button>
+      <button class="timer-btn" onclick="openTimer(${c.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${c.minutes}:00</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// Build grid
+document.getElementById('grid').innerHTML = CHALLENGES.map(buildCard).join('');
+
+// Staggered entrance
+document.querySelectorAll('.card').forEach((card, i) => {
+  card.style.animationDelay = `${i * 55}ms`;
+});
+
+// ── COPY CODE ────────────────────────────────────────────────────────
+function copyCode(id) {
+  if (!navigator.clipboard) return;
+  navigator.clipboard.writeText(CODE[id] || '').then(() => {
+    const btn = document.getElementById('cpbtn'+id);
+    if (!btn) return;
+    btn.innerHTML = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── MARK DONE ────────────────────────────────────────────────────────
+function markDone(id, btn) {
+  const card = document.getElementById('card'+id);
+  if (!card) return;
+  card.classList.toggle('complete');
+  btn.innerHTML = card.classList.contains('complete') ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Undo' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Done';
+  const done = document.querySelectorAll('.card.complete').length;
+  const el = document.getElementById('progressCount');
+  if (el) el.textContent = `${done} / ${CHALLENGES.length} done`;
+}
+
+// ── FILTER ───────────────────────────────────────────────────────────
+const TIER_CLS = {all:'a-all', early:'a-early', mid:'a-mid', late:'a-late'};
+function filter(tier){
+  document.querySelectorAll('.card').forEach(card=>{
+    card.classList.toggle('hidden', tier!=='all' && card.dataset.tier!==tier);
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn,i)=>{
+    btn.className = 'tab-btn';
+    if (['all','early','mid','late'][i]===tier) btn.classList.add(TIER_CLS[tier]);
+  });
+}
+
+// ── WEB AUDIO ────────────────────────────────────────────────────────
+let audioCtx = null;
+let soundMuted = false;
+
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, dur, vol, type='sine') {
+  if (soundMuted) return;
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    osc.start(); osc.stop(ctx.currentTime + dur + 0.01);
+  } catch(e) {}
+}
+function tickSound() { beep(1000, 0.04, 0.07, 'sine'); }
+function warnSound() { beep(1200, 0.07, 0.12, 'sine'); }
+function alarmSound() {
+  beep(880, 0.13, 0.35, 'square');
+  setTimeout(() => beep(660, 0.13, 0.35, 'square'), 190);
+  setTimeout(() => beep(880, 0.13, 0.35, 'square'), 380);
+  setTimeout(() => beep(1100, 0.28, 0.42, 'sine'), 570);
+}
+function toggleMute() {
+  soundMuted = !soundMuted;
+  const btn = document.getElementById('tMuteBtn');
+  if (btn) { btn.innerHTML = soundMuted ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg> Muted' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Sound'; btn.classList.toggle('muted', soundMuted); }
+}
+
+// ── TIMER ────────────────────────────────────────────────────────────
+const CIRC = 722.57;  // 2 * pi * 115
+let tSec=0, tTotal=0, tRunning=false, tInterval=null, tTierColor='#4ade80';
+const TIER_COLORS = {early:'#4ade80', mid:'#60a5fa', late:'#fb923c'};
+
+function openTimer(id){
+  const c = CHALLENGES.find(x=>x.id===id);
+  if (!c) return;
+  tTotal = c.minutes*60; tSec = tTotal; tRunning = false;
+  clearInterval(tInterval);
+  tTierColor = TIER_COLORS[c.tier]||'#4ade80';
+  document.getElementById('tRingFg').style.stroke = tTierColor;
+  document.getElementById('tName').textContent = `#${c.id} — ${c.name}`;
+  document.getElementById('tbStart').innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start';
+  document.getElementById('tbStart').className = 'tb start';
+  tUpdate();
+  document.getElementById('tOverlay').className = 't-overlay open';
+}
+
+function tUpdate(){
+  const m = Math.floor(tSec/60);
+  const s = (tSec%60).toString().padStart(2,'0');
+  const d = document.getElementById('tDisplay');
+  d.textContent = `${m}:${s}`;
+  const warn = tSec <= 30 && tSec > 0;
+  d.className = 't-display' + (warn ? ' warn' : '');
+  // Ring
+  const fg = document.getElementById('tRingFg');
+  if (fg) {
+    fg.style.strokeDashoffset = tTotal > 0 ? CIRC * (1 - tSec/tTotal) : CIRC;
+    fg.style.stroke = (tSec <= 30 && tSec > 0) ? '#fb923c' : (tSec <= 0 ? '#ef4444' : tTierColor);
+  }
+  // Sub label
+  const sub = document.getElementById('tSub');
+  if (sub) {
+    if (tSec <= 0) sub.textContent = "TIME'S UP";
+    else if (tSec <= 10) sub.textContent = 'HURRY!';
+    else if (tSec <= 30) sub.textContent = 'ALMOST DONE';
+    else sub.textContent = 'REMAINING';
+  }
+}
+
+function tStartPause(){
+  if (tSec<=0){ tReset(); return; }
+  tRunning = !tRunning;
+  const btn = document.getElementById('tbStart');
+  if (tRunning) {
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause'; btn.className = 'tb pause';
+    tInterval = setInterval(() => {
+      if (!tRunning){ clearInterval(tInterval); return; }
+      tSec--;
+      tUpdate();
+      if (tSec <= 10 && tSec > 0) warnSound();
+      else if (tSec > 0) tickSound();
+      if (tSec <= 0) {
+        clearInterval(tInterval); tRunning = false;
+        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Restart'; btn.className = 'tb start';
+        alarmSound();
+        const ov = document.getElementById('tOverlay');
+        ov.classList.add('flash');
+        setTimeout(() => ov.classList.remove('flash'), 4000);
+      }
+    }, 1000);
+  } else {
+    clearInterval(tInterval);
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Resume'; btn.className = 'tb start';
+  }
+}
+
+function tReset(){
+  clearInterval(tInterval); tRunning = false; tSec = tTotal;
+  document.getElementById('tbStart').innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start';
+  document.getElementById('tbStart').className = 'tb start';
+  document.getElementById('tRingFg').style.stroke = tTierColor;
+  tUpdate();
+}
+function tClose(){
+  clearInterval(tInterval); tRunning = false;
+  document.getElementById('tOverlay').className = 't-overlay';
+}
+document.getElementById('tOverlay').addEventListener('click', function(e){ if(e.target===this) tClose(); });
+
+// ── MAKECODE BLOCKS RENDERER ──────────────────────────────────────────
+(function () {
+  var MCODE_URL = 'https://makecode.microbit.org/';
+  var blockId = 0;
+  if (!document.querySelector('pre.blocks')) return;
+  function sendBlock(pre) {
+    var f = document.getElementById('makecoderenderer');
+    if (!f || !f.contentWindow) return;
+    f.contentWindow.postMessage({ type:'renderblocks', id:pre.id, code:pre.innerText }, MCODE_URL);
+  }
+  window.addEventListener('message', function (ev) {
+    var msg = ev.data;
+    if (!msg || msg.source !== 'makecode') return;
+    if (msg.type === 'renderready') {
+      document.querySelectorAll('pre.blocks').forEach(function (pre) {
+        pre.id = 'pxt-' + (blockId++);
+        sendBlock(pre);
+      });
+    } else if (msg.type === 'renderblocks' && msg.uri) {
+      var pre = document.getElementById(msg.id);
+      if (!pre) return;
+      var img = document.createElement('img');
+      img.src = msg.uri; img.alt = 'MakeCode blocks';
+      img.width = msg.width || undefined; img.height = msg.height || undefined;
+      pre.parentNode.insertBefore(img, pre);
+      pre.parentNode.removeChild(pre);
+    }
+  }, false);
+  var f = document.createElement('iframe');
+  f.id = 'makecoderenderer';
+  f.src = MCODE_URL + '--docs?render=1';
+  f.setAttribute('aria-hidden','true');
+  f.style.cssText = 'position:absolute;left:0;bottom:0;width:1px;height:1px;border:none;';
+  document.body.appendChild(f);
+}());
+</script>
+</body>
+</html>
