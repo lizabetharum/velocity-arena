@@ -477,8 +477,11 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Give teams two minutes to commit to one of their three morning loadouts (no new designs, no deliberation past the buzzer), then move directly into MakeCode setup with all four formulas programmed simultaneously. Circulate during setup using the Setup Monitoring Chart, watching for the most common miscodes: Speed output confused with the stat value, Endurance decay written as E×1.5×t instead of (20−E)×1.5×t, and Power coded linearly instead of quadratically. Run two to three simulation rounds of three minutes each, requiring a gap sentence entry before each new round. Run the post-match debrief in sequence (Endurance, then Turning, then Power) using the five scripted talk moves. Close with the non-optional individual exit ticket.",
         "script": "https://docs.google.com/document/d/1dLE5nbDOkwBGEi6ejIJX1IT48ir071mXRRU2A1_6Kvw/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-07-simulation-matches.html",
-        "makecode":"https://makecode.microbit.org/S61177-39386-22135-51757",
-        "exit": "https://docs.google.com/document/d/1oKYXqje3BTpjz0dP2PdVla2iYO8AsNsje_8kERxn5d0/edit?usp=sharing"
+        "makecode":[{"url":"https://makecode.microbit.org/S61177-39386-22135-51757", "label":"Starter Code"},
+          {"url":"https://makecode.microbit.org/S81289-36957-94190-01641", "label":"Starter Code with Launch Sequence"}
+        ],
+        "worksheet":[{"url":"https://velocity-arena-gold.vercel.app/lessons/launch-sequence-tuning.html", label:"Tuning Instructions for Launch Sequence"}], 
+         "exit": "https://docs.google.com/document/d/1oKYXqje3BTpjz0dP2PdVla2iYO8AsNsje_8kERxn5d0/edit?usp=sharing"
       },
       {
         "name": "Open Lab: Free Code Time",

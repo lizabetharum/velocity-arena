@@ -195,7 +195,10 @@ if (!day) {
     const links = a.link
       ? [{ url: a.link, label: 'Open activity' }]
       : (typeof getLessonLinks === 'function' ? getLessonLinks(a.name) : []).map(l => ({ url: l.url, label: l.label || 'Open lesson' }));
-    if (a.makecode) links.push({ url: a.makecode, label: 'MakeCode', newTab: true });
+    (a.makecode == null ? [] : (Array.isArray(a.makecode) ? a.makecode : [a.makecode]))
+      .map(x => typeof x === 'string' ? { url: x, label: 'MakeCode' } : { url: x.url, label: x.label || 'MakeCode' })
+      .filter(x => x.url)
+      .forEach(l => links.push({ url: l.url, label: l.label, newTab: true }));
     const linksHtml = links.map(l =>
       `<a class="act-link" href="${l.url}"${l.newTab ? ' target="_blank"' : ''}>${l.label} →</a>`
     ).join('');
