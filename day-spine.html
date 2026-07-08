@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Velocity Arena — Day Spine</title>
+<style>
+  :root{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EEF2F3;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#DBE1E4; --line-strong:#C1C9CD;
+    --teal:#0B7A8C; --teal-deep:#075867;
+    --field:#1F2A37; --setup:#9AA3AB;
+    --wa-ink:#9A4409; --wa-bg:#FBEEDD;
+    --ex-ink:#0B6E4E; --ex-bg:#E7F5EE;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#10151A; --card:#161C22; --band:#1B232B;
+      --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+      --line:#28323B; --line-strong:#374350;
+      --teal:#3FC5DA; --teal-deep:#7FE0EF;
+      --field:#8FA2B4; --setup:#5B6771;
+      --wa-ink:#E9A24C; --wa-bg:#2A2013;
+      --ex-ink:#54C79A; --ex-bg:#14261E;
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EEF2F3;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#DBE1E4; --line-strong:#C1C9CD;
+    --teal:#0B7A8C; --teal-deep:#075867; --field:#1F2A37; --setup:#9AA3AB;
+    --wa-ink:#9A4409; --wa-bg:#FBEEDD; --ex-ink:#0B6E4E; --ex-bg:#E7F5EE;
+  }
+  :root[data-theme="dark"]{
+    --paper:#10151A; --card:#161C22; --band:#1B232B;
+    --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+    --line:#28323B; --line-strong:#374350;
+    --teal:#3FC5DA; --teal-deep:#7FE0EF; --field:#8FA2B4; --setup:#5B6771;
+    --wa-ink:#E9A24C; --wa-bg:#2A2013; --ex-ink:#54C79A; --ex-bg:#14261E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:8.5in;margin:0 auto;padding:24px 20px 80px;}
+
+  /* screen chrome */
+  .bar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;
+    background:var(--paper);border-bottom:1px solid var(--line);padding:12px 20px;}
+  .bar .t{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+  .bar .sp{flex:1;}
+  .btn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);
+    border:1px solid var(--line-strong);border-radius:6px;padding:8px 12px;cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+
+  /* page = one printed sheet */
+  .page{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:26px 28px;margin:0 0 18px;}
+
+  /* cover */
+  .cover .kick{font:600 11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--teal);}
+  .cover h1{font:800 30px/1.05 var(--sans);letter-spacing:-.02em;margin:10px 0 4px;text-wrap:balance;}
+  .cover .sub{font:500 14px/1.5 var(--sans);color:var(--ink-2);max-width:64ch;margin:0 0 22px;}
+  .dq{border-left:3px solid var(--teal);background:var(--band);border-radius:0 8px 8px 0;
+    padding:16px 18px;margin:0 0 22px;}
+  .dq .lab{font:600 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);}
+  .dq p{font:700 18px/1.35 var(--sans);letter-spacing:-.01em;margin:8px 0 0;text-wrap:balance;}
+  .dq b{color:var(--teal-deep);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 22px;}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr;}}
+  .box{border:1px solid var(--line);border-radius:8px;padding:16px 18px;}
+  .box h3{font:700 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;margin:0 0 12px;color:var(--ink);}
+  .loop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .chip{font:700 12px/1 var(--sans);background:var(--band);border:1px solid var(--line-strong);
+    border-radius:999px;padding:8px 13px;color:var(--ink);}
+  .loop .ar{color:var(--teal);font:700 13px/1 var(--mono);}
+  .loop .cap{flex-basis:100%;font:500 12px/1.4 var(--sans);color:var(--ink-3);margin-top:8px;}
+  ol.five{margin:0;padding:0;list-style:none;counter-reset:f;display:grid;gap:9px;}
+  ol.five li{counter-increment:f;display:grid;grid-template-columns:22px 1fr;gap:10px;
+    font:500 13px/1.35 var(--sans);color:var(--ink-2);}
+  ol.five li::before{content:counter(f);font:700 11px/18px var(--mono);text-align:center;
+    color:var(--teal);background:var(--band);border:1px solid var(--line-strong);border-radius:5px;height:18px;}
+  ol.five b{color:var(--ink);font-weight:700;}
+  .legend{display:grid;gap:9px;}
+  .legend .row{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:start;
+    font:500 12.5px/1.35 var(--sans);color:var(--ink-2);}
+  .legend .sw{width:5px;height:16px;border-radius:2px;margin-left:4px;}
+  .lp{font:700 9px/14px var(--mono);letter-spacing:.06em;padding:1px 6px;border-radius:4px;display:inline-block;}
+  .lp.wa{color:var(--wa-ink);background:var(--wa-bg);}
+  .lp.ex{color:var(--ex-ink);background:var(--ex-bg);}
+
+  /* day header */
+  .dhead{display:flex;align-items:flex-end;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:4px;}
+  .dnum{font:800 30px/.85 var(--mono);letter-spacing:-.03em;color:var(--teal-deep);}
+  .dnum small{display:block;font:600 9px/1 var(--mono);letter-spacing:.14em;color:var(--ink-3);margin-top:6px;}
+  .dhead .th{flex:1;}
+  .dhead .wk{font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--teal);}
+  .dhead h2{font:800 19px/1.15 var(--sans);letter-spacing:-.015em;margin:6px 0 0;text-wrap:balance;}
+  .idea{background:var(--band);border-radius:6px;padding:9px 12px;margin:12px 0 14px;
+    font:500 12px/1.4 var(--sans);color:var(--ink-2);}
+  .idea b{font:700 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-right:8px;}
+  .idea .fx{font-family:var(--mono);color:var(--ink);}
+
+  /* activity rows */
+  .acts{display:grid;gap:0;}
+  .act{display:grid;grid-template-columns:58px 1fr;gap:14px;padding:9px 0 9px 12px;
+    border-top:1px solid var(--line);border-left:3px solid var(--cat,transparent);
+    margin-left:0;break-inside:avoid;}
+  .act:first-child{border-top:none;}
+  .act.ice,.act.ends,.act.brk{--cat:transparent;border-left-color:transparent;padding-left:15px;}
+  .act.math{--cat:var(--teal);}
+  .act.field{--cat:var(--field);}
+  .act.lab{--cat:var(--teal);border-left-style:dashed;}
+  .act.setup{--cat:var(--setup);}
+  .meta{text-align:right;padding-top:1px;}
+  .meta .m{font:700 13px/1 var(--mono);color:var(--ink);font-variant-numeric:tabular-nums;}
+  .meta .m i{font-style:normal;font-size:9px;color:var(--ink-3);}
+  .meta .b{font:600 8px/1.2 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-top:5px;}
+  .body .n{font:700 13.5px/1.25 var(--sans);letter-spacing:-.01em;color:var(--ink);}
+  .body .do{font:400 12.5px/1.4 var(--sans);color:var(--ink-2);margin-top:3px;}
+  .body .sub{display:grid;grid-template-columns:auto 1fr;gap:8px;margin-top:4px;align-items:start;}
+  .body .sub .lp{margin-top:1px;}
+  .body .sub p{margin:0;font:400 12px/1.38 var(--sans);color:var(--ink-2);}
+  .body .do .fx,.body .sub p .fx{font-family:var(--mono);font-size:11.5px;color:var(--ink);
+    background:var(--band);border-radius:3px;padding:0 4px;}
+  .brk .body .n{color:var(--ink-3);font-weight:600;font-size:12px;display:inline;}
+  .brk .body .do{display:inline;color:var(--ink-3);}
+
+  .foot{font:500 11px/1.4 var(--mono);color:var(--ink-3);text-align:center;margin-top:14px;letter-spacing:.03em;}
+
+  @media print{
+    :root{--paper:#fff;--card:#fff;}
+    .bar{display:none;}
+    body{background:#fff;font-size:12px;}
+    .wrap{max-width:none;margin:0;padding:0;}
+    .page{border:none;border-radius:0;padding:0.4in 0.5in;margin:0;
+      page-break-after:always;break-after:page;}
+    .page:last-child{page-break-after:auto;}
+    .act{break-inside:avoid;}
+    @page{size:Letter;margin:0;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+
+<div class="bar">
+  <span class="t">Velocity Arena · Day Spine</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Theme</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</div>
+
+<div class="wrap" id="wrap">
+  <section class="page cover">
+    <div class="kick">Facilitator Field Cards · 16 Days</div>
+    <h1>The Day Spine</h1>
+    <p class="sub">One page per day. Every activity boiled down to the three things you actually do while standing in the room — the move, the mistake to catch, and how it closes. The full facilitator notes stay as your prep-the-night-before backup; this is the card you hold during class.</p>
+
+    <div class="dq">
+      <span class="lab">The whole program is one question</span>
+      <p>How can you use data, equations, and code to build a robot athlete that wins on <b>math, not luck</b>?</p>
+    </div>
+
+    <div class="grid2">
+      <div class="box">
+        <h3>The loop — every match day is the same 4 steps</h3>
+        <div class="loop">
+          <span class="chip">Predict</span><span class="ar">→</span>
+          <span class="chip">Run</span><span class="ar">→</span>
+          <span class="chip">Gap</span><span class="ar">→</span>
+          <span class="chip">Recover</span>
+          <span class="cap">The math changes each week. The loop never does. Learn the loop, not 16 separate days.</span>
+        </div>
+      </div>
+      <div class="box">
+        <h3>If you're underwater, protect these five</h3>
+        <ol class="five">
+          <li><span><b>Predict</b> before each match</span></li>
+          <li><span><b>Gap sentence</b> after each match</span></li>
+          <li><span><b>Loss recovery</b> after every loss</span></li>
+          <li><span><b>Students</b> explain the math — not you</span></li>
+          <li><span><b>ENDS</b> closure to end the day</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>How to read a card</h3>
+      <div class="legend">
+        <div class="row"><span class="sw" style="background:var(--teal)"></span><span>The <b>left rail color</b> tells you the kind of block at a glance — <b style="color:var(--teal-deep)">teal = math</b>, <b style="color:var(--field)">dark = on the field</b> (build / match), <b style="color:var(--teal-deep)">dashed = self-directed Open Lab</b>, <b style="color:var(--setup)">grey = setup</b>. Ice-breakers and breaks have no rail.</span></div>
+        <div class="row"><span class="lp wa">WATCH</span><span>The specific misconception or error to catch — the one thing that quietly breaks the day if you miss it.</span></div>
+        <div class="row"><span class="lp ex">EXIT</span><span>How the activity closes — the exit ticket or non-optional check before moving on.</span></div>
+      </div>
+    </div>
+    <div class="foot">Generated from days-default.js + days-tn.js · 16-day (4×4) curriculum · print at 100%, one day per page</div>
+  </section>
+
+  <div id="days"></div>
+</div>
+
+<script id="data" type="application/json">
+[
+{"d":1,"w":1,"wn":"Play Lab + Boot Camp","th":"First Contact: Speed, Bots, and the Question That Drives Everything","mi":"Proportional reasoning. [[Motor Power = Speed×100/20]]. Each stat point = 5 motor power.","a":[
+ {"n":"Circle Pass","m":20,"b":"Ice Breaker","do":"Sound + movement passes around the circle; each person copies and adds a twist. Call \"reverse.\" No winner — don't explain the purpose."},
+ {"n":"Mirror: Pairs","m":15,"b":"Ice Breaker","do":"Partners mirror slow movements in silence; swap; then no leader. Physical presence before math."},
+ {"n":"Pre-Task Diagnostic","m":15,"b":"Challenge Block","do":"8 questions, 12 min, silent. Read the framing: information, not a grade. Don't coach.","wa":"Blanking student → privately, \"just put your best guess,\" and move on."},
+ {"n":"Pre-Reflection Survey","m":10,"b":"Challenge Block","do":"Right after the diagnostic, same framing. Confirm each student picks the right site + name/team so it matches the roster."},
+ {"n":"Driving Question Reveal + Teams","m":10,"b":"LX Setup","do":"Unveil the driving-question poster (it anchors all 4 weeks). Announce 3-person teams; they sit together. No math yet."},
+ {"n":"Stat Card Distribution","m":5,"b":"LX Setup","do":"Hand out stat cards — 4 rows, 3 greyed out. Fill only Speed today. It's a permanent 4-week artifact, not scratch paper."},
+ {"n":"Speed Stat Challenge","m":40,"b":"Challenge Block","do":"Ask what 100% means. Board: [[Motor Power % = Speed×100/20]]. Predict S=10, then compute S=1,3,5,6,8; compare with a neighbor team.","wa":"Teams using the [[Speed×5]] shortcut vs the full formula — push written steps, then name the proportional relationship.","ex":"Two-question exit ticket + first stat-card entry."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"First Bot Drive","m":80,"b":"Match-Build-Make","do":"Gas-pedal question. Predict: does doubling Speed double distance? Program S=3 then S=6, drive 30s, record distance for each.","wa":"Surface one \"friction fallacy\" team next to one that predicted exact doubling; push the predicted-vs-actual gap."},
+ {"n":"Open Lab: Free Code","m":30,"b":"Open Lab","do":"Open the lab, then say nothing. One question per table (\"What are you trying?\"), wait 10s, move on. Prompt only students who haven't touched the bot.","ex":"Scripted reflection + pair-share."}
+]},
+{"d":2,"w":1,"wn":"Play Lab + Boot Camp","th":"Endurance: When Your Bot Runs Out of Power","mi":"Rate of change / linear decay. [[P(t) = 100 − (20−E)×1.5×t]]. Power decays at a steady rate.","a":[
+ {"n":"Failure Bow","m":15,"b":"Ice Breaker","do":"Someone makes a mistake, bows, everyone cheers. You go first to set the scale. Keep it quick."},
+ {"n":"Slow Down, Slow Down","m":15,"b":"Ice Breaker","do":"Lead paced jumping jacks, gradually slowing the room. They feel the drop — that's Endurance. Don't belabor the metaphor."},
+ {"n":"Endurance Stat Challenge","m":50,"b":"Challenge Block","do":"Show the partial decay graph (t=4,5 blank); predict will it hit 0 and P at t=5 — no calculating. Then board [[P(t)=100−(20−E)×1.5×t]]; run E=6,4,2 + own allocation; plot.","wa":"Ask only which step they're on and what number they got. Sequence the share: table → graph → slope meaning.","ex":"Exit ticket before stat-card entry."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Program Endurance Into Your Bot","m":65,"b":"Match-Build-Make","do":"Worksheet predictions for all 4 time points first. Walk the code structure, then MakeCode with the starter link; run the 2-min / 4-burst test, record early vs late distance.","wa":"Check the formula structure — decay is [[(20−E)×1.5×t]], not [[E×1.5×t]].","ex":"≥2 teams share their gap sentence; push toward what the formula didn't account for."},
+ {"n":"Break","m":2,"b":"Break","do":"2-minute reset between back-to-back activities."},
+ {"n":"Role Rotation Briefing","m":10,"b":"Match-Build-Make","do":"Introduce Coder / Fabricator / Analyst (rotate weekly). The Analyst's data tells the Coder what to change; the Fabricator's setup decides if the data is accurate. 5 min to pick Week 2 roles."},
+ {"n":"Bot Naming Ceremony","m":40,"b":"Match-Build-Make","do":"Three formulas generate a bot name from name-letters (x), birth month (y), team number (z). Work x=4, y=3, z=2 on the board by hand before any device; then real inputs, post name + one sentence.","wa":"Don't rush — teams invested in a name stay engaged through later losses."},
+ {"n":"Open Lab: Free Code","m":20,"b":"Open Lab","do":"The Endurance value is locked on the card, but the code is theirs. One question per table, listen, move on.","ex":"Closing ritual: write + share one observation; connect it to the math."}
+]},
+{"d":3,"w":1,"wn":"Play Lab + Boot Camp","th":"Turning + The Story Your Data Tells","mi":"Coordinate geometry. Turning controls turn radius; grid navigation IS the math. [[d = √((x₂−x₁)²+(y₂−y₁)²)]].","a":[
+ {"n":"Human Robot Programming Challenge","m":25,"b":"Ice Breaker","do":"One student is the bot; a partner gives movement commands (\"forward 3, turn 90° left\"). Surfaces how imprecise words are — sets up the Turning formula as the fix. Fast and physical."},
+ {"n":"Distance-Time Graphs","m":65,"b":"Challenge Block","do":"Plot two bot runs, write one sentence on why the lines differ. Then introduce [[d = √((x₂−x₁)²+(y₂−y₁)²)]] using the arena grid; work a navigation challenge.","wa":"Students adding the horizontal + vertical gaps instead of using the quadratic form."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Energy Reset","m":3,"b":"","do":"30s jumping jacks / 30s arm circles / 30s silent stretch. Use it to break a slump, not as a reward."},
+ {"n":"Coordinate Navigation: Arc Approximation","m":90,"b":"Match-Build-Make","do":"Walk a 2- vs 8-segment path (more segments approximate a curve, never equal it). [[Turn Ratio = 0.2 + TURNING×0.02]]; calculate T=5; test 3 wheel-speed configs in MakeCode, predicting each arc first.","wa":"Target = three consecutive successful navigations by end of Day 4. Finalize the Turning allocation."},
+ {"n":"Open Lab: Free Code","m":35,"b":"Open Lab","do":"Free navigation practice — different targets and Turning values to build feel for turn radius. No required output."}
+]},
+{"d":4,"w":1,"wn":"Play Lab + Boot Camp","th":"Power: Ratio, Motor Speed, and the Scoop","mi":"Non-proportional / quadratic scaling. [[charge speed = Power²]]. Double the Power → quadruple the charge speed.","a":[
+ {"n":"Finger Speed-Sums","m":20,"b":"Ice Breaker","do":"Both show fingers on 3; first to call the sum wins. 5–7 fast rounds. Primes competitive instinct before Power."},
+ {"n":"Power Stat Challenge","m":50,"b":"Challenge Block","do":"Board: [[charge speed = Power²]], [[follow-through = 120 + Power×35]]. Gut-predict Power 8 before calculating (surfaces the linear misconception), then ratio table + bot trials.","wa":"The whole point: doubling Speed doubles output (proportional); doubling Power quadruples charge speed (quadratic)."},
+ {"n":"Power Allocation: Stat Card Fill-In","m":3,"b":"Transition","do":"[[Power = 20 − (S+E+T)]] — not a free choice. If the three already sum to 20, revise one before the block. Check every card."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Scoop Build + Ratio Testing","m":90,"b":"Match-Build-Make","do":"Predict on the worksheet first. Build a cardboard scoop (3-point checklist to test). 3 shots at Power 4, 3 at Power 8; compute charge-speed ratio (exactly 4.0) vs actual distance ratio (lower).","wa":"That gap between 4.0 and the real distance ratio IS the lesson.","ex":"Exit ticket: choose Power, show the [[Power²]] calc, confirm the 20-point total."},
+ {"n":"Open Lab: Free Code","m":40,"b":"Open Lab","do":"Refine scoop + Power value. Require one scoop redesign and one speed change; record which mattered more."}
+]},
+{"d":5,"w":2,"wn":"Season 1","th":"The Full System: 20 Points, Four Stats, One Equation","mi":"Budget constraint: [[S + E + T + P = 20]]. The equals sign means BALANCE, not \"the answer is.\"","a":[
+ {"n":"Conditional Simon Says","m":20,"b":"Ice Breaker","do":"\"If your Speed > 10, stand; if Endurance < 5, clap twice.\" They check their own card before acting. Every choice is conditional on the budget."},
+ {"n":"Two-Formula Warm-Up","m":8,"b":"Warm-up Block","do":"Board (pre-set): Speed=7, Endurance=5. 3 min solo, both outputs from memory. Discuss Q3 — what the two numbers together say about the bot. No single right answer; don't pick a winner."},
+ {"n":"The Budget Constraint","m":50,"b":"Challenge Block","do":"Board: [[S+P+T+E=20]]. Teams design 3 loadouts, all four outputs each. Push \"If Speed = 8, what are you giving up?\"","wa":"Note equals-sign errors (adding to one stat without subtracting) but DON'T correct — save them for the minute-45 misconception move.","ex":"Address the equals-sign-as-balance idea explicitly."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Cold Recall Check","m":10,"b":"Challenge Block","do":"5 questions, 10 min, solo, no notes. Framing: \"not a test — helps me teach.\" Tally on the chart; don't coach.","ex":"Share-out via \"Who got something different?\" (never \"Who got it wrong?\")."},
+ {"n":"Dashboard Introduction","m":10,"b":"Transition","do":"Pre-load the projector with a sample loadout + gap sentence (<60s demo). Teams confirm total = 20, then enter. Model the 3-part gap sentence: predicted / did / gap.","ex":"Non-optional check: loadout total, gap-sentence format, Data Owner named."},
+ {"n":"Simulation Matches","m":90,"b":"Match-Build-Make","do":"2 min to commit to one morning loadout (buzzer = final). Program all four formulas; run 2–3 sim rounds, a gap sentence before each.","wa":"Common miscodes: Speed output = the stat value; decay as [[E×1.5×t]]; Power coded linearly.","ex":"Non-optional individual exit ticket."},
+ {"n":"Open Lab: Free Code","m":30,"b":"Open Lab","do":"\"Which loadout matched your predictions best?\" then step back. Hold the line: predictive accuracy ≠ winning.","ex":"Journal 5 silent min. Two sentences: Week 1 done, Season 1 announced."}
+]},
+{"d":6,"w":2,"wn":"Season 1","th":"Lock In Your Build: Allocations, Fabrication, One Hard Correction","mi":"All four formulas at once. Interleaved practice — identify the formula BEFORE you calculate.","a":[
+ {"n":"Equation Relay Race","m":20,"b":"Ice Breaker","do":"Relay: each student solves one step of a multi-step equation, tags the next. 2–3 rounds; fix procedural errors after each round, not during."},
+ {"n":"Official Stat Allocation: Interleaved Set","m":50,"b":"Challenge Block","do":"12 shuffled problems face-down. Rule: tag the formula type BEFORE calculating. 30–35 min silent; lock in official stats via Prove Your Build.","wa":"Don't let them flip until after the comprehension check. This is the LAST change before Day 7 competition."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Field Geometry + Approach Planning","m":50,"b":"Challenge","do":"Board: [[LAUNCH SEQUENCE → HANDOFF POINT → MATCH LOOP]]. Plot start, tip-off, goal; apply the distance formula from the ball zone at (4,2); commit to a position and bot-test it."},
+ {"n":"Launch Sequence Programming + Testing","m":60,"b":"Match-Build-Make","do":"Two launch strategies on paper first (+1 prediction each). Code/test A ×3, then B ×3; record hit rate + post-kick position.","wa":"At min 35, name accuracy vs reliability. Step 8: change one variable only."},
+ {"n":"Launch Showcase","m":20,"b":"Match-Build-Make","do":"Each team runs once; observers log one math claim per run (30s pause). Push \"they were fast\" → \"Speed is probably above 8.\"","ex":"Fixed 10-min window: one change, cite the observation that justified it. Sequences lock."},
+ {"n":"Open Lab: Final Verification","m":15,"b":"Open Lab","do":"Pre-Match Checklist in order (Power, Endurance, Speed, Turning) — one in the code, one checking the math.","wa":"Any unresolved mismatch carries a PENDING into tomorrow's first match."}
+]},
+{"d":7,"w":2,"wn":"Season 1","th":"Season 1 Begins: First Matches and the Leaderboard","mi":"Slope-intercept form: [[P(t) = 100 − rt]]. Slope r = power lost per minute; x-intercept = when the bot dies.","a":[
+ {"n":"Trashketball: Warm-Up","m":20,"b":"Ice Breaker","do":"Solve an allocation equation right → earn a paper-ball shot (bonus for the make). 3–4 rounds; fix errors before the shot."},
+ {"n":"Endurance Decay in Slope-Intercept Form","m":50,"b":"Challenge Block","do":"On their own bot: 20%-floor time (set P=20) and x-intercept (set P=0). Board both first. Name it: [[r]] = the slope = power lost per minute.","wa":"Errors: using P=0 for the floor; using E instead of [[r=(20−E)×1.5]]; arithmetic in r.","ex":"Non-optional exit ticket + data-log entry (equation + x-intercept)."},
+ {"n":"Pre-Match Prediction Huddle","m":10,"b":"","do":"Each team reads its full allocation aloud (value, formula, output), then writes ONE goal-count prediction — signed, no ranges, no revising."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Dashboard + Match Rules","m":15,"b":"Transition","do":"Rules in <10 min: 3-min matches, no mid-match code changes, 30s dispute window with evidence. Every team enters one practice row.","ex":"Non-optional ready check: pre-match checklist aloud before the first match."},
+ {"n":"Season 1 Round-Robin, Day 1","m":90,"b":"Match-Build-Make","do":"3 rounds. Write the prediction before hearing the opponent's; play 3 min; record goals + W/L immediately.","wa":"Run loss recovery BETWEEN rounds with any team that lost — don't wait until the end.","ex":"Exit ticket: prediction, result, gap, one cause hypothesis."},
+ {"n":"Leaderboard Reveal + Open Lab","m":30,"b":"Match-Build-Make / Open Lab","do":"Read every row aloud. Explain Best Prediction = avg |predicted−actual|, smaller is better, tracked separately from wins. Name the leader.","ex":"Closing ritual: one concept + full calc, written then shared in bot terms."}
+]},
+{"d":8,"w":2,"wn":"Season 1","th":"Matching Situations, Graphs, and Linear Equations","mi":"Linear equations from two data points. [[slope = Δy/Δx]]; solve the y-intercept from a known point.","a":[
+ {"n":"Math Scavenger Hunt: Leaderboard Edition","m":20,"b":"Ice Breaker","do":"Answer-chain cards using real leaderboard stats; each answer points to the next card. Self-correcting — if they're lost, the previous answer was wrong."},
+ {"n":"Matching Situations, Graphs, Linear Equations","m":50,"b":"Challenge Block","do":"Match Verbal / Table / Graph card sets by slope. Then pick two class-scatter points → slope → solve b → [[Goals = m·Speed + b]]; interpret both.","wa":"Different point pairs give different but valid equations — that's the point.","ex":"Non-optional exit ticket."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Season 1 Match Day 2","m":70,"b":"Match-Build-Make","do":"2 rounds, same cycle — but predict from the scatter-plot equation ([[y=mx+b]], Speed as input). Loss recovery before Round 2.","wa":"Don't start until every team can state its prediction source and has a written equation-based prediction.","ex":"Verify 2 filled log rows + updated dashboards; name the Best Prediction leader."},
+ {"n":"Rivalry Cards","m":20,"b":"Match-Build-Make","do":"One trash-talk card per team — must cite a specific stat (\"Endurance=3 → slows at minute 4\"). No data, no card. Post on the wall.","wa":"Any card without data goes back for revision."},
+ {"n":"Day 8 Open Lab","m":25,"b":"Open Lab","do":"Does your morning equation still hold vs today's results? One question per team: does today support or contradict your model? Prep Formula Race Cards for next session."}
+]},
+{"d":9,"w":3,"wn":"Commissioner / Season 2","th":"Season 1: Adjustments, Linear Equations, and the Gap","mi":"Residuals: predicted − actual. The formula you got WRONG is more informative than the one you got right.","a":[
+ {"n":"Rivalry Card Response","m":20,"b":"Ice Breaker","do":"Open the dashboard; verify every number on the card you received. Wrong → sticky \"check your data\" + the correct number. Right → name one stat where you beat them and the plan.","wa":"Keep it analytical — is the number right, and where did you verify it? Facilitate process, not content."},
+ {"n":"Formula Relay: All Five Types","m":50,"b":"Challenge Block","do":"20 shuffled cards across 6 formula types; solve as a team, bring for a stamp (correct + complete only, else \"check your work\"). Then sort into 6 piles, count errors per type.","wa":"Five formulas are linear; Power ([[P²]]) is quadratic — name it.","ex":"Exit ticket: a Match-Day-3 prediction using your WEAKEST formula type, substitution shown."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Season 1 Match Day 3","m":90,"b":"Match-Build-Make","do":"3 matches; predict with your weakest formula type. Gap > 20% → name the specific input that was off (a coefficient/assumption), not \"we scored fewer.\"","wa":"Loss recovery every loss: walk to the formula, find the one input, name the change.","ex":"Read the leaderboard starting with Best Prediction, not Wins."},
+ {"n":"Open Lab: Post-Match Debrief","m":40,"b":"Open Lab","do":"10 min: find one PATTERN in another team's data (not a result): \"We noticed ___. This matters because ___.\" Read it aloud to that team.","ex":"Exit ticket: one finding + one \"If we change [stat] X→Y, we expect [outcome] because [data]\" hypothesis."}
+]},
+{"d":10,"w":3,"wn":"Commissioner / Season 2","th":"Season 1 Final Matches + Distance Formula on Match Data","mi":"Distance formula applied to tip-off, ball, and goal to judge charge efficiency. Hitting farther ≠ useful progress.","a":[
+ {"n":"Best Match Gallery Walk","m":20,"b":"Ice Breaker","do":"Post your single best Season 1 match (config + result). Dot-vote the most mathematically interesting finding — who learned most from one result, not who won."},
+ {"n":"Distance Formula: How Far Did the Ball Travel","m":50,"b":"Challenge Block","do":"A=(4,2) tip-off, G=(8,2) goal, B=your landing point. Compute A→B, A→G, B→G; the efficiency ratio; the theoretical minimum kicks.","wa":"Errors: squaring the sum not each difference; skipping the final √; inverting the ratio. Big idea: hitting farther doesn't always help.","ex":"Non-optional exit ticket."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Cold Recall Check","m":10,"b":"Challenge Block","do":"5 questions, 10 min, solo, no notes/devices. Circulate, tally, don't answer. Pause on Q4: name the move — \"finding a zero of a function.\"","ex":"Invite anyone who struggled with Q4 to find you in Open Lab."},
+ {"n":"Season 1 Final Round","m":90,"b":"Match-Build-Make","do":"Data is the main event. 10-min audit: avg prediction error across match days, over/under, improving or not. 2 short rounds; predict from the Day 8 equation.","wa":"Analysis block: avg error + trend, the one input the model keeps missing, a Season 2 hypothesis with a real calculation.","ex":"Exit: \"If I change [stat] X→Y, my equation predicts [result], which addresses [the residual pattern].\""},
+ {"n":"Open Lab: Season 2 Planning","m":30,"b":"Open Lab","do":"Write ≥1 Season 2 hypothesis backed by a number: \"If I change [stat] X→Y, then [outcome], because [dashboard number].\"","wa":"Point to the win/loss-by-matchup column; don't name the stat. Track B must write the hypothesis before testing.","ex":"Pair-share checks each other's change + citation. Season 2 locks Monday."}
+]},
+{"d":11,"w":3,"wn":"Season 2 + Commissioner","th":"You Run the League Now: Commissioner Prep + the Underdog Mechanic","mi":"Proportional vs non-proportional at 50%: Speed +50% → +50% output; Power +50% → +125% charge speed.","a":[
+ {"n":"Human Number Line: Stat Rankings","m":20,"b":"Ice Breaker","do":"Which Season 1 stat mattered most FOR WINNING (not most allocated)? Stand on the tape line, no data. Then a 3-min dashboard check: did winners allocate more to it?","ex":"Exit: \"The stat that mattered most was ___ because our data shows ___.\""},
+ {"n":"Proportional Scaling + Commissioner Prep","m":45,"b":"Challenge Block","do":"Scaling tool: original output → scale the stat 50% → new output → percent change, for two stats. Then draft a rule-change proposal.","wa":"Errors: raw difference instead of percent change; [[Power×5]] instead of [[Power²]]. Key contrast: Speed +50% → +50%, Power +50% → +125%.","ex":"Verbal check: proposal caps/floors a stat, 2 cited numbers with the math, effect on last place."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Underdog Mechanic + Season 2 Reallocation","m":30,"b":"Match-Build-Make","do":"No clear last place → skip it. Else the last-place team gets +2 points (stats total 22); everyone else checks: does my own allocation still pass my proposed rule?","wa":"Show the math, not just the decision. Underdog team: recompute Motor Power + Charge Speed at 22.","ex":"Exit: Performance Hypothesis sentence with both formula calcs + a real tradeoff."},
+ {"n":"Practice Matches: Test New Loadout Hypotheses","m":60,"b":"Match-Build-Make","do":"No scoring — every run is a hypothesis test. Write the hypothesis BEFORE the run (which stat, from→to, expected, Season 1 evidence); no write, no count. ~4 runs.","wa":"Vague hypotheses; teams that confirm after one run and stop; teams that ran but wrote nothing.","ex":"≥2 complete entries + the Commissioner Proposal box filled."},
+ {"n":"Open Lab: Commissioner Proposal Refinement","m":40,"b":"Open Lab","do":"Verify every number against the dashboard. Does it actually help last place, or just you? Force a real percent change: [[(new−old)/old×100]].","wa":"A number that lives only on the worksheet doesn't count until it's found in the dashboard.","ex":"Every team: ≥1 dashboard-verified number + a written percent change."}
+]},
+{"d":12,"w":3,"wn":"Season 2 + Commissioner","th":"The Commissioner's Meeting: You Change the Rules","mi":"Data-backed argument. Every claim cites a dashboard number. Causal (X produces Y) vs correlational (they just co-occur).","a":[
+ {"n":"Lobby the Commissioners","m":25,"b":"Ice Breaker","do":"10 min circulating: \"here's our proposal, here's the number, what do you think?\" Don't engage with content — \"tell them, not me.\" Then 11 min revision.","ex":"Quick check: each team names the one math concept its proposal uses."},
+ {"n":"Final Proposal Verification","m":35,"b":"Challenge Block","do":"Check every number vs the dashboard: both cited numbers real, how much it helps last place, that it doesn't help you more, name the concept.","wa":"Errors: dividing by the after value; comparing raw point gains instead of percentages. You judge truth, not persuasiveness.","ex":"Point at one number per team; a member explains from memory + names the concept."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Commissioner's Meeting: Presentations + Vote","m":90,"b":"Match-Build-Make","do":"3 min each; the proposing team doesn't vote on its own rule; majority of the others passes. Everyone verifies the presenter's percent-change math. Passed rules go on the wall in marker.","wa":"Hold 3 min hard; ask \"can anyone verify the math?\" before the vote. An objection only counts if it names a number.","ex":"Exit: calculate a percent change for a capped stat + write one allocation satisfying every rule."},
+ {"n":"Open Lab: Season 2 Allocation Verification","m":35,"b":"Open Lab","do":"Recalculator: enter an allocation that satisfies EVERY passed rule and still sums to 20 (22 for Underdog). Program MakeCode, one test drive.","wa":"If rule minimums add up to more than 20, the rules conflict — flag it to the room.","ex":"Exit: the hardest constraint written as an inequality + confirm the allocation passes every rule."}
+]},
+{"d":13,"w":4,"wn":"Showcase Week","th":"Your Win Equation + Season 2 Begins","mi":"Build your OWN linear equation from match data: two points → slope → y-intercept → a testable prediction.","a":[
+ {"n":"The Prediction Market","m":20,"b":"Ice Breaker","do":"One number on a card: \"We'll win X of Y,\" based on a real Season 1 fact. No ranges, no peeking. Post all at once on 3; each says what number led to it. Tape down for Day 14."},
+ {"n":"Building and Solving Linear Equations","m":50,"b":"Challenge Block","do":"x = a bot's stat value, y = its Season 1 Win% (not raw wins). Pick two bots → build a line → test it on a third, untouched bot; compute the residual.","wa":"Lesson-breaking errors: raw wins instead of Win%; two bots too close together. Hold \"predicts approximately,\" not \"will win.\"","ex":"Match Gate: every team posts its prediction sentence before it can play."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Season 2 Match Day 1","m":90,"b":"Match-Build-Make","do":"3 rounds under Commissioner rules. Before each: read the equation, plug in the opponent's stat, write a win-probability number. Announce ball mode before Rounds 2–3 (dog ball rewards Speed, rubber rewards Endurance).","wa":"Loss recovery: pick which of 3 reasons missed — wrong slope, wrong x, or ball mode (ball-mode reason valid only in Rounds 2–3).","ex":"Exit: round, prediction direction, which of the 3 reasons explains the miss."},
+ {"n":"Open Lab: Residual Logging","m":35,"b":"Open Lab","do":"Prediction vs actual per match; residual + direction (too high/low); one pattern sentence (or \"no clear pattern in 3\"); one question for tomorrow.","wa":"Say plainly: 3 matches isn't enough to change the equation — revision comes tomorrow with 6 results.","ex":"Check: 3 residuals, 3 directions, 1 pattern sentence, 1 question."}
+]},
+{"d":14,"w":4,"wn":"Showcase Week","th":"Season 2: Percent Change and the Model vs. the Match","mi":"Percent change = [[(new−old)/old×100]] — a proportional comparison, NOT the percentage-point difference.","a":[
+ {"n":"Stat Auction + Prediction Check","m":30,"b":"Ice Breaker","do":"Tokens (3/team, 4 for last place) bid on stat packages; the winner recomputes the output and must sum to 20 before the next package. Then a 5-min prediction check.","wa":"Revising a prediction needs one specific dashboard number + one sentence, in pen on the card.","ex":"Each team states what stat changed and its effect on the formula output before Match 1."},
+ {"n":"Percent Change: Season 1 → Season 2","m":50,"b":"Challenge Block","do":"Board first: [[(S2−S1)÷S1×100]]. Walk Speed 4→6 together; 30 min solo. At min 38, the Power counterexample (50% → 125%).","wa":"The #1 error: dividing by Season 2 instead of Season 1. Percent change tells you how big the move was, not whether it was worth it.","ex":"Exit ticket: Endurance 6→3 + the 40% Power question."},
+ {"n":"Lunch","m":60,"b":"Break","do":"Protected break. No math talk."},
+ {"n":"Season 2 Match Day 2","m":90,"b":"Match-Build-Make","do":"Dog ball all day (remove the other balls; post the sign). Verify auction winners' stats in MakeCode yourself. Before each: read last residual, decide up/down/same, estimate the opponent stat, write a number.","wa":"Best Model badge = closest to the prediction card, not most wins. \"Blame the ball\" → it's the same ball all match day.","ex":"Exit ticket on the End-of-Day page."},
+ {"n":"Open Lab: Residual Analysis","m":40,"b":"Open Lab","do":"Fill the residual table (Ball Mode, Predicted, Actual, Residual, Size, Direction). Did direction flip Day 13→14? Yes → hold + name the ball mode. No → check Size: same = starting number, growing = slope.","wa":"Most common error: skipping the sorting question and jumping to changing a value. Check Step 2 before Step 3.","ex":"Exit: completed table, yes/no, Step 4 (2 sentences or hold), Step 5 prediction, and why."}
+]},
+{"d":15,"w":4,"wn":"Showcase Week","th":"Creative Expression: Bot Identity + Match 3 + Post-Diagnostic","mi":"Explain your reasoning out loud: every claim needs a number next to it. Same 8 concepts as Day 1 — measured again.","a":[
+ {"n":"Bot Lore Gallery Walk","m":25,"b":"Hook","do":"Re-read every bot origin story since Day 2. Add one new sentence that only makes sense because you played both seasons. 3 min, then post."},
+ {"n":"Teach the Math","m":45,"b":"Challenge Block","do":"Each student picks a different formula, enters their real numbers, reads the walkthrough, writes a plain-language explanation. Present; after each, ask \"How did you get that specific number?\"","wa":"Two errors: [[P²]] read as [[P×2]]; percent change divided by the new value, not the old.","ex":"Index card: formula, full calculation, one plain-language sentence."},
+ {"n":"Lunch / Snack","m":20,"b":"Break","do":"20-minute break."},
+ {"n":"Match Day 3","m":90,"b":"Match-Build-Make","do":"Alternating balls: R1 foam, R2 dog, R3 rubber — announce + log the mode BEFORE predicting (a transfer test). MY EQUATION check before Match 1; don't start without a written equation.","wa":"Retrospective: name which of 4 causes drove the residual — slope error, x-choice, model drift, environmental sensitivity.","ex":"Exit ticket, then the Bracket Reveal."},
+ {"n":"Post-Task Diagnostic","m":15,"b":"Challenge Block","do":"Same 8 concepts as Day 1, 12-min timer. Deliver the \"comparing you to yourself from 4 weeks ago\" script. Stand aside; \"read it again, do your best.\"","ex":"\"Computers closed\" + one non-evaluative line. Review the Diagnostic Dashboard after."},
+ {"n":"Post-Reflection Survey","m":10,"b":"Challenge Block","do":"Right after the diagnostic, same sitting. Confirm site + name/team so it matches their Day 1 pre-reflection."},
+ {"n":"Open Lab: Reflection Time","m":30,"b":"Open Lab","do":"Prep the Exhibition pitch from the Bot Identity card: name + allocation, compute one formula live, biggest gap sentence, one Season 1→2 change and why. Rehearse on a teammate."},
+ {"n":"ENDS Closing Ritual","m":10,"b":"ENDS","do":"Each student names a moment where data changed their mind, citing a specific number."}
+]},
+{"d":16,"w":4,"wn":"Showcase Week","th":"Community Exhibition: You Are the Experts Now","mi":"Explain the math to an outsider. You only know a concept if a visitor who's never seen the system can do it themselves.","a":[
+ {"n":"Expert Setup","m":40,"b":"Hook","do":"Set the station (scouting report, bot, grid, dashboard). Rehearse the 3 visitor mini-challenges on a teammate.","wa":"Too much jargon or a skipped calc → \"explain it as if you've never heard of a bot.\" Write the one thing every visitor should leave understanding."},
+ {"n":"Community Exhibition: Teaching + Best Teacher Voting","m":70,"b":"Match-Build-Make","do":"Visitors do 3 mini-challenges: unit rate (wins ÷ Speed), coordinate distance, and why Speed scales proportionally. Goal: every visitor completes all three unprompted.","wa":"Stay OUT of the explanation. Redirect confusion to the student: \"show them the formula on your card.\" Answering for a student defeats the session."},
+ {"n":"Snack Break","m":20,"b":"Break","do":"20-minute break."},
+ {"n":"Walk the Wall: Final Gallery","m":20,"b":"Hook","do":"Quiet gallery of every artifact — bot names, rivalry cards, leaderboard, Commissioner rules, scouting reports. Don't narrate. Give it its full time."},
+ {"n":"Awards Ceremony","m":60,"b":"Match-Build-Make","do":"Every award announced with its data criterion + the calculation (\"Most Improved = highest percent-change in win rate, here's the math\"). Then student-led growth statements."},
+ {"n":"Open Lab: Final Debrief","m":10,"b":"Open Lab","do":"Final journal: what you learned about yourself as a problem solver + one moment you solved something you thought you couldn't. Name what the program produced — a room that can explain algebra with its own data."},
+ {"n":"ENDS Closing Ritual","m":10,"b":"ENDS","do":"Final reflection: what you learned about yourself; one moment you solved something you thought you couldn't; what you'd do differently. 5 min."}
+]}
+]
+</script>
+<script>
+(function(){
+  var CAT={"Challenge Block":"math","Challenge":"math","Warm-up Block":"math",
+    "Match-Build-Make":"field","Match-Build-Make / Open Lab":"field",
+    "Open Lab":"lab","Transition":"setup","LX Setup":"setup",
+    "Ice Breaker":"ice","Hook":"ice","Break":"brk","ENDS":"ends","":"ice"};
+  function fx(s){return (s||"").replace(/\[\[(.+?)\]\]/g,'<span class="fx">$1</span>');}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  var DATA;
+  try{DATA=JSON.parse(document.getElementById("data").textContent||"[]");}catch(e){DATA=[];}
+  var host=document.getElementById("days");
+  DATA.forEach(function(d){
+    var pg=el("section","page day");
+    var head=el("div","dhead");
+    head.appendChild(el("div","dnum","<span>"+String(d.d).padStart(2,"0")+"</span><small>DAY</small>"));
+    var th=el("div","th");
+    th.appendChild(el("div","wk","Week "+d.w+" · "+d.wn));
+    th.appendChild(el("h2",null,d.th));
+    head.appendChild(th);
+    pg.appendChild(head);
+    if(d.mi)pg.appendChild(el("div","idea","<b>Big idea</b>"+fx(d.mi)));
+    var acts=el("div","acts");
+    d.a.forEach(function(a){
+      var cat=CAT[a.b]!=null?CAT[a.b]:"ice";
+      var row=el("div","act "+cat);
+      var mins=a.m>=60&&a.m%60===0? (a.m/60)+"<i>h</i>" : a.m+"<i>m</i>";
+      var meta=el("div","meta","<div class='m'>"+mins+"</div>"+(cat==="brk"?"":"<div class='b'>"+(a.b||"—")+"</div>"));
+      row.appendChild(meta);
+      var body=el("div","body");
+      if(cat==="brk"){
+        body.appendChild(el("span","n",a.n+" — "));
+        body.appendChild(el("span","do",fx(a.do)));
+      }else{
+        body.appendChild(el("div","n",a.n));
+        body.appendChild(el("div","do",fx(a.do)));
+        if(a.wa){var w=el("div","sub");w.innerHTML="<span class='lp wa'>WATCH</span><p>"+fx(a.wa)+"</p>";body.appendChild(w);}
+        if(a.ex){var x=el("div","sub");x.innerHTML="<span class='lp ex'>EXIT</span><p>"+fx(a.ex)+"</p>";body.appendChild(x);}
+      }
+      row.appendChild(body);
+      acts.appendChild(row);
+    });
+    pg.appendChild(acts);
+    host.appendChild(pg);
+  });
+  // theme toggle
+  var root=document.documentElement, tb=document.getElementById("theme");
+  tb&&tb.addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){cur=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+    root.setAttribute("data-theme",cur==="dark"?"light":"dark");
+  });
+  var pb=document.getElementById("print");
+  pb&&pb.addEventListener("click",function(){window.print();});
+})();
+</script>
+</body>
+</html>
