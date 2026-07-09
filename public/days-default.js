@@ -451,9 +451,10 @@ const DAYS_DEFAULT = [
         "mins": 10,
         "block": "Challenge Block",
         "description": "Five questions, 10 minutes, by yourself, no notes. General math -- slopes, recipes, percentages, distances. No grade. This is just a check on what is sticking after four days.",
+        "link": { url: "/lessons/recall-check-day5.html", label: "Questions" },
         "facilitatorDescription": "Run a silent individual recall check on five math concepts from Days 1–4. Open with the exact framing line ('This is not a test -- I'm using this to figure out what I need to teach differently today'), give students 60 seconds to scan all five questions before the timer starts, then hold 10 minutes of silent individual work while you circulate and tally responses on the monitoring chart. Don't coach during the work period. Run a whole-class share-out using 'Who got something different?' (not 'Who got it wrong?'), and use errors to build connecting questions to the Budget Constraint.",
         "script": "https://docs.google.com/document/d/1TuqKRSipwR2pC5txnlN7Eh3y-p1Rh2dCIVb8uFO9iKA/edit?usp=drive_link",
-        "worksheet": [{url: "/lessons/recall-check-day5.html", label: "Questions"},
+        "worksheet": [{url: "https://velocity-arena-gold.vercel.app/lessons/recall-check-day5.html", label: "Questions"},
            {url: "https://docs.google.com/document/d/16C_9YMX6Szv5DiSE_71MBRQAclnXx0yRoyBLDajxnfw/edit?usp=sharing", label: "Answers"}
         ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day05-04-cold-recall.html"
@@ -535,7 +536,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Place the 12-problem set face down on each table before students enter, no formula sheets visible. Introduce the task: tag the formula structure first, then calculate. Do not let students flip until after the comprehension check. Hold 30–35 minutes of individual silent work; circulate with the monitoring chart. Students finish by locking in their stats with the online Prove Your Build. There is an extra-practice HTML worksheet for fast finishers.",
         "script": "https://docs.google.com/document/d/1Y6w0LgGfHSx_5icP4yTCNnHzYIYSofLFxoQVoNdZweY/edit?usp=drive_link",
         "worksheet": [
-          { url: "/lessons/interleaved-day6.html", label: "Questions" },
+          { url: "https://velocity-arena-gold.vercel.app/lessons/interleaved-day6.html", label: "Questions" },
           { url: "https://drive.google.com/file/d/1HTKprechKjPNoACQ-fWBMvjIPoCIACLS/view?usp=drive_link", label: "Answer Key" }
         ],
         "exemplar": "https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6-interleaved-exemplars.html",
@@ -917,6 +918,7 @@ const DAYS_DEFAULT = [
         "mins": 10,
         "block": "Challenge Block",
         "description": "Five questions, 10 minutes, individual work, non-bot context, no grade. Write on paper without notes or devices. (1) Percent change in motor power between Speed = 6 and Speed = 9. (2) Slope-intercept form from slope 2 through (1,3). (3) Distance from (2,5) to (7,17). (4) When does P(t) = 100 - 12t reach zero? (5) A bot travels 150 cm in 5 seconds -- what is its speed in cm/sec, and how far at that rate for 8 seconds?",
+        "link": { url: "/lessons/recall-check-day10.html", label: "Questions" },
         "facilitatorDescription": "Distribute the Cold Recall Check and read the framing: five questions, 10 minutes, individual work, no notes, no devices, no grade. Write all five questions on the board. Students work alone for eight minutes with no bot, notes, or devices. Circulate slowly and fill in the monitoring chart, marking any student who leaves a question blank by the five-minute mark; do not answer math questions, even if asked. Call pencils down at minute nine. Students self-check. Read answers to Q1–Q3. Pause on Q4: read the answer, ask one discussion question about how students knew to set the function to zero, name the move as finding a zero of a function, then read Q5. Close with a consolidation line and an open invitation for anyone who struggled with Q4 to find you during Open Lab.",
         "script": "https://docs.google.com/document/d/1024tZLvwZFUNsyWOCjqZPvSyYATN3y7V_JNpg0d78MU/edit?usp=drive_link",
         "worksheet": "/lessons/recall-check-day10.html",

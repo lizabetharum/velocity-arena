@@ -34,7 +34,8 @@ const ACTIVITY_LESSONS = {
     { url: '/lessons/crack-the-bot.html',     label: 'Crack the bot' },
   ],
   'Dashboard Introduction': '/student/week-1.html',
-  'Simulation Matches: Your Loadout vs. Reality': [{url: "/lessons/simulation-matches.html", label: "Simulation matches Code"},
+  'Simulation Matches: Your Loadout vs. Reality': [{url: "/lessons/launch-sequence-tuning.html", label: "Launch Sequence Tuning"},
+    {url: "/lessons/simulation-matches.html", label: "Simulation matches Code"},
     {url:"/activities/dashboard/velocity-arena-dashboard.html", label: "Dashboard"},
     {url:"/activities/dashboard/dashboard-guide-preseason.html", label: "Dashboard Guide"}
 
@@ -82,6 +83,7 @@ const ACTIVITY_LESSONS = {
     {url: '/lessons/what-if/', label: 'What-If? Analysis'}
   ],
     'Official Stat Allocation: Interleaved Problem Set': [
+    { url: '/lessons/interleaved-day6.html',        label: 'Questions' },
     { url: '/lessons/interleaved-problem-set.html', label: 'Problem set' },
     { url: '/lessons/prove-your-build.html',        label: 'Prove your build' },
   ],
