@@ -1265,13 +1265,8 @@
               <div>
                 <span class="view-small-label">X &mdash; input (what you control)</span>
                 <select id="x-field" onchange="autoPopulateTable()" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color: var(--fg-0);background: var(--bg-2);">
-                  <option value="">-- pick from match log --</option>
+                  <option value="">-- pick the input --</option>
                   <option value="match">Match #</option>
-                  <option value="week">Week</option>
-                  <option value="goals_for">Goals For (from score)</option>
-                  <option value="goals_against">Goals Against (from score)</option>
-                  <option value="predictedGoals">Predicted Goals</option>
-                  <option value="predictionError">Prediction Error</option>
                   <option value="custom">Custom (type my own)</option>
                 </select>
                 <input type="text" id="x-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color: var(--fg-0);margin-top:4px;display:none;" oninput="updateChart()">
@@ -1279,13 +1274,11 @@
               <div>
                 <span class="view-small-label">Y &mdash; result (what you measure)</span>
                 <select id="y-field" onchange="autoPopulateTable()" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color: var(--fg-0);background: var(--bg-2);">
-                  <option value="">-- pick from match log --</option>
-                  <option value="match">Match #</option>
-                  <option value="week">Week</option>
-                  <option value="goals_for">Goals For (from score)</option>
-                  <option value="goals_against">Goals Against (from score)</option>
-                  <option value="predictedGoals">Predicted Goals</option>
-                  <option value="predictionError">Prediction Error</option>
+                  <option value="">-- pick the result --</option>
+                  <option value="cumulative_goals_for">Cumulative Goals For (running total)</option>
+                  <option value="cumulative_wins">Cumulative Wins (running total)</option>
+                  <option value="cumulative_points">Cumulative Points (running total)</option>
+                  <option value="prediction_residual">Prediction residual (predicted − actual)</option>
                   <option value="custom">Custom (type my own)</option>
                 </select>
                 <input type="text" id="y-label" placeholder="or type a custom label" style="font-family:var(--font);font-size:11px;font-weight:600;padding:5px 7px;border:1.5px solid var(--border);border-radius:4px;width:100%;outline:none;color: var(--fg-0);margin-top:4px;display:none;" oninput="updateChart()">
@@ -2105,25 +2098,29 @@ function deleteJustification(i) {
 }
 
 // ─── FOUR VIEWS ────────────────────────────────────────────
-function getMatchFieldValue(match, field) {
-  if (field === 'match') return parseFloat(match.match) || '';
+// idx + cum are supplied by autoPopulateTable. `cum` carries running totals
+// aligned to the match log: { goals:[], wins:[], pts:[] } (null = no result yet).
+function getMatchFieldValue(match, field, idx, cum) {
+  if (field === 'match') {
+    const m = parseFloat(match.match);
+    return !isNaN(m) ? m : (typeof idx === 'number' ? idx + 1 : '');
+  }
+  if (field === 'cumulative_goals_for') return (cum && cum.goals && cum.goals[idx] != null) ? cum.goals[idx] : '';
+  if (field === 'cumulative_wins')      return (cum && cum.wins  && cum.wins[idx]  != null) ? cum.wins[idx]  : '';
+  if (field === 'cumulative_points')    return (cum && cum.pts   && cum.pts[idx]   != null) ? cum.pts[idx]   : '';
+  if (field === 'prediction_residual')  { const e = rowError(match); return e == null ? '' : e; }
+  // Legacy fields — kept so older saved selections still resolve; no longer in the menu.
   if (field === 'week') return parseFloat(match.week) || '';
-  if (field === 'goals_for') {
-    if (match.score && match.score.includes('-')) return parseFloat(match.score.split('-')[0]) || 0;
-    return '';
-  }
-  if (field === 'goals_against') {
-    if (match.score && match.score.includes('-')) return parseFloat(match.score.split('-')[1]) || 0;
-    return '';
-  }
+  if (field === 'goals_for') { const v = rowGoalsFor(match); return v == null ? '' : v; }
+  if (field === 'goals_against') { const v = rowGoalsAgainst(match); return v == null ? '' : v; }
   if (field === 'predictedGoals') {
     const p = parseFloat(match.predictedGoals);
     return isNaN(p) ? '' : p;
   }
   if (field === 'predictionError') {
     const p = parseFloat(match.predictedGoals);
-    const a = parseInt((match.score || '').split('-')[0]);
-    return (!isNaN(p) && !isNaN(a)) ? Math.abs(p - a) : '';
+    const a = rowGoalsFor(match);
+    return (!isNaN(p) && a != null) ? Math.abs(p - a) : '';
   }
   return '';
 }
@@ -2133,6 +2130,10 @@ function getFieldLabel(field) {
   if (field === 'week') return 'Week';
   if (field === 'goals_for') return 'Goals For';
   if (field === 'goals_against') return 'Goals Against';
+  if (field === 'cumulative_goals_for') return 'Cumulative Goals For';
+  if (field === 'cumulative_wins') return 'Cumulative Wins';
+  if (field === 'cumulative_points') return 'Cumulative Points';
+  if (field === 'prediction_residual') return 'Prediction residual (P − A)';
   if (field === 'predictedGoals') return 'Predicted Goals';
   if (field === 'predictionError') return 'Prediction Error';
   return '';
@@ -2160,18 +2161,44 @@ function autoPopulateTable() {
   if (xField && xField !== 'custom') document.getElementById('x-label').value = xLabel;
   if (yField && yField !== 'custom') document.getElementById('y-label').value = yLabel;
 
-  // Only auto-populate if both fields are set to match log columns
-  if (!xField || !yField || xField === 'custom' || yField === 'custom') {
-    updateChart();
-    return;
-  }
+  // Wait until both axes are chosen. If BOTH are Custom there's nothing to
+  // derive from the log — leave the student's manually entered rows alone.
+  if (!xField || !yField) { updateChart(); return; }
+  const xReal = xField !== 'custom';
+  const yReal = yField !== 'custom';
+  if (!xReal && !yReal) { updateChart(); return; }
 
   const log = currentTeam().matchLog || [];
-  const points = [];
+  // Running totals in match order. Each array is null for a match with no
+  // result yet, so unplayed matches add no flat point.
+  // Points follow the leaderboard convention: W = 3, D = 1, L = 0.
+  let rG = 0, rW = 0, rP = 0;
+  const cum = { goals: [], wins: [], pts: [] };
   log.forEach(m => {
-    const x = getMatchFieldValue(m, xField);
-    const y = getMatchFieldValue(m, yField);
-    if (x !== '' && y !== '') points.push({ x: String(x), y: String(y) });
+    const g = rowGoalsFor(m);
+    const wl = rowWL(m);
+    const decided = (wl === 'W' || wl === 'L' || wl === 'D');
+    if (g != null) rG += g;
+    if (wl === 'W') { rW += 1; rP += 3; }
+    else if (wl === 'D') { rP += 1; }
+    cum.goals.push(g != null ? rG : null);
+    cum.wins.push(decided ? rW : null);
+    cum.pts.push(decided ? rP : null);
+  });
+  const points = [];
+  log.forEach((m, i) => {
+    const x = xReal ? getMatchFieldValue(m, xField, i, cum) : '';
+    const y = yReal ? getMatchFieldValue(m, yField, i, cum) : '';
+    if (xReal && yReal) {
+      // Both from the match log — keep only complete, correctly-paired rows.
+      if (x !== '' && y !== '') points.push({ x: String(x), y: String(y) });
+    } else {
+      // One axis is Custom: pre-fill the SELECTED axis for each match and
+      // leave the custom axis blank, so the student enters each value on the
+      // row that already holds its matching value — the pairing can't drift.
+      const realVal = xReal ? x : y;
+      if (realVal !== '') points.push({ x: xReal ? String(x) : '', y: yReal ? String(y) : '' });
+    }
   });
 
   // Keep at least 5 rows
