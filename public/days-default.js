@@ -657,7 +657,7 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Each team reads their full stat allocation out loud (stat value, formula, output) before writing a prediction. Speed first, then Endurance, Turning, Power. Don't move to prediction writing until every table has stated at least their Speed formula and Endurance equation. Then each team writes one specific goal count in the Match Log, signs it, and cannot revise it. No ranges. Push any team whose prediction doesn't connect to their stats. Close with one consolidation sentence and announce Round 1 pairings.",
         "script": "https://docs.google.com/document/d/1MPHXBv6GjZAw_n43uA1C1gVnbK3Agf-gZQ9qS5WXZiI/edit?usp=drive_link",
         "worksheet": [{"url": "https://drive.google.com/file/d/18ukziO44pBk2qOvoce7cZgA-TPX_mrnj/view?usp=sharing", label:"Match Data Log"}, 
-          {"url": "https://drive.google.com/file/d/1mwWmRex420ZWpt2E1EEmxknTkd9EtR2S/view?usp=drive_link", label:"Make My Prediction"}],
+          {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"}],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-03-pre-match-prediction.html"
       },
       {
@@ -684,7 +684,11 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Explain the match cycle once before Round 1 (read prediction aloud, play, record result immediately), then run three rounds. Each round: teams write their prediction before hearing their opponent's, play three minutes, record goals and win/loss in the data log right after. Fill the prediction-accuracy tracking chart across all three rounds. Run the loss recovery protocol between rounds with any team that lost; don't wait until after all three rounds. Close with the leaderboard reveal (best prediction named alongside most wins), then the non-optional exit ticket: prediction, result, gap, and one hypothesis for what caused it.",
         "worksheet":[{url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view?usp=drive_link",label:"Live Event Log"},
           {url:"https://drive.google.com/file/d/1RYwXGMSLKrTY7lIj3_fNufiNjJoOUJ2R/view?usp=drive_link",label:"Example Live Event Log"},
-        {url:"https://drive.google.com/file/d/1x7-E8SWswK7gdlIXXCbdLahyOylb6GkR/view?usp=drive_link",label:"Example Rule Log"}],
+          {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
+          {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
+          {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"},
+          {url:"https://drive.google.com/file/d/1x7-E8SWswK7gdlIXXCbdLahyOylb6GkR/view?usp=drive_link",label:"Example Rule Log"}
+        ],
           "script": "https://docs.google.com/document/d/1lroWp1H0Omgc33hkRmZWrzq-DX3_e4t3s-jVibIkh6M/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-04-match-day-1.html"
       },
@@ -761,7 +765,13 @@ const DAYS_DEFAULT = [
         "description": "Two more matches. Before each match, log your scatter plot equation's prediction in the data log. After each match, record the actual result. Loss-recovery protocol for every losing team. Update the data dashboard. No blanks.",
         "facilitatorDescription": "Run two rounds of head-to-head matches using the same cycle as Day 7, with one change: teams generate predictions from their scatter plot equation (y = mx + b, Speed allocation as input) before each round. Don't start Round 1 until every team can state their prediction source and has a written equation-based prediction. After each round, teams record goals and outcome immediately; run the loss recovery protocol with losing teams before Round 2. After both rounds, verify every data log has two filled rows and every dashboard is updated. Close with the leaderboard reveal (name the Best Prediction leader), one connecting question, and the non-optional exit ticket: one sentence in the data log before Rivalry Cards materials are distributed.",
         "script": "https://docs.google.com/document/d/1cDzAaPXt3_Dw0tMcW1HhyzLZHhy476vrmZ--eLWcdE0/edit?usp=drive_link",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-03-match-day-2.html"
+        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-03-match-day-2.html",
+        "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
+          {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
+          {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
+          {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
+          {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
+        ]
       },
     
       {
@@ -843,6 +853,12 @@ const DAYS_DEFAULT = [
         "description": "Three matches. Before each match: state your prediction from the morning equation. After each match: record actual result. For any match where prediction and actual differ by more than 20%, write one sentence identifying what variable your model missed. Loss-recovery protocol runs for every losing team between matches. Dashboard complete before end of day.",
         "facilitatorDescription": "Teams play three 3-minute matches, predicting their score before each one using their weakest formula type from the morning relay. After each match, they compare prediction to actual. If the gap is more than 20%, they write one sentence naming the specific model input their prediction got wrong (a coefficient or assumption like decay rate, slope, or which stat they over-weighted), not a vague outcome like 'we scored fewer goals.' After each loss, run the loss-recovery protocol: acknowledge the frustration, walk the team to the formula to find the one input that was off, and have them name what they'll change next round. Near the end, every team reviews all three matches and fills in a sentence for any gap over 20%. Close by reading the leaderboard, starting with Best Prediction rather than Wins.",
         "script": "https://docs.google.com/document/d/1D1CHjrAQSb-416lwkp8oU7HxM79GZYlLDU7Fih8qmc4/edit?usp=drive_link",
+        "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
+          {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
+          {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
+          {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
+          {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day09-03-match-day-3.html"
       },
     
@@ -932,6 +948,12 @@ const DAYS_DEFAULT = [
         "description": "Final round-robin matches. Loss-recovery for every losing team. After all matches: complete data dashboard —win/loss by stat matchup. Leaderboard final Season 1 update.",
         "facilitatorDescription": "Teams play their final three Season 1 matches, but the data analysis is the main event, not the matches. Open with a 10-minute audit: before any bot runs, each team calculates their average prediction error across the three prior match days, notes whether they consistently over- or under-predicted, and decides whether they are improving, worsening, or flat. Then run two short rounds. Before each match, teams predict using their Day 8 scatter plot equation; after each, write one sentence on whether the result fits their season pattern. Stop at minute 36. Spend 25 minutes on the analysis block (calculate average error and trend, identify the one input variable the model keeps missing, build a Season 2 hypothesis with an actual equation calculation). Teams pressure-test each other's hypotheses for one specific mathematical objection. Close by naming the practice as residual analysis. Non-optional exit: final hypothesis in 'If I change [stat] from [X] to [Y], my equation predicts [result], which addresses [the residual pattern].'",
         "script": "https://docs.google.com/document/d/1nDIFSSs9hH2m1YF55zIwJxYLpvB6c4gepoi7yyzRj_c/edit?usp=drive_link",
+       "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
+           {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
+           {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
+           {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
+           {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
+        ],
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-04-season1-final-round.html",
        "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W3_D10_AnalysisBlock_Exemplars.html",
        "exit": "https://docs.google.com/document/d/107J961KuTWvqb6B6CFyopDkdD8PnyV-9RjHNZ7TnLkM/edit?usp=sharing"
