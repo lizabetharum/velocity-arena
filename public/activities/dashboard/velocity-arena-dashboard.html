@@ -536,6 +536,11 @@
   .fv-step-body { min-width: 0; }
   .fv-step-title { font-size: 13px; font-weight: 800; color: var(--fg-0); margin-bottom: 2px; line-height: 36px; }
   .fv-step-hint { font-size: 11px; color: var(--steel); line-height: 1.5; margin-bottom: 10px; }
+  .fv-explain { font-size: 11.5px; line-height: 1.55; color: var(--fg-0); background: var(--bg-2);
+    border: 1px solid var(--border); border-left: 3px solid var(--accent, var(--steel));
+    border-radius: 0 6px 6px 0; padding: 9px 11px; margin-top: 10px; }
+  .fv-explain b { font-weight: 800; }
+  .fv-explain .muted { color: var(--steel); }
   .four-views-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1308,6 +1313,7 @@
               <canvas id="four-views-chart"></canvas>
             </div>
           </div>
+          <div id="fv-explain" class="fv-explain" aria-live="polite"></div>
         </div>
       </div>
 
@@ -2239,6 +2245,34 @@ function removeDataPoint(i) {
   renderDataPoints();
 }
 
+// Plain-language caption under the chart: what the points show + the trend.
+function fourViewsExplanation(fv, slope, n) {
+  if (!fv.xField || !fv.yField)
+    return 'Pick an <b>input</b> (X) and a <b>result</b> (Y) above — your matches graph automatically.';
+  const yf = fv.yField, xf = fv.xField;
+  const yName = (yf !== 'custom') ? getFieldLabel(yf) : (fv.yLabel || 'your Y value');
+  const xUnit = (xf === 'match') ? 'match' : (fv.xLabel || 'step of X');
+  let base;
+  if (yf === 'cumulative_goals_for')
+    base = 'Each point is your <b>running total of goals</b> after that match. A total only grows, so the line climbs — the steeper it is, the more goals you score per match.';
+  else if (yf === 'cumulative_wins')
+    base = 'Each point is your <b>running total of wins</b>. The line steps up when you win and stays flat when you don’t — a steeper line means you win more often.';
+  else if (yf === 'cumulative_points')
+    base = 'Each point is your <b>total league points</b> so far (3 for a win, 1 for a draw). A steeper climb means you’re earning points faster.';
+  else if (yf === 'prediction_residual')
+    base = 'Each point is how far your prediction missed that match (<b>predicted − actual</b>). Above the 0 line you predicted <b>too high</b>; below it, <b>too low</b>; on it, exactly right. If the points drift toward 0, your predictions are getting more accurate.';
+  else
+    base = 'Each point pairs your chosen X with your chosen Y. As X goes up, watch whether Y rises, falls, or stays flat.';
+
+  if (n < 2 || slope == null || !isFinite(slope))
+    return base + ' <span class="muted">Log at least two matches to see the trend line.</span>';
+
+  const dir = slope > 0.05 ? 'rising' : (slope < -0.05 ? 'falling' : 'roughly flat');
+  return base + ' <span class="muted">The dashed best-fit line is <b>' + dir +
+    '</b>: for every 1 more ' + xUnit + ', <b>' + yName + '</b> changes by about <b>' +
+    slope.toFixed(2) + '</b>.</span>';
+}
+
 function updateChart() {
   const fv = currentTeam().fourViews;
   fv.xLabel = document.getElementById('x-label').value;
@@ -2258,6 +2292,7 @@ function updateChart() {
     }
   ];
 
+  let fitSlope = null;
   // Line of best fit
   if (pts.length >= 2) {
     const n = pts.length;
@@ -2267,6 +2302,7 @@ function updateChart() {
     const sumX2 = pts.reduce((a, p) => a + p.x * p.x, 0);
     const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     const b = (sumY - m * sumX) / n;
+    fitSlope = m;
     const minX = Math.min(...pts.map(p => p.x));
     const maxX = Math.max(...pts.map(p => p.x));
     datasets.push({
@@ -2310,6 +2346,9 @@ function updateChart() {
       }
     }
   });
+
+  const fvExplain = document.getElementById('fv-explain');
+  if (fvExplain) fvExplain.innerHTML = fourViewsExplanation(fv, fitSlope, pts.length);
 }
 
 function updateEquationText() {
