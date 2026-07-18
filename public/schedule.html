@@ -29,6 +29,11 @@ body{
 .topnav nav a:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:2px;}
 .topnav .util{font:600 11px/1 var(--font-mono);color:var(--fg-1);letter-spacing:.04em;padding-bottom:14px;font-variant-numeric:tabular-nums;}
 .topnav .util b{color:var(--accent);}
+.topnav .site-pick{display:flex;align-items:center;gap:7px;padding-bottom:14px;white-space:nowrap;}
+.topnav .site-pick label{font:600 10px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);}
+.topnav .site-pick select{font:600 11px/1 var(--font-sans);color:var(--fg-0);background:var(--bg-1);border:1px solid var(--line-strong);border-radius:6px;padding:6px 8px;cursor:pointer;}
+.topnav .site-pick select:hover{border-color:var(--accent);}
+.topnav .site-pick select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 .topnav .accent-rule{height:1px;background:var(--line-cyan);margin:0 -32px;}
 @media (max-width:780px){.topnav nav{display:none;}}
 
@@ -120,6 +125,10 @@ body{
       <a href="/teachers.html">Teacher Resources</a>
       <a href="/about.html">About</a>
     </nav>
+    <div class="site-pick">
+      <label for="site-picker-select">Site</label>
+      <select id="site-picker-select" onchange="onSitePickerChange(this.value)"></select>
+    </div>
     <span class="util" id="day-pill"></span>
   </div>
   <div class="accent-rule"></div>
@@ -175,6 +184,18 @@ body{
 <script src="/days.js"></script>
 <script>
 const campDates = (typeof buildCampDates === 'function') ? buildCampDates() : [];
+
+// Populate the topnav site picker (options + current selection). Changing it
+// calls onSitePickerChange (site.js) → saves the site and reloads, so the
+// schedule re-renders for that site (DAYS + camp dates are site-dispatched).
+(function initSitePicker(){
+  const sel = document.getElementById('site-picker-select');
+  if (!sel || typeof SITE_OPTIONS === 'undefined') return;
+  const current = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  sel.innerHTML =
+    (current ? '' : '<option value="">Pick a site…</option>') +
+    SITE_OPTIONS.map(o => `<option value="${o.code}"${o.code === current ? ' selected' : ''}>${o.label}</option>`).join('');
+})();
 
 const TOTAL_DAYS = (DAYS && DAYS.length) || 20;
 
