@@ -684,7 +684,6 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Explain the match cycle once before Round 1 (read prediction aloud, play, record result immediately), then run three rounds. Each round: teams write their prediction before hearing their opponent's, play three minutes, record goals and win/loss in the data log right after. Fill the prediction-accuracy tracking chart across all three rounds. Run the loss recovery protocol between rounds with any team that lost; don't wait until after all three rounds. Close with the leaderboard reveal (best prediction named alongside most wins), then the non-optional exit ticket: prediction, result, gap, and one hypothesis for what caused it.",
         "worksheet":[{url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view?usp=drive_link",label:"Live Event Log"},
           {url:"https://drive.google.com/file/d/1RYwXGMSLKrTY7lIj3_fNufiNjJoOUJ2R/view?usp=drive_link",label:"Example Live Event Log"},
-          {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
           {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
           {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"},
           {url:"https://drive.google.com/file/d/1x7-E8SWswK7gdlIXXCbdLahyOylb6GkR/view?usp=drive_link",label:"Example Rule Log"}
@@ -767,7 +766,6 @@ const DAYS_DEFAULT = [
         "script": "https://docs.google.com/document/d/1cDzAaPXt3_Dw0tMcW1HhyzLZHhy476vrmZ--eLWcdE0/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day08-03-match-day-2.html",
         "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
-          {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
           {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
           {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
           {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
@@ -854,7 +852,6 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams play three 3-minute matches, predicting their score before each one using their weakest formula type from the morning relay. After each match, they compare prediction to actual. If the gap is more than 20%, they write one sentence naming the specific model input their prediction got wrong (a coefficient or assumption like decay rate, slope, or which stat they over-weighted), not a vague outcome like 'we scored fewer goals.' After each loss, run the loss-recovery protocol: acknowledge the frustration, walk the team to the formula to find the one input that was off, and have them name what they'll change next round. Near the end, every team reviews all three matches and fills in a sentence for any gap over 20%. Close by reading the leaderboard, starting with Best Prediction rather than Wins.",
         "script": "https://docs.google.com/document/d/1D1CHjrAQSb-416lwkp8oU7HxM79GZYlLDU7Fih8qmc4/edit?usp=drive_link",
         "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
-          {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
           {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
           {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
           {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
@@ -949,7 +946,6 @@ const DAYS_DEFAULT = [
         "facilitatorDescription": "Teams play their final three Season 1 matches, but the data analysis is the main event, not the matches. Open with a 10-minute audit: before any bot runs, each team calculates their average prediction error across the three prior match days, notes whether they consistently over- or under-predicted, and decides whether they are improving, worsening, or flat. Then run two short rounds. Before each match, teams predict using their Day 8 scatter plot equation; after each, write one sentence on whether the result fits their season pattern. Stop at minute 36. Spend 25 minutes on the analysis block (calculate average error and trend, identify the one input variable the model keeps missing, build a Season 2 hypothesis with an actual equation calculation). Teams pressure-test each other's hypotheses for one specific mathematical objection. Close by naming the practice as residual analysis. Non-optional exit: final hypothesis in 'If I change [stat] from [X] to [Y], my equation predicts [result], which addresses [the residual pattern].'",
         "script": "https://docs.google.com/document/d/1nDIFSSs9hH2m1YF55zIwJxYLpvB6c4gepoi7yyzRj_c/edit?usp=drive_link",
        "worksheet":[{url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link", label:"Prediction Sheet"},
-           {url:"https://drive.google.com/file/d/1hVJNpTUkkKDmxkJY0WbW3KVfkuc-sO5b/view?usp=drive_link",label:"Prediction Sheet"},
            {url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view",label:"Example Live Event Log"},
            {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
            {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
