@@ -222,6 +222,17 @@ function buildRecords(rows){
   return recs;
 }
 
+function expectedText(s){
+  if(!s) return '—';
+  if(s.k==='fix')     return s.a[0];
+  if(s.k==='range')   { const m=s.label.match(/\(([^)]*)\)/); return s.min+'–'+s.max+(m?' · '+m[1]:''); }
+  if(s.k==='near')    return '\u2248'+s.a+' (\u00b1'+s.tol+')';
+  if(s.k==='square')  return 'a POWER\u00b2 value: 1,4,9,16,25,36,49,64,81,100';
+  if(s.k==='derived') return 'computed from their own blanks';
+  if(s.k==='eye')     return 'no key \u2014 free text';
+  return '—';
+}
+
 function judge(spec, val, fields){
   const given=String(val==null?'':val).trim();
   if(given==='') return {cls:'', verdict:'blank', want:spec.label};
@@ -261,12 +272,13 @@ function render(recs){
   recs.forEach(r=>{ const c=r.challenge||0; (byCh[c]=byCh[c]||[]).push(r); });
 
   // ── duplicate detection: same normalized answer across different teams ──
-  const dupMap={}; // ch|idx|normvalue -> Set(who)
+  const dupMap={}; // ch|idx|normvalue -> {teams:Set, raw, fields}
   recs.forEach(r=>{ const spec=KEY[r.challenge]; if(!spec) return;
     spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(!v||String(v).trim()==='')return;
       const key=r.challenge+'|'+i+'|'+norm(v);
-      (dupMap[key]=dupMap[key]||new Set()).add(r.who); }); });
-  const isDup=(ch,i,v,who)=>{ const s=dupMap[ch+'|'+i+'|'+norm(v)]; return s&&s.size>1; };
+      if(!dupMap[key]) dupMap[key]={teams:new Set(), raw:String(v).trim(), fields:r.fields};
+      dupMap[key].teams.add(r.who); }); });
+  const isDup=(ch,i,v)=>{ const e=dupMap[ch+'|'+i+'|'+norm(v)]; return e&&e.teams.size>1; };
 
   let html='';
   // summary
@@ -275,7 +287,7 @@ function render(recs){
     spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
       const j=judge(s,v,r.fields); tot++; if(j.cls==='ok')ok++; else if(j.cls==='bad')bad++; else if(j.cls==='eye')eye++; }); });
   // free-text answers shared by >1 team
-  let dupCells=0; Object.values(dupMap).forEach(s=>{ if(s.size>1) dupCells++; });
+  let dupCells=0; Object.values(dupMap).forEach(e=>{ if(e.teams.size>1) dupCells++; });
 
   html+='<h2>Summary</h2><div>'+
     '<span class="stat">Teams / rows <b>'+recs.length+'</b></span>'+
@@ -315,19 +327,31 @@ function render(recs){
   });
 
   // copying panel
-  const clusters=Object.entries(dupMap).filter(([k,s])=>s.size>1)
-    .map(([k,s])=>{ const [ch,i,val]=k.split('|'); return {ch,i,val,teams:[...s]}; })
-    .sort((a,b)=>b.teams.length-a.teams.length).slice(0,40);
+  const clusters=Object.entries(dupMap).filter(([k,e])=>e.teams.size>1)
+    .map(([k,e])=>{ const [ch,i]=k.split('|'); return {ch,i,val:e.raw,fields:e.fields,teams:[...e.teams]}; })
+    .sort((a,b)=>b.teams.length-a.teams.length).slice(0,60);
   html+='<h2>Answers shared across teams</h2>';
   if(!clusters.length){ html+='<div class="muted" style="font-size:12.5px">No identical answers across teams.</div>'; }
   else{
-    html+='<div class="warn"><b>Read this carefully.</b> On the fixed-answer blanks (square counts, chargePower) every team <i>should</i> match — that\'s not copying, that\'s correct. The tell is identical <b>free-text</b> reasoning, or identical <b>measured</b> values like distances and tuned unitMs, which should differ bot to bot.</div>';
-    html+='<div class="scroll"><table><thead><tr><th>Challenge</th><th>Blank</th><th>Identical answer</th><th>Teams</th><th>Type</th></tr></thead><tbody>';
+    html+='<div class="warn"><b>Read the Verdict column first.</b> On fixed blanks every team <i>should</i> match — that\'s correctness, not copying. What matters is <b style="color:var(--bad)">WRONG — whole group</b>: the entire class landed on the same wrong answer, which is one misconception (or one source) spreading. Identical <b>free-text</b> reasoning and identical <b>measured</b> values (distances, tuned unitMs) are the copying tell, since those should differ bot to bot.</div>';
+    html+='<div class="scroll"><table><thead><tr><th>Ch</th><th>Blank</th><th>Identical answer</th><th>Expected</th><th>Verdict</th><th>Teams</th><th>Type</th></tr></thead><tbody>';
     clusters.forEach(c=>{
       const spec=KEY[c.ch]; const s=spec?spec.p[c.i]:null;
       const kind=s?(s.k==='fix'?'fixed — matching is expected':(s.k==='eye'?'free text — suspicious if identical':'measured — should differ')):'—';
       const cls=s&&s.k==='fix'?'':'dup';
-      html+='<tr><td>'+esc(c.ch)+'</td><td>p'+esc(c.i)+' '+esc(s?s.label:'')+'</td><td class="mono '+cls+'">'+esc(c.val)+'</td><td>'+esc(c.teams.join(', '))+'</td><td class="muted">'+kind+'</td></tr>';
+      const j=s?judge(s,c.val,c.fields):{cls:'',verdict:''};
+      let vTxt='—', vCls='';
+      if(s&&s.k!=='eye'){
+        if(j.cls==='ok'){ vTxt='correct'; vCls='ok'; }
+        else if(j.cls==='bad'){ vTxt='WRONG — whole group'; vCls='bad'; }
+        else if(j.cls==='eye'){ vTxt=j.verdict||'your call'; vCls='eye'; }
+      }
+      html+='<tr><td>'+esc(c.ch)+'</td><td>p'+esc(c.i)+' '+esc(s?s.label:'')+'</td>'+
+            '<td class="mono '+cls+'">'+esc(c.val)+'</td>'+
+            '<td class="mono muted">'+esc(expectedText(s))+'</td>'+
+            '<td class="'+vCls+'">'+esc(vTxt)+'</td>'+
+            '<td>'+esc(c.teams.join(', '))+'</td>'+
+            '<td class="muted">'+esc(kind)+'</td></tr>';
     });
     html+='</tbody></table></div>';
   }
