@@ -108,13 +108,15 @@
 // ─────────── EXPECTED ANSWERS (prediction blanks p0…pN, by challenge id) ───────────
 // kind: fix = one right answer · range = tuned value in a band · derived = computed
 // from their own earlier blanks · eye = no key, needs your eyes
+// derived blanks carry deps:[...] — the blanks the formula draws on — so a right
+// calculation built on wrong inputs is flagged amber, not green.
 const KEY = {
  1:{name:'Dead Straight', p:[
    {k:'fix', a:['6'], label:'grid squares (7−1)'},
    {k:'fix', a:['6'], label:'drive( )'},
    {k:'range', min:520, max:700, label:'unitMs (expect 590–620)'},
    {k:'range', min:40, max:200, label:'startupMs (expect 80–140)'},
-   {k:'derived', label:'(unitMs × 6) + startupMs', fn:f=>num(f.p2)*6+num(f.p3)}]},
+   {k:'derived', label:'(unitMs × squares) + startupMs', deps:[1,2,3], fn:f=>num(f.p2)*num(f.p1)+num(f.p3)}]},
  2:{name:'Right Angle', p:[
    {k:'fix', a:['3'], label:'Leg 1 squares'},
    {k:'fix', a:['3'], label:'Leg 1 drive( )'},
@@ -123,7 +125,7 @@ const KEY = {
    {k:'eye', label:'predicted cm from target'}]},
  3:{name:'Straight Shot', p:[
    {k:'range', min:1, max:10, label:'their POWER stat'},
-   {k:'derived', label:'chargePower = POWER²', fn:f=>Math.min(num(f.p0)*num(f.p0),100)},
+   {k:'derived', label:'chargePower = POWER²', deps:[0], fn:f=>Math.min(num(f.p0)*num(f.p0),100)},
    {k:'eye', label:'predicted ball ranking'},
    {k:'eye', label:'reasoning'}]},
  4:{name:'Corner Kick: Left', p:[
@@ -222,18 +224,21 @@ function buildRecords(rows){
   return recs;
 }
 
-function expectedText(s){
+function expectedText(s, fields){
   if(!s) return '—';
   if(s.k==='fix')     return s.a[0];
   if(s.k==='range')   { const m=s.label.match(/\(([^)]*)\)/); return s.min+'–'+s.max+(m?' · '+m[1]:''); }
   if(s.k==='near')    return '\u2248'+s.a+' (\u00b1'+s.tol+')';
   if(s.k==='square')  return 'a POWER\u00b2 value: 1,4,9,16,25,36,49,64,81,100';
-  if(s.k==='derived') return 'computed from their own blanks';
+  if(s.k==='derived'){
+    if(fields){ const w=s.fn(fields); if(!isNaN(w)) return 'their numbers \u2192 '+Math.round(w); }
+    return 'computed from their own blanks';
+  }
   if(s.k==='eye')     return 'no key \u2014 free text';
   return '—';
 }
 
-function judge(spec, val, fields){
+function judge(spec, val, fields, all){
   const given=String(val==null?'':val).trim();
   if(given==='') return {cls:'', verdict:'blank', want:spec.label};
   if(spec.k==='eye') return {cls:'eye', verdict:'your call', want:spec.label};
@@ -252,8 +257,20 @@ function judge(spec, val, fields){
   if(spec.k==='derived'){
     const want=spec.fn(fields); const n=num(given);
     if(isNaN(want)) return {cls:'eye', verdict:'needs their earlier blanks', want:spec.label};
-    const ok=!isNaN(n)&&Math.abs(n-want)<=Math.max(1,Math.abs(want)*0.02);
-    return {cls:ok?'ok':'bad', verdict:ok?'matches their numbers':('their numbers give '+want), want:spec.label};
+    const mathOk=!isNaN(n)&&Math.abs(n-want)<=Math.max(1,Math.abs(want)*0.02);
+    // Part 1 — did they calculate correctly from the numbers they wrote down?
+    if(!mathOk) return {cls:'bad', verdict:'their numbers give '+Math.round(want), want:spec.label};
+    // Part 2 — were those numbers themselves any good? Right math on wrong inputs
+    // is still a wrong prediction, so it must not read as green.
+    const wrong=[], odd=[];
+    (all&&spec.deps?spec.deps:[]).forEach(d=>{
+      const dv=fields['p'+d]; if(dv==null||String(dv).trim()==='') return;
+      const c=judge(all[d], dv, fields, all).cls;
+      if(c==='bad') wrong.push('p'+d); else if(c==='eye') odd.push('p'+d);
+    });
+    if(wrong.length) return {cls:'eye', verdict:'math ok \u2014 but built on wrong '+wrong.join(', '), want:spec.label};
+    if(odd.length)   return {cls:'eye', verdict:'math ok \u2014 but '+odd.join(', ')+' out of range', want:spec.label};
+    return {cls:'ok', verdict:'correct', want:spec.label};
   }
   if(spec.k==='square'){
     const n=num(given); const r=Math.sqrt(n);
@@ -285,7 +302,7 @@ function render(recs){
   let tot=0, ok=0, bad=0, eye=0;
   recs.forEach(r=>{ const spec=KEY[r.challenge]; if(!spec)return;
     spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
-      const j=judge(s,v,r.fields); tot++; if(j.cls==='ok')ok++; else if(j.cls==='bad')bad++; else if(j.cls==='eye')eye++; }); });
+      const j=judge(s,v,r.fields,spec.p); tot++; if(j.cls==='ok')ok++; else if(j.cls==='bad')bad++; else if(j.cls==='eye')eye++; }); });
   // free-text answers shared by >1 team
   let dupCells=0; Object.values(dupMap).forEach(e=>{ if(e.teams.size>1) dupCells++; });
 
@@ -297,6 +314,7 @@ function render(recs){
     '<span class="stat" style="color:var(--eye)">Your call <b>'+eye+'</b></span>'+
     '<span class="stat" style="color:var(--dup)">Shared answers <b>'+dupCells+'</b></span></div>';
   html+='<div class="legend"><span class="lg ok">Correct</span><span class="lg bad">Wrong</span><span class="lg eye">Needs your eyes</span><span class="lg dup">Purple outline = same answer as another team</span></div>';
+  html+='<div class="callout"><b>About the calculated blanks.</b> On blanks that are computed from their own earlier answers — Challenge 1\'s total ms, Challenge 3\'s chargePower — <b>green means both things are right</b>: the arithmetic <i>and</i> the numbers it was built on. A team that multiplied correctly but started from a wrong square count or an untuned unitMs is marked <b style="color:var(--eye)">amber</b>, reading “math ok — but built on wrong p1”. That is a different lesson than a team that simply cannot multiply, and it should be taught differently.</div>';
 
   // per-challenge tables
   Object.keys(byCh).sort((a,b)=>a-b).forEach(ch=>{
@@ -306,7 +324,7 @@ function render(recs){
     // per-blank miss counts
     const miss=spec.p.map(()=>0), seen=spec.p.map(()=>0);
     list.forEach(r=>spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
-      seen[i]++; if(judge(s,v,r.fields).cls==='bad') miss[i]++; }));
+      seen[i]++; if(judge(s,v,r.fields,spec.p).cls==='bad') miss[i]++; }));
     html+='<div class="scroll"><table><thead><tr><th>Team / student</th>';
     spec.p.forEach((s,i)=>{ const pct=seen[i]?Math.round(100*miss[i]/seen[i]):0;
       html+='<th>p'+i+' — '+esc(s.label)+(seen[i]?'<br><span class="muted">'+miss[i]+'/'+seen[i]+' wrong ('+pct+'%)</span>':'')+'</th>'; });
@@ -315,7 +333,7 @@ function render(recs){
       html+='<tr><td class="who">'+esc(r.who||'—')+'</td>';
       spec.p.forEach((s,i)=>{
         const v=r.fields['p'+i];
-        const j=judge(s,v,r.fields);
+        const j=judge(s,v,r.fields,spec.p);
         const dup=(v!=null&&String(v).trim()!=='')&&isDup(r.challenge,i,v,r.who);
         const cls=[j.cls, dup?'dup':''].filter(Boolean).join(' ');
         html+='<td class="'+cls+'"><span class="mono">'+esc(v==null||String(v).trim()===''?'—':v)+'</span>'+
@@ -339,7 +357,7 @@ function render(recs){
       const spec=KEY[c.ch]; const s=spec?spec.p[c.i]:null;
       const kind=s?(s.k==='fix'?'fixed — matching is expected':(s.k==='eye'?'free text — suspicious if identical':'measured — should differ')):'—';
       const cls=s&&s.k==='fix'?'':'dup';
-      const j=s?judge(s,c.val,c.fields):{cls:'',verdict:''};
+      const j=s?judge(s,c.val,c.fields,spec.p):{cls:'',verdict:''};
       let vTxt='—', vCls='';
       if(s&&s.k!=='eye'){
         if(j.cls==='ok'){ vTxt='correct'; vCls='ok'; }
@@ -348,7 +366,7 @@ function render(recs){
       }
       html+='<tr><td>'+esc(c.ch)+'</td><td>p'+esc(c.i)+' '+esc(s?s.label:'')+'</td>'+
             '<td class="mono '+cls+'">'+esc(c.val)+'</td>'+
-            '<td class="mono muted">'+esc(expectedText(s))+'</td>'+
+            '<td class="mono muted">'+esc(expectedText(s,c.fields))+'</td>'+
             '<td class="'+vCls+'">'+esc(vTxt)+'</td>'+
             '<td>'+esc(c.teams.join(', '))+'</td>'+
             '<td class="muted">'+esc(kind)+'</td></tr>';
