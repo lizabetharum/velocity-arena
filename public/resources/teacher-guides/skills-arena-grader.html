@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills Arena — Answer Checker</title>
+<style>
+  :root{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EEF2F3;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#DBE1E4; --line-strong:#C1C9CD;
+    --teal:#0B7A8C; --teal-deep:#075867;
+    --ok:#0B6E4E; --ok-bg:#E7F5EE;
+    --bad:#A32020; --bad-bg:#FBEAEA;
+    --eye:#B4611F; --eye-bg:#FBEEDD;
+    --dup:#7A5AA8; --dup-bg:#F0EBF8;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#10151A; --card:#161C22; --band:#1B232B;
+      --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+      --line:#28323B; --line-strong:#374350; --teal:#3FC5DA; --teal-deep:#7FE0EF;
+      --ok:#54C79A; --ok-bg:#14261E; --bad:#E98080; --bad-bg:#2B1616;
+      --eye:#E29A5A; --eye-bg:#2A2013; --dup:#B69BE0; --dup-bg:#221C2E; }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .bar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 20px;}
+  .bar .back{font:600 11px/1 var(--sans);color:var(--teal);text-decoration:none;}
+  .bar .t{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+  .bar .sp{flex:1;}
+  .btn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:6px;padding:8px 12px;cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn.go{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .sheet{max-width:1080px;margin:0 auto;padding:24px 22px 70px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 30px 24px;}
+  .head{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:14px;}
+  .eyebrow{font:600 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:0 0 9px;}
+  h1{font:800 25px/1.1 var(--sans);letter-spacing:-.02em;margin:0;}
+  .lede{font:400 13px/1.5 var(--sans);color:var(--ink-2);margin:10px 0 0;max-width:70ch;}
+  h2{font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep);margin:26px 0 10px;}
+  textarea{width:100%;min-height:150px;font:400 12px/1.5 var(--mono);color:var(--ink);background:var(--band);
+    border:1.5px solid var(--line-strong);border-radius:8px;padding:11px 13px;resize:vertical;}
+  textarea:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
+  .drop{border:2px dashed var(--line-strong);border-radius:8px;padding:14px;text-align:center;color:var(--ink-3);font-size:12.5px;margin:8px 0;}
+  .drop.over{border-color:var(--teal);background:var(--band);color:var(--teal-deep);}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;}
+  .lg{font:700 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 7px;border-radius:4px;}
+  .lg.ok{background:var(--ok-bg);color:var(--ok);} .lg.bad{background:var(--bad-bg);color:var(--bad);}
+  .lg.eye{background:var(--eye-bg);color:var(--eye);} .lg.dup{background:var(--dup-bg);color:var(--dup);}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 6px;}
+  th,td{border:1px solid var(--line-strong);padding:6px 9px;text-align:left;color:var(--ink-2);vertical-align:top;}
+  thead th{background:var(--band);font:700 9.5px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;position:sticky;top:0;}
+  td.ok{background:var(--ok-bg);color:var(--ok);font-weight:700;}
+  td.bad{background:var(--bad-bg);color:var(--bad);font-weight:700;}
+  td.eye{background:var(--eye-bg);color:var(--eye);}
+  td.dup{outline:2px solid var(--dup);outline-offset:-2px;}
+  td.who{font-weight:700;color:var(--ink);white-space:nowrap;}
+  .mono{font-family:var(--mono);font-size:11.5px;}
+  .muted{color:var(--ink-3);}
+  .callout{border-left:3px solid var(--teal);background:var(--band);border-radius:0 8px 8px 0;padding:11px 14px;margin:14px 0;font:400 12.5px/1.5 var(--sans);color:var(--ink-2);}
+  .callout b{color:var(--ink);}
+  .warn{border-left:3px solid var(--eye);background:var(--eye-bg);border-radius:0 8px 8px 0;padding:11px 14px;margin:14px 0;font:400 12.5px/1.5 var(--sans);color:var(--ink-2);}
+  .warn b{color:var(--eye);}
+  .stat{display:inline-block;background:var(--band);border:1px solid var(--line);border-radius:6px;padding:7px 11px;margin:0 8px 8px 0;font:600 12px/1 var(--sans);color:var(--ink-2);}
+  .stat b{color:var(--ink);font-size:15px;}
+  .scroll{overflow-x:auto;}
+  .hide{display:none;}
+  @media print{ .bar,.noprint{display:none;} body{background:#fff;font-size:11px;} .card{border:none;padding:.3in;} @page{size:Letter landscape;margin:0;} }
+</style>
+</head>
+<body>
+<div class="bar noprint">
+  <a class="back" href="/resources/teacher-guides/skills-arena-answer-key.html">← Answer key</a>
+  <span class="t">Skills Arena · Answer checker</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Theme</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</div>
+
+<div class="sheet">
+  <div class="card">
+    <div class="head">
+      <p class="eyebrow">Teacher tool · Velocity Arena</p>
+      <h1>Skills Arena — Answer Checker</h1>
+      <p class="lede">Paste the Skills Arena export (or drop the CSV) and this marks every prediction blank against the expected answer, shows you exactly where the class went wrong, and flags answers that are <b>identical across teams</b> — the copying tell.</p>
+    </div>
+
+    <div class="noprint">
+      <h2>1 · Paste or drop your CSV</h2>
+      <div class="drop" id="drop">Drop the CSV file here — or paste the contents below</div>
+      <textarea id="csv" placeholder="Paste the CSV here (include the header row)…"></textarea>
+      <div class="row">
+        <button class="btn go" id="run" type="button">Check answers</button>
+        <button class="btn" id="demo" type="button">Load a sample</button>
+        <span class="muted" id="parsed"></span>
+      </div>
+      <div class="callout"><b>What it expects.</b> Any CSV with a team/student column, a challenge column, and the answers — either as a <code>Fields</code> column holding JSON (<code>{"p0":"6","p1":"6"}</code>) or as plain <code>p0, p1, p2…</code> columns. It auto-detects which. Nothing is uploaded; this runs entirely in your browser.</div>
+    </div>
+
+    <div id="out"></div>
+  </div>
+</div>
+
+<script>
+// ─────────── EXPECTED ANSWERS (prediction blanks p0…pN, by challenge id) ───────────
+// kind: fix = one right answer · range = tuned value in a band · derived = computed
+// from their own earlier blanks · eye = no key, needs your eyes
+const KEY = {
+ 1:{name:'Dead Straight', p:[
+   {k:'fix', a:['6'], label:'grid squares (7−1)'},
+   {k:'fix', a:['6'], label:'drive( )'},
+   {k:'range', min:520, max:700, label:'unitMs (expect 590–620)'},
+   {k:'range', min:40, max:200, label:'startupMs (expect 80–140)'},
+   {k:'derived', label:'(unitMs × 6) + startupMs', fn:f=>num(f.p2)*6+num(f.p3)}]},
+ 2:{name:'Right Angle', p:[
+   {k:'fix', a:['3'], label:'Leg 1 squares'},
+   {k:'fix', a:['3'], label:'Leg 1 drive( )'},
+   {k:'fix', a:['5'], label:'Leg 2 squares'},
+   {k:'fix', a:['5'], label:'Leg 2 drive( )'},
+   {k:'eye', label:'predicted cm from target'}]},
+ 3:{name:'Straight Shot', p:[
+   {k:'range', min:1, max:10, label:'their POWER stat'},
+   {k:'derived', label:'chargePower = POWER²', fn:f=>Math.min(num(f.p0)*num(f.p0),100)},
+   {k:'eye', label:'predicted ball ranking'},
+   {k:'eye', label:'reasoning'}]},
+ 4:{name:'Corner Kick: Left', p:[
+   {k:'fix', a:['2'], label:'Leg 1 squares (4→2)'},
+   {k:'fix', a:['2'], label:'Leg 1 drive( )'},
+   {k:'square', label:'chargePower = POWER²'},
+   {k:'eye', label:'Leg 2 first try'},
+   {k:'eye', label:'reasoning'}]},
+ 5:{name:'Corner Kick: Right', p:[
+   {k:'fix', a:['2'], label:'Leg 1 squares (0→2)'},
+   {k:'fix', a:['2'], label:'Leg 1 drive( )'},
+   {k:'square', label:'chargePower = POWER²'},
+   {k:'eye', label:'their Card 4 winning Leg 2'},
+   {k:'fix', a:['the same','same'], label:'same or different?'},
+   {k:'eye', label:'reasoning'}]},
+ 6:{name:'Two-Ball Combo', p:[
+   {k:'eye', label:'which ball first'},{k:'eye', label:'route to A'},
+   {k:'eye', label:'route to B'},{k:'eye', label:'A will/will not score'},
+   {k:'eye', label:'B will/will not score'}]},
+ 7:{name:'Power Control Lab', p:[
+   {k:'fix', a:['9'], label:'P=3 → chargePower %'},
+   {k:'fix', a:['36'], label:'P=6 → chargePower %'},
+   {k:'fix', a:['81'], label:'P=9 → chargePower %'},
+   {k:'fix', a:['27'], label:'jump 3→6 (36−9)'},
+   {k:'fix', a:['45'], label:'jump 6→9 (81−36)'},
+   {k:'fix', a:['bigger'], label:'each increase will be…'},
+   {k:'eye', label:'reasoning'}]},
+ 8:{name:'Precision Parking', p:[
+   {k:'eye', label:'path'},
+   {k:'eye', label:'entry coordinate'},
+   {k:'fix', a:['turnright','turnright()'], label:'turn to end facing (5,0)'},
+   {k:'fix', a:['2'], label:'total drive() calls'},
+   {k:'fix', a:['2'], label:'total turn calls'}]},
+ 9:{name:'Boss Level', p:[
+   {k:'eye', label:'detour side'},{k:'eye', label:'detour route'},
+   {k:'eye', label:'which goal'},{k:'eye', label:'route to parking'},
+   {k:'near', a:11, tol:3, label:'total function calls (≈11)'}]}
+};
+
+// ─────────── helpers ───────────
+function num(v){ const m=String(v==null?'':v).replace(/,/g,'').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):NaN; }
+function norm(v){ return String(v==null?'':v).toLowerCase().replace(/[\s(),%]/g,'').replace(/ms$/,'').trim(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// tolerant CSV parser (quotes, embedded commas/newlines)
+function parseCSV(text){
+  const rows=[]; let row=[], cur='', q=false;
+  text=text.replace(/\r\n?/g,'\n');
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(cur); cur=''; }
+    else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+    else cur+=c;
+  }
+  if(cur.length||row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(r=>r.some(x=>String(x).trim()!==''));
+}
+
+function findCol(hdr, names){
+  for(const n of names){
+    const i=hdr.findIndex(h=>h.toLowerCase().trim()===n);
+    if(i>=0) return i;
+  }
+  for(const n of names){
+    const i=hdr.findIndex(h=>h.toLowerCase().includes(n));
+    if(i>=0) return i;
+  }
+  return -1;
+}
+
+// Build records: {who, challenge, fields:{p0:…}}
+function buildRecords(rows){
+  const hdr=rows[0].map(h=>String(h).trim());
+  const iWho=findCol(hdr,['team','token','student','name']);
+  const iCh =findCol(hdr,['challenge','card','id']);
+  const iF  =findCol(hdr,['fields','state','answers','json']);
+  const pCols=hdr.map((h,i)=>({h:h.toLowerCase().trim(),i})).filter(x=>/^[pg]\d+$/.test(x.h));
+  const recs=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row) continue;
+    const who = iWho>=0 ? String(row[iWho]||'').trim() : ('row '+r);
+    const ch  = iCh>=0 ? num(row[iCh]) : NaN;
+    let fields={};
+    if(iF>=0 && String(row[iF]||'').trim()){
+      try{ fields=JSON.parse(row[iF]); }catch(e){
+        // sometimes doubled-quotes survive; try a repair
+        try{ fields=JSON.parse(String(row[iF]).replace(/""/g,'"')); }catch(e2){ fields={}; }
+      }
+    }
+    if(pCols.length){ pCols.forEach(c=>{ if(String(row[c.i]||'').trim()!=='') fields[c.h]=row[c.i]; }); }
+    if(!who && !Object.keys(fields).length) continue;
+    recs.push({who, challenge:isNaN(ch)?null:ch, fields});
+  }
+  return recs;
+}
+
+function judge(spec, val, fields){
+  const given=String(val==null?'':val).trim();
+  if(given==='') return {cls:'', verdict:'blank', want:spec.label};
+  if(spec.k==='eye') return {cls:'eye', verdict:'your call', want:spec.label};
+  if(spec.k==='fix'){
+    const ok=spec.a.some(a=>norm(a)===norm(given)||norm(given).includes(norm(a)));
+    return {cls:ok?'ok':'bad', verdict:ok?'correct':('expected '+spec.a[0]), want:spec.label};
+  }
+  if(spec.k==='range'){
+    const n=num(given); const ok=!isNaN(n)&&n>=spec.min&&n<=spec.max;
+    return {cls:ok?'ok':'eye', verdict:ok?'in range':('outside '+spec.min+'–'+spec.max), want:spec.label};
+  }
+  if(spec.k==='near'){
+    const n=num(given); const ok=!isNaN(n)&&Math.abs(n-spec.a)<=spec.tol;
+    return {cls:ok?'ok':'bad', verdict:ok?'reasonable':('expected ≈'+spec.a), want:spec.label};
+  }
+  if(spec.k==='derived'){
+    const want=spec.fn(fields); const n=num(given);
+    if(isNaN(want)) return {cls:'eye', verdict:'needs their earlier blanks', want:spec.label};
+    const ok=!isNaN(n)&&Math.abs(n-want)<=Math.max(1,Math.abs(want)*0.02);
+    return {cls:ok?'ok':'bad', verdict:ok?'matches their numbers':('their numbers give '+want), want:spec.label};
+  }
+  if(spec.k==='square'){
+    const n=num(given); const r=Math.sqrt(n);
+    const ok=!isNaN(n)&&Math.abs(r-Math.round(r))<0.001&&Math.round(r)>=1&&Math.round(r)<=10;
+    return {cls:ok?'ok':'bad', verdict:ok?('= '+Math.round(r)+'²'):'not a POWER² value', want:spec.label};
+  }
+  return {cls:'', verdict:'', want:spec.label};
+}
+
+function render(recs){
+  const out=document.getElementById('out');
+  if(!recs.length){ out.innerHTML='<div class="warn"><b>Nothing parsed.</b> Check the CSV has a header row, and a team/student column plus either a <code>Fields</code> JSON column or <code>p0,p1,…</code> columns.</div>'; return; }
+
+  // group by challenge
+  const byCh={};
+  recs.forEach(r=>{ const c=r.challenge||0; (byCh[c]=byCh[c]||[]).push(r); });
+
+  // ── duplicate detection: same normalized answer across different teams ──
+  const dupMap={}; // ch|idx|normvalue -> Set(who)
+  recs.forEach(r=>{ const spec=KEY[r.challenge]; if(!spec) return;
+    spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(!v||String(v).trim()==='')return;
+      const key=r.challenge+'|'+i+'|'+norm(v);
+      (dupMap[key]=dupMap[key]||new Set()).add(r.who); }); });
+  const isDup=(ch,i,v,who)=>{ const s=dupMap[ch+'|'+i+'|'+norm(v)]; return s&&s.size>1; };
+
+  let html='';
+  // summary
+  let tot=0, ok=0, bad=0, eye=0;
+  recs.forEach(r=>{ const spec=KEY[r.challenge]; if(!spec)return;
+    spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
+      const j=judge(s,v,r.fields); tot++; if(j.cls==='ok')ok++; else if(j.cls==='bad')bad++; else if(j.cls==='eye')eye++; }); });
+  // free-text answers shared by >1 team
+  let dupCells=0; Object.values(dupMap).forEach(s=>{ if(s.size>1) dupCells++; });
+
+  html+='<h2>Summary</h2><div>'+
+    '<span class="stat">Teams / rows <b>'+recs.length+'</b></span>'+
+    '<span class="stat">Answers checked <b>'+tot+'</b></span>'+
+    '<span class="stat" style="color:var(--ok)">Correct <b>'+ok+'</b></span>'+
+    '<span class="stat" style="color:var(--bad)">Wrong <b>'+bad+'</b></span>'+
+    '<span class="stat" style="color:var(--eye)">Your call <b>'+eye+'</b></span>'+
+    '<span class="stat" style="color:var(--dup)">Shared answers <b>'+dupCells+'</b></span></div>';
+  html+='<div class="legend"><span class="lg ok">Correct</span><span class="lg bad">Wrong</span><span class="lg eye">Needs your eyes</span><span class="lg dup">Purple outline = same answer as another team</span></div>';
+
+  // per-challenge tables
+  Object.keys(byCh).sort((a,b)=>a-b).forEach(ch=>{
+    const spec=KEY[ch]; const list=byCh[ch];
+    html+='<h2>Challenge '+ch+(spec?' · '+spec.name:' · (no answer key)')+'</h2>';
+    if(!spec){ html+='<div class="muted" style="font-size:12.5px">No key for this challenge id — check the CSV\'s challenge column.</div>'; return; }
+    // per-blank miss counts
+    const miss=spec.p.map(()=>0), seen=spec.p.map(()=>0);
+    list.forEach(r=>spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
+      seen[i]++; if(judge(s,v,r.fields).cls==='bad') miss[i]++; }));
+    html+='<div class="scroll"><table><thead><tr><th>Team / student</th>';
+    spec.p.forEach((s,i)=>{ const pct=seen[i]?Math.round(100*miss[i]/seen[i]):0;
+      html+='<th>p'+i+' — '+esc(s.label)+(seen[i]?'<br><span class="muted">'+miss[i]+'/'+seen[i]+' wrong ('+pct+'%)</span>':'')+'</th>'; });
+    html+='</tr></thead><tbody>';
+    list.forEach(r=>{
+      html+='<tr><td class="who">'+esc(r.who||'—')+'</td>';
+      spec.p.forEach((s,i)=>{
+        const v=r.fields['p'+i];
+        const j=judge(s,v,r.fields);
+        const dup=(v!=null&&String(v).trim()!=='')&&isDup(r.challenge,i,v,r.who);
+        const cls=[j.cls, dup?'dup':''].filter(Boolean).join(' ');
+        html+='<td class="'+cls+'"><span class="mono">'+esc(v==null||String(v).trim()===''?'—':v)+'</span>'+
+              (j.verdict&&j.verdict!=='correct'?'<br><span class="muted" style="font-size:11px">'+esc(j.verdict)+'</span>':'')+'</td>';
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  });
+
+  // copying panel
+  const clusters=Object.entries(dupMap).filter(([k,s])=>s.size>1)
+    .map(([k,s])=>{ const [ch,i,val]=k.split('|'); return {ch,i,val,teams:[...s]}; })
+    .sort((a,b)=>b.teams.length-a.teams.length).slice(0,40);
+  html+='<h2>Answers shared across teams</h2>';
+  if(!clusters.length){ html+='<div class="muted" style="font-size:12.5px">No identical answers across teams.</div>'; }
+  else{
+    html+='<div class="warn"><b>Read this carefully.</b> On the fixed-answer blanks (square counts, chargePower) every team <i>should</i> match — that\'s not copying, that\'s correct. The tell is identical <b>free-text</b> reasoning, or identical <b>measured</b> values like distances and tuned unitMs, which should differ bot to bot.</div>';
+    html+='<div class="scroll"><table><thead><tr><th>Challenge</th><th>Blank</th><th>Identical answer</th><th>Teams</th><th>Type</th></tr></thead><tbody>';
+    clusters.forEach(c=>{
+      const spec=KEY[c.ch]; const s=spec?spec.p[c.i]:null;
+      const kind=s?(s.k==='fix'?'fixed — matching is expected':(s.k==='eye'?'free text — suspicious if identical':'measured — should differ')):'—';
+      const cls=s&&s.k==='fix'?'':'dup';
+      html+='<tr><td>'+esc(c.ch)+'</td><td>p'+esc(c.i)+' '+esc(s?s.label:'')+'</td><td class="mono '+cls+'">'+esc(c.val)+'</td><td>'+esc(c.teams.join(', '))+'</td><td class="muted">'+kind+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  out.innerHTML=html;
+}
+
+// ─────────── wiring ───────────
+document.getElementById('run').addEventListener('click',()=>{
+  const rows=parseCSV(document.getElementById('csv').value);
+  if(rows.length<2){ document.getElementById('out').innerHTML='<div class="warn"><b>Need a header row plus at least one data row.</b></div>'; return; }
+  const recs=buildRecords(rows);
+  document.getElementById('parsed').textContent=rows.length-1+' rows parsed · '+recs.length+' records';
+  render(recs);
+});
+const drop=document.getElementById('drop');
+['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',ev=>{
+  const f=ev.dataTransfer.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=()=>{ document.getElementById('csv').value=r.result; document.getElementById('run').click(); }; r.readAsText(f);
+});
+document.getElementById('demo').addEventListener('click',()=>{
+  document.getElementById('csv').value=
+'Team,Challenge,Fields\n'+
+'"Goon Bros",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
+'"Triple McKGee",1,"{""p0"":""7"",""p1"":""7"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
+'"The Minions",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3600""}"\n'+
+'"Goon Bros",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""27"",""p4"":""45"",""p5"":""bigger"",""p6"":""because it squares""}"\n'+
+'"Triple McKGee",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""300"",""p4"":""125"",""p5"":""the same"",""p6"":""because it squares""}"\n'+
+'"The Minions",7,"{""p0"":""6"",""p1"":""12"",""p2"":""18"",""p3"":""6"",""p4"":""6"",""p5"":""the same"",""p6"":""because it squares""}"';
+  document.getElementById('run').click();
+});
+var root=document.documentElement;
+document.getElementById('theme').addEventListener('click',()=>{ let c=root.getAttribute('data-theme'); if(!c)c=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'; root.setAttribute('data-theme',c==='dark'?'light':'dark'); });
+document.getElementById('print').addEventListener('click',()=>window.print());
+</script>
+</body>
+</html>
