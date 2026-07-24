@@ -58,6 +58,8 @@
   td.eye{background:var(--eye-bg);color:var(--eye);}
   td.dup{outline:2px solid var(--dup);outline-offset:-2px;}
   td.who{font-weight:700;color:var(--ink);white-space:nowrap;}
+  td.when{font-weight:700;color:var(--ink-2);white-space:nowrap;font-size:12px;}
+  #dayFilter{padding:6px 10px;}
   .mono{font-family:var(--mono);font-size:11.5px;}
   .muted{color:var(--ink-3);}
   .callout{border-left:3px solid var(--teal);background:var(--band);border-radius:0 8px 8px 0;padding:11px 14px;margin:14px 0;font:400 12.5px/1.5 var(--sans);color:var(--ink-2);}
@@ -97,7 +99,12 @@
         <button class="btn" id="demo" type="button">Load a sample</button>
         <span class="muted" id="parsed"></span>
       </div>
-      <div class="callout"><b>What it expects.</b> Any CSV with a team/student column, a challenge column, and the answers — either as a <code>Fields</code> column holding JSON (<code>{"p0":"6","p1":"6"}</code>) or as plain <code>p0, p1, p2…</code> columns. It auto-detects which. Nothing is uploaded; this runs entirely in your browser.</div>
+      <div class="callout"><b>What it expects.</b> Any CSV with a team/student column, a challenge column, and the answers — either as a <code>Fields</code> column holding JSON (<code>{"p0":"6","p1":"6"}</code>) or as plain <code>p0, p1, p2…</code> columns. It auto-detects which. If there's a <b>Timestamp</b> or <b>Date</b> column, it dates each attempt and lets you view one day at a time — so a team's Monday run and Wednesday run don't blur together. Nothing is uploaded; this runs entirely in your browser.</div>
+    </div>
+
+    <div class="row hide noprint" id="dayFilterRow">
+      <label class="muted" for="dayFilter" style="font-weight:700;font-size:12.5px;">Show attempts from:</label>
+      <select class="btn" id="dayFilter"></select>
     </div>
 
     <div id="out"></div>
@@ -198,18 +205,40 @@ function findCol(hdr, names){
   return -1;
 }
 
-// Build records: {who, challenge, fields:{p0:…}}
+// Turn a timestamp/date cell into {dayKey, sort, dateDisp, timeDisp} or null.
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function parseWhen(raw){
+  raw=String(raw||'').trim();
+  if(!raw) return null;
+  let d=new Date(raw);
+  if(isNaN(d)) d=new Date(raw.replace(' ','T'));  // Safari: "2026-07-23 14:30" needs a T
+  const hasTime=/\d{1,2}:\d{2}/.test(raw);
+  if(!isNaN(d)){
+    const p2=n=>('0'+n).slice(-2);
+    let h=d.getHours(); const ap=h<12?'a':'p'; let h12=h%12||12;
+    return { dayKey:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),
+             sort:d.getTime(),
+             dateDisp:MON[d.getMonth()]+' '+d.getDate(),
+             timeDisp:hasTime?(h12+':'+p2(d.getMinutes())+ap):'' };
+  }
+  const key=raw.split(/[ T]/)[0];  // couldn't parse — use the leading date-looking chunk
+  return { dayKey:key, sort:key, dateDisp:key, timeDisp:hasTime?raw.split(/[ T]/).slice(1).join(' '):'' };
+}
+
+// Build records: {who, challenge, fields:{p0:…}, when}
 function buildRecords(rows){
   const hdr=rows[0].map(h=>String(h).trim());
   const iWho=findCol(hdr,['team','token','student','name']);
   const iCh =findCol(hdr,['challenge','card','id']);
   const iF  =findCol(hdr,['fields','state','answers','json']);
+  const iWhen=findCol(hdr,['timestamp','date','submitted','created','when','time']);
   const pCols=hdr.map((h,i)=>({h:h.toLowerCase().trim(),i})).filter(x=>/^[pg]\d+$/.test(x.h));
   const recs=[];
   for(let r=1;r<rows.length;r++){
     const row=rows[r]; if(!row) continue;
     const who = iWho>=0 ? String(row[iWho]||'').trim() : ('row '+r);
     const ch  = iCh>=0 ? num(row[iCh]) : NaN;
+    const when = iWhen>=0 ? parseWhen(row[iWhen]) : null;
     let fields={};
     if(iF>=0 && String(row[iF]||'').trim()){
       try{ fields=JSON.parse(row[iF]); }catch(e){
@@ -219,7 +248,7 @@ function buildRecords(rows){
     }
     if(pCols.length){ pCols.forEach(c=>{ if(String(row[c.i]||'').trim()!=='') fields[c.h]=row[c.i]; }); }
     if(!who && !Object.keys(fields).length) continue;
-    recs.push({who, challenge:isNaN(ch)?null:ch, fields});
+    recs.push({who, challenge:isNaN(ch)?null:ch, fields, when});
   }
   return recs;
 }
@@ -297,6 +326,9 @@ function render(recs){
       dupMap[key].teams.add(r.who); }); });
   const isDup=(ch,i,v)=>{ const e=dupMap[ch+'|'+i+'|'+norm(v)]; return e&&e.teams.size>1; };
 
+  const hasDates=recs.some(r=>r.when);
+  const dayKeys=[...new Set(recs.filter(r=>r.when).map(r=>r.when.dayKey))].sort();
+
   let html='';
   // summary
   let tot=0, ok=0, bad=0, eye=0;
@@ -312,7 +344,8 @@ function render(recs){
     '<span class="stat" style="color:var(--ok)">Correct <b>'+ok+'</b></span>'+
     '<span class="stat" style="color:var(--bad)">Wrong <b>'+bad+'</b></span>'+
     '<span class="stat" style="color:var(--eye)">Your call <b>'+eye+'</b></span>'+
-    '<span class="stat" style="color:var(--dup)">Shared answers <b>'+dupCells+'</b></span></div>';
+    '<span class="stat" style="color:var(--dup)">Shared answers <b>'+dupCells+'</b></span>'+
+    (hasDates?'<span class="stat">Days <b>'+dayKeys.length+'</b></span>':'')+'</div>';
   html+='<div class="legend"><span class="lg ok">Correct</span><span class="lg bad">Wrong</span><span class="lg eye">Needs your eyes</span><span class="lg dup">Purple outline = same answer as another team</span></div>';
   html+='<div class="callout"><b>About the calculated blanks.</b> On blanks that are computed from their own earlier answers — Challenge 1\'s total ms, Challenge 3\'s chargePower — <b>green means both things are right</b>: the arithmetic <i>and</i> the numbers it was built on. A team that multiplied correctly but started from a wrong square count or an untuned unitMs is marked <b style="color:var(--eye)">amber</b>, reading “math ok — but built on wrong p1”. That is a different lesson than a team that simply cannot multiply, and it should be taught differently.</div>';
 
@@ -325,12 +358,18 @@ function render(recs){
     const miss=spec.p.map(()=>0), seen=spec.p.map(()=>0);
     list.forEach(r=>spec.p.forEach((s,i)=>{ const v=r.fields['p'+i]; if(v==null||String(v).trim()==='')return;
       seen[i]++; if(judge(s,v,r.fields,spec.p).cls==='bad') miss[i]++; }));
-    html+='<div class="scroll"><table><thead><tr><th>Team / student</th>';
+    html+='<div class="scroll"><table><thead><tr>'+(hasDates?'<th>When</th>':'')+'<th>Team / student</th>';
     spec.p.forEach((s,i)=>{ const pct=seen[i]?Math.round(100*miss[i]/seen[i]):0;
       html+='<th>p'+i+' — '+esc(s.label)+(seen[i]?'<br><span class="muted">'+miss[i]+'/'+seen[i]+' wrong ('+pct+'%)</span>':'')+'</th>'; });
     html+='</tr></thead><tbody>';
-    list.forEach(r=>{
-      html+='<tr><td class="who">'+esc(r.who||'—')+'</td>';
+    // group a team's own attempts together, oldest first
+    const sorted=list.slice().sort((a,b)=>
+      (a.who||'').localeCompare(b.who||'') ||
+      ((a.when&&a.when.sort)>(b.when&&b.when.sort)?1:-1));
+    sorted.forEach(r=>{
+      html+='<tr>';
+      if(hasDates){ html+='<td class="when">'+(r.when?esc(r.when.dateDisp)+(r.when.timeDisp?'<br><span class="muted" style="font-size:11px">'+esc(r.when.timeDisp)+'</span>':''):'<span class="muted">—</span>')+'</td>'; }
+      html+='<td class="who">'+esc(r.who||'—')+'</td>';
       spec.p.forEach((s,i)=>{
         const v=r.fields['p'+i];
         const j=judge(s,v,r.fields,spec.p);
@@ -377,13 +416,41 @@ function render(recs){
 }
 
 // ─────────── wiring ───────────
-document.getElementById('run').addEventListener('click',()=>{
-  const rows=parseCSV(document.getElementById('csv').value);
-  if(rows.length<2){ document.getElementById('out').innerHTML='<div class="warn"><b>Need a header row plus at least one data row.</b></div>'; return; }
-  const recs=buildRecords(rows);
-  document.getElementById('parsed').textContent=rows.length-1+' rows parsed · '+recs.length+' records';
+let ALL=[];  // every record from the last CSV, before the day filter
+
+function dispDay(dayKey){
+  const d=new Date(dayKey+'T00:00');
+  if(isNaN(d)) return dayKey;
+  return MON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+}
+function populateDayFilter(){
+  const sel=document.getElementById('dayFilter');
+  const row=document.getElementById('dayFilterRow');
+  const dated=ALL.filter(r=>r.when);
+  const days=[...new Set(dated.map(r=>r.when.dayKey))].sort();
+  if(days.length<2){ row.classList.add('hide'); sel.innerHTML=''; return; }  // nothing to filter
+  row.classList.remove('hide');
+  let opts='<option value="__all">All days ('+dated.length+' attempts)</option>';
+  days.forEach(k=>{ const n=dated.filter(r=>r.when.dayKey===k).length;
+    opts+='<option value="'+k+'">'+esc(dispDay(k))+' ('+n+')</option>'; });
+  sel.innerHTML=opts;
+}
+function applyAndRender(){
+  const sel=document.getElementById('dayFilter');
+  const pick=(sel && !document.getElementById('dayFilterRow').classList.contains('hide')) ? sel.value : '__all';
+  const recs=(pick && pick!=='__all') ? ALL.filter(r=>r.when && r.when.dayKey===pick) : ALL;
   render(recs);
-});
+}
+function runCSV(){
+  const rows=parseCSV(document.getElementById('csv').value);
+  if(rows.length<2){ document.getElementById('out').innerHTML='<div class="warn"><b>Need a header row plus at least one data row.</b></div>'; document.getElementById('dayFilterRow').classList.add('hide'); return; }
+  ALL=buildRecords(rows);
+  document.getElementById('parsed').textContent=rows.length-1+' rows parsed · '+ALL.length+' records';
+  populateDayFilter();
+  applyAndRender();
+}
+document.getElementById('run').addEventListener('click',runCSV);
+document.getElementById('dayFilter').addEventListener('change',applyAndRender);
 const drop=document.getElementById('drop');
 ['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
@@ -393,13 +460,14 @@ drop.addEventListener('drop',ev=>{
 });
 document.getElementById('demo').addEventListener('click',()=>{
   document.getElementById('csv').value=
-'Team,Challenge,Fields\n'+
-'"Goon Bros",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
-'"Triple McKGee",1,"{""p0"":""7"",""p1"":""7"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
-'"The Minions",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3600""}"\n'+
-'"Goon Bros",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""27"",""p4"":""45"",""p5"":""bigger"",""p6"":""because it squares""}"\n'+
-'"Triple McKGee",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""300"",""p4"":""125"",""p5"":""the same"",""p6"":""because it squares""}"\n'+
-'"The Minions",7,"{""p0"":""6"",""p1"":""12"",""p2"":""18"",""p3"":""6"",""p4"":""6"",""p5"":""the same"",""p6"":""because it squares""}"';
+'Timestamp,Team,Challenge,Fields\n'+
+'"2026-07-21 10:15","Goon Bros",1,"{""p0"":""7"",""p1"":""7"",""p2"":""600"",""p3"":""100"",""p4"":""4300""}"\n'+
+'"2026-07-21 10:18","The Minions",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3600""}"\n'+
+'"2026-07-23 10:05","Goon Bros",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
+'"2026-07-23 10:07","The Minions",1,"{""p0"":""6"",""p1"":""6"",""p2"":""600"",""p3"":""100"",""p4"":""3700""}"\n'+
+'"2026-07-23 11:20","Goon Bros",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""27"",""p4"":""45"",""p5"":""bigger"",""p6"":""because it squares""}"\n'+
+'"2026-07-23 11:22","The Minions",7,"{""p0"":""6"",""p1"":""12"",""p2"":""18"",""p3"":""6"",""p4"":""6"",""p5"":""the same"",""p6"":""because it squares""}"\n'+
+'"2026-07-23 11:25","Triple T",7,"{""p0"":""9"",""p1"":""36"",""p2"":""81"",""p3"":""300"",""p4"":""125"",""p5"":""the same"",""p6"":""because it squares""}"';
   document.getElementById('run').click();
 });
 var root=document.documentElement;
