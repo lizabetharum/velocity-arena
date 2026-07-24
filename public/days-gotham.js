@@ -32,11 +32,11 @@ const GOTHAM_DAY_13 = {
   "vocabulary": "PREDICTION, GAP (prediction error), RATE OF CHANGE. The gap is predicted minus actual. The rate of change is centimetres per second — the bot's speed, and the slope of its line.",
   "activities": [
     {
-      "name": "Start the Distance Lab",
-      "mins": 20,
+      "name": "Launch the Distance Lab",
+      "mins": 15,
       "block": "Hook",
-      "description": "No warm-up video — the bot driving is the hook. Today you predict how far your bot travels BEFORE it moves, then measure how close you got. Learn the two moves you repeat all day: predict before the run, then say 'we predicted ___, we got ___, the gap was ___, because ___.'",
-      "facilitatorDescription": "Start straight in — no Crosstown data, no matches. Hand out the worksheet, load the Distance Lab MakeCode (button A drives, button B adds half a second). Teach the prediction ritual (one number, written before the bot moves, signed) and the gap sentence. Lock stats to sum 20; they do not change all week."
+      "description": "Quick start, no video. Three things: (1) get your worksheet and the Distance Lab code on your bot; (2) lock your 4 stats so they add to 20 and write them on the board; (3) learn the two moves you repeat all day — predict a distance BEFORE the bot moves, then after each run say 'we predicted ___, we got ___, the gap was ___, because ___.'",
+      "facilitatorDescription": "This is a launch, not a warm-up game — the bot driving is the hook. Roughly 15 minutes, three concrete things: hand out the worksheet and load the MakeCode (button A drives, B adds half a second); every team locks 4 stats summing to 20 and writes them on the board (the Speed stat sets the bot's power, so it must be fixed before anyone drives); teach the prediction ritual and the gap sentence with a 30-second demo drive. Then straight to Trial 1."
     },
     {
       "name": "Distance Lab worksheet",
@@ -59,16 +59,15 @@ const GOTHAM_DAY_13 = {
       "name": "Make your equation poster",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "In Canva, build a poster with your equation and your graph of the five dots. Nothing else yet. This is the poster you will teach a visitor from on Thursday.",
-      "facilitatorDescription": "Teams build their poster in Canva -- their equation and their five-point graph. This consolidates the morning, seeds tomorrow's Model Swap (posters go on the wall or screen so every equation is visible), and becomes their exhibition artifact. Tell them now that they will teach from this poster on Thursday."
+      "description": "In Canva, build a poster with your equation and your graph of the five dots. Nothing else yet -- this is the poster you'll teach a visitor from on Thursday. Also write your equation BIG on a sheet of paper and tape it to the wall; that's what the class compares tomorrow.",
+      "facilitatorDescription": "Teams build their poster in Canva -- their equation and their five-point graph -- and it becomes their exhibition artifact. Have each team ALSO write its final equation large on a plain sheet and post it on the wall, so all four equations are visible at once for tomorrow's Model Swap without depending on screens. Tell them now they will teach from the Canva poster on Thursday."
     },
     {
       "name": "Introduce the Target Challenge",
       "mins": 40,
       "block": "Match-Build-Make",
       "description": "A tape line goes on the floor at a set distance (say 100 cm). Use your equation to pick the drive time that stops your bot on the line. Compute it, drive, measure the miss. A few tries each.",
-      "facilitatorDescription": "This is the predict-then-test game that replaces matches — and it cannot come out 0-0. Set a target line; teams use their equation backwards (time = (target - start-up) / speed) to choose a drive time, then test and measure the miss. Same MakeCode. It is exactly what visitors will try on Thursday. Teams whose bots drive crooked can spend part of this block on Skills Arena Challenge 1 (Dead Straight) so they measure cleaner — only if needed.",
-      "link": "/lessons/distance-lab-worksheet.html"
+      "facilitatorDescription": "A separate, live activity from the worksheet — you run it, there is no handout. It is the predict-then-test game that replaces matches, and it cannot come out 0-0. Set a target line; teams use their equation backwards (time = (target - start-up) / speed) to choose a drive time, then drive and measure the miss. Same MakeCode as the morning (button B sets the time). It is exactly what visitors will try on Thursday. Teams whose bots drive crooked can spend part of this block on Skills Arena Challenge 1 (Dead Straight) so they measure cleaner — only if needed."
     },
     {
       "name": "Close + preview tomorrow",
@@ -109,8 +108,7 @@ const GOTHAM_DAY_14 = {
       "mins": 70,
       "block": "Match-Build-Make",
       "description": "New target line at a distance you have NEVER driven to. Use your equation to pick the drive time, write your prediction, then drive. Getting a distance right that you never measured is the proof your equation works. Several rounds at new distances.",
-      "facilitatorDescription": "This replaces the match Proving Rounds and cannot come out 0-0. Teams solve time = (target - start-up) / speed, commit a prediction, then drive and measure the miss. It is the same predict-then-test loop as matches, but it needs no opponent and no goal. Run several rounds at new distances; the miss should shrink as they trust the model.",
-      "link": "/lessons/distance-lab-worksheet.html"
+      "facilitatorDescription": "This replaces the match Proving Rounds and cannot come out 0-0. A live activity, no handout. Teams solve time = (target - start-up) / speed, commit a prediction, then drive and measure the miss. Same predict-then-test loop as matches, but it needs no opponent and no goal. Run several rounds at new distances; the miss should shrink as they trust the model."
     },
     {
       "name": "Lunch",
