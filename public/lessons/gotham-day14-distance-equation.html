@@ -741,7 +741,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
   <div class="sec-hd">
     <div class="sec-step-lbl">Step 5 of 5</div>
     <div class="sec-title">Share with the class.</div>
-    <div class="sec-desc">Read your report card out loud. Every team's bot has a different speed.</div>
+    <div class="sec-desc">Read your report card, then type in another team's numbers to compare the two bots and make your keep/change decision.</div>
   </div>
 
   <!-- REPORT CARD -->
@@ -770,23 +770,55 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
 
   </div>
 
-  <!-- CLASS DISCUSSION PROMPTS -->
+  <!-- INTERACTIVE MODEL SWAP: compare with another team -->
   <div class="card">
-    <div class="card-lbl clbl-m">Listen for these things when other teams share</div>
-    <div style="display:flex;flex-direction:column;">
-      <div class="discuss-item">
-        <div class="di-dot" style="background:var(--cyan)"></div>
-        <span>Which group has the <strong style="color:var(--cyan)">biggest slope</strong>? Their bot is the <strong>fastest</strong> — the most cm per second.</span>
+    <div class="card-lbl clbl-m">&#128101; Compare with another team</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6;">Go read another team's poster. Type their <strong>speed</strong> and <strong>start-up</strong> here to see both bots on one graph — then decide what to keep and what to change.</p>
+    <div class="dp-fields">
+      <div class="fld">
+        <div class="fld-lbl">Their speed (cm per second)</div>
+        <input class="fld-inp" id="cmp-m" type="number" step="0.1" placeholder="?" oninput="compareTeams()">
       </div>
-      <div class="discuss-item">
-        <div class="di-dot" style="background:var(--yellow)"></div>
-        <span>Which group has the <strong style="color:var(--yellow)">smallest residual</strong>? Their equation predicted a new run most accurately. (Use size, ignoring the sign — −8 is bigger than +2.)</span>
-      </div>
-      <div class="discuss-item">
-        <div class="di-dot" style="background:var(--green)"></div>
-        <span>Whose <strong style="color:var(--green)">start-up (b)</strong> is the biggest? That bot loses the most distance getting going.</span>
+      <div class="fld">
+        <div class="fld-lbl">Their start-up (cm, usually negative)</div>
+        <input class="fld-inp" id="cmp-b" type="number" step="0.1" placeholder="?" oninput="compareTeams()">
       </div>
     </div>
+
+    <div class="graph-wrap" id="cmpWrap" style="display:none;margin-top:14px;">
+      <div class="graph-lbl">&#128202; Both bots on one graph</div>
+      <svg class="liveGraph" id="graph5" viewBox="0 0 500 300"></svg>
+      <div class="graph-legend">
+        <div class="leg"><div style="width:20px;height:0;border-top:2px dashed var(--cyan);display:inline-block;margin-top:6px"></div>&nbsp;Your bot</div>
+        <div class="leg"><div style="width:20px;height:0;border-top:2px dashed var(--orange);display:inline-block;margin-top:6px"></div>&nbsp;Their bot</div>
+      </div>
+    </div>
+
+    <div class="res-block" id="cmpResult" style="display:none;">
+      <div class="res-row">
+        <span class="rr-lbl">Faster bot (bigger speed)</span>
+        <span class="rr-val" id="cmp-faster">—</span>
+      </div>
+      <div class="res-row">
+        <span class="rr-lbl">Loses more getting going (bigger start-up)</span>
+        <span class="rr-val" id="cmp-startup">—</span>
+      </div>
+      <div class="res-row" style="border-top:2px solid var(--border);padding-top:10px;">
+        <span class="rr-lbl" style="font-weight:800;color:var(--text)">How far apart after a 5-second drive</span>
+        <span class="rr-val" id="cmp-gap" style="color:var(--orange);font-size:22px;">—</span>
+      </div>
+      <div class="res-interp" id="cmp-interp"></div>
+    </div>
+  </div>
+
+  <!-- KEEP / CHANGE decision -->
+  <div class="card">
+    <div class="card-lbl clbl-y">Your keep / change decision</div>
+    <div class="sentence-frame" style="line-height:2.1;">
+      Looking at their equation, one thing we will <strong style="color:var(--green)">keep</strong> in ours is ____, because ____.<br>
+      One thing we will <strong style="color:var(--orange)">change</strong> is ____, because ____.
+    </div>
+    <div style="margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6;">Write this on your Model Swap slip. The reason has to use a <strong>number</strong> — "their speed is 6 cm/s bigger than ours" — not "theirs looks better."</div>
   </div>
 
   <button class="btn-back" onclick="goSection(4)" style="margin-top:4px;">&larr; Back</button>
@@ -872,7 +904,7 @@ function renderGraph(svgId, opts){
   const svg = document.getElementById(svgId);
   if(!svg) return;
   const {p1=null, p2=null, showLine=false, m=null, b=null,
-    testPt=null, showRiseRun=false, statName='Stat'} = opts;
+    testPt=null, showRiseRun=false, statName='Stat', line2=null} = opts;
 
   // Fixed axes for visual consistency
   const xMin=0, xMax=6, yMin=0, yMax=320;
@@ -928,6 +960,14 @@ function renderGraph(svgId, opts){
     const sly1=Math.max(MT, Math.min(MT+PH, sy(ly1)));
     const sly2=Math.max(MT, Math.min(MT+PH, sy(ly2)));
     html+=`<line x1="${sx(lx1)}" y1="${sly1}" x2="${sx(lx2)}" y2="${sly2}" stroke="#00e5ff" stroke-width="2" stroke-opacity="0.5" stroke-dasharray="6 3"/>`;
+  }
+
+  // Second line (another team) for the compare panel
+  if(line2 && line2.m!==null && line2.m!==undefined && !isNaN(line2.m) && !isNaN(line2.b)){
+    const q1=r2(line2.m*xMin+line2.b), q2=r2(line2.m*xMax+line2.b);
+    const sq1=Math.max(MT, Math.min(MT+PH, sy(q1)));
+    const sq2=Math.max(MT, Math.min(MT+PH, sy(q2)));
+    html+=`<line x1="${sx(xMin)}" y1="${sq1}" x2="${sx(xMax)}" y2="${sq2}" stroke="#ff9100" stroke-width="2.4" stroke-opacity="0.75" stroke-dasharray="6 3"/>`;
   }
 
   // Rise/run triangle
@@ -1194,6 +1234,31 @@ function goToReport(){
 
 
   goSection(5);
+}
+
+// ── INTERACTIVE MODEL SWAP: compare two teams' equations ─────────────
+function compareTeams(){
+  const m2=gv('cmp-m'), b2=gv('cmp-b');
+  const myM=slope, myB=yInt;
+  const wrap=document.getElementById('cmpWrap'), res=document.getElementById('cmpResult');
+  if(myM===null||myB===null||isNaN(m2)||isNaN(b2)){ wrap.style.display='none'; res.style.display='none'; return; }
+  wrap.style.display='block'; res.style.display='block';
+  renderGraph('graph5',{ showLine:true, m:myM, b:myB, line2:{m:m2,b:b2}, statName:STAT_LABELS['time'] });
+
+  const df=r2(myM-m2), fEl=document.getElementById('cmp-faster');
+  if(Math.abs(df)<0.05) fEl.innerHTML='<span style="color:var(--muted)">Same speed ('+myM+' cm/s)</span>';
+  else if(df>0) fEl.innerHTML='<span style="color:var(--cyan)">Your bot &mdash; '+df+' cm/s faster</span>';
+  else fEl.innerHTML='<span style="color:var(--orange)">Their bot &mdash; '+Math.abs(df)+' cm/s faster</span>';
+
+  const suEl=document.getElementById('cmp-startup'), myLoss=Math.abs(myB), theirLoss=Math.abs(b2);
+  if(Math.abs(myLoss-theirLoss)<0.05) suEl.innerHTML='<span style="color:var(--muted)">About the same</span>';
+  else if(myLoss>theirLoss) suEl.innerHTML='<span style="color:var(--cyan)">Yours ('+myB+' cm)</span>';
+  else suEl.innerHTML='<span style="color:var(--orange)">Theirs ('+b2+' cm)</span>';
+
+  const myD=r2(myM*5+myB), theirD=r2(m2*5+b2), gap=r2(Math.abs(myD-theirD));
+  document.getElementById('cmp-gap').textContent=gap+' cm';
+  document.getElementById('cmp-interp').textContent=
+    'After 5 seconds your bot goes '+myD+' cm and theirs goes '+theirD+' cm \u2014 '+gap+' cm apart. The bigger the speed difference, the faster that gap opens up.';
 }
 
 // ── AUTO-INIT (no stat picker for distance data) ─────────────────────
