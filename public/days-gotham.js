@@ -59,8 +59,8 @@ const GOTHAM_DAY_13 = {
       "name": "Make your equation poster",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "Big paper: your equation and your graph of the five dots. Nothing else yet. This is the thing you will teach a visitor on Thursday.",
-      "facilitatorDescription": "Teams put their equation and their five-point graph on chart paper. This consolidates the morning, seeds tomorrow's Model Swap (equations go on the wall), and becomes their exhibition artifact. Tell them now that they will teach from this poster on Thursday."
+      "description": "In Canva, build a poster with your equation and your graph of the five dots. Nothing else yet. This is the poster you will teach a visitor from on Thursday.",
+      "facilitatorDescription": "Teams build their poster in Canva -- their equation and their five-point graph. This consolidates the morning, seeds tomorrow's Model Swap (posters go on the wall or screen so every equation is visible), and becomes their exhibition artifact. Tell them now that they will teach from this poster on Thursday."
     },
     {
       "name": "Introduce the Target Challenge",
@@ -130,8 +130,8 @@ const GOTHAM_DAY_14 = {
       "name": "Finish your poster",
       "mins": 30,
       "block": "Open Lab",
-      "description": "Add the Target Challenge and your before/after miss to the poster. This is now the whole story you'll teach on Thursday.",
-      "facilitatorDescription": "Teams complete the poster: equation, graph, the Target Challenge, and the before/after miss. It is both their Goal 1 evidence and their exhibition station."
+      "description": "In Canva, add the Target Challenge and your before/after miss to your poster. This is now the whole story you'll teach on Thursday.",
+      "facilitatorDescription": "Teams finish their Canva poster: equation, graph, the Target Challenge, and the before/after miss. It is both their Goal 1 evidence and their exhibition station. Print it or display it on a screen for the exhibition."
     }
   ],
   "ends": "Fill in the card: 'Our Target miss started at ____ cm and is now ____ cm. The change that helped most was ____.' If it got worse, write why."
