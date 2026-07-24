@@ -67,7 +67,8 @@ const GOTHAM_DAY_13 = {
       "mins": 40,
       "block": "Match-Build-Make",
       "description": "A tape line goes on the floor at a set distance (say 100 cm). Use your equation to pick the drive time that stops your bot on the line. Compute it, drive, measure the miss. A few tries each.",
-      "facilitatorDescription": "A separate, live activity from the worksheet — you run it, there is no handout. It is the predict-then-test game that replaces matches, and it cannot come out 0-0. Set a target line; teams use their equation backwards (time = (target - start-up) / speed) to choose a drive time, then drive and measure the miss. Same MakeCode as the morning (button B sets the time). It is exactly what visitors will try on Thursday. Teams whose bots drive crooked can spend part of this block on Skills Arena Challenge 1 (Dead Straight) so they measure cleaner — only if needed."
+      "facilitatorDescription": "The predict-then-test game that replaces matches, and it cannot come out 0-0. Set a target line; teams use their equation backwards (time = (target - start-up) / speed) to choose a drive time, then drive and measure the miss. Same MakeCode as the morning (button B sets the time). Print the Target Challenge worksheet, one per team. It is exactly what visitors will try on Thursday. Teams whose bots drive crooked can spend part of this block on Skills Arena Challenge 1 (Dead Straight) — only if needed.",
+      "link": "/lessons/target-challenge-worksheet.html"
     },
     {
       "name": "Close + preview tomorrow",
@@ -101,14 +102,15 @@ const GOTHAM_DAY_14 = {
       "block": "Challenge Block",
       "description": "First, make your model different from everyone else's in one way. Then study another team's equation and write down: what you keep, what you change, and why — citing a number.",
       "facilitatorDescription": "Ten minutes of divergence first: every team makes their model visibly different from the reference (add a variable, use a different pair of points, split it in two, switch to a table) — otherwise all four equations look alike and there is nothing to compare. Then swap: each team studies one other team's model and fills a slip with keep/change and a number-backed why. This is Goal 2.",
-      "link": "/lessons/day13-linear-equations.html"
+      "link": "/lessons/gotham-day14-distance-equation.html"
     },
     {
       "name": "Target Challenge — the real test",
       "mins": 70,
       "block": "Match-Build-Make",
       "description": "New target line at a distance you have NEVER driven to. Use your equation to pick the drive time, write your prediction, then drive. Getting a distance right that you never measured is the proof your equation works. Several rounds at new distances.",
-      "facilitatorDescription": "This replaces the match Proving Rounds and cannot come out 0-0. A live activity, no handout. Teams solve time = (target - start-up) / speed, commit a prediction, then drive and measure the miss. Same predict-then-test loop as matches, but it needs no opponent and no goal. Run several rounds at new distances; the miss should shrink as they trust the model."
+      "facilitatorDescription": "This replaces the match Proving Rounds and cannot come out 0-0. Teams solve time = (target - start-up) / speed, commit a prediction, then drive and measure the miss. Same predict-then-test loop as matches, but it needs no opponent and no goal. Run several rounds at new distances on the Target Challenge worksheet; the miss should shrink as they trust the model.",
+      "link": "/lessons/target-challenge-worksheet.html"
     },
     {
       "name": "Lunch",
