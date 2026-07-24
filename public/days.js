@@ -1,12 +1,14 @@
 // Site dispatcher.
 // Loads the right schedule for the active site:
-//   - TN  (Crosstown)                 → DAYS_TN   (16 days, compressed timings, snack break)
-//   - NY1 (Gotham Tech) +
-//     NY2 (Claremont International HS) +
-//     NY3 (South Bronx Community)     → DAYS_NY1 (16 days, full-length activities, lunch)
-//   - no site selected                → DAYS_NY1 (all four pilot sites run the 16-day arc;
-//                                                 the 20-day DAYS_DEFAULT is legacy master content)
-// Both 16-day arrays are built in days-tn.js by buildFourWeekDays().
+//   - TN  (Crosstown)                 → DAYS_TN     (16 days, compressed timings, snack break)
+//   - NY1 (Gotham Tech)               → DAYS_GOTHAM (days 1–12 default; 13–16 = compressed
+//                                                    "final four days" plan v3)
+//   - NY2 (Claremont International HS) +
+//     NY3 (South Bronx Community)     → DAYS_NY1   (16 days, full-length activities, lunch)
+//   - no site selected                → DAYS_NY1   (all four pilot sites run the 16-day arc;
+//                                                    the 20-day DAYS_DEFAULT is legacy master content)
+// DAYS_TN/DAYS_NY1 are built in days-tn.js by buildFourWeekDays();
+// DAYS_GOTHAM is built in days-gotham.js.
 //
 // Each array is loaded at page time (see <script src="..."> tags in pages
 // that consume DAYS). This file picks one and exposes it as the global
@@ -17,7 +19,10 @@ const DAYS = (function pickDays() {
   if (code === 'TN' && typeof DAYS_TN !== 'undefined' && DAYS_TN.length > 0) {
     return DAYS_TN;
   }
-  if ((code === 'NY1' || code === 'NY2' || code === 'NY3') && typeof DAYS_NY1 !== 'undefined' && DAYS_NY1.length > 0) {
+  if (code === 'NY1' && typeof DAYS_GOTHAM !== 'undefined' && DAYS_GOTHAM.length > 0) {
+    return DAYS_GOTHAM;
+  }
+  if ((code === 'NY2' || code === 'NY3') && typeof DAYS_NY1 !== 'undefined' && DAYS_NY1.length > 0) {
     return DAYS_NY1;
   }
   if (typeof DAYS_NY1 !== 'undefined' && DAYS_NY1.length > 0) return DAYS_NY1;
