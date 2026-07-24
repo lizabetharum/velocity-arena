@@ -9,9 +9,12 @@
 //   Day 15  Post-Task Diagnostic + Reflection, Teach the Math, teach-back
 //   Day 16  Community Exhibition (visitors try the Target Challenge) — no awards
 //
-// Days 1–12 are unchanged from the master schedule (DAYS_DEFAULT). Only the
-// closing four days differ, so this file reuses DAYS_DEFAULT.slice(0, 12) and
-// appends four inline day objects below.
+// Days 1–12 are unchanged from what Gotham's sibling NY sites run (DAYS_NY1),
+// which is the correctly re-weeked 4-day-week schedule: days 1–4 = week 1,
+// 5–8 = week 2, 9–12 = week 3, 13–16 = week 4. Only the closing four days
+// differ, so this file reuses DAYS_NY1.slice(0, 12) and appends four inline
+// day objects below. (Do NOT slice DAYS_DEFAULT — that 20-day master groups
+// its weeks differently and would mis-label days 5–12.)
 //
 // In-the-room steps + reasoning:
 //   /resources/teacher-guides/gotham-v3-teacher-card.html  (what to do)
@@ -246,10 +249,11 @@ const GOTHAM_DAY_16 = {
   "ends": "What did you learn about yourself as a problem solver? Name one specific moment from this program where you solved something you thought you could not. You have 5 minutes."
 };
 
-// Days 1–12 from the master schedule, then the four v3 closing days.
-const DAYS_GOTHAM = (typeof DAYS_DEFAULT !== 'undefined')
+// Days 1–12 (correctly weeked) from DAYS_NY1, then the four closing days.
+// days-tn.js defines DAYS_NY1 and loads before this file.
+const DAYS_GOTHAM = (typeof DAYS_NY1 !== 'undefined' && DAYS_NY1.length >= 12)
   ? [
-      ...DAYS_DEFAULT.slice(0, 12),
+      ...DAYS_NY1.slice(0, 12),
       GOTHAM_DAY_13,
       GOTHAM_DAY_14,
       GOTHAM_DAY_15,
