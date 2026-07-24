@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distance Lab — when the bots can't reach the ball</title>
+<style>
+  :root{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EEF2F3;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#DBE1E4; --line-strong:#C1C9CD;
+    --teal:#0B7A8C; --teal-deep:#075867;
+    --warn:#B4611F; --warn-bg:#FBEEDD;
+    --ok:#0B6E4E; --ok-bg:#E7F5EE;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#10151A; --card:#161C22; --band:#1B232B;
+      --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+      --line:#28323B; --line-strong:#374350;
+      --teal:#3FC5DA; --teal-deep:#7FE0EF; --warn:#E29A5A; --warn-bg:#2A2013;
+      --ok:#54C79A; --ok-bg:#14261E; }
+  }
+  :root[data-theme="light"]{--paper:#F6F8F9;--card:#FFFFFF;--band:#EEF2F3;--ink:#14181C;--ink-2:#3C444B;--ink-3:#6B747C;--line:#DBE1E4;--line-strong:#C1C9CD;--teal:#0B7A8C;--teal-deep:#075867;--warn:#B4611F;--warn-bg:#FBEEDD;--ok:#0B6E4E;--ok-bg:#E7F5EE;}
+  :root[data-theme="dark"]{--paper:#10151A;--card:#161C22;--band:#1B232B;--ink:#EAEEF1;--ink-2:#AEB7BF;--ink-3:#7E8891;--line:#28323B;--line-strong:#374350;--teal:#3FC5DA;--teal-deep:#7FE0EF;--warn:#E29A5A;--warn-bg:#2A2013;--ok:#54C79A;--ok-bg:#14261E;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+
+  .bar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 20px;}
+  .bar .back{font:600 11px/1 var(--sans);color:var(--teal);text-decoration:none;}
+  .bar .t{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+  .bar .sp{flex:1;}
+  .btn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:6px;padding:8px 12px;cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+
+  .sheet{max-width:780px;margin:0 auto;padding:24px 20px 70px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 30px 24px;}
+
+  .head{border-bottom:3px solid var(--ink);padding-bottom:12px;margin-bottom:8px;}
+  .eyebrow{font:600 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:0 0 9px;}
+  h1{font:800 27px/1.1 var(--sans);letter-spacing:-.02em;margin:0;text-wrap:balance;}
+  .sub{font:500 15px/1.5 var(--sans);color:var(--ink-2);margin:10px 0 0;}
+
+  h2{font:800 20px/1.15 var(--sans);margin:32px 0 6px;color:var(--ink);border-top:3px solid var(--ink);padding-top:14px;}
+  h3{font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--teal-deep);margin:20px 0 8px;}
+
+  ol.steps{list-style:none;margin:10px 0 0;padding:0;counter-reset:s;}
+  ol.steps > li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:13px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line);}
+  ol.steps > li:last-child{border-bottom:none;}
+  ol.steps > li::before{content:counter(s);font:800 13px/26px var(--mono);text-align:center;color:#fff;background:var(--ink);border-radius:6px;height:26px;}
+  .doit{font:500 15.5px/1.55 var(--sans);color:var(--ink);}
+  .doit b{font-weight:800;}
+  .doit .note{display:block;font:400 13.5px/1.5 var(--sans);color:var(--ink-3);margin-top:4px;}
+
+  .say{background:var(--band);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:12px 15px;margin:12px 0;font:600 15px/1.6 var(--sans);color:var(--ink);}
+  .say .lbl{display:block;font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep);margin-bottom:7px;}
+
+  .callout{border-left:3px solid var(--teal);background:var(--band);border-radius:0 8px 8px 0;padding:12px 15px;margin:14px 0;font:400 14px/1.55 var(--sans);color:var(--ink-2);}
+  .callout b{color:var(--ink);}
+  .warn{border-left:3px solid var(--warn);background:var(--warn-bg);border-radius:0 8px 8px 0;padding:12px 15px;margin:14px 0;font:400 14px/1.55 var(--sans);color:var(--ink-2);}
+  .warn b{color:var(--warn);}
+  .ok{border-left:3px solid var(--ok);background:var(--ok-bg);border-radius:0 8px 8px 0;padding:12px 15px;margin:14px 0;font:400 14px/1.55 var(--sans);color:var(--ink-2);}
+  .ok b{color:var(--ok);}
+
+  .eqbox{background:var(--band);border:2px solid var(--line-strong);border-radius:10px;padding:16px;margin:14px 0;text-align:center;}
+  .eqbox .e{font:800 21px/1.35 var(--mono);color:var(--ink);}
+  .eqbox .l{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px;}
+
+  table.d{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0;}
+  table.d th,table.d td{border:1px solid var(--line-strong);padding:9px 8px;text-align:center;color:var(--ink-2);}
+  table.d thead th{background:var(--band);font:700 9.5px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;}
+  table.d td.t{font-weight:800;color:var(--ink);width:56px;}
+  table.d td.blank{height:40px;}
+  table.d td.chg{text-align:left;}
+
+  table.iff{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0;}
+  table.iff th,table.iff td{border:1px solid var(--line-strong);padding:9px 11px;text-align:left;vertical-align:top;color:var(--ink-2);}
+  table.iff thead th{background:var(--band);font:700 9.5px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;}
+  table.iff td.if{width:38%;font-weight:800;color:var(--ink);}
+
+  p{margin:0 0 10px;color:var(--ink-2);font-size:14.5px;}
+  ul{margin:0 0 10px;padding-left:20px;color:var(--ink-2);font-size:14.5px;}
+  li{margin-bottom:5px;}
+  b{color:var(--ink);}
+  code{font-family:var(--mono);font-size:13px;background:var(--band);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink);}
+  .foot{border-top:3px solid var(--ink);margin-top:30px;padding-top:13px;font:400 13px/1.5 var(--sans);color:var(--ink-3);}
+  .foot a{color:var(--teal-deep);font-weight:700;text-decoration:none;}
+
+  @media print{
+    .bar{display:none;}
+    :root{--paper:#fff;--card:#fff;}
+    body{background:#fff;font-size:12.5px;}
+    .sheet{max-width:none;padding:0;} .card{border:none;padding:.35in .4in;}
+    ol.steps > li,.eqbox,table.d,table.iff,.say{break-inside:avoid;}
+    @page{size:Letter;margin:0;}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="back" href="/teachers.html">← Resources</a>
+  <span class="t">Distance Lab</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Theme</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</div>
+
+<div class="sheet">
+  <div class="card">
+
+    <div class="head">
+      <p class="eyebrow">Velocity Arena · Contingency lab</p>
+      <h1>Distance Lab</h1>
+      <p class="sub">For the day when the bots <b>never touch the ball</b>. You do not need a working match to do real mathematical modelling — you need a bot that moves, a tape measure, and a prediction. Everything the project asks for can be done right here.</p>
+    </div>
+
+    <div class="warn"><b>Why this lab exists.</b> Zero ball touches does not mean the students failed. It means the bots cannot yet <i>reach</i> the ball — which is a distance-and-direction problem, not a soccer problem. This lab attacks that problem directly and produces the prediction data the week needs <b>at the same time</b>. Fix the bots by doing the math on them.</div>
+
+    <div class="ok"><b>The one thing that can never be zero.</b> Goals can be zero. Ball touches can be zero. But <b>any bot whose wheels turn at all travels some distance</b>, and a tape measure will always give you a number. That number is all the mathematics needs.</div>
+
+    <!-- SETUP -->
+    <h2>Setup — ten minutes</h2>
+    <ul>
+      <li><b>One long strip of tape on the floor</b> per team, as a start line. Bots always start with wheels behind it.</li>
+      <li><b>One tape measure or metre stick per team.</b> This is the most important object in the room today.</li>
+      <li><b>Measure in centimetres.</b> Not squares, not "about a foot." Centimetres, written down.</li>
+      <li>Each team needs their <b>MakeCode project open</b>, because they will change one number in it repeatedly.</li>
+    </ul>
+
+    <!-- THE LOOP -->
+    <h2>The lab — run this loop for the whole block</h2>
+    <ol class="steps">
+      <li><span class="doit"><b>Trial 1 is calibration: drive for exactly 1 second.</b> Set the drive to 1000 ms, run it, and measure how far the bot travelled in centimetres.<span class="note">Write it down. This number is the bot's <b>speed in cm per second</b>. Every team's will be different — that is the point.</span></span></li>
+      <li><span class="doit"><b>Now predict, before touching anything.</b> "If our bot drives for <b>3 seconds</b>, it will travel ______ cm."<span class="note">They get this by multiplying: cm per second × 3. Written down and signed before the bot moves.</span></span></li>
+      <li><span class="doit"><b>Run it for 3 seconds. Measure the actual distance in cm.</b></span></li>
+      <li><span class="doit"><b>Gap sentence, out loud and written:</b> "We predicted ___ cm. We got ___ cm. The gap was ___ cm. Because ___."<span class="note">Almost every team will travel <b>less</b> than predicted. That is real — the bot loses time speeding up at the start. Let them discover it; do not tell them.</span></span></li>
+      <li><span class="doit"><b>Change exactly ONE number</b> in their model or their code, and write down which one.<span class="note">Usually: subtract a start-up lag from the prediction, or adjust the cm-per-second figure.</span></span></li>
+      <li><span class="doit"><b>Predict a new distance for a new time</b> (try 2 s, then 4 s, then 5 s), run, measure, gap sentence again.<span class="note">Aim for <b>five trials</b> per team. Five predicted-vs-actual pairs is plenty of data for Tuesday.</span></span></li>
+    </ol>
+
+    <!-- THE MATH -->
+    <h2>The mathematics they are actually doing</h2>
+    <p>This is not a consolation activity. It is a cleaner version of the same modelling the matches were supposed to produce — and the relationship here is genuinely linear, so the equation behaves:</p>
+    <div class="eqbox">
+      <div class="l">Their model</div>
+      <div class="e">distance = speed &times; time &minus; startup lag</div>
+      <div class="l" style="margin:12px 0 0;">which is slope-intercept form</div>
+      <div class="e" style="font-size:19px;">y = m x + b</div>
+    </div>
+    <ul>
+      <li><b>m (the slope)</b> is the bot's speed in <b>cm per second</b> — a number with a real physical meaning they measured themselves.</li>
+      <li><b>b (the intercept)</b> is the <b>start-up lag</b>, and it comes out <b>negative</b> — the bot always falls short because it spends the first fraction of a second accelerating. Students discovering a negative intercept and being able to say what it means physically is a genuinely strong outcome.</li>
+      <li><b>x</b> is drive time in seconds; <b>y</b> is predicted distance in cm.</li>
+    </ul>
+    <div class="callout"><b>Why this is better math than "goals vs. speed."</b> Goals are noisy, low-numbered, and depend on the opponent. Distance is a clean linear function of time that every team can measure to the centimetre, and <b>the parameters are numbers they control in their own code</b>. When they change <code>unitMs</code> and the line moves, they are seeing a parameter change a model. That is Goal 1 exactly.</div>
+
+    <!-- DATA SHEET -->
+    <h2>Data sheet — one per team, print and hand out</h2>
+    <p><b>Team: _______________________  ·  Our bot's speed: _______ cm per second</b></p>
+    <table class="d">
+      <thead><tr><th>Trial</th><th>Drive time<br>(seconds)</th><th>Predicted<br>(cm)</th><th>Actual<br>(cm)</th><th>Gap<br>(pred &minus; actual)</th><th style="width:31%">The one thing we changed</th></tr></thead>
+      <tbody>
+        <tr><td class="t">1</td><td class="blank">1.0</td><td class="blank">—</td><td class="blank"></td><td class="blank">—</td><td class="chg">calibration trial</td></tr>
+        <tr><td class="t">2</td><td class="blank">3.0</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="chg blank"></td></tr>
+        <tr><td class="t">3</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="chg blank"></td></tr>
+        <tr><td class="t">4</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="chg blank"></td></tr>
+        <tr><td class="t">5</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="chg blank"></td></tr>
+      </tbody>
+    </table>
+    <div class="say"><span class="lbl">The sentence that ends the block</span>
+      "Our gap started at ______ cm and finished at ______ cm. The one thing we changed was ______."</div>
+
+    <!-- WHAT GOOD LOOKS LIKE -->
+    <h2>What success looks like today</h2>
+    <ul>
+      <li><b>Every team has five rows filled in.</b> That is the whole target.</li>
+      <li><b>The gap column gets smaller down the page.</b> Not perfectly, not for everyone — but the trend should be visible and they should be able to say why.</li>
+      <li><b>Every team can state their bot's cm per second</b> and that it differs from the team next to them.</li>
+      <li><b>Nobody is troubleshooting a soccer match.</b> If a bot drives straight for 5 seconds and lands where predicted, it can now reach a ball — you have fixed the actual problem.</li>
+    </ul>
+
+    <!-- FEEDS TUESDAY -->
+    <h2>How this feeds Tuesday exactly like matches would have</h2>
+    <p>Tuesday's lesson needs a scatter plot, two points, a slope, an intercept and a residual. This lab gives all five:</p>
+    <table class="iff">
+      <thead><tr><th>Tuesday needs…</th><th>The lab provides…</th></tr></thead>
+      <tbody>
+        <tr><td class="if">x-axis</td><td><b>Drive time</b> in seconds (or their Speed stat, if comparing across teams)</td></tr>
+        <tr><td class="if">y-axis</td><td><b>Distance travelled</b> in cm</td></tr>
+        <tr><td class="if">Two points to build a line</td><td>Any two of their five trials</td></tr>
+        <tr><td class="if">Slope with real meaning</td><td>cm per second — their bot's speed</td></tr>
+        <tr><td class="if">A residual</td><td>The <b>Gap</b> column, already computed on the sheet</td></tr>
+        <tr><td class="if">Proving Rounds (Tue PM)</td><td>Predict a distance they have <b>never tried</b> (say 6 s), then run it. Gap should be small if the model is good.</td></tr>
+        <tr><td class="if">Model Swap (Goal 2)</td><td>Every team's cm-per-second differs, so their lines genuinely differ — compare and defend</td></tr>
+      </tbody>
+    </table>
+    <div class="ok"><b>Nothing downstream changes.</b> The equation, the Model Swap, the Proving Rounds, the Before/After card, the poster and the teach-back all run exactly as written in the plan. Only the quantity on the y-axis is different.</div>
+
+    <!-- IF EVEN THIS FAILS -->
+    <h2>If the bots will not move at all</h2>
+    <p>Then it is a technical fault, not a maths problem. Work down this list, fastest check first:</p>
+    <ul>
+      <li><b>Do the LEDs show a number?</b> If not, the program did not flash. Re-copy the file to the micro:bit.</li>
+      <li><b>Fresh batteries, and the Cutebot's own power switch ON.</b> This is the single most common cause.</li>
+      <li><b>Is the Cutebot Pro extension in the project?</b> Without it the drive blocks do nothing.</li>
+      <li><b>Does the bot respond to a bare 1-second drive</b> in a brand-new empty project? If yes, the fault is in their code, not the hardware.</li>
+    </ul>
+    <div class="warn"><b>And if only one or two bots work:</b> run the lab on <b>shared bots</b>, rotating teams through. Each team still writes their own prediction before their turn and measures their own trial, so every team keeps its own data and its own model. Sharing hardware does not mean sharing an equation. If <b>no</b> bot moves, teach Tuesday's method on the <a href="/resources/teacher-guides/day13-practice-dataset.html" style="color:var(--teal-deep);font-weight:700;text-decoration:none;">practice dataset</a> and be honest with students that the numbers are stand-ins.</div>
+
+    <div class="foot">Velocity Arena · NYC FIRST. Companion sheets: <a href="/resources/teacher-guides/gotham-v3-teacher-card.html">What To Do, Mon–Thu</a> · <a href="/resources/teacher-guides/gotham-days13-16-plan-v3.html">v3 plan</a> · <a href="/lessons/day13-linear-equations.html">Build Your Bot's Equation</a> · <a href="/resources/teacher-guides/day13-practice-dataset.html">Practice dataset</a>.</div>
+  </div>
+</div>
+
+<script>
+  var root=document.documentElement;
+  var t=document.getElementById('theme');
+  if(t) t.addEventListener('click',function(){
+    var c=root.getAttribute('data-theme');
+    if(!c) c=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+    root.setAttribute('data-theme',c==='dark'?'light':'dark');
+  });
+  var p=document.getElementById('print');
+  if(p) p.addEventListener('click',function(){window.print();});
+</script>
+</body>
+</html>
