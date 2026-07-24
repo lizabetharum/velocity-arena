@@ -94,15 +94,15 @@ const GOTHAM_DAY_14 = {
       "name": "Read the equations on the wall",
       "mins": 15,
       "block": "Hook",
-      "description": "Look at every team's equation. Whose bot is fastest? How can you tell just from the equation?",
+      "description": "Look at every team's equation on the wall. They are ALL different -- why? (Different bots.) Whose bot is fastest, and how can you tell just from the equation?",
       "facilitatorDescription": "The speed is the number in front of the time; the fastest bot has the biggest one. Every team's equation is different — that is correct, do not fix it. This frames the Model Swap that follows."
     },
     {
       "name": "Model Swap",
-      "mins": 35,
+      "mins": 30,
       "block": "Challenge Block",
-      "description": "First, make your model different from everyone else's in one way. Then study another team's equation and write down: what you keep, what you change, and why — citing a number.",
-      "facilitatorDescription": "Ten minutes of divergence first: every team makes their model visibly different from the reference (add a variable, use a different pair of points, split it in two, switch to a table) — otherwise all four equations look alike and there is nothing to compare. Then swap: each team studies one other team's model and fills a slip with keep/change and a number-backed why. This is Goal 2.",
+      "description": "Your equation is already different from every other team's -- because your bot is different. Pick one other team. Type their speed and start-up into the equation tool to see both bots on one graph, then decide: what do you keep in yours, what do you change, and why (cite a number)?",
+      "facilitatorDescription": "No \"make it different\" step -- with distance data every bot gives a genuinely different equation (different speed, different start-up), so there is real material to compare from the start. Pair teams up. Each team studies one other team's posted equation and uses the on-screen tool's Compare panel (enter the other team's speed and start-up) to see both lines and the differences, then fills a Model Swap slip: what we keep, what we change, and why -- citing a number. Keeping everything is allowed if defended with a number. This is Goal 2.",
       "link": "/lessons/gotham-day14-distance-equation.html"
     },
     {
