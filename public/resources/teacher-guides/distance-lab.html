@@ -63,6 +63,11 @@
   .ok{border-left:3px solid var(--ok);background:var(--ok-bg);border-radius:0 8px 8px 0;padding:12px 15px;margin:14px 0;font:400 14px/1.55 var(--sans);color:var(--ink-2);}
   .ok b{color:var(--ok);}
 
+  pre.code{background:var(--band);border:1px solid var(--line-strong);border-radius:10px;padding:14px 16px;
+    margin:8px 0;overflow-x:auto;white-space:pre;font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink);}
+  .cbtn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line-strong);
+    border-radius:6px;padding:8px 12px;cursor:pointer;margin:4px 0 10px;}
+  .cbtn:hover{border-color:var(--teal);color:var(--teal);}
   .eqbox{background:var(--band);border:2px solid var(--line-strong);border-radius:10px;padding:16px;margin:14px 0;text-align:center;}
   .eqbox .e{font:800 21px/1.35 var(--mono);color:var(--ink);}
   .eqbox .l{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px;}
@@ -139,11 +144,48 @@
       <li><span class="doit"><b>Predict a new distance for a new time</b> (try 2 s, then 4 s, then 5 s), run, measure, gap sentence again.<span class="note">Aim for <b>five trials</b> per team. Five predicted-vs-actual pairs is plenty of data for Tuesday.</span></span></li>
     </ol>
 
-    <div class="callout"><b>Pacing &mdash; budget 45&ndash;60 minutes for five trials.</b> The measuring itself is fast: predict (1 min), run (30 sec), measure (1 min), gap sentence (2 min). The slow part is <b>re-downloading to the micro:bit</b> after a code change, which can run 2&ndash;3 minutes a go. Two ways to protect the pace:
-      <ul style="margin:8px 0 0;">
-        <li><b>Not every trial needs a code change.</b> Several trials can just use a <i>different drive time</i> with the same code &mdash; they still produce a predicted-vs-actual pair, with no re-flash.</li>
-        <li><b>If you are running short, stop at three trials.</b> Three well-measured rows are enough for Tuesday. Do not rush the measuring to reach five.</li>
-      </ul></div>
+    <div class="callout"><b>Pacing &mdash; budget 30&ndash;40 minutes for five trials,</b> plus about 15 minutes at the start to paste the code and download it once. Each trial is roughly: predict (1 min), run (30 sec), measure (1 min), gap sentence (2 min).<br><br>Because <b>button B changes the drive time</b>, there is <b>no re-downloading between trials</b> &mdash; that is what keeps this inside a single block. If you are running short, <b>stop at three trials</b>; three well-measured rows are enough for Tuesday. Never rush the measuring to reach five.</div>
+
+    <!-- THE CODE -->
+    <h2>The code &mdash; paste this once, then never re-download</h2>
+    <p>Open MakeCode, add the <b>Cutebot Pro</b> extension, switch to <b>JavaScript</b>, select all and delete, then paste this in. It is the whole program.</p>
+    <button class="cbtn" id="copycode" type="button">Copy the code</button>
+<pre class="code"><code id="labcode">// ═══════════════════════════════════════════════════════
+//  DISTANCE LAB
+//  A  = run one trial
+//  B  = add 0.5 s to the drive time
+//  A+B = reset to 1.0 s
+// ═══════════════════════════════════════════════════════
+
+let SPEED = 5                          // &lt;-- your team's Speed stat
+let motorPower = SPEED * 100 / 20      // same formula as your match code
+let driveMs = 1000                     // start at 1.0 second
+
+// The display shows TENTHS of a second:  10 = 1.0s,  25 = 2.5s
+basic.showNumber(driveMs / 100)
+
+// A -- run one trial
+input.onButtonPressed(Button.A, function () {
+    basic.showString("GO")
+    CutebotPro.pwmCruiseControl(motorPower, motorPower)
+    basic.pause(driveMs)
+    CutebotPro.stopImmediately(CutebotProMotors.ALL)
+    basic.showNumber(driveMs / 100)
+})
+
+// B -- add half a second. No re-download needed.
+input.onButtonPressed(Button.B, function () {
+    driveMs += 500
+    basic.showNumber(driveMs / 100)
+})
+
+// A+B -- back to 1.0 second
+input.onButtonPressed(Button.AB, function () {
+    driveMs = 1000
+    basic.showNumber(driveMs / 100)
+})</code></pre>
+    <div class="ok"><b>Why it is built this way.</b> <b>Button B changes the drive time</b>, so teams step through 1.0 s &rarr; 1.5 s &rarr; 2.0 s and so on <b>without re-downloading to the micro:bit</b>. One download at the start of the block and that is it. Everything else is prediction, driving and measuring.</div>
+    <div class="callout"><b>The only line a team edits</b> is <code>let SPEED = 5</code> &mdash; their own Speed stat, so their bot drives at the same power it would in a match. Change it, download once, and leave the laptop alone.<br><br><b>Reading the display:</b> it shows tenths of a second, so <b>10 means 1.0 s</b> and <b>25 means 2.5 s</b>. Have teams read it aloud before every run &mdash; it is how they know which trial they are on.</div>
 
     <!-- THE MATH -->
     <h2>The mathematics they are actually doing</h2>
@@ -246,6 +288,12 @@
   });
   var p=document.getElementById('print');
   if(p) p.addEventListener('click',function(){window.print();});
+  var cc=document.getElementById('copycode');
+  if(cc) cc.addEventListener('click',function(){
+    navigator.clipboard.writeText(document.getElementById('labcode').textContent).then(function(){
+      var o=cc.textContent; cc.textContent='Copied'; setTimeout(function(){cc.textContent=o;},1400);
+    });
+  });
 </script>
 </body>
 </html>
