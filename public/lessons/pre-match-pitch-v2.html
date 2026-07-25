@@ -430,6 +430,16 @@ select{cursor:pointer;height:54px;font-size:16px}
         </div>
       </div>
 
+      <div class="calc-option" onclick="selectCalc('proportional',this)">
+        <div class="calc-check"><div class="calc-check-dot"></div></div>
+        <div class="ticon y"><i data-lucide="scale"></i></div>
+        <div class="calc-info">
+          <div class="calc-name">Proportional Scaling</div>
+          <div class="calc-formula">scaled = original × scale factor</div>
+          <div class="calc-desc">Scale a stat up or down. A straight-line stat (Motor Power = Speed × 5) scales by the same factor; a squared stat (Power²) grows much faster.</div>
+        </div>
+      </div>
+
 
     </div>
     <div class="err-box" id="noCalcErr" style="display:none">Select a calculation above first.</div>
@@ -729,6 +739,32 @@ const calcData = {
       'Think of y = mx + b like a taxi. b is the starting fee. m is the rate per mile. x is how many miles you go. Plug in ___ for x: ___ × ___ + ___ = ___. That\'s the output.',
       'The slope m = ___ tells us the rate of change — for every 1 step in x, y changes by ___. The starting value b = ___. At x = ___, we get: ___ × ___ + ___ = ___.'
     ]
+  },
+  proportional: {
+    formula: 'scaled value = original × scale factor',
+    inputs: [
+      {id:'prop_orig', label:'Original Value', hint:'The value before scaling (e.g. Motor Power = Speed × 5)', unit:''},
+      {id:'prop_factor', label:'Scale Factor', hint:'How much you scale by. 1.5 = +50%, 2 = double', unit:'×'}
+    ],
+    compute: vals => vals[0] * vals[1],
+    resultLabel: 'Scaled Value',
+    resultSuffix: '',
+    steps: (vals, r) => {
+      const pct = Math.round((vals[1] - 1) * 100);
+      const q = vals[1] * vals[1];
+      return [
+        {lucide:'file-text',color:'',title:'Write the formula',body:`<span class="hl">scaled value = original × scale factor</span>`},
+        {lucide:'hash',color:'',title:'Plug in your values',body:`Original = <span class="val">${vals[0]}</span> &nbsp;·&nbsp; Scale factor = <span class="val">${vals[1]}</span>×`},
+        {lucide:'x',color:'',title:'Multiply',body:`<span class="val">${vals[0]}</span> × <span class="val">${vals[1]}</span> = <span class="ans">${r.toFixed(2)}</span>`},
+        {lucide:'lightbulb',color:'y',title:'What proportional means',body:`A scale factor of <span class="val">${vals[1]}</span>× is a <span class="val">${pct>=0?'+':''}${pct}%</span> change. Motor Power = Speed × 5 is a <b>straight line</b>, so scaling the input by ${vals[1]}× scales the output by the same ${vals[1]}×. The ratio stays fixed — that is what proportional means.`},
+        {lucide:'zap',color:'o',title:'Not everything scales the same',body:`Charge Speed = Power² is <b>quadratic</b>, not proportional. Scale Power by ${vals[1]}× and Charge Speed scales by ${vals[1]}² = <span class="ans">${q.toFixed(2)}×</span> — far more. Squaring breaks proportionality.`}
+      ];
+    },
+    starters: [
+      'Proportional scaling means the output changes by the SAME factor as the input. My original value was ___. I scaled by ___×, so the new value is ___ × ___ = ___. The ratio between them stays the same — that is what proportional means.',
+      'Motor Power = Speed × 5 is a straight line, so it scales proportionally. Scale Speed by 1.5 (that is +50%) and Motor Power also goes up 50%: ___ × 1.5 = ___.',
+      'Careful — Power² is NOT proportional. Scaling Power by 1.5 scales Charge Speed by 1.5² = 2.25, a 125% jump, not 50%. Squaring makes the output grow much faster than the input.'
+    ]
   }
 };
 
@@ -776,7 +812,7 @@ function calculateResult() {
     return;
   }
   // Division-by-zero guard (skip for calcs where zero inputs are valid)
-  const skipZeroCheck = ['budget','percent','distance','linear'];
+  const skipZeroCheck = ['budget','percent','distance','linear','proportional'];
   if (!skipZeroCheck.includes(selectedCalc) && vals.slice(1).some(v => v===0)) {
     document.getElementById('calcResultArea').innerHTML = '<div class="err-box" style="display:block">You cannot divide by zero. Check your numbers — the bottom number cannot be 0.</div>';
     return;
