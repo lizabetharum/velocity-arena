@@ -4,7 +4,7 @@
 // score with untuned stats, so matches keep coming out 0–0. The last week
 // drops matches entirely and runs on the Distance Lab instead — distance can
 // never come out 0–0, because it needs no opponent and no goal:
-//   Day 13  Distance Lab — measure, build the equation, start a poster
+//   Day 13  Distance Lab — measure, build the equation, poster, Precision Final
 //   Day 14  Compare models (Model Swap) + Percent Change + limits of the model
 //   Day 15  Post-Task Diagnostic + Reflection, Teach the Math, teach-back
 //   Day 16  Community Exhibition (visitors try the Target Challenge) — no awards
@@ -64,12 +64,13 @@ const GOTHAM_DAY_13 = {
       "link": "https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link"
     },
     {
-      "name": "Introduce the Target Challenge",
-      "mins": 40,
+      "name": "Target Challenge — Precision Final",
+      "mins": 50,
       "block": "Match-Build-Make",
-      "description": "A tape line goes on the floor at a set distance (say 100 cm). Use your equation to pick the drive time that stops your bot on the line. Compute it, drive, measure the miss. A few tries each.",
-      "facilitatorDescription": "The predict-then-test game that replaces matches, and it cannot come out 0-0. Set a target line; teams use their equation backwards (time = (target - start-up) / speed) to choose a drive time, then drive and measure the miss. Same MakeCode as the morning (button B sets the time). Print the Target Challenge worksheet, one per team. It is exactly what visitors will try on Thursday. Teams whose bots drive crooked can spend part of this block on Skills Arena Challenge 1 (Dead Straight) — only if needed.",
-      "link": "/lessons/target-challenge-worksheet.html"
+      "description": "Run your equation backwards to hit a target line. Work out the drive time, turn it into milliseconds (× 1000), put it on the ★ line of the code, download, and drive. Practice a couple, then the Precision Final: a surprise target, best of 2, closest to the line wins.",
+      "facilitatorDescription": "The predict-then-test game that replaces matches — and it cannot come out 0-0. Load the Target Challenge code (one marked line: let driveMs). Teams solve time = (target - start-up) / speed, convert seconds to ms (× 1000), set the ★ line, download, and drive. Because everyone programs the EXACT time, the competition is fair — no half-second grid — so the winner is whoever's equation and measuring were sharpest. Run 2-3 practice targets, then a Precision Final on a surprise target: best of 2, closest wins, crown a champion. One neutral ref (you or a fixed student) measures at the line to keep it clean. Print the worksheet; open the code page. Bots that drift can do Skills Arena Challenge 1 (Dead Straight) first — only if needed.",
+      "link": "/lessons/target-challenge-worksheet.html",
+      "makecode": { "url": "/resources/teacher-guides/target-challenge-code.html", "label": "Target Challenge code" }
     },
     {
       "name": "Close + preview tomorrow",
