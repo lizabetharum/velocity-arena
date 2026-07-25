@@ -222,29 +222,29 @@ const GOTHAM_DAY_16 = {
   "activities": [
     {
       "name": "Expert setup + last rehearsal",
-      "mins": 40,
+      "mins": 45,
       "block": "Challenge Block",
       "description": "Set your station: poster, bot, coordinate grid, dashboard on screen. One last run of the sentence you rewrote yesterday.",
       "facilitatorDescription": "Stations: poster, bot, grid, dashboard on a screen. One last practice of the sentence each team rewrote in the teach-back rehearsal. If a team wants to DEMO its launch for visitors, run the go/no-go check now (3 test launches; 2 of 3 must score) — GO teams may demo, NO-GO teams stick to the Target Challenge. Card: day16-visitor-challenge-cards (Demo Your Launch)."
     },
     {
       "name": "Community Exhibition",
-      "mins": 70,
+      "mins": 75,
       "block": "Match-Build-Make",
       "description": "Visitors try your Target Challenge: your team teaches them to use your equation to stop the bot on the line. They also do the three mini-challenge cards. Fill the Visitor Completion Tracker as you go.",
       "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate distance, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer. Optional: GO teams (from the morning check) may run a Demo Your Launch station — a demonstration, not a contest, so it stays consistent with the no-awards close.",
       "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
     },
     {
-      "name": "Walk the Wall",
-      "mins": 20,
+      "name": "Celebration: Victory Laps + Sign the Wall",
+      "mins": 30,
       "block": "Open Lab",
-      "description": "Walk past all four weeks of work in silence — bot lore, posters, equations, Target cards. Don't narrate.",
-      "facilitatorDescription": "Silent gallery of the whole program as one object. Do not narrate; let them see it."
+      "description": "The send-off. Each team takes a VICTORY LAP — one last bot run while the whole room counts down and cheers (no scoring; every team gets the same cheer). Then music on: sign each other's wall equations and a class banner with one thing you're proud of, and take a group photo at the wall.",
+      "facilitatorDescription": "High-energy — the opposite of a silent gallery. Two parts. (1) VICTORY LAPS: go team by team; the room does a 3-2-1 countdown and the team runs its bot one last time (their launch, or a target run) purely for fun — everyone cheers. No scoring, no winner: every team gets the same cheer, which keeps it consistent with the no-awards close. (2) SIGN THE WALL: put music on, hand out markers, and everyone signs each other's wall equations / posters and a big class banner, each adding one thing they're proud of. Snap a group photo at the wall. Keep it loud and quick — the reflective part is the closing circle right after."
     },
     {
       "name": "Closing circle + final journal",
-      "mins": 40,
+      "mins": 30,
       "block": "Open Lab",
       "description": "Each person names one moment this week they solved something they thought they couldn't. No awards — just the room hearing each other.",
       "facilitatorDescription": "No competitive awards. Run a closing circle: each student names one specific moment this week they solved something they thought they could not, with a number or calculation attached. Then the final journal. The point is the room hearing each other, not a winner."
