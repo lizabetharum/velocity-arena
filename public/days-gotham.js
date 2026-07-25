@@ -88,7 +88,7 @@ const GOTHAM_DAY_14 = {
   "day": 14,
   "week": 4,
   "weekName": "Final Four Days",
-  "theme": "Compare models, then beat the target",
+  "theme": "Compare models, build a launch, measure the gain",
   "bigMathIdea": "A line from two points is a claim you have to test. The strongest test is predicting a distance you have never driven and hitting it. Using the equation backwards — time = (target - start-up) / speed — turns the model into a tool.",
   "vocabulary": "SLOPE (m), Y-INTERCEPT (b), RESIDUAL. Residual = predicted minus actual on a target you did not use to build the line. A small residual means the model holds.",
   "activities": [
