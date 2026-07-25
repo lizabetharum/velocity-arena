@@ -5,7 +5,7 @@
 // drops matches entirely and runs on the Distance Lab instead — distance can
 // never come out 0–0, because it needs no opponent and no goal:
 //   Day 13  Distance Lab — measure, build the equation, start a poster
-//   Day 14  Compare models (Model Swap) + Percent Change + proportional check
+//   Day 14  Compare models (Model Swap) + Percent Change + limits of the model
 //   Day 15  Post-Task Diagnostic + Reflection, Teach the Math, teach-back
 //   Day 16  Community Exhibition (visitors try the Target Challenge) — no awards
 //
@@ -121,11 +121,11 @@ const GOTHAM_DAY_14 = {
       "facilitatorDescription": "Protected break."
     },
     {
-      "name": "Is distance proportional to time?",
+      "name": "How far can we trust it?",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "Pick two of your times where one is DOUBLE the other (like 2 s and 4 s). Is the 4-second distance exactly double the 2-second distance? Check it. It is not — and your equation says why.",
-      "facilitatorDescription": "A proportional-reasoning check that gives the start-up real meaning. Doubling the time does NOT double the distance: for distance = 38t − 7, twice 2 s (2×69 = 138) is less than the actual 4 s (145). The reason is the start-up — it is a ONE-time loss, subtracted once no matter how long you drive, so the longer the drive the less it matters. Proportional relationships pass through zero; theirs does not, because b is not zero. Connects straight back to the Week-1 proportional-scaling idea. Have each team test it on their own numbers and write one sentence on why doubling the time gives MORE than double the distance."
+      "description": "Your equation came from drives of about 1 to 5 seconds. Push it past that. What does it predict for a 10-second drive? For a 0.1-second drive? One of those answers is impossible — find it. A model is only safe near the times you actually measured.",
+      "facilitatorDescription": "An extrapolation / limits-of-a-model activity. Two edges: (1) NEAR end — because start-up is negative, at very short times the equation predicts a NEGATIVE distance, which is impossible; have teams solve distance = 0 for the time (time = -start-up / speed, e.g. 7/38 ≈ 0.18 s) — below that the model is nonsense. (2) FAR end — extrapolating to 10-20 s leaves the measured range, where batteries drain, the bot drifts, or it hits a wall, so the straight line may not hold. The idea: a linear model is trustworthy IN and NEAR the data you collected, not far outside it. Each team finds the smallest time their equation still makes sense, and names one reason a very long drive might break the line. If floor space allows, test a longer drive and see whether it still lands on the line."
     },
     {
       "name": "Finish your poster",
