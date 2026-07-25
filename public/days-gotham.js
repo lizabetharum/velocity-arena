@@ -115,7 +115,8 @@ const GOTHAM_DAY_14 = {
       "facilitatorDescription": "A two-leg launch, all arithmetic — no trig (these are pre-algebra students). Corner to the midline (turn, drive), then turn head-on and drive to the ball, then the locked code kicks (Power squared). Students MEASURE each leg's distance with a tape and convert it to a drive time with THEIR own equation: ms = (distance - start-up) / speed x 1000, done TWICE (each leg has its own start-up loss). Turn angles are set at 45 to start, or measured with a protractor — never calculated. Four numbers go into the code (two angles, two ms); paste the snippet into STUDENT ZONE B of the match code. Tune one leg at a time: a distance miss is a ms fix, a direction miss is an angle fix. TEST THE KICK yourself first — wide goal, short distance behind the ball — then compete: most goals out of 5, one neutral ref. Print the worksheet; open the code page.",
       "link": "/lessons/launch-sequence-worksheet.html",
       "makecode": [
-        { "url": "/resources/teacher-guides/launch-starter.html", "label": "Launch Sequence starter — change 4 numbers" },
+        { "url": "https://makecode.microbit.org/S89224-43320-62794-41458", "label": "Open the Launch Sequence starter in MakeCode" },
+        { "url": "/resources/teacher-guides/launch-starter.html", "label": "Launch starter — line-by-line + copy/download" },
         { "url": "/resources/teacher-guides/launch-sequence-code.html", "label": "Just the launch snippet" }
       ]
     },
