@@ -430,15 +430,6 @@ select{cursor:pointer;height:54px;font-size:16px}
         </div>
       </div>
 
-      <div class="calc-option" onclick="selectCalc('proportional',this)">
-        <div class="calc-check"><div class="calc-check-dot"></div></div>
-        <div class="ticon y"><i data-lucide="scale"></i></div>
-        <div class="calc-info">
-          <div class="calc-name">Proportional Scaling</div>
-          <div class="calc-formula">new value = (part ÷ whole) × scale</div>
-          <div class="calc-desc">Scale one number up or down to match a new total. Used when comparing bots with different stat budgets.</div>
-        </div>
-      </div>
 
     </div>
     <div class="err-box" id="noCalcErr" style="display:none">Select a calculation above first.</div>
@@ -738,32 +729,6 @@ const calcData = {
       'Think of y = mx + b like a taxi. b is the starting fee. m is the rate per mile. x is how many miles you go. Plug in ___ for x: ___ × ___ + ___ = ___. That\'s the output.',
       'The slope m = ___ tells us the rate of change — for every 1 step in x, y changes by ___. The starting value b = ___. At x = ___, we get: ___ × ___ + ___ = ___.'
     ]
-  },
-  proportional: {
-    formula: 'new value = (part ÷ whole) × scale',
-    inputs: [
-      {id:'prop_part', label:'Part', hint:'The specific piece you are scaling (e.g. one stat)', unit:''},
-      {id:'prop_whole', label:'Whole', hint:'The total it comes from (e.g. total stat budget)', unit:''},
-      {id:'prop_scale', label:'New Scale', hint:'The new total you want to scale it to', unit:''}
-    ],
-    compute: vals => (vals[0]/vals[1])*vals[2],
-    resultLabel: 'Scaled Value',
-    resultSuffix: '',
-    steps: (vals, r) => {
-      const ratio = (vals[0]/vals[1]).toFixed(4);
-      return [
-        {lucide:'file-text',color:'',title:'Write the formula',body:`<span class="hl">new value = (part ÷ whole) × scale</span>`},
-        {lucide:'hash',color:'',title:'Plug in your values',body:`Part = <span class="val">${vals[0]}</span> &nbsp;·&nbsp; Whole = <span class="val">${vals[1]}</span> &nbsp;·&nbsp; Scale = <span class="val">${vals[2]}</span>`},
-        {lucide:'divide',color:'',title:'Step 1: Find the ratio',body:`<span class="val">${vals[0]}</span> ÷ <span class="val">${vals[1]}</span> = <span class="val">${ratio}</span> &nbsp;(that's ${(parseFloat(ratio)*100).toFixed(1)}%)`},
-        {lucide:'x',color:'',title:'Step 2: Multiply by the new scale',body:`<span class="val">${ratio}</span> × <span class="val">${vals[2]}</span> = <span class="ans">${r.toFixed(2)}</span>`},
-        {lucide:'lightbulb',color:'y',title:'What this means',body:`<span class="val">${vals[0]}</span> out of <span class="val">${vals[1]}</span> scales to <span class="ans">${r.toFixed(2)}</span> out of <span class="val">${vals[2]}</span>. The ratio stays the same — that's what proportional means.`}
-      ];
-    },
-    starters: [
-      'Proportional scaling keeps the ratio the same when you change the total. If ___ out of ___ scales to a new total of ___, we divide ___ by ___ to get the ratio, then multiply by ___. Answer: ___.',
-      'Imagine a recipe. If the recipe makes 10 cookies and you want 25, you scale everything up. Same idea. ___ out of ___ → ratio = ___. Times the new scale of ___ = ___.',
-      'Proportional means the fraction stays fixed. ___ ÷ ___ = ___. That fraction of ___ = ___. The part is still the same share of the whole, just at a different size.'
-    ]
   }
 };
 
@@ -814,10 +779,6 @@ function calculateResult() {
   const skipZeroCheck = ['budget','percent','distance','linear'];
   if (!skipZeroCheck.includes(selectedCalc) && vals.slice(1).some(v => v===0)) {
     document.getElementById('calcResultArea').innerHTML = '<div class="err-box" style="display:block">You cannot divide by zero. Check your numbers — the bottom number cannot be 0.</div>';
-    return;
-  }
-  if (selectedCalc === 'proportional' && vals[1] === 0) {
-    document.getElementById('calcResultArea').innerHTML = '<div class="err-box" style="display:block">The "Whole" cannot be zero — you cannot divide by zero.</div>';
     return;
   }
 
