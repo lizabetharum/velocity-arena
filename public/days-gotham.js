@@ -5,7 +5,7 @@
 // drops matches entirely and runs on the Distance Lab instead — distance can
 // never come out 0–0, because it needs no opponent and no goal:
 //   Day 13  Distance Lab — measure, build the equation, start a poster
-//   Day 14  Compare models (Model Swap) + the Target Challenge
+//   Day 14  Compare models (Model Swap) + Percent Change + proportional check
 //   Day 15  Post-Task Diagnostic + Reflection, Teach the Math, teach-back
 //   Day 16  Community Exhibition (visitors try the Target Challenge) — no awards
 //
@@ -106,12 +106,12 @@ const GOTHAM_DAY_14 = {
       "link": "/lessons/gotham-day14-distance-equation.html"
     },
     {
-      "name": "Target Challenge — the real test",
+      "name": "Percent Change — how much better?",
       "mins": 70,
-      "block": "Match-Build-Make",
-      "description": "New target line at a distance you have NEVER driven to. Use your equation to pick the drive time, write your prediction, then drive. Getting a distance right that you never measured is the proof your equation works. Several rounds at new distances.",
-      "facilitatorDescription": "This replaces the match Proving Rounds and cannot come out 0-0. Teams solve time = (target - start-up) / speed, commit a prediction, then drive and measure the miss. Same predict-then-test loop as matches, but it needs no opponent and no goal. Run several rounds at new distances on the Target Challenge worksheet; the miss should shrink as they trust the model.",
-      "link": "/lessons/target-challenge-worksheet.html"
+      "block": "Challenge Block",
+      "description": "Your first predictions were off by a lot; after you fixed your model they got close. Put a number on how much better: percent change = (new gap − old gap) ÷ old gap × 100. Then compare with another team — who cut their error by more?",
+      "facilitatorDescription": "Using their Distance Lab gaps (an early gap and their best gap), teams compute the percent reduction in prediction error — that IS the Goal 1 evidence, quantified: a change they made and the measured improvement it caused. Catch the one trap: divide by the OLD gap, not the new. The interactive does the arithmetic and compares two teams. Close by writing the result sentence on the poster.",
+      "link": "/lessons/gotham-day14-percent-change.html"
     },
     {
       "name": "Lunch",
@@ -121,60 +121,45 @@ const GOTHAM_DAY_14 = {
       "facilitatorDescription": "Protected break."
     },
     {
-      "name": "Is your model getting better?",
+      "name": "Is distance proportional to time?",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "Fill one card: 'Our Target miss started at ___ cm and is now ___ cm. The change that helped most was ___.' Then look across the class — whose model holds best at a brand-new distance?",
-      "facilitatorDescription": "Each team writes the before/after Target-miss card (this is the Goal 1 evidence: a change that reduced the gap on a later attempt). If a team got worse, they write why — do not fake a happy ending. Then a short class discussion: a model that predicts an untested distance well is a good model."
+      "description": "Pick two of your times where one is DOUBLE the other (like 2 s and 4 s). Is the 4-second distance exactly double the 2-second distance? Check it. It is not — and your equation says why.",
+      "facilitatorDescription": "A proportional-reasoning check that gives the start-up real meaning. Doubling the time does NOT double the distance: for distance = 38t − 7, twice 2 s (2×69 = 138) is less than the actual 4 s (145). The reason is the start-up — it is a ONE-time loss, subtracted once no matter how long you drive, so the longer the drive the less it matters. Proportional relationships pass through zero; theirs does not, because b is not zero. Connects straight back to the Week-1 proportional-scaling idea. Have each team test it on their own numbers and write one sentence on why doubling the time gives MORE than double the distance."
     },
     {
       "name": "Finish your poster",
       "mins": 30,
       "block": "Open Lab",
-      "description": "In Canva, add the Target Challenge and your before/after miss to your poster. This is now the whole story you'll teach on Thursday.",
-      "facilitatorDescription": "Teams finish their Canva poster: equation, graph, the Target Challenge, and the before/after miss. It is both their Goal 1 evidence and their exhibition station. Print it or display it on a screen for the exhibition."
+      "description": "In Canva, add your percent-change result — how much you cut your prediction error — to your poster. This is now the whole story you'll teach on Thursday.",
+      "facilitatorDescription": "Teams finish their Canva poster: equation, graph, and the percent-change result (a change they made and the measured improvement). It is both their Goal 1 evidence and their exhibition station. Print it or display it on a screen for the exhibition."
     }
   ],
-  "ends": "Fill in the card: 'Our Target miss started at ____ cm and is now ____ cm. The change that helped most was ____.' If it got worse, write why."
+  "ends": "Finish the sentence: 'We changed ____ and cut our prediction error by ____%.' You have 3 minutes."
 };
 
 const GOTHAM_DAY_15 = {
   "day": 15,
   "week": 4,
   "weekName": "Final Four Days",
-  "theme": "Assessments first, then get ready to teach",
+  "theme": "Get ready to teach, then measure the growth",
   "bigMathIdea": "You understand something when you can teach it with your own numbers. 'The 38 means our bot goes 38 cm every second; the minus 7 means it loses 7 cm getting started.'",
   "vocabulary": "POST-TASK DIAGNOSTIC, TEACH-BACK. The post-task is the Day 1 diagnostic in parallel form — same concepts, measuring four weeks of growth. A teach-back is a rehearsal against a teammate playing a confused visitor.",
   "activities": [
     {
-      "name": "Post-Task Diagnostic",
-      "mins": 15,
-      "block": "Challenge Block",
-      "description": "Individual, 12-minute timer. Not a grade — it compares you to yourself four weeks ago.",
-      "facilitatorDescription": "Non-negotiable, and it goes first. Individual, 12-min timer. Read the 'comparing you to yourself four weeks ago' framing so it is not heard as a test.",
-      "link": "/activities/diagnostic-post/index.html"
-    },
-    {
-      "name": "Post-Reflection Survey",
-      "mins": 15,
-      "block": "Challenge Block",
-      "description": "Same sitting as the diagnostic. Confirm your name is spelled the same as Day 1 so the before/after matches.",
-      "facilitatorDescription": "Non-negotiable. Same sitting. Confirm site + name spelling so it matches the Day 1 pre-reflection, or the pair is unusable.",
-      "link": "/activities/reflection-post/index.html"
-    },
-    {
-      "name": "Bot lore — add one sentence",
+      "name": "Teach it in 30 seconds",
       "mins": 25,
       "block": "Hook",
-      "description": "Add one line to your bot's story that only makes sense because of what you measured this week. Post it on the wall.",
-      "facilitatorDescription": "Quick reconnect to bot identity before the teaching prep. Each team adds one sentence to their bot's lore that references something concrete they found this week (their speed, their start-up cost, their best Target hit). Three minutes to write and post."
+      "description": "Turn to the team next to you. In 30 seconds, no notes, explain what your equation's speed number and start-up number MEAN — not the numbers, what they tell you about your bot. Then swap.",
+      "facilitatorDescription": "A low-stakes teaching warm-up that primes Teach the Math and the teach-back. Pairs of teams take turns: 30 seconds each to explain, in plain words, what their speed (cm per second) and start-up (cm lost getting going) mean for their bot — no jargon, no reading off the poster. Listeners flag any sentence they did not follow. It surfaces the confusing spots before a real visitor hits them tomorrow."
     },
     {
       "name": "Teach the Math",
       "mins": 50,
       "block": "Challenge Block",
       "description": "Explain your own equation using your real numbers, as if to someone who has never seen it. No jargon. 'The 38 means our bot goes 38 cm every second. The minus 7 means it loses 7 cm getting started.'",
-      "facilitatorDescription": "Each team explains their equation in plain language with their actual numbers. Push on the meaning of each part: what does the number in front of the time mean, what does the start-up number mean. After each explanation ask 'how did you get that specific number?' This is the rehearsal for teaching a visitor tomorrow."
+      "facilitatorDescription": "Each team explains their equation in plain language with their actual numbers. In the Teach the Math tool, Gotham students pick DISTANCE or LINEAR EQUATION (or PERCENT CHANGE) — the formulas they used this week — and explain with their real numbers. Push on the meaning of each part: what the number in front of the time means, what the start-up number means. After each explanation ask 'how did you get that specific number?' This is the rehearsal for teaching a visitor tomorrow.",
+      "link": "/lessons/pre-match-pitch-v2.html"
     },
     {
       "name": "Lunch",
@@ -182,13 +167,6 @@ const GOTHAM_DAY_15 = {
       "block": "Break",
       "description": "Protected.",
       "facilitatorDescription": "Protected break."
-    },
-    {
-      "name": "Finish the station",
-      "mins": 45,
-      "block": "Challenge Block",
-      "description": "Poster on the wall, bot ready, tape line down, the Target Challenge set up exactly the way a visitor will meet it tomorrow.",
-      "facilitatorDescription": "Teams set up their exhibition station: finished poster, bot loaded and ready, target line taped, the Target Challenge staged as a visitor will encounter it. The poster shows the equation, the graph, and the before/after Target miss."
     },
     {
       "name": "Teach-back rehearsal",
@@ -197,9 +175,32 @@ const GOTHAM_DAY_15 = {
       "description": "Pair up. One team plays the confused visitor and tries YOUR Target Challenge after ONE explanation — no rescuing. Note exactly where they got stuck, rewrite that one sentence, then swap.",
       "facilitatorDescription": "Team A plays a confused visitor and genuinely attempts Team B's Target Challenge after one explanation, with no second explanation. Note where the visitor got stuck, rewrite that one sentence, then swap. No team clears Goal 4's bar cold; this rehearsal gets them there.",
       "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
+    },
+    {
+      "name": "Post-Task Diagnostic",
+      "mins": 15,
+      "block": "Challenge Block",
+      "description": "Individual, 12-minute timer. Not a grade — it compares you to yourself four weeks ago. The only formal assessment of the day.",
+      "facilitatorDescription": "The only formal assessment of the day. Individual, 12-min timer. Read the 'comparing you to yourself four weeks ago' framing so it is not heard as a test. Protect this block even if the day runs long — it is the research before/after and cannot be recovered later.",
+      "link": "/activities/diagnostic-post/index.html"
+    },
+    {
+      "name": "Post-Reflection Survey",
+      "mins": 10,
+      "block": "Challenge Block",
+      "description": "Same sitting as the diagnostic. Confirm your name is spelled the same as Day 1 so the before/after matches.",
+      "facilitatorDescription": "Run right after the diagnostic, same sitting. Confirm site + name spelling so it matches the Day 1 pre-reflection, or the pair is unusable.",
+      "link": "/activities/reflection-post/index.html"
+    },
+    {
+      "name": "Open Lab: Reflection Time",
+      "mins": 30,
+      "block": "Open Lab",
+      "description": "Get your Community Exhibition station ready: poster on the wall, bot and tape line set up for the Target Challenge. Rehearse your explanation one more time on a teammate. Be ready to explain your equation, how much you cut your error (percent change), and how a visitor hits a target.",
+      "facilitatorDescription": "Final exhibition prep. Each team sets up its station (finished poster, bot loaded, target line taped) and rehearses teaching the Target Challenge once more. Every team should be able to say in plain words: what their equation means, their percent-change result, and how a visitor uses the equation to hit the target. Close with the Skill Bridge ritual."
     }
   ],
-  "ends": "What will you tell a stranger tomorrow about what your team figured out? One sentence. You have 4 minutes."
+  "ends": "What will you tell someone tomorrow at the Exhibition about what you learned? You have 5 minutes."
 };
 
 const GOTHAM_DAY_16 = {
@@ -224,13 +225,6 @@ const GOTHAM_DAY_16 = {
       "description": "Visitors try your Target Challenge: your team teaches them to use your equation to stop the bot on the line. They also do the three mini-challenge cards. Fill the Visitor Completion Tracker as you go.",
       "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate distance, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer.",
       "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
-    },
-    {
-      "name": "Snack",
-      "mins": 20,
-      "block": "Break",
-      "description": "Break.",
-      "facilitatorDescription": "Break."
     },
     {
       "name": "Walk the Wall",

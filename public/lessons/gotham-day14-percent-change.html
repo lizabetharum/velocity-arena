@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 14 — Percent Change: How Much Better?</title>
+<style>
+  :root{
+    --bg:#0d1b2a; --surface:#132033; --card:#1a2d45; --border:#2a4060;
+    --cyan:#00e5ff; --yellow:#ffd600; --green:#00e676; --red:#ff5252;
+    --orange:#ff9100; --purple:#ce93d8; --text:#e8f0fe; --muted:#7a9cc0;
+    --sans:'Inter',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+  .hdr{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:2px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .badge{background:var(--yellow);color:#0d1b2a;font:900 11px/1 var(--sans);text-transform:uppercase;letter-spacing:.08em;padding:5px 12px;border-radius:20px;}
+  .hdr .ti{font:800 15px/1.2 var(--sans);}
+  .hdr .su{font:400 11px/1.3 var(--sans);color:var(--muted);}
+  .hdr .sp{flex:1;}
+  .hdr a{font:600 11px/1 var(--sans);color:var(--muted);text-decoration:none;}
+
+  .wrap{max-width:620px;margin:0 auto;padding:20px 16px 60px;}
+  .lede{font-size:15.5px;color:var(--text);margin-bottom:6px;}
+  .sub{font-size:14px;color:var(--muted);margin-bottom:18px;}
+
+  .step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;}
+  .step-n{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .step-n .n{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:900 13px/1 var(--mono);background:rgba(255,214,0,.15);color:var(--yellow);flex-shrink:0;}
+  .step-n .t{font:800 16px/1.2 var(--sans);}
+  .step p{font-size:14px;color:var(--muted);margin-bottom:10px;}
+  .step p.dk{color:var(--text);}
+  b{color:var(--text);}
+
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0;}
+  .fld label{display:block;font:700 11px/1.3 var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+  .fld input{width:100%;padding:11px 12px;background:var(--surface);border:2px solid var(--border);border-radius:9px;color:var(--text);font:800 19px/1 var(--sans);text-align:center;-moz-appearance:textfield;}
+  .fld input::-webkit-inner-spin-button{-webkit-appearance:none;}
+  .fld input:focus{outline:none;border-color:var(--yellow);}
+
+  .concept{background:rgba(0,229,255,.05);border-left:4px solid var(--cyan);border-radius:0 10px 10px 0;padding:13px 15px;margin:12px 0;font-size:14px;color:var(--text);}
+  .concept .h{font:900 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px;}
+  .concept.yc{background:rgba(255,214,0,.05);border-left-color:var(--yellow);} .concept.yc .h{color:var(--yellow);}
+  .concept.oc{background:rgba(255,145,0,.05);border-left-color:var(--orange);} .concept.oc .h{color:var(--orange);}
+
+  .formula{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin:12px 0;text-align:center;}
+  .formula .big{font:800 18px/1.7 var(--mono);color:var(--text);}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;}
+  .frac .top{border-bottom:2px solid var(--muted);padding:0 8px 3px;}
+  .frac .bot{padding:3px 8px 0;}
+
+  .result{background:linear-gradient(135deg,rgba(0,230,118,.09),rgba(0,229,255,.04));border:2px solid rgba(0,230,118,.3);border-radius:12px;padding:18px;margin:12px 0;text-align:center;display:none;}
+  .result.show{display:block;}
+  .result .big{font:900 40px/1 var(--sans);color:var(--green);}
+  .result .lbl{font:700 12px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px;}
+  .result .words{font-size:15px;color:var(--text);margin-top:12px;line-height:1.6;}
+  .result.worse{border-color:rgba(255,82,82,.35);background:linear-gradient(135deg,rgba(255,82,82,.08),transparent);}
+  .result.worse .big{color:var(--red);}
+
+  .work{font:700 15px/2 var(--mono);color:var(--text);text-align:center;margin:8px 0;}
+  .work .v{color:var(--yellow);}
+
+  .cmp-out{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:14px;color:var(--text);display:none;}
+  .cmp-out.show{display:block;}
+
+  .frame{background:rgba(42,64,96,.35);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:15px;line-height:2;color:var(--text);}
+  .fill{display:inline-block;min-width:52px;border-bottom:2px solid var(--yellow);color:var(--yellow);font-weight:900;text-align:center;padding:0 5px;}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <span class="badge">Day 14</span>
+  <div><div class="ti">Percent Change: How Much Better?</div><div class="su">Put a number on how much your prediction improved</div></div>
+  <span class="sp"></span>
+  <a href="/lessons/">← Lessons</a>
+</div>
+
+<div class="wrap">
+  <p class="lede">This week your first predictions were <b>off by a lot</b>. Then you changed one thing and they got <b>much closer</b>. <b>Percent change</b> puts a single number on <i>how much</i> better you got.</p>
+  <p class="sub">You'll need two numbers from your Distance Lab sheet: an <b>early</b> prediction gap and your <b>best</b> gap.</p>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-n"><div class="n">1</div><div class="t">Your two gaps</div></div>
+    <p>Write the gap as a plain positive number — how many cm you were off, ignoring the sign.</p>
+    <div class="fields">
+      <div class="fld"><label>Early gap (cm)</label><input id="oldv" type="number" min="0" placeholder="?" oninput="calc()"></div>
+      <div class="fld"><label>Best gap (cm)</label><input id="newv" type="number" min="0" placeholder="?" oninput="calc()"></div>
+    </div>
+    <p class="note">Example from the Distance Lab: an early prediction off by <b>14</b> cm, later down to <b>2</b> cm.</p>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-n"><div class="n">2</div><div class="t">The formula</div></div>
+    <div class="formula">
+      <div class="big">percent change =
+        <span class="frac"><span class="top">new − old</span><span class="bot">old</span></span>
+        × 100</div>
+    </div>
+    <div class="concept yc"><div class="h">&#9888; The one trap</div>
+      You divide by the <b>OLD</b> number, not the new one. The old gap is where you started from, so it's the thing you measure the change against.</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-n"><div class="n">3</div><div class="t">Your result</div></div>
+    <div class="work" id="work">Fill in both gaps above.</div>
+    <div class="result" id="result">
+      <div class="big" id="pct">—</div>
+      <div class="lbl">percent change in your prediction error</div>
+      <div class="words" id="words"></div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-n"><div class="n">4</div><div class="t">Compare with another team</div></div>
+    <p>Read another team's two gaps off their poster. Who cut their error by more?</p>
+    <div class="fields">
+      <div class="fld"><label>Their early gap (cm)</label><input id="cOld" type="number" min="0" placeholder="?" oninput="compare()"></div>
+      <div class="fld"><label>Their best gap (cm)</label><input id="cNew" type="number" min="0" placeholder="?" oninput="compare()"></div>
+    </div>
+    <div class="cmp-out" id="cmpOut"></div>
+    <div class="concept oc" style="margin-top:12px;"><div class="h">Why percent, not just cm?</div>
+      A team that went from 40 cm off to 20 cm off improved <b>20 cm</b> — the same 20 cm as a team that went from 24 to 4. But the second team cut their error by <b>83%</b> and the first by only <b>50%</b>. Percent change is fair no matter how big the gaps started.</div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-n"><div class="n">5</div><div class="t">Say it on your poster</div></div>
+    <div class="frame">
+      "We changed <span class="fill">&nbsp;</span> and cut our prediction error by <span class="fill" id="say-pct">&nbsp;</span>% — from <span class="fill" id="say-old">&nbsp;</span> cm down to <span class="fill" id="say-new">&nbsp;</span> cm."
+    </div>
+    <p class="note">That sentence is your Goal-1 evidence: a change you made, and the measured improvement it caused.</p>
+  </div>
+</div>
+
+<script>
+  function r0(n){ return Math.round(n); }
+  function calc(){
+    var o=parseFloat(document.getElementById('oldv').value);
+    var n=parseFloat(document.getElementById('newv').value);
+    var work=document.getElementById('work'), res=document.getElementById('result');
+    if(isNaN(o)||isNaN(n)||o<=0){ work.textContent='Fill in both gaps above (early gap must be more than 0).'; res.className='result'; return; }
+    var pc=(n-o)/o*100, pcR=r0(pc);
+    work.innerHTML='( <span class="v">'+n+'</span> − <span class="v">'+o+'</span> ) ÷ <span class="v">'+o+'</span> × 100 = '+ (Math.round(pc*10)/10) +'%';
+    var big=document.getElementById('pct'), words=document.getElementById('words');
+    if(pc<0){
+      res.className='result show';
+      big.textContent=pcR+'%';
+      words.innerHTML='Your prediction error is <b>'+Math.abs(pcR)+'% smaller</b> than when you started. That negative sign means it went <b>down</b> — which is exactly what you want.';
+    } else if(pc===0){
+      res.className='result show';
+      big.textContent='0%';
+      words.innerHTML='No change — your best gap is the same as your early one. Did you enter them the right way round? Early gap goes in the first box.';
+    } else {
+      res.className='result show worse';
+      big.textContent='+'+pcR+'%';
+      words.innerHTML='Your error got <b>bigger</b> by '+pcR+'%. That happens sometimes and it is honest data — but check you put your <b>early</b> gap in the first box and your <b>best</b> gap in the second.';
+    }
+    document.getElementById('say-pct').textContent=Math.abs(pcR);
+    document.getElementById('say-old').textContent=o;
+    document.getElementById('say-new').textContent=n;
+  }
+  function compare(){
+    var o=parseFloat(document.getElementById('oldv').value), n=parseFloat(document.getElementById('newv').value);
+    var co=parseFloat(document.getElementById('cOld').value), cn=parseFloat(document.getElementById('cNew').value);
+    var out=document.getElementById('cmpOut');
+    if(isNaN(o)||isNaN(n)||o<=0||isNaN(co)||isNaN(cn)||co<=0){ out.className='cmp-out'; return; }
+    var mine=Math.abs((n-o)/o*100), theirs=Math.abs((cn-co)/co*100);
+    out.className='cmp-out show';
+    var youR=Math.round(mine), themR=Math.round(theirs);
+    if(Math.abs(mine-theirs)<0.5) out.innerHTML='Tie — you both cut your error by about <b>'+youR+'%</b>.';
+    else if(mine>theirs) out.innerHTML='<b style="color:var(--green)">You cut yours by more</b>: '+youR+'% vs their '+themR+'%.';
+    else out.innerHTML='<b style="color:var(--orange)">They cut theirs by more</b>: '+themR+'% vs your '+youR+'%. What did they change that you could try?';
+  }
+</script>
+</body>
+</html>
