@@ -35,7 +35,7 @@ const GOTHAM_DAY_13 = {
       "name": "Launch the Distance Lab",
       "mins": 15,
       "block": "Hook",
-      "description": "Quick start, no video. Three things: (1) get your worksheet and the Distance Lab code on your bot; (2) lock your 4 stats so they add to 20 and write them on the board; (3) learn the two moves you repeat all day — predict a distance BEFORE the bot moves, then after each run say 'we predicted ___, we got ___, the gap was ___, because ___.'",
+      "description": "Three things: (1) get your worksheet and the Distance Lab code on your bot; (2) lock your 4 stats so they add to 20 and write them on the board; (3) learn the two moves you repeat all day — predict a distance BEFORE the bot moves, then after each run say 'we predicted ___, we got ___, the gap was ___, because ___.'",
       "facilitatorDescription": "This is a launch, not a warm-up game — the bot driving is the hook. Roughly 15 minutes, three concrete things: hand out the worksheet and load the MakeCode (button A drives, B adds half a second); every team locks 4 stats summing to 20 and writes them on the board (the Speed stat sets the bot's power, so it must be fixed before anyone drives); teach the prediction ritual and the gap sentence with a 30-second demo drive. Then straight to Trial 1."
     },
     {
@@ -75,7 +75,7 @@ const GOTHAM_DAY_13 = {
       "name": "Close + preview tomorrow",
       "mins": 20,
       "block": "Open Lab",
-      "description": "Each team says its smallest Target miss out loud. Tomorrow you compare your equation with another team's, then get better at the target.",
+      "description": "Tomorrow you compare your equation with another team's, then get better at the target. Velocity Arena",
       "facilitatorDescription": "Each team states its smallest Target miss and one idea for improving it. Preview Tuesday: compare models, then beat the target at a distance you have never driven to."
     }
   ],
