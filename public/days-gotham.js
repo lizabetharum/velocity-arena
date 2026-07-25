@@ -112,12 +112,13 @@ const GOTHAM_DAY_14 = {
       "mins": 60,
       "block": "Match-Build-Make",
       "description": "The launch runs in two legs: turn out to the midline and drive, then turn to face the ball head-on and drive to it, then kick. Work out each drive time in milliseconds from your Distance Lab equation. Most goals out of 5 wins.",
-      "facilitatorDescription": "A two-leg launch, all arithmetic — no trig (these are pre-algebra students). Corner to the midline (turn, drive), then turn head-on and drive to the ball, then the locked code kicks (Power squared). Students MEASURE each leg's distance with a tape and convert it to a drive time with THEIR own equation: ms = (distance - start-up) / speed x 1000, done TWICE (each leg has its own start-up loss). Turn angles are set at 45 to start, or measured with a protractor — never calculated. Four numbers go into the code (two angles, two ms); paste the snippet into STUDENT ZONE B of the match code. Tune one leg at a time: a distance miss is a ms fix, a direction miss is an angle fix. TEST THE KICK yourself first — wide goal, short distance behind the ball — then compete: most goals out of 5, one neutral ref. Print the worksheet; open the code page.",
+      "facilitatorDescription": "A two-leg launch, all arithmetic — no trig (these are pre-algebra students). Corner to the midline (turn, drive), then turn head-on and drive to the ball, then the locked code kicks (Power squared). Students MEASURE each leg's distance with a tape and convert it to a drive time with THEIR own equation: ms = (distance - start-up) / speed x 1000, done TWICE (each leg has its own start-up loss). Turn angles are set at 45 to start, or measured with a protractor — never calculated. Four numbers go into the Launch Test (two angles, two ms) — no field calibration, press A to launch and kick, change a number and re-test in seconds. Tune one leg at a time: a distance miss is a ms fix, a direction miss is an angle fix. TEST THE KICK yourself first — wide goal, short distance behind the ball — then run Launch-and-Score: most goals out of 5, one neutral ref (rules + a printable scoreboard in the Launch-and-Score format). Print the worksheet.",
       "link": "/lessons/launch-sequence-worksheet.html",
       "makecode": [
         { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test in MakeCode — set stats + 4 numbers, press A (no calibration)" },
         { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test — copy / download / walkthrough" },
-        { "url": "https://makecode.microbit.org/S89224-43320-62794-41458", "label": "Full match starter (roams; needs W/B/goal calibration)" }
+        { "url": "https://makecode.microbit.org/S89224-43320-62794-41458", "label": "Full match starter (roams; needs W/B/goal calibration)" },
+        { "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" }
       ]
     },
     {
@@ -224,14 +225,14 @@ const GOTHAM_DAY_16 = {
       "mins": 40,
       "block": "Challenge Block",
       "description": "Set your station: poster, bot, coordinate grid, dashboard on screen. One last run of the sentence you rewrote yesterday.",
-      "facilitatorDescription": "Stations: poster, bot, grid, dashboard on a screen. One last practice of the sentence each team rewrote in the teach-back rehearsal."
+      "facilitatorDescription": "Stations: poster, bot, grid, dashboard on a screen. One last practice of the sentence each team rewrote in the teach-back rehearsal. If a team wants to DEMO its launch for visitors, run the go/no-go check now (3 test launches; 2 of 3 must score) — GO teams may demo, NO-GO teams stick to the Target Challenge. Card: day16-visitor-challenge-cards (Demo Your Launch)."
     },
     {
       "name": "Community Exhibition",
       "mins": 70,
       "block": "Match-Build-Make",
       "description": "Visitors try your Target Challenge: your team teaches them to use your equation to stop the bot on the line. They also do the three mini-challenge cards. Fill the Visitor Completion Tracker as you go.",
-      "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate distance, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer.",
+      "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate distance, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer. Optional: GO teams (from the morning check) may run a Demo Your Launch station — a demonstration, not a contest, so it stays consistent with the no-awards close.",
       "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
     },
     {
