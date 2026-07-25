@@ -5,7 +5,7 @@
 // drops matches entirely and runs on the Distance Lab instead — distance can
 // never come out 0–0, because it needs no opponent and no goal:
 //   Day 13  Distance Lab — measure, build the equation, poster, Precision Final
-//   Day 14  Compare models (Model Swap) + Percent Change + limits of the model
+//   Day 14  Model Swap + Launch Sequence (distance formula) + Percent Change
 //   Day 15  Post-Task Diagnostic + Reflection, Teach the Math, teach-back
 //   Day 16  Community Exhibition (visitors try the Target Challenge) — no awards
 //
@@ -54,6 +54,14 @@ const GOTHAM_DAY_13 = {
       "block": "Break",
       "description": "Protected. No math talk.",
       "facilitatorDescription": "Protected break."
+    },{
+      "name": "Target Challenge — Precision Final",
+      "mins": 50,
+      "block": "Match-Build-Make",
+      "description": "Run your equation backwards to hit a target line. Work out the drive time, turn it into milliseconds (× 1000), put it on the ★ line of the code, download, and drive. Practice a couple, then the Precision Final: a surprise target, best of 2, closest to the line wins.",
+      "facilitatorDescription": "The predict-then-test game that replaces matches — and it cannot come out 0-0. Load the Target Challenge code (one marked line: let driveMs). Teams solve time = (target - start-up) / speed, convert seconds to ms (× 1000), set the ★ line, download, and drive. Because everyone programs the EXACT time, the competition is fair — no half-second grid — so the winner is whoever's equation and measuring were sharpest. Run 2-3 practice targets, then a Precision Final on a surprise target: best of 2, closest wins, crown a champion. One neutral ref (you or a fixed student) measures at the line to keep it clean. Print the worksheet; open the code page. Bots that drift can do Skills Arena Challenge 1 (Dead Straight) first — only if needed.",
+      "link": "/lessons/target-challenge-worksheet.html",
+      "makecode": [{ url: "https://makecode.microbit.org/S88736-26870-92526-90781", label: "Target Challenge code" }]
     },
     {
       "name": "Make your equation poster",
@@ -63,16 +71,7 @@ const GOTHAM_DAY_13 = {
       "facilitatorDescription": "Teams build their poster in Canva -- their equation and their five-point graph -- and it becomes their exhibition artifact. The poster worksheet lays out what belongs on it. Have each team ALSO write its final equation large on a plain sheet and post it on the wall, so all four equations are visible at once for tomorrow's Model Swap without depending on screens. Tell them now they will teach from the Canva poster on Thursday.",
       "link": "https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link"
     },
-    {
-      "name": "Target Challenge — Precision Final",
-      "mins": 50,
-      "block": "Match-Build-Make",
-      "description": "Run your equation backwards to hit a target line. Work out the drive time, turn it into milliseconds (× 1000), put it on the ★ line of the code, download, and drive. Practice a couple, then the Precision Final: a surprise target, best of 2, closest to the line wins.",
-      "facilitatorDescription": "The predict-then-test game that replaces matches — and it cannot come out 0-0. Load the Target Challenge code (one marked line: let driveMs). Teams solve time = (target - start-up) / speed, convert seconds to ms (× 1000), set the ★ line, download, and drive. Because everyone programs the EXACT time, the competition is fair — no half-second grid — so the winner is whoever's equation and measuring were sharpest. Run 2-3 practice targets, then a Precision Final on a surprise target: best of 2, closest wins, crown a champion. One neutral ref (you or a fixed student) measures at the line to keep it clean. Print the worksheet; open the code page. Bots that drift can do Skills Arena Challenge 1 (Dead Straight) first — only if needed.",
-      "link": "/lessons/target-challenge-worksheet.html",
-      "makecode": [{ url: "https://makecode.microbit.org/S88736-26870-92526-90781", label: "Target Challenge code" },
-      {url:"https://velocity-arena-gold.vercel.app/lessons/target-challenge-worksheet.html", label: "Target Challenge worksheet"}]
-    },
+    
     {
       "name": "Close + preview tomorrow",
       "mins": 20,
@@ -80,6 +79,7 @@ const GOTHAM_DAY_13 = {
       "description": "Tomorrow you compare your equation with another team's, then get better at the target. Velocity Arena",
       "facilitatorDescription": "Preview Tuesday: compare models, then beat the target at a distance you have never driven to."
     }
+    
   ],
   "ends": "Name the one thing about your bot you were most wrong about today. You have 3 minutes."
 };
@@ -108,12 +108,13 @@ const GOTHAM_DAY_14 = {
       "link": "/lessons/gotham-day14-distance-equation.html"
     },
     {
-      "name": "Percent Change — how much better?",
-      "mins": 70,
-      "block": "Challenge Block",
-      "description": "Your first predictions were off by a lot; after you fixed your model they got close. Put a number on how much better: percent change = (new gap − old gap) ÷ old gap × 100. Then compare with another team — who cut their error by more?",
-      "facilitatorDescription": "Using their Distance Lab gaps (an early gap and their best gap), teams compute the percent reduction in prediction error — that IS the Goal 1 evidence, quantified: a change they made and the measured improvement it caused. Catch the one trap: divide by the OLD gap, not the new. The interactive does the arithmetic and compares two teams. Close by writing the result sentence on the poster.",
-      "link": "/lessons/gotham-day14-percent-change.html"
+      "name": "Launch Sequence",
+      "mins": 60,
+      "block": "Match-Build-Make",
+      "description": "The ball is off to the side. Use the distance formula to find the straight-line (diagonal) distance to it, turn that into a drive time with your equation, aim your bot, and launch. Then the bot kicks. Most goals out of 5 wins.",
+      "facilitatorDescription": "New math — the distance formula — plus a second stat, Power (the kick strength = Power squared). The ball sits at (across, up) from the bot's start; teams compute the diagonal = sqrt(across^2 + up^2), convert it to a drive time with THEIR Distance Lab equation (times 1000 for ms), aim the bot by hand, and launch with the marked-line code. Then the bot kicks. Set the ball on a Pythagorean triple (60-80, 30-40, 90-120) for clean whole-number diagonals. TEST THE KICK yourself first — wide goal, short distance behind the ball — and only start the competition once bots reliably score: most goals out of 5, one neutral ref. Print the worksheet; open the code page.",
+      "link": "/lessons/launch-sequence-worksheet.html",
+      "makecode": { "url": "/resources/teacher-guides/launch-sequence-code.html", "label": "Launch Sequence code" }
     },
     {
       "name": "Lunch",
@@ -123,11 +124,12 @@ const GOTHAM_DAY_14 = {
       "facilitatorDescription": "Protected break."
     },
     {
-      "name": "How far can we trust it?",
-      "mins": 45,
+      "name": "Percent Change — the correction",
+      "mins": 40,
       "block": "Challenge Block",
-      "description": "Your equation came from drives of about 1 to 5 seconds. Push it past that. What does it predict for a 10-second drive? For a 0.1-second drive? One of those answers is impossible — find it. A model is only safe near the times you actually measured.",
-      "facilitatorDescription": "An extrapolation / limits-of-a-model activity. Two edges: (1) NEAR end — because start-up is negative, at very short times the equation predicts a NEGATIVE distance, which is impossible; have teams solve distance = 0 for the time (time = -start-up / speed, e.g. 7/38 ≈ 0.18 s) — below that the model is nonsense. (2) FAR end — extrapolating to 10-20 s leaves the measured range, where batteries drain, the bot drifts, or it hits a wall, so the straight line may not hold. The idea: a linear model is trustworthy IN and NEAR the data you collected, not far outside it. Each team finds the smallest time their equation still makes sense, and names one reason a very long drive might break the line. If floor space allows, test a longer drive and see whether it still lands on the line."
+      "description": "In the Distance Lab you first GUESSED your speed from the 1-second run, then CORRECTED it using two runs. Put a number on how much that correction moved your speed: percent change = (corrected − first guess) ÷ first guess × 100. Then compare with another team.",
+      "facilitatorDescription": "Grounded in what every team actually has: a first-guess speed (the 1-second run) and a corrected speed (from the difference of two runs), both on the Distance Lab sheet. The correction is always there and always meaningful (~15-25% up), because the 1-second run undercounts due to start-up — so this does NOT assume their predictions got better; it measures how much the model correction changed their number, and why the naive first guess made early predictions miss. Catch the one trap: divide by the FIRST (old) number. The interactive does the arithmetic and compares two teams. Close by writing the result on the poster.",
+      "link": "/lessons/gotham-day14-percent-change.html"
     },
     {
       "name": "Finish your poster",
