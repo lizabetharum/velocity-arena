@@ -76,7 +76,7 @@ const GOTHAM_DAY_13 = {
       "mins": 20,
       "block": "Open Lab",
       "description": "Tomorrow you compare your equation with another team's, then get better at the target. Velocity Arena",
-      "facilitatorDescription": "Each team states its smallest Target miss and one idea for improving it. Preview Tuesday: compare models, then beat the target at a distance you have never driven to."
+      "facilitatorDescription": "Preview Tuesday: compare models, then beat the target at a distance you have never driven to."
     }
   ],
   "ends": "Name the one thing about your bot you were most wrong about today. You have 3 minutes."
