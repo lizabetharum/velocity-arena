@@ -129,10 +129,10 @@ const GOTHAM_DAY_14 = {
     },
     {
       "name": "Percent Change — the correction",
-      "mins": 40,
+      "mins": 45,
       "block": "Challenge Block",
       "description": "In the Distance Lab you first GUESSED your speed from the 1-second run, then CORRECTED it using two runs. Put a number on how much that correction moved your speed: percent change = (corrected − first guess) ÷ first guess × 100. Then compare with another team.",
-      "facilitatorDescription": "Grounded in what every team actually has: a first-guess speed (the 1-second run) and a corrected speed (from the difference of two runs), both on the Distance Lab sheet. The correction is always there and always meaningful (~15-25% up), because the 1-second run undercounts due to start-up — so this does NOT assume their predictions got better; it measures how much the model correction changed their number, and why the naive first guess made early predictions miss. Catch the one trap: divide by the FIRST (old) number. The interactive does the arithmetic and compares two teams. Close by writing the result on the poster.",
+      "facilitatorDescription": "Grounded in what every team actually has: a first-guess speed (the 1-second run) and a corrected speed (from the difference of two runs), both on the Distance Lab sheet. The correction is always there and always meaningful (~15-25% up), because the 1-second run undercounts due to start-up — so this does NOT assume their predictions got better; it measures how much the model correction changed their number, and why the naive first guess made early predictions miss. Catch the one trap: divide by the FIRST (old) number. The interactive teaches it, then gives eight practice problems (mixed rise/fall, plus a same-raw-gain comparison) before they compute their own — enough to fill the 45-minute block. Close by writing the result on the poster.",
       "link": "/lessons/gotham-day14-percent-change.html"
     },
     {
