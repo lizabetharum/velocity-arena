@@ -70,7 +70,8 @@ const GOTHAM_DAY_13 = {
       "description": "Run your equation backwards to hit a target line. Work out the drive time, turn it into milliseconds (× 1000), put it on the ★ line of the code, download, and drive. Practice a couple, then the Precision Final: a surprise target, best of 2, closest to the line wins.",
       "facilitatorDescription": "The predict-then-test game that replaces matches — and it cannot come out 0-0. Load the Target Challenge code (one marked line: let driveMs). Teams solve time = (target - start-up) / speed, convert seconds to ms (× 1000), set the ★ line, download, and drive. Because everyone programs the EXACT time, the competition is fair — no half-second grid — so the winner is whoever's equation and measuring were sharpest. Run 2-3 practice targets, then a Precision Final on a surprise target: best of 2, closest wins, crown a champion. One neutral ref (you or a fixed student) measures at the line to keep it clean. Print the worksheet; open the code page. Bots that drift can do Skills Arena Challenge 1 (Dead Straight) first — only if needed.",
       "link": "/lessons/target-challenge-worksheet.html",
-      "makecode": { "url": "/resources/teacher-guides/target-challenge-code.html", "label": "Target Challenge code" }
+      "makecode": [{ url: "https://makecode.microbit.org/S88736-26870-92526-90781", label: "Target Challenge code" },
+      {url:"https://velocity-arena-gold.vercel.app/lessons/target-challenge-worksheet.html", label: "Target Challenge worksheet"}]
     },
     {
       "name": "Close + preview tomorrow",
