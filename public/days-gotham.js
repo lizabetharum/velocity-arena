@@ -67,7 +67,7 @@ const GOTHAM_DAY_13 = {
       "name": "Make your equation poster",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "In Canva, build a poster with your equation and your graph of the five dots. Nothing else yet -- this is the poster you'll teach a visitor from on Thursday. Also write your equation BIG on a sheet of paper and tape it to the wall; that's what the class compares tomorrow. The worksheet walks you through what goes on the poster.",
+      "description": "In Canva, build a poster with your equation and your graph of the five dots. Nothing else yet -- this is the poster you'll teach a visitor from on Thursday. Also write your equation BIG on a sheet of paper and tape it to the wall; that's what the class compares tomorrow. The step-by-step lesson page and the worksheet walk you through what goes on the poster.",
       "facilitatorDescription": "Teams build their poster in Canva -- their equation and their five-point graph -- and it becomes their exhibition artifact. The poster worksheet lays out what belongs on it. Have each team ALSO write its final equation large on a plain sheet and post it on the wall, so all four equations are visible at once for tomorrow's Model Swap without depending on screens. Tell them now they will teach from the Canva poster on Thursday.",
       "link": "https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link"
     },
