@@ -71,7 +71,7 @@
   <a class="back" href="/lessons/launch-sequence-worksheet.html">&larr; Launch Sequence worksheet</a>
   <span class="t">Launch Sequence Starter</span>
   <span class="sp"></span>
-  <a class="btn go" href="https://makecode.microbit.org/S89224-43320-62794-41458" target="_blank" rel="noopener">Open in MakeCode &#8599;</a>
+  <a class="btn go" href="https://makecode.microbit.org/_g7T87XUFzHJz" target="_blank" rel="noopener">Open in MakeCode &#8599;</a>
   <button class="btn" id="copy" type="button">Copy all</button>
   <a class="btn" href="/resources/teacher-guides/gameCode-launch-starter.ts" download>Download .ts</a>
   <button class="btn" id="theme" type="button">Theme</button>
@@ -92,7 +92,7 @@
     </ol>
     <div class="warn"><b>Only the four &#9733; numbers change.</b> ms&nbsp;=&nbsp;(distance&nbsp;&minus;&nbsp;start-up)&nbsp;&divide;&nbsp;speed&nbsp;&times;&nbsp;1000, from your Distance Lab equation. Leave <code>currentPower</code>, the pauses (300 / 150), and everything below the LOCKED line alone. Stop leg&nbsp;2 a little <b>short</b> of the ball &mdash; the locked code rolls the last bit and kicks (strength&nbsp;=&nbsp;Power&sup2;).</div>
     <div class="toolrow">
-      <span class="muted">1591 lines &middot; source file <code>gameCode-launch-starter.ts</code> &middot; based on the current match starter <code>gameCode-v2.ts</code></span>
+      <span class="muted">1369 lines &middot; source file <code>gameCode-launch-starter.ts</code> &middot; based on the current match starter <code>gameCode-v2.ts</code></span>
     </div>
 <pre class="code"><code id="src"><span class="line">/**</span>
 <span class="line"> * ============================================================</span>
@@ -102,33 +102,9 @@
 <span class="line"> * 8' x 4' Field | White Floor | Black Border Tape</span>
 <span class="line"> * ============================================================</span>
 <span class="line"> *</span>
-<span class="line"> * HOW A MATCH RUNS</span>
-<span class="line"> *   1. Press A (idle)   -&gt; compute stats, calibrate border threshold (W/B),</span>
-<span class="line"> *                          calibrate the goal heading (G), show "ready" target.</span>
-<span class="line"> *   2. Press A (ready)  -&gt; start the match: run the scripted launch kick, then</span>
-<span class="line"> *                          enter the main loop.</span>
-<span class="line"> *   3. matchLoop()      -&gt; repeatedly: update endurance, chase/aim/kick the ball</span>
-<span class="line"> *                          if we have it, otherwise scan + roam to find it.</span>
-<span class="line"> *   B   = soft reset (re-center behavior mid-match)</span>
-<span class="line"> *   A+B = stop the match.</span>
-<span class="line"> *</span>
-<span class="line"> * STUDENT STATS (total 20 · Power 1-10 · Speed/Endurance/Turning 1-17) and all tunable distances/thresholds live</span>
-<span class="line"> * at the very bottom in the INITIALIZATION block.</span>
-<span class="line"> *</span>
-<span class="line"> * NONNEGOTIABLE STAT FORMULAS (do not change - students compute these by hand):</span>
-<span class="line"> *   motorPower        = SPEED * 100 / 20</span>
-<span class="line"> *   turnRatio         = 0.2 + TURNING * 0.02</span>
-<span class="line"> *   chargePower       = min(POWER * POWER, 100)</span>
-<span class="line"> *   FOLLOW_THROUGH_MS = 120 + POWER * 35</span>
-<span class="line"> *   DECAY_RATE        = 20 - ENDURANCE</span>
-<span class="line"> *   minWheelSpeed     = max(WHEEL_FLOOR, round(motorPower * 0.25))   // WHEEL_FLOOR = 15</span>
-<span class="line"> *   lowPowerThreshold = minWheelSpeed</span>
-<span class="line"> *   endurancePercent  = 100 - DECAY_RATE * matchTime / 40</span>
-<span class="line"> *</span>
-<span class="line"> * SPEED FLOOR: minWheelSpeed is the real floor = max(WHEEL_FLOOR, round(motorPower * 0.25)).</span>
-<span class="line"> * For low-to-mid SPEED the WHEEL_FLOOR term wins, so currentPower bottoms out at WHEEL_FLOOR</span>
-<span class="line"> * (currently 15) and lowPowerActive (red) fires there. Lower WHEEL_FLOOR = bigger drainable</span>
-<span class="line"> * range (ENDURANCE matters more); too low and the bot stalls when tired.</span>
+<span class="line"> * BLACK-LINE BEHAVIOR: crossing the black tape anywhere (launch, roam, or the</span>
+<span class="line"> * charge) runs handleBorder() to back off, turn away, and recover. The START</span>
+<span class="line"> * line under the bot in the corner is ignored until it rolls off it (lineArmed).</span>
 <span class="line"> * ============================================================</span>
 <span class="line"> */</span>
 <span class="line"></span>
@@ -144,6 +120,28 @@
 <span class="line">    CutebotPro.pwmCruiseControl(0, 0)</span>
 <span class="line">    basic.pause(10)</span>
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">// Drive straight for up to `ms`. Ignores the START line, but the moment we cross</span>
+<span class="line">// a NEW black line it stops and runs full border recovery (handleBorder).</span>
+<span class="line">function driveForwardOrStop(ms: number): boolean {</span>
+<span class="line">    CutebotPro.pwmCruiseControl(motorPower, motorPower)</span>
+<span class="line">    let t0 = input.runningTime()</span>
+<span class="line">    while (input.runningTime() - t0 &lt; ms) {</span>
+<span class="line">        readTrackbit()</span>
+<span class="line">        let side = borderSideFrom(BORDER_THRESHOLD)</span>
+<span class="line">        if (!lineArmed) {</span>
+<span class="line">            if (side == 0) { lineArmed = true }      // rolled off the start line -&gt; armed</span>
+<span class="line">        } else if (side &gt; 0) {</span>
+<span class="line">            borderSide = side</span>
+<span class="line">            motorStop()</span>
+<span class="line">            handleBorder()                            // hit a NEW black line -&gt; recover</span>
+<span class="line">            return true</span>
+<span class="line">        }</span>
+<span class="line">        basic.pause(5)</span>
+<span class="line">    }</span>
+<span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
+<span class="line">    return false</span>
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">// ============================================================</span>
@@ -243,89 +241,57 @@
 <span class="line"> *  Your kick sends the ball the way the bot is FACING, so finish your launch</span>
 <span class="line"> *  BEHIND the ball and pointed straight at the goal.</span>
 <span class="line"> *</span>
-<span class="line"> *  ── DRIVE BY DISTANCE (best for geometry) ──</span>
-<span class="line"> *     CutebotPro.runBlockCnt(n)     drives exactly n x 27 cm, then stops.</span>
-<span class="line"> *     Measure a distance in cm, divide by 27 -&gt; that's your block count.</span>
-<span class="line"> *     Same distance on every bot (fast or slow), so your math stays true.</span>
-<span class="line"> *</span>
-<span class="line"> *  ── DRIVE BY TIME (approximate) ──</span>
-<span class="line"> *     CutebotPro.pwmCruiseControl(currentPower, currentPower)</span>
-<span class="line"> *     basic.pause(Math.round(900 * powerScale))   // powerScale evens out speed</span>
-<span class="line"> *</span>
 <span class="line"> *  ── TURN IN PLACE ──</span>
 <span class="line"> *     CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace,  45)   // spin left 45 deg</span>
 <span class="line"> *     CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 90)   // spin right 90 deg</span>
 <span class="line"> *</span>
-<span class="line"> *  ── STOP / WAIT ──</span>
-<span class="line"> *     CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line"> *     basic.pause(500)                                              // wait 0.5 s</span>
-<span class="line"> *</span>
-<span class="line"> *  ── PICK A STRATEGY (use geometry!) ──</span>
-<span class="line"> *   TIER 1  Straight shot: set up so the ball is already between you and the</span>
-<span class="line"> *           goal, then drive straight.   (shortest path is a straight line)</span>
-<span class="line"> *   TIER 2  Diagonal: ball is forward AND to the side. Turn toward it, drive the</span>
-<span class="line"> *           diagonal, then turn back the SAME angle to re-face the goal.</span>
-<span class="line"> *           (right triangle:  a^2 + b^2 = c^2  -&gt; drive the hypotenuse c)</span>
-<span class="line"> *   TIER 3  Approach from behind: drive to the far side of the ball (opposite the</span>
-<span class="line"> *           goal), then come straight through it.   (bot, ball, goal on ONE line)</span>
-<span class="line"> *</span>
-<span class="line"> *  ── WORKED EXAMPLE (ball 81 cm forward, 81 cm left -&gt; 45 deg, c ~= 115 cm) ──</span>
+<span class="line"> *  ── DRIVE FORWARD (border-aware) ──</span>
+<span class="line"> *     driveForwardOrStop(ms)   // drives forward; if it hits the black line it</span>
+<span class="line"> *                              // runs handleBorder() and returns true</span>
+<span class="line"> *  ── WORKED EXAMPLE (ball 81 cm forward, 81 cm left -&gt; 45 deg) ──</span>
 <span class="line"> *     CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, 45)</span>
 <span class="line"> *     basic.pause(300)</span>
 <span class="line"> *     CutebotPro.stopImmediately(CutebotProMotors.ALL); basic.pause(150)</span>
-<span class="line"> *     CutebotPro.runBlockCnt(4)          // 115 cm / 27 ~= 4 blocks</span>
-<span class="line"> *     basic.pause(150)</span>
+<span class="line"> *     driveForwardOrStop(2000)</span>
 <span class="line"> *     CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, 45)</span>
-<span class="line"> *     basic.pause(150)</span>
 <span class="line"> * ============================================================================</span>
 <span class="line"> */</span>
 <span class="line">function launchSequence() {</span>
-<span class="line">    // Border detection is paused here so your exact turns/drives run uninterrupted.</span>
-<span class="line">    launchActive = true                            // &lt;- DO NOT DELETE</span>
+<span class="line">    // Border detection is ON during the launch: if we cross the black line we run</span>
+<span class="line">    // handleBorder and bail into the match loop. The START line under the bot is</span>
+<span class="line">    // ignored until we roll off it (lineArmed).</span>
+<span class="line">    launchActive = false</span>
+<span class="line">    lineArmed = false</span>
 <span class="line">    let powerScale = 30 / Math.max(1, motorPower)  // &lt;- DO NOT DELETE (only used if you drive by TIME)</span>
-<span class="line"></span>
-<span class="line">    // ========================================================================</span>
-<span class="line">    //   ★ WRITE YOUR LAUNCH HERE ★</span>
-<span class="line">    //   Drive from your corner to BEHIND the ball, pointed at the goal.</span>
-<span class="line">    // ========================================================================</span>
 <span class="line"></span>
 <span class="line">    // ══════════════════════════════════════════════════════════════════</span>
 <span class="line">    //   ★ YOUR LAUNCH — change ONLY the four ★ numbers, nothing else. ★</span>
 <span class="line">    //   Two-leg path:  corner  →  midline  →  ball.</span>
-<span class="line">    //   Each ms comes from your Distance Lab equation:</span>
-<span class="line">    //        ms = (distance − start-up) ÷ speed × 1000</span>
 <span class="line">    // ══════════════════════════════════════════════════════════════════</span>
 <span class="line"></span>
-<span class="line">    // LEG 1 — turn toward the midline, then drive out to it</span>
+<span class="line">    // LEG 1 — turn LEFT, then drive forward to the midline</span>
 <span class="line">    CutebotPro.trolleySteering(CutebotProTurn.LeftInPlace, <span class="pick">45</span>)   // ★ 1. LEG-1 ANGLE</span>
 <span class="line">    basic.pause(300)</span>
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
 <span class="line">    basic.pause(150)</span>
-<span class="line">    CutebotPro.pwmCruiseControl(currentPower, currentPower)</span>
-<span class="line">    basic.pause(<span class="pick">2800</span>)                                            // ★ 2. ms1 — corner to midline</span>
-<span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line">    basic.pause(150)</span>
+<span class="line">    if (driveForwardOrStop(<span class="pick">1900</span>)) { return }   // ★ 2. ms1 — hit line -&gt; handleBorder ran, go to match</span>
 <span class="line"></span>
-<span class="line">    // LEG 2 — turn to face the ball head-on, then drive ALMOST to it.</span>
-<span class="line">    // Stop a little SHORT — the LOCKED code below rolls the last bit and kicks.</span>
+<span class="line">    // LEG 2 — turn RIGHT, then drive forward toward the ball</span>
 <span class="line">    CutebotPro.trolleySteering(CutebotProTurn.RightInPlace, <span class="pick">45</span>)  // ★ 3. LEG-2 ANGLE</span>
 <span class="line">    basic.pause(300)</span>
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
 <span class="line">    basic.pause(150)</span>
-<span class="line">    CutebotPro.pwmCruiseControl(currentPower, currentPower)</span>
-<span class="line">    basic.pause(<span class="pick">1500</span>)                                            // ★ 4. ms2 — midline to ball</span>
+<span class="line">    if (driveForwardOrStop(<span class="pick">800</span>)) { return }   // ★ 4. ms2 — hit line -&gt; handleBorder ran, go to match</span>
+<span class="line"></span>
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line"></span>
-<span class="line"></span>
-<span class="line"></span>
+<span class="line">    basic.pause(150)</span>
 <span class="line"></span>
 <span class="line">    // ========================================================================</span>
 <span class="line">    //   LOCKED -- do not change anything below this line.</span>
-<span class="line">    //   The bot turns border safety back ON, drives the last bit to the ball,</span>
-<span class="line">    //   and kicks it straight through the goal.</span>
+<span class="line">    //   Drives the last bit to the ball, then kicks it straight through the goal.</span>
 <span class="line">    // ========================================================================</span>
 <span class="line">    motorStop()</span>
-<span class="line">    launchActive = false                           // border safety back ON</span>
+<span class="line">    launchActive = false</span>
 <span class="line">    basic.pause(30)</span>
 <span class="line">    if (checkBorder() &gt; 0) { handleBorder(); return }</span>
 <span class="line">    if (!matchRunning) { return }</span>
@@ -336,9 +302,7 @@
 <span class="line"></span>
 <span class="line">    // Commit the kick straight through the goal.</span>
 <span class="line">    ballDetected = true</span>
-<span class="line">    launchActive = true                            // goal-line tape must NOT abort the kick</span>
-<span class="line">    chargeAndFollowThrough()</span>
-<span class="line">    launchActive = false</span>
+<span class="line">    chargeAndFollowThrough()                       // black line -&gt; handleBorder (inside)</span>
 <span class="line"></span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line">    motorStop(); basic.pause(60)</span>
@@ -413,7 +377,7 @@
 <span class="line">// GOAL HEADING CALIBRATION  (press A -&gt; point at goal, press B)</span>
 <span class="line">// ============================================================</span>
 <span class="line">// Captures the compass heading toward the opponent's goal. Used for goal-biased</span>
-<span class="line">// roaming, the goal-seeking dribble, repositioning, and own-goal avoidance.</span>
+<span class="line">// roaming, repositioning, and own-goal avoidance.</span>
 <span class="line">function calibrateGoalHeading() {</span>
 <span class="line">    strip.showColor(neopixel.rgb(255, 0, 255))</span>
 <span class="line">    basic.showString("G")</span>
@@ -449,7 +413,6 @@
 <span class="line">        calibrateGoalHeading()</span>
 <span class="line">        ownGoalHeading = (goalHeading + 180) % 360</span>
 <span class="line">        readyToLaunch = true</span>
-<span class="line">        // showBuildArchetype()      // optional: scroll the build name (SPEEDSTER / SNIPER / TANK / NINJA)</span>
 <span class="line"></span>
 <span class="line">        if (SPEED + ENDURANCE + TURNING + POWER != 20) {</span>
 <span class="line">            basic.showString("ERR")</span>
@@ -542,10 +505,8 @@
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">// Blocking heading read for use while STATIONARY (compass is most reliable then).</span>
-<span class="line">// Settles for vibration, forces fresh reads, retries a few times; -1 if it can't</span>
-<span class="line">// get a stable value.</span>
 <span class="line">function stableHeadingBlocking(): number {</span>
-<span class="line">    basic.pause(50)                  // let chassis vibration settle (it skews the magnetometer)</span>
+<span class="line">    basic.pause(50)                  // let chassis vibration settle</span>
 <span class="line">    for (let i = 0; i &lt; 5; i++) {</span>
 <span class="line">        lastCachedHeading = -1</span>
 <span class="line">        let h = stableHeading()</span>
@@ -570,8 +531,7 @@
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Active brake: a brief reverse pulse (scaled by speed) then a hard stop, to kill</span>
-<span class="line">// momentum quickly without coasting.</span>
+<span class="line">// Active brake: a brief reverse pulse (scaled by speed) then a hard stop.</span>
 <span class="line">function hardStop() {</span>
 <span class="line">    let brakeTime = 160 + Math.max(SPEED - 5, 0) * 35</span>
 <span class="line">    CutebotPro.pwmCruiseControl(-80, -80)</span>
@@ -602,15 +562,9 @@
 <span class="line">// ============================================================</span>
 <span class="line">// ROAM STEP  (one search arc + checks)</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Drives one randomized arc segment to cover ground, biased toward the opponent's</span>
-<span class="line">// half. Afterwards it checks the border and runs a jam test.</span>
 <span class="line">function roamStep() {</span>
-<span class="line">    // Jam baseline: read the heading while still. After the arc we re-read it; an</span>
-<span class="line">    // arc that produced ~no rotation means the wheels are free-spinning.</span>
 <span class="line">    let h0 = stableHeadingBlocking()</span>
 <span class="line"></span>
-<span class="line">    // Goal-biased roam: ~70% of direction changes steer the arc toward the goal;</span>
-<span class="line">    // the rest stay random so the bot still explores.</span>
 <span class="line">    let gs = 0</span>
 <span class="line">    if (goalHeadingValid) {</span>
 <span class="line">        gs = goalSide()</span>
@@ -630,7 +584,6 @@
 <span class="line">        sameDirectionCount += 1</span>
 <span class="line">    }</span>
 <span class="line"></span>
-<span class="line">    // Arc sharpness (jittered turnRatio) and segment length (shorter when tired).</span>
 <span class="line">    let dynamicRatio = Math.max(0.10, Math.min(0.45,</span>
 <span class="line">        turnRatio + Math.randomRange(-8, 8) / 100))</span>
 <span class="line"></span>
@@ -639,7 +592,6 @@
 <span class="line">        ? Math.max(Math.min(thisDuration / 2 + Math.randomRange(-50, 50), 300), 150)</span>
 <span class="line">        : Math.max(Math.min(thisDuration + speedDurationBonus + Math.randomRange(-50, 50), 550), 150)</span>
 <span class="line"></span>
-<span class="line">    // Wheel speeds for the arc; strip color shows turn direction (red = low power).</span>
 <span class="line">    let lSpeed: number</span>
 <span class="line">    let rSpeed: number</span>
 <span class="line">    if (lastTurnWasLeft) {</span>
@@ -661,7 +613,6 @@
 <span class="line">        rSpeed = Math.min(rSpeed, currentPower)</span>
 <span class="line">    }</span>
 <span class="line"></span>
-<span class="line">    // Drive the segment (driveAndWatch handles borders + ball detection mid-drive).</span>
 <span class="line">    borderHandledInSeg = false</span>
 <span class="line">    CutebotPro.pwmCruiseControl(lSpeed, rSpeed)</span>
 <span class="line">    driveAndWatch(dynamicDuration, lSpeed, rSpeed)</span>
@@ -680,10 +631,6 @@
 <span class="line">        } else {</span>
 <span class="line">            roamCounter += 1</span>
 <span class="line"></span>
-<span class="line">            // JAM CHECK (wheels free-spinning in place): the arc should have rotated</span>
-<span class="line">            // the body. If the heading barely moved, CONFIRM with a deliberate</span>
-<span class="line">            // in-place spin test before escaping, so a gentle arc that nets ~0</span>
-<span class="line">            // rotation can't trigger a false escape.</span>
 <span class="line">            if (h0 &gt;= 0 &amp;&amp; !borderHandledInSeg) {</span>
 <span class="line">                let h1 = stableHeadingBlocking()</span>
 <span class="line">                if (h1 &gt;= 0 &amp;&amp; angleDiffAbs(h0, h1) &lt; 5) {</span>
@@ -704,9 +651,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// REPOSITION: drop back to our side, then look down the field</span>
 <span class="line">// ============================================================</span>
-<span class="line">// When several scans turn up nothing, stop loitering: drive back toward our own</span>
-<span class="line">// goal, then turn to face the opponent's goal (where the ball usually is) and</span>
-<span class="line">// scan from there. Skipped on low power (too slow to be worth the trip).</span>
 <span class="line">function repositionHome() {</span>
 <span class="line">    if (!matchRunning || !goalHeadingValid || lowPowerActive) { return }</span>
 <span class="line">    strip.showColor(neopixel.colors(NeoPixelColors.Indigo))</span>
@@ -715,9 +659,7 @@
 <span class="line">    turnToHeading(ownGoalHeading, 15)</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line"></span>
-<span class="line">    // 2. Drive back to our own side. IGNORE the ball on the way: grabbing it here</span>
-<span class="line">    //    leaves us on the WRONG side of it (between the ball and our own goal),</span>
-<span class="line">    //    which would aim a kick at our OWN net. Get home first, then attack.</span>
+<span class="line">    // 2. Drive back to our own side. IGNORE the ball on the way.</span>
 <span class="line">    let t0 = input.runningTime()</span>
 <span class="line">    let hitEdge = false</span>
 <span class="line">    let lastKeep = input.runningTime()</span>
@@ -728,7 +670,7 @@
 <span class="line">        if (checkBorder() &gt; 0) { motorStop(); hitEdge = true; break }   // reached our back edge</span>
 <span class="line">        if (input.runningTime() - lastKeep &gt; 200) {</span>
 <span class="line">            lastKeep = input.runningTime()</span>
-<span class="line">            CutebotPro.pwmCruiseControl(currentPower, currentPower)     // keep-alive so it gets home</span>
+<span class="line">            CutebotPro.pwmCruiseControl(currentPower, currentPower)     // keep-alive</span>
 <span class="line">        }</span>
 <span class="line">        basic.pause(8)</span>
 <span class="line">    }</span>
@@ -736,9 +678,6 @@
 <span class="line">    borderSide = 0</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line"></span>
-<span class="line">    // If we stopped RIGHT ON our back edge, pull off the line BEFORE turning. An</span>
-<span class="line">    // in-place spin at the edge can walk a wheel off the field, or jam a wheel</span>
-<span class="line">    // against the wall (reads as "stuck spinning") and drift us off.</span>
 <span class="line">    if (hitEdge) {</span>
 <span class="line">        CutebotPro.pwmCruiseControl(-35, -35)</span>
 <span class="line">        basic.pause(320)</span>
@@ -751,7 +690,7 @@
 <span class="line">    // 3. Turn to look DOWN THE FIELD (toward their goal) and scan from our side.</span>
 <span class="line">    turnToHeading(goalHeading, 15)</span>
 <span class="line">    if (!matchRunning) { return }</span>
-<span class="line">    if (checkBorder() &gt; 0) { handleBorder(); return }   // safety: the turn drifted us to a line</span>
+<span class="line">    if (checkBorder() &gt; 0) { handleBorder(); return }</span>
 <span class="line">    lookForBall()</span>
 <span class="line">}</span>
 <span class="line"></span>
@@ -783,8 +722,7 @@
 <span class="line">            continue</span>
 <span class="line">        }</span>
 <span class="line"></span>
-<span class="line">        // After enough roam segments, do a stationary scan. If that finds nothing</span>
-<span class="line">        // repeatedly, drop back home and look down the field.</span>
+<span class="line">        // After enough roam segments, do a stationary scan.</span>
 <span class="line">        let scanLimit = lowPowerActive ? 2 : Math.max(3, 3 + Math.round(TURNING / 2))</span>
 <span class="line">        if (roamCounter &gt;= scanLimit) {</span>
 <span class="line">            roamCounter = 0</span>
@@ -816,22 +754,16 @@
 <span class="line">// ============================================================</span>
 <span class="line">// SHOT PREPARATION  (fail-safe own-goal guard)</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Lock onto the ball, nudge out of the own-goal cone if needed, confirm. Returns</span>
-<span class="line">// true when the ball is locked in front and safe to kick.</span>
 <span class="line">function prepareShot(): boolean {</span>
 <span class="line">    if (!lockOntoBall()) { return false }       // 1. center on the ball</span>
 <span class="line">    aimAwayFromOwnGoal()                         // 2. minimal turn out of the own-goal cone</span>
-<span class="line">    if (confirmBall(true)) { return true }       // 3. confirm; if the turn nudged it off,</span>
+<span class="line">    if (confirmBall(true)) { return true }       // 3. confirm</span>
 <span class="line">    return lockOntoBall()                        //    re-acquire once</span>
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">// ============================================================</span>
 <span class="line">// BALL CONFIRMATION</span>
 <span class="line">// ============================================================</span>
-<span class="line"></span>
-<span class="line">// Confirm a stable object within `maxCm`. Takes 4 sonar reads and only confirms</span>
-<span class="line">// when at least 3 land in range AND they cluster within CONFIRM_SPREAD_CM. A real</span>
-<span class="line">// ball gives a tight cluster; field edges / people / the far wall give scatter.</span>
 <span class="line">function confirmWithin(maxCm: number, alreadyStopped: boolean): boolean {</span>
 <span class="line">    if (!alreadyStopped) {</span>
 <span class="line">        CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
@@ -855,12 +787,10 @@
 <span class="line">    return false</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Confirm a ball at charge range (close).</span>
 <span class="line">function confirmBall(alreadyStopped: boolean = false): boolean {</span>
 <span class="line">    return confirmWithin(BALL_DETECT_CM, alreadyStopped)</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Confirm a ball at scan range (farther).</span>
 <span class="line">function confirmBallScan(): boolean {</span>
 <span class="line">    return confirmWithin(BALL_SCAN_CM, false)</span>
 <span class="line">}</span>
@@ -868,9 +798,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// ALIGNMENT GATE</span>
 <span class="line">// ============================================================</span>
-<span class="line">// ballHeading meaning:  -1 = found on a left sweep | 0 = centered |</span>
-<span class="line">//                        1 = found on a right sweep | 99 = found while driving</span>
-<span class="line">// Rotates toward the ball if it isn't centered, then hands off to prepareShot.</span>
 <span class="line">function alignBeforeCharge(): boolean {</span>
 <span class="line">    if (!matchRunning) { return false }</span>
 <span class="line">    if (ballHeading == 99) { ballHeading = 0 }</span>
@@ -878,7 +805,7 @@
 <span class="line"></span>
 <span class="line">    let alignPower = Math.max(22, Math.min(45, 18 + TURNING * 3))</span>
 <span class="line">    let alignMs = Math.max(60, 220 - TURNING * 16)</span>
-<span class="line">    let maxAttempts = Math.max(2, Math.round(TURNING / 2))   // at least 2 tries to center</span>
+<span class="line">    let maxAttempts = Math.max(2, Math.round(TURNING / 2))</span>
 <span class="line"></span>
 <span class="line">    for (let attempt = 0; attempt &lt; maxAttempts; attempt++) {</span>
 <span class="line">        if (!matchRunning) { return false }</span>
@@ -913,9 +840,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// STUCK / JAM RECOVERY</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Break free from a jam: a strong RANDOMIZED reverse + over-90 turn. The</span>
-<span class="line">// randomness matters when two identical bots lock together - it breaks symmetry</span>
-<span class="line">// so they don't mirror the same escape and re-lock instantly.</span>
 <span class="line">function unstick() {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line">    strip.showColor(neopixel.colors(NeoPixelColors.Orange))</span>
@@ -925,7 +849,7 @@
 <span class="line">    basic.pause(backMs)</span>
 <span class="line">    CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
 <span class="line">    basic.pause(80)</span>
-<span class="line">    if (checkBorder() &gt; 0) { handleBorder(); return }   // reversed onto a line?</span>
+<span class="line">    if (checkBorder() &gt; 0) { handleBorder(); return }</span>
 <span class="line"></span>
 <span class="line">    let escape = 90 + Math.randomRange(25, 90)</span>
 <span class="line">    turnAwayFrom(lastTurnWasLeft ? 1 : 2, escape)</span>
@@ -940,127 +864,60 @@
 <span class="line">}</span>
 <span class="line"></span>
 <span class="line">// ============================================================</span>
-<span class="line">// CHARGE / DRIBBLE / KICK</span>
+<span class="line">// CHARGE / KICK  (clean version — pushes straight; black line -&gt; handleBorder)</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Push the ball toward the goal. While IN CONTACT the push gently curves toward</span>
-<span class="line">// the goal heading (open play only); while still approaching it drives straight.</span>
-<span class="line">// After each push it chases the ball forward to keep dribbling, only stopping to</span>
-<span class="line">// rescan when the ball is truly lost. Includes two jam guards.</span>
+<span class="line">// Push the ball straight through. Keep driving while it stays in front; stop and</span>
+<span class="line">// run full border recovery the instant we cross the black line.</span>
+<span class="line">// ============================================================</span>
+<span class="line">// CHARGE / KICK  (clean version — pushes straight; black line -&gt; handleBorder)</span>
+<span class="line">// ============================================================</span>
+<span class="line">// Push the ball straight through. If it rolls ahead, chase forward and kick it</span>
+<span class="line">// AGAIN instead of turning away. Stop only when the ball is truly gone, the</span>
+<span class="line">// match ends, or we cross the black line (-&gt; handleBorder).</span>
+<span class="line">// ============================================================</span>
+<span class="line">// CHARGE / KICK  (clean version — pushes straight; black line -&gt; handleBorder)</span>
+<span class="line">// ============================================================</span>
+<span class="line">// Push the ball straight through. If it rolls ahead, chase forward and kick it</span>
+<span class="line">// AGAIN instead of turning away. Stop only when the ball is truly gone, the</span>
+<span class="line">// match ends, or we cross the black line (-&gt; handleBorder).</span>
 <span class="line">function chargeAndFollowThrough() {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line">    flashHeadlights()</span>
 <span class="line">    strip.showColor(neopixel.colors(NeoPixelColors.Yellow))</span>
 <span class="line"></span>
-<span class="line">    // Charge power (guarded: launch runs before matchLoop ever sets enduranceFactor).</span>
+<span class="line">    // Charge power (endurance-scaled; floor 30, cap 100).</span>
 <span class="line">    let factor = enduranceFactor &gt; 0 ? enduranceFactor : 1</span>
-<span class="line">    effectiveCharge = Math.max(Math.round(chargePower * factor), 25)</span>
-<span class="line">    effectiveCharge = Math.min(effectiveCharge, 100)</span>
-<span class="line">    dynamicCharge = Math.max(effectiveCharge, 30)</span>
-<span class="line">    actualFollowThrough = Math.min(FOLLOW_THROUGH_MS, 500)</span>
-<span class="line"></span>
-<span class="line">    // Goal-seeking dribble: bias one wheel so the IN-CONTACT push curves toward the</span>
-<span class="line">    // goal heading. Skipped during the dead-reckoned launch (straight kick). Uses</span>
-<span class="line">    // turnToHeading's convention (ge &gt; 0 =&gt; curve right); if you had to swap</span>
-<span class="line">    // turnToHeading for your wiring, swap the two branches below too.</span>
-<span class="line">    let lPush = dynamicCharge</span>
-<span class="line">    let rPush = dynamicCharge</span>
-<span class="line">    if (!launchActive &amp;&amp; goalHeadingValid) {</span>
-<span class="line">        let gh = stableHeadingBlocking()</span>
-<span class="line">        if (gh &gt;= 0) {</span>
-<span class="line">            let ge = goalHeading - gh</span>
-<span class="line">            while (ge &gt; 180) { ge -= 360 }</span>
-<span class="line">            while (ge &lt; -180) { ge += 360 }</span>
-<span class="line">            let bias = Math.round(dynamicCharge * 0.45)</span>
-<span class="line">            if (ge &gt; GOAL_AIM_TOL) { rPush = Math.max(dynamicCharge - bias, 18) }          // goal right -&gt; curve right</span>
-<span class="line">            else if (ge &lt; 0 - GOAL_AIM_TOL) { lPush = Math.max(dynamicCharge - bias, 18) } // goal left  -&gt; curve left</span>
-<span class="line">        }</span>
-<span class="line">    }</span>
-<span class="line"></span>
-<span class="line">    stuckTimer = input.runningTime()            // sonar-based stuck timer (distance frozen)</span>
-<span class="line">    lastBallDist = 0</span>
-<span class="line">    let chargeStartTime = input.runningTime()   // total-charge jam cap (sonar-independent)</span>
+<span class="line">    let charge = Math.min(Math.max(Math.round(chargePower * factor), 30), 100)</span>
+<span class="line">    let chaseMs = 500          // give up only after seeing NOTHING ahead this long</span>
 <span class="line"></span>
 <span class="line">    while (ballDetected) {</span>
 <span class="line">        if (!matchRunning) { return }</span>
 <span class="line">        if (matchExpired()) { endMatch(); return }</span>
-<span class="line">        if (checkBorder() &gt; 0) { handleBorder(); ballDetected = false; return }</span>
+<span class="line">        if (checkBorder() &gt; 0) { motorStop(); handleBorder(); ballDetected = false; return }  // black line -&gt; recover</span>
 <span class="line"></span>
-<span class="line">        // --- Stuck timer: reset whenever the ball distance actually changes ---</span>
-<span class="line">        let currentDist = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
-<span class="line">        if (currentDist &gt; 5 &amp;&amp; currentDist &lt; BALL_DETECT_CM) {</span>
-<span class="line">            if (Math.abs(currentDist - lastBallDist) &gt; 3) {</span>
-<span class="line">                stuckTimer = input.runningTime()</span>
-<span class="line">                lastBallDist = currentDist</span>
-<span class="line">            }</span>
-<span class="line">            if (input.runningTime() - stuckTimer &gt; 550) {</span>
-<span class="line">                unstick(); ballDetected = false; return</span>
-<span class="line">            }</span>
-<span class="line">        } else if (currentDist &gt;= BALL_DETECT_CM) {</span>
-<span class="line">            stuckTimer = input.runningTime()</span>
-<span class="line">            lastBallDist = 0</span>
-<span class="line">        }</span>
+<span class="line">        // Push straight through / toward the ball.</span>
+<span class="line">        CutebotPro.pwmCruiseControl(charge, charge)</span>
+<span class="line">        let f = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
+<span class="line">        if (f &gt; 5 &amp;&amp; f &lt; BALL_DETECT_CM) { continue }   // still close in front -&gt; keep driving through</span>
 <span class="line"></span>
-<span class="line">        // --- Jam cap: a jittering ball can keep resetting the stuck timer while the</span>
-<span class="line">        //     wheels free-spin. Cap TOTAL charge time and confirm with a compass</span>
-<span class="line">        //     spin-test; escape only if the body truly won't move. ---</span>
-<span class="line">        if (input.runningTime() - chargeStartTime &gt; 1800) {</span>
-<span class="line">            CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line">            basic.pause(60)</span>
-<span class="line">            let hc0 = stableHeadingBlocking()</span>
-<span class="line">            CutebotPro.pwmCruiseControl(45, -45)               // spin-in-place test</span>
-<span class="line">            basic.pause(250)</span>
-<span class="line">            CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line">            basic.pause(60)</span>
-<span class="line">            let hc1 = stableHeadingBlocking()</span>
-<span class="line">            if (hc0 &gt;= 0 &amp;&amp; hc1 &gt;= 0 &amp;&amp; angleDiffAbs(hc0, hc1) &lt; 12) {</span>
-<span class="line">                unstick(); ballDetected = false; return        // confirmed jam -&gt; break free</span>
-<span class="line">            }</span>
-<span class="line">            chargeStartTime = input.runningTime()              // moving fine -&gt; keep pushing</span>
-<span class="line">        }</span>
-<span class="line"></span>
-<span class="line">        // --- Push: curve only once the ball is in contact; drive straight to close</span>
-<span class="line">        //     the final gap (curving early veers off and misses). ---</span>
-<span class="line">        if (currentDist &gt; 5 &amp;&amp; currentDist &lt; CONTACT_CM) {</span>
-<span class="line">            CutebotPro.pwmCruiseControl(lPush, rPush)                  // in contact -&gt; dribble toward goal</span>
-<span class="line">        } else {</span>
-<span class="line">            CutebotPro.pwmCruiseControl(dynamicCharge, dynamicCharge)  // approaching -&gt; straight at the ball</span>
-<span class="line">        }</span>
-<span class="line">        let chargeStart = input.runningTime()</span>
-<span class="line">        while (input.runningTime() - chargeStart &lt; actualFollowThrough) {</span>
-<span class="line">            if (!matchRunning) { return }</span>
-<span class="line">            if (resetRequested) { handleReset(); CutebotPro.stopImmediately(CutebotProMotors.ALL); return }</span>
+<span class="line">        // Ball rolled ahead. Chase forward; keep chasing as long as it stays in</span>
+<span class="line">        // SIGHT, and kick AGAIN the moment we close back into contact range.</span>
+<span class="line">        let lastSeen = input.runningTime()</span>
+<span class="line">        let reacquired = false</span>
+<span class="line">        while (input.runningTime() - lastSeen &lt; chaseMs) {</span>
+<span class="line">            if (!matchRunning) { motorStop(); return }</span>
 <span class="line">            if (matchExpired()) { endMatch(); return }</span>
-<span class="line">            if (checkBorder() &gt; 0) { handleBorder(); ballDetected = false; return }</span>
+<span class="line">            if (checkBorder() &gt; 0) { motorStop(); handleBorder(); ballDetected = false; return }</span>
+<span class="line">            CutebotPro.pwmCruiseControl(charge, charge)                   // keep chasing forward</span>
+<span class="line">            let g = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
+<span class="line">            if (g &gt; 5 &amp;&amp; g &lt; BALL_DETECT_CM) { reacquired = true; break } // caught up -&gt; loop kicks again</span>
+<span class="line">            if (g &gt; 5 &amp;&amp; g &lt; BALL_SEE_CM) { lastSeen = input.runningTime() } // still in sight -&gt; keep chasing</span>
 <span class="line">            basic.pause(5)</span>
 <span class="line">        }</span>
 <span class="line"></span>
-<span class="line">        // --- After the push: still in contact? keep driving through. Otherwise the</span>
-<span class="line">        //     ball rolled ahead - chase it forward (dribble) instead of turning away. ---</span>
-<span class="line">        let f = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
-<span class="line">        if (f &gt; 5 &amp;&amp; f &lt; BALL_DETECT_CM) {</span>
-<span class="line">            ballDetected = true            // still in contact -&gt; keep driving through</span>
-<span class="line">        } else {</span>
-<span class="line">            let ftStart = input.runningTime()</span>
-<span class="line">            CutebotPro.pwmCruiseControl(dynamicCharge, dynamicCharge)</span>
-<span class="line">            while (input.runningTime() - ftStart &lt; actualFollowThrough) {</span>
-<span class="line">                if (!matchRunning) { return }</span>
-<span class="line">                if (resetRequested) { handleReset(); CutebotPro.stopImmediately(CutebotProMotors.ALL); return }</span>
-<span class="line">                if (matchExpired()) { endMatch(); return }</span>
-<span class="line">                if (checkBorder() &gt; 0) { handleBorder(); ballDetected = false; return }</span>
-<span class="line">                basic.pause(5)</span>
-<span class="line">            }</span>
-<span class="line">            // Re-acquire: still ahead within sight -&gt; keep dribbling it on. Only stop</span>
-<span class="line">            // and rescan if we've genuinely lost it.</span>
-<span class="line">            let g = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
-<span class="line">            if (g &gt; 5 &amp;&amp; g &lt; BALL_SEE_CM) {</span>
-<span class="line">                ballDetected = true                    // still ahead -&gt; keep pushing it on</span>
-<span class="line">                chargeStartTime = input.runningTime()  // real progress -&gt; reset the jam cap</span>
-<span class="line">            } else {</span>
-<span class="line">                CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
-<span class="line">                ballDetected = false</span>
-<span class="line">                lastTurnWasLeft = !lastTurnWasLeft</span>
-<span class="line">                roamCounter = 999          // lost it -&gt; rescan immediately (chase the rebound)</span>
-<span class="line">            }</span>
+<span class="line">        if (!reacquired) {</span>
+<span class="line">            motorStop()</span>
+<span class="line">            ballDetected = false        // truly lost -&gt; let the match loop search</span>
 <span class="line">        }</span>
 <span class="line">    }</span>
 <span class="line">}</span>
@@ -1068,9 +925,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// BALL SCAN</span>
 <span class="line">// ============================================================</span>
-<span class="line"></span>
-<span class="line">// Which side of us the goal is on, from the cached heading:</span>
-<span class="line">//   -1 = goal to the left | 0 = roughly ahead | 1 = goal to the right.</span>
 <span class="line">function goalSide(): number {</span>
 <span class="line">    if (!goalHeadingValid) { return 0 }</span>
 <span class="line">    if (lastCachedHeading &lt; 0) { return 0 }</span>
@@ -1081,12 +935,6 @@
 <span class="line">    return diff &gt; 0 ? 1 : -1</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// One in-place scan leg, STEP-SCAN style: rotate a small step, STOP, then ping</span>
-<span class="line">// while still. (A still sonar beam actually sees the ball; pinging mid-rotation</span>
-<span class="line">// sweeps past it during the echo-timeout gap.) Returns:</span>
-<span class="line">//   1 = ball found (ballHeading/ballDetected set)</span>
-<span class="line">//   2 = aborted (border handled or match stopped) -- caller must return</span>
-<span class="line">//   0 = nothing found, leg completed</span>
 <span class="line">function sweepLeg(turnLeft: boolean, ms: number, foundHeading: number): number {</span>
 <span class="line">    const STEP_MS = 90</span>
 <span class="line">    let elapsed = 0</span>
@@ -1100,14 +948,12 @@
 <span class="line">            return 2</span>
 <span class="line">        }</span>
 <span class="line"></span>
-<span class="line">        // rotate one small step...</span>
 <span class="line">        let burst = Math.min(STEP_MS, ms - elapsed)</span>
 <span class="line">        if (turnLeft) { CutebotPro.pwmCruiseControl(0 - scanPower, scanPower) }</span>
 <span class="line">        else { CutebotPro.pwmCruiseControl(scanPower, 0 - scanPower) }</span>
 <span class="line">        basic.pause(burst)</span>
 <span class="line">        elapsed += burst</span>
 <span class="line"></span>
-<span class="line">        // ...then STOP and look.</span>
 <span class="line">        CutebotPro.stopImmediately(CutebotProMotors.ALL)</span>
 <span class="line">        basic.pause(30)</span>
 <span class="line">        let d = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
@@ -1119,24 +965,18 @@
 <span class="line">    return 0</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// We spotted a ball at scan range and are now facing it: drive straight in so the</span>
-<span class="line">// normal charge path (which needs the closer BALL_DETECT_CM) can take the shot.</span>
 <span class="line">function closeOnBall() {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line">    driveUntilBall(1100)     // border-aware; stops &amp; confirms once within detect range</span>
-<span class="line">    ballHeading = 0          // dead ahead now; matchLoop re-confirms and self-clears if gone</span>
+<span class="line">    ballHeading = 0          // dead ahead now</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Full search sweep: confirm dead-ahead, then sweep left-out / back / right-out /</span>
-<span class="line">// back, biased toward the goal side. On any find, close on the ball and return.</span>
 <span class="line">function lookForBall() {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line"></span>
 <span class="line">    let baseLegMs = Math.max(320, 360 + SPEED * 10)</span>
 <span class="line">    if (lastCachedHeading &lt; 0 &amp;&amp; goalHeadingValid) { stableHeading() }</span>
 <span class="line">    let gs = goalSide()</span>
-<span class="line">    // Bias the OUTBOUND excursion toward the goal side; each return leg uses the</span>
-<span class="line">    // SAME duration as its outbound, so net rotation per pair is zero.</span>
 <span class="line">    let leftLegMs = gs &lt; 0 ? baseLegMs + 25 : gs &gt; 0 ? Math.max(60, baseLegMs - 20) : baseLegMs</span>
 <span class="line">    let rightLegMs = gs &gt; 0 ? baseLegMs + 25 : gs &lt; 0 ? Math.max(60, baseLegMs - 20) : baseLegMs</span>
 <span class="line"></span>
@@ -1170,10 +1010,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// DRIVE AND WATCH  (drive a segment while watching border + ball)</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Keeps the bot driving at (lSpeed,rSpeed) for `ms`, while: polling the border</span>
-<span class="line">// (hard + soft) on a tight cadence, refreshing endurance + the adaptive</span>
-<span class="line">// threshold, keeping the motor command alive, and pinging for the ball. Returns</span>
-<span class="line">// early (with borderHandledInSeg set) when a border is handled or a ball is found.</span>
 <span class="line">function driveAndWatch(ms: number, lSpeed: number, rSpeed: number) {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line"></span>
@@ -1183,7 +1019,7 @@
 <span class="line">    let lastBorderPoll = 0</span>
 <span class="line">    let lastMotorRefresh = input.runningTime()</span>
 <span class="line">    let pingInterval = (SPEED &gt;= 6 || lowPowerActive) ? 25 : 40</span>
-<span class="line">    const BORDER_POLL_MS = 6         // tight cadence: border safety outranks I2C smoothness</span>
+<span class="line">    const BORDER_POLL_MS = 6</span>
 <span class="line"></span>
 <span class="line">    while (input.runningTime() - watchStart &lt; ms) {</span>
 <span class="line">        if (!matchRunning) { return }</span>
@@ -1197,8 +1033,6 @@
 <span class="line"></span>
 <span class="line">            let hardSide = launchActive ? 0 : borderSideFrom(BORDER_THRESHOLD)</span>
 <span class="line">            if (hardSide &gt; 0) {</span>
-<span class="line">                // Active brake + short reverse: kill momentum and pull the sensors</span>
-<span class="line">                // back off the line so we can't coast off the field.</span>
 <span class="line">                CutebotPro.pwmCruiseControl(-60, -60)</span>
 <span class="line">                basic.pause(70)</span>
 <span class="line">                motorStop()</span>
@@ -1207,11 +1041,10 @@
 <span class="line">                return</span>
 <span class="line">            }</span>
 <span class="line"></span>
-<span class="line">            // Soft border (pre-line): evade early so we never creep onto the tape.</span>
 <span class="line">            let softThresh = Math.round(BORDER_THRESHOLD * (lowPowerActive ? 0.65 : 0.75))</span>
 <span class="line">            let softSide = launchActive ? 0 : borderSideFrom(softThresh)</span>
 <span class="line">            if (softSide &gt; 0) {</span>
-<span class="line">                softEvade(softSide)      // reverses (active brake) + sets borderHandledInSeg</span>
+<span class="line">                softEvade(softSide)</span>
 <span class="line">                return</span>
 <span class="line">            }</span>
 <span class="line">        }</span>
@@ -1227,8 +1060,6 @@
 <span class="line">            pingInterval = (SPEED &gt;= 6 || lowPowerActive) ? 25 : 40</span>
 <span class="line">            showEnduranceMeter()</span>
 <span class="line"></span>
-<span class="line">            // Track the floor with a smoothed estimate and keep the threshold a</span>
-<span class="line">            // fixed margin above it. Moves both ways, clamped [80,220].</span>
 <span class="line">            if (borderSide == 0 &amp;&amp; input.runningTime() - lastBaselineUpdate &gt; 1500) {</span>
 <span class="line">                lastBaselineUpdate = input.runningTime()</span>
 <span class="line">                let acc = 0</span>
@@ -1250,19 +1081,14 @@
 <span class="line">            lastPingTime = input.runningTime()</span>
 <span class="line">            let dist = CutebotPro.ultrasonic(SonarUnit.Centimeters)</span>
 <span class="line">            if (dist &gt; 5 &amp;&amp; dist &lt; BALL_DETECT_CM) {</span>
-<span class="line">                // Close enough to commit: stop and confirm.</span>
 <span class="line">                motorStop()</span>
 <span class="line">                if (confirmBall(true)) { ballHeading = 99; ballDetected = true; return }</span>
-<span class="line">                // Glanced it mid-arc: switch the segment to STRAIGHT toward it so the</span>
-<span class="line">                // keep-alive won't revert to the old curve and orbit the ball.</span>
 <span class="line">                let straight = Math.max(lSpeed, rSpeed)</span>
 <span class="line">                lSpeed = straight</span>
 <span class="line">                rSpeed = straight</span>
 <span class="line">                CutebotPro.pwmCruiseControl(straight, straight)</span>
 <span class="line">                lastMotorRefresh = input.runningTime()</span>
 <span class="line">            } else if (dist &gt; 5 &amp;&amp; dist &lt; BALL_SEE_CM) {</span>
-<span class="line">                // Saw it at range: stop arcing and drive STRAIGHT at it to close the</span>
-<span class="line">                // gap (commit/confirm happens once it's inside BALL_DETECT_CM).</span>
 <span class="line">                let straightSee = Math.max(lSpeed, rSpeed)</span>
 <span class="line">                lSpeed = straightSee</span>
 <span class="line">                rSpeed = straightSee</span>
@@ -1270,8 +1096,6 @@
 <span class="line">                lastMotorRefresh = input.runningTime()</span>
 <span class="line">            }</span>
 <span class="line"></span>
-<span class="line">            // FAILSAFE: the blocking ping can stall border polling long enough to</span>
-<span class="line">            // coast onto the line. Re-read the border the instant the ping returns.</span>
 <span class="line">            if (!launchActive) {</span>
 <span class="line">                readTrackbit()</span>
 <span class="line">                if (borderSideFrom(BORDER_THRESHOLD) &gt; 0) {</span>
@@ -1285,13 +1109,11 @@
 <span class="line">            }</span>
 <span class="line">        }</span>
 <span class="line"></span>
-<span class="line">        basic.pause(5)        // ~200 Hz; plenty, and eases the I2C bus</span>
+<span class="line">        basic.pause(5)</span>
 <span class="line">    }</span>
-<span class="line">    // Normal time-out exit: roamStep handles the braking pulse + stop.</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Light evade for a SOFT (pre-line) border hit. Brief reverse + a big turn away.</span>
-<span class="line">// Gentler/shorter on low power so we can't reverse off the opposite edge.</span>
+<span class="line">// Light evade for a SOFT (pre-line) border hit.</span>
 <span class="line">function softEvade(side: number) {</span>
 <span class="line">    motorStop()</span>
 <span class="line">    basic.pause(20)</span>
@@ -1310,8 +1132,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// BORDER HANDLING  (full recovery from a hard border hit)</span>
 <span class="line">// ============================================================</span>
-<span class="line">// Brake, pin our field position from the heading, then back up + turn away +</span>
-<span class="line">// nudge forward, retrying up to 3 times until clear. Optionally scans afterward.</span>
 <span class="line">function handleBorder(depth: number = 0, scanAfter: boolean = true) {</span>
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line">    if (matchExpired()) { endMatch(); return }</span>
@@ -1323,8 +1143,6 @@
 <span class="line">    if (!matchRunning) { return }</span>
 <span class="line"></span>
 <span class="line">    speedExtra = Math.max(SPEED - 4, 0)</span>
-<span class="line">    // Low power: gentle, SHORT reverse (no extension) so we never reverse off the</span>
-<span class="line">    // opposite edge. Normal power keeps the speed-scaled backup.</span>
 <span class="line">    backupPower = lowPowerActive ? -25 : (0 - 40 - speedExtra * 5)</span>
 <span class="line">    backupTime = lowPowerActive ? 130 : (250 + speedExtra * 20)</span>
 <span class="line"></span>
@@ -1368,9 +1186,6 @@
 <span class="line">// ============================================================</span>
 <span class="line">// STATS &amp; DISPLAY</span>
 <span class="line">// ============================================================</span>
-<span class="line"></span>
-<span class="line">// Derive all runtime values from the four student stats. (See the nonnegotiable</span>
-<span class="line">// formulas at the top of the file.)</span>
 <span class="line">function computeStats() {</span>
 <span class="line">    motorPower = SPEED * 100 / 20</span>
 <span class="line">    currentPower = motorPower</span>
@@ -1384,15 +1199,12 @@
 <span class="line">    lowPowerThreshold = minWheelSpeed</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Quick white blink of the front headlights (used to flag a confirmed ball).</span>
 <span class="line">function flashHeadlights() {</span>
 <span class="line">    CutebotPro.singleHeadlights(CutebotProRGBLight.RGBA, 255, 255, 255)</span>
 <span class="line">    basic.pause(30)</span>
 <span class="line">    CutebotPro.singleHeadlights(CutebotProRGBLight.RGBA, 0, 0, 0)</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Optional: scroll the build archetype so students connect their stat spend to an</span>
-<span class="line">// identity. A unique highest stat names the build; a tie =&gt; BALANCED.</span>
 <span class="line">function showBuildArchetype() {</span>
 <span class="line">    let top = Math.max(SPEED, Math.max(POWER, Math.max(TURNING, ENDURANCE)))</span>
 <span class="line">    let leaders = 0</span>
@@ -1410,7 +1222,6 @@
 <span class="line">    basic.showString(name)</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Quick bar chart of the four stats on cols 0-3: SPEED, TURNING, ENDURANCE, POWER.</span>
 <span class="line">function showStatBars() {</span>
 <span class="line">    basic.clearScreen()</span>
 <span class="line">    let vals = [SPEED, TURNING, ENDURANCE, POWER]</span>
@@ -1420,7 +1231,6 @@
 <span class="line">    }</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Live endurance meter on column 2 (taller = more power left).</span>
 <span class="line">function showEnduranceMeter() {</span>
 <span class="line">    bars_count = Math.round(enduranceFactor * 5)</span>
 <span class="line">    bars_count = Math.max(1, Math.min(5, bars_count))</span>
@@ -1431,16 +1241,12 @@
 <span class="line">// ============================================================</span>
 <span class="line">// COMPASS / FIELD-POSITION HELPERS</span>
 <span class="line">// ============================================================</span>
-<span class="line"></span>
-<span class="line">// Smallest absolute angle between two headings (0-180).</span>
 <span class="line">function angleDiffAbs(a: number, b: number): number {</span>
 <span class="line">    let d = Math.abs(a - b)</span>
 <span class="line">    if (d &gt; 180) { d = 360 - d }</span>
 <span class="line">    return d</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Own-goal "danger cone" half-width. Widens toward cautious (WIDE) as our</span>
-<span class="line">// position estimate goes stale (no recent wall contact).</span>
 <span class="line">function ownGoalCone(): number {</span>
 <span class="line">    let elapsed = input.runningTime() - lastHomeUpdate</span>
 <span class="line">    let caution = Math.min(1, elapsed / HOME_DECAY_MS)</span>
@@ -1449,8 +1255,6 @@
 <span class="line">        (OWN_GOAL_CONE_WIDE - OWN_GOAL_CONE_NARROW) * p)</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Pin which half we're in from the heading at a wall (called from handleBorder</span>
-<span class="line">// while stopped): facing our own goal =&gt; home end; facing their goal =&gt; far end.</span>
 <span class="line">function updateHomeProximityOnBorder() {</span>
 <span class="line">    if (!goalHeadingValid) { return }</span>
 <span class="line">    let h = stableHeadingBlocking()</span>
@@ -1460,10 +1264,6 @@
 <span class="line">    lastHomeUpdate = input.runningTime()</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Rotate in place to an absolute compass heading (shortest way). Gives up rather</span>
-<span class="line">// than spinning blindly if the compass can't be read.</span>
-<span class="line">// NOTE: err &gt; 0 means turn clockwise. If your bot turns the WRONG way for its</span>
-<span class="line">// wiring, swap the two pwmCruiseControl lines below.</span>
 <span class="line">function turnToHeading(target: number, tolDeg: number = 10) {</span>
 <span class="line">    let turnPwr = Math.max(25, Math.min(40, 20 + TURNING * 2))</span>
 <span class="line">    for (let i = 0; i &lt; 30; i++) {</span>
@@ -1483,15 +1283,13 @@
 <span class="line">    motorStop()</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// Re-center on a ball that isn't dead-ahead: a tiny zero-net L/R/R/L sweep,</span>
-<span class="line">// stopping on the first confirmed hit. Returns true if the ball is locked in front.</span>
 <span class="line">function lockOntoBall(): boolean {</span>
 <span class="line">    if (confirmBall(true)) { return true }</span>
 <span class="line">    let p = 24</span>
 <span class="line">    let dirs = [-1, 1, 1, -1]          // small L, R, R, L -- net rotation ~0</span>
 <span class="line">    for (let i = 0; i &lt; dirs.length; i++) {</span>
 <span class="line">        if (!matchRunning) { return false }</span>
-<span class="line">        if (checkBorder() &gt; 0) { motorStop(); return false }   // let matchLoop handle the border</span>
+<span class="line">        if (checkBorder() &gt; 0) { motorStop(); return false }</span>
 <span class="line">        if (dirs[i] &lt; 0) { CutebotPro.pwmCruiseControl(0 - p, p) }</span>
 <span class="line">        else { CutebotPro.pwmCruiseControl(p, 0 - p) }</span>
 <span class="line">        basic.pause(90)</span>
@@ -1502,13 +1300,10 @@
 <span class="line">    return false</span>
 <span class="line">}</span>
 <span class="line"></span>
-<span class="line">// If we're inside the own-goal danger cone, turn out via the SHORTER edge (minimal</span>
-<span class="line">// move, so the ball stays nearest dead-ahead). Always returns true; the real</span>
-<span class="line">// safety is the cone test that calls this from prepareShot.</span>
 <span class="line">function aimAwayFromOwnGoal(): boolean {</span>
 <span class="line">    if (!goalHeadingValid) { return true }</span>
 <span class="line">    let h = stableHeadingBlocking()</span>
-<span class="line">    if (h &lt; 0) { return true }          // stopped + unreadable is rare; don't spin in circles</span>
+<span class="line">    if (h &lt; 0) { return true }</span>
 <span class="line">    let cone = ownGoalCone()</span>
 <span class="line">    let d = h - ownGoalHeading</span>
 <span class="line">    while (d &gt; 180) { d -= 360 }</span>
@@ -1528,6 +1323,7 @@
 <span class="line">let readyToLaunch = false</span>
 <span class="line">let resetRequested = false</span>
 <span class="line">let launchActive = false</span>
+<span class="line">let lineArmed = false</span>
 <span class="line">let matchStartTime = 0</span>
 <span class="line">let matchTime = 0</span>
 <span class="line"></span>
@@ -1645,32 +1441,14 @@
 <span class="line">/* ============================================================================</span>
 <span class="line"> *  ★ STUDENT ZONE A — STAT ALLOCATION ★</span>
 <span class="line"> * ============================================================================</span>
-<span class="line"> *  Give your bot its personality. Fill in the four stats below.</span>
-<span class="line"> *</span>
-<span class="line"> *  RULES:</span>
-<span class="line"> *   • Each stat is a whole number, at least 1.</span>
-<span class="line"> *   • POWER goes up to 10  (Power² caps the kick at 100 there — more is wasted).</span>
-<span class="line"> *   • SPEED, ENDURANCE, and TURNING go up to 17.</span>
-<span class="line"> *   • The four values MUST add up to exactly 20 (your point budget).</span>
-<span class="line"> *</span>
-<span class="line"> *  WHAT EACH ONE DOES:</span>
-<span class="line"> *   SPEED      how fast it drives around the field</span>
-<span class="line"> *   TURNING    how sharply it arcs while searching / how fast it aims</span>
-<span class="line"> *   ENDURANCE  how well it keeps its power late in the match</span>
-<span class="line"> *   POWER      how hard it kicks the ball</span>
-<span class="line"> *</span>
-<span class="line"> *  TRADE-OFFS: every point you add to one stat is a point taken from another --</span>
-<span class="line"> *  you cannot be great at everything. Pick a strategy:</span>
-<span class="line"> *    SPEEDSTER = high SPEED · SNIPER = high POWER ·</span>
-<span class="line"> *    TANK = high ENDURANCE · NINJA = high TURNING</span>
-<span class="line"> *</span>
-<span class="line"> *  EXAMPLE (a balanced build):  SPEED 5 + TURNING 5 + ENDURANCE 5 + POWER 5 = 20</span>
+<span class="line"> *  Each stat is a whole number ≥ 1. POWER up to 10; SPEED/ENDURANCE/TURNING up</span>
+<span class="line"> *  to 17. The four MUST add up to exactly 20.</span>
 <span class="line"> * ============================================================================</span>
 <span class="line"> */</span>
-<span class="line">SPEED     = 0    // &lt;- YOUR VALUE HERE</span>
-<span class="line">TURNING   = 0    // &lt;- YOUR VALUE HERE</span>
-<span class="line">ENDURANCE = 0    // &lt;- YOUR VALUE HERE</span>
-<span class="line">POWER     = 0    // &lt;- YOUR VALUE HERE</span>
+<span class="line">SPEED = <span class="pick">0</span>    // &lt;- YOUR VALUE HERE</span>
+<span class="line">TURNING = <span class="pick">0</span>    // &lt;- YOUR VALUE HERE</span>
+<span class="line">ENDURANCE = <span class="pick">0</span>    // &lt;- YOUR VALUE HERE</span>
+<span class="line">POWER = <span class="pick">0</span>    // &lt;- YOUR VALUE HERE</span>
 <span class="line">// CHECK before you run:  SPEED + TURNING + ENDURANCE + POWER  must equal 20</span>
 <span class="line"></span>
 <span class="line">// ── Tunable distances / thresholds ─────────────────────────</span>
@@ -1678,9 +1456,9 @@
 <span class="line">BORDER_THRESHOLD = 130     // overwritten by calibrateThreshold</span>
 <span class="line">borderMargin = 40          // overwritten by calibrateThreshold</span>
 <span class="line">scanPower = 25             // in-place scan/turn speed</span>
-<span class="line">BALL_DETECT_CM = 40        // commit-to-charge range</span>
-<span class="line">BALL_SEE_CM = 45           // home-in range while driving; keep &lt; half field width</span>
-<span class="line">CONTACT_CM = 15            // only dribble-curve once the ball is THIS close (in contact)</span>
+<span class="line">BALL_DETECT_CM = 50        // commit-to-charge range</span>
+<span class="line">BALL_SEE_CM = 70           // home-in range while driving; keep &lt; half field width</span>
+<span class="line">CONTACT_CM = 15            // (unused by the clean charge, kept for reference)</span>
 <span class="line">BALL_SCAN_CM = 50          // scan-spot range; shorter = fewer false hits on walls/people</span>
 <span class="line">// ───────────────────────────────────────────────────────────</span>
 <span class="line"></span>

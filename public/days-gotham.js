@@ -28,7 +28,7 @@ const GOTHAM_DAY_13 = {
   "week": 4,
   "weekName": "Final Four Days",
   "theme": "Distance Lab — turn a moving bot into a model",
-  "bigMathIdea": "A prediction is a model, not a guess. Measure how far the bot drives, compare it to what you predicted, and the gap tells you what to fix. distance = speed x time - startup lag is y = mx + b. Distance can never come out 0-0 the way a match can.",
+  "bigMathIdea": "A prediction is a model, not a guess. Measure how far the bot drives, compare it to what you predicted, and the gap tells you what to fix. distance = speed x time + start-up (start-up is negative, so it reads as −) is y = mx + b. Distance can never come out 0-0 the way a match can.",
   "vocabulary": "PREDICTION, GAP (prediction error), RATE OF CHANGE. The gap is predicted minus actual. The rate of change is centimeters per second — the bot's speed, and the slope of its line.",
   "activities": [
     {
@@ -117,7 +117,7 @@ const GOTHAM_DAY_14 = {
       "makecode": [
         { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test in MakeCode — set stats + 4 numbers, press A (no calibration)" },
         { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test — copy / download / walkthrough" },
-        { "url": "https://makecode.microbit.org/S89224-43320-62794-41458", "label": "Full match starter (roams; needs W/B/goal calibration)" },
+        { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "Full match starter (roams; needs W/B/goal calibration)" },
         { "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" }
       ]
     },
@@ -175,7 +175,7 @@ const GOTHAM_DAY_15 = {
       "mins": 60,
       "block": "Challenge Block",
       "description": "Explain your own equation using your real numbers, as if to someone who has never seen it. No jargon. 'The 38 means our bot goes 38 cm every second. The minus 7 means it loses 7 cm getting started.'",
-      "facilitatorDescription": "Each team explains their equation in plain language with their actual numbers. In the Teach the Math tool, Gotham students pick DISTANCE or LINEAR EQUATION (or PERCENT CHANGE) — the formulas they used this week — and explain with their real numbers. Push on the meaning of each part: what the number in front of the time means, what the start-up number means. After each explanation ask 'how did you get that specific number?' This is the rehearsal for teaching a visitor tomorrow.",
+      "facilitatorDescription": "Each team explains their equation in plain language with their actual numbers. In the Teach the Math tool, Gotham students pick LINEAR EQUATION (or PERCENT CHANGE) — the formulas they used this week — and explain with their real numbers. Push on the meaning of each part: what the number in front of the time means, what the start-up number means. After each explanation ask 'how did you get that specific number?' This is the rehearsal for teaching a visitor tomorrow.",
       "link": "/lessons/pre-match-pitch-v2.html"
     },
     {
@@ -239,15 +239,15 @@ const GOTHAM_DAY_16 = {
       "name": "Expert setup + last rehearsal",
       "mins": 45,
       "block": "Challenge Block",
-      "description": "Set your station: poster, bot, coordinate grid, dashboard on screen. One last run of the sentence you rewrote yesterday.",
-      "facilitatorDescription": "Stations: poster, bot, grid, dashboard on a screen. One last practice of the sentence each team rewrote in the teach-back rehearsal. If a team wants to DEMO its launch for visitors, run the go/no-go check now (3 test launches; 2 of 3 must score) — GO teams may demo, NO-GO teams stick to the Target Challenge. Card: day16-visitor-challenge-cards (Demo Your Launch)."
+      "description": "Set your station: poster, bot, Kicker Standing (paper leaderboard of successful kicks out of 5 tries). One last run of the sentence you rewrote yesterday.",
+      "facilitatorDescription": "Stations: poster, bot, Kicker Standing (paper leaderboard of successful kicks out of 5 tries). One last practice of the sentence each team rewrote in the teach-back rehearsal. If a team wants to DEMO its launch for visitors, run the go/no-go check now (3 test launches; 2 of 3 must score) — GO teams may demo, NO-GO teams stick to the Target Challenge. Card: day16-visitor-challenge-cards (Demo Your Launch)."
     },
     {
       "name": "Community Exhibition",
       "mins": 75,
       "block": "Match-Build-Make",
       "description": "Visitors try your Target Challenge: your team teaches them to use your equation to stop the bot on the line. They also do the three mini-challenge cards. Fill the Visitor Completion Tracker as you go.",
-      "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate distance, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer. Optional: GO teams (from the morning check) may run a Demo Your Launch station — a demonstration, not a contest, so it stays consistent with the no-awards close.",
+      "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate plotting, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer. Optional: GO teams (from the morning check) may run a Demo Your Launch station — a demonstration, not a contest, so it stays consistent with the no-awards close.",
       "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
     },
     {
