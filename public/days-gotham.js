@@ -29,7 +29,7 @@ const GOTHAM_DAY_13 = {
   "weekName": "Final Four Days",
   "theme": "Distance Lab — turn a moving bot into a model",
   "bigMathIdea": "A prediction is a model, not a guess. Measure how far the bot drives, compare it to what you predicted, and the gap tells you what to fix. distance = speed x time - startup lag is y = mx + b. Distance can never come out 0-0 the way a match can.",
-  "vocabulary": "PREDICTION, GAP (prediction error), RATE OF CHANGE. The gap is predicted minus actual. The rate of change is centimetres per second — the bot's speed, and the slope of its line.",
+  "vocabulary": "PREDICTION, GAP (prediction error), RATE OF CHANGE. The gap is predicted minus actual. The rate of change is centimeters per second — the bot's speed, and the slope of its line.",
   "activities": [
     {
       "name": "Launch the Distance Lab",
@@ -132,8 +132,8 @@ const GOTHAM_DAY_14 = {
       "name": "Launch-and-Score (competition)",
       "mins": 45,
       "block": "Match-Build-Make",
-      "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, re-tune between each, most goals of 5 wins. It can't come out 0-0.",
-      "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches, then 5 scored launches per team, re-tuning allowed between launches. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to centre. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format.",
+      "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, no re-tuning between them — your numbers are locked in from warm-up — most goals of 5 wins. It can't come out 0-0.",
+      "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches (adjust and re-download freely here), then 5 scored launches per team with no re-tuning during the scored round — the four numbers are locked in from warm-up. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to center. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format.",
       "link": "/resources/teacher-guides/launch-and-score-format.html"
     },
     {

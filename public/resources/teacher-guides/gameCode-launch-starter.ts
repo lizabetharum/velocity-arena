@@ -13,7 +13,7 @@
  *                          enter the main loop.
  *   3. matchLoop()      -> repeatedly: update endurance, chase/aim/kick the ball
  *                          if we have it, otherwise scan + roam to find it.
- *   B   = soft reset (re-center behaviour mid-match)
+ *   B   = soft reset (re-center behavior mid-match)
  *   A+B = stop the match.
  *
  * STUDENT STATS (total 20 · Power 1-10 · Speed/Endurance/Turning 1-17) and all tunable distances/thresholds live

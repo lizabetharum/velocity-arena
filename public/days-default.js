@@ -61,8 +61,8 @@ const DAYS_DEFAULT = [
         "name": "Stat Card Distribution",
         "mins": 5,
         "block": "LX Setup",
-        "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are greyed out. Today you fill in one line. This card is yours for four weeks.",
-        "facilitatorDescription": "Hand each student a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are greyed out today; only Speed will be filled in. The card stays with the student for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
+        "description": "You get a blank stat card with four rows: Speed, Endurance, Turning, Power. Three rows are grayed out. Today you fill in one line. This card is yours for four weeks.",
+        "facilitatorDescription": "Hand each student a blank stat card with four rows (Speed, Endurance, Turning, Power). Three rows are grayed out today; only Speed will be filled in. The card stays with the student for the full four weeks -- emphasize that it is a permanent artifact, not scratch paper.",
         "script": "https://docs.google.com/document/d/1K0kG2dMqj8hDzy1uFp6OpIj4PZrtm1eb9zCeg_wqSx0/edit?usp=sharing",
         "template": { url: "https://docs.google.com/document/d/10e6BRrdOqRjV_aabz8LA6NHu1ecOew2DZcBor0bIpLg/edit?usp=drive_link", label: "Stat Card"},
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day01-04-stat-card-distribution.html"
@@ -683,10 +683,8 @@ const DAYS_DEFAULT = [
         "description": "Three matches, round-robin bracket. Before each match, state your prediction from the data log. After each match, record actual goals and win/loss immediately. Loss-recovery protocol runs for every losing team before the next match -- no skipping it.",
         "facilitatorDescription": "Explain the match cycle once before Round 1 (read prediction aloud, play, record result immediately), then run three rounds. Each round: teams write their prediction before hearing their opponent's, play three minutes, record goals and win/loss in the data log right after. Fill the prediction-accuracy tracking chart across all three rounds. Run the loss recovery protocol between rounds with any team that lost; don't wait until after all three rounds. Close with the leaderboard reveal (best prediction named alongside most wins), then the non-optional exit ticket: prediction, result, gap, and one hypothesis for what caused it.",
         "worksheet":[{url:"https://drive.google.com/file/d/171eshq43PzOOIowS3JLx2r1bPhMGMwnf/view?usp=drive_link",label:"Live Event Log"},
-          {url:"https://drive.google.com/file/d/1RYwXGMSLKrTY7lIj3_fNufiNjJoOUJ2R/view?usp=drive_link",label:"Example Live Event Log"},
           {url:"https://drive.google.com/file/d/1yhCgOwJ5Z5XhFBFsEcMv-DedGmM6_ANR/view",label:"Postmatch Update Sheet (PAGE 1 ONLY)"},
-          {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"},
-          {url:"https://drive.google.com/file/d/1x7-E8SWswK7gdlIXXCbdLahyOylb6GkR/view?usp=drive_link",label:"Example Rule Log"}
+          {url:"https://drive.google.com/file/d/1n3EZQV0o0ExakFQpK4mfPhatoTHqjjhE/view",label:"Rule Log"}
         ],
           "script": "https://docs.google.com/document/d/1lroWp1H0Omgc33hkRmZWrzq-DX3_e4t3s-jVibIkh6M/edit?usp=drive_link",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day07-04-match-day-1.html"
