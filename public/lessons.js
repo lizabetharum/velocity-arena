@@ -95,6 +95,8 @@ const ACTIVITY_LESSONS = {
     { url: '/lessons/equation-poster.html', label: 'Make Your Equation Poster' },
     { url: 'https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link', label: 'Poster worksheet' },
   ],
+  'Distance Lab worksheet': { url: '/lessons/distance-lab-worksheet.html', label: 'Distance Lab worksheet' },
+  'Target Challenge — Precision Final': { url: '/lessons/target-challenge-worksheet.html', label: 'Target Challenge worksheet' },
 };
 
 // Normalize mapping values into an array of { url, label } objects.
