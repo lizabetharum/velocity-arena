@@ -569,6 +569,12 @@ const DAYS_DEFAULT = [
         "description": "Program your launch sequence in MakeCode: the starting routine that controls your bot's initial movement, angle, and timing before it reaches the ball. Run it twice. Record your actual time to reach the ball both times. Compare against your Speed prediction from the geometry block. If they match, your math and your code agree. If they don't, write one sentence in your dashboard identifying where the model broke down.",
         "facilitatorDescription": "Teams design two launch strategies on paper before touching MakeCode: turns, drives, and one prediction each. Code and test Strategy A for three trials, then switch to Strategy B for three trials, recording hit rate and post-kick robot position for each. Stop the class at minute 35 to name the accuracy-versus-reliability distinction before teams move into comparison. Teams choose one strategy and justify it in writing using hit rate, approach angle, and post-kick position. Step 8 requires changing one variable only.",
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
+        
+        "makecode": [
+        { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test simple code— set stats + 4 numbers in launch, press A (no calibration)" },
+        { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test simple— walkthrough instructions" },
+         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "For After when you want to combine launch with gameCode (update ZONE A + B , includes W/B/goal calibration)" }
+        ],
         "script":[
           {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"}
         ],
