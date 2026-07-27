@@ -146,6 +146,17 @@ body{font-family: 'Inter',sans-serif;background:var(--bg);color:var(--text);min-
 /* ── SENTENCE FRAME ───────────────────────────── */
 .sentence-frame{background:rgba(42,64,96,.35);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:15px;line-height:2;}
 .sf-fill{color:var(--yellow);font-weight:900;display:inline-block;border-bottom:2px solid var(--yellow);padding:0 4px;min-width:40px;text-align:center;}
+/* Inline blanks in the Model Swap decision — typed, not handwritten, so the
+   slip is captured on Save. Sized to sit on the sentence's baseline. */
+.sf-in{font-family:'Inter',sans-serif;font-size:15px;font-weight:800;color:var(--yellow);
+  background:rgba(13,27,42,.55);border:none;border-bottom:2px solid var(--yellow);border-radius:4px 4px 0 0;
+  padding:2px 8px;margin:0 2px;}
+.sf-in:focus{outline:none;background:rgba(0,229,255,.1);border-bottom-color:var(--cyan);color:var(--cyan);}
+.sf-in::placeholder{color:var(--muted);font-weight:600;opacity:.75;}
+.sf-num{width:88px;text-align:center;}
+.sf-pick{width:118px;cursor:pointer;}
+.sf-pick option{background:var(--card);color:var(--text);}
+.sf-why{width:min(100%,340px);}
 
 /* ── RESIDUAL ROWS ────────────────────────────── */
 .res-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;}
@@ -233,6 +244,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
     </button>
   </div>
 </header>
+
+<!-- WHO — outside the sections so it stays visible on all five steps -->
+<div id="who-card"></div>
 
 
 <!-- ═══════════════════════════════════════════════════
@@ -815,19 +829,38 @@ hr.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
   <div class="card">
     <div class="card-lbl clbl-y">Your decision — write it on your Model Swap slip</div>
     <p style="font-size:13.5px;color:var(--muted);margin-bottom:10px;line-height:1.6;">You can't copy their numbers &mdash; it's a different bot. The question is: does seeing their equation make you <strong>trust</strong> one of your numbers, or <strong>doubt</strong> one?</p>
-    <div class="sentence-frame" style="line-height:2.15;">
-      One number we're <strong style="color:var(--green)">keeping</strong> (we're sure of it) is our <strong>______</strong> = ______ ,<br>because ______ .<br><br>
-      One number we'll <strong style="color:var(--orange)">change / re-check</strong> is our <strong>______</strong> ,<br>because next to their bot it looks ______ .
+    <div class="sentence-frame" style="line-height:2.4;">
+      One number we're <strong style="color:var(--green)">keeping</strong> (we're sure of it) is our
+      <select class="sf-in sf-pick" id="keep-which">
+        <option value="">choose…</option>
+        <option value="speed">speed</option>
+        <option value="start-up">start-up</option>
+      </select>
+      = <input class="sf-in sf-num" id="keep-value" type="number" step="0.1" placeholder="?"> ,<br>
+      because <input class="sf-in sf-why" id="keep-why" type="text" placeholder="name a number from your runs"> .<br><br>
+      One number we'll <strong style="color:var(--orange)">change / re-check</strong> is our
+      <select class="sf-in sf-pick" id="chg-which">
+        <option value="">choose…</option>
+        <option value="speed">speed</option>
+        <option value="start-up">start-up</option>
+      </select> ,<br>
+      because next to their bot it looks <input class="sf-in sf-why" id="chg-why" type="text" placeholder="name a number — theirs vs. ours"> .
     </div>
     <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.65;background:rgba(206,147,216,.06);border:1px solid rgba(206,147,216,.2);border-radius:8px;padding:11px 14px;">
       <strong style="color:var(--purple)">Example:</strong> "We're <strong>keeping</strong> our speed, 38 cm/s &mdash; all five of our runs lined up. We'll <strong>re-check</strong> our start-up: ours is &minus;20 but their bot (and two others) got about &minus;7, so ours is probably a bad measurement." The reason has to name numbers, not "theirs looks better."
     </div>
   </div>
 
+  <!-- SAVE -->
+  <div id="save-card"></div>
+
   <button class="btn-back" onclick="goSection(4)" style="margin-top:4px;">&larr; Back</button>
 </section>
 
 
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script src="/lesson-save.js"></script>
 <script>
 // ── STATE ────────────────────────────────────────────────────────────
 let selectedStat = 'time';
@@ -1277,6 +1310,79 @@ function initDistance(){
 }
 if(document.readyState!=='loading') initDistance();
 else document.addEventListener('DOMContentLoaded', initDistance);
+
+// ── Save to the class spreadsheet ────────────────────────────────────
+// This is the Model Swap slip. Goal 2 asks for a documented comparison to
+// another team's model plus a defended keep/change call, so the two teams'
+// numbers and both "because" sentences all have to land in the sheet.
+function _v(id){
+  var el = document.getElementById(id);
+  if (!el) return '';
+  if (el.tagName === 'SELECT') return el.value;
+  if (el.type === 'number') { var n = parseFloat(el.value); return isNaN(n) ? '' : n; }
+  return el.value.trim();
+}
+
+function collectModelSwap(){
+  var theirM = _v('cmp-m'), theirB = _v('cmp-b');
+  var haveBoth = slope !== null && yInt !== null && theirM !== '' && theirB !== '';
+
+  return {
+    // Their own model, built in sections 1-4.
+    trial1Time: _v('dp1x'), trial1Distance: _v('dp1y'),
+    trial2Time: _v('dp2x'), trial2Distance: _v('dp2y'),
+    ourSpeed: slope === null ? '' : slope,
+    ourStartUp: yInt === null ? '' : yInt,
+    ourEquation: (slope === null || yInt === null)
+      ? ''
+      : 'y = ' + slope + 'x ' + (yInt < 0 ? '− ' + Math.abs(yInt) : '+ ' + yInt),
+    testTime: _v('test-x'), testDistance: _v('test-y'),
+    testResidual: testResidual === null ? '' : testResidual,
+
+    // The comparison itself.
+    theirSpeed: theirM,
+    theirStartUp: theirB,
+    speedGap: haveBoth ? r2(slope - theirM) : '',
+    gapAfter5s: haveBoth ? r2(Math.abs((slope * 5 + yInt) - (theirM * 5 + theirB))) : '',
+
+    // The decision — Goal 2 evidence.
+    keepWhich: _v('keep-which'),
+    keepValue: _v('keep-value'),
+    keepBecause: _v('keep-why'),
+    changeWhich: _v('chg-which'),
+    changeBecause: _v('chg-why')
+  };
+}
+
+// Name strip lives above the section tabs, so it's on screen from step 1 and
+// stays put as the student moves through to the report.
+VA.renderIdentity({ mount: 'who-card' });
+
+VA.renderSaveCard({
+  mount: 'save-card',
+  lesson: 'gotham-day14-model-swap',
+  title: 'Save our Model Swap slip',
+  collect: collectModelSwap
+});
+
+// Restore a previous save on this device. Only the raw inputs are restored;
+// slope/yInt stay null until the student walks the sections again, which is
+// deliberate — the derivation is the lesson, not the number.
+(function restoreSwap(){
+  var prev = VA.loadLocal('gotham-day14-model-swap');
+  if (!prev || !prev.fields) return;
+  var f = prev.fields;
+  function set(id, v){
+    var el = document.getElementById(id);
+    if (el && v !== '' && v != null) el.value = v;
+  }
+  set('dp1x', f.trial1Time);   set('dp1y', f.trial1Distance);
+  set('dp2x', f.trial2Time);   set('dp2y', f.trial2Distance);
+  set('test-x', f.testTime);   set('test-y', f.testDistance);
+  set('cmp-m', f.theirSpeed);  set('cmp-b', f.theirStartUp);
+  set('keep-which', f.keepWhich); set('keep-value', f.keepValue); set('keep-why', f.keepBecause);
+  set('chg-which', f.changeWhich); set('chg-why', f.changeBecause);
+})();
 </script>
 </body>
 </html>

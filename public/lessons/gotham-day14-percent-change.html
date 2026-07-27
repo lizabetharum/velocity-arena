@@ -92,6 +92,9 @@
   <p class="lede"><b>Percent change</b> tells you how big a change is compared to where you started. It turns a raw change into a fair "how much bigger (or smaller)" number.</p>
   <p class="sub">Today: learn it, practice it, then use it on your own bot's speed.</p>
 
+  <!-- WHO -->
+  <div id="who-card"></div>
+
   <!-- STEP 1 -->
   <div class="step">
     <div class="step-n"><div class="n">1</div><div class="t">Why not just the raw change?</div></div>
@@ -202,7 +205,14 @@
     <p class="note"><b>A:</b> "up 25%" means the new speed is 1.25 × the old — so you <b>divide</b>, not multiply. <b>B:</b> the second 10% is taken on the <b>bigger</b> number, so the two percents don't simply add to 30% — start from 100 and step through.</p>
   </div>
 
+  <!-- SAVE -->
+  <div id="save-card"></div>
+
 </div>
+
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script src="/lesson-save.js"></script>
 
 <script>
   function r0(n){ return Math.round(n); }
@@ -246,6 +256,80 @@
     else if(Math.abs(v+correct)<=1){ fb.textContent='right size, wrong sign — it went '+(correct<0?'DOWN, so negative':'UP, so positive'); fb.className='pfb no'; }
     else { fb.textContent='not yet — (new − old) ÷ old × 100'; fb.className='pfb no'; }
   }
+
+  // ── Save to the class spreadsheet ────────────────────────────────────
+  // The eight practice answers, in order, so we can score them server-side
+  // free rather than storing a separate "is it right" flag per question.
+  var PRACTICE_KEY = [25, 20, 50, 60, -75, -10, 20, 10];
+
+  function numOrBlank(id){
+    var el = document.getElementById(id);
+    if (!el) return '';
+    var v = parseFloat(el.value);
+    return isNaN(v) ? '' : v;
+  }
+
+  function collectPercentChange(){
+    var o = parseFloat(document.getElementById('oldv').value);
+    var n = parseFloat(document.getElementById('newv').value);
+    var haveOwn = !isNaN(o) && !isNaN(n) && o > 0;
+    var pct = haveOwn ? Math.round((n - o) / o * 1000) / 10 : '';
+
+    var out = {
+      firstGuessSpeed: isNaN(o) ? '' : o,
+      correctedSpeed:  isNaN(n) ? '' : n,
+      percentChange:   pct,
+      // The Goal-1 sentence they put on the poster, assembled for the
+      // facilitator so it can be read without re-deriving it.
+      posterSentence: haveOwn
+        ? 'Our 1-second guess was ' + o + ' cm/s. Doing it properly gave ' + n +
+          ' cm/s — a ' + Math.abs(Math.round(pct)) + '% correction.'
+        : ''
+    };
+
+    var right = 0, answered = 0;
+    for (var i = 0; i < PRACTICE_KEY.length; i++) {
+      var v = numOrBlank('p' + (i + 1));
+      out['practice' + (i + 1)] = v;
+      if (v !== '') {
+        answered++;
+        if (Math.abs(v - PRACTICE_KEY[i]) <= 1) right++;
+      }
+    }
+    out.practiceAnswered = answered;
+    out.practiceCorrect = right;
+
+    out.challengeA_oldSpeed   = numOrBlank('c1');
+    out.challengeB_totalPct   = numOrBlank('c2');
+    return out;
+  }
+
+  // Name goes at the top of the page; the button sits with the finished work.
+  VA.renderIdentity({ mount: 'who-card' });
+
+  VA.renderSaveCard({
+    mount: 'save-card',
+    lesson: 'gotham-day14-percent-change',
+    title: 'Save my work',
+    collect: collectPercentChange
+  });
+
+  // Restore a previous save on this device so a reload doesn't lose answers.
+  (function restore(){
+    var prev = VA.loadLocal('gotham-day14-percent-change');
+    if (!prev || !prev.fields) return;
+    var f = prev.fields;
+    function set(id, v){
+      var el = document.getElementById(id);
+      if (el && v !== '' && v != null) el.value = v;
+    }
+    set('oldv', f.firstGuessSpeed);
+    set('newv', f.correctedSpeed);
+    for (var i = 1; i <= 8; i++) set('p' + i, f['practice' + i]);
+    set('c1', f.challengeA_oldSpeed);
+    set('c2', f.challengeB_totalPct);
+    calc();
+  })();
 </script>
 </body>
 </html>
