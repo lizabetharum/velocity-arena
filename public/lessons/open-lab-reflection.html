@@ -378,6 +378,11 @@ textarea{min-height:110px;resize:vertical;font-size:16px;line-height:1.65}
 
 <main class="main">
 
+<!-- WHO — outside the panels so it stays visible on all three tabs.
+     Replaces the old panel-1-only "Your name" box: one name entry now feeds
+     the print view, the copy-to-clipboard text, and the class spreadsheet. -->
+<div id="who-card"></div>
+
 <!-- ════════════════════════════════════════
      PANEL 0 · TODAY'S BLOCK
 ════════════════════════════════════════ -->
@@ -449,12 +454,6 @@ textarea{min-height:110px;resize:vertical;font-size:16px;line-height:1.65}
   <div class="sec-eyebrow">Step 1 · Individual Reflection</div>
   <h1 class="sec-title">Your Reflection</h1>
   <p class="sec-desc">Work alone. Answer all 3 prompts. Every answer must include the formula written out — with your actual stat numbers and your result.</p>
-
-  <!-- Name field -->
-  <div class="field-group" style="margin-bottom:20px">
-    <label class="field-label" style="margin-bottom:6px">Your name (for your printed copy):</label>
-    <input type="text" id="studentName" placeholder="First name" maxlength="60" style="max-width:300px">
-  </div>
 
   <div class="warn-box">
     <div class="ticon sm y"><i data-lucide="hash"></i></div>
@@ -666,6 +665,12 @@ textarea{min-height:110px;resize:vertical;font-size:16px;line-height:1.65}
   </div>
 
   <div class="err-box" id="reflectErr">Fill in all 3 prompts above before moving on. Remember — every answer needs a formula written out with your numbers.</div>
+
+  <!-- SAVE — on the Reflect panel, not the next one. "Next" is gated on all
+       three prompts, so a student part-way through could otherwise never send
+       anything, and partial answers are exactly what a facilitator wants to
+       see. Saving again later just updates the same row. -->
+  <div id="save-card"></div>
 
   <div class="btn-row">
     <button class="btn btn-ghost" onclick="goPanel(0)">&#8592; Back</button>
@@ -1022,6 +1027,9 @@ textarea{min-height:110px;resize:vertical;font-size:16px;line-height:1.65}
   </div>
 </div>
 
+<script src="/config.js"></script>
+<script src="/site.js"></script>
+<script src="/lesson-save.js"></script>
 <script>
 // ── STATE ─────────────────────────────────
 const state = { selectedSkill: null, selectedMoment: null, agree: null };
@@ -1099,6 +1107,38 @@ function goPanel(n) {
   if (n===2) { setTimeout(initPanel3Charts, 80); }
 }
 
+// ── SAVE TO THE CLASS SPREADSHEET ─────────
+function collectReflection() {
+  const txt = id => {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  };
+  const moments = document.querySelectorAll('#momentGrid .moment-card');
+  const chosenMoment = (state.selectedMoment != null && moments[state.selectedMoment])
+    ? moments[state.selectedMoment].textContent.trim().replace(/\s+/g, ' ').slice(0, 80)
+    : '';
+
+  const p1 = txt('p1text'), p2 = txt('p2text'), p3 = txt('p3text');
+  return {
+    formulaUsedMost: state.selectedSkill || '',
+    prompt1_formula: p1,
+    hardMomentType: chosenMoment,
+    prompt2_hardestMoment: p2,
+    prompt3_adviceWithFormula: p3,
+    // Lets a facilitator sort for blank or one-line answers without opening each cell.
+    promptsAnswered: [p1, p2, p3].filter(Boolean).length
+  };
+}
+
+VA.renderIdentity({ mount: 'who-card' });
+
+VA.renderSaveCard({
+  mount: 'save-card',
+  lesson: 'gotham-day15-open-lab-reflection',
+  title: 'Send to my facilitator',
+  collect: collectReflection
+});
+
 // ── SKILL SELECTOR — PRE-FILLS TEXTAREA ───
 function selectSkill(key, el) {
   state.selectedSkill = key;
@@ -1171,10 +1211,22 @@ function checkReflectAndNext() {
   goPanel(2);
 }
 
+// ── STUDENT NAME ──────────────────────────
+// Comes from the identity strip at the top of the page (see /lesson-save.js),
+// which is also what gets sent to the class spreadsheet — so the printed copy,
+// the copied text and the sheet always agree.
+function studentDisplayName() {
+  const el = id => document.getElementById(id);
+  const first = el('vasave-first') ? el('vasave-first').value.trim() : '';
+  const init  = el('vasave-init')  ? el('vasave-init').value.trim()  : '';
+  if (!first) return '';
+  return init ? first + ' ' + init.toUpperCase() + '.' : first;
+}
+
 // ── PRINT / SAVE AS PDF ───────────────────
 function printWork() {
   // Populate print view with all current answers
-  const name = document.getElementById('studentName').value.trim();
+  const name = studentDisplayName();
   const p1   = document.getElementById('p1text').value.trim();
   const p2   = document.getElementById('p2text').value.trim();
   const p3   = document.getElementById('p3text').value.trim();
@@ -1620,7 +1672,7 @@ function updateRatio() {
 
 // ── COPY ANSWERS TO CLIPBOARD ─────────────
 function copyAnswers() {
-  const name = document.getElementById('studentName').value.trim() || '[name]';
+  const name = studentDisplayName() || '[name]';
   const p1   = document.getElementById('p1text').value.trim() || '(not answered)';
   const p2   = document.getElementById('p2text').value.trim() || '(not answered)';
   const p3   = document.getElementById('p3text').value.trim() || '(not answered)';
