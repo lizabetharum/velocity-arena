@@ -115,11 +115,9 @@ const GOTHAM_DAY_14 = {
       "facilitatorDescription": "A two-leg launch, all arithmetic — no trig (these are pre-algebra students). Corner to the midline (turn, drive), then turn head-on and drive to the ball, then the locked code kicks (Power squared). Students MEASURE each leg's distance with a tape and convert it to a drive time with THEIR own equation: ms = (distance - start-up) / speed x 1000, done TWICE (each leg has its own start-up loss). Turn angles are set at 45 to start, or measured with a protractor — never calculated. Four numbers go into the Launch Test (two angles, two ms) — no field calibration, press A to launch and kick, change a number and re-test in seconds. Tune one leg at a time: a distance miss is a ms fix, a direction miss is an angle fix. TEST THE KICK yourself first — wide goal, short distance behind the ball. Here the goal is a launch that lands reliably; the Launch-and-Score competition is the after-lunch block. Print the worksheet.",
       "link": "/lessons/launch-sequence-worksheet.html",
       "makecode": [
-        { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test in MakeCode — set stats + 4 numbers, press A (no calibration)" },
-        { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test — copy / download / walkthrough" },
-        { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "Full match starter (roams; needs W/B/goal calibration)" },
-        { "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" }
-      ]
+        { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test morning code— set stats + 4 numbers, press A (no calibration)" },
+        { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test — walkthrough instructions" }
+        ]
     },
     {
       "name": "Lunch",
@@ -134,8 +132,14 @@ const GOTHAM_DAY_14 = {
       "block": "Match-Build-Make",
       "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, no re-tuning between them — your numbers are locked in from warm-up — most goals of 5 wins. It can't come out 0-0.",
       "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches (adjust and re-download freely here), then 5 scored launches per team with no re-tuning during the scored round — the four numbers are locked in from warm-up. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to center. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format.",
-      "link": "/resources/teacher-guides/launch-and-score-format.html"
+      "link": "/resources/teacher-guides/launch-and-score-format.html",
+      "makecode": [{ "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" },
+         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "For After afternoon shootout (needs ZONE B  + W/B/goal calibration)" }
+        
+      ]
     },
+
+  
     {
       "name": "Percent Change — the correction",
       "mins": 45,

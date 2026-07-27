@@ -100,6 +100,30 @@ const CONFIG = {
   // Source script: apps-script/what-if-publish.gs (deploy as a Web App
   // bound to the same spreadsheet that whatIfSheetCsvUrl reads from).
   // Leave empty to disable auto-publish (Generate Shareable URL still works).
-  whatIfPublishEndpoint: "https://script.google.com/macros/s/AKfycbz2OauwNlB16epK02Asw3SGRNnlrLwBA2ykZVwOZvYvcVQBmXdpuSNsjEhdkStq1BUyJw/exec"
+  whatIfPublishEndpoint: "https://script.google.com/macros/s/AKfycbz2OauwNlB16epK02Asw3SGRNnlrLwBA2ykZVwOZvYvcVQBmXdpuSNsjEhdkStq1BUyJw/exec",
+
+  // Apps Script Web App URL(s) that collect interactive-lesson answers.
+  // One deployment per site, each bound to that site's source workbook —
+  // the same per-site workbooks the anonymizer already reads.
+  //
+  // Every lesson wired with /lesson-save.js posts here and lands in its own
+  // tab, named after the lesson. Wiring a new lesson needs NO change to this
+  // file and no redeploy.
+  //
+  // Setup (once per site):
+  //   1. Open that site's Google Sheet → Extensions → Apps Script.
+  //   2. Paste apps-script/velocity-arena-collect.gs into Code.gs.
+  //   3. Deploy → New deployment → Web app.
+  //        Execute as: Me     Who has access: Anyone
+  //   4. Paste the /exec URL below, next to that site's code.
+  //
+  // Leave a site empty until it's deployed — its lessons still work and save
+  // to the student's device, with a notice telling them to see the facilitator.
+  lessonCollectEndpoint: {
+    NY1: "https://script.google.com/macros/s/AKfycbxGlUwKlE5b-TX1ZZdsndDbf8B7qNIAtOIkCh8zo_6D71gMvTpfnvsslbRVpfbiqvVx/exec",   // Gotham Tech
+    NY2: "",   // Claremont International HS
+    NY3: "",   // South Bronx Community
+    TN:  "",   // Crosstown
+  }
 
 };
