@@ -69,6 +69,9 @@ const ACTIVITY_LESSONS = {
     { url: '/lessons/proportional-scaling.html',         label: 'Proportional scaling' },
     { url: '/lessons/day11-commissioner-proposal.html',  label: 'Commissioner proposal' },
   ],
+  'Model Swap':[{ url: '/lessons/gotham-day14-distance-equation.html',  label: 'Model Swap' }],
+'Percent Change — the correction':[{ url: '/lessons/gotham-day14-percent-change.html',  label: 'Percent Change' }],
+
   'Underdog Mechanic Announced + Season 2 Stat Reallocation':[{url:'/lessons/season2-reallocation.html', label: 'Season 2 reallocation'}], 
   'Final Proposal Verification': '/lessons/proposal-verification.html',
   'Building and Solving Linear Equations': '/lessons/day13-linear-equations.html',
@@ -97,6 +100,9 @@ const ACTIVITY_LESSONS = {
   ],
   'Distance Lab worksheet': { url: '/lessons/distance-lab-worksheet.html', label: 'Distance Lab worksheet' },
   'Target Challenge — Precision Final': { url: '/lessons/target-challenge-worksheet.html', label: 'Target Challenge worksheet' },
+  // Model Swap + Percent Change live with the other Day 14 entries above.
+  'Post-Task Diagnostic': { url: '/activities/diagnostic-post/index.html', label: 'Post-Task Diagnostic' },
+  'Post-Reflection Survey': { url: '/activities/reflection-post/index.html', label: 'Post-Reflection Survey' },
 };
 
 // Normalize mapping values into an array of { url, label } objects.
