@@ -121,8 +121,8 @@ const CONFIG = {
   // to the student's device, with a notice telling them to see the facilitator.
   lessonCollectEndpoint: {
     NY1: "https://script.google.com/macros/s/AKfycbxGlUwKlE5b-TX1ZZdsndDbf8B7qNIAtOIkCh8zo_6D71gMvTpfnvsslbRVpfbiqvVx/exec",   // Gotham Tech
-    NY2: "",   // Claremont International HS
-    NY3: "",   // South Bronx Community
+    NY2: "https://script.google.com/macros/s/AKfycbzAR665qHzkyrir6BXrCbxyeq3nMbpktCYiE_TbqxXlM4ICYjp0ilDUp3VWn0TPLg2F/exec",   // Claremont International HS
+    NY3: "https://script.google.com/macros/s/AKfycbyTOT26KYSKCgQAi8HhpSuBZSHdAdQ6QigTjhxiQ2wrHyxh84e0Gpn6d5cZjGM0dkGCkw/exec",   // South Bronx Community
     TN:  "",   // Crosstown
   }
 
