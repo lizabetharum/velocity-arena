@@ -575,7 +575,7 @@ const DAYS_DEFAULT = [
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
         
         "makecode": [
-         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "NEW: Update this Program after completing Launch Test simple (click MakeCode link in upper right corner)" }
+         { "url": "https://makecode.microbit.org/_0iWbF3HUa93s", "label": "NEW: Update this Program after completing Launch Test simple (click MakeCode link in upper right corner)" }
         ],
         "script":[
           {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"}

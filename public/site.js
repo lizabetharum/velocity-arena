@@ -31,15 +31,28 @@ function setSelectedSite(code) {
 // siteCode ("NY1" | "NY2" | "NY3" | "TN") picks that site's start date from
 // CONFIG.siteStartDates. If omitted, falls back to the site saved in
 // localStorage via the header picker, then to CONFIG.startDate.
+//
+// The array is as long as the LOADED SCHEDULE (DAYS.length — 16 for all four
+// 2026 pilots), not a hardcoded 20. It used to always build 20, which meant
+// the four days after a site's last real camp day still looked like valid camp
+// days: getCampInfo() in today.html matched today against date 17-20, returned
+// a day number with no matching entry in DAYS, and renderDay() then threw on
+// `day.week`. The "Camp has ended" branch existed but could never fire. TN hit
+// this first (camp ended 2026-07-23); every site hits it the day after its own
+// Day 16.
+//
+// Falls back to 20 when DAYS isn't loaded — the diagnostic-post pages don't
+// load days.js and index this array at [19], so they keep their old behaviour.
 function buildCampDates(siteCode) {
   const code = siteCode || getSelectedSite();
   const siteStart = code && CONFIG.siteStartDates && CONFIG.siteStartDates[code];
   const startISO = siteStart || CONFIG.startDate;
   const start = new Date(startISO + 'T00:00:00');
   const holidaySet = new Set(CONFIG.holidays || []);
+  const total = (typeof DAYS !== 'undefined' && DAYS.length) ? DAYS.length : 20;
   const dates = [];
   let d = new Date(start);
-  while (dates.length < 20) {
+  while (dates.length < total) {
     const dow = d.getDay();
     const iso = d.toISOString().slice(0, 10);
     // Mon(1)–Thu(4) are camp days; skip Fri/Sat/Sun and holidays.
