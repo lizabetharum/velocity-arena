@@ -135,7 +135,7 @@ const GOTHAM_DAY_14 = {
       "link": "/resources/teacher-guides/launch-and-score-format.html",
       "makecode": [
         { "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" },
-        { "url": "https://makecode.microbit.org/S31221-80355-24737-48760", "label": "FULL GAME CODE — complete match program (calibrate W/B/goal, press A twice)" },
+        { "url": "https://makecode.microbit.org/_0iWbF3HUa93s", "label": "FULL GAME CODE — complete match program (calibrate W/B/goal, press A twice)" },
         { "url": "/resources/teacher-guides/game-launch-setup.html", "label": "Full game code — which lines to change: stats 1352-1355, launch 177/181/184/188" }
       ]
     },
