@@ -61,7 +61,24 @@ const ACTIVITY_LESSONS = {
 
   'Formula Relay: All Five Types in One Race':
 [{url: "/lessons/formula-race-cards.html", label:"Formula Race Cards"}],
-  'Season 1 Match Day 3': {url: '/lessons/match-day-3.html', label: 'The 20% Gap Rule'},
+  // Match-day walkthrough — the order of the five sheets plus logging the
+  // result in the dashboard. Only on the Season 1 round-robin days: those are
+  // the ones that hand out this exact sheet set (Prediction, Live Event Log,
+  // Post-Match page 1, Match Data Log, Rule Log). The Season 2 match days use
+  // a different single worksheet, so linking it there would misdirect.
+  'Pre-Match Prediction Huddle': [
+    { url: '/lessons/match-day-steps.html', label: 'Match day — what to fill in, and when' },
+  ],
+  'Season 1 Round-Robin Matches, Day 1': [
+    { url: '/lessons/match-day-steps.html', label: 'Match day — what to fill in, and when' },
+  ],
+  'Season 1 Match Day 2': [
+    { url: '/lessons/match-day-steps.html', label: 'Match day — what to fill in, and when' },
+  ],
+  'Season 1 Match Day 3': [
+    { url: '/lessons/match-day-3.html',     label: 'The 20% Gap Rule' },
+    { url: '/lessons/match-day-steps.html', label: 'Match day — what to fill in, and when' },
+  ],
   "Leaderboard Reveal + Open Lab":[{url:"/lessons/leaderboard-chase-builder.html" , label:"Prepare for tomorrow's scavenger hunt"}],
   'Season 1 Final Round':{url:'/lessons/analysis-block.html', label: 'Season 1 Analysis Block'},
   'Distance Formula: How Far Did the Ball Travel': '/lessons/day10-distance-formula.html',
