@@ -34,7 +34,11 @@ body{font-family:var(--font-sans);background:var(--body-bg);color:var(--text);mi
 
 /* NAV */
 .site-nav{background:var(--navy);border-bottom:0.0625rem solid var(--border);}
-.nav-inner{max-width:90rem;margin:0 auto;padding:0 2rem;display:flex;gap:0;}
+/* flex-wrap is load-bearing: the nav links are white-space:nowrap, so without
+   it the row stays on one line (~1025px) and drags every page that uses this
+   stylesheet into horizontal scroll on a phone. Kept in sync with the same
+   rule in styles/site-header.css. */
+.nav-inner{max-width:90rem;margin:0 auto;padding:0 2rem;display:flex;gap:0;flex-wrap:wrap;}
 .nav-link{font-size:0.6875rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.04em;padding:0.875rem 0.75rem 1.125rem;border-bottom:0.1875rem solid transparent;text-decoration:none;display:block;transition:color .15s;white-space:nowrap;}
 .nav-link:hover{color:var(--white);}
 .nav-link.active{color:var(--cyan);border-bottom-color:var(--cyan);}
@@ -142,9 +146,44 @@ body{font-family:var(--font-sans);background:var(--body-bg);color:var(--text);mi
 .site-footer a:hover{text-decoration:underline;}
 
 /* RESPONSIVE */
+
+/* Tablets and small windows: shrink the header chrome before it gets tight. */
+@media(max-width:48rem){
+  .header-inner{flex-wrap:wrap;padding:1.25rem 1rem 0;gap:0.875rem;}
+  .logo-name{font-size:1.875rem;}
+  .nav-inner{padding:0 0.5rem;}
+  .nav-link{padding:0.75rem 0.625rem 0.875rem;}
+}
+
 @media(max-width:40rem){
-  .header-inner{flex-direction:column;align-items:flex-start;}
+  /* Keep the header short. Unshrunk it ran 525px on a 390x844 phone — 62% of
+     the screen before a single word of the day's plan. */
+  .site-header{padding-bottom:0.875rem;}
+  .header-inner{flex-direction:column;align-items:stretch;padding:0.875rem 0.875rem 0;gap:0.625rem;}
   .header-robot{display:none;}
+  .logo-program{font-size:0.5625rem;letter-spacing:.06em;margin-bottom:0.25rem;}
+  .logo-name{font-size:1.5rem;}
+  .logo-sub{display:none;}          /* long strapline wraps to 3+ lines */
+
+  /* The right-hand cluster (site picker + partner logo + robot) is a bare
+     inline-styled div with no class, so it's reached as a child. Left alone
+     it measures ~426px and overflows a 390px phone on its own. Site picker
+     and partner logo share one row rather than stacking. */
+  .header-inner > div{width:100%;display:flex;align-items:flex-end;gap:0.75rem;}
+  .site-picker{flex:1 1 auto;min-width:0;gap:0.1875rem;}
+  .site-picker label{font-size:0.5625rem;}
+  .site-picker select{width:100%;min-width:0;padding:0.5625rem 0.625rem;font-size:1rem;}
+  /* !important because the partner logo carries an inline height:48px from
+     renderHeader() in site.js, which would otherwise win and squeeze the site
+     picker until the site name truncates. */
+  .header-inner > div img{height:28px !important;flex-shrink:0;}
+
+  /* Tighter nav rows, but each link still clears the 44px touch minimum.
+     Deliberately px, not rem: html{font-size} is 26px here and 21px on
+     today.html, so a rem value would land ~30-60% off the intended target. */
+  .nav-link{padding:0 0.5rem;font-size:0.625rem;letter-spacing:.02em;
+    min-height:44px;display:flex;align-items:center;}
+
   .resource-grid{grid-template-columns:1fr;}
   .stat-row{grid-template-columns:1fr 1fr;}
   .week-grid{grid-template-columns:1fr;}

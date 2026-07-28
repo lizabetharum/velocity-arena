@@ -9,6 +9,15 @@
 <style>
 /* smaller global text on this page */
 html{font-size:21px;}
+/* The whole page is sized in rem off that 21px root, which is tuned for a
+   classroom screen. On a phone it makes every box ~30% larger than it needs
+   to be — the header alone ran 62% of a 390x844 viewport. Scaling the root
+   shrinks the entire layout proportionally, which keeps the design intact
+   instead of overriding sizes box by box.
+   (rem in a media *query* is always 16px-based, so these breakpoints stay
+   640px / 768px regardless of the root above.) */
+@media(max-width:48rem){ html{font-size:18px;} }
+@media(max-width:40rem){ html{font-size:16px;} }
 
 /* ── ZOOM STRIP ─────────────────────────────────────────────────────────── */
 .zoom-strip{background:var(--navy2);border-bottom:0.0625rem solid var(--card-border);}
@@ -194,8 +203,73 @@ html{font-size:21px;}
 .today-split .act-name{font-size:0.8125rem;}
 .today-split .act-block{font-size:0.5625rem;}
 .today-split .act-lesson-link{font-size:0.6875rem;margin-top:0.25rem;}
-@media (max-width: 480px){
+/* Were inline styles; moved to classes so the media queries below can
+   restack them (an inline grid-template-columns beats any stylesheet rule). */
+.tip-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;}
+.week-card-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.375rem;}
+
+/* ── PHONES / NARROW WINDOWS ───────────────────────────────────────────────
+   The split view and every two-column row on this page are fixed-width grids
+   (9rem label + content, 5-across day strips). Below ~768px those columns eat
+   most of a phone screen and the text column collapses to a few characters,
+   so they stack or shrink here. Nothing above 768px changes. */
+
+@media (max-width: 768px){
   .today-split{grid-template-columns:1fr;gap:1.5rem;}
+
+  /* Label/value rows: put the label above its value instead of beside it. */
+  .tc-row,
+  .today-split .tc-row{grid-template-columns:1fr;gap:0.25rem;}
+  .act-pill,
+  .today-split .act-pill{grid-template-columns:1fr;gap:0.25rem;}
+  .act-pill-block{white-space:normal;}
+
+  /* At phone width the split-view type shrinks to ~12px; restore it once the
+     columns are stacked and there's room again. */
+  .today-split .act-pill{font-size:0.8125rem;line-height:1.5;}
+  .today-split .tc-row{padding:0.875rem 1rem;}
+  .today-split .exit-q{font-size:0.875rem;}
+  .today-split .act-block{font-size:0.625rem;}
+  .today-split .act-lesson-link{font-size:0.8125rem;}
+
+  .hero{padding:1.25rem 1.25rem;}
+  .hero-theme{font-size:1.375rem;}
+  .hero-actions{gap:0.5rem;}
+  .hero-actions > *{flex:1 1 auto;text-align:center;}
+
+  /* Week strips: 5 across is unreadable on a phone. */
+  .wf-days,
+  .week-pip-row{grid-template-columns:repeat(2,1fr);gap:0.5rem;}
+
+  /* Residual log is a 5-column table; let it scroll rather than squash. */
+  .log-rows{overflow-x:auto;}
+  .log-row{min-width:26rem;}
+
+  .formula-grid{grid-template-columns:1fr;}
+  .tip-grid-3{grid-template-columns:1fr;}
+  .week-card-row{grid-template-columns:repeat(2,1fr);}
+  .exit-btns{flex-wrap:wrap;}
+  .exit-btns > *{flex:1 1 auto;}
+
+  /* Comfortable touch targets — several links/buttons sat under 32px tall.
+     The lesson links matter most: they're how students open their worksheet,
+     and they sit stacked close together under each activity. */
+  /* .nav-link is sized in style.css with the rest of the shared header —
+     setting it here too stacked min-height on top of its padding. */
+  .btn-primary,
+  .btn-outline,
+  .exit-btns > *{min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
+  .act-lesson-link,
+  .today-split .act-lesson-link{min-height:44px;display:inline-flex;align-items:center;
+    padding:0.25rem 0;margin-top:0.125rem;}
+}
+
+@media (max-width: 480px){
+  .hero-theme{font-size:1.1875rem;}
+  .hero-math{font-size:0.875rem;}
+  .wf-days,
+  .week-pip-row{grid-template-columns:1fr;}
+  .hero-actions > *{flex:1 1 100%;}
 }
 
 /* ── OFFDAY ─────────────────────────────────────────────────────────────── */
@@ -490,7 +564,7 @@ html{font-size:21px;}
               <div class="dt-card-chevron">▾</div>
             </div>
             <div class="dt-card-body">
-              <div class="tip-box" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem">
+              <div class="tip-box tip-grid-3">
                 <div>
                   <div class="tip-label" style="color:var(--green)">Analyst</div>
                   <div style="font-size:0.8125rem;color:var(--white);line-height:1.5">Knows the numbers. Ask about predictions and residuals.</div>
@@ -877,7 +951,7 @@ function buildWeekGrid(currentDay) {
     }).join('');
     return `<div style="margin-bottom:1rem">
       <div style="font-size:.75rem;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">${w.label}</div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.375rem">${cards}</div>
+      <div class="week-card-row">${cards}</div>
     </div>`;
   }).join('');
 }
