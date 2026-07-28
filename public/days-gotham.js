@@ -130,11 +130,13 @@ const GOTHAM_DAY_14 = {
       "name": "Launch-and-Score (competition)",
       "mins": 45,
       "block": "Match-Build-Make",
-      "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, no re-tuning between them — your numbers are locked in from warm-up — most goals of 5 wins. It can't come out 0-0.",
-      "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches (adjust and re-download freely here), then 5 scored launches per team with no re-tuning during the scored round — the four numbers are locked in from warm-up. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to center. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format.",
+      "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, no re-tuning between them — your numbers are locked in from warm-up — most goals of 5 wins. It can't come out 0-0. Moving up to the FULL GAME CODE? It plays a whole match on its own — you set your four stats (lines 1352-1355) and your four launch numbers: lines 181 and 188 for how far it drives, 177 and 184 for the angles it turns.",
+      "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches (adjust and re-download freely here), then 5 scored launches per team with no re-tuning during the scored round — the four numbers are locked in from warm-up. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to center. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format. Teams ready for more move to the FULL GAME CODE — the complete match program (launch, roam, find the ball, kick, stay in bounds). It needs W/B/goal calibration and only six numbers change: the four stats on lines 1352-1355 and the four launch numbers on 177/181/184/188. The setup page walks students through each one.",
       "link": "/resources/teacher-guides/launch-and-score-format.html",
-      "makecode": [{ "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" }
-        
+      "makecode": [
+        { "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" },
+        { "url": "https://makecode.microbit.org/S31221-80355-24737-48760", "label": "FULL GAME CODE — complete match program (calibrate W/B/goal, press A twice)" },
+        { "url": "/resources/teacher-guides/game-launch-setup.html", "label": "Full game code — which lines to change: stats 1352-1355, launch 177/181/184/188" }
       ]
     },
 
