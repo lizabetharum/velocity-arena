@@ -116,7 +116,7 @@ const GOTHAM_DAY_14 = {
       "link": "/lessons/launch-sequence-worksheet.html",
       "makecode": [
         { "url": "https://makecode.microbit.org/_d2XTEwUP80uz", "label": "Starter Code with Kick Practice — set stats + 4 numbers, press A (no calibration)" },
-        { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test — walkthrough instructions" }
+        { "url": "/resources/teacher-guides/launch-test.html", "label": "NEW: Update this Program after completing previous Starter Code with Kick Practice (clickMakeCode link in upper right corner)" }
         ]
     },
     {
@@ -133,8 +133,7 @@ const GOTHAM_DAY_14 = {
       "description": "Put your launch to the test against the other teams. Same field for everyone — same corner, ball spot, and goal. Five launches, no re-tuning between them — your numbers are locked in from warm-up — most goals of 5 wins. It can't come out 0-0.",
       "facilitatorDescription": "The friendly competition that uses the launch teams built this morning. Set ONE fair field: same corner, ball spot, and goal width for all. A few warm-up launches (adjust and re-download freely here), then 5 scored launches per team with no re-tuning during the scored round — the four numbers are locked in from warm-up. A launch scores when the ball crosses the goal line; one neutral ref calls it. Most goals of 5 wins; tie = sudden-death closest to center. If a team's kick won't land, they compete on closest approach so they still get a fair turn. Rules + a printable scoreboard are in the Launch-and-Score format.",
       "link": "/resources/teacher-guides/launch-and-score-format.html",
-      "makecode": [{ "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" },
-         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "Update this Program after completing previous (MakeCode link in upper right corner)" }
+      "makecode": [{ "url": "/resources/teacher-guides/launch-and-score-format.html", "label": "Launch-and-Score — rules + scoreboard" }
         
       ]
     },
