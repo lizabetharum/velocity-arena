@@ -559,6 +559,10 @@ const DAYS_DEFAULT = [
           {url: "https://docs.google.com/document/d/10tYb3mtXpHfbFy4Y6HHhJmP0NN0dBbG9crw59XQaq_E/edit?usp=drive_link", label: "Script"}
         ],
         "worksheet":"https://drive.google.com/file/d/12wQ4G8t6jRv9rQ-ArWou8l2Ety60gRwc/view?usp=drive_link",
+        "makecode": [
+        { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "NEW: Launch Test simple code— set stats + 4 numbers in launch, press A (no calibration)" },
+        { "url": "/resources/teacher-guides/launch-test.html", "label": "NEW: Launch Test simple— walkthrough instructions" }
+        ],
         "exemplar":"https://velocity-arena-gold.vercel.app/resources/teacher-guides/exemplars/VA_Exemplar_W2_D6_Field_Geometry_Worksheet_Exemplars.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day06-03-field-geometry-approach.html"
       },
@@ -571,9 +575,7 @@ const DAYS_DEFAULT = [
         "worksheet":"https://drive.google.com/file/d/1VzbAcbRjnR7msfgj64VVwI092OdGHi-P/view?usp=drive_link",
         
         "makecode": [
-        { "url": "https://makecode.microbit.org/S79351-84573-26399-92910", "label": "Launch Test simple code— set stats + 4 numbers in launch, press A (no calibration)" },
-        { "url": "/resources/teacher-guides/launch-test.html", "label": "Launch Test simple— walkthrough instructions" },
-         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "For After when you want to combine launch with gameCode (update ZONE A + B , includes W/B/goal calibration)" }
+         { "url": "https://makecode.microbit.org/_g7T87XUFzHJz", "label": "NEW: Update this Program after completing Launch Test simple (click MakeCode link in upper right corner)" }
         ],
         "script":[
           {url: "https://docs.google.com/document/d/1Rc5LTyZ-DiKI3uFtoPhbc5ZplUPDeTCK2HRk1XGjISs/edit?usp=sharing", label: "Script"}
