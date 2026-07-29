@@ -49,15 +49,16 @@ const ACTIVITY_LESSONS = {
 [{url: "https://velocity-arena-gold.vercel.app/resources/formula-race-cards.html", label:"Prepare Formula Race Cards"}],
 
 'Field Geometry + Approach Planning':[
-  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template"},
+  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template (old)"},
  
-  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
-  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
+  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help (old)"},
+  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice (old)"}],
 'Launch Sequence Programming + Testing':[
-  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template"},
+  {url:"/resources/teacher-guides/game-launch-setup.html", label:"Match Code — set stats + launch"},
+  {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template (old)"},
  
- {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help"},
-  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice"}],
+ {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help (old)"},
+  {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice (old)"}],
 
   'Formula Relay: All Five Types in One Race':
 [{url: "/lessons/formula-race-cards.html", label:"Formula Race Cards"}],
