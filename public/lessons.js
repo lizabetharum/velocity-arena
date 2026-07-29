@@ -54,7 +54,7 @@ const ACTIVITY_LESSONS = {
   {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help (old)"},
   {url:"/resources/launch-sequences.html", label:"Launch Sequence Practice (old)"}],
 'Launch Sequence Programming + Testing':[
-  {url:"/resources/teacher-guides/game-launch-setup.html", label:"Match Code — set stats + launch"},
+  {url:"/resources/teacher-guides/game-launch-setup.html", label:"Match Code INSTRUCTIONS — set stats + launch"},
   {url:"/lessons/launchsequence-designer.html", label:"Launch Sequence Designer Template (old)"},
  
  {url:"/resources/launch-sequence-help.html", label:"Launch Sequence Help (old)"},
