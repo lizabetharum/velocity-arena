@@ -262,17 +262,30 @@ async function scoreNewSubmissions() {
   btn.textContent = 'Scoring…';
   status.textContent = 'Grading with Claude (may take ~1 min for many submissions)…';
 
+  // Grade in small batches so each request stays under the serverless
+  // function timeout (~10s), looping until a batch grades fewer than a full
+  // round — i.e. nothing new is left. Each fetch is a fresh invocation with
+  // its own time budget, so this scores any number of submissions per click.
+  const PER_ROUND = 6;
+  const MAX_ROUNDS = 60;          // safety cap: up to ~360 submissions per click
+  let total = 0;
+  const allErrors = [];
+
   try {
-    const res = await fetch('/api/score-diagnostic?max=100');
-    const data = await res.json();
-    if (!res.ok || !data.ok) throw new Error(data.error || 'Scoring failed');
-    status.textContent = `Scored ${data.scored} submission${data.scored === 1 ? '' : 's'}. Refreshing…`;
-    if (data.errors && data.errors.length) {
-      console.warn('score errors:', data.errors);
+    for (let round = 0; round < MAX_ROUNDS; round++) {
+      status.textContent = `Grading with Claude… ${total} scored so far`;
+      const res = await fetch('/api/score-diagnostic?max=' + PER_ROUND);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Scoring failed');
+      total += data.scored || 0;
+      if (data.errors && data.errors.length) allErrors.push(...data.errors);
+      if ((data.scored || 0) < PER_ROUND) break;   // ran out of unscored rows
     }
+    status.textContent = `Scored ${total} submission${total === 1 ? '' : 's'}. Refreshing…`;
+    if (allErrors.length) console.warn('score errors:', allErrors);
     await loadData();
   } catch (err) {
-    status.textContent = 'Scoring error: ' + err.message;
+    status.textContent = `Scoring error after ${total} scored: ${err.message}`;
   } finally {
     btn.disabled = false;
     btn.textContent = originalText;
