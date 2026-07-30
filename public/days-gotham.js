@@ -253,7 +253,8 @@ const GOTHAM_DAY_16 = {
       "block": "Match-Build-Make",
       "description": "Visitors try your Target Challenge: your team teaches them to use your equation to stop the bot on the line. They also do the three mini-challenge cards. Fill the Visitor Completion Tracker as you go.",
       "facilitatorDescription": "Each team teaches visitors their live Target Challenge — predict the drive time from the equation, then hit the taped line. Visitors also work the three printed mini-challenge cards (unit rate, coordinate plotting, proportional scaling — content from weeks 1-3). Fill the Visitor Completion Tracker: did the visitor succeed after ONE explanation? Stay out of it — the students teach. This is Goal 4, and it does not depend on soccer. Optional: GO teams (from the morning check) may run a Demo Your Launch station — a demonstration, not a contest, so it stays consistent with the no-awards close.",
-      "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html"
+      "link": "/resources/teacher-guides/day16-visitor-challenge-cards.html",
+      "worksheet": [{ "url": "https://drive.google.com/file/d/1BYobzlOQRuSXn5oFmjynSbnk1h4ZVCyX/view?usp=drive_link", "label": "Day 16 Visitor Challenge Handout" }]
     },
     {
       "name": "Lunch",
