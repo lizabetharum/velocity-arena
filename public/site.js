@@ -52,11 +52,14 @@ function buildCampDates(siteCode) {
   const total = (typeof DAYS !== 'undefined' && DAYS.length) ? DAYS.length : 20;
   const dates = [];
   let d = new Date(start);
+  // Camp days are Mon(1)–Thu(4) at most sites. Claremont (NY2) runs its 4-day
+  // close-out Tue(2)–Fri(5), so it uses a shifted weekday window.
+  const loDow = code === 'NY2' ? 2 : 1;
+  const hiDow = code === 'NY2' ? 5 : 4;
   while (dates.length < total) {
     const dow = d.getDay();
     const iso = d.toISOString().slice(0, 10);
-    // Mon(1)–Thu(4) are camp days; skip Fri/Sat/Sun and holidays.
-    if (dow >= 1 && dow <= 4 && !holidaySet.has(iso)) {
+    if (dow >= loDow && dow <= hiDow && !holidaySet.has(iso)) {
       dates.push(new Date(d));
     }
     d.setDate(d.getDate() + 1);

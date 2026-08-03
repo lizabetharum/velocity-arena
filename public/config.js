@@ -25,7 +25,7 @@ const CONFIG = {
   // skipping weekends and any holidays listed below.
   siteStartDates: {
     NY1: "2026-07-06",   // Gotham Tech
-    NY2: "2026-07-20",   // Claremont International HS (shifted +1 week: missed most of the Jul 20–23 week, resuming at Day 5 on Mon Jul 27)
+    NY2: "2026-08-04",   // Claremont International HS — 4-day close-out (Distance Lab), Tue Aug 4 – Fri Aug 7
     NY3: "2026-07-27",   // South Bronx Community
     TN:  "2026-06-29",   // Tennessee
   },
