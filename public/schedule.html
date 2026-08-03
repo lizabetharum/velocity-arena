@@ -198,7 +198,10 @@ const campDates = (typeof buildCampDates === 'function') ? buildCampDates() : []
     SITE_OPTIONS.map(o => `<option value="${o.code}"${o.code === current ? ' selected' : ''}>${o.label}</option>`).join('');
 })();
 
-const TOTAL_DAYS = (DAYS && DAYS.length) || 20;
+const _sp = new URLSearchParams(location.search);
+const FULL16 = _sp.get('full') === '16' && typeof DAYS_NY1 !== 'undefined' && DAYS_NY1.length > 0;
+const VDAYS = FULL16 ? DAYS_NY1 : DAYS;
+const TOTAL_DAYS = (VDAYS && VDAYS.length) || 20;
 
 // Derive weeks from DAYS so per-site overrides (e.g. TN Showcase Week)
 // flow through. Falls back to the 20-day defaults if a week is empty.
@@ -208,21 +211,24 @@ const DEFAULT_WEEK_NAMES = {
   3: 'Season 2 + Commissioner',
   4: 'Season 2 + Exhibition',
 };
-const weeks = [1, 2, 3, 4].map(num => {
-  const first = DAYS.find(d => d.week === num);
-  return { num, name: (first && first.weekName) || DEFAULT_WEEK_NAMES[num] };
+const weekNums = [...new Set(VDAYS.map(d => d.week))].sort((a, b) => a - b);
+const weeks = (weekNums.length ? weekNums : [1, 2, 3, 4]).map(num => {
+  const first = VDAYS.find(d => d.week === num);
+  return { num, name: (first && first.weekName) || DEFAULT_WEEK_NAMES[num] || ('Week ' + num) };
 });
 
 // ── Heading / meta / grid columns ─ site-aware ─────────────────
 (function () {
-  const NUM_WORDS = { 16: 'Sixteen', 20: 'Twenty' };
-  const word = NUM_WORDS[TOTAL_DAYS] || TOTAL_DAYS;
+  const NUM_WORDS = { 1:'One', 2:'Two', 3:'Three', 4:'Four', 5:'Five', 16: 'Sixteen', 20: 'Twenty' };
+  const dayWord = NUM_WORDS[TOTAL_DAYS] || TOTAL_DAYS;
+  const wkN = weeks.length;
+  const wkWord = NUM_WORDS[wkN] || wkN;
   const h = document.getElementById('schedule-heading');
-  if (h) h.textContent = `${word} days. Four weeks.`;
+  if (h) h.textContent = `${dayWord} days. ${wkWord} week${wkN === 1 ? '' : 's'}.`;
   const meta = document.getElementById('schedule-meta');
-  if (meta) meta.textContent = `04 WEEKS · ${String(TOTAL_DAYS).padStart(2, '0')} DAYS`;
-  // 16 days → 4 cols, 20 days → 5 cols (default)
-  const cols = TOTAL_DAYS === 16 ? 4 : 5;
+  if (meta) meta.textContent = `${String(wkN).padStart(2, '0')} WEEK${wkN === 1 ? '' : 'S'} · ${String(TOTAL_DAYS).padStart(2, '0')} DAYS`;
+  // <=5 days -> one col per day; 16 -> 4 cols; else 5
+  const cols = TOTAL_DAYS <= 5 ? TOTAL_DAYS : (TOTAL_DAYS === 16 ? 4 : 5);
   document.documentElement.style.setProperty('--days-per-week', cols);
   // Site-aware daily structure: Crosstown runs 8:00–12:00 with a 20-min snack break;
   // NYC sites run 10:00–2:45 with a 60-min lunch.
@@ -309,6 +315,7 @@ function campDayContext() {
 const ctx = campDayContext();
 
 function stateFor(dayNum) {
+  if (FULL16) return '';
   if (!ctx || ctx.status === 'before') return 'is-future';
   if (ctx.status === 'after') return 'is-past';
   if (ctx.status === 'weekend') {
@@ -322,22 +329,24 @@ function stateFor(dayNum) {
 
 const grid = document.getElementById('schedule-grid');
 grid.innerHTML = weeks.map(w => {
-  const days = DAYS.filter(d => d.week === w.num);
+  const days = VDAYS.filter(d => d.week === w.num);
   const cards = days.map(d => {
-    const weekday = (typeof campDayWeekday === 'function' && campDates.length)
+    const weekday = (!FULL16 && typeof campDayWeekday === 'function' && campDates.length && campDates[d.day - 1])
       ? campDayWeekday(campDates, d.day)
       : '';
     const state = stateFor(d.day);
     const milestone = MILESTONES[d.day];
+    const tag = FULL16 ? 'div' : 'a';
+    const href = FULL16 ? '' : ` href="/day.html?day=${d.day}"`;
     return `
-      <a class="day-card ${state}" href="/day.html?day=${d.day}">
+      <${tag} class="day-card ${state}"${href}>
         <div class="dc-top">
           <div class="dc-num">${String(d.day).padStart(2, '0')}</div>
           <div class="dc-day">${weekday}</div>
         </div>
         <div class="dc-theme">${d.theme || ''}</div>
         ${milestone ? `<div class="dc-milestone">${milestone}</div>` : ''}
-      </a>`;
+      </${tag}>`;
   }).join('');
 
   return `
@@ -350,10 +359,23 @@ grid.innerHTML = weeks.map(w => {
     </div>`;
 }).join('');
 
+(function () {
+  const grid = document.getElementById('schedule-grid');
+  if (!grid) return;
+  const site = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+  const st = 'display:block;margin:6px 0 18px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font:600 13px/1.5 var(--font-sans);color:var(--fg-1);';
+  const a = 'color:var(--accent);font-weight:700;text-decoration:none;';
+  let html = '';
+  if (FULL16) html = `<div style="${st}">Full 16-day reference plan (all four weeks). <a style="${a}" href="/schedule.html">&larr; Back to the current site&rsquo;s schedule</a></div>`;
+  else if (site === 'NY2') html = `<div style="${st}">Claremont is running the 4-day close-out. <a style="${a}" href="/schedule.html?full=16">See the full 16-day program &rarr;</a></div>`;
+  if (html) grid.insertAdjacentHTML('beforebegin', html);
+})();
+
 // ── Day pill in topnav ───────────────────────────────────────
 (function () {
   const el = document.getElementById('day-pill');
   if (!el) return;
+  if (FULL16) { el.innerHTML = 'FULL 16-DAY PLAN'; return; }
   if (!ctx) { el.innerHTML = 'STUDENT'; return; }
   if (ctx.status === 'today' && ctx.day) {
     el.innerHTML = `STUDENT · DAY <b>${ctx.day}</b> / ${TOTAL_DAYS}`;
