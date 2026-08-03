@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teach a Visitor — Community Exhibition</title>
+<style>
+  :root{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EFF2F4; --shade:#E4E9EC;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#D6DCE0; --line-strong:#9AA4AC; --rule:#14181C;
+    --teal:#0B7A8C; --teal-deep:#075867;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#10151A; --card:#161C22; --band:#1B232B; --shade:#232D36;
+      --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+      --line:#28323B; --line-strong:#4A5661; --rule:#EAEEF1;
+      --teal:#3FC5DA; --teal-deep:#7FE0EF; }
+  }
+  :root[data-theme="light"]{--paper:#F6F8F9;--card:#FFFFFF;--band:#EFF2F4;--shade:#E4E9EC;--ink:#14181C;--ink-2:#3C444B;--ink-3:#6B747C;--line:#D6DCE0;--line-strong:#9AA4AC;--rule:#14181C;--teal:#0B7A8C;--teal-deep:#075867;}
+  :root[data-theme="dark"]{--paper:#10151A;--card:#161C22;--band:#1B232B;--shade:#232D36;--ink:#EAEEF1;--ink-2:#AEB7BF;--ink-3:#7E8891;--line:#28323B;--line-strong:#4A5661;--rule:#EAEEF1;--teal:#3FC5DA;--teal-deep:#7FE0EF;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+  .bar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 20px;}
+  .bar .back{font:600 11px/1 var(--sans);color:var(--teal);text-decoration:none;}
+  .bar .t{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+  .bar .sp{flex:1;}
+  .btn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:6px;padding:8px 12px;cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+
+  .sheet{max-width:740px;margin:0 auto;padding:22px 20px 70px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 30px 22px;}
+
+  .head{border-bottom:3px solid var(--rule);padding-bottom:10px;margin-bottom:10px;}
+  .eyebrow{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:0 0 8px;}
+  h1{font:800 26px/1.1 var(--sans);letter-spacing:-.02em;margin:0;}
+  .who{display:flex;gap:20px;flex-wrap:wrap;margin-top:11px;font:600 14px/2 var(--sans);color:var(--ink-2);}
+  .who span{flex:1;min-width:170px;}
+
+  .flow{display:flex;gap:8px;margin:12px 0 4px;}
+  .flow .s{flex:1;border:2px solid var(--line-strong);border-radius:9px;padding:9px 10px;text-align:center;}
+  .flow .s .n{font:800 10px/1 var(--mono);color:var(--teal-deep);letter-spacing:.1em;}
+  .flow .s .l{font:800 13.5px/1.25 var(--sans);color:var(--ink);margin-top:5px;}
+  .flow .s .d{font:400 11.5px/1.3 var(--sans);color:var(--ink-3);margin-top:3px;}
+
+  h2{font:800 17px/1.2 var(--sans);margin:20px 0 6px;color:var(--ink);
+     border-top:2px solid var(--rule);padding-top:11px;display:flex;align-items:baseline;gap:10px;}
+  h2 .n{font:800 12px/22px var(--mono);background:var(--ink);color:var(--card);border-radius:5px;
+        min-width:22px;text-align:center;padding:0 6px;flex-shrink:0;}
+
+  p{margin:0 0 8px;color:var(--ink-2);font-size:14.5px;}
+  .lead{color:var(--ink);font-weight:600;}
+  b{color:var(--ink);}
+
+  .fill{display:inline-block;min-width:60px;border-bottom:2px solid var(--ink);margin:0 4px;height:1.35em;vertical-align:baseline;}
+  .fill.sm{min-width:40px;} .fill.lg{min-width:130px;} .fill.xl{min-width:100%;margin:6px 0;}
+
+  .pick{border:2px solid var(--line-strong);border-radius:10px;padding:12px 14px;margin:9px 0;}
+  .pick .ph{display:flex;align-items:center;gap:9px;font:800 13px/1.2 var(--sans);color:var(--ink);margin-bottom:7px;}
+  .pick .cbx{width:18px;height:18px;border:2px solid var(--ink);border-radius:4px;flex-shrink:0;}
+  .eqline{font:700 17px/1.7 var(--sans);color:var(--ink);}
+  .row{font-size:14.5px;color:var(--ink);margin:6px 0;}
+  .row .lbl{font-weight:700;}
+  .note{font-size:12.5px;color:var(--ink-3);}
+
+  .say{background:var(--band);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:11px 14px;margin:9px 0;}
+  .say .tl{font:800 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep);margin-bottom:7px;}
+  .say p{color:var(--ink);font-size:15px;margin:0;line-height:2;}
+
+  .yn{display:inline-block;border:2px solid var(--ink);border-radius:16px;padding:3px 14px;font:800 13px/1.4 var(--sans);margin:0 6px 6px 0;color:var(--ink);}
+
+  .foot{border-top:3px solid var(--rule);margin-top:16px;padding-top:11px;font:400 12.5px/1.5 var(--sans);color:var(--ink-3);}
+
+  @media print{
+    .bar{display:none;}
+    :root{--paper:#fff;--card:#fff;--band:#f2f2f2;--shade:#e8e8e8;--ink:#000;--ink-2:#000;--ink-3:#333;--line:#999;--line-strong:#000;--rule:#000;--teal:#000;--teal-deep:#000;}
+    html,body{background:#fff;}
+    body{font-size:11.5px;line-height:1.4;}
+    .sheet{max-width:none;margin:0;padding:0;}
+    .card{border:none;border-radius:0;padding:0.4in 0.5in;}
+    @page{size:Letter;margin:0;}
+    h2{break-after:avoid;} .pick,.say,.flow,.who{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="back" href="/teachers.html">← Resources</a>
+  <span class="t">Exhibition · Teach a Visitor</span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Theme</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</div>
+
+<div class="sheet">
+  <div class="card">
+
+    <div class="head">
+      <p class="eyebrow">Velocity Arena · Community Exhibition</p>
+      <h1>Teach a Visitor</h1>
+      <div class="who">
+        <span>Your team: <span class="fill lg"></span></span>
+        <span>Your name: <span class="fill lg"></span></span>
+      </div>
+    </div>
+
+    <p class="lead">Pick one of your equations and teach it to a visitor. Then they try a problem and you check their work. <b>Win = the visitor solves it correctly after just ONE explanation.</b></p>
+
+    <div class="flow">
+      <div class="s"><div class="n">STEP 1</div><div class="l">You teach</div><div class="d">Explain your equation</div></div>
+      <div class="s"><div class="n">STEP 2</div><div class="l">Visitor solves</div><div class="d">They try a problem</div></div>
+      <div class="s"><div class="n">STEP 3</div><div class="l">You correct</div><div class="d">Check it together</div></div>
+    </div>
+
+    <!-- 1 -->
+    <h2><span class="n">1</span> Pick the equation you'll teach</h2>
+    <p>Check <b>one</b> box and fill in <b>your team's own numbers.</b></p>
+    <div class="pick">
+      <div class="ph"><span class="cbx"></span> How far the bot goes</div>
+      <div class="eqline">distance = <span class="fill sm"></span> × time + <span class="fill sm"></span></div>
+      <div class="row note">The first number is your <b>speed</b> (cm per second). The second is your <b>start-up</b> (usually negative).</div>
+    </div>
+    <div class="pick">
+      <div class="ph"><span class="cbx"></span> How long to drive to hit a line</div>
+      <div class="eqline">time = ( target − <span class="fill sm"></span> ) ÷ <span class="fill sm"></span></div>
+      <div class="row note">Fill in your <b>start-up</b>, then your <b>speed</b>. The answer is in seconds — multiply by 1000 for milliseconds.</div>
+    </div>
+
+    <!-- 2 -->
+    <h2><span class="n">2</span> Teach it — say this out loud</h2>
+    <p>Fill the blanks first, then explain it to your visitor <b>once</b>, in your own words.</p>
+    <div class="say"><div class="tl">Your explanation</div>
+      <p>"Our equation is <span class="fill lg"></span>.<br>
+      The number <span class="fill sm"></span> means our bot goes <span class="fill sm"></span> cm every second.<br>
+      The number <span class="fill sm"></span> means <span class="fill lg"></span>.<br>
+      So if you know the <span class="fill"></span>, you can find the <span class="fill"></span>."</p>
+    </div>
+
+    <!-- 3 -->
+    <h2><span class="n">3</span> Now the visitor solves</h2>
+    <p>Give them <b>one</b> number to try. Let them work it out — don't do it for them.</p>
+    <div class="pick">
+      <div class="row"><span class="lbl">The number to try:</span> <span class="fill"></span></div>
+      <div class="row"><span class="lbl">Visitor works it out here:</span></div>
+      <span class="fill xl"></span>
+      <div class="row"><span class="lbl">Visitor's answer:</span> <span class="fill"></span></div>
+    </div>
+
+    <!-- 4 -->
+    <h2><span class="n">4</span> Check it together</h2>
+    <div class="pick">
+      <div class="row"><span class="lbl">The answer should be:</span> <span class="fill"></span></div>
+      <div class="row" style="margin-top:9px;"><span class="lbl">How did they do?</span> <span class="yn">RIGHT</span> <span class="yn">CLOSE</span> <span class="yn">NOT YET</span></div>
+      <div class="row note"><b>If NOT YET:</b> point to the one step they missed, explain just that step, and let them try once more.</div>
+    </div>
+
+    <!-- 5 -->
+    <h2><span class="n">5</span> Did it work? <span class="note" style="font-weight:400;margin-left:6px;">(this is our tracker)</span></h2>
+    <div class="pick">
+      <div class="row"><span class="lbl">Visitor solved it after just ONE explanation?</span></div>
+      <div class="row"><span class="yn">YES</span> <span class="yn">PARTLY</span> <span class="yn">NO</span></div>
+      <div class="row" style="margin-top:8px;"><span class="lbl">Visitor's first name (optional):</span> <span class="fill lg"></span></div>
+      <div class="row note">Thank your visitor — then reset for the next one.</div>
+    </div>
+
+    <div class="foot">Velocity Arena · NYC FIRST · Community Exhibition. One sheet per visitor — grab a new one for each person you teach.</div>
+
+  </div>
+</div>
+
+<script>
+  var root=document.documentElement;
+  var t=document.getElementById('theme');
+  if(t) t.addEventListener('click',function(){
+    var c=root.getAttribute('data-theme');
+    if(!c) c=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+    root.setAttribute('data-theme',c==='dark'?'light':'dark');
+  });
+  var p=document.getElementById('print');
+  if(p) p.addEventListener('click',function(){window.print();});
+</script>
+</body>
+</html>
