@@ -42,62 +42,58 @@ const DAYS_NY2 = [
   },
   {
     "day": 2, "week": 1, "weekName": "Close-Out",
-    "theme": "Percent change + finish the poster",
-    "bigMathIdea": "Quantify your improvement: percent change = (new - old) / old x 100. A better method should shrink your prediction error.",
+    "theme": "Percent change, finish the poster, Skills Arena",
+    "bigMathIdea": "Quantify your improvement: percent change = (new - old) / old x 100. Then sharpen your driving in the Skills Arena.",
     "vocabulary": "PERCENT CHANGE, MODEL COMPARISON — keep/change one thing after seeing another team's equation.",
     "activities": [
       { "name": "Percent Change — the correction", "mins": 45, "block": "Challenge Block",
         "description": "How much did your prediction improve? 'Our first guess was off by ___, our best by ___ — that's a ___% improvement.'",
         "link": "/lessons/gotham-day14-percent-change.html" },
-      { "name": "Finish your poster", "mins": 75, "block": "Challenge Block",
-        "description": "Finish the Canva poster: equation, graph, and your percent-change result. Add a QR code to the shared design; print in b/w on 8.5 x 11 (the QR opens the color version)." },
-      { "name": "Lunch", "mins": 60, "block": "Lunch", "description": "One hour." },
-      { "name": "Compare equations", "mins": 45, "block": "Challenge Block",
+      { "name": "Compare equations", "mins": 30, "block": "Challenge Block",
         "description": "Read another team's equation. Write one thing to keep and one to re-check in your own — citing a number." },
-      { "name": "Open Lab: Skills Arena + catch-up", "mins": 75, "block": "Open Lab",
-        "description": "Finish any lab work, then Skills Arena driving challenges (drive straight, turn exact angles, park on a spot).",
+      { "name": "Finish your poster", "mins": 45, "block": "Challenge Block",
+        "description": "Finish the Canva poster: equation, graph, and your percent-change result. Add a QR to the shared design; print in b/w on 8.5 x 11 (the QR opens the color version)." },
+      { "name": "Lunch", "mins": 60, "block": "Lunch", "description": "One hour." },
+      { "name": "Skills Arena", "mins": 120, "block": "Open Lab",
+        "description": "The whole afternoon: robot driving challenges — drive straight, turn exact angles, park on a spot. Great practice that sharpens the same driving the Distance Lab measured.",
         "link": "/lessons/skills-arena.html" }
     ],
     "ends": "Every team's poster is done and shows a percent-change result."
   },
   {
     "day": 3, "week": 1, "weekName": "Close-Out",
-    "theme": "Practice teaching",
-    "bigMathIdea": "You understand it when you can teach it. Explain your equation so a stranger can use it after ONE explanation.",
-    "vocabulary": "SLOPE, INTERCEPT — the parts of your equation you explain; plain language over jargon.",
+    "theme": "Practice teaching + measure the growth",
+    "bigMathIdea": "You understand it when you can teach it. Explain your equation so a stranger can use it after ONE explanation — then show your growth since Day 1.",
+    "vocabulary": "SLOPE, INTERCEPT — the parts of your equation you explain; GROWTH — Day 1 vs now.",
     "activities": [
       { "name": "Teach the Math", "mins": 60, "block": "Challenge Block",
-        "description": "Each team explains its equation in plain language with its real numbers: what the speed number means, what the start-up number means. Write your one-sentence opener." },
+        "description": "Each team explains its equation in plain language with its real numbers: what the speed number means, what the start-up means. Write your one-sentence opener." },
       { "name": "Teach-back rehearsal", "mins": 60, "block": "Challenge Block",
         "description": "Pair up. One is a confused visitor; the other explains ONCE and lets them try — no rescuing. Fix the sentence that didn't land, then switch." },
       { "name": "Lunch", "mins": 60, "block": "Lunch", "description": "One hour." },
-      { "name": "Set up your exhibition station", "mins": 60, "block": "Challenge Block",
-        "description": "Poster up, bot ready, target line down — staged the way a visitor will meet it. Do one full dry run." },
-      { "name": "Open Lab: Skills Arena (early finishers)", "mins": 60, "block": "Open Lab",
-        "description": "Teams that are ready practice Skills Arena driving challenges or polish their station.",
-        "link": "/lessons/skills-arena.html" }
+      { "name": "Post-Task Diagnostic + Reflection", "mins": 50, "block": "Challenge Block",
+        "description": "12 minutes, individual, silent — then the Reflection. Every student types name, last initial, and team exactly as on Day 1, or their results can't be matched. Protect this; never cut it.",
+        "link": "/activities/diagnostic-post/" },
+      { "name": "Set up your exhibition station", "mins": 70, "block": "Challenge Block",
+        "description": "Poster up, bot ready, target line down — staged the way a visitor will meet it tomorrow. Do one full dry run." }
     ],
-    "ends": "Every student has practiced their explanation once and rewritten the confusing part."
+    "ends": "Every student has practiced their explanation, and the Post-Task + Reflection are done."
   },
   {
     "day": 4, "week": 1, "weekName": "Close-Out",
-    "theme": "Teach visitors, then measure the growth",
-    "bigMathIdea": "Teach a stranger your math, then show how far you've come since Day 1.",
-    "vocabulary": "GROWTH — the difference between Day 1 and now.",
+    "theme": "Teach visitors, then celebrate",
+    "bigMathIdea": "Teach a stranger your math — the real test that the math, not the robot, is what you learned.",
+    "vocabulary": "EXPLANATION — a visitor succeeds after ONE of yours.",
     "activities": [
       { "name": "Expert setup + last rehearsal", "mins": 30, "block": "Hook",
         "description": "Stations ready; run the sentence you rewrote yesterday one more time." },
       { "name": "Community Exhibition", "mins": 90, "block": "Match-Build-Make",
         "description": "Visitors try your challenge and you teach them; fill the Visitor Handout — did the visitor succeed after ONE explanation? Stay out of it; the students teach.",
         "link": "/resources/teacher-guides/visitor-teach-handout.html" },
-      { "name": "Lunch", "mins": 60, "block": "Lunch", "description": "One hour." },
-      { "name": "Post-Task Diagnostic + Reflection", "mins": 50, "block": "Challenge Block",
-        "description": "12 minutes, individual, silent, then the Reflection. Every student types name, last initial, and team exactly as on Day 1, or their results can't be matched. Protect this; never cut it.",
-        "link": "/activities/diagnostic-post/" },
-      { "name": "Closing circle + celebrate", "mins": 70, "block": "Open Lab",
-        "description": "Each student names one thing they can do now that they couldn't on Day 1. Sign posters, group photo, send-off." }
+      { "name": "Closing circle + celebrate", "mins": 30, "block": "Open Lab",
+        "description": "Each student names one thing they can do now that they couldn't on Day 1. Sign posters, quick group photo — then EARLY DISMISSAL (about 12:30)." }
     ],
-    "ends": "Finish the sentence: 'On Day 1 I couldn't ___. Now I can ___.'"
+    "ends": "Finish the sentence: 'On Day 1 I couldn't ___. Now I can ___.' (Early dismissal after the exhibition.)"
   }
 ];
 
