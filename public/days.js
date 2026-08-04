@@ -75,7 +75,10 @@ const DAYS_NY2 = [
         "description": "12 minutes, individual, silent — then the Reflection. Every student types name, last initial, and team exactly as on Day 1, or their results can't be matched. Protect this; never cut it.",
         "link": "/activities/diagnostic-post/" },
       { "name": "Set up your exhibition station", "mins": 70, "block": "Challenge Block",
-        "description": "Poster up, bot ready, target line down — staged the way a visitor will meet it tomorrow. Do one full dry run." }
+        "description": "Poster up, bot ready, target line down — staged the way a visitor will meet it tomorrow. Do one full dry run." },
+      { "name": "Skills Arena — extra time", "mins": 0, "block": "Open Lab",
+        "description": "Any team that finishes early sharpens driving in the Skills Arena — the same driving the Distance Lab measured. Has an EN | ES toggle.",
+        "link": { "url": "/lessons/skills-arena.html", "label": "Skills Arena" } }
     ],
     "ends": "Every student has practiced their explanation, and the Post-Task + Reflection are done."
   },
