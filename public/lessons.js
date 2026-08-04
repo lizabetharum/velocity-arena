@@ -110,11 +110,11 @@ const ACTIVITY_LESSONS = {
   ],
   'Make your equation poster': [
     { url: '/lessons/equation-poster.html', label: 'Make Your Equation Poster' },
-    { url: 'https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link', label: 'Poster worksheet' },
+    { url: '/lessons/equation-poster-worksheet.html', label: 'Poster worksheet' },
   ],
   'Finish your poster': [
     { url: '/lessons/equation-poster.html', label: 'Make Your Equation Poster' },
-    { url: 'https://drive.google.com/file/d/1wxyEuCcRT_HvEsloPDCbQWhhZeruTtjP/view?usp=drive_link', label: 'Poster worksheet' },
+    { url: '/lessons/equation-poster-worksheet.html', label: 'Poster worksheet' },
   ],
   'Distance Lab worksheet': { url: '/lessons/distance-lab-worksheet.html', label: 'Distance Lab worksheet' },
   'Target Challenge — Precision Final': { url: '/lessons/target-challenge-worksheet.html', label: 'Target Challenge worksheet' },
