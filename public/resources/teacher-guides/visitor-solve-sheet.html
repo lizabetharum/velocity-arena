@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visitor Sheet — Solve It</title>
+<style>
+  :root{
+    --paper:#F6F8F9; --card:#FFFFFF; --band:#EFF2F4; --shade:#E4E9EC;
+    --ink:#14181C; --ink-2:#3C444B; --ink-3:#6B747C;
+    --line:#D6DCE0; --line-strong:#9AA4AC; --rule:#14181C;
+    --teal:#0B7A8C; --teal-deep:#075867;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#10151A; --card:#161C22; --band:#1B232B; --shade:#232D36;
+      --ink:#EAEEF1; --ink-2:#AEB7BF; --ink-3:#7E8891;
+      --line:#28323B; --line-strong:#4A5661; --rule:#EAEEF1;
+      --teal:#3FC5DA; --teal-deep:#7FE0EF; }
+  }
+  :root[data-theme="light"]{--paper:#F6F8F9;--card:#FFFFFF;--band:#EFF2F4;--shade:#E4E9EC;--ink:#14181C;--ink-2:#3C444B;--ink-3:#6B747C;--line:#D6DCE0;--line-strong:#9AA4AC;--rule:#14181C;--teal:#0B7A8C;--teal-deep:#075867;}
+  :root[data-theme="dark"]{--paper:#10151A;--card:#161C22;--band:#1B232B;--shade:#232D36;--ink:#EAEEF1;--ink-2:#AEB7BF;--ink-3:#7E8891;--line:#28323B;--line-strong:#4A5661;--rule:#EAEEF1;--teal:#3FC5DA;--teal-deep:#7FE0EF;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+  .bar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 20px;}
+  .bar .back{font:600 11px/1 var(--sans);color:var(--teal);text-decoration:none;}
+  .bar .t{font:700 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);}
+  .bar .sp{flex:1;}
+  .btn{font:600 12px/1 var(--sans);color:var(--ink);background:var(--card);border:1px solid var(--line-strong);border-radius:6px;padding:8px 12px;cursor:pointer;}
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .lang{display:inline-flex;gap:3px;margin-left:6px;font:700 11px/1 var(--mono);}
+  .lang a{padding:4px 8px;border:1px solid var(--line-strong);border-radius:5px;color:var(--ink-3);text-decoration:none;}
+  .lang a.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .lang a:hover{color:var(--teal);}
+
+  .sheet{max-width:740px;margin:0 auto;padding:22px 20px 70px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 30px 22px;}
+
+  .head{border-bottom:3px solid var(--rule);padding-bottom:10px;margin-bottom:12px;}
+  .eyebrow{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:0 0 8px;}
+  h1{font:800 27px/1.1 var(--sans);letter-spacing:-.02em;margin:0;}
+  .sub{font:500 14.5px/1.55 var(--sans);color:var(--ink-2);margin:9px 0 0;}
+
+  h2{font:800 15px/1.2 var(--sans);margin:16px 0 7px;color:var(--ink);
+     border-top:2px solid var(--rule);padding-top:9px;display:flex;align-items:baseline;gap:10px;}
+  h2 .n{font:800 12px/22px var(--mono);background:var(--ink);color:var(--card);border-radius:5px;
+        min-width:22px;text-align:center;padding:0 6px;flex-shrink:0;}
+
+  p{margin:0 0 8px;color:var(--ink-2);font-size:14px;}
+  b{color:var(--ink);}
+
+  .fld{border:2px solid var(--line-strong);border-radius:10px;padding:12px 14px;margin:9px 0;}
+  .fld .lbl{font:800 12px/1.2 var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink);margin-bottom:9px;}
+  .fill{display:inline-block;min-width:60px;border-bottom:2px solid var(--ink);margin:0 4px;height:1.5em;vertical-align:baseline;}
+  .fill.full{display:block;min-width:0;width:100%;margin:4px 0;}
+  .fill.lg{min-width:180px;}
+
+  .eqbig{font:700 20px/2.1 var(--sans);color:var(--ink);}
+
+  .work{border:2px solid var(--line-strong);border-radius:10px;margin:9px 0;
+        background:repeating-linear-gradient(var(--card),var(--card) 33px,var(--line) 33px,var(--line) 34px);
+        height:290px;}
+  .worktag{font:800 12px/1.2 var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink);
+           padding:8px 12px 0;}
+
+  .ans{display:flex;align-items:baseline;gap:10px;border:2px solid var(--ink);border-radius:10px;
+       padding:14px 16px;margin:9px 0;background:var(--band);}
+  .ans .lbl{font:800 15px/1.2 var(--sans);color:var(--ink);white-space:nowrap;}
+  .ans .fill{flex:1;min-width:0;}
+
+  .check{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin:10px 0 0;
+         font:700 15px/1.4 var(--sans);color:var(--ink);}
+  .check .cbx{display:inline-block;width:17px;height:17px;border:2px solid var(--ink);border-radius:4px;vertical-align:middle;margin-right:7px;}
+  .check .who{font:600 12.5px/1.4 var(--sans);color:var(--ink-3);width:100%;margin-top:4px;}
+
+  .foot{border-top:3px solid var(--rule);margin-top:16px;padding-top:11px;font:400 12.5px/1.5 var(--sans);color:var(--ink-3);}
+
+  @media print{
+    .bar{display:none;}
+    :root{--paper:#fff;--card:#fff;--band:#f2f2f2;--shade:#e8e8e8;--ink:#000;--ink-2:#000;--ink-3:#333;--line:#bbb;--line-strong:#000;--rule:#000;--teal:#000;--teal-deep:#000;}
+    html,body{background:#fff;}
+    body{font-size:12px;line-height:1.4;}
+    .sheet{max-width:none;margin:0;padding:0;}
+    .card{border:none;border-radius:0;padding:0.45in 0.55in;}
+    @page{size:Letter;margin:0;}
+    h2{break-after:avoid;} .fld,.ans,.work,.head{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="back" href="/teachers.html">← Resources</a>
+  <span class="t">Exhibition · Visitor Sheet</span>
+  <span class="lang"><a href="/resources/teacher-guides/visitor-solve-sheet.html" class="active">EN</a><a href="/resources/teacher-guides/es/visitor-solve-sheet.html">ES</a></span>
+  <span class="sp"></span>
+  <button class="btn" id="theme" type="button">Theme</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</div>
+
+<div class="sheet">
+  <div class="card">
+
+    <div class="head">
+      <p class="eyebrow">Velocity Arena · Community Exhibition</p>
+      <h1>Your Turn — Solve It</h1>
+      <p class="sub">A student just taught you their robot's math. Use their equation to solve the problem below. <b>Show your work</b> in the box — the student will check it with you when you're done.</p>
+    </div>
+
+    <!-- 1 -->
+    <h2><span class="n">1</span> The equation the student taught you</h2>
+    <div class="fld">
+      <div class="lbl">Write it here (or copy what the student wrote)</div>
+      <div class="eqbig"><span class="fill full"></span></div>
+    </div>
+
+    <!-- 2 -->
+    <h2><span class="n">2</span> The problem to solve</h2>
+    <div class="fld">
+      <div class="lbl">Find</div>
+      <span class="fill full"></span>
+      <span class="fill full"></span>
+    </div>
+
+    <!-- 3 -->
+    <h2><span class="n">3</span> Show your work</h2>
+    <div class="work"><div class="worktag">Work it out here</div></div>
+
+    <div class="ans">
+      <span class="lbl">My answer:</span>
+      <span class="fill"></span>
+    </div>
+
+    <div class="check">
+      The student checked it:
+      <span><span class="cbx"></span>Right</span>
+      <span><span class="cbx"></span>Close</span>
+      <span><span class="cbx"></span>Not yet — try again</span>
+      <span class="who">If it's "Not yet," the student explains the one step you missed and you try once more.</span>
+    </div>
+
+    <div class="foot">Velocity Arena · NYC FIRST · Community Exhibition. Thanks for playing — you just did real robotics math!</div>
+
+  </div>
+</div>
+
+<script>
+  var root=document.documentElement;
+  var t=document.getElementById('theme');
+  if(t) t.addEventListener('click',function(){
+    var c=root.getAttribute('data-theme');
+    if(!c) c=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+    root.setAttribute('data-theme',c==='dark'?'light':'dark');
+  });
+  var p=document.getElementById('print');
+  if(p) p.addEventListener('click',function(){window.print();});
+</script>
+</body>
+</html>
