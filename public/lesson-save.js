@@ -32,6 +32,9 @@
 (function () {
   'use strict';
 
+  // The script element that loaded us — read its data-lesson for auto-mode.
+  var SELF = document.currentScript;
+
   var STORE_PREFIX = 'va_lesson_';
   var ID_KEY = 'va_student_id';
 
@@ -87,6 +90,33 @@
       return null;
     },
 
+    // Generic field capture — every input/textarea/select/contenteditable with
+    // an id becomes a column (the identity inputs are skipped). Lets a lesson
+    // wire "Save my work" with no hand-written collect().
+    collectAllFields: function () { return collectAllFields(); },
+
+    // Repopulate fields by id from the last local save, so a reload (or a
+    // return on the same device) brings the work back. Fires input/change so
+    // any on-page calculators recompute.
+    restoreFields: function (lesson) {
+      var prev = VA.loadLocal(lesson);
+      var f = prev && prev.fields;
+      if (!f) return;
+      Object.keys(f).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var v = f[id];
+        var type = (el.type || '').toLowerCase();
+        if (el.isContentEditable) { if (v != null && v !== '') el.innerHTML = v; }
+        else if (type === 'checkbox' || type === 'radio') { el.checked = !!v && v !== '0' && v !== 0; }
+        else if (v != null && v !== '') { el.value = v; }
+        try {
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        } catch (e) {}
+      });
+    },
+
     /**
      * Render the "who is working on this?" fields. Put this near the TOP of
      * the page — a student should name themselves before they start, not
@@ -124,6 +154,9 @@
       var mount = document.getElementById(opts.mount);
       if (!mount) return;
 
+      // No collect() given → capture every field on the page generically.
+      opts.collect = opts.collect || collectAllFields;
+
       var haveStrip = !!document.getElementById('vasave-first');
 
       mount.innerHTML =
@@ -144,8 +177,67 @@
       document.getElementById('vasave-go').addEventListener('click', function () {
         submit(opts, this);
       });
+
+      // Auto-save to localStorage as they work, so nothing is lost on a reload,
+      // a tab close, or a language toggle (EN and ES share one lesson key).
+      var asTimer = null;
+      function autosave() {
+        VA.saveLocal(opts.lesson, {
+          lesson: opts.lesson,
+          site: currentSite(),
+          firstName: val('vasave-first'),
+          lastInitial: val('vasave-init'),
+          team: val('vasave-team'),
+          ts: new Date().toISOString(),
+          fields: (opts.collect && opts.collect()) || {}
+        });
+      }
+      document.addEventListener('input', function () { clearTimeout(asTimer); asTimer = setTimeout(autosave, 400); }, true);
+      document.addEventListener('change', function () { clearTimeout(asTimer); asTimer = setTimeout(autosave, 400); }, true);
     }
   };
+
+  // Every input/textarea/select/contenteditable with an id → one column.
+  function collectAllFields() {
+    var out = {};
+    Array.prototype.forEach.call(document.querySelectorAll('input, textarea, select'), function (el) {
+      var id = el.id;
+      if (!id || id.indexOf('vasave') === 0) return;
+      var type = (el.type || '').toLowerCase();
+      if (type === 'checkbox' || type === 'radio') out[id] = el.checked ? 1 : 0;
+      else out[id] = el.value;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[contenteditable=""],[contenteditable="true"]'), function (el) {
+      if (el.id) out[el.id] = (el.innerHTML || '');
+    });
+    return out;
+  }
+
+  // Auto-mode: a page that includes us as
+  //   <script src="/lesson-save.js" data-lesson="my-lesson"></script>
+  // gets the whole thing with no other JS — an identity strip at the top of the
+  // main content, a Save card at the bottom, generic field capture, auto-save,
+  // and restore-on-load. EN and ES share the lesson key, so both write one tab.
+  function autoInit(lesson) {
+    // If the page already declares its own mount points, respect them
+    // (identity at top, save at bottom). Otherwise render ONE self-contained
+    // card — name + Save together — at the end of the main content column, so
+    // we never inject a strip above a page's own header.
+    if (document.getElementById('save-card')) {
+      if (document.getElementById('who-card')) VA.renderIdentity({ mount: 'who-card' });
+      VA.renderSaveCard({ mount: 'save-card', lesson: lesson });
+      VA.restoreFields(lesson);
+      return;
+    }
+    var host = document.querySelector('main') || document.querySelector('.wrap') ||
+               document.querySelector('.sheet') || document.querySelector('.content') ||
+               document.querySelector('.page') || document.querySelector('.container') ||
+               document.body;
+    var s = document.createElement('div'); s.id = 'save-card';
+    host.appendChild(s);
+    VA.renderSaveCard({ mount: 'save-card', lesson: lesson });  // includes name fields
+    VA.restoreFields(lesson);
+  }
 
   function identityFields() {
     var id = loadIdentity();
@@ -257,6 +349,16 @@
   }
 
   window.VA = VA;
+
+  // Fire auto-mode if this script tag carries a data-lesson.
+  var autoLesson = SELF && SELF.getAttribute && SELF.getAttribute('data-lesson');
+  if (autoLesson) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { autoInit(autoLesson); });
+    } else {
+      autoInit(autoLesson);
+    }
+  }
 
   // ── styles, injected once so lesson pages need no extra CSS ──
   var css =
