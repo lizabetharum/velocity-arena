@@ -1850,13 +1850,25 @@ function applyDoneState(id, done){
 // next. Runs through updateEarnedCount(), which fires on load, on sheet
 // restore, and on every Done/Undo.
 function applyReveal(){
-  var cards = Array.prototype.slice.call(document.querySelectorAll('#grid .card'));
-  var firstIncomplete = -1;
-  for (var i = 0; i < cards.length; i++){
-    if (!cards[i].classList.contains('complete')){ firstIncomplete = i; break; }
+  var grid = document.getElementById('grid');
+  if (!grid) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  // Show one more challenge than the number completed — robust to any order.
+  var completed = cards.filter(function(c){ return c.classList.contains('complete'); }).length;
+  var reveal = completed + 1;
+  cards.forEach(function(c, i){ c.classList.toggle('locked', i >= reveal); });
+
+  // A one-line hint so a locked list reads as intentional, not broken.
+  var anyLocked = cards.some(function(c){ return c.classList.contains('locked'); });
+  var hint = document.getElementById('revealHint');
+  if (!hint){
+    hint = document.createElement('div');
+    hint.id = 'revealHint';
+    hint.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;font-weight:700;padding:6px 0 2px;';
+    grid.appendChild(hint);
   }
-  if (firstIncomplete === -1) firstIncomplete = cards.length - 1; // all done → show all
-  cards.forEach(function(c, i){ c.classList.toggle('locked', i > firstIncomplete); });
+  hint.textContent = anyLocked ? 'Finish this challenge to unlock the next →' : '';
+  hint.style.display = anyLocked ? '' : 'none';
 }
 
 function updateEarnedCount(){
