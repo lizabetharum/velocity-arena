@@ -280,7 +280,6 @@ const DAYS_NY3 = [
       { "name": "Lunch", "mins": 60, "block": "Lunch", "description": "One hour." },
       { "name": "Post-Task Diagnostic", "mins": 25, "block": "Challenge Block",
         "description": "12 minutes, individual, silent. Every student types name, last initial, and team exactly as on Day 1. Protect this; never cut it.",
-        "link": "/activities/diagnostic-post/",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day20-02-post-task-diagnostic.html",
         "script": "https://docs.google.com/document/d/1KYGrQCGgyWRPsgwlafFgnID0cetHfHpnEK8oQ3o7kr8/edit?usp=drive_link" },
       { "name": "Post-Reflection", "mins": 25, "block": "Challenge Block",
