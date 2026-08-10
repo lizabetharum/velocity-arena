@@ -49,6 +49,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .card{background:var(--surface);border:1px solid var(--ccb,var(--border));border-radius:14px;padding:0;overflow:hidden;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.4);animation:cardIn .4s ease both;transition:box-shadow .2s,transform .2s;}
 .card:hover{box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px var(--cc,transparent);transform:translateY(-1px);}
 .card.complete{opacity:.5;filter:saturate(.35);}
+.card.locked{display:none!important;}
 .card.hidden{display:none;}
 @keyframes cardIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 .wm{position:absolute;right:12px;top:6px;font-family:'Chakra Petch',sans-serif;font-size:8rem;font-weight:700;line-height:1;color:rgba(255,255,255,.025);pointer-events:none;z-index:0;}
@@ -1844,10 +1845,25 @@ function applyDoneState(id, done){
   if (btn) btn.innerHTML = done ? I.undo+' Undo' : I.check+' Done';
 }
 
+// Progressive reveal: show challenges one at a time — every card up to and
+// including the first not-yet-completed one. Finishing a challenge reveals the
+// next. Runs through updateEarnedCount(), which fires on load, on sheet
+// restore, and on every Done/Undo.
+function applyReveal(){
+  var cards = Array.prototype.slice.call(document.querySelectorAll('#grid .card'));
+  var firstIncomplete = -1;
+  for (var i = 0; i < cards.length; i++){
+    if (!cards[i].classList.contains('complete')){ firstIncomplete = i; break; }
+  }
+  if (firstIncomplete === -1) firstIncomplete = cards.length - 1; // all done → show all
+  cards.forEach(function(c, i){ c.classList.toggle('locked', i > firstIncomplete); });
+}
+
 function updateEarnedCount(){
   const earned = document.querySelectorAll('.card.complete').length;
   const el = document.getElementById('progressCount');
   if(el) el.textContent = `${earned} / ${SKILLS.length} earned`;
+  applyReveal();
 }
 
 // ── MARK DONE ───────────────────────────────────────────────────────────────
