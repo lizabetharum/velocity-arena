@@ -26,7 +26,7 @@ const CONFIG = {
   siteStartDates: {
     NY1: "2026-07-06",   // Gotham Tech
     NY2: "2026-08-04",   // Claremont International HS — 4-day close-out (Distance Lab), Tue Aug 4 – Fri Aug 7
-    NY3: "2026-07-27",   // South Bronx Community
+    NY3: "2026-08-11",   // South Bronx Community — 7-session match catch-up begins Tue Aug 11 (Mon–Thu window; both Fridays are non-teaching)
     TN:  "2026-06-29",   // Tennessee
   },
 
