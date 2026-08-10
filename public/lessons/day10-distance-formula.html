@@ -139,6 +139,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cs-label{font-size:13px;color:var(--muted);flex-shrink:0;}
 .cs-expr{font-size:13px;font-family:monospace;color:var(--text);flex-shrink:0;}
 .cs-blank{width:52px;height:34px;background:var(--card);border:2px solid var(--border);border-radius:6px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;-moz-appearance:textfield;}
+.reflect-fill{font-size:14px;color:var(--text);line-height:2.6;}
+.reflect-fill .cs-blank{margin:0 3px;vertical-align:middle;}
+.reflect-fill .cs-blank::-webkit-inner-spin-button{-webkit-appearance:none;}
 .cs-blank::-webkit-outer-spin-button,.cs-blank::-webkit-inner-spin-button{-webkit-appearance:none;}
 .cs-blank:focus{border-color:var(--cyan);}
 .cs-blank.correct{border-color:var(--green);background:rgba(0,230,118,.08);}
@@ -886,6 +889,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="sec-sub">See your three distances — then answer four questions</div>
   </div>
 
+  <!-- FIELD + 3 POINTS (read-only reference of what you marked) -->
+  <div class="card">
+    <div class="card-title green"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>Your Field + Three Points</div>
+    <div class="field-note">A reminder of what you marked: <strong style="color:#00e5ff;">A</strong> = tip-off (4, 2), <strong style="color:#ffd600;">B</strong> = your ball position, <strong style="color:#ff9100;">G</strong> = goal (8, 2).</div>
+    <div class="grid-wrap"><div id="reflectFieldMirror"></div></div>
+    <div class="coord-row">
+      <div class="coord-box a"><div class="coord-letter">A</div><div class="coord-value">(4, 2)</div><div class="coord-label">Tip-off</div></div>
+      <div class="coord-box b"><div class="coord-letter">B</div><div class="coord-value" id="bCoordValReflect">—</div><div class="coord-label">Your ball</div></div>
+      <div class="coord-box g"><div class="coord-letter">G</div><div class="coord-value">(8, 2)</div><div class="coord-label">Goal</div></div>
+    </div>
+  </div>
+
   <!-- VISUAL DISTANCE BARS -->
   <div class="card">
     <div class="card-title green"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="2" y="11" width="4" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="8" y="7" width="4" height="11" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="4" height="15" rx="1" stroke="currentColor" stroke-width="1.5"/><polyline points="4,10 10,7 16,4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Your Three Distances</div>
@@ -946,7 +961,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="hint-pill" onclick="toggleHint('hq1')">💡 How do I write it as a fraction?</div>
       <div class="hint-text" id="hq1">Divide: A→B ÷ A→G. Example: if A→B = 2 and A→G = 4, the fraction is 2/4 = 1/2 = 50%. Your charge closed half the distance.</div>
-      <textarea class="reflect-input" id="r1ans" placeholder="Your charge moved the ball _____ units. That is _____ out of 4 total units, which is _____%."></textarea>
+      <div class="reflect-fill">Your charge moved the ball <input type="number" class="cs-blank" id="r1_units"> units. That is <input type="number" class="cs-blank" id="r1_ab"> out of 4 total units, which is <input type="number" class="cs-blank" id="r1_pct">%.</div>
     </div>
 
     <!-- Q2 -->
@@ -959,7 +974,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="hint-pill" onclick="toggleHint('hq2')">💡 What if I get 1?</div>
       <div class="hint-text" id="hq2">Getting 1 means your charge is long enough to score in one shot — theoretically. Did that actually happen in your match? If not, think about why: the path may not be perfectly straight, or contact may have been off-center.</div>
-      <textarea class="reflect-input" id="r2ans" placeholder="A→G ÷ A→B = _____ ÷ _____ ≈ _____. So you would need about _____ charges to score."></textarea>
+      <div class="reflect-fill">A→G ÷ A→B = <input type="number" class="cs-blank" id="r2_ag"> ÷ <input type="number" class="cs-blank" id="r2_ab"> ≈ <input type="number" class="cs-blank" id="r2_res">. So you would need about <input type="number" class="cs-blank" id="r2_charges"> charges to score.</div>
     </div>
 
     <!-- Q3 -->
@@ -1321,7 +1336,24 @@ function goSection(n){
   });
   document.getElementById('ptab'+n).classList.add('active');
   document.getElementById('progFill').style.width=PROG[n-1]+'%';
+  if(n===4) renderReflectField();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Mirror the marked-up field (A, B, G + distance lines) into Compare + Reflect,
+// read-only, so students can see the three points again while they answer.
+function renderReflectField(){
+  var src = document.getElementById('fieldSvg');
+  var mirror = document.getElementById('reflectFieldMirror');
+  if(!src || !mirror) return;
+  mirror.innerHTML = src.outerHTML
+    .replace(/\sid="[^"]*"/g, '')       // drop ids so they don't duplicate
+    .replace(/\sonclick="[^"]*"/g, ''); // read-only
+  var svg = mirror.querySelector('svg');
+  if(svg){ svg.classList.add('grid-svg'); svg.style.pointerEvents='none'; }
+  var bVal = document.getElementById('bCoordVal');
+  var out = document.getElementById('bCoordValReflect');
+  if(out && bVal && /\d/.test(bVal.textContent)) out.textContent = bVal.textContent.trim();
 }
 
 // ── HINT ──────────────────────────────────────────────────────
