@@ -193,15 +193,21 @@ if (!day) {
   }).join('');
 
   const actRows = (day.activities || []).map(a => {
-    const links = a.link
-      ? [ (a.link && typeof a.link === 'object')
-            ? { url: a.link.url, label: a.link.label || 'Open activity' }
-            : { url: a.link, label: 'Open activity' } ]
-      : (typeof getLessonLinks === 'function' ? getLessonLinks(a.name) : []).map(l => ({ url: l.url, label: l.label || 'Open lesson' }));
+    // Gather links from link / worksheet / webpage (exemplar stays teacher-only),
+    // falling back to lessons.js by activity name; then append MakeCode.
+    const asL = v => v == null ? [] : (Array.isArray(v) ? v : [v]).map(x =>
+      typeof x === 'string' ? { url: x, label: null } : { url: x.url, label: x.label || null }).filter(x => x.url);
+    let links = [];
+    asL(a.link).forEach(l => links.push({ url: l.url, label: l.label || 'Open activity' }));
+    asL(a.worksheet).forEach(l => links.push({ url: l.url, label: l.label || 'Worksheet' }));
+    asL(a.webpage).forEach(l => links.push({ url: l.url, label: l.label || 'Open' }));
+    if (!links.length && typeof getLessonLinks === 'function')
+      getLessonLinks(a.name).forEach(l => links.push({ url: l.url, label: l.label || 'Open lesson' }));
     (a.makecode == null ? [] : (Array.isArray(a.makecode) ? a.makecode : [a.makecode]))
       .map(x => typeof x === 'string' ? { url: x, label: 'MakeCode' } : { url: x.url, label: x.label || 'MakeCode' })
       .filter(x => x.url)
       .forEach(l => links.push({ url: l.url, label: l.label, newTab: true }));
+    { const seen = {}; links = links.filter(l => seen[l.url] ? false : (seen[l.url] = true)); }
     const linksHtml = links.map(l =>
       `<a class="act-link" href="${l.url}"${l.newTab ? ' target="_blank"' : ''}>${l.label} →</a>`
     ).join('');
