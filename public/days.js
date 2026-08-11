@@ -221,9 +221,7 @@ const DAYS_NY3 = [
         "link": "/activities/reflection-post/" },
       { "name": "Open Lab — exhibition setup", "mins": 70, "block": "Open Lab",
         "description": "Set up your exhibition station — poster, bot, dashboard; do one dry run. Skills Arena if time.",
-        "link": "/lessons/open-lab-reflection.html",
-        "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day18-04-open-lab-reflection.html",
-        "script": "https://docs.google.com/document/d/1lvW3OtIjKUPp7oxeYng28ghkXNTotYAh6RL108wr7CU/edit?usp=drive_link" }
+        "link": "/lessons/skills-arena.html" }
     ],
     "ends": "Every team rehearsed teaching its equation, built its poster, and finished the Post-Task + Reflection."
   },
