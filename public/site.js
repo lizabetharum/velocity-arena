@@ -53,9 +53,10 @@ function buildCampDates(siteCode) {
   const dates = [];
   let d = new Date(start);
   // Camp days are Mon(1)–Thu(4) at most sites. Claremont (NY2) runs its 4-day
-  // close-out Tue(2)–Fri(5), so it uses a shifted weekday window.
+  // close-out Tue(2)–Fri(5). South Bronx (NY3) runs its 5-day catch-up
+  // Tue–Fri then Mon, so it uses a Mon(1)–Fri(5) window (Friday included).
   const loDow = code === 'NY2' ? 2 : 1;
-  const hiDow = code === 'NY2' ? 5 : 4;
+  const hiDow = (code === 'NY2' || code === 'NY3') ? 5 : 4;
   while (dates.length < total) {
     const dow = d.getDay();
     const iso = d.toISOString().slice(0, 10);

@@ -231,9 +231,11 @@ const weeks = (weekNums.length ? weekNums : [1, 2, 3, 4]).map(num => {
   const cols = TOTAL_DAYS <= 5 ? TOTAL_DAYS : (TOTAL_DAYS === 16 ? 4 : 5);
   document.documentElement.style.setProperty('--days-per-week', cols);
   // Site-aware daily structure: Crosstown runs 8:00–12:00 with a 20-min snack break;
-  // NYC sites run 10:00–2:45 with a 60-min lunch.
+  // most NYC sites run 10:00–3:00 with a 60-min lunch; South Bronx (NY3) runs its
+  // 5-day catch-up 9:00–2:00, so its blocks shift one hour earlier.
   const siteCode = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
   const isTN = siteCode === 'TN';
+  const nycBase = siteCode === 'NY3' ? 9*60 : 10*60;
   const fmt = (mins) => {
     let h = Math.floor(mins / 60);
     const m = mins % 60;
@@ -252,13 +254,13 @@ const weeks = (weekNums.length ? weekNums : [1, 2, 3, 4]).map(num => {
         { name: 'ENDS Ritual',        dur: 5,  start: 11*60 + 55, accent: true },
       ]
     : [
-        { name: 'Arrival',            dur: 5,  start: 10*60      },
-        { name: 'Hook',               dur: 25, start: 10*60 + 5  },
-        { name: 'Challenge Block',    dur: 65, start: 10*60 + 30 },
-        { name: 'Lunch',              dur: 60, start: 11*60 + 35 },
-        { name: 'Match · Build · Make', dur: 90, start: 12*60 + 35 },
-        { name: 'Open Lab',           dur: 50, start: 14*60 + 5  },
-        { name: 'ENDS Ritual',        dur: 5,  start: 14*60 + 55, accent: true },
+        { name: 'Arrival',            dur: 5,  start: nycBase       },
+        { name: 'Hook',               dur: 25, start: nycBase + 5   },
+        { name: 'Challenge Block',    dur: 65, start: nycBase + 30  },
+        { name: 'Lunch',              dur: 60, start: nycBase + 95  },
+        { name: 'Match · Build · Make', dur: 90, start: nycBase + 155 },
+        { name: 'Open Lab',           dur: 50, start: nycBase + 245 },
+        { name: 'ENDS Ritual',        dur: 5,  start: nycBase + 295, accent: true },
       ];
   const grid = document.getElementById('structure-grid');
   if (grid) {
@@ -368,7 +370,7 @@ grid.innerHTML = weeks.map(w => {
   let html = '';
   if (FULL16) html = `<div style="${st}">Full 16-day reference plan (all four weeks). <a style="${a}" href="/schedule.html">&larr; Back to the current site&rsquo;s schedule</a></div>`;
   else if (site === 'NY2') html = `<div style="${st}">Claremont is running the 4-day close-out. <a style="${a}" href="/schedule.html?full=16">See the full 16-day program &rarr;</a><br><a style="${a}" href="/lessons/skills-arena.html">Skills Arena &rarr;</a> <span style="color:var(--fg-2);font-weight:600;">— Day 2 (all afternoon) &amp; Day 3 (extra time). Has an EN | ES toggle.</span></div>`;
-  else if (site === 'NY3') html = `<div style="${st}">South Bronx is running the 7-session match catch-up (Sessions 1&ndash;7 below replace Days 10&ndash;16). <a style="${a}" href="/resources/teacher-guides/south-bronx-catch-up-plan.html">Open the catch-up plan &rarr;</a> · <a style="${a}" href="/schedule.html?full=16">See the full 16-day program &rarr;</a></div>`;
+  else if (site === 'NY3') html = `<div style="${st}">South Bronx is running the 5-session match catch-up (Sessions 1&ndash;5 below, 9:00&ndash;2:00). <a style="${a}" href="/resources/teacher-guides/south-bronx-catch-up-plan.html">Open the catch-up plan &rarr;</a> · <a style="${a}" href="/schedule.html?full=16">See the full 16-day program &rarr;</a></div>`;
   if (html) grid.insertAdjacentHTML('beforebegin', html);
 })();
 
