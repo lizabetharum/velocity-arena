@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velocity Arena — Season 2 Stat Reallocation</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Montserrat', sans-serif; background: #ddd; color: #000; }
+@media print {
+  html, body { background: white; margin: 0; padding: 0; }
+  @page { size: 11in 8.5in landscape; margin: 0; }
+  .page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; }
+  .screen-note { display: none; }
+}
+.page { width: 11in; height: 8.5in; padding: 0.3in 0.35in; background: white; display: flex; flex-direction: column; margin: 0 auto; }
+.card { flex: 1; border: 1.5px solid #000; display: flex; flex-direction: column; background: white; }
+.card-header { background: #fff; color: #000; border-bottom: 1.5px solid #000; padding: 7px 14px 9px; display: flex; flex-direction: row; align-items: center; flex-shrink: 0; }
+.activity-name { font-size: 13pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+.header-meta { font-size: 8pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #666; text-align: right; line-height: 1.5; flex-shrink: 0; }
+.progress-wrap { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.progress-bar { width: 1.2in; height: 14px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: #000; border-radius: 2px; }
+.progress-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.08em; color: #999; text-transform: uppercase; }
+.math-bar { background: #efefef; border-bottom: 1.5px solid #000; padding: 4px 14px; font-size: 8.5pt; font-weight: 700; flex-shrink: 0; line-height: 1.4; }
+.math-bar span { font-weight: 500; }
+.card-body { flex: 1; display: grid; grid-template-columns: 2.4fr 3fr 3.4fr; min-height: 0; }
+.col { display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1.5px solid #000; }
+.section { border-bottom: 1px solid #000; padding: 5px 9px; display: flex; flex-direction: column; }
+.section:last-child { border-bottom: none; flex: 1; }
+.section.grow { flex: 1; min-height: 0; }
+.section-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; flex-shrink: 0; }
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.checklist li { font-size: 8pt; line-height: 1.35; display: flex; gap: 7px; align-items: flex-start; }
+.checklist li::before { content: '☐'; font-size: 9.5pt; line-height: 1.1; flex-shrink: 0; }
+.checklist li.note { font-style: italic; color: #444; margin-top: 2px; }
+.checklist li.note::before { content: '→'; font-style: normal; }
+.timing-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+.timing-table tr { border-bottom: 1px solid #ddd; }
+.timing-table tr:last-child { border-bottom: none; }
+.timing-table td { padding: 5px 7px 5px 0; vertical-align: top; line-height: 1.35; }
+.timing-table td.t-time { font-size: 7.5pt; font-weight: 800; width: 0.55in; white-space: nowrap; color: #000; }
+.timing-table td.t-action { font-weight: 700; width: 1in; font-size: 8pt; }
+.timing-table td.t-focus { font-size: 7.5pt; font-style: italic; color: #333; line-height: 1.4; }
+.timing-table .hard-row td { background: #999; color: #fff; font-weight: 700; padding: 5px 7px; font-style: normal; }
+.say-list { display: flex; flex-direction: column; gap: 5px; }
+.say-item { display: flex; gap: 7px; align-items: flex-start; }
+.say-tag { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #000; color: #fff; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; line-height: 1.6; margin-top: 1px; }
+.say-tag.dont { background: white; color: #000; border: 1px solid #000; }
+.say-quote { font-size: 8.5pt; font-style: italic; line-height: 1.45; border-left: 2px solid #000; padding-left: 7px; }
+.say-quote.plain { border-left: none; padding-left: 0; font-style: normal; font-size: 8pt; color: #444; }
+.watch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+.watch-item { font-size: 7.5pt; line-height: 1.35; }
+.watch-trigger { font-weight: 700; display: block; margin-bottom: 2px; }
+.watch-redirect { font-style: italic; color: #333; }
+.hard-stop { flex-shrink: 0; border-top: 2px solid #999; background: #999; color: #fff; padding: 6px 14px; font-size: 8.5pt; display: flex; align-items: center; gap: 12px; }
+.hard-stop-label { font-size: 7pt; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; white-space: nowrap; border: 1px solid #fff; padding: 2px 7px; }
+.hard-stop-text { font-weight: 600; line-height: 1.4; }
+.card-footer { flex-shrink: 0; border-top: 1px solid #ccc; background: #fff; padding: 3px 14px; display: flex; justify-content: space-between; font-size: 6.5pt; color: #888; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-note { text-align: center; padding: 8px; font-size: 8pt; color: #666; background: #ddd; font-family: 'Montserrat', sans-serif; }
+.produces { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.produces li { font-size: 7.5pt; line-height: 1.3; display: flex; gap: 6px; align-items: flex-start; }
+.produces li::before { content: '\25B8'; font-size: 8pt; line-height: 1.2; flex-shrink: 0; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="screen-note">Print: File → Print · Landscape · Background graphics ON · Fit to page</div>
+<div class="page">
+<div class="card">
+  <div class="card-header">
+    <div class="activity-name">Season 2 Stat Reallocation</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:60%;"></div></div>
+      <span class="progress-label">3 of 5</span>
+    </div>
+    <div class="header-meta">South Bronx · Season 2 · 75 min<br>Worksheet → reprogram → solo practice → commit</div>
+  </div>
+  <div class="math-bar">MATH: <span>Motor Power = Speed × 5 | Charge Speed = Power²</span></div>
+  <div class="card-body">
+    <div class="col">
+<div class="section">
+  <div class="section-label">Before You Start</div>
+  <ul class="checklist">
+    <li>Have the My New Build worksheet and the dashboard ready on student devices.</li>
+    <li>Set up solo practice: each student can run their bot on the new stats.</li>
+    <li>Post the Season 1 results visibly so teams can compare before vs. after.</li>
+    <li>Ensure the dashboard is accessible so teams can commit their new loadout.</li>
+    <li>Have the My New Build worksheet ready — record OLD (Season 1) stats before any changes.</li>
+  </ul>
+</div>
+<div class="section">
+  <div class="section-label">Students Produce</div>
+  <ul class="produces">
+    <li>A revised 4-stat allocation summing to 20.</li>
+    <li>A predicted effect for the change, tested in solo practice.</li>
+    <li>All students: a completed My New Build worksheet with both formula computations and a tradeoff statement.</li>
+  </ul>
+</div>
+<div class="section grow">
+  <div class="section-label">Reference</div>
+  <div style="font-size:8pt; line-height:1.5; display:flex; flex-direction:column; gap:6px;">
+    <div>Motor Power = Speed × 5</div>
+    <div>Charge Speed = Power²</div>
+    <div>Budget: S + P + T + E = 20</div>
+    <div>No stat below 1</div>
+    <div>Exit Ticket: Both formulas correct + real tradeoff stated.</div>
+  </div>
+</div>
+</div>
+    <div class="col">
+<div class="section grow">
+  <div class="section-label">Timing</div>
+  <table class="timing-table">
+    <tr><td class="t-time">0:00–0:05</td><td class="t-action">Open</td><td class="t-focus">Season 2 is open: you may now move points. Total still 20. Frame: spend each point where it does the most work.</td></tr>
+    <tr><td class="t-time">0:05–0:20</td><td class="t-action">Worksheet</td><td class="t-focus">Fill My New Build: pick changes (sum 20), compute Motor Power and Charge Speed, predict the effect. Circulate; ask for formula math.</td></tr>
+    <tr class="hard-row"><td class="t-time">0:05</td><td class="t-action">Hard Stop: Record S1</td><td class="t-focus">Every student records OLD (all four Season 1 stat values). Do not allow changes until complete.</td></tr>
+    <tr><td class="t-time">0:12–0:15</td><td class="t-action">Reprogram + test</td><td class="t-focus">Reprogram the new stats; run solo practice. Compare Motor Power and Charge Speed outputs to Season 1.</td></tr>
+    <tr><td class="t-time">0:20–0:27</td><td class="t-action">Commit</td><td class="t-focus">Teams commit the new loadout in the dashboard; class verifies each sum = 20. Use all five talk moves.</td></tr>
+    <tr class="hard-row"><td class="t-time">0:27–0:30</td><td class="t-action">Exit Ticket</td><td class="t-focus">Speed = ___, Power = ___, Motor Power = ___ × 5 = ___, Charge Speed = ___² = ___. Show formulas AND a real tradeoff.</td></tr>
+  </table>
+</div></div>
+    <div class="col">
+<div class="section">
+  <div class="section-label">Say This</div>
+  <div class="say-list">
+    <div class="say-item"><span class="say-tag">Open</span><div class="say-quote">Season 2 is open. You may move points between all four stats — your total still adds to 20. Spend each point where it buys the most.</div></div>
+    <div class="say-item"><span class="say-tag">Hard Stop</span><div class="say-quote">Before moving numbers: write down your Season 1 stats. Every stat. That’s your before picture for the comparison.</div></div>
+    <div class="say-item"><span class="say-tag">Press for Math</span><div class="say-quote">You moved a point into that stat. What happens to the output? Show me the formula.</div></div>
+    <div class="say-item"><span class="say-tag">Tradeoff</span><div class="say-quote">You raised that stat — which stat did the point come out of? What does that cost you?</div></div>
+    <div class="say-item"><span class="say-tag dont">Not This</span><div class="say-quote plain">Don't let 'stronger at everything' pass. The budget is 20 — every gain is a tradeoff. 'Which stat dropped? Show me the math.'</div></div>
+  </div>
+</div>
+<div class="section grow">
+  <div class="section-label">Watch For → Redirect</div>
+  <div class="watch-grid">
+    <div class="watch-item"><span class="watch-trigger">Skips formulas after sum.</span><span class="watch-redirect">Say: 'Sum is right. Now show Motor Power and Charge Speed using the formulas.' No leaving without formula math visible.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Change didn't do what they predicted.</span><span class="watch-redirect">Good — that's the residual. 'Predicted vs. actual: what's the gap? What would you fix?'</span></div>
+    <div class="watch-item"><span class="watch-trigger">Raises a stat with no reason.</span><span class="watch-redirect">'What does the formula say that buys you? Why that stat over the others?'</span></div>
+    <div class="watch-item"><span class="watch-trigger">Sum ≠ 20.</span><span class="watch-redirect">Ask: 'Add out loud. Where are you over or under?' Point to the total. Do not give arithmetic.</span></div>
+    <div class="watch-item"><span class="watch-trigger">No prediction written.</span><span class="watch-redirect">Say: 'Write one sentence: what will this change do to your output?' You'll check it in solo practice.</span></div>
+    <div class="watch-item"><span class="watch-trigger">Exit shows 'stronger at everything' or blank formula.</span><span class="watch-redirect">Note for follow-up: needs to understand the tradeoff before committing the loadout.</span></div>
+  </div>
+</div></div>
+  </div>
+  <div class="hard-stop">
+    <span class="hard-stop-label">Hard Stop</span>
+    <span class="hard-stop-text">Before any student moves numbers: every student writes their Season 1 stats — the before picture. Every student computes both formulas and states a real tradeoff before committing the new loadout.</span>
+  </div>
+  <div class="card-footer">
+    <span>Velocity Arena · Facilitator Activity Card · South Bronx</span>
+    <span>Season 2 Stat Reallocation · Summer Sparks 2026</span>
+  </div>
+</div>
+</div>
+</body>
+</html>
