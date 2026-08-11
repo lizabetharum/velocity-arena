@@ -174,8 +174,8 @@ const DAYS_NY3 = [
     "vocabulary": "PROPORTIONAL SCALING, REALLOCATION — Season 2 stat changes. RESIDUAL — predicted minus actual.",
     "activities": [
       { "name": "Proportional Scaling — scaling your stats", "mins": 45, "block": "Challenge Block",
-        "description": "A straight-line stat scales by the same factor; a squared stat grows much faster. See what a stat change will do before you make it.",
-        "link": "/lessons/proportional-scaling.html",
+        "description": "A straight-line stat scales by the same factor; a squared stat grows much faster. See what a stat change will do before you reallocate.",
+        "link": "/lessons/proportional-scaling-reallocation.html",
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day11-02-commissioner-proposal-prep.html",
         "script": "https://docs.google.com/document/d/1s9wUXxuyLnXP-TNXoZV22tcXRDgv5g6wBUYuzYEQjk8/edit?usp=drive_link" },
       { "name": "Season 2 stat reallocation", "mins": 75, "block": "Challenge Block",
