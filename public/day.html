@@ -241,7 +241,11 @@ if (!day) {
   // is scheduled to start 5 min after the program opens (8:05 TN, 10:05 NYC). The arrival
   // itself isn't shown as a schedule row — the listing starts with activity #1.
   const scheduleRows = [];
-  let cursor = dayStartMins + 5;
+  // South Bronx (NY3) days fill the 9:00–2:00 window exactly and close with their
+  // own final activity, so they take no arrival offset and no appended ENDS row —
+  // the program lands on 2:00 sharp.
+  const isNY3 = siteCode === 'NY3';
+  let cursor = dayStartMins + (isNY3 ? 0 : 5);
   (day.activities || []).forEach(a => {
     scheduleRows.push({ time: cursor, label: a.name, mins: a.mins || 0 });
     cursor += (a.mins || 0);
@@ -249,7 +253,7 @@ if (!day) {
   // Skip auto-appending an ENDS row if the day's last activity is already an ENDS block
   // (some days — e.g. Days 15, 16 in DAYS_TN — include ENDS in their activities array).
   const lastAct = (day.activities || [])[(day.activities || []).length - 1];
-  const lastIsEnds = lastAct && (lastAct.block || '').toLowerCase() === 'ends';
+  const lastIsEnds = (lastAct && (lastAct.block || '').toLowerCase() === 'ends') || isNY3;
   // ENDS is a flexible closing reflection — typically a few minutes, sometimes less.
   // Default is 5 min; days that need a longer ENDS can set endsMins explicitly.
   const endsMins = (typeof day.endsMins === 'number') ? day.endsMins : 5;
