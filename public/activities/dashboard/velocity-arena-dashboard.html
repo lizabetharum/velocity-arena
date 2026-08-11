@@ -1987,7 +1987,15 @@ function refreshMatchFormDefaults() {
   const roundEl = document.getElementById('new-round');
   if (!dayEl || !roundEl) return;
   if (typeof approxCampDayForCurrentSite === 'function') {
-    const today = approxCampDayForCurrentSite();
+    let today = approxCampDayForCurrentSite();
+    // South Bronx (NY3) runs a catch-up whose own calendar starts at Day 1, but
+    // its matches ARE Season 1 (program Days 7–10 → Week 2) and Season 2
+    // (Days 13–16 → Week 4). Without this remap the Day field would default to 1,
+    // and the leaderboard maps Day 1 → Week 1 (trial), excluding it from every
+    // standings tab. Map the first two sessions to a Season-1 day, the rest to
+    // a Season-2 day. The facilitator can still override the Day per row.
+    const siteCode = (typeof getSelectedSite === 'function') ? getSelectedSite() : null;
+    if (siteCode === 'NY3' && today != null) today = (today <= 2) ? 10 : 13;
     if (today != null) dayEl.value = today;
   }
   roundEl.value = getNextRoundForDay(dayEl.value);
