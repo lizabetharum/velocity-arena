@@ -1824,9 +1824,11 @@ async function loadSkillsProgress(){
       // Sheet returns array of {challenge, status} rows; latest wins.
       const merged = {};
       data.forEach(row => { merged[row.challenge] = row.status === 'completed'; });
-      // Reset all card visual state then re-apply from sheet truth.
-      document.querySelectorAll('.card.complete').forEach(c => c.classList.remove('complete'));
-      Object.keys(merged).forEach(c => applyDoneState(parseInt(c, 10), merged[c]));
+      // Apply the sheet's truth to every card WITHOUT a wholesale reset.
+      // applyDoneState only flips a card whose state actually differs, so a
+      // same-device reload (local === sheet) changes nothing and the grid never
+      // repaints — that full-grid remove/re-add was the on-load "flash."
+      SKILLS.forEach(s => applyDoneState(s.id, !!merged[s.id]));
       localStorage.setItem('va_skills_progress', JSON.stringify(
         Object.fromEntries(Object.entries(merged).filter(([_, v]) => v))
       ));
@@ -1840,6 +1842,9 @@ async function loadSkillsProgress(){
 function applyDoneState(id, done){
   const card = document.getElementById('card'+id);
   if (!card) return;
+  // No-op if the card is already in the target state — prevents needless DOM
+  // writes (and any flash) when the sheet agrees with what's already shown.
+  if (card.classList.contains('complete') === !!done) return;
   card.classList.toggle('complete', !!done);
   const btn = card.querySelector('.done-btn');
   if (btn) btn.innerHTML = done ? I.undo+' Undo' : I.check+' Done';
