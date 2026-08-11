@@ -136,7 +136,7 @@ const DAYS_NY3 = [
         "quickCard": "https://velocity-arena-gold.vercel.app/resources/quick-cards/activity-card-day10-02-distance-formula.html",
         "script": "https://docs.google.com/document/d/1lRKCnAD5SpXp7_wdQIluC7-JFSzYTQHtmj1mScfo_5M/edit?usp=sharing" },
       { "name": "Skills Arena", "mins": 30, "block": "Open Lab",
-        "description": "Sharpen driving — straight lines, exact turns, park on a spot. Click the Done button at the end of each challenge to unlock the next. (South Bronx already did the Day 10 Cold Recall.)",
+        "description": "Sharpen driving — straight lines, exact turns, park on a spot. Click the Done button at the end of each challenge to unlock the next.",
         "link": "/lessons/skills-arena.html" }
     ],
     "ends": "Every team has ~4-5 Season-1 rounds logged, plus a distance-formula calculation."
