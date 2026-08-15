@@ -128,7 +128,7 @@ table.roster .delta-neg{color:#9C1A20;}
 <div class="main" id="main" style="display:none;">
 
   <div class="notice">
-    <strong>How scoring works.</strong> Each answer is graded by Claude Haiku against a rubric and saved to the Google Sheet. Scoring is 0 / 0.5 / 1 per question with a short rationale. Click "Score new submissions" to grade any submissions that have not yet been scored. Scores persist in the sheet, so you only pay the API cost once per submission. Hover any cell in the roster to see Claude's reasoning.
+    <strong>How scoring works.</strong> Each question is graded on its own by Claude Haiku against a rubric, at temperature 0 — so two students who gave the same answer to a question always get the same score. Scoring is 0 / 0.5 / 1 per question with a short rationale, saved to the Google Sheet. "Score new submissions" grades only submissions that have no AI score yet. "Re-score everything" re-grades every submission with the current grader — use it once to replace the older, inconsistent scores. Hover any cell in the roster to see Claude's reasoning.
   </div>
 
   <div class="toolbar">
@@ -142,6 +142,7 @@ table.roster .delta-neg{color:#9C1A20;}
     </select>
     <button id="refresh-btn">Refresh</button>
     <button id="score-btn" style="background:#E86C3F;">Score new submissions</button>
+    <button id="rescore-btn" style="background:transparent;border:1px solid #E86C3F;color:#E86C3F;">Re-score everything</button>
     <div class="status" id="status"></div>
   </div>
 
@@ -252,43 +253,57 @@ function render(records) {
 
 document.getElementById('state-filter').addEventListener('change', renderForFilter);
 document.getElementById('refresh-btn').addEventListener('click', () => { loadData(); });
-document.getElementById('score-btn').addEventListener('click', scoreNewSubmissions);
+document.getElementById('score-btn').addEventListener('click', () => runScoring(false));
+document.getElementById('rescore-btn').addEventListener('click', () => {
+  if (confirm('Re-score EVERY submission with the corrected grader? This overwrites the existing AI scores (identical answers will now get identical scores). It may take a few minutes and use API credits.')) {
+    runScoring(true);
+  }
+});
 
-async function scoreNewSubmissions() {
-  const btn = document.getElementById('score-btn');
+// force = false → grade only submissions that have no AI score yet.
+// force = true  → re-grade everything (fixes the earlier inconsistent scores).
+async function runScoring(force) {
+  const scoreBtn   = document.getElementById('score-btn');
+  const rescoreBtn = document.getElementById('rescore-btn');
   const status = document.getElementById('status');
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Scoring…';
-  status.textContent = 'Grading with Claude (may take ~1 min for many submissions)…';
+  const activeBtn = force ? rescoreBtn : scoreBtn;
+  const originalText = activeBtn.textContent;
+  scoreBtn.disabled = true;
+  rescoreBtn.disabled = true;
+  activeBtn.textContent = force ? 'Re-scoring…' : 'Scoring…';
+  status.textContent = force
+    ? 'Re-grading all submissions with Claude (may take a few minutes)…'
+    : 'Grading with Claude (may take ~1 min for many submissions)…';
 
   // Grade in small batches so each request stays under the serverless
   // function timeout (~10s), looping until a batch grades fewer than a full
   // round — i.e. nothing new is left. Each fetch is a fresh invocation with
   // its own time budget, so this scores any number of submissions per click.
   const PER_ROUND = 6;
-  const MAX_ROUNDS = 60;          // safety cap: up to ~360 submissions per click
+  const MAX_ROUNDS = 200;         // safety cap
+  const qs = '/api/score-diagnostic?max=' + PER_ROUND + (force ? '&force=1' : '');
   let total = 0;
   const allErrors = [];
 
   try {
     for (let round = 0; round < MAX_ROUNDS; round++) {
-      status.textContent = `Grading with Claude… ${total} scored so far`;
-      const res = await fetch('/api/score-diagnostic?max=' + PER_ROUND);
+      status.textContent = `Grading with Claude… ${total} ${force ? 're-scored' : 'scored'} so far`;
+      const res = await fetch(qs);
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || 'Scoring failed');
       total += data.scored || 0;
       if (data.errors && data.errors.length) allErrors.push(...data.errors);
-      if ((data.scored || 0) < PER_ROUND) break;   // ran out of unscored rows
+      if ((data.scored || 0) < PER_ROUND) break;   // nothing left to grade this round
     }
-    status.textContent = `Scored ${total} submission${total === 1 ? '' : 's'}. Refreshing…`;
+    status.textContent = `${force ? 'Re-scored' : 'Scored'} ${total} submission${total === 1 ? '' : 's'}. Refreshing…`;
     if (allErrors.length) console.warn('score errors:', allErrors);
     await loadData();
   } catch (err) {
-    status.textContent = `Scoring error after ${total} scored: ${err.message}`;
+    status.textContent = `Scoring error after ${total} ${force ? 're-scored' : 'scored'}: ${err.message}`;
   } finally {
-    btn.disabled = false;
-    btn.textContent = originalText;
+    scoreBtn.disabled = false;
+    rescoreBtn.disabled = false;
+    activeBtn.textContent = originalText;
   }
 }
 

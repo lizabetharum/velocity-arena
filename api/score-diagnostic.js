@@ -164,6 +164,12 @@ export default async function handler(req) {
 
   const url = new URL(req.url);
   const maxRows = parseInt(url.searchParams.get('max') || '50', 10);
+  // force=1 re-grades rows that were already scored (used to fix the earlier
+  // inconsistent scoring). Without it, only unscored rows are graded.
+  const force = url.searchParams.get('force') === '1';
+  // One answer cache for the whole invocation: identical (variant, question,
+  // answer) is graded once and reused, so duplicates can never diverge.
+  const answerCache = new Map();
 
   const serviceEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -191,7 +197,7 @@ export default async function handler(req) {
     for (const target of targets) {
       if (remaining <= 0) break;
       try {
-        const n = await scoreSheet(target, accessToken, anthropicKey, remaining);
+        const n = await scoreSheet(target, accessToken, anthropicKey, remaining, force, answerCache);
         totalScored += n;
         remaining -= n;
       } catch (e) {
@@ -213,7 +219,7 @@ export default async function handler(req) {
 }
 
 // ─── PER-SHEET SCORING ─────────────────────────────────────────────────
-async function scoreSheet(target, accessToken, anthropicKey, budget) {
+async function scoreSheet(target, accessToken, anthropicKey, budget, force, cache) {
   // Read the full sheet — tab name has a space, so URL-encode the whole range.
   const tabRange = `${target.tab}!A1:AN1000`;
   const readRes = await fetch(
@@ -263,7 +269,7 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
     //   row[22]  Q1_Score (AI)
     //   row[39]  ScoredAt (AI)
     const alreadyScored = row[22] !== undefined && row[22] !== '' && row[39] !== undefined && row[39] !== '';
-    if (alreadyScored) continue;
+    if (alreadyScored && !force) continue;
 
     // Only score submitted rows. Draft rows (no Submitted At) get skipped.
     const submittedAt = (row[20] || '').toString().trim();
@@ -282,7 +288,7 @@ async function scoreSheet(target, accessToken, anthropicKey, budget) {
 
     let aiResult;
     try {
-      aiResult = await scoreSubmission(rubric, answers, anthropicKey);
+      aiResult = await scoreSubmission(target.variant, rubric, answers, anthropicKey, cache);
     } catch (e) {
       console.warn(`row ${i + 1} score failed:`, e.message);
       continue;
@@ -331,27 +337,56 @@ async function writeRange(sheetId, accessToken, range, values) {
 }
 
 // ─── CLAUDE CALL ──────────────────────────────────────────────────────
-async function scoreSubmission(rubric, answers, apiKey) {
-  const rubricText = rubric.map((r, i) => {
-    const student = (answers[i] || '').toString().trim() || '(blank)';
-    return `
-Question ${r.q} — ${r.topic}
-Question text: ${r.question}
-Expected answer (for full credit, 1.0): ${r.correct}
-Half credit (0.5) if: ${r.partial}
-Student answer: ${student}`;
-  }).join('\n');
+// Each question is graded ON ITS OWN, against only its rubric entry, at
+// temperature 0. That is what makes scoring consistent: identical answers to
+// the same question produce an identical prompt and therefore an identical
+// score — and one question's score can no longer be swayed by the student's
+// other answers (the earlier all-eight-at-once prompt caused both problems).
+// The cache keys on (variant, question, normalized answer) so a repeated
+// answer is graded once and reused.
 
-  const prompt = `You are grading a middle-school math diagnostic. Be fair, literal, and generous on minor phrasing issues (e.g. "two hundred" = "200", "cm per second" = "cm/s"). "Not yet" or blank answers must get 0.
+function canonAnswer(s) {
+  return (s || '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
+}
 
-**Unit policy**: if the student's numeric answer is correct but they omitted or used a casual unit ("200" instead of "200 miles", "4" instead of "4 cm/s"), award 1.0 — this diagnostic tests math, not unit notation. Only penalize units when the question explicitly tests unit conversion or when the partial-credit criteria specifically call out missing units.
+async function scoreSubmission(variant, rubric, answers, apiKey, cache) {
+  // Grade the eight questions in parallel; the shared cache still dedupes
+  // across submissions as they are processed.
+  const scores = await Promise.all(
+    rubric.map((item, i) => scoreAnswer(variant, item, answers[i], apiKey, cache))
+  );
+  return { scores };
+}
 
-For each question, return a score of exactly 1.0 (correct), 0.5 (partial credit per the criteria below), or 0 (incorrect, blank, or "Not yet"), plus a one-sentence rationale under 120 characters.
+async function scoreAnswer(variant, item, answer, apiKey, cache) {
+  const raw = (answer || '').toString().trim();
+  const norm = canonAnswer(raw);
 
-${rubricText}
+  // Deterministic non-attempts — never spend an API call, never vary.
+  if (!norm || norm === 'not yet') {
+    return { q: item.q, score: 0, reason: 'Blank or "Not yet" — no attempt.' };
+  }
 
-Respond with ONLY a JSON object on a single line, no markdown, no preamble:
-{"scores":[{"q":1,"score":1,"reason":"..."},{"q":2,"score":0.5,"reason":"..."},...{"q":8,"score":0,"reason":"..."}]}`;
+  const key = `${variant}|${item.q}|${norm}`;
+  if (cache && cache.has(key)) {
+    const c = cache.get(key);
+    return { q: item.q, score: c.score, reason: c.reason };
+  }
+
+  const prompt = `You are grading ONE question on a middle-school math diagnostic. Be fair and literal, and generous on minor phrasing ("two hundred" = "200", "cm per second" = "cm/s").
+
+Unit policy: if the numeric answer is correct but units are omitted or casual ("200" for "200 miles", "4" for "4 cm/s"), award 1.0 — this tests math, not unit notation. Only penalize units when the half-credit rule below explicitly calls them out.
+
+Question ${item.q} — ${item.topic}
+Question text: ${item.question}
+Full credit (1.0): ${item.correct}
+Half credit (0.5) if: ${item.partial}
+Otherwise score 0.
+
+Student answer: ${raw}
+
+Respond with ONLY a JSON object on one line, no markdown, no preamble:
+{"score":1,"reason":"...(one sentence, under 120 characters)"}`;
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -362,7 +397,8 @@ Respond with ONLY a JSON object on a single line, no markdown, no preamble:
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1500,
+      max_tokens: 300,
+      temperature: 0,
       messages: [{ role: 'user', content: prompt }]
     })
   });
@@ -373,25 +409,18 @@ Respond with ONLY a JSON object on a single line, no markdown, no preamble:
   }
   const data = await res.json();
   const text = data?.content?.[0]?.text || '';
-  // Extract first JSON object from the reply
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('no JSON in reply: ' + text.slice(0, 200));
   let parsed;
   try { parsed = JSON.parse(match[0]); }
   catch (e) { throw new Error('bad JSON: ' + match[0].slice(0, 200)); }
-  if (!Array.isArray(parsed.scores) || parsed.scores.length !== 8) {
-    throw new Error('expected 8 scores, got ' + (parsed.scores?.length || 0));
-  }
-  // Sanitize values
-  parsed.scores.forEach(s => {
-    s.score = Math.max(0, Math.min(1, parseFloat(s.score) || 0));
-    // Round to 0, 0.5, 1
-    if (s.score < 0.25) s.score = 0;
-    else if (s.score < 0.75) s.score = 0.5;
-    else s.score = 1;
-    s.reason = ((s.reason || '') + '').slice(0, 200);
-  });
-  return parsed;
+
+  let score = Math.max(0, Math.min(1, parseFloat(parsed.score) || 0));
+  score = score < 0.25 ? 0 : score < 0.75 ? 0.5 : 1;   // snap to 0 / 0.5 / 1
+  const reason = ((parsed.reason || '') + '').slice(0, 200);
+
+  if (cache) cache.set(key, { score, reason });
+  return { q: item.q, score, reason };
 }
 
 // ─── HELPERS (copied from diagnostic-dashboard.js) ────────────────────
